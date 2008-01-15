@@ -1,6 +1,6 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>7db2cbbe-080c-473a-95ec-573c7b0997a7</ProjectGuid>
+    <ProjectGuid>8ab126e6-589e-4c3c-87d2-ec409caeff51</ProjectGuid>
     <ProjectTypeGuids>{96E2B04D-8817-42c6-938A-82C39BA4D311};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>

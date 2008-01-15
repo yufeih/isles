@@ -1,0 +1,79 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isles", "Isles\Isles.csproj", "{23F408E0-D6E0-41C6-94C7-C64A7CB373A3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27} = {BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isles.Pipeline", "Isles.Pipeline\Isles.Pipeline.csproj", "{77E31563-2EED-400D-8591-1ACED921E11F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27} = {BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isles.Engine", "Isles.Engine\Isles.Engine.csproj", "{BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 6
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs06.codeplex.com/
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = Isles.Engine\\Content\\Content.contentproj
+		SccProjectTopLevelParentUniqueName1 = Isles.Engine\\Isles.Engine.csproj
+		SccProjectName1 = Isles.Engine/Content
+		SccLocalPath1 = Isles.Engine\\Content
+		SccProjectUniqueName2 = Isles.Engine\\Isles.Engine.csproj
+		SccProjectName2 = Isles.Engine
+		SccLocalPath2 = Isles.Engine
+		SccProjectUniqueName3 = Isles.Pipeline\\Isles.Pipeline.csproj
+		SccProjectName3 = Isles.Pipeline
+		SccLocalPath3 = Isles.Pipeline
+		SccProjectUniqueName4 = Isles\\Content\\Content.contentproj
+		SccProjectTopLevelParentUniqueName4 = Isles\\Isles.csproj
+		SccProjectName4 = Isles/Content
+		SccLocalPath4 = Isles\\Content
+		SccProjectUniqueName5 = Isles\\Isles.csproj
+		SccProjectName5 = Isles
+		SccLocalPath5 = Isles
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Debug|Xbox 360 = Debug|Xbox 360
+		Release|x86 = Release|x86
+		Release|Xbox 360 = Release|Xbox 360
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{23F408E0-D6E0-41C6-94C7-C64A7CB373A3}.Debug|x86.ActiveCfg = Debug|x86
+		{23F408E0-D6E0-41C6-94C7-C64A7CB373A3}.Debug|x86.Build.0 = Debug|x86
+		{23F408E0-D6E0-41C6-94C7-C64A7CB373A3}.Debug|Xbox 360.ActiveCfg = Debug|x86
+		{23F408E0-D6E0-41C6-94C7-C64A7CB373A3}.Release|x86.ActiveCfg = Release|x86
+		{23F408E0-D6E0-41C6-94C7-C64A7CB373A3}.Release|x86.Build.0 = Release|x86
+		{23F408E0-D6E0-41C6-94C7-C64A7CB373A3}.Release|Xbox 360.ActiveCfg = Release|x86
+		{77E31563-2EED-400D-8591-1ACED921E11F}.Debug|x86.ActiveCfg = Debug|x86
+		{77E31563-2EED-400D-8591-1ACED921E11F}.Debug|x86.Build.0 = Debug|x86
+		{77E31563-2EED-400D-8591-1ACED921E11F}.Debug|Xbox 360.ActiveCfg = Debug|Xbox 360
+		{77E31563-2EED-400D-8591-1ACED921E11F}.Debug|Xbox 360.Build.0 = Debug|Xbox 360
+		{77E31563-2EED-400D-8591-1ACED921E11F}.Release|x86.ActiveCfg = Release|x86
+		{77E31563-2EED-400D-8591-1ACED921E11F}.Release|x86.Build.0 = Release|x86
+		{77E31563-2EED-400D-8591-1ACED921E11F}.Release|Xbox 360.ActiveCfg = Release|Xbox 360
+		{77E31563-2EED-400D-8591-1ACED921E11F}.Release|Xbox 360.Build.0 = Release|Xbox 360
+		{BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27}.Debug|x86.ActiveCfg = Debug|x86
+		{BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27}.Debug|x86.Build.0 = Debug|x86
+		{BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27}.Debug|Xbox 360.ActiveCfg = Debug|x86
+		{BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27}.Release|x86.ActiveCfg = Release|x86
+		{BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27}.Release|x86.Build.0 = Release|x86
+		{BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27}.Release|Xbox 360.ActiveCfg = Release|x86
+		{3EF57541-D5ED-4B48-A308-5AC5E48E3588}.Debug|x86.ActiveCfg = Debug|x86
+		{3EF57541-D5ED-4B48-A308-5AC5E48E3588}.Debug|Xbox 360.ActiveCfg = Debug|x86
+		{3EF57541-D5ED-4B48-A308-5AC5E48E3588}.Release|x86.ActiveCfg = Release|x86
+		{3EF57541-D5ED-4B48-A308-5AC5E48E3588}.Release|Xbox 360.ActiveCfg = Release|x86
+		{8AB126E6-589E-4C3C-87D2-EC409CAEFF51}.Debug|x86.ActiveCfg = Debug|x86
+		{8AB126E6-589E-4C3C-87D2-EC409CAEFF51}.Debug|Xbox 360.ActiveCfg = Debug|x86
+		{8AB126E6-589E-4C3C-87D2-EC409CAEFF51}.Release|x86.ActiveCfg = Release|x86
+		{8AB126E6-589E-4C3C-87D2-EC409CAEFF51}.Release|Xbox 360.ActiveCfg = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,6 +1,6 @@
 using System;
 
-namespace CodePlexTest
+namespace Isles
 {
     static class Program
     {

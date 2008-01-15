@@ -5,11 +5,10 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CodePlexTest")]
-[assembly: AssemblyProduct("CodePlexTest")]
+[assembly: AssemblyTitle("Isles.Engine")]
+[assembly: AssemblyProduct("Isles.Engine")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyCompany("")]
-
 [assembly: AssemblyCopyright("Copyright ©  2008")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,8 +19,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("1252cc68-5ef0-4434-82e7-f7681f8578ee")]
-
+[assembly: Guid("99d2346b-dd45-4c0e-ae0c-e99a8d96c4ec")]
 
 // Version information for an assembly consists of the following four values:
 //
