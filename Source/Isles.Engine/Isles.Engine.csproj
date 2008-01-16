@@ -44,6 +44,7 @@
       <Private>False</Private>
       <SpecificVersion>True</SpecificVersion>
     </Reference>
+    <Reference Include="Microsoft.Xna.Framework.Content.Pipeline, Version=2.0.0.0, Culture=neutral, PublicKeyToken=6d5c3888ef60e27d, processorArchitecture=x86" />
     <Reference Include="Microsoft.Xna.Framework.Game, Version=2.0.0.0, Culture=neutral, PublicKeyToken=6d5c3888ef60e27d, processorArchitecture=MSIL">
       <Private>False</Private>
       <SpecificVersion>True</SpecificVersion>
@@ -54,11 +55,70 @@
     <Reference Include="System">
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="AI\Graph.cs" />
+    <Compile Include="AI\PathManager.cs" />
+    <Compile Include="AI\PriorityQueue.cs" />
+    <Compile Include="Entity\Agent.cs" />
+    <Compile Include="Entity\Building.cs" />
+    <Compile Include="Entity\Crop.cs" />
+    <Compile Include="Entity\Entity.cs" />
+    <Compile Include="Entity\Farmland.cs" />
+    <Compile Include="Entity\Function.cs" />
+    <Compile Include="Entity\Hand.cs" />
+    <Compile Include="Entity\Stone.cs" />
+    <Compile Include="Entity\Tree.cs" />
+    <Compile Include="Entity\WorldContent.cs" />
+    <Compile Include="Game\GameWorld.cs" />
+    <Compile Include="Game\AudioManager.cs" />
+    <Compile Include="Game\Camera.cs" />
+    <Compile Include="Game\Game.cs" />
+    <Compile Include="Game\Input.cs" />
+    <Compile Include="Game\IScreen.cs" />
+    <Compile Include="Game\Log.cs" />
+    <Compile Include="Game\Math2D.cs" />
+    <Compile Include="Game\Profiler.cs" />
+    <Compile Include="Game\ScreenshotCapturer.cs" />
+    <Compile Include="Game\State.cs" />
+    <Compile Include="Game\Storage.cs" />
+    <Compile Include="Graphics\AnimationClip.cs" />
+    <Compile Include="Graphics\AnimationPlayer.cs" />
+    <Compile Include="Graphics\Billboard.cs" />
+    <Compile Include="Graphics\Effects\BloomComponent.cs" />
+    <Compile Include="Graphics\Effects\BloomSettings.cs" />
+    <Compile Include="Graphics\GameModel.cs" />
+    <Compile Include="Graphics\Keyframe.cs" />
+    <Compile Include="Graphics\Landscape.cs" />
+    <Compile Include="Graphics\Landscape.Grid.cs" />
+    <Compile Include="Graphics\Landscape.Layer.cs" />
+    <Compile Include="Graphics\Landscape.Patch.cs" />
+    <Compile Include="Graphics\Landscape.Reader.cs" />
+    <Compile Include="Graphics\Landscape.Sky.cs" />
+    <Compile Include="Graphics\Landscape.Terrain.cs" />
+    <Compile Include="Graphics\Landscape.Vegetation.cs" />
+    <Compile Include="Graphics\Landscape.Water.cs" />
+    <Compile Include="Graphics\Loading.cs" />
+    <Compile Include="Graphics\ModelManager.cs" />
+    <Compile Include="Graphics\PointSprite.cs" />
+    <Compile Include="Graphics\ShadowMapEffect.cs" />
+    <Compile Include="Graphics\SkinningData.cs" />
+    <Compile Include="Graphics\Text.cs" />
+    <Compile Include="Graphics\TypeReaders.cs" />
+    <Compile Include="Graphics\Vertex.cs" />
+    <Compile Include="Levels\Level.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scene.cs" />
+    <Compile Include="Game\Scene.cs" />
+    <Compile Include="Game\Settings.cs" />
+    <Compile Include="Game\GameScene.cs" />
+    <Compile Include="Screens\GameScreen.cs" />
+    <Compile Include="Screens\GameScreen.Logic.cs" />
+    <Compile Include="Screens\GameScreen.UI.cs" />
+    <Compile Include="Spells\Fireball.cs" />
+    <Compile Include="Spells\Spell.cs" />
+    <Compile Include="UI\UIDisplay.cs" />
+    <Compile Include="UI\UIElement.cs" />
   </ItemGroup>
   <ItemGroup>
     <NestedContentProject Include="Content\Content.contentproj">
@@ -67,6 +127,8 @@
     </NestedContentProject>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Diagrams\UI.cd" />
+    <None Include="Diagrams\Overview.cd" />
     <None Include="Diagrams\SceneManagement.cd" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

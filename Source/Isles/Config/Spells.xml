@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<ArrayOfSpellSettings>
+	<SpellSettings>
+		<Name>Rain</Name>
+		<Description>Create a rain at a given area</Description>
+    <Icon>14</Icon>
+    <Class>Rain</Class>
+    <Hotkey>R</Hotkey>
+	</SpellSettings>
+  <SpellSettings>
+    <Name>Fireball</Name>
+    <Description>Create a destructive fireball</Description>
+    <Icon>8</Icon>
+    <Class>Fireball</Class>
+    <Hotkey>F</Hotkey>
+  </SpellSettings>
+  <SpellSettings>
+    <Name>Blizzard</Name>
+    <Description>Create a destructive blizzard at a given area</Description>
+    <Icon>7</Icon>
+    <Class>Blizzard</Class>
+    <Hotkey>B</Hotkey>
+  </SpellSettings>
+  <SpellSettings>
+    <Name>MagicShield</Name>
+    <Description>Create a magic shield to protect the god</Description>
+    <Icon>11</Icon>
+    <Class>MagicShield</Class>
+    <Hotkey>S</Hotkey>
+  </SpellSettings>
+  <SpellSettings>
+    <Name>Lighting</Name>
+    <Description>Create a destructive lighting</Description>
+    <Icon>9</Icon>
+    <Class>Lighting</Class>
+    <Hotkey>L</Hotkey>
+  </SpellSettings>
+  <SpellSettings>
+    <Name>Blow</Name>
+    <Description>Blow the enermies away from the island</Description>
+    <Icon>13</Icon>
+    <Class>Blow</Class>
+    <Hotkey>W</Hotkey>
+  </SpellSettings>
+</ArrayOfSpellSettings>
