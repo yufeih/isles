@@ -14,7 +14,7 @@
     <Position X="4.25" Y="4.75" Width="1.5" />
     <TypeIdentifier>
       <FileName>Entity\Entity.cs</FileName>
-      <HashCode>AAQAAgAAAAAAAgAgAAAAIAQBACAEAAEgAAQBAAAEAAI=</HashCode>
+      <HashCode>AAQAAgAAAAAAAgAgAAAAIAQBACBEAAEgAAQBAAAEAII=</HashCode>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
@@ -22,7 +22,7 @@
     <Position X="5.75" Y="6.25" Width="1.5" />
     <TypeIdentifier>
       <FileName>Entity\Entity.cs</FileName>
-      <HashCode>gAAAgAAAAAAAgIAAAZCCCCIAAAQIgACACEAEAgMBEIM=</HashCode>
+      <HashCode>gAAAgAAAAAAAgIAAAZCCCCIAAAQIgACACEAEAgMBEAM=</HashCode>
     </TypeIdentifier>
   </Class>
   <Class Name="Isles.Engine.BaseAgent" Collapsed="true">
@@ -67,15 +67,23 @@
       <HashCode>AAQAAAAAAAAAAgAAAAADACIAAACAAAAAgEgAAAAIAIE=</HashCode>
     </TypeIdentifier>
   </Class>
+  <Class Name="Isles.Engine.SceneManager" Collapsed="true">
+    <Position X="4.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Game\SceneManager.cs</FileName>
+      <HashCode>ABYBAAAAAAAQAkAAAAAABAAAAAACAAAAAiAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
   <Interface Name="Isles.Engine.ISceneObject">
     <Position X="2.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <FileName>Game\Scene.cs</FileName>
-      <HashCode>AAQAAAAAAAAAAgAgAAAAAAQAACAAAAAAAAABAAAAAAA=</HashCode>
+      <HashCode>AAQAAAAAAAAAAgAgAAAAAAQAACBAAAAAAAABAAAAAIA=</HashCode>
     </TypeIdentifier>
   </Interface>
   <Interface Name="Isles.Engine.ISceneManager" Collapsed="true">
-    <Position X="2.75" Y="3" Width="1.5" />
+    <Position X="4.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <FileName>Game\Scene.cs</FileName>
       <HashCode>ABYBAAAAAAAQAkAAAAAABAAAAAACAAAAAiAAAAAAAAA=</HashCode>

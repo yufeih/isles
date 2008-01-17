@@ -520,11 +520,11 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </None>
-    <Compile Include="Models\engine_diff_tex.tga">
+    <None Include="Models\engine_diff_tex.tga">
       <Name>engine_diff_tex</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
-    </Compile>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Creatures\" />

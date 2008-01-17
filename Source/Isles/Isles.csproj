@@ -80,6 +80,7 @@
     </Content>
     <Content Include="Game.ico" />
     <Content Include="GameThumbnail.png" />
+    <Content Include="License.txt" />
   </ItemGroup>
   <ItemGroup>
     <NestedContentProject Include="Content\Content.contentproj">

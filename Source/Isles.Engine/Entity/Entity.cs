@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -118,10 +119,42 @@ namespace Isles.Engine
         public abstract void Update(GameTime gameTime);
 
         /// <summary>
-        /// Draw the building
+        /// Draw the entity
         /// </summary>
         /// <param name="gameTime"></param>
         public abstract void Draw(GameTime gameTime);
+
+        /// <summary>
+        /// Tests whether the object occupies the specified point.
+        /// </summary>
+        /// <param name="point">Point to be tested in world space</param>
+        /// <returns></returns>
+        public virtual bool Intersects(Point point)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Tests whether the object intersects the specified ray.
+        /// </summary>
+        /// <param name="ray">Ray to be tested in world space</param>
+        /// <returns></returns>
+        public virtual float? Intersects(Ray ray)
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Write the scene object to an output stream
+        /// </summary>
+        /// <param name="writer"></param>
+        public virtual void Serialize(XmlWriter writer) { }
+
+        /// <summary>
+        /// Read and initialize the scene object from an input stream
+        /// </summary>
+        /// <param name="reader"></param>
+        public virtual void Deserialize(XmlReader reader) { }
     }
 
     #endregion
@@ -287,16 +320,6 @@ namespace Isles.Engine
         {
             return false;
         }
-
-        /// <summary>
-        /// Ray intersection test
-        /// </summary>
-        /// <param name="ray">Target ray</param>
-        /// <returns>
-        /// Distance from the intersection point to the ray starting position,
-        /// Null if there's no intersection.
-        /// </returns>
-        public abstract Nullable<float> Intersects(Ray ray);
 
         /// <summary>
         /// Called when the entity highlighted state changed

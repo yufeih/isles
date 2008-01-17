@@ -1,3 +1,9 @@
+//-----------------------------------------------------------------------------
+//  Isles v1.0
+//  
+//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
+//-----------------------------------------------------------------------------
+
 using System;
 using System.IO;
 using System.Collections;
@@ -87,10 +93,6 @@ namespace Isles.Engine
 
             // Initialize landscape
             landscape = screen.LevelContent.Load<Landscape>("Landscapes/Landscape");
-
-            progress.Refresh(40);
-
-            landscape.Initialize(screen.Game);
 
             progress.Refresh(50);
 

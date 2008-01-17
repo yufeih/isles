@@ -1,3 +1,9 @@
+//-----------------------------------------------------------------------------
+//  Isles v1.0
+//  
+//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
+//-----------------------------------------------------------------------------
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -150,6 +156,9 @@ namespace Isles.Graphics
             // Initialize vegetation
             ReadVegetationContent(input);
 
+            // Initialize everything
+            Initialize(BaseGame.Singleton);
+
             // Log landscape info
             Log.Write("Landscape loaded...");
         }
@@ -157,7 +166,7 @@ namespace Isles.Graphics
         /// <summary>
         /// Call this everytime a landscape is loaded
         /// </summary>
-        public void Initialize(BaseGame game)
+        protected void Initialize(BaseGame game)
         {
             this.game = game;
             this.graphics = game.GraphicsDevice;

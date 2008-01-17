@@ -1,3 +1,9 @@
+//-----------------------------------------------------------------------------
+//  Isles v1.0
+//  
+//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
+//-----------------------------------------------------------------------------
+
 #region Using Statements
 using System;
 using System.IO;
@@ -400,6 +406,8 @@ namespace Isles.Engine
 
         public BaseGame()
         {
+            singleton = this;
+
             // Initialize log
             Log.Initialize();
             Log.NewLine();
@@ -432,6 +440,23 @@ namespace Isles.Engine
         }
 
         /// <summary>
+        /// Gets the singleton instance of base game
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is not a strict implementation of 'Singleton'. The constructor is not private.
+        /// since we want to allow real games to derive from this class, so the singleton is
+        /// actually the current game. Typically an app only creates 1 game instance, that won't
+        /// be a problem most of the time.
+        /// </remarks>
+        public static BaseGame Singleton
+        {
+            get { return singleton; }
+        }
+
+        private static BaseGame singleton;
+
+        /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
         /// This is where it can query for any required services and load any non-graphic
         /// related content.  Calling base.Initialize will enumerate through any components
@@ -441,10 +466,6 @@ namespace Isles.Engine
         {
             graphics.DeviceReset += new EventHandler(graphics_DeviceReset);
             graphics_DeviceReset(null, EventArgs.Empty);
-
-            // Initialize components
-            //Components.Add(new Test.SkinnedMesh(this));
-            //Components.Add(new Test.DynamicMesh(this));
 
             // Initialize sound
             Components.Add(sound = new AudioManager(this));

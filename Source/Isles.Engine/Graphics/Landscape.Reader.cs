@@ -1,6 +1,13 @@
+//-----------------------------------------------------------------------------
+//  Isles v1.0
+//  
+//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
+//-----------------------------------------------------------------------------
+
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;

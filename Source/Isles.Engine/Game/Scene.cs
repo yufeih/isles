@@ -1,11 +1,99 @@
+//-----------------------------------------------------------------------------
+//  Isles v1.0
+//  
+//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
+//-----------------------------------------------------------------------------
+
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Engine
 {
+    /// <summary>
+    /// Interface for an object that can be drawed on the scene.
+    /// ISceneObject instances are managed by a ISceneManager for
+    /// efficient visibility test, collision detection, ray casting, etc.
+    /// </summary>
+    public interface ISceneObject
+    {
+        /// <summary>
+        /// Gets the name of the scene object.
+        /// You can query for a scene object by its name
+        /// </summary>
+        /// <remarks>
+        /// DO NOT change the name of a scene object after it has
+        /// been added to the scene manager.
+        /// </remarks>
+        string Name { get; }
+
+        /// <summary>
+        /// Gets the position of the scene object
+        /// </summary>
+        Vector3 Position { get; }
+
+        /// <summary>
+        /// Gets the axis-aligned bounding box of the scene object
+        /// </summary>
+        BoundingBox BoundingBox { get; }
+
+        /// <summary>
+        /// Gets or sets whether the position or bounding box of the
+        /// scene object has changed since last update.
+        /// </summary>
+        /// <remarks>
+        /// By marking the IsDirty property of a scene object, the scene
+        /// manager will be able to adjust its internal data structure
+        /// to adopt to the change of transformation.
+        /// </remarks>
+        bool IsDirty { get; set; }
+
+        /// <summary>
+        /// Update the scene object
+        /// </summary>
+        /// <param name="gameTime"></param>
+        void Update(GameTime gameTime);
+
+        /// <summary>
+        /// Draw the scene object
+        /// </summary>
+        /// <param name="gameTime"></param>
+        void Draw(GameTime gameTime);
+
+        /// <summary>
+        /// Tests whether the object occupies the specified point.
+        /// </summary>
+        /// <param name="point">Point to be tested in world space</param>
+        /// <returns></returns>
+        bool Intersects(Point point);
+
+        /// <summary>
+        /// Tests whether the object intersects the specified ray.
+        /// </summary>
+        /// <param name="ray">Ray to be tested in world space</param>
+        /// <returns>
+        /// Distance from the intersection point to the ray starting position,
+        /// Null if there's no intersection.
+        /// </returns>
+        float? Intersects(Ray ray);
+
+        /// <summary>
+        /// Write the scene object to an output stream
+        /// </summary>
+        /// <param name="writer"></param>
+        void Serialize(XmlWriter writer);
+
+        /// <summary>
+        /// Read and initialize the scene object from an input stream
+        /// </summary>
+        /// <param name="reader"></param>
+        void Deserialize(XmlReader reader);
+    }
+
+
     /// <summary>
     /// Interface for a scene manager.
     /// A scene manager provides manages ISceneObject instances,
@@ -95,56 +183,5 @@ namespace Isles.Engine
         /// <param name="name"></param>
         /// <returns></returns>
         ISceneObject SceneObjectFromName(string name);
-    }
-
-    /// <summary>
-    /// Interface for an object that can be drawed on the scene.
-    /// ISceneObject instances are managed by a ISceneManager for
-    /// efficient visibility test, collision detection, ray casting, etc.
-    /// </summary>
-    public interface ISceneObject
-    {
-        /// <summary>
-        /// Gets the name of the scene object.
-        /// You can query for a scene object by its name
-        /// </summary>
-        /// <remarks>
-        /// DO NOT change the name of a scene object after it has
-        /// been added to the scene manager.
-        /// </remarks>
-        string Name { get; }
-
-        /// <summary>
-        /// Gets the position of the scene object
-        /// </summary>
-        Vector3 Position { get; }
-
-        /// <summary>
-        /// Gets the axis-aligned bounding box of the scene object
-        /// </summary>
-        BoundingBox BoundingBox { get; }
-
-        /// <summary>
-        /// Gets or sets whether the position or bounding box of the
-        /// scene object has changed since last update.
-        /// </summary>
-        /// <remarks>
-        /// By mark the IsDirty property of a scene object, the scene
-        /// manager will be able to adjust its internal data structure
-        /// to adopt to the change of transformation.
-        /// </remarks>
-        bool IsDirty { get; set; }
-
-        /// <summary>
-        /// Update the scene object
-        /// </summary>
-        /// <param name="gameTime"></param>
-        void Update(GameTime gameTime);
-
-        /// <summary>
-        /// Draw the scene object
-        /// </summary>
-        /// <param name="gameTime"></param>
-        void Draw(GameTime gameTime);
     }
 }
