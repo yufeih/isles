@@ -1,3 +1,9 @@
+//-----------------------------------------------------------------------------
+//  Isles v1.0
+//  
+//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
+//-----------------------------------------------------------------------------
+
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -285,7 +291,7 @@ namespace Isles.Engine
             iconTexture = content.Load<Texture2D>("UI/Icons");
 
             // Initialize shadow mapping
-            shadow = new ShadowMapEffect(game);
+            //shadow = new ShadowMapEffect(game);
         }
 
         /// <summary>
