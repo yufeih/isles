@@ -21,6 +21,7 @@
 //
 //=============================================================================
 using System;
+using System.Windows.Forms;
 using Isles.Engine;
 
 namespace Isles
@@ -50,7 +51,6 @@ namespace Isles
             catch (Exception e)
             {
                 MessageBox.Show("Error: " + e.Message + "\n\nSee log file for error detailes.", "Isles");
-
                 Log.Write(e.Source + " - " + e.Message);
                 Log.NewLine();
                 Log.Write(e.StackTrace, false);
