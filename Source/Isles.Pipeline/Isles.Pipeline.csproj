@@ -73,10 +73,21 @@
     <Reference Include="System">
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ContentProcessor1.cs" />
+    <Compile Include="Landscape\Landscape.cs" />
+    <Compile Include="Landscape\Landscape.Vegetation.cs" />
+    <Compile Include="Landscape\LandscapePipeline.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SkinnedModel\SkinnedModelProcessor.cs" />
+    <Compile Include="SkinnedModel\TypeWriters.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Isles.Engine\Isles.Engine.csproj">
+      <Project>{BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27}</Project>
+      <Name>Isles.Engine</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
