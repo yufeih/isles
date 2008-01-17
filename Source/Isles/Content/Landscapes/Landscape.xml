@@ -1,0 +1,37 @@
+﻿<?xml version="1.0"?>
+<Landscape>
+	<Width>2048</Width>
+	<Depth>2048</Depth>
+	<Height>256</Height>
+	<BaseHeight>-8</BaseHeight>
+	<Heightmap>Terrain.bmp</Heightmap>
+	<WaterTexture>water.jpg</WaterTexture>
+	<SkyBox>skyCubeMap.dds</SkyBox>
+	<LayerCollection>
+		<Layer>
+			<ColorTexture>terrainsnow01.dds</ColorTexture>
+			<AlphaTexture>Layer0Alpha.tga</AlphaTexture>
+			<NormalTexture>terrainsnow01_n.dds</NormalTexture>
+		</Layer>
+    <Layer>
+      <ColorTexture>Textures/Grass.png</ColorTexture>
+      <AlphaTexture>Layer1Alpha.tga</AlphaTexture>
+      <NormalTexture>Layer0Normal.dds</NormalTexture>
+    </Layer>
+    <Layer>
+      <ColorTexture>terrainjmgrassdirt.dds</ColorTexture>
+      <AlphaTexture>Layer2Alpha.tga</AlphaTexture>
+      <NormalTexture>terrainjmgrassdirt_n.dds</NormalTexture>
+    </Layer>
+	</LayerCollection>
+	<VegetationCollection>
+		<Vegetation>
+			<Width>16</Width>
+			<Height>16</Height>
+			<WindAmount>1</WindAmount>
+			<MaxCountPerGrid>2</MaxCountPerGrid>
+			<Texture>Grass1.bmp</Texture>
+			<Distribution>GrassDistribution.bmp</Distribution>
+		</Vegetation>
+	</VegetationCollection>
+</Landscape>
