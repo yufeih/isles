@@ -127,9 +127,9 @@
     </NestedContentProject>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Diagrams\UI.cd" />
     <None Include="Diagrams\Overview.cd" />
     <None Include="Diagrams\SceneManagement.cd" />
+    <None Include="Diagrams\UI.cd" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\v2.0\Microsoft.Xna.GameStudio.Common.targets" />
