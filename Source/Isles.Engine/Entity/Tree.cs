@@ -34,6 +34,14 @@ namespace Isles.Engine
         
         #region Methods
         /// <summary>
+        /// Game world factory method
+        /// </summary>
+        public static IWorldObject Create(GameWorld world)
+        {
+            return new Tree(world, null);
+        }
+
+        /// <summary>
         /// Create a new tree
         /// </summary>
         public Tree(GameWorld world, TreeSettings settings) : base(world)

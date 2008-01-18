@@ -60,16 +60,16 @@ namespace Isles.Engine
         void Draw(GameTime gameTime);
 
         /// <summary>
-        /// Write the scene object to an output stream
+        /// Write the scene object to a set of attributes
         /// </summary>
         /// <param name="writer"></param>
-        void Serialize(XmlElement node);
+        void Serialize(IDictionary<string, string> attributes);
 
         /// <summary>
-        /// Read and initialize the scene object from an input stream
+        /// Read and initialize the scene object from a set of attributes
         /// </summary>
         /// <param name="reader"></param>
-        void Deserialize(XmlElement node);
+        void Deserialize(IDictionary<string, string> attributes);
     }
     #endregion
 
@@ -121,7 +121,7 @@ namespace Isles.Engine
             }
         }
         #endregion
-
+        
         #region Field
         /// <summary>
         /// Enumerates all world objects
@@ -228,15 +228,6 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Adds a new world object
-        /// </summary>
-        /// <param name="worldObject"></param>
-        public void Add(IWorldObject worldObject)
-        {
-            worldObjects.Add(worldObject);
-        }
-
-        /// <summary>
         /// Update the game world and all the world objects
         /// </summary>
         /// <param name="gameTime"></param>
@@ -317,13 +308,32 @@ namespace Isles.Engine
         public virtual void Load(XmlElement node, Loading context)
         {
             // Load landscape
-            XmlNode current = node.SelectSingleNode("Landscape");
-            if (current == null)
+            string landscapeFile = node.Attributes["Landscape"].InnerText;
+            if (landscapeFile == null)
                 throw new Exception("World does not have a landscape");
 
-            landscape = levelContent.Load<Landscape>(current.InnerText);
+            landscape = levelContent.Load<Landscape>(landscapeFile);
 
             // Load objects
+            IWorldObject worldObject;
+            IDictionary<string, string> attributes = new Dictionary<string, string>();
+
+            foreach (XmlNode child in node.ChildNodes)
+            {
+                // Ignore comments and other stuff...
+                XmlElement element = (child as XmlElement);
+
+                if (element != null)
+                {
+                    // Initialize object attributes from XML element
+                    attributes.Clear();
+
+                    foreach (XmlAttribute attribute in element.Attributes)
+                        attributes.Add(attribute.Name, attribute.Value);
+
+                    worldObject = Create(child.Name, attributes);
+                }
+            }
         }
 
         /// <summary>
@@ -332,6 +342,34 @@ namespace Isles.Engine
         /// <param name="outStream"></param>
         public virtual void Save(XmlElement node, Loading context)
         {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Delegate to realize factory method
+        /// </summary>
+        public delegate IWorldObject Creator(GameWorld world);
+
+        /// <summary>
+        /// This dictionary holds all the info to create a world object of a given type.
+        /// For a given type of object, the create funtion calls its corresponding Creator,
+        /// which is responsible for performing the actual creation stuff.
+        /// 
+        /// I haven't figure out a better way to do this.
+        /// If you know how, let me know it ASAP :)
+        /// </summary>
+        static Dictionary<string, Creator> creators = new Dictionary<string, Creator>();
+
+        /// <summary>
+        /// Register a world object creator.
+        /// If a new type of world object is implemented, to allow creating the object using
+        /// GameWorld.Create, create an object creator and register it here.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="creator"></param>
+        public static void RegisterCreator(Type type, Creator creator)
+        {
+            creators.Add(type.Name, creator);
         }
 
         /// <summary>
@@ -341,8 +379,23 @@ namespace Isles.Engine
         /// <returns>null if the type is not supported</returns>
         public IWorldObject Create(Type type)
         {
+            return Create(type.Name);
+        }
 
-            return null;
+        public IWorldObject Create(Type type, IDictionary<string, string> attributes)
+        {
+            return Create(type.Name, attributes);
+        }
+
+        public IWorldObject Create(string typeName, IDictionary<string, string> attributes)
+        {
+            IWorldObject worldObject = Create(typeName);
+
+            // Deserialize world object
+            if (worldObject != null)
+                worldObject.Deserialize(attributes);
+
+            return worldObject;
         }
 
         /// <summary>
@@ -352,9 +405,29 @@ namespace Isles.Engine
         /// <returns></returns>
         public IWorldObject Create(string typeName)
         {
-            return null;
+            // Lookup the creators table to find a suitable creator
+            if (!creators.ContainsKey(typeName))
+                throw new Exception("Unknown object type: " + typeName);
+
+            // Delegate to the creator
+            IWorldObject worldObject = creators[typeName](this);
+
+            // Add the new object to the world
+            if (worldObject != null)
+                Add(worldObject);
+
+            return worldObject;
         }
 
+        /// <summary>
+        /// Adds a new world object
+        /// </summary>
+        /// <param name="worldObject"></param>
+        public void Add(IWorldObject worldObject)
+        {
+            worldObjects.Add(worldObject);
+        }
+        
         /// <summary>
         /// Destroy a scene object
         /// </summary>

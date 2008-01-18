@@ -1,7 +1,14 @@
 <!--Isles world format-->
-<World Name="Isles" Description="Isles description" Level="Demo">
-  
-  <!--Landscape is a must for every world-->
-  <Landscape>Landscapes/Landscape</Landscape>
+<World Name="Isles" Description="Isles description" Landscape="Landscapes/Landscape" Level="Demo">
+
+  <!--
+    Every object is an XML element.
+    The element contains a name indicating object type and several object attributes.
+    
+    Object Types: Tree, Building...
+    
+    Common Attributes:
+      Position: object automatically falls onto the ground, so z is ignored :)
+  -->
   
 </World>

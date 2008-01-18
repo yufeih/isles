@@ -127,13 +127,13 @@ namespace Isles.Engine
         /// Write the scene object to an output stream
         /// </summary>
         /// <param name="writer"></param>
-        public virtual void Serialize(XmlElement node) { }
+        public virtual void Serialize(IDictionary<string, string> attributes) { }
 
         /// <summary>
         /// Read and initialize the scene object from an input stream
         /// </summary>
         /// <param name="reader"></param>
-        public virtual void Deserialize(XmlElement node) { }
+        public virtual void Deserialize(IDictionary<string, string> attributes) { }
     }
 
     #endregion

@@ -63,15 +63,24 @@
     <Compile Include="AI\PathManager.cs" />
     <Compile Include="AI\PriorityQueue.cs" />
     <Compile Include="Entity\Agent.cs" />
-    <Compile Include="Entity\Building.cs" />
-    <Compile Include="Entity\Crop.cs" />
+    <Compile Include="Entity\Building.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Entity\Crop.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Entity\Entity.cs" />
-    <Compile Include="Entity\Farmland.cs" />
+    <Compile Include="Entity\Farmland.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Entity\Stone.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Entity\Tree.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Game\Function.cs" />
     <Compile Include="Entity\Hand.cs" />
-    <Compile Include="Entity\Stone.cs" />
-    <Compile Include="Entity\Tree.cs" />
-    <Compile Include="Entity\WorldContent.cs" />
     <Compile Include="Game\AudioManager.cs" />
     <Compile Include="Game\Camera.cs" />
     <Compile Include="Game\GameLogic.cs" />

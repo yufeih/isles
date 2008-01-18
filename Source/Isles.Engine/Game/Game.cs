@@ -800,6 +800,9 @@ namespace Isles.Engine
         {
             // Initialize screens
             AddScreen("GameScreen", gameScreen = new GameScreen());
+
+            // Register world objects
+            GameWorld.RegisterCreator(typeof(Tree), Tree.Create);
         }
 
         protected override void OnInitialized()

@@ -88,7 +88,6 @@ namespace Isles.Engine
                     // Get height
                     billboards[x, y].Position.Z = 0;
                 }
-
         }
 
         public override void Update(GameTime gameTime)
