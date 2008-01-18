@@ -51,18 +51,18 @@ namespace Isles.Engine
         /// Create a fireball entity
         /// </summary>
         /// <param name="screen"></param>
-        public Fireball(GameScreen screen)
-            : base(screen)
+        public Fireball(GameWorld world)
+            : base(world)
         {
             texture = new Texture2D[FireBallTextureFrames];
 
             for (int i = 0; i < FireBallTextureFrames; i++)
             {
-                texture[i] = screen.Content.Load<Texture2D>(
+                texture[i] = world.Content.Load<Texture2D>(
                     "Spells/Fireball/areaeffect_" + (i + 1));
             }
 
-            screen.Game.Sound.Play("cast", this);
+            BaseGame.Singleton.Sound.Play("cast", this);
         }
 
         public override void Update(GameTime gameTime)
@@ -76,18 +76,18 @@ namespace Isles.Engine
             {
                 // Add a little gravity, since this is fire ball, we
                 // reduce the effect of gravity.
-                velocity += screen.Gravity * 0.08f *
+                velocity += world.GameLogic.Gravity * 0.08f *
                     (float)gameTime.ElapsedGameTime.TotalSeconds;
 
                 position += velocity;
 
                 // Destroy anyway if we're too far away
                 if (Position.LengthSquared() > 1e7)
-                    screen.EntityManager.Remove(this);
+                    world.Destroy(this);
             }
 
             // Hit test
-            float height = screen.Landscape.GetHeight(Position.X, Position.Y);
+            float height = world.Landscape.GetHeight(Position.X, Position.Y);
             if (height > Position.Z)
             {
                 //position.Z = height;
@@ -98,7 +98,7 @@ namespace Isles.Engine
             if (explode && (int)frame >= FireBallTextureFrames)
             {
                 frame = 0;
-                screen.EntityManager.Remove(this);
+                world.Destroy(this);
             }
         }
 
@@ -143,7 +143,7 @@ namespace Isles.Engine
             else
                 billboard.Type = BillboardType.CenterOriented | BillboardType.DepthBufferEnable;
 
-            screen.Game.Billboard.Draw(billboard);
+            BaseGame.Singleton.Billboard.Draw(billboard);
         }
     }
     #endregion
@@ -160,12 +160,17 @@ namespace Isles.Engine
         Texture2D aim;
 
         /// <summary>
+        /// Game screen, we need hand position
+        /// </summary>
+        GameScreen screen;
+
+        /// <summary>
         /// Create a new spell
         /// </summary>
         public FireballSpell(GameScreen screen, SpellSettings settings)
-            : base(screen, settings)
+            : base(screen.World, settings)
         {
-            aim = screen.Content.Load<Texture2D>("Textures/SpellAreaOfEffect");
+            aim = world.Content.Load<Texture2D>("Textures/SpellAreaOfEffect");
         }
 
         /// <summary>
@@ -183,7 +188,7 @@ namespace Isles.Engine
 
             size.X = size.Y = 128;
 
-            screen.Landscape.DrawSurface(aim, point, size);
+            screen.World.Landscape.DrawSurface(aim, point, size);
         }
 
         /// <summary>
@@ -204,7 +209,7 @@ namespace Isles.Engine
                 return false;
             }
 
-            Fireball fireball = new Fireball(screen);
+            Fireball fireball = new Fireball(world);
 
             fireball.Position = hand.GetCastPosition();
 
@@ -220,7 +225,7 @@ namespace Isles.Engine
 
             fireball.Velocity = speed;
 
-            screen.EntityManager.Add(fireball);
+            screen.World.Add(fireball);
 
             return false;
         }

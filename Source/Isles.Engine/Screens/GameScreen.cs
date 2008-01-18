@@ -8,6 +8,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -24,19 +25,19 @@ namespace Isles.Engine
     {
         #region Variables
         /// <summary>
-        /// Game camera for demo level
+        /// In game user interface
+        /// </summary>
+        GameUI ui;
+
+        /// <summary>
+        /// In game camera
         /// </summary>
         GameCamera gameCamera;
 
         /// <summary>
-        /// Game landscape
+        /// Game world
         /// </summary>
-        Landscape landscape;
-
-        /// <summary>
-        /// Default game light
-        /// </summary>
-        ShadowMapEffect shadow;
+        GameWorld world;
 
         /// <summary>
         /// God's hand
@@ -64,30 +65,6 @@ namespace Isles.Engine
         GraphicsDeviceManager graphics;
 
         /// <summary>
-        /// Content for game screen.
-        /// Resources are created during game load and destroyed
-        /// until game exits
-        /// </summary>
-        ContentManager content;
-
-        /// <summary>
-        /// Content manager for a level
-        /// Resources created using this content manager are destroyed
-        /// when the level exits.
-        /// </summary>
-        ContentManager levelContent;
-
-        /// <summary>
-        /// Game entity manager
-        /// </summary>
-        EntityManager entityManager;
-
-        /// <summary>
-        /// Entity picked this frame
-        /// </summary>
-        Entity pickedEntity;
-
-        /// <summary>
         /// Cursor position in 3D space
         /// </summary>
         Vector3 cursorPosition;
@@ -113,35 +90,27 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Gets game landscape
+        /// Gets in game ui
         /// </summary>
-        public Landscape Landscape
+        public GameUI UI
         {
-            get { return landscape; }
+            get { return ui; }
         }
 
         /// <summary>
-        /// Gets game screen content manager
+        /// Gets game camera
         /// </summary>
-        public ContentManager Content
+        public GameCamera Camera
         {
-            get { return content; }
+            get { return gameCamera; }
         }
 
         /// <summary>
-        /// Gets game screen level content manager
+        /// Gets game world
         /// </summary>
-        public ContentManager LevelContent
+        public GameWorld World
         {
-            get { return levelContent; }
-        }
-
-        /// <summary>
-        /// Gets game entity manager
-        /// </summary>
-        public EntityManager EntityManager
-        {
-            get { return entityManager; }
+            get { return world; }
         }
 
         /// <summary>
@@ -186,30 +155,25 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Gets the default light source used for shadow mapping
+        /// Each level has a unique name stored in this dictionary
         /// </summary>
-        public ShadowMapEffect Shadow
-        {
-            get { return shadow; }
-        }
+        Dictionary<string, ILevel> LevelDictionary = new Dictionary<string, ILevel>();
         #endregion
 
         #region Initialization
 
-        public GameScreen(BaseGame game)
+        public GameScreen()
         {
-            this.game = game;
-            this.graphics = game.Graphics;
-            this.content = game.Content;
-            this.levelContent = new ContentManager(game.Services);
-            this.levelContent.RootDirectory = content.RootDirectory;
+            game = BaseGame.Singleton;
+            graphics = game.Graphics;
+            ui = new GameUI();
         }
 
         /// <summary>
         /// Starts a new level
         /// </summary>
         /// <param name="newLevel"></param>
-        public void StartLevel(ILevel newLevel)
+        public void StartLevel(Stream levelFile)
         {
             // Reset loading context
             loadContext.Reset();
@@ -220,36 +184,42 @@ namespace Isles.Engine
             if (currentLevel != null)
                 currentLevel.Unload();
 
-            // Unload level content
-            levelContent.Unload();
-
             // Reset everything
             Reset();
 
             loadContext.Refresh(0, "Loading...");
 
+            // Read XML scene content
+            XmlDocument doc = new XmlDocument();
+            doc.Load(levelFile);
+
+            if (doc.DocumentElement.Name != "World")
+                throw new Exception("Invalid world format.");
+
+            // Load game world
+            world = new GameWorld();
+            world.Load(doc.DocumentElement, loadContext);
+            
+            // Find ILevel from level attribute
+            ILevel newLevel;
+            string levelName = doc.DocumentElement.Attributes["Level"].InnerText;
+
+            if (levelName != null && LevelDictionary.ContainsKey(levelName))
+                newLevel = LevelDictionary[levelName];
+            else
+                newLevel = new Level();
+
             // Load new level
             newLevel.Load(this, loadContext);
-
-            // Set new landscape
-            landscape = newLevel.Landscape;
 
             // Set new level
             currentLevel = newLevel;
 
             // Initialize camera
-            gameCamera = new GameCamera(this);
-            gameCamera.FlyTo(new Vector3(landscape.Width / 2, landscape.Depth / 2, 0), true);
-            gameCamera.SpaceBounds = new BoundingBox(Vector3.Zero,
-                new Vector3(landscape.Width, landscape.Depth, 6 * landscape.Height));
+            gameCamera = new GameCamera(world.Landscape);
 
             // Set new camera
             game.Camera = gameCamera;
-
-            // Setup user interface
-            ResetUserInterface();
-
-            InitializeGameLogic();
         }
 
         /// <summary>
@@ -257,15 +227,11 @@ namespace Isles.Engine
         /// </summary>
         public void Reset()
         {
-            entityManager.Reset();
-            hand.Reset();
+            if (hand != null)
+                hand.Reset();
 
-            Wood = 0;
-            Gold = 0;
-            Food = 0;
-
-            Dependencies.Clear();
-            functions.Clear();
+            if (world != null)
+                world.Reset();
         }
 
         #region Graphics Content
@@ -280,15 +246,11 @@ namespace Isles.Engine
             // Initialize loading context
             loadContext = new Loading(graphics.GraphicsDevice);
 
-            // Initialize eneity manager
-            entityManager = new EntityManager(this);
-
             // Initialize hand
             hand = new Hand(this);
 
             // Initialize UI
-            ui = new UIDisplay(game);
-            iconTexture = content.Load<Texture2D>("UI/Icons");
+            ui = new GameUI();
 
             // Initialize shadow mapping
             //shadow = new ShadowMapEffect(game);
@@ -324,116 +286,6 @@ namespace Isles.Engine
         {
         }
 
-        /// <summary>
-        /// Pick a game entity from the cursor
-        /// </summary>
-        /// <returns></returns>
-        public Entity Pick()
-        {
-            if (pickedEntity != null)
-                return pickedEntity;
-
-            // Cache the result
-            return pickedEntity = Pick(game.PickRay);
-        }
-
-        /// <summary>
-        /// Pick grid offset
-        /// </summary>
-        readonly Point[] PickGridOffset = new Point[9]
-        {
-            new Point(-1, -1), new Point(0, -1), new Point(1, -1),
-            new Point(-1, 0) , new Point(0, 0) , new Point(1, 0) ,
-            new Point(-1, 1) , new Point(0, 1) , new Point(1, 1) ,
-        };
-
-        /// <summary>
-        /// Pick a game entity from the given gay
-        /// </summary>
-        /// <returns></returns>
-        public Entity Pick(Ray ray)
-        {
-            // This value affects how accurate this algorithm works.
-            // Basically, a sample point starts at the origion of the
-            // pick ray, it's position incremented along the direction
-            // of the ray each step with a value of PickPrecision.
-            // A pick precision of half the grid size is good, since
-            // each grid has at most one game entity.
-            const float PickPrecision = 5.0f;
-
-            // This is the bounding box for all game entities
-            BoundingBox boundingBox = landscape.TerrainBoundingBox;
-            boundingBox.Max.Z += Entity.MaxHeight;
-
-            // Nothing will be picked if the ray doesn't even intersects
-            // with the bounding box of all grids
-            Nullable<float> result = ray.Intersects(boundingBox);
-            if (!result.HasValue)
-                return null;
-
-            // Initialize the sample point
-            Vector3 step = ray.Direction * PickPrecision;
-            Vector3 sampler = ray.Position + ray.Direction * result.Value;
-
-            // Keep track of the grid visited previously, so that we can
-            // avoid checking the same grid.
-            Point previousGrid = new Point(-1, -1);
-
-            while ( // Stop probing if we're outside the box
-                boundingBox.Contains(sampler) == ContainmentType.Contains)
-            {
-                // Project to XY plane and get which grid we're in
-                Point grid = landscape.PositionToGrid(sampler.X, sampler.Y);
-
-                // If we hit the ground, nothing is picked
-                if (landscape.HeightField[grid.X, grid.Y] > sampler.Z)
-                    return null;
-
-                // Check the grid visited previously
-                if (grid.X != previousGrid.X || grid.Y != previousGrid.Y)
-                {
-                    // Check the 9 adjacent grids in case we miss the some
-                    // entities like trees (Trees are big at the top but are
-                    // small at the bottom).
-                    // Also find the minimum distance from the entity to the
-                    // pick ray position to make the pick correct
-
-                    Point pt;
-                    float shortest = 10000;
-                    Entity pickEntity = null;
-
-                    for (int i = 0; i < PickGridOffset.Length; i++)
-                    {
-                        pt.X = grid.X + PickGridOffset[i].X;
-                        pt.Y = grid.Y + PickGridOffset[i].Y;
-
-                        if (landscape.IsValidGrid(pt))
-                        {
-                            foreach (Entity entity in landscape.Data[pt.X, pt.Y].Owners)
-                            {
-                                Nullable<float> value = entity.Intersects(ray);
-
-                                if (value.HasValue && value.Value < shortest)
-                                {
-                                    shortest = value.Value;
-                                    pickEntity = entity;
-                                }
-                            }
-                        }
-                    }
-
-                    if (pickEntity != null)
-                        return pickEntity;
-
-                    previousGrid = grid;
-                }
-
-                // Sample next position
-                sampler += step;
-            }
-
-            return null;
-        }        
         #endregion
 
         #region Update and Draw
@@ -443,20 +295,17 @@ namespace Isles.Engine
         /// </summary>
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
-        {
-            // Set picked entity to null
-            pickedEntity = null;
-            
+        {            
             // Update UI first
-            UpdateUI(gameTime);
+            //UpdateUI(gameTime);
 
             // Update level
             if (currentLevel != null)
                 currentLevel.Update(gameTime);
 
-            // Update landscape
-            if (landscape != null)
-                landscape.Update(gameTime);
+            // Update world
+            if (world != null)
+                world.Update(gameTime);
 
             // Update 3D cursor
             UpdateCursor();
@@ -468,15 +317,12 @@ namespace Isles.Engine
             // Update current spell
             if (currentSpell != null)
                 currentSpell.Update(gameTime);
-
-            // Update all game entites
-            entityManager.Update(gameTime);
         }
 
         private void UpdateCursor()
         {
             // Update game cursor position
-            Nullable<Vector3> hitPoint = landscape.Intersects(game.PickRay);
+            Nullable<Vector3> hitPoint = world.Landscape.Intersects(game.PickRay);
             if (hitPoint.HasValue)
             {
                 cursorPosition = hitPoint.Value;
@@ -496,21 +342,15 @@ namespace Isles.Engine
         /// <param name="gameTime"></param>
         public void Draw(GameTime gameTime)
         {
-            //GenerateShadowMap(gameTime);
-
-            // Draw shadow receivers using a special shadow mapping pixel shader
-            //landscape.Draw(gameTime, shadow.ViewProjection, shadow.ShadowMap);
-            landscape.Draw(gameTime);
-
-            // Draw all game entities
-            entityManager.Draw(gameTime);
+            // Draw game world
+            world.Draw(gameTime);
 
             // Draw current spell
             if (currentSpell != null)
                 currentSpell.Draw(gameTime);
 
             //DrawGridOwner();
-            DrawGameStates();
+            //DrawGameStates();
 
             // Draw level
             if (currentLevel != null)
@@ -522,55 +362,15 @@ namespace Isles.Engine
             // Force all point sprites to be drawed
             game.PointSprite.Present(gameTime);
             
-            DrawUI(gameTime);
+            //DrawUI(gameTime);
 
             // Draw god's hand at last
             if (hand != null)
                 hand.Draw(gameTime);
         }
-
-        private void GenerateShadowMap(GameTime gameTime)
-        {
-            shadow.Position = new Vector3(0, 0, 100);
-
-            // Generate shadow maps first
-            shadow.Begin();
-
-            shadow.Effect.Parameters["ViewProjection"].SetValue(shadow.ViewProjection);
-
-            //shadow.Effect.Begin();
-
-            //foreach (EffectPass pass in shadow.Effect.CurrentTechnique.Passes)
-            {
-                //pass.Begin();
-
-                // Only entities cast shadows
-                entityManager.GenerateShadows(gameTime, shadow.Effect);
-
-                //pass.End();
-            }
-
-            //shadow.Effect.End();
-            shadow.End();
-        }
-
-        private void DrawGridOwner()
-        {
-            for (int y = 0; y < landscape.GridRowCount; y++)
-                for (int x = 0; x < landscape.GridColumnCount; x++)
-                {
-                    // FIXME: Not implemented
-                    //if (landscape.Data[x, y].Owners != null)
-                    //    Text.DrawString(landscape.Data[x, y].Owners.Name,
-                    //        14, new Vector3(landscape.GridToPosition(x, y), landscape.HeightField[x, y]),
-                    //        Color.White);
-                }
-        }
-
         #endregion
 
         #region Dispose
-
         /// <summary>
         /// Dispose
         /// </summary>
@@ -588,17 +388,10 @@ namespace Isles.Engine
         {
             if (disposing)
             {
-                if (landscape != null)
-                    landscape.Dispose();
-
-                if (shadow != null)
-                    shadow.Dispose();
-
-                if (ui != null)
-                    ui.Dispose();
+                //if (ui != null)
+                //    ui.Dispose();
             }
         }
-
         #endregion
     }
 }

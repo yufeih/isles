@@ -34,11 +34,6 @@ namespace Isles.Engine
         void Unload();
 
         /// <summary>
-        /// Get level landscape
-        /// </summary>
-        Landscape Landscape { get; }
-
-        /// <summary>
         /// Update level stuff
         /// </summary>
         /// <param name="gameTime"></param>
@@ -59,19 +54,6 @@ namespace Isles.Engine
     public class Level : ILevel
     {
         /// <summary>
-        /// Landscape for demo level
-        /// </summary>
-        Landscape landscape;
-
-        /// <summary>
-        /// ILevel interface
-        /// </summary>
-        public Landscape Landscape
-        {
-            get { return landscape; }
-        }
-
-        /// <summary>
         /// Create a new stone
         /// </summary>
         public Level()
@@ -85,16 +67,9 @@ namespace Isles.Engine
         public virtual void Load(GameScreen screen, Loading progress)
         {
             // Set initial money
-            screen.Wood = 40000;
-            screen.Gold = 40000;
-            screen.Food = 50000;
-
-            progress.Refresh(10);
-
-            // Initialize landscape
-            landscape = screen.LevelContent.Load<Landscape>("Landscapes/Landscape");
-
-            progress.Refresh(50);
+            screen.World.GameLogic.Wood = 40000;
+            screen.World.GameLogic.Gold = 40000;
+            screen.World.GameLogic.Food = 50000;
 
             InitializeSettings(screen, progress);
 
@@ -107,72 +82,57 @@ namespace Isles.Engine
 
         private void InitializeFunctions(GameScreen screen)
         {
-            screen.AddFunction(new FunctionPlantTree(screen));
+            //screen.AddFunction(new FunctionPlantTree(screen));
         }
 
         void InitializeSettings(GameScreen screen, Loading progress)
         {
             using (FileStream file = new FileStream("Config/Buildings.xml", FileMode.Open))
             {
-                screen.BuildingSettings = (BuildingSettingsCollection)
+                screen.World.GameLogic.BuildingSettings = (BuildingSettingsCollection)
                     new XmlSerializer(typeof(BuildingSettingsCollection)).Deserialize(file);
             }
 
-            foreach (BuildingSettings settings in screen.BuildingSettings)
-                screen.LevelContent.Load<Model>(settings.Model);
-
-            progress.Refresh(65);
-
             using (FileStream file = new FileStream("Config/Trees.xml", FileMode.Open))
             {
-                screen.TreeSettings = (TreeSettingsCollection)
+                screen.World.GameLogic.TreeSettings = (TreeSettingsCollection)
                     new XmlSerializer(typeof(TreeSettingsCollection)).Deserialize(file);
             }
 
-            foreach (TreeSettings settings in screen.TreeSettings)
-                screen.LevelContent.Load<Model>(settings.Model);
-
-            progress.Refresh(70);
-
             using (FileStream file = new FileStream("Config/Stones.xml", FileMode.Open))
             {
-                screen.StoneSettings = (StoneSettingsCollection)
+                screen.World.GameLogic.StoneSettings = (StoneSettingsCollection)
                     new XmlSerializer(typeof(StoneSettingsCollection)).Deserialize(file);
             }
 
-            foreach (StoneSettings settings in screen.StoneSettings)
-                screen.LevelContent.Load<Model>(settings.Model);
-
-            progress.Refresh(80);
-
             using (FileStream file = new FileStream("Config/Spells.xml", FileMode.Open))
             {
-                screen.SpellSettings = (SpellSettingsCollection)
+                screen.World.GameLogic.SpellSettings = (SpellSettingsCollection)
                     new XmlSerializer(typeof(SpellSettingsCollection)).Deserialize(file);
             }
         }
 
         void InitializeWorldContent(GameScreen screen)
         {
-            const string WorldContentFile = "Content/Levels/World.Isles";
+            //const string WorldContentFile = "Content/Levels/World.Isles";
 
-            WorldContent.Save(
-                WorldContent.GenerateTestContent(), WorldContentFile);
-            WorldContent world = WorldContent.Load(WorldContentFile);
+            //WorldContent.Save(
+            //    WorldContent.GenerateTestContent(), WorldContentFile);
+            //WorldContent world = WorldContent.Load(WorldContentFile);
 
-            for (int i = 0; i < world.TreePositions.Count; i++)
-            {
-                Tree tree = screen.EntityManager.CreateTree(screen.TreeSettings[0]);
-                if (!tree.Place(landscape, new Vector3(world.TreePositions[i], 0), 0))
-                    screen.EntityManager.RemoveTree(tree);
-            }
+            //for (int i = 0; i < world.TreePositions.Count; i++)
+            //{
+            //    Tree tree = screen.EntityManager.CreateTree(screen.TreeSettings[0]);
+            //    if (!tree.Place(landscape, new Vector3(world.TreePositions[i], 0), 0))
+            //        screen.EntityManager.RemoveTree(tree);
+            //}
 
-            for (int i = 0; i < world.StonePositions.Count; i++)
-            {
-                Stone stone = screen.EntityManager.CreateStone(screen.StoneSettings[0]);
-                if (!stone.Place(landscape, new Vector3(world.StonePositions[i], 0), 0))
-                    screen.EntityManager.RemoveStone(stone);
-            }
+            //for (int i = 0; i < world.StonePositions.Count; i++)
+            //{
+            //    Stone stone = screen.EntityManager.CreateStone(screen.StoneSettings[0]);
+            //    if (!stone.Place(landscape, new Vector3(world.StonePositions[i], 0), 0))
+            //        screen.EntityManager.RemoveStone(stone);
+            //}
         }
 
         /// <summary>
@@ -180,8 +140,7 @@ namespace Isles.Engine
         /// </summary>
         public virtual void Unload()
         {
-            if (landscape != null)
-                landscape.Unload();
+
         }
 
         /// <summary>

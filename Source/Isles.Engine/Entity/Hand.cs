@@ -200,7 +200,7 @@ namespace Isles.Engine
         /// </summary>
         /// <param name="gameScreen"></param>
         public Hand(GameScreen gameScreen)
-            : base(gameScreen.Game, gameScreen.Content.Load<Model>("Models/Hand"))
+            : base(BaseGame.Singleton.Content.Load<Model>("Models/Hand"))
         {
             this.screen = gameScreen;
 
@@ -301,8 +301,8 @@ namespace Isles.Engine
             // Set active entity
             activeEntity = entity;
 
-            screen.EntityManager.Selected = null;
-            screen.EntityManager.Highlighted = null;
+            screen.World.Select(null);
+            screen.World.Highlight(null);
             return true;
         }
 
@@ -352,20 +352,20 @@ namespace Isles.Engine
         private void UpdateState(GameTime gameTime)
         {
             // Pick a game entity
-            Entity pickedEntity = screen.Pick();
+            Entity pickedEntity = screen.World.Pick();
 
             switch (state)
             {
                 case HandState.Idle:
 
                     // Highlight picked entity
-                    screen.EntityManager.Highlighted = pickedEntity;
+                    screen.World.Highlight(null);
 
                     // Left click to select an entity
                     if (Input.MouseLeftButtonJustPressed)
                     {
                         // Select the picked entity
-                        screen.EntityManager.Selected = pickedEntity;
+                        screen.World.Select(pickedEntity);
 
                         Input.SuppressMouseEvent();
                     }
@@ -383,7 +383,7 @@ namespace Isles.Engine
                             activeEntity = pickedEntity;
 
                             // Deselect all
-                            screen.EntityManager.Selected = null;
+                            screen.World.Select(null);
 
                             // Change to dragging state
                             state = HandState.Dragging;
@@ -540,7 +540,7 @@ namespace Isles.Engine
                 position = game.PickRay.Position + distanceSmoother * game.PickRay.Direction;
 
                 // Make sure our hand is above ground
-                float height = screen.Landscape.GetHeight(position.X, position.Y);
+                float height = screen.World.Landscape.GetHeight(position.X, position.Y);
                 if (position.Z < height + distanceAboveGround)
                     position.Z = height + distanceAboveGround;
             }

@@ -23,19 +23,6 @@ namespace Isles.Engine
         TreeSettings settings;
 
         /// <summary>
-        /// Model of this tree
-        /// </summary>
-        GameModel model;
-
-        /// <summary>
-        /// Gets the game model of this tree
-        /// </summary>
-        public GameModel Model
-        {
-            get { return model; }
-        }
-
-        /// <summary>
         /// Gets or sets the settings of this tree
         /// </summary>
         public TreeSettings Settings
@@ -49,16 +36,16 @@ namespace Isles.Engine
         /// <summary>
         /// Create a new tree
         /// </summary>
-        public Tree(GameScreen gameScreen, TreeSettings settings) : base(gameScreen)
+        public Tree(GameWorld world, TreeSettings settings) : base(world)
         {
             this.settings = settings;
 
             Name = settings.Name;
 
             // NOTE: Override existing root transform...
-            Model xnaModel = gameScreen.LevelContent.Load<Model>(settings.Model);
+            Model xnaModel = world.LevelContent.Load<Model>(settings.Model);
             xnaModel.Root.Transform = settings.Transform;
-            model = new GameModel(gameScreen.Game, xnaModel);
+            model = new GameModel(xnaModel);
 
             // Tree size are fixed?
             size = model.BoundingBox.Max - model.BoundingBox.Min;
@@ -182,10 +169,10 @@ namespace Isles.Engine
             Building building = entity as Building;
             if (building != null && building.Settings.StoreWood)
             {
-                screen.Wood += Settings.Wood;
+                world.GameLogic.Wood += Settings.Wood;
 
                 hand.Drop();
-                screen.EntityManager.RemoveTree(this);
+                world.Destroy(this);
                 return false;
             }
 
@@ -195,9 +182,9 @@ namespace Isles.Engine
 
         public override bool EndDrop(Hand hand, Entity entity, bool leftButton)
         {
-            if (!Place(screen.Landscape))
+            if (!Place(world.Landscape))
             {
-                screen.EntityManager.RemoveTree(this);
+                world.Destroy(this);
             }
 
             return true;
@@ -206,11 +193,11 @@ namespace Isles.Engine
         public override void Follow(Hand hand)
         {
             // Highlight buildings that can store wood
-            Building building = screen.Pick() as Building;
+            Building building = world.Pick() as Building;
             if (building != null && building.Settings.StoreWood)
-                screen.EntityManager.Highlighted = building;
+                world.Highlighted.Add(building);
             else
-                screen.EntityManager.Highlighted = null;
+                world.Highlighted.Clear();
 
             base.Follow(hand);
         }

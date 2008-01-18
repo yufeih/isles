@@ -67,11 +67,6 @@ namespace Isles.Engine
         protected BuildingSettings settings;
 
         /// <summary>
-        /// Bounding box of this building
-        /// </summary>
-        protected GameModel model;
-
-        /// <summary>
         /// Whether the location is valid for this building
         /// </summary>
         protected bool isValidLocation = true;
@@ -97,14 +92,6 @@ namespace Isles.Engine
                     // TODO: destroy the building
                 }
             }
-        }
-
-        /// <summary>
-        /// Gets the game model of this building
-        /// </summary>
-        public GameModel Model
-        {
-            get { return model; }
         }
 
         /// <summary>
@@ -138,7 +125,7 @@ namespace Isles.Engine
         /// <summary>
         /// Create a new building
         /// </summary>
-        public Building(GameScreen gameScreen, BuildingSettings settings) : base(gameScreen)
+        public Building(GameWorld world, BuildingSettings settings) : base(world)
         {
             this.settings = settings;
 
@@ -147,9 +134,9 @@ namespace Isles.Engine
             health = settings.Health;
 
             // NOTE: Override existing root transform...
-            Model xnaModel = gameScreen.LevelContent.Load<Model>(settings.Model);
+            Model xnaModel = world.LevelContent.Load<Model>(settings.Model);
             xnaModel.Root.Transform = settings.Transform;
-            model = new GameModel(gameScreen.Game, xnaModel );
+            model = new GameModel(xnaModel);
 
             // Center game model (Only on XY axis)
             model.CenterModel(false);
@@ -172,17 +159,17 @@ namespace Isles.Engine
             {
                 if (settings.Functions.Count > 0)
                 {
-                    screen.ClearScrollPanelElements();
+                    //world.ClearScrollPanelElements();
 
-                    foreach (string key in settings.Functions)
-                    {
-                        screen.AddScrollPanelElement(
-                            screen.GetFunction(key).UIControl);
-                    }
+                    //foreach (string key in settings.Functions)
+                    //{
+                    //    world.AddScrollPanelElement(
+                    //        world.GetFunction(key).UIControl);
+                    //}
                 }
                 else
                 {
-                    screen.ResetScrollPanelElements();
+                    //world.ResetScrollPanelElements();
                 }
             }
         }
@@ -296,7 +283,7 @@ namespace Isles.Engine
 
             // Set state to constructing
             state = BuildingState.Constructing;
-            startTime = screen.Game.CurrentGameTime.TotalGameTime.TotalSeconds;
+            startTime = BaseGame.Singleton.CurrentGameTime.TotalGameTime.TotalSeconds;
 
             return true;
         }
@@ -353,7 +340,7 @@ namespace Isles.Engine
 
         public override void Follow(Hand hand)
         {
-            isValidLocation = IsValidLocation(screen.Landscape);
+            isValidLocation = IsValidLocation(world.Landscape);
             base.Follow(hand);
         }
 
@@ -363,7 +350,7 @@ namespace Isles.Engine
             if (!leftButton)
             {
                 hand.Drop();
-                screen.EntityManager.RemoveBuilding(this);
+                world.Destroy(this);
                 return false;
             }
 
@@ -372,16 +359,16 @@ namespace Isles.Engine
 
         public override void Dropping(Hand hand, Entity entity, bool leftButton)
         {
-            isValidLocation = IsValidLocation(screen.Landscape);
+            isValidLocation = IsValidLocation(world.Landscape);
             base.Dropping(hand, entity, leftButton);
         }
 
         public override bool EndDrop(Hand hand, Entity entity, bool leftButton)
         {
-            if (!Place(screen.Landscape))
+            if (!Place(world.Landscape))
             {
                 // Drop failed, removes it
-                screen.EntityManager.RemoveBuilding(this);
+                world.Destroy(this);
             }
             return true;
         }
@@ -421,7 +408,8 @@ namespace Isles.Engine
                 int wood = (int)(settings.Wood * progress - woodSpend);
                 int gold = (int)(settings.Gold * progress - goldSpend);
 
-                if (wood <= screen.Wood && gold <= screen.Gold)
+                if (wood <= world.GameLogic.Wood &&
+                    gold <= world.GameLogic.Gold)
                 {
                     if (woodSpend + wood >= settings.Wood &&
                         goldSpend + gold >= settings.Gold)
@@ -432,8 +420,8 @@ namespace Isles.Engine
                         CompleteBuild();
                     }
 
-                    screen.Wood -= wood;
-                    screen.Gold -= gold;
+                    world.GameLogic.Wood -= wood;
+                    world.GameLogic.Gold -= gold;
 
                     woodSpend += wood;
                     goldSpend += gold;
@@ -457,7 +445,7 @@ namespace Isles.Engine
                 int wood = (int)(settings.Wood * f - woodSpend);
                 int gold = (int)(settings.Gold * f - goldSpend);
 
-                if (wood <= screen.Wood && gold <= screen.Gold)
+                if (wood <= world.GameLogic.Wood && gold <= world.GameLogic.Gold)
                 {
                     state = BuildingState.Constructing;
                 }
@@ -470,7 +458,7 @@ namespace Isles.Engine
             state = BuildingState.Normal;
 
             // Building finished, update dependencies
-            screen.Dependencies[settings.Name] = true;
+            world.GameLogic.Dependencies[settings.Name] = true;
         }
 
         /// <summary>

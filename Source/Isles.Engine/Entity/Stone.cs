@@ -23,11 +23,6 @@ namespace Isles.Engine
         StoneSettings settings;
 
         /// <summary>
-        /// Model of this stone
-        /// </summary>
-        GameModel model;
-
-        /// <summary>
         /// Stone speed
         /// </summary>
         //Vector3 speed;
@@ -48,14 +43,6 @@ namespace Isles.Engine
         //float radius;
 
         /// <summary>
-        /// Gets the game model of this stone
-        /// </summary>
-        public GameModel Model
-        {
-            get { return model; }
-        }
-
-        /// <summary>
         /// Gets or sets the settings of this stone
         /// </summary>
         public StoneSettings Settings
@@ -69,16 +56,16 @@ namespace Isles.Engine
         /// <summary>
         /// Create a new stone
         /// </summary>
-        public Stone(GameScreen gameScreen, StoneSettings settings) : base (gameScreen)
+        public Stone(GameWorld world, StoneSettings settings) : base (world)
         {
             this.settings = settings;
 
             Name = settings.Name;
 
             // NOTE: Override existing root transform...
-            Model xnaModel = gameScreen.LevelContent.Load<Model>(settings.Model);
+            Model xnaModel = world.LevelContent.Load<Model>(settings.Model);
             xnaModel.Root.Transform = settings.Transform;
-            model = new GameModel(gameScreen.Game, xnaModel);
+            model = new GameModel(xnaModel);
 
             // Stone size are fixed?
             size = model.BoundingBox.Max - model.BoundingBox.Min;
@@ -198,11 +185,11 @@ namespace Isles.Engine
         public override void Follow(Hand hand)
         {
             // Highlight buildings that can store gold
-            Building building = screen.Pick() as Building;
+            Building building = world.Pick() as Building;
             if (building != null && building.Settings.StoreCrystal)
-                screen.EntityManager.Highlighted = building;
+                world.Highlight(building);
             else
-                screen.EntityManager.Highlighted = null;
+                world.Highlight(null);
 
             base.Follow(hand);
         }
@@ -214,10 +201,10 @@ namespace Isles.Engine
             Building building = entity as Building;
             if (building != null && building.Settings.StoreCrystal)
             {
-                screen.Gold += Settings.Gold;
+                world.GameLogic.Gold += Settings.Gold;
 
                 hand.Drop();
-                screen.EntityManager.RemoveStone(this);
+                world.Destroy(this);
                 return false;
             }
 
@@ -250,10 +237,10 @@ namespace Isles.Engine
         /// </returns>
         public override bool EndDrop(Hand hand, Entity entity, bool leftButton)
         {
-            if (!Place(screen.Landscape))
+            if (!Place(world.Landscape))
             {
                 // Drop failed, removes it
-                screen.EntityManager.Remove(this);
+                world.Destroy(this);
             }
             return true;
         }

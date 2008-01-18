@@ -39,11 +39,12 @@ namespace Isles.Engine
         /// <summary>
         /// Create a new crop
         /// </summary>
-        public Crop(GameScreen screen, Vector3 size) : base(screen)
+        public Crop(GameWorld world, Vector3 size)
+            : base(world)
         {
             this.size = size;
 
-            texture = screen.LevelContent.Load<Texture2D>("Textures/Vegetation/Crop2");
+            texture = world.LevelContent.Load<Texture2D>("Textures/Vegetation/Crop2");
 
             Random random = new Random();
 
@@ -111,7 +112,7 @@ namespace Isles.Engine
                     billboards[x, y].Position = LocalToWorld(billboards[x, y].Position);
 
                     // Get height
-                    billboards[x, y].Position.Z = screen.Landscape.GetHeight(
+                    billboards[x, y].Position.Z = world.Landscape.GetHeight(
                         billboards[x, y].Position.X, billboards[x, y].Position.Y);
                 }
 
@@ -127,7 +128,7 @@ namespace Isles.Engine
         {
             foreach (Billboard b in billboards)
             {
-                screen.Game.Billboard.Draw(b);
+                BaseGame.Singleton.Billboard.Draw(b);
             }
         }
 
@@ -170,22 +171,22 @@ namespace Isles.Engine
             // If dropped on a food storage, add to our total food amount,
             Building building = entity as Building;
             if (building != null && building.Settings.StoreFood)
-                screen.Food += 100; // TODO: crop settings
+                world.GameLogic.Food += 100; // TODO: crop settings
 
             // We're done with this crop
             hand.Drop();
-            screen.EntityManager.Remove(this);
+            world.Destroy(this);
             return false;
         }
 
         public override void Follow(Hand hand)
         {
             // Highlight buildings that can store food
-            Building building = screen.Pick() as Building;
+            Building building = world.Pick() as Building;
             if (building != null && building.Settings.StoreFood)
-                screen.EntityManager.Highlighted = building;
+                world.Highlight(building);
             else
-                screen.EntityManager.Highlighted = null;
+                world.Highlight(null);
 
             base.Follow(hand);
         }

@@ -51,7 +51,6 @@ namespace Isles.Engine
         protected Matrix view;
         protected Matrix projection;
 
-        protected BaseGame game;
         protected GraphicsDevice device;
 
         /// <summary>
@@ -70,12 +69,10 @@ namespace Isles.Engine
             get { return projection; }
         }
 
-        public Camera(BaseGame game)
+        public Camera(GraphicsDevice graphics)
         {
-            this.game = game;
-
-            device = game.GraphicsDevice;
-            game.Graphics.DeviceReset += new EventHandler(Graphics_DeviceReset);
+            device = graphics;
+            graphics.DeviceReset += new EventHandler(Graphics_DeviceReset);
             view = Matrix.CreateLookAt(eye, lookAt, up);
             Graphics_DeviceReset(null, EventArgs.Empty);
 
@@ -86,7 +83,6 @@ namespace Isles.Engine
         {
             projection = Matrix.CreatePerspectiveFieldOfView(
                 MathHelper.PiOver4, (float)device.Viewport.Width / device.Viewport.Height, 1, 5000);
-            //projection = Matrix.CreateScale(0.001f, 0.001f, -0.0001f);
         }
         
         /// <summary>
@@ -97,13 +93,6 @@ namespace Isles.Engine
         {
             // Update matrix and view frustum
             Matrix.CreateLookAt(ref eye, ref lookAt, ref up, out view);
-            //view = Matrix.CreateLookAt(eye, lookAt, up);
-            //Log.Write(eye.ToString());
-            //Log.Write(lookAt.ToString());
-            //Log.Write(view.Translation.ToString());
-            //Text.DrawString(
-            //    up.ToString(),
-            //    15, new Vector2(0, 200), Color.Yellow);
         }
     }
 
@@ -151,17 +140,23 @@ namespace Isles.Engine
             new Vector3(-100, -100, 0), new Vector3(1100, 1100, 2000));
 
         Landscape landscape;
-        GameScreen gameScreen;
+        BaseGame game;
 
         /// <summary>
         /// Creates a game camera
         /// </summary>
         /// <param name="game"></param>
         /// <param name="landscape"></param>
-        public GameCamera(GameScreen gameScreen) : base(gameScreen.Game)
+        public GameCamera(Landscape landscape)
+            : base(BaseGame.Singleton.GraphicsDevice)
         {
-            this.gameScreen = gameScreen;
-            this.landscape = gameScreen.Landscape;
+            this.game = BaseGame.Singleton;
+            this.landscape = landscape;
+
+            // Center camera
+            FlyTo(new Vector3(landscape.Width / 2, landscape.Depth / 2, 0), true);
+            SpaceBounds = new BoundingBox(Vector3.Zero,
+                new Vector3(landscape.Width, landscape.Depth, 6 * landscape.Height));
         }
 
         /// <summary>

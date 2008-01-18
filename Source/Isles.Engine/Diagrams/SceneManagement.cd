@@ -10,11 +10,11 @@
   <Comment CommentText="Agent System:&#xD;&#xA;&#xD;&#xA;The base agent class derives from Entity class, it provides basic charactor manipulation functions, e.g., play animation, walk, perform actions... It also provides a goal-driven state machine mechanism to allow flexible and hierarchical behavior control.&#xD;&#xA;&#xD;&#xA;BaseAgent class will derive many different kinds of classes, e.g., Creature, Civilian, Hunter, Boss...&#xD;&#xA;&#xD;&#xA;BaseAgent class interacts with Isles.AI to get path finding service, interacts with Isles.IWorld to get to  know the world around it.">
     <Position X="10.521" Y="7.781" Height="2.604" Width="3.283" />
   </Comment>
-  <Class Name="Isles.Engine.BaseEntity" Collapsed="true">
+  <Class Name="Isles.Engine.WorldObject" Collapsed="true">
     <Position X="4.25" Y="4.75" Width="1.5" />
     <TypeIdentifier>
       <FileName>Entity\Entity.cs</FileName>
-      <HashCode>AAQAAgAAAAAAAgAgAAAAIAQBACBEAAEgAAQBAAAEAII=</HashCode>
+      <HashCode>AAQAEgAAAAAAAgAgAAAAIAQBACBEAAEgAAQBAAAEAII=</HashCode>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
@@ -67,26 +67,11 @@
       <HashCode>AAQAAAAAAAAAAgAAAAADACIAAACAAAAAgEgAAAAIAIE=</HashCode>
     </TypeIdentifier>
   </Class>
-  <Class Name="Isles.Engine.SceneManager" Collapsed="true">
-    <Position X="4.5" Y="1.5" Width="1.5" />
-    <TypeIdentifier>
-      <FileName>Game\SceneManager.cs</FileName>
-      <HashCode>ABYBAAAAAAAQAkAAAAAABAAAAAACAAAAAiAAAAAAAAA=</HashCode>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" />
-  </Class>
-  <Interface Name="Isles.Engine.ISceneObject">
+  <Interface Name="Isles.Engine.IWorldObject">
     <Position X="2.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <FileName>Game\Scene.cs</FileName>
+      <FileName>Game\GameWorld.cs</FileName>
       <HashCode>AAQAAAAAAAAAAgAgAAAAAAQAACBAAAAAAAABAAAAAIA=</HashCode>
-    </TypeIdentifier>
-  </Interface>
-  <Interface Name="Isles.Engine.ISceneManager" Collapsed="true">
-    <Position X="4.5" Y="0.5" Width="1.5" />
-    <TypeIdentifier>
-      <FileName>Game\Scene.cs</FileName>
-      <HashCode>ABYBAAAAAAAQAkAAAAAABAAAAAACAAAAAiAAAAAAAAA=</HashCode>
     </TypeIdentifier>
   </Interface>
 </ClassDiagram>

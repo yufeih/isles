@@ -124,9 +124,9 @@ namespace Isles.Graphics
 
         #region Methods
 
-        public GameModel(BaseGame game, Model model)
+        public GameModel(Model model)
         {
-            this.game = game;
+            this.game = BaseGame.Singleton;
             this.model = model;
             this.bones = new Matrix[model.Bones.Count];
             this.effect = game.Content.Load<Effect>("Effects/Model");

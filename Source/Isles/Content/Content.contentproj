@@ -297,10 +297,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Levels\World.Isles">
+    <Content Include="Levels\World.xml">
       <Name>World</Name>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
     <None Include="Models\turret_alt_diff_tex.tga">
       <Name>turret_alt_diff_tex</Name>
       <Importer>TextureImporter</Importer>

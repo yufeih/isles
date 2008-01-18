@@ -7,9 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isles", "Isles\Isles.csproj
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isles.Pipeline", "Isles.Pipeline\Isles.Pipeline.csproj", "{77E31563-2EED-400D-8591-1ACED921E11F}"
-	ProjectSection(ProjectDependencies) = postProject
-		{BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27} = {BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isles.Engine", "Isles.Engine\Isles.Engine.csproj", "{BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27}"
 EndProject

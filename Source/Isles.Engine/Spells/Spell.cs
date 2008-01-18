@@ -33,16 +33,16 @@ namespace Isles.Engine
         /// <summary>
         /// Game screen
         /// </summary>
-        protected GameScreen screen;
+        protected GameWorld world;
         #endregion
         
         #region Methods
         /// <summary>
         /// Create a new spell
         /// </summary>
-        public Spell(GameScreen gameScreen, SpellSettings settings)
+        public Spell(GameWorld world, SpellSettings settings)
         {
-            this.screen = gameScreen;
+            this.world = world;
             this.settings = settings;
         }
 

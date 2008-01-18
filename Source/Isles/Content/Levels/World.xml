@@ -1,0 +1,7 @@
+<!--Isles world format-->
+<World Name="Isles" Description="Isles description" Level="Demo">
+  
+  <!--Landscape is a must for every world-->
+  <Landscape>Landscapes/Landscape</Landscape>
+  
+</World>

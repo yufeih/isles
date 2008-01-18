@@ -417,7 +417,7 @@ namespace Isles.UI
     }
     #endregion
 
-    #region
+    #region Scroll Panel
     /// <summary>
     /// Game scroll panel
     /// </summary>

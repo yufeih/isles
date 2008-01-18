@@ -26,10 +26,10 @@ namespace Isles.Engine
         /// <summary>
         /// Create a new farmland
         /// </summary>
-        public Farmland(GameScreen screen, BuildingSettings settings)
-            : base(screen, settings)
+        public Farmland(GameWorld world, BuildingSettings settings)
+            : base(world, settings)
         {
-            crop = new Crop(screen, size);
+            crop = new Crop(world, size);
         }
 
         /// <summary>

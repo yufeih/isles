@@ -13,7 +13,8 @@ namespace Isles.Engine
 {
     /// <summary>
     /// A function is a set of action that can be
-    /// performed by clicking the corrosponding button
+    /// performed by clicking the corrosponding button.
+    /// TODO: Replace function with spell.
     /// </summary>
     public interface IFunction
     {
@@ -72,26 +73,26 @@ namespace Isles.Engine
         {
             this.screen = screen;
 
-            // Create a button
-            button = new Button(screen.IconTexture, Rectangle.Empty,
-                screen.GetIcon(0), Keys.T);
+            //// Create a button
+            //button = new Button(screen.IconTexture, Rectangle.Empty,
+            //    screen.GetIcon(0), Keys.T);
 
-            button.Click += new EventHandler(button_Click);
+            //button.Click += new EventHandler(button_Click);
         }
 
         void button_Click(object sender, EventArgs e)
         {
-            if (screen.BigHand.StopActions())
-            {
-                Tree tree = screen.EntityManager.CreateTree(screen.TreeSettings[0]);
+            //if (screen.BigHand.StopActions())
+            //{
+            //    Tree tree = screen.EntityManager.CreateTree(screen.TreeSettings[0]);
 
-                if (tree != null)
-                {
-                    screen.BigHand.Drag(tree);
-                }
-            }
+            //    if (tree != null)
+            //    {
+            //        screen.BigHand.Drag(tree);
+            //    }
+            //}
 
-            screen.ResetScrollPanelElements();
+            //screen.ResetScrollPanelElements();
         }
     }
 }

@@ -10,7 +10,6 @@
 #region Using Statements
 using System;
 using System.Collections.Generic;
-using Isles.Engine;
 #endregion
 
 namespace Isles.Graphics

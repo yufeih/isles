@@ -14,25 +14,26 @@ namespace Isles.Engine
     #region BaseEntity
 
     /// <summary>
-    /// Base game entity
+    /// Base world object
     /// </summary>
-    public abstract class BaseEntity : ISceneObject, IAudioEmitter
+    public abstract class BaseEntity : IWorldObject, IAudioEmitter
     {
+        #region Field
+
         public static int EntityCount = 0;
 
         /// <summary>
-        /// Game screen
+        /// Game world
         /// </summary>
-        protected GameScreen screen;
+        protected GameWorld world;
 
-        #region IAudioEmitter
         /// <summary>
         /// Gets or sets the 3D position of the entity.
         /// </summary>
         public Vector3 Position
         {
             get { return position; }
-            set { position = value; }
+            set { position = value; IsDirty = true; }
         }
 
         protected Vector3 position;
@@ -68,9 +69,7 @@ namespace Isles.Engine
         }
 
         protected Vector3 velocity;
-        #endregion
 
-        #region ISceneObject
 
         protected bool isDirty = false;
 
@@ -106,10 +105,10 @@ namespace Isles.Engine
         /// <summary>
         /// Constructor
         /// </summary>
-        public BaseEntity(GameScreen gameScreen)
+        public BaseEntity(GameWorld world)
         {
+            this.world = world;
             this.name = "Entity " + (EntityCount++);
-            this.screen = gameScreen;
         }
 
         /// <summary>
@@ -125,36 +124,16 @@ namespace Isles.Engine
         public abstract void Draw(GameTime gameTime);
 
         /// <summary>
-        /// Tests whether the object occupies the specified point.
-        /// </summary>
-        /// <param name="point">Point to be tested in world space</param>
-        /// <returns></returns>
-        public virtual bool Intersects(Point point)
-        {
-            return false;
-        }
-
-        /// <summary>
-        /// Tests whether the object intersects the specified ray.
-        /// </summary>
-        /// <param name="ray">Ray to be tested in world space</param>
-        /// <returns></returns>
-        public virtual float? Intersects(Ray ray)
-        {
-            return null;
-        }
-
-        /// <summary>
         /// Write the scene object to an output stream
         /// </summary>
         /// <param name="writer"></param>
-        public virtual void Serialize(XmlWriter writer) { }
+        public virtual void Serialize(XmlElement node) { }
 
         /// <summary>
         /// Read and initialize the scene object from an input stream
         /// </summary>
         /// <param name="reader"></param>
-        public virtual void Deserialize(XmlReader reader) { }
+        public virtual void Deserialize(XmlElement node) { }
     }
 
     #endregion
@@ -172,6 +151,16 @@ namespace Isles.Engine
         public const float MaxHeight = 1000.0f;
 
         #region Field
+        /// <summary>
+        /// Gets the model of the entity
+        /// </summary>
+        public GameModel Model
+        {
+            get { return model; }
+        }
+
+        protected GameModel model;
+        
         /// <summary>
         /// Entitis can only rotate on the XY plane :(
         /// </summary>
@@ -213,6 +202,7 @@ namespace Isles.Engine
         {
             get { return size; }
         }
+
         /// <summary>
         /// Gets or sets Whether this entity has been selected
         /// </summary>
@@ -237,9 +227,16 @@ namespace Isles.Engine
         /// <summary>
         /// Constructor
         /// </summary>
-        public Entity(GameScreen screen)
-            : base(screen)
+        public Entity(GameWorld world)
+            : this(world, null)
         {
+
+        }
+        
+        public Entity(GameWorld world, GameModel model)
+            : base(world)
+        {
+            this.model = model;
         }
 
         /// <summary>
@@ -341,6 +338,40 @@ namespace Isles.Engine
             return region;
         }
 
+        /// <summary>
+        /// Called when the user decided to drop this entity (button just released)
+        /// </summary>
+        /// <param name="entity">
+        /// The target entity to be drop to (can be null).
+        /// </param>
+        /// <returns>
+        /// Whether the hand should drop this entity
+        /// </returns>
+        public virtual bool EndDrop(Hand hand, Entity entity, bool leftButton)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Tests whether the object occupies the specified point.
+        /// </summary>
+        /// <param name="point">Point to be tested in world space</param>
+        /// <returns></returns>
+        public virtual bool Intersects(Point point)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Tests whether the object intersects the specified ray.
+        /// </summary>
+        /// <param name="ray">Ray to be tested in world space</param>
+        /// <returns></returns>
+        public virtual float? Intersects(Ray ray)
+        {
+            return null;
+        }
+        
         #region Drag & Drop
         /// <summary>
         /// Called when the user decided to drag this entity (button just pressed)
@@ -363,7 +394,7 @@ namespace Isles.Engine
             // Pick up then entity only when the hand has enough power
             if (hand.Power >= dragForce)
             {
-                Pickup(screen.Landscape);
+                Pickup(world.Landscape);
                 hand.Drag(this);
             }
         }
@@ -413,21 +444,6 @@ namespace Isles.Engine
                 -(double)(Input.MousePosition.Y - mouseBeginDropPosition.Y),
                  (double)(Input.MousePosition.X - mouseBeginDropPosition.X));
         }
-
-        /// <summary>
-        /// Called when the user decided to drop this entity (button just released)
-        /// </summary>
-        /// <param name="entity">
-        /// The target entity to be drop to (can be null).
-        /// </param>
-        /// <returns>
-        /// Whether the hand should drop this entity
-        /// </returns>
-        public virtual bool EndDrop(Hand hand, Entity entity, bool leftButton)
-        {
-            return false;
-        }
-
         #endregion
         #endregion
     }
@@ -480,13 +496,13 @@ namespace Isles.Engine
         /// <summary>
         /// A list of all game entities
         /// </summary>
-        LinkedList<ISceneObject> baseEntities = new LinkedList<ISceneObject>();
+        LinkedList<IWorldObject> baseEntities = new LinkedList<IWorldObject>();
 
         /// <summary>
         /// Base entities are not deleted immediately the Remove
         /// method is called, it's deleted until the end of the frame.
         /// </summary>
-        List<ISceneObject> toBeDeleted = new List<ISceneObject>();
+        List<IWorldObject> toBeDeleted = new List<IWorldObject>();
 
         /// <summary>
         /// Number of visible entities this frame
@@ -498,7 +514,7 @@ namespace Isles.Engine
         /// <summary>
         /// Gets the list of all game entities
         /// </summary>
-        public LinkedList<ISceneObject> BaseEntities
+        public LinkedList<IWorldObject> BaseEntities
         {
             get { return baseEntities; }
         }
@@ -539,152 +555,9 @@ namespace Isles.Engine
 
         #endregion
 
-        #region Methods
         public EntityManager(GameScreen gameScreen)
         {
-            screen = gameScreen;
-            selection = gameScreen.Content.Load<Texture2D>("Textures/SpellAreaOfEffect");
-        }
-
-        /// <summary>
-        /// Create a building and add it to the entity manager
-        /// </summary>
-        /// <param name="settings"></param>
-        /// <returns></returns>
-        public Building CreateBuilding(BuildingSettings settings)
-        {
-            Building entity;
-
-            if (settings.IsFarmland)
-                entity = new Farmland(screen, settings);
-            else
-                entity = new Building(screen, settings);
-
-            buildings.AddFirst(entity);
-
-            return entity;
-        }
-
-        /// <summary>
-        /// Removes a building
-        /// </summary>
-        /// <param name="building"></param>
-        public void RemoveBuilding(Building building)
-        {
-            System.Diagnostics.Debug.Assert(buildings.Contains(building));
-            buildings.Remove(building);
-        }
-
-        /// <summary>
-        /// Create a tree and add it to the entity manager
-        /// </summary>
-        /// <param name="settings"></param>
-        /// <returns></returns>
-        public Tree CreateTree(TreeSettings settings)
-        {
-            Tree entity = new Tree(screen, settings);
-
-            trees.AddFirst(entity);
-
-            return entity;
-        }
-
-        /// <summary>
-        /// Removes a building
-        /// </summary>
-        /// <param name="building"></param>
-        public void RemoveTree(Tree tree)
-        {
-            System.Diagnostics.Debug.Assert(trees.Contains(tree));
-            trees.Remove(tree);
-        }
-
-        /// <summary>
-        /// Create a tree and add it to the entity manager
-        /// </summary>
-        /// <param name="settings"></param>
-        /// <returns></returns>
-        public Stone CreateStone(StoneSettings settings)
-        {
-            Stone entity = new Stone(screen, settings);
-
-            stones.AddFirst(entity);
-
-            return entity;
-        }
-
-        /// <summary>
-        /// Removes a building
-        /// </summary>
-        /// <param name="building"></param>
-        public void RemoveStone(Stone stone)
-        {
-            System.Diagnostics.Debug.Assert(stones.Contains(stone));
-            stones.Remove(stone);
-        }
-
-        /// <summary>
-        /// Adds a game entity
-        /// </summary>
-        public void Add(ISceneObject newEntity)
-        {
-            System.Diagnostics.Debug.Assert(!baseEntities.Contains(newEntity));
-            baseEntities.AddFirst(newEntity);
-        }
-
-        /// <summary>
-        /// Removes a game entity
-        /// </summary>
-        /// <param name="entity"></param>
-        public void Remove(ISceneObject entity)
-        {
-            System.Diagnostics.Debug.Assert(baseEntities.Contains(entity));
-            toBeDeleted.Add(entity);
-        }
-
-        /// <summary>
-        /// Reset the entity manager
-        /// </summary>
-        public void Reset()
-        {
-            selected = highlighted = null;
-
-            stones.Clear();
-            trees.Clear();
-            buildings.Clear();
-            baseEntities.Clear();
-            toBeDeleted.Clear();
-        }
-
-        /// <summary>
-        /// Updates all game entities
-        /// </summary>
-        /// <param name="gameTime"></param>
-        public void Update(GameTime gameTime)
-        {
-            // Delete all base entities
-            foreach (ISceneObject entity in toBeDeleted)
-            {
-                baseEntities.Remove(entity);
-            }
-
-            // Clear to be deleted
-            toBeDeleted.Clear();
-
-            // Draw all buildings
-            foreach (Entity entity in buildings)
-                entity.Update(gameTime);
-
-            // Draw all trees
-            foreach (Entity entity in trees)
-                entity.Update(gameTime);
-
-            // Draw all stones
-            foreach (Entity entity in stones)
-                entity.Update(gameTime);
-
-            foreach (ISceneObject entity in baseEntities)
-                entity.Update(gameTime);
+            //selection = gameScreen.Content.Load<Texture2D>("Textures/SpellAreaOfEffect");
         }
 
         /// <summary>
@@ -699,7 +572,7 @@ namespace Isles.Engine
                 float size = 2 *
                     Math.Max(selected.Size.X, selected.Size.Y);
 
-                screen.Landscape.DrawSurface(
+                screen.World.Landscape.DrawSurface(
                     selection,
                     new Vector2(selected.Position.X, selected.Position.Y),
                     new Vector2(size, size));
@@ -732,81 +605,11 @@ namespace Isles.Engine
                 }
 
             // Draw all base entities
-            foreach (ISceneObject entity in baseEntities)
+            foreach (IWorldObject entity in baseEntities)
                 entity.Draw(gameTime);
 
             Text.DrawString("Visible entities: " + VisibleEntities, 14, new Vector2(0, 100), Color.Bisque);
         }
-
-        /// <summary>
-        /// Generate shadow map        
-        /// </summary>
-        /// <param name="gameTime"></param>
-        /// <param name="effect"></param>
-        public void GenerateShadows(GameTime gameTime, Effect effect)
-        {
-            GraphicsDevice graphics = screen.Game.GraphicsDevice;
-
-            // Draw all buildings
-            foreach (Building entity in buildings)
-                GenerateShadows(graphics, entity.Model.Model, effect, entity.Model.Transform);
-
-            // Draw all trees
-            foreach (Tree entity in trees)
-                GenerateShadows(graphics, entity.Model.Model, effect, entity.Model.Transform);
-
-            // Draw all stones
-            foreach (Stone entity in stones)
-                GenerateShadows(graphics, entity.Model.Model, effect, entity.Model.Transform);
-        }
-
-        /// <summary>
-        /// Bone used for drawing models
-        /// </summary>
-        Matrix[] bones = new Matrix[16];
-        List<Effect> storedEffects = new List<Effect>();
-
-        /// <summary>
-        /// Generate shadow map for a model
-        /// </summary>
-        /// <param name="model"></param>
-        /// <param name="effect"></param>
-        private void GenerateShadows(
-            GraphicsDevice graphics, Model model, Effect effect, Matrix world)
-        {
-            if (bones.Length < model.Bones.Count)
-                bones = new Matrix[model.Bones.Count];
-
-            // Copy model absolute transform
-            model.CopyAbsoluteBoneTransformsTo(bones);
-
-            foreach (ModelMesh mesh in model.Meshes)
-            {
-                // Update transform
-                effect.Parameters["World"].SetValue(bones[mesh.ParentBone.Index] * world);
-
-                foreach (ModelMeshPart part in mesh.MeshParts)
-                {
-                    // Store mesh part effect
-                    storedEffects.Add(part.Effect);
-
-                    // Apply our own effect
-                    part.Effect = effect;
-                }
-
-                mesh.Draw();
-
-                // Restore mesh effect after rendering
-                for (int i = 0; i < mesh.MeshParts.Count; i++)
-                {
-                    mesh.MeshParts[i].Effect = storedEffects[i];
-                }
-
-                // Clear stored effect
-                storedEffects.Clear();
-            }
-        }
-        #endregion
     }
 
     #endregion

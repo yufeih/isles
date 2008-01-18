@@ -799,13 +799,16 @@ namespace Isles.Engine
         public GameIsles()
         {
             // Initialize screens
-            AddScreen("GameScreen", gameScreen = new GameScreen(this));
+            AddScreen("GameScreen", gameScreen = new GameScreen());
         }
 
         protected override void OnInitialized()
         {
             // Start new level
-            gameScreen.StartLevel(new Level());
+            using (Stream stream = new FileStream("Content/Levels/World.xml", FileMode.Open))
+            {
+                gameScreen.StartLevel(stream);
+            }
 
             // Start game screen
             StartScreen(gameScreen);
