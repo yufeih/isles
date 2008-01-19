@@ -7,8 +7,9 @@
     
     Object Types: Tree, Building...
     
-    Common Attributes:
-      Position: object automatically falls onto the ground, so z is ignored :)
+    Attributes: Name, Description Model, Position, Transform, Scale Velocity, Health MaxHealth,
+                ConstructionTime, BaseHeight, Wood, Gold, StoresWood, StoresGold, StoresFood
   -->
+  <Tree Model="models/arrow" Position="1000, 1000, 0" Transform="40, 0, 0, 0, 0, 40, 0, 0, 0, 0, 100, 0, 0, 0, 100, 1" />
   
 </World>

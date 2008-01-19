@@ -6,9 +6,10 @@ using System.Xml.Serialization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Isles.Engine;
 using Isles.Graphics;
 
-namespace Isles.Engine
+namespace Isles
 {
     #region Farmland
 
@@ -26,8 +27,8 @@ namespace Isles.Engine
         /// <summary>
         /// Create a new farmland
         /// </summary>
-        public Farmland(GameWorld world, BuildingSettings settings)
-            : base(world, settings)
+        public Farmland(GameWorld world)
+            : base(world)
         {
             crop = new Crop(world, size);
         }

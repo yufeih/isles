@@ -7,9 +7,10 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Isles.Engine;
 using Isles.Graphics;
 
-namespace Isles.Engine
+namespace Isles
 {
     #region Building
     /// <summary>
@@ -17,7 +18,7 @@ namespace Isles.Engine
     /// </summary>
     public class Building : Entity
     {
-        #region BuildingState
+        #region Building State & Flag
         /// <summary>
         /// State of the building
         /// </summary>
@@ -48,33 +49,35 @@ namespace Isles.Engine
             /// </summary>
             Destroyed,
         }
+
+        /// <summary>
+        /// Flag for a building
+        /// </summary>
+        [Flags()]
+        public enum BuildingFlag
+        {
+            StoresWood = 1 << 0,
+            StoresGold = 1 << 1,
+            StoresFood = 1 << 2,
+        }
         #endregion
 
         #region Fields
-        /// <summary>
-        /// State of the building
-        /// </summary>
-        protected BuildingState state = BuildingState.Locating;
-
-        /// <summary>
-        /// Base height of the building
-        /// </summary>
-        protected float baseHeight;
-
-        /// <summary>
-        /// Settings of this building
-        /// </summary>
-        protected BuildingSettings settings;
-
         /// <summary>
         /// Whether the location is valid for this building
         /// </summary>
         protected bool isValidLocation = true;
 
         /// <summary>
-        /// Health of the building
+        /// Gets or sets max health of the building
         /// </summary>
-        protected float health;
+        public float MaxHealth
+        {
+            get { return maxHealth; }
+            set { maxHealth = value; }
+        }
+
+        protected float maxHealth = 100;
 
         /// <summary>
         /// Gets or sets the health of the building
@@ -91,8 +94,15 @@ namespace Isles.Engine
                     state = BuildingState.Destroyed;
                     // TODO: destroy the building
                 }
+                else
+                {
+                    health = value;
+                }
             }
         }
+
+        protected float health = 100;
+
 
         /// <summary>
         /// Gets the building state
@@ -101,6 +111,9 @@ namespace Isles.Engine
         {
             get { return state; }
         }
+
+        protected BuildingState state = BuildingState.Locating;
+
 
         /// <summary>
         /// Gets or set the base height of the building
@@ -111,13 +124,45 @@ namespace Isles.Engine
             set { baseHeight = value; }
         }
 
+        protected float baseHeight = 50;
+
+
         /// <summary>
-        /// Gets or sets the settings of this building
+        /// Gets or sets the time to construct this building
         /// </summary>
-        public BuildingSettings Settings
+        public float ConstructionTime;
+
+
+        /// <summary>
+        /// Gets or sets how much wood needed for the building
+        /// </summary>
+        public int Wood;
+
+
+        /// <summary>
+        /// Gets or sets how much gold needed for the building
+        /// </summary>
+        public int Gold;
+
+
+        /// <summary>
+        /// Gets or sets building flag
+        /// </summary>
+        public BuildingFlag Flag;
+
+        public bool StoresWood
         {
-            get { return settings; }
-            set { settings = value; }
+            get { return (Flag & BuildingFlag.StoresWood) == BuildingFlag.StoresWood; }
+        }
+
+        public bool StoresGold
+        {
+            get { return (Flag & BuildingFlag.StoresGold) == BuildingFlag.StoresGold; }
+        }
+
+        public bool StoresFood
+        {
+            get { return (Flag & BuildingFlag.StoresFood) == BuildingFlag.StoresFood; }
         }
         #endregion
         
@@ -125,53 +170,45 @@ namespace Isles.Engine
         /// <summary>
         /// Create a new building
         /// </summary>
-        public Building(GameWorld world, BuildingSettings settings) : base(world)
+        public Building(GameWorld world) : base(world)
         {
-            this.settings = settings;
-
-            Name = settings.Name;
-
-            health = settings.Health;
-
-            // NOTE: Override existing root transform...
-            Model xnaModel = world.LevelContent.Load<Model>(settings.Model);
-            xnaModel.Root.Transform = settings.Transform;
-            model = new GameModel(xnaModel);
-
-            // Center game model (Only on XY axis)
-            model.CenterModel(false);
-
-            size.Z = model.BoundingBox.Max.Z;
-            size.X = model.BoundingBox.Max.X - model.BoundingBox.Min.X;
-            size.Y = model.BoundingBox.Max.Y - model.BoundingBox.Min.Y;
-
-            baseHeight = -model.BoundingBox.Min.Z * 5;    // FIXME: Time 2 for debug only
-
-            settings.ConstructionTime = 0;  // CHEAT!! CHEAT!!
         }
 
-        /// <summary>
-        /// Change game UI when this building is selected
-        /// </summary>
-        protected override void OnSelectStateChanged()
+        public override void Deserialize(IDictionary<string, string> attributes)
         {
-            if (selected)
-            {
-                if (settings.Functions.Count > 0)
-                {
-                    //world.ClearScrollPanelElements();
+            base.Deserialize(attributes);
 
-                    //foreach (string key in settings.Functions)
-                    //{
-                    //    world.AddScrollPanelElement(
-                    //        world.GetFunction(key).UIControl);
-                    //}
-                }
-                else
-                {
-                    //world.ResetScrollPanelElements();
-                }
-            }
+            string value = "";
+
+            if (attributes.TryGetValue("MaxHealth", out value))
+                health = maxHealth = float.Parse(value);
+
+            if (attributes.TryGetValue("Health", out value))
+                health = float.Parse(value);
+
+            if (health > maxHealth)
+                health = maxHealth;
+
+            if (attributes.TryGetValue("BaseHeight", out value))
+                baseHeight = float.Parse(value);
+
+            if (attributes.TryGetValue("ConstructionTime", out value))
+                ConstructionTime = float.Parse(value);
+
+            if (attributes.TryGetValue("Wood", out value))
+                Wood = int.Parse(value);
+
+            if (attributes.TryGetValue("Gold", out value))
+                Gold = int.Parse(value);
+
+            if (attributes.TryGetValue("StoresWood", out value))
+                Flag |= BuildingFlag.StoresWood;
+
+            if (attributes.TryGetValue("StoresGold", out value))
+                Flag |= BuildingFlag.StoresGold;
+
+            if (attributes.TryGetValue("StoresFood", out value))
+                Flag |= BuildingFlag.StoresFood;
         }
 
         /// <summary>
@@ -393,11 +430,10 @@ namespace Isles.Engine
 
             if (state == BuildingState.Constructing)
             {
-                if (settings.ConstructionTime > 0)
+                if (ConstructionTime > 0)
                 {
                     progress = (float)(
-                        (gameTime.TotalGameTime.TotalSeconds - startTime) /
-                            settings.ConstructionTime);
+                        (gameTime.TotalGameTime.TotalSeconds - startTime) / ConstructionTime);
                 }
                 else
                 {
@@ -405,17 +441,17 @@ namespace Isles.Engine
                 }
 
                 // Check to see if we have enough wood and gold
-                int wood = (int)(settings.Wood * progress - woodSpend);
-                int gold = (int)(settings.Gold * progress - goldSpend);
+                int wood = (int)(Wood * progress - woodSpend);
+                int gold = (int)(Gold * progress - goldSpend);
 
                 if (wood <= world.GameLogic.Wood &&
                     gold <= world.GameLogic.Gold)
                 {
-                    if (woodSpend + wood >= settings.Wood &&
-                        goldSpend + gold >= settings.Gold)
+                    if (woodSpend + wood >= Wood &&
+                        goldSpend + gold >= Gold)
                     {
-                        wood = settings.Wood - woodSpend;
-                        gold = settings.Gold - goldSpend;
+                        wood = Wood - woodSpend;
+                        gold = Gold - goldSpend;
 
                         CompleteBuild();
                     }
@@ -438,12 +474,11 @@ namespace Isles.Engine
 
                 // Check to see if we have additional wood and gold
                 float f = (float)(
-                    (gameTime.TotalGameTime.TotalSeconds - startTime) /
-                        settings.ConstructionTime);
+                    (gameTime.TotalGameTime.TotalSeconds - startTime) / ConstructionTime);
 
                 // Check to see if we have enough wood and gold
-                int wood = (int)(settings.Wood * f - woodSpend);
-                int gold = (int)(settings.Gold * f - goldSpend);
+                int wood = (int)(Wood * f - woodSpend);
+                int gold = (int)(Gold * f - goldSpend);
 
                 if (wood <= world.GameLogic.Wood && gold <= world.GameLogic.Gold)
                 {
@@ -458,7 +493,7 @@ namespace Isles.Engine
             state = BuildingState.Normal;
 
             // Building finished, update dependencies
-            world.GameLogic.Dependencies[settings.Name] = true;
+            world.GameLogic.Dependencies[Name] = true;
         }
 
         /// <summary>
@@ -506,7 +541,7 @@ namespace Isles.Engine
 
         public override Rectangle DrawStatus(Rectangle region)
         {
-            Text.DrawString("Name: " + Name + "\nDescription: " + settings.Description,
+            Text.DrawString("Name: " + Name + "\nDescription: " + Description,
                 15, new Vector2((float)region.X, (float)region.Y), Color.Orange);
 
             return region;
@@ -514,143 +549,5 @@ namespace Isles.Engine
         #endregion
     }
 
-    #endregion
-
-    #region BuildingSettings
-    /// <summary>
-    /// Settings for a single building
-    /// </summary>
-    [Serializable()]
-    public class BuildingSettings
-    {
-        #region Variables
-        /// <summary>
-        /// Name of the building
-        /// </summary>
-        public string Name = "";
-
-        /// <summary>
-        /// Description of the building
-        /// </summary>
-        public string Description = "";
-
-        /// <summary>
-        /// Asset name of the building model
-        /// </summary>
-        public string Model = "";
-
-        /// <summary>
-        /// Transform of the model
-        /// </summary>
-        public Matrix Transform = Matrix.Identity;
-
-        /// <summary>
-        /// Hot key of the building
-        /// </summary>
-        public Keys Hotkey;
-
-        /// <summary>
-        /// Icon of the building
-        /// </summary>
-        public int Icon;
-
-        /// <summary>
-        /// How much wood it costs
-        /// </summary>
-        public int Wood;
-
-        /// <summary>
-        /// How many gold it costs
-        /// </summary>
-        public int Gold;
-
-        /// <summary>
-        /// How many seconds it takes to construct
-        /// </summary>
-        public float ConstructionTime;
-
-        /// <summary>
-        /// How much damage it can suffer
-        /// </summary>
-        public float Health;
-
-        /// <summary>
-        /// Whether this building stores wood or not
-        /// </summary>
-        public bool StoreWood;
-
-        /// <summary>
-        /// Whether this building stores gold or not
-        /// </summary>
-        public bool StoreCrystal;
-
-        /// <summary>
-        /// Whether this building stores food or not
-        /// </summary>
-        public bool StoreFood;
-
-        /// <summary>
-        /// Whether this building is farmland or not,
-        /// farmlands are treated specially
-        /// </summary>
-        public bool IsFarmland;
-
-        /// <summary>
-        /// Dependencies
-        /// </summary>
-        public List<string> Dependencies = new List<string>();
-
-        /// <summary>
-        /// Functions of the building
-        /// </summary>
-        public List<string> Functions = new List<string>();
-        #endregion
-    }
-
-    #region BuildingSettingsCollection
-    /// <summary>
-    /// Settings for all buildings
-    /// </summary>
-    [Serializable()]
-    public class BuildingSettingsCollection: ICollection
-    {
-        List<BuildingSettings> settings = new List<BuildingSettings>();
-
-        public BuildingSettings this[int index]
-        {
-            get { return settings[index]; }
-        }
-
-        public void CopyTo(Array a, int index)
-        {
-            settings.CopyTo((BuildingSettings[])a, index);
-        }
-
-        public int Count
-        {
-            get { return settings.Count; }
-        }
-
-        public object SyncRoot
-        {
-            get { return this; }
-        }
-
-        public bool IsSynchronized
-        {
-            get { return false; }
-        }
-
-        public IEnumerator GetEnumerator()
-        {
-            return settings.GetEnumerator();
-        }
-
-        public void Add(BuildingSettings newBuilding)
-        {
-            settings.Add(newBuilding);
-        }
-    }
-    #endregion
     #endregion
 }

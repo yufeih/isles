@@ -79,11 +79,6 @@ namespace Isles.Engine
         Vector3 position;
 
         /// <summary>
-        /// Current game screen
-        /// </summary>
-        GameScreen screen;
-
-        /// <summary>
         /// Active entity
         /// </summary>
         Entity activeEntity;
@@ -112,6 +107,37 @@ namespace Isles.Engine
         /// Gets or sets the max power of the hand
         /// </summary>
         public float MaxPower = 100.0f;
+
+        /// <summary>
+        /// Game world
+        /// </summary>
+        GameWorld world;
+
+        /// <summary>
+        /// Cursor position in 3D space
+        /// </summary>
+        Vector3 cursorPosition;
+
+        /// <summary>
+        /// Cursor radius from eye in 3D space
+        /// </summary>
+        float cursorDistance = 500.0f;
+
+        /// <summary>
+        /// Gets game cursor position in 3D space
+        /// </summary>
+        public Vector3 CursorPosition
+        {
+            get { return cursorPosition; }
+        }
+
+        /// <summary>
+        /// Gets the distance from cursor to eye in 3D space
+        /// </summary>
+        public float CursorDistance
+        {
+            get { return cursorDistance; }
+        }
 
         /// <summary>
         /// Gets current hand state
@@ -195,22 +221,37 @@ namespace Isles.Engine
         #endregion
 
         #region Methods
+        public Hand(GameWorld world)
+        {
+            this.world = world;
+        }
+
+        public Hand(GameWorld world, Model model)
+            : base(model)
+        {
+            this.world = world;
+        }
+
         /// <summary>
         /// Create a hand
         /// </summary>
         /// <param name="gameScreen"></param>
-        public Hand(GameScreen gameScreen)
-            : base(BaseGame.Singleton.Content.Load<Model>("Models/Hand"))
+        public Hand(GameWorld world, string modelFilename)
+            : base(BaseGame.Singleton.Content.Load<Model>(modelFilename))
         {
-            this.screen = gameScreen;
-
-            this.model.Root.Transform =
-                Matrix.CreateScale(0.2f) *
-                Matrix.CreateRotationX(MathHelper.ToRadians(30)) *
-                Matrix.CreateRotationY(MathHelper.ToRadians(20)) *
-                Matrix.CreateTranslation(0, -12, 0);
+            this.world = world;
 
             //screen.Game.IsMouseVisible = false;
+        }
+
+        public Hand(GameWorld world, string modelFilename, Matrix transform)
+            : base(BaseGame.Singleton.Content.Load<Model>(modelFilename))
+        {
+            this.world = world;
+
+            model.Root.Transform = transform;
+
+            Refresh();
         }
 
         /// <summary>
@@ -243,7 +284,7 @@ namespace Isles.Engine
                 {
                     state = HandState.Cast;
 
-                    screen.CurrentSpell = activeSpell = spell;
+                    activeSpell = spell;
                 }
             }
         }
@@ -268,7 +309,7 @@ namespace Isles.Engine
         {
             state = HandState.Idle;
 
-            screen.CurrentSpell = activeSpell = null;
+            activeSpell = null;
         }
 
         /// <summary>
@@ -301,8 +342,8 @@ namespace Isles.Engine
             // Set active entity
             activeEntity = entity;
 
-            screen.World.Select(null);
-            screen.World.Highlight(null);
+            world.Select(null);
+            world.Highlight(null);
             return true;
         }
 
@@ -341,6 +382,8 @@ namespace Isles.Engine
         {
             RestrictCursor();
 
+            UpdateCursor();
+
             SmoothHandPosition(gameTime);
 
             UpdateState(gameTime);
@@ -352,20 +395,20 @@ namespace Isles.Engine
         private void UpdateState(GameTime gameTime)
         {
             // Pick a game entity
-            Entity pickedEntity = screen.World.Pick();
+            Entity pickedEntity = world.Pick();
 
             switch (state)
             {
                 case HandState.Idle:
 
                     // Highlight picked entity
-                    screen.World.Highlight(null);
+                    world.Highlight(null);
 
                     // Left click to select an entity
                     if (Input.MouseLeftButtonJustPressed)
                     {
                         // Select the picked entity
-                        screen.World.Select(pickedEntity);
+                        world.Select(pickedEntity);
 
                         Input.SuppressMouseEvent();
                     }
@@ -383,7 +426,7 @@ namespace Isles.Engine
                             activeEntity = pickedEntity;
 
                             // Deselect all
-                            screen.World.Select(null);
+                            world.Select(null);
 
                             // Change to dragging state
                             state = HandState.Dragging;
@@ -534,22 +577,39 @@ namespace Isles.Engine
             else
             {
                 // Snap hand to landscape
-                distanceSmoother += (screen.CursorDistance - distanceSmoother) *
+                distanceSmoother += (cursorDistance - distanceSmoother) *
                         gameTime.ElapsedGameTime.Milliseconds * 0.01f;
 
                 position = game.PickRay.Position + distanceSmoother * game.PickRay.Direction;
 
                 // Make sure our hand is above ground
-                float height = screen.World.Landscape.GetHeight(position.X, position.Y);
+                float height = world.Landscape.GetHeight(position.X, position.Y);
                 if (position.Z < height + distanceAboveGround)
                     position.Z = height + distanceAboveGround;
+            }
+        }
+
+        private void UpdateCursor()
+        {
+            // Update game cursor position
+            Nullable<Vector3> hitPoint = world.Landscape.Intersects(game.PickRay);
+            if (hitPoint.HasValue)
+            {
+                cursorPosition = hitPoint.Value;
+                cursorDistance = Vector3.Subtract(
+                    hitPoint.Value, game.PickRay.Position).Length();
+            }
+            else
+            {
+                cursorPosition = game.PickRay.Position +
+                                 game.PickRay.Direction * cursorDistance;
             }
         }
 
         #region Restrict Cursor
         private void RestrictCursor()
         {
-            if (!screen.Game.IsActive)
+            if (!BaseGame.Singleton.IsActive)
                 return;
 
             const int BorderThickness = 5;
@@ -602,7 +662,7 @@ namespace Isles.Engine
             //else
             {
                 // Update hand position
-                world = Matrix.CreateTranslation(Vector3.Transform(position, game.View));            
+                transform = Matrix.CreateTranslation(Vector3.Transform(position, game.View));            
             }
 
             if (!visible)
@@ -617,7 +677,7 @@ namespace Isles.Engine
                 {
                     foreach (BasicEffect effect in mesh.Effects)
                     {
-                        effect.World = bones[mesh.ParentBone.Index] * world;
+                        effect.World = bones[mesh.ParentBone.Index] * transform;
                         effect.View = Matrix.Identity;
                         effect.Projection = game.Projection;
                         effect.EnableDefaultLighting();

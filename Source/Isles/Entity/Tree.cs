@@ -6,9 +6,10 @@ using System.Xml.Serialization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Isles.Engine;
 using Isles.Graphics;
 
-namespace Isles.Engine
+namespace Isles
 {
     #region Tree
     /// <summary>
@@ -17,46 +18,23 @@ namespace Isles.Engine
     public class Tree : Entity
     {
         #region Fields
-        /// <summary>
-        /// Settings of this tree
-        /// </summary>
-        TreeSettings settings;
-
-        /// <summary>
-        /// Gets or sets the settings of this tree
-        /// </summary>
-        public TreeSettings Settings
-        {
-            get { return settings; }
-            set { settings = value; }
-        }
         #endregion
         
         #region Methods
         /// <summary>
-        /// Game world factory method
-        /// </summary>
-        public static IWorldObject Create(GameWorld world)
-        {
-            return new Tree(world, null);
-        }
-
-        /// <summary>
         /// Create a new tree
         /// </summary>
-        public Tree(GameWorld world, TreeSettings settings) : base(world)
+        public Tree(GameWorld world) : base(world)
         {
-            this.settings = settings;
 
-            Name = settings.Name;
+        }
 
-            // NOTE: Override existing root transform...
-            Model xnaModel = world.LevelContent.Load<Model>(settings.Model);
-            xnaModel.Root.Transform = settings.Transform;
-            model = new GameModel(xnaModel);
+        public override void Deserialize(IDictionary<string, string> attributes)
+        {
+            base.Deserialize(attributes);
 
-            // Tree size are fixed?
-            size = model.BoundingBox.Max - model.BoundingBox.Min;
+            // Fall on the ground
+            position.Z = world.Landscape.GetHeight(position.X, position.Y);
         }
 
         /// <summary>
@@ -175,9 +153,9 @@ namespace Isles.Engine
             // If dropped on a wood storage, add to our total wood amount,
             // and we're done with this wood
             Building building = entity as Building;
-            if (building != null && building.Settings.StoreWood)
+            if (building != null && building.StoresWood)
             {
-                world.GameLogic.Wood += Settings.Wood;
+                world.GameLogic.Wood += 100; // FIXME: Magic number
 
                 hand.Drop();
                 world.Destroy(this);
@@ -202,7 +180,7 @@ namespace Isles.Engine
         {
             // Highlight buildings that can store wood
             Building building = world.Pick() as Building;
-            if (building != null && building.Settings.StoreWood)
+            if (building != null && building.StoresWood)
                 world.Highlighted.Add(building);
             else
                 world.Highlighted.Clear();
@@ -210,86 +188,6 @@ namespace Isles.Engine
             base.Follow(hand);
         }
         #endregion
-    }
-    #endregion
-
-    #region TreeSettings
-    /// <summary>
-    /// Settings for a single tree
-    /// </summary>
-    [Serializable()]
-    public class TreeSettings
-    {
-        #region Variables
-        /// <summary>
-        /// Name of the tree
-        /// </summary>
-        public string Name = "";
-
-        /// <summary>
-        /// Description of the tree
-        /// </summary>
-        public string Description = "";
-
-        /// <summary>
-        /// Asset name of the tree model
-        /// </summary>
-        public string Model = "";
-
-        /// <summary>
-        /// Transform of the model
-        /// </summary>
-        public Matrix Transform = Matrix.Identity;
-
-        /// <summary>
-        /// How much wood it provides
-        /// </summary>
-        public int Wood;
-        #endregion
-    }
-
-    /// <summary>
-    /// Settings for all trees
-    /// </summary>
-    [Serializable()]
-    public class TreeSettingsCollection: ICollection
-    {
-        List<TreeSettings> settings = new List<TreeSettings>();
-
-        public TreeSettings this[int index]
-        {
-            get { return settings[index]; }
-        }
-
-        public void CopyTo(Array a, int index)
-        {
-            settings.CopyTo((TreeSettings[])a, index);
-        }
-
-        public int Count
-        {
-            get { return settings.Count; }
-        }
-
-        public object SyncRoot
-        {
-            get { return this; }
-        }
-
-        public bool IsSynchronized
-        {
-            get { return false; }
-        }
-
-        public IEnumerator GetEnumerator()
-        {
-            return settings.GetEnumerator();
-        }
-
-        public void Add(TreeSettings newTree)
-        {
-            settings.Add(newTree);
-        }
     }
     #endregion
 }

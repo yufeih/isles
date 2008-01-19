@@ -43,50 +43,10 @@ namespace Isles.Engine
         public int Food;
 
         /// <summary>
-        /// All building settings
-        /// </summary>
-        public BuildingSettingsCollection BuildingSettings = new BuildingSettingsCollection();
-
-        /// <summary>
-        /// All tree settings
-        /// </summary>
-        public TreeSettingsCollection TreeSettings = new TreeSettingsCollection();
-
-        /// <summary>
-        /// All stone settings
-        /// </summary>
-        public StoneSettingsCollection StoneSettings = new StoneSettingsCollection();
-
-        /// <summary>
-        /// All spell settings
-        /// </summary>
-        public SpellSettingsCollection SpellSettings = new SpellSettingsCollection();
-
-        /// <summary>
         /// Dependency list. Stores a key/bool pair. E.g., ["farmhouse", true] means that
         /// farmhouse is available.
         /// </summary>
         public Dictionary<string, bool> Dependencies = new Dictionary<string, bool>();
-
-        /// <summary>
-        /// Function list
-        /// </summary>
-        Dictionary<string, IFunction> functions = new Dictionary<string, IFunction>();
-
-        public void AddFunction(IFunction function)
-        {
-            functions.Add(function.Name, function);
-        }
-
-        public IFunction GetFunction(string key)
-        {
-            return functions[key];
-        }
-
-        public void RemoveFunction(IFunction function)
-        {
-            functions.Remove(function.Name);
-        }
 
         /// <summary>
         /// Check building dependencies
@@ -112,7 +72,6 @@ namespace Isles.Engine
             Food = 0;
 
             Dependencies.Clear();
-            functions.Clear();
         }
     }
 }

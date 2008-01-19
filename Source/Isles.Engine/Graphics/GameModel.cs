@@ -31,7 +31,7 @@ namespace Isles.Graphics
         /// <summary>
         /// Model world transform
         /// </summary>
-        protected Matrix world = Matrix.Identity;
+        protected Matrix transform = Matrix.Identity;
 
         /// <summary>
         /// XNA model class
@@ -41,7 +41,7 @@ namespace Isles.Graphics
         /// <summary>
         /// Hold all models bones
         /// </summary>
-        protected Matrix[] bones;
+        protected static Matrix[] bones = new Matrix[16];
 
         /// <summary>
         /// Effect used to draw the model
@@ -68,8 +68,8 @@ namespace Isles.Graphics
         /// </summary>
         public Matrix Transform
         {
-            get { return world; }
-            set { world = value; }
+            get { return transform; }
+            set { transform = value; }
         }
 
         /// <summary>
@@ -124,20 +124,50 @@ namespace Isles.Graphics
 
         #region Methods
 
-        public GameModel(Model model)
+        public GameModel()
         {
             this.game = BaseGame.Singleton;
-            this.model = model;
-            this.bones = new Matrix[model.Bones.Count];
             this.effect = game.Content.Load<Effect>("Effects/Model");
+        }
+
+        public GameModel(Model model)
+            : this()
+        {
+            SetModel(model);
+        }
+
+        public GameModel(string modelAssetname)
+            : this()
+        {
+            SetModel(game.Content.Load<Model>(modelAssetname));
+        }
+
+        /// <summary>
+        /// Load the game model from XNB model file
+        /// </summary>
+        /// <param name="modelFilename"></param>
+        public void Load(string modelAssetname)
+        {
+            SetModel(game.Content.Load<Model>(modelAssetname));
+        }
+
+        public void SetModel(Model model)
+        {
+            this.model = model;
 
             if (model != null)
             {
+                // Adjust bone array size
+                if (bones.Length < model.Bones.Count)
+                    bones = new Matrix[model.Bones.Count];
+
                 skin = model.Tag as SkinningData;
 
                 if (skin != null)
                 {
                     player = new AnimationPlayer(skin);
+
+                    // Play the first animation clip
                     IEnumerator<KeyValuePair<string, AnimationClip>> enumerator =
                         skin.AnimationClips.GetEnumerator();
 
@@ -147,12 +177,28 @@ namespace Isles.Graphics
             }
 
             // Compute model bounding box.
-            // Does this work for animated models?
-            ComputeBoundingBox();
+            boundingBox = ComputeBoundingBox(model);
         }
 
-        protected void ComputeBoundingBox()
+        /// <summary>
+        /// Manually refresh the game model.
+        /// This method currently re-compute the bounding box of the model.
+        /// But you do not have to call this after calling SetModel
+        /// </summary>
+        public void Refresh()
         {
+            boundingBox = ComputeBoundingBox(model);
+        }
+
+        /// <summary>
+        /// Compute bounding box for the model.
+        /// NOTE: This method probably DO NOT work for animated mesh
+        /// </summary>
+        public static BoundingBox ComputeBoundingBox(Model model)
+        {
+            if (null == model)
+                return new BoundingBox(Vector3.Zero, Vector3.Zero);
+
             // Compute bounding box
             Vector3 min = new Vector3(1000, 1000, 1000);
             Vector3 max = new Vector3(-1000, -1000, -1000);
@@ -189,7 +235,7 @@ namespace Isles.Graphics
                 }
             }
 
-            boundingBox = new BoundingBox(min, max);
+            return new BoundingBox(min, max);
         }
 
         /// <summary>
@@ -215,7 +261,7 @@ namespace Isles.Graphics
         public virtual void Update(GameTime gameTime)
         {
             if (player != null)
-                player.Update(gameTime.ElapsedGameTime, true, world);
+                player.Update(gameTime.ElapsedGameTime, true, transform);
         }
 
         public void Draw(GameTime gameTime)
@@ -238,7 +284,7 @@ namespace Isles.Graphics
             {
                 foreach (BasicEffect effect in mesh.Effects)
                 {
-                    effect.World = bones[mesh.ParentBone.Index] * world;
+                    effect.World = bones[mesh.ParentBone.Index] * transform;
                     effect.View = game.View;
                     effect.Projection = game.Projection;
 

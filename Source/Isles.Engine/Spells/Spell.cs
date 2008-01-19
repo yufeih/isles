@@ -46,21 +46,21 @@ namespace Isles.Engine
             this.settings = settings;
         }
 
-        /// <summary>
-        /// Factory method to create a spell based on spell settings
-        /// </summary>
-        /// <param name="spellClass"></param>
-        /// <returns></returns>
-        public static Spell Create(GameScreen screen, SpellSettings settings)
-        {
-            switch (settings.Class)
-            {
-                case "Fireball":
-                    return new FireballSpell(screen, settings);
-                default:
-                    return null;
-            }
-        }
+        ///// <summary>
+        ///// Factory method to create a spell based on spell settings
+        ///// </summary>
+        ///// <param name="spellClass"></param>
+        ///// <returns></returns>
+        //public static Spell Create(GameScreen screen, SpellSettings settings)
+        //{
+        //    switch (settings.Class)
+        //    {
+        //        case "Fireball":
+        //            return new FireballSpell(screen, settings);
+        //        default:
+        //            return null;
+        //    }
+        //}
 
         /// <summary>
         /// Update

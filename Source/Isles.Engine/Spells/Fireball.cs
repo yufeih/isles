@@ -160,15 +160,10 @@ namespace Isles.Engine
         Texture2D aim;
 
         /// <summary>
-        /// Game screen, we need hand position
+        /// Create a new spell. TODO: pass in a hand
         /// </summary>
-        GameScreen screen;
-
-        /// <summary>
-        /// Create a new spell
-        /// </summary>
-        public FireballSpell(GameScreen screen, SpellSettings settings)
-            : base(screen.World, settings)
+        public FireballSpell(GameWorld world, SpellSettings settings)
+            : base(world, settings)
         {
             aim = world.Content.Load<Texture2D>("Textures/SpellAreaOfEffect");
         }
@@ -181,14 +176,14 @@ namespace Isles.Engine
         {
             // Draw the aim texture
 
-            Vector2 point, size;
+            //Vector2 point, size;
 
-            point.X = screen.CursorPosition.X;
-            point.Y = screen.CursorPosition.Y;
+            //point.X = screen.CursorPosition.X;
+            //point.Y = screen.CursorPosition.Y;
 
-            size.X = size.Y = 128;
+            //size.X = size.Y = 128;
 
-            screen.World.Landscape.DrawSurface(aim, point, size);
+            //World.Landscape.DrawSurface(aim, point, size);
         }
 
         /// <summary>
@@ -209,23 +204,23 @@ namespace Isles.Engine
                 return false;
             }
 
-            Fireball fireball = new Fireball(world);
+            //Fireball fireball = new Fireball(world);
 
-            fireball.Position = hand.GetCastPosition();
+            //fireball.Position = hand.GetCastPosition();
 
-            Vector3 speed = Vector3.Normalize(
-                screen.CursorPosition - fireball.Position) * 20;
+            //Vector3 speed = Vector3.Normalize(
+            //    screen.CursorPosition - fireball.Position) * 20;
 
-            // Add a little random factor
-            Random random = new Random();
+            //// Add a little random factor
+            //Random random = new Random();
 
-            speed.X += ((float)random.NextDouble() - 0.5f) / 2;
-            speed.Y += ((float)random.NextDouble() - 0.5f) / 2;
-            speed.Z += ((float)random.NextDouble() - 0.5f) / 2;
+            //speed.X += ((float)random.NextDouble() - 0.5f) / 2;
+            //speed.Y += ((float)random.NextDouble() - 0.5f) / 2;
+            //speed.Z += ((float)random.NextDouble() - 0.5f) / 2;
 
-            fireball.Velocity = speed;
+            //fireball.Velocity = speed;
 
-            screen.World.Add(fireball);
+            //World.Add(fireball);
 
             return false;
         }

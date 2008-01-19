@@ -6,9 +6,10 @@ using System.Xml.Serialization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Isles.Engine;
 using Isles.Graphics;
 
-namespace Isles.Engine
+namespace Isles
 {
     #region Crop
 
@@ -169,7 +170,7 @@ namespace Isles.Engine
         {
             // If dropped on a food storage, add to our total food amount,
             Building building = entity as Building;
-            if (building != null && building.Settings.StoreFood)
+            if (building != null && building.StoresFood)
                 world.GameLogic.Food += 100; // TODO: crop settings
 
             // We're done with this crop
@@ -182,7 +183,7 @@ namespace Isles.Engine
         {
             // Highlight buildings that can store food
             Building building = world.Pick() as Building;
-            if (building != null && building.Settings.StoreFood)
+            if (building != null && building.StoresFood)
                 world.Highlight(building);
             else
                 world.Highlight(null);

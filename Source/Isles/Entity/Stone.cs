@@ -6,9 +6,10 @@ using System.Xml.Serialization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Isles.Engine;
 using Isles.Graphics;
 
-namespace Isles.Engine
+namespace Isles
 {
     #region Stone
     /// <summary>
@@ -17,11 +18,6 @@ namespace Isles.Engine
     public class Stone : Entity
     {
         #region Fields
-        /// <summary>
-        /// Settings of this stone
-        /// </summary>
-        StoneSettings settings;
-
         /// <summary>
         /// Stone speed
         /// </summary>
@@ -43,32 +39,28 @@ namespace Isles.Engine
         //float radius;
 
         /// <summary>
-        /// Gets or sets the settings of this stone
+        /// Gets or sets the value of the stone
         /// </summary>
-        public StoneSettings Settings
-        {
-            get { return settings; }
-            set { settings = value; }
-        }
+        public int Gold;
         #endregion
         
         #region Methods
         /// <summary>
         /// Create a new stone
         /// </summary>
-        public Stone(GameWorld world, StoneSettings settings) : base (world)
+        public Stone(GameWorld world) : base (world)
+        { 
+
+        }
+
+        public override void Deserialize(IDictionary<string, string> attributes)
         {
-            this.settings = settings;
+            base.Deserialize(attributes);
 
-            Name = settings.Name;
+            string value;
 
-            // NOTE: Override existing root transform...
-            Model xnaModel = world.LevelContent.Load<Model>(settings.Model);
-            xnaModel.Root.Transform = settings.Transform;
-            model = new GameModel(xnaModel);
-
-            // Stone size are fixed?
-            size = model.BoundingBox.Max - model.BoundingBox.Min;
+            if (attributes.TryGetValue("Gold", out value))
+                Gold = int.Parse(value);
         }
 
         /// <summary>
@@ -186,7 +178,7 @@ namespace Isles.Engine
         {
             // Highlight buildings that can store gold
             Building building = world.Pick() as Building;
-            if (building != null && building.Settings.StoreCrystal)
+            if (building != null && building.StoresGold)
                 world.Highlight(building);
             else
                 world.Highlight(null);
@@ -199,9 +191,9 @@ namespace Isles.Engine
             // If dropped on a gold storage, add to our total gold amount,
             // and we're done with this stone
             Building building = entity as Building;
-            if (building != null && building.Settings.StoreCrystal)
+            if (building != null && building.StoresGold)
             {
-                world.GameLogic.Gold += Settings.Gold;
+                world.GameLogic.Gold += Gold;
 
                 hand.Drop();
                 world.Destroy(this);
@@ -246,86 +238,6 @@ namespace Isles.Engine
         }
 
         #endregion
-    }
-    #endregion
-
-    #region StoneSettings
-    /// <summary>
-    /// Settings for a single stone
-    /// </summary>
-    [Serializable()]
-    public class StoneSettings
-    {
-        #region Variables
-        /// <summary>
-        /// Name of the stone
-        /// </summary>
-        public string Name = "";
-
-        /// <summary>
-        /// Description of the stone
-        /// </summary>
-        public string Description = "";
-
-        /// <summary>
-        /// Asset name of the stone model
-        /// </summary>
-        public string Model = "";
-
-        /// <summary>
-        /// Transform of the model
-        /// </summary>
-        public Matrix Transform = Matrix.Identity;
-
-        /// <summary>
-        /// How much gold it provides
-        /// </summary>
-        public int Gold;
-        #endregion
-    }
-
-    /// <summary>
-    /// Settings for all stones
-    /// </summary>
-    [Serializable()]
-    public class StoneSettingsCollection: ICollection
-    {
-        List<StoneSettings> settings = new List<StoneSettings>();
-
-        public StoneSettings this[int index]
-        {
-            get { return settings[index]; }
-        }
-
-        public void CopyTo(Array a, int index)
-        {
-            settings.CopyTo((StoneSettings[])a, index);
-        }
-
-        public int Count
-        {
-            get { return settings.Count; }
-        }
-
-        public object SyncRoot
-        {
-            get { return this; }
-        }
-
-        public bool IsSynchronized
-        {
-            get { return false; }
-        }
-
-        public IEnumerator GetEnumerator()
-        {
-            return settings.GetEnumerator();
-        }
-
-        public void Add(StoneSettings newStone)
-        {
-            settings.Add(newStone);
-        }
     }
     #endregion
 }

@@ -26,7 +26,7 @@ namespace Isles.Engine
         /// <summary>
         /// Load a game level
         /// </summary>
-        void Load(GameScreen screen, Loading progress);
+        void Load(GameWorld world, Loading progress);
 
         /// <summary>
         /// Unload a game level
@@ -64,75 +64,14 @@ namespace Isles.Engine
         /// <summary>
         /// Load a game level
         /// </summary>
-        public virtual void Load(GameScreen screen, Loading progress)
+        public virtual void Load(GameWorld world, Loading progress)
         {
             // Set initial money
-            screen.World.GameLogic.Wood = 40000;
-            screen.World.GameLogic.Gold = 40000;
-            screen.World.GameLogic.Food = 50000;
-
-            InitializeSettings(screen, progress);
+            world.GameLogic.Wood = 40000;
+            world.GameLogic.Gold = 40000;
+            world.GameLogic.Food = 50000;
 
             progress.Refresh(90);
-
-            InitializeWorldContent(screen);
-
-            InitializeFunctions(screen);
-        }
-
-        private void InitializeFunctions(GameScreen screen)
-        {
-            //screen.AddFunction(new FunctionPlantTree(screen));
-        }
-
-        void InitializeSettings(GameScreen screen, Loading progress)
-        {
-            using (FileStream file = new FileStream("Config/Buildings.xml", FileMode.Open))
-            {
-                screen.World.GameLogic.BuildingSettings = (BuildingSettingsCollection)
-                    new XmlSerializer(typeof(BuildingSettingsCollection)).Deserialize(file);
-            }
-
-            using (FileStream file = new FileStream("Config/Trees.xml", FileMode.Open))
-            {
-                screen.World.GameLogic.TreeSettings = (TreeSettingsCollection)
-                    new XmlSerializer(typeof(TreeSettingsCollection)).Deserialize(file);
-            }
-
-            using (FileStream file = new FileStream("Config/Stones.xml", FileMode.Open))
-            {
-                screen.World.GameLogic.StoneSettings = (StoneSettingsCollection)
-                    new XmlSerializer(typeof(StoneSettingsCollection)).Deserialize(file);
-            }
-
-            using (FileStream file = new FileStream("Config/Spells.xml", FileMode.Open))
-            {
-                screen.World.GameLogic.SpellSettings = (SpellSettingsCollection)
-                    new XmlSerializer(typeof(SpellSettingsCollection)).Deserialize(file);
-            }
-        }
-
-        void InitializeWorldContent(GameScreen screen)
-        {
-            //const string WorldContentFile = "Content/Levels/World.Isles";
-
-            //WorldContent.Save(
-            //    WorldContent.GenerateTestContent(), WorldContentFile);
-            //WorldContent world = WorldContent.Load(WorldContentFile);
-
-            //for (int i = 0; i < world.TreePositions.Count; i++)
-            //{
-            //    Tree tree = screen.EntityManager.CreateTree(screen.TreeSettings[0]);
-            //    if (!tree.Place(landscape, new Vector3(world.TreePositions[i], 0), 0))
-            //        screen.EntityManager.RemoveTree(tree);
-            //}
-
-            //for (int i = 0; i < world.StonePositions.Count; i++)
-            //{
-            //    Stone stone = screen.EntityManager.CreateStone(screen.StoneSettings[0]);
-            //    if (!stone.Place(landscape, new Vector3(world.StonePositions[i], 0), 0))
-            //        screen.EntityManager.RemoveStone(stone);
-            //}
         }
 
         /// <summary>

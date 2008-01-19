@@ -62,30 +62,13 @@
     <Compile Include="AI\Graph.cs" />
     <Compile Include="AI\PathManager.cs" />
     <Compile Include="AI\PriorityQueue.cs" />
-    <Compile Include="Entity\Agent.cs" />
-    <Compile Include="Entity\Building.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Entity\Crop.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Entity\Entity.cs" />
-    <Compile Include="Entity\Farmland.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Entity\Stone.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Entity\Tree.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Game\Function.cs" />
-    <Compile Include="Entity\Hand.cs" />
+    <Compile Include="Game\Entity.cs" />
     <Compile Include="Game\AudioManager.cs" />
     <Compile Include="Game\Camera.cs" />
     <Compile Include="Game\GameLogic.cs" />
     <Compile Include="Game\Game.cs" />
     <Compile Include="Game\GameWorld.cs" />
+    <Compile Include="Game\Hand.cs" />
     <Compile Include="Game\Input.cs" />
     <Compile Include="Game\IScreen.cs" />
     <Compile Include="Game\Log.cs" />
@@ -93,7 +76,7 @@
     <Compile Include="Game\Profiler.cs" />
     <Compile Include="Game\ScreenshotCapturer.cs" />
     <Compile Include="Game\State.cs" />
-    <Compile Include="Game\Storage.cs" />
+    <Compile Include="Game\Helper.cs" />
     <Compile Include="Graphics\Billboard.cs" />
     <Compile Include="Graphics\Effects\BloomComponent.cs" />
     <Compile Include="Graphics\Effects\BloomSettings.cs" />
@@ -116,10 +99,6 @@
     <Compile Include="Levels\Level.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Game\Settings.cs" />
-    <Compile Include="Screens\GameScreen.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Screens\GameScreen.Logic.cs" />
     <Compile Include="Spells\Fireball.cs" />
     <Compile Include="Spells\Spell.cs" />
     <Compile Include="UI\GameUI.cs" />

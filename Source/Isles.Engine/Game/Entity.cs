@@ -12,7 +12,6 @@ using Isles.Graphics;
 namespace Isles.Engine
 {
     #region BaseEntity
-
     /// <summary>
     /// Base world object
     /// </summary>
@@ -127,15 +126,29 @@ namespace Isles.Engine
         /// Write the scene object to an output stream
         /// </summary>
         /// <param name="writer"></param>
-        public virtual void Serialize(IDictionary<string, string> attributes) { }
+        public virtual void Serialize(IDictionary<string, string> attributes)
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Read and initialize the scene object from an input stream
         /// </summary>
         /// <param name="reader"></param>
-        public virtual void Deserialize(IDictionary<string, string> attributes) { }
-    }
+        public virtual void Deserialize(IDictionary<string, string> attributes)
+        {
+            string value = "";
 
+            if (attributes.TryGetValue("Name", out value))
+                name = value;
+
+            if (attributes.TryGetValue("Position", out value))
+                position = Helper.StringToVector3(value);
+
+            if (attributes.TryGetValue("Velocity", out value))
+                velocity = Helper.StringToVector3(value);
+        }
+    }
     #endregion
 
     #region Entity
@@ -151,6 +164,17 @@ namespace Isles.Engine
         public const float MaxHeight = 1000.0f;
 
         #region Field
+        /// <summary>
+        /// Gets or sets entity description
+        /// </summary>
+        public string Description
+        {
+            get { return description; }
+            set { description = value; }
+        }
+
+        protected string description;
+
         /// <summary>
         /// Gets the model of the entity
         /// </summary>
@@ -237,6 +261,55 @@ namespace Isles.Engine
             : base(world)
         {
             this.model = model;
+        }
+
+        public override void Deserialize(IDictionary<string, string> attributes)
+        {
+            base.Deserialize(attributes);
+
+            string value = "";
+
+            // Get entity description
+            attributes.TryGetValue("Description", out description);                
+
+            // Initialize model
+            if (attributes.TryGetValue("Model", out value))
+            {
+                GameModel newModel = // Treat game model as level content
+                    new GameModel(world.LevelContent.Load<Model>(value));
+
+                Matrix transform = Matrix.Identity;
+                
+                // Get model transform
+                if (attributes.TryGetValue("Transform", out value))
+                    transform = Helper.StringToMatrix(value);
+
+                if (attributes.TryGetValue("Scale", out value))
+                    transform *= Matrix.CreateScale(Helper.StringToVector3(value));
+
+                if (transform != Matrix.Identity)
+                {
+                    newModel.Model.Root.Transform = transform;
+                    newModel.Refresh();
+                }
+
+                SetModel(newModel);
+            }
+        }
+
+        /// <summary>
+        /// Set the model of the entity
+        /// </summary>
+        public virtual void SetModel(GameModel model)
+        {
+            this.model = model;
+
+            // Center game model by default
+            this.model.CenterModel(false);
+
+            // Compute size based on game model
+            if (model != null)
+                size = model.BoundingBox.Max - model.BoundingBox.Min;
         }
 
         /// <summary>
@@ -339,20 +412,6 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Called when the user decided to drop this entity (button just released)
-        /// </summary>
-        /// <param name="entity">
-        /// The target entity to be drop to (can be null).
-        /// </param>
-        /// <returns>
-        /// Whether the hand should drop this entity
-        /// </returns>
-        public virtual bool EndDrop(Hand hand, Entity entity, bool leftButton)
-        {
-            return false;
-        }
-
-        /// <summary>
         /// Tests whether the object occupies the specified point.
         /// </summary>
         /// <param name="point">Point to be tested in world space</param>
@@ -444,173 +503,86 @@ namespace Isles.Engine
                 -(double)(Input.MousePosition.Y - mouseBeginDropPosition.Y),
                  (double)(Input.MousePosition.X - mouseBeginDropPosition.X));
         }
+
+        /// <summary>
+        /// Called when the user decided to drop this entity (button just released)
+        /// </summary>
+        /// <param name="entity">
+        /// The target entity to be drop to (can be null).
+        /// </param>
+        /// <returns>
+        /// Whether the hand should drop this entity
+        /// </returns>
+        public virtual bool EndDrop(Hand hand, Entity entity, bool leftButton)
+        {
+            return false;
+        }
         #endregion
         #endregion
     }
 
     #endregion
     
-    #region EntityManager
-
+    #region BaseAgent
     /// <summary>
-    /// A manager class manages all game entities
+    /// Base class for all game agents
     /// </summary>
-    public class EntityManager
+    public class BaseAgent : Entity
     {
-        #region Variables
-        /// <summary>
-        /// Game screen
-        /// </summary>
-        GameScreen screen;
+        #region Entity
+        public override bool BeginDrag(Hand hand)
+        {
+            // Agents can't be dragged
+            return false;
+        }
 
-        /// <summary>
-        /// Texture used to draw selection
-        /// </summary>
-        Texture2D selection;
+        public override bool BeginDrop(Hand hand, Entity entity, bool leftButton)
+        {
+            // Agents can't be dropped
+            return false;
+        }
 
-        /// <summary>
-        /// Currently selected entity
-        /// </summary>
-        Entity selected;
+        public override void Update(GameTime gameTime)
+        {
+            throw new Exception("The method or operation is not implemented.");
+        }
 
-        /// <summary>
-        /// Currently highlighted entity
-        /// </summary>
-        Entity highlighted;
+        public override void Draw(GameTime gameTime)
+        {
+            throw new Exception("The method or operation is not implemented.");
+        }
 
-        /// <summary>
-        /// All stones, managed seperately
-        /// </summary>
-        LinkedList<Stone> stones = new LinkedList<Stone>();
-
-        /// <summary>
-        /// All trees, managed seperately
-        /// </summary>
-        LinkedList<Tree> trees = new LinkedList<Tree>();
-
-        /// <summary>
-        /// All buildings, managed seperately
-        /// </summary>
-        LinkedList<Building> buildings = new LinkedList<Building>();
-
-        /// <summary>
-        /// A list of all game entities
-        /// </summary>
-        LinkedList<IWorldObject> baseEntities = new LinkedList<IWorldObject>();
-
-        /// <summary>
-        /// Base entities are not deleted immediately the Remove
-        /// method is called, it's deleted until the end of the frame.
-        /// </summary>
-        List<IWorldObject> toBeDeleted = new List<IWorldObject>();
-
-        /// <summary>
-        /// Number of visible entities this frame
-        /// </summary>
-        public int VisibleEntities;
+        public override float? Intersects(Ray ray)
+        {
+            throw new Exception("The method or operation is not implemented.");
+        }
         #endregion
 
-        #region Propeties
-        /// <summary>
-        /// Gets the list of all game entities
-        /// </summary>
-        public LinkedList<IWorldObject> BaseEntities
+        public BaseAgent(GameWorld world)
+            : base(world)
         {
-            get { return baseEntities; }
-        }
 
-        /// <summary>
-        /// Gets or sets currently selected entity
-        /// </summary>
-        public Entity Selected
-        {
-            get { return selected; }
-
-            set
-            {
-                if (selected != null)
-                    selected.Selected = false;
-                selected = value;
-                if (selected != null)
-                    selected.Selected = true;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets currently highlighted entity
-        /// </summary>
-        public Entity Highlighted
-        {
-            get { return highlighted; }
-
-            set
-            {
-                if (highlighted != null)
-                    highlighted.Highlighted = false;
-                highlighted = value;
-                if (highlighted != null)
-                    highlighted.Highlighted = true;
-            }
-        }
-
-        #endregion
-
-        public EntityManager(GameScreen gameScreen)
-        {
-            //selection = gameScreen.Content.Load<Texture2D>("Textures/SpellAreaOfEffect");
-        }
-
-        /// <summary>
-        /// Draw all game entities
-        /// </summary>
-        /// <param name="gameTime"></param>
-        public void Draw(GameTime gameTime)
-        {
-            // Draw selection
-            if (selected != null)
-            {
-                float size = 2 *
-                    Math.Max(selected.Size.X, selected.Size.Y);
-
-                screen.World.Landscape.DrawSurface(
-                    selection,
-                    new Vector2(selected.Position.X, selected.Position.Y),
-                    new Vector2(size, size));
-            }
-
-            VisibleEntities = 0;
-
-            // Draw all buildings
-            foreach (Entity entity in buildings)
-                if (entity.VisibilityTest(screen.Game.ViewProjection))
-                {
-                    entity.Draw(gameTime);
-                    VisibleEntities++;
-                }
-
-            // Draw all trees
-            foreach (Entity entity in trees)
-                if (entity.VisibilityTest(screen.Game.ViewProjection))
-                {
-                    entity.Draw(gameTime);
-                    VisibleEntities++;
-                }
-
-            // Draw all stones
-            foreach (Entity entity in stones)
-                if (entity.VisibilityTest(screen.Game.ViewProjection))
-                {
-                    entity.Draw(gameTime);
-                    VisibleEntities++;
-                }
-
-            // Draw all base entities
-            foreach (IWorldObject entity in baseEntities)
-                entity.Draw(gameTime);
-
-            Text.DrawString("Visible entities: " + VisibleEntities, 14, new Vector2(0, 100), Color.Bisque);
         }
     }
-
     #endregion
+
+    ///// <summary>
+    ///// Draw all game entities
+    ///// </summary>
+    ///// <param name="gameTime"></param>
+    //public void Draw(GameTime gameTime)
+    //{
+    //    // Draw selection
+    //    if (selected != null)
+    //    {
+    //        float size = 2 *
+    //            Math.Max(selected.Size.X, selected.Size.Y);
+
+    //        screen.World.Landscape.DrawSurface(
+    //            selection,
+    //            new Vector2(selected.Position.X, selected.Position.Y),
+    //            new Vector2(size, size));
+    //    }
+    //}
+
 }

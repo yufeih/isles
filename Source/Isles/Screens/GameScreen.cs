@@ -13,10 +13,11 @@ using System.Xml.Serialization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Isles.Engine;
 using Isles.Graphics;
 using Isles.UI;
 
-namespace Isles.Engine
+namespace Isles
 {
     /// <summary>
     /// Represents a game screen
@@ -50,11 +51,6 @@ namespace Isles.Engine
         BaseGame game;
 
         /// <summary>
-        /// Current level
-        /// </summary>
-        ILevel currentLevel;
-
-        /// <summary>
         /// Loading bar
         /// </summary>
         Loading loadContext;
@@ -63,21 +59,6 @@ namespace Isles.Engine
         /// Graphcis device
         /// </summary>
         GraphicsDeviceManager graphics;
-
-        /// <summary>
-        /// Cursor position in 3D space
-        /// </summary>
-        Vector3 cursorPosition;
-
-        /// <summary>
-        /// Cursor radius from eye in 3D space
-        /// </summary>
-        float cursorDistance = 500.0f;
-
-        /// <summary>
-        /// Only one spell can be casted at a time
-        /// </summary>
-        Spell currentSpell;
         #endregion
 
         #region Properties
@@ -121,43 +102,6 @@ namespace Isles.Engine
             get { return hand; }
         }
 
-        /// <summary>
-        /// Gets current level
-        /// </summary>
-        public ILevel CurrentLevel
-        {
-            get { return currentLevel; }
-        }
-
-        /// <summary>
-        /// Gets game cursor position in 3D space
-        /// </summary>
-        public Vector3 CursorPosition
-        {
-            get { return cursorPosition; }
-        }
-
-        /// <summary>
-        /// Gets the distance from cursor to eye in 3D space
-        /// </summary>
-        public float CursorDistance
-        {
-            get { return cursorDistance; }
-        }
-
-        /// <summary>
-        /// Gets or sets current spell
-        /// </summary>
-        public Spell CurrentSpell
-        {
-            get { return currentSpell; }
-            set { currentSpell = value; }
-        }
-
-        /// <summary>
-        /// Each level has a unique name stored in this dictionary
-        /// </summary>
-        Dictionary<string, ILevel> LevelDictionary = new Dictionary<string, ILevel>();
         #endregion
 
         #region Initialization
@@ -178,12 +122,6 @@ namespace Isles.Engine
             // Reset loading context
             loadContext.Reset();
 
-            loadContext.Refresh(0, "Unloading...");
-
-            // Unload current level
-            if (currentLevel != null)
-                currentLevel.Unload();
-
             // Reset everything
             Reset();
 
@@ -193,27 +131,15 @@ namespace Isles.Engine
             XmlDocument doc = new XmlDocument();
             doc.Load(levelFile);
 
-            if (doc.DocumentElement.Name != "World")
-                throw new Exception("Invalid world format.");
-
             // Load game world
-            world = new GameWorld();
-            world.Load(doc.DocumentElement, loadContext);
-            
-            // Find ILevel from level attribute
-            ILevel newLevel;
-            string levelName = doc.DocumentElement.Attributes["Level"].InnerText;
+            world = new GameWorld(doc.DocumentElement, loadContext);
 
-            if (levelName != null && LevelDictionary.ContainsKey(levelName))
-                newLevel = LevelDictionary[levelName];
-            else
-                newLevel = new Level();
-
-            // Load new level
-            newLevel.Load(this, loadContext);
-
-            // Set new level
-            currentLevel = newLevel;
+            // Initialize hand
+            hand = new Hand(world, "Models/Hand",
+                Matrix.CreateScale(0.2f) *
+                Matrix.CreateRotationX(MathHelper.ToRadians(30)) *
+                Matrix.CreateRotationY(MathHelper.ToRadians(20)) *
+                Matrix.CreateTranslation(0, -12, 0));
 
             // Initialize camera
             gameCamera = new GameCamera(world.Landscape);
@@ -246,9 +172,6 @@ namespace Isles.Engine
             // Initialize loading context
             loadContext = new Loading(graphics.GraphicsDevice);
 
-            // Initialize hand
-            hand = new Hand(this);
-
             // Initialize UI
             ui = new GameUI();
 
@@ -264,8 +187,7 @@ namespace Isles.Engine
         /// </summary>
         public void UnloadContent()
         {
-            if (currentLevel != null)
-                currentLevel.Unload();
+
         }
         #endregion
 
@@ -299,41 +221,13 @@ namespace Isles.Engine
             // Update UI first
             //UpdateUI(gameTime);
 
-            // Update level
-            if (currentLevel != null)
-                currentLevel.Update(gameTime);
-
             // Update world
             if (world != null)
                 world.Update(gameTime);
 
-            // Update 3D cursor
-            UpdateCursor();
-
             // Update our big hand
             if (hand != null)
                 hand.Update(gameTime);
-
-            // Update current spell
-            if (currentSpell != null)
-                currentSpell.Update(gameTime);
-        }
-
-        private void UpdateCursor()
-        {
-            // Update game cursor position
-            Nullable<Vector3> hitPoint = world.Landscape.Intersects(game.PickRay);
-            if (hitPoint.HasValue)
-            {
-                cursorPosition = hitPoint.Value;
-                cursorDistance = Vector3.Subtract(
-                    hitPoint.Value, game.PickRay.Position).Length();
-            }
-            else
-            {
-                cursorPosition = game.PickRay.Position +
-                                 game.PickRay.Direction * cursorDistance;
-            }
         }
 
         /// <summary>
@@ -344,17 +238,6 @@ namespace Isles.Engine
         {
             // Draw game world
             world.Draw(gameTime);
-
-            // Draw current spell
-            if (currentSpell != null)
-                currentSpell.Draw(gameTime);
-
-            //DrawGridOwner();
-            //DrawGameStates();
-
-            // Draw level
-            if (currentLevel != null)
-                currentLevel.Draw(gameTime);
 
             // Force all billboards to be drawed before our UI is rendered
             game.Billboard.Present(gameTime);

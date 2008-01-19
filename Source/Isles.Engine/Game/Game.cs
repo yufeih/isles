@@ -777,46 +777,4 @@ namespace Isles.Engine
 
         #endregion
     }
-
-    /// <summary>
-    /// Game Isles
-    /// </summary>
-    public class GameIsles : BaseGame
-    {
-        /// <summary>
-        /// Game screen
-        /// </summary>
-        GameScreen gameScreen;
-
-        /// <summary>
-        /// Gets game screen
-        /// </summary>
-        public GameScreen GameScreen
-        {
-            get { return gameScreen; }
-        }
-
-        public GameIsles()
-        {
-            // Initialize screens
-            AddScreen("GameScreen", gameScreen = new GameScreen());
-
-            // Register world objects
-            GameWorld.RegisterCreator(typeof(Tree), Tree.Create);
-        }
-
-        protected override void OnInitialized()
-        {
-            // Start new level
-            using (Stream stream = new FileStream("Content/Levels/World.xml", FileMode.Open))
-            {
-                gameScreen.StartLevel(stream);
-            }
-
-            // Start game screen
-            StartScreen(gameScreen);
-
-            base.OnInitialized();
-        }
-    }
 }

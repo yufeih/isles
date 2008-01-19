@@ -179,7 +179,9 @@ namespace Isles.Engine
 
 
         /// <summary>
-        /// Game content manager
+        /// Game content manager.
+        /// Assets loaded using this content manager will not be unloaded
+        /// until the termination of the application.
         /// </summary>
         public ContentManager Content
         {
@@ -190,7 +192,9 @@ namespace Isles.Engine
 
 
         /// <summary>
-        /// Content manager for a single level/world
+        /// Content manager for a single level/world.
+        /// Assets loaded using this content manager is unloaded each time
+        /// a game world is released.
         /// </summary>
         public ContentManager LevelContent
         {
@@ -209,6 +213,17 @@ namespace Isles.Engine
         }
 
         protected GameLogic gameLogic = new GameLogic();
+
+
+        /// <summary>
+        /// CUrrent level
+        /// </summary>
+        public ILevel Level
+        {
+            get { return level; }
+        }
+
+        protected ILevel level;
         #endregion
 
         #region Methods
@@ -217,6 +232,12 @@ namespace Isles.Engine
             this.content = BaseGame.Singleton.Content;
             this.levelContent = new ContentManager(BaseGame.Singleton.Services);
             this.levelContent.RootDirectory = content.RootDirectory;
+        }
+
+        public GameWorld(XmlElement node, Loading context)
+            : this()
+        {
+            Load(node, context);
         }
 
         /// <summary>
@@ -249,6 +270,9 @@ namespace Isles.Engine
 
             foreach (Entity o in entities)
                 o.Update(gameTime);
+
+            // Update level
+            level.Update(gameTime);
         }
 
         /// <summary>
@@ -264,41 +288,23 @@ namespace Isles.Engine
 
             foreach (Entity o in entities)
                 o.Draw(gameTime);
+
+            level.Draw(gameTime);
         }
 
-        public bool PointSceneIntersects(Vector3 point)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
+        /// <summary>
+        /// Each level has a unique name stored in this dictionary
+        /// </summary>
+        static Dictionary<string, ILevel> levelDictionary = new Dictionary<string, ILevel>();
 
-        public bool RaySceneIntersects(Ray ray)
+        /// <summary>
+        /// Register a new level logic
+        /// </summary>
+        /// <param name="levelName"></param>
+        /// <param name="level"></param>
+        public static void RegisterLevel(string levelName, ILevel level)
         {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public bool SceneObjectIntersects(IWorldObject object1, IWorldObject object2)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public IEnumerable<IWorldObject> SceneObjectsFromPoint(Vector3 point)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public IEnumerable<IWorldObject> SceneObjectsFromRay(Ray ray)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public IEnumerable<IWorldObject> SceneObjectsFromRegion(BoundingBox boundingBox)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public IWorldObject SceneObjectFromName(string name)
-        {
-            throw new Exception("The method or operation is not implemented.");
+            levelDictionary.Add(levelName, level);
         }
 
         /// <summary>
@@ -307,6 +313,10 @@ namespace Isles.Engine
         /// <param name="inStream"></param>
         public virtual void Load(XmlElement node, Loading context)
         {
+            // Validate XML element
+            if (node.Name != "World")
+                throw new Exception("Invalid world format.");
+
             // Load landscape
             string landscapeFile = node.Attributes["Landscape"].InnerText;
             if (landscapeFile == null)
@@ -314,7 +324,7 @@ namespace Isles.Engine
 
             landscape = levelContent.Load<Landscape>(landscapeFile);
 
-            // Load objects
+            // Load world objects
             IWorldObject worldObject;
             IDictionary<string, string> attributes = new Dictionary<string, string>();
 
@@ -334,6 +344,19 @@ namespace Isles.Engine
                     worldObject = Create(child.Name, attributes);
                 }
             }
+            
+            // Find ILevel from level attribute
+            string levelName = node.Attributes["Level"].InnerText;
+
+            if (levelName != null && levelDictionary.ContainsKey(levelName))
+                level = levelDictionary[levelName];
+            else
+                level = new Level();
+
+            // Load new level
+            level.Load(this, context);
+
+            Log.Write("Game world loaded.");
         }
 
         /// <summary>
@@ -438,10 +461,54 @@ namespace Isles.Engine
         }
 
         /// <summary>
+        /// Select a world object, pass null to deselect everything
+        /// </summary>
+        /// <param name="select"></param>
+        public void Select(Entity obj)
+        {
+            selected.Clear();
+            if (obj != null)
+                selected.Add(obj);
+        }
+
+        /// <summary>
+        /// Select multiple entites
+        /// </summary>
+        /// <param name="objects"></param>
+        public void SelectMultiple(IEnumerable<Entity> objects)
+        {
+            selected.Clear();
+            selected.AddRange(objects);
+        }
+
+        /// <summary>
+        /// Highlight a world object, pass null to dehighlight everything
+        /// </summary>
+        /// <param name="obj"></param>
+        public void Highlight(Entity obj)
+        {
+            highlighted.Clear();
+            if (obj != null)
+                highlighted.Add(obj);
+        }
+
+        /// <summary>
+        /// Highlight multiple entities
+        /// </summary>
+        /// <param name="objects"></param>
+        public void HighlightMultiple(IEnumerable<Entity> objects)
+        {
+            highlighted.Clear();
+            highlighted.AddRange(objects);
+        }
+        #endregion
+
+        #region Pick
+        /// <summary>
         /// Entity picked this frame
         /// </summary>
         Entity pickedEntity;
-        
+
         /// <summary>
         /// Pick an entity from the cursor
         /// </summary>
@@ -454,7 +521,7 @@ namespace Isles.Engine
             // Cache the result
             return pickedEntity = Pick(BaseGame.Singleton.PickRay);
         }
-        
+
         /// <summary>
         /// Pick grid offset
         /// </summary>
@@ -551,47 +618,42 @@ namespace Isles.Engine
 
             return null;
         }
+        #endregion
 
-        /// <summary>
-        /// Select a world object, pass null to deselect everything
-        /// </summary>
-        /// <param name="select"></param>
-        public void Select(Entity obj)
+        #region NotImplemented
+        public bool PointSceneIntersects(Vector3 point)
         {
-            selected.Clear();
-            if (obj != null)
-                selected.Add(obj);
+            throw new Exception("The method or operation is not implemented.");
         }
 
-        /// <summary>
-        /// Select multiple entites
-        /// </summary>
-        /// <param name="objects"></param>
-        public void SelectMultiple(IEnumerable<Entity> objects)
+        public bool RaySceneIntersects(Ray ray)
         {
-            selected.Clear();
-            selected.AddRange(objects);
+            throw new Exception("The method or operation is not implemented.");
         }
 
-        /// <summary>
-        /// Highlight a world object, pass null to dehighlight everything
-        /// </summary>
-        /// <param name="obj"></param>
-        public void Highlight(Entity obj)
+        public bool SceneObjectIntersects(IWorldObject object1, IWorldObject object2)
         {
-            highlighted.Clear();
-            if (obj != null)
-                highlighted.Add(obj);
+            throw new Exception("The method or operation is not implemented.");
         }
 
-        /// <summary>
-        /// Highlight multiple entities
-        /// </summary>
-        /// <param name="objects"></param>
-        public void HighlightMultiple(IEnumerable<Entity> objects)
+        public IEnumerable<IWorldObject> SceneObjectsFromPoint(Vector3 point)
         {
-            highlighted.Clear();
-            highlighted.AddRange(objects);
+            throw new Exception("The method or operation is not implemented.");
+        }
+
+        public IEnumerable<IWorldObject> SceneObjectsFromRay(Ray ray)
+        {
+            throw new Exception("The method or operation is not implemented.");
+        }
+
+        public IEnumerable<IWorldObject> SceneObjectsFromRegion(BoundingBox boundingBox)
+        {
+            throw new Exception("The method or operation is not implemented.");
+        }
+
+        public IWorldObject SceneObjectFromName(string name)
+        {
+            throw new Exception("The method or operation is not implemented.");
         }
         #endregion
     }
