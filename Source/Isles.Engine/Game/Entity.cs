@@ -295,6 +295,9 @@ namespace Isles.Engine
 
                 SetModel(newModel);
             }
+
+            // OLD CODE: Place the entity
+            Place(world.Landscape);
         }
 
         /// <summary>
@@ -416,9 +419,17 @@ namespace Isles.Engine
         /// </summary>
         /// <param name="point">Point to be tested in world space</param>
         /// <returns></returns>
-        public virtual bool Intersects(Point point)
+        public virtual bool Intersects(Vector3 point)
         {
-            return false;
+            if (null == model)
+                return false;
+
+            // Transform point to object space
+            Matrix worldInverse = Matrix.Invert(model.Transform);
+            Vector3 newPosition = Vector3.Transform(point, worldInverse);
+
+            // Performs a bounding box test
+            return model.BoundingBox.Contains(newPosition) == ContainmentType.Contains;
         }
 
         /// <summary>
@@ -428,7 +439,17 @@ namespace Isles.Engine
         /// <returns></returns>
         public virtual float? Intersects(Ray ray)
         {
-            return null;
+            if (null == model)
+                return null;
+
+            // Transform ray to object space
+            Matrix worldInverse = Matrix.Invert(model.Transform);
+            Vector3 newPosition = Vector3.Transform(ray.Position, worldInverse);
+            Vector3 newTarget = Vector3.Transform(ray.Position + ray.Direction, worldInverse);
+            Ray newRay = new Ray(newPosition, newTarget - newPosition);
+
+            // Perform a bounding box intersection...
+            return newRay.Intersects(model.BoundingBox);
         }
         
         #region Drag & Drop

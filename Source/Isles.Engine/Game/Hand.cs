@@ -402,7 +402,7 @@ namespace Isles.Engine
                 case HandState.Idle:
 
                     // Highlight picked entity
-                    world.Highlight(null);
+                    world.Highlight(pickedEntity);
 
                     // Left click to select an entity
                     if (Input.MouseLeftButtonJustPressed)

@@ -344,28 +344,6 @@ namespace Isles
             }
             return true;
         }
-
-        /// <summary>
-        /// Ray intersection test
-        /// </summary>
-        /// <param name="ray">Target ray</param>
-        /// <returns>
-        /// Distance from the intersection point to the ray starting position,
-        /// Null if there's no intersection.
-        /// </returns>
-        public override Nullable<float> Intersects(Ray ray)
-        {
-            // Transform ray to object space
-            Matrix worldInverse = Matrix.Invert(model.Transform);
-            Vector3 newPosition = Vector3.Transform(ray.Position, worldInverse);
-            Vector3 newTarget = Vector3.Transform(ray.Position + ray.Direction, worldInverse);
-            Ray newRay = new Ray(newPosition, newTarget - newPosition);
-
-            // Perform a bounding box intersection...
-            //
-            // HACK HACK!!! We need a more accurate algorithm :)
-            return newRay.Intersects(model.BoundingBox);
-        }
         #endregion
 
         #region Drag & Drop

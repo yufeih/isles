@@ -135,6 +135,12 @@ namespace Isles.Engine
 
 
         /// <summary>
+        /// Gets or sets the texture used to draw the selection
+        /// </summary>
+        public Texture2D SelectionTexture;
+
+
+        /// <summary>
         /// Enumerates all game entities
         /// </summary>
         public IEnumerable<Entity> Entities
@@ -161,7 +167,7 @@ namespace Isles.Engine
         /// </summary>
         public List<Entity> Highlighted
         {
-            get { return Highlighted; }
+            get { return highlighted; }
         }
 
         protected List<Entity> highlighted = new List<Entity>();
@@ -289,7 +295,29 @@ namespace Isles.Engine
             foreach (Entity o in entities)
                 o.Draw(gameTime);
 
+            DrawSelection(gameTime);
+
             level.Draw(gameTime);
+        }
+
+        private void DrawSelection(GameTime gameTime)
+        {
+            if (SelectionTexture == null)
+                return;
+
+            foreach (Entity e in selected)
+            {
+                if (e != null)
+                {
+                    float size = 2 *
+                        Math.Max(e.Size.X, e.Size.Y);
+
+                    landscape.DrawSurface(
+                        SelectionTexture,
+                        new Vector2(e.Position.X, e.Position.Y),
+                        new Vector2(size, size));
+                }
+            }
         }
 
         /// <summary>
@@ -466,9 +494,16 @@ namespace Isles.Engine
         /// <param name="select"></param>
         public void Select(Entity obj)
         {
+            foreach (Entity e in selected)
+                e.Selected = false;
+
             selected.Clear();
+
             if (obj != null)
+            {
+                obj.Selected = true;
                 selected.Add(obj);
+            }
         }
 
         /// <summary>
@@ -477,8 +512,15 @@ namespace Isles.Engine
         /// <param name="objects"></param>
         public void SelectMultiple(IEnumerable<Entity> objects)
         {
+            foreach (Entity e in selected)
+                e.Selected = false;
+
             selected.Clear();
+
             selected.AddRange(objects);
+
+            foreach (Entity e in selected)
+                e.Selected = true;
         }
 
         /// <summary>
@@ -487,9 +529,16 @@ namespace Isles.Engine
         /// <param name="obj"></param>
         public void Highlight(Entity obj)
         {
+            foreach (Entity e in highlighted)
+                e.Highlighted = false;
+
             highlighted.Clear();
+
             if (obj != null)
+            {
                 highlighted.Add(obj);
+                obj.Highlighted = true;
+            }
         }
 
         /// <summary>
@@ -498,8 +547,15 @@ namespace Isles.Engine
         /// <param name="objects"></param>
         public void HighlightMultiple(IEnumerable<Entity> objects)
         {
+            foreach (Entity e in highlighted)
+                e.Highlighted = false;
+
             highlighted.Clear();
+
             highlighted.AddRange(objects);
+
+            foreach (Entity e in highlighted)
+                e.Highlighted = true;
         }
         #endregion
 

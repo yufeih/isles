@@ -133,6 +133,8 @@ namespace Isles
 
             // Load game world
             world = new GameWorld(doc.DocumentElement, loadContext);
+            world.SelectionTexture =
+                BaseGame.Singleton.Content.Load<Texture2D>("Textures/SpellAreaOfEffect");
 
             // Initialize hand
             hand = new Hand(world, "Models/Hand",
