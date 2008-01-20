@@ -6,12 +6,14 @@
 
 using System;
 using System.IO;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
 
 namespace Isles.Engine
 {
+    #region Helper
     /// <summary>
     /// A simple helper class
     /// </summary>
@@ -70,4 +72,89 @@ namespace Isles.Engine
         }
         #endregion
     }
+    #endregion
+
+    #region BroadcastList
+    /// <summary>
+    /// A list, allow safe deletion of objects
+    /// </summary>
+    /// <typeparam name="TValue"></typeparam>
+    /// <remarks>
+    /// Remove objects until update is called
+    /// </remarks>
+    public class BroadcastList<TValue, TList> 
+        : IEnumerable<TValue>, ICollection<TValue> where TList : ICollection<TValue>, new()
+    {
+        bool clear;
+        private TList elements = new TList();
+        private List<TValue> pendingDeletes = new List<TValue>();
+
+        public void Update()
+        {
+            if (clear)
+            {
+                elements.Clear();
+                clear = false;
+            }
+            else
+            {
+                foreach (TValue e in pendingDeletes)
+                    elements.Remove(e);
+            }
+
+            pendingDeletes.Clear();
+        }
+
+        public TList Elements
+        {
+            get { return elements; }
+        }
+
+        public IEnumerator<TValue> GetEnumerator()
+        {
+            return elements.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public void Add(TValue e)
+        {
+            elements.Add(e);
+        }
+
+        public bool Remove(TValue e)
+        {
+            pendingDeletes.Add(e);
+            return true;
+        }
+
+        public void Clear()
+        {
+            clear = true;
+        }
+
+        public bool IsReadOnly
+        {
+            get { return true; }
+        }
+
+        public int Count
+        {
+            get { return elements.Count; }
+        }
+
+        public bool Contains(TValue item)
+        {
+            return elements.Contains(item);
+        }
+
+        public void CopyTo(TValue[] array, int arrayIndex)
+        {
+            elements.CopyTo(array, arrayIndex);
+        }
+    }
+    #endregion
 }

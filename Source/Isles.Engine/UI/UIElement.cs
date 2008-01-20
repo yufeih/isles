@@ -335,7 +335,8 @@ namespace Isles.UI
         /// <summary>
         /// All UI elements in this panel
         /// </summary>
-        protected List<IUIElement> elements = new List<IUIElement>();
+        protected BroadcastList<IUIElement, List<IUIElement>> elements = new
+                  BroadcastList<IUIElement, List<IUIElement>>();
 
         public Panel()
         {
@@ -557,12 +558,12 @@ namespace Isles.UI
                 if (i >= current && i < n)
                 {
                     // Reset element area
-                    elements[i].Visible = true;
-                    elements[i].Area = rect;
+                    elements.Elements[i].Visible = true;
+                    elements.Elements[i].Area = rect;
                 }
                 else
                 {
-                    elements[i].Visible = false;
+                    elements.Elements[i].Visible = false;
                 }
                 
                 rect.X += buttonWidth;

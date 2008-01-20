@@ -47,16 +47,16 @@ namespace Isles.Graphics
             VertexPositionTexture[] vertexData = new VertexPositionTexture[]
             {
                 new VertexPositionTexture(
-                    new Vector3(-3 * width, -3 * depth, 0),
+                    new Vector3(-3 * size.X, -3 * size.Y, 0),
                     new Vector2(0, 0)),
                 new VertexPositionTexture(
-                    new Vector3(4 * width, -3 * depth, 0),
+                    new Vector3(4 * size.X, -3 * size.Y, 0),
                     new Vector2(4, 0)),
                 new VertexPositionTexture(
-                    new Vector3(4 * width, 4 * depth, 0),
+                    new Vector3(4 * size.X, 4 * size.Y, 0),
                     new Vector2(4, 4)),
                 new VertexPositionTexture(
-                    new Vector3(-3 * width, 4 * depth, 0),
+                    new Vector3(-3 * size.X, 4 * size.Y, 0),
                     new Vector2(0, 4))
             };
 

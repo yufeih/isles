@@ -162,7 +162,7 @@ namespace Isles.Graphics
                     x = xIndex * MaxPatchResolution;
                     y = yIndex * MaxPatchResolution;
 
-                    vertices[baseIndex] = landscape.TerrainVertices[x + xPatch, y + yPatch];
+                    vertices[baseIndex] = landscape.terrainVertices[x + xPatch, y + yPatch];
 
                     // FIX patch tearing caused by different LOD
                     // Perform fixing on 4 edges
@@ -174,8 +174,8 @@ namespace Isles.Graphics
                         k = MagicLength[lowerLOD];
                         t = (yPatch / k) * k;
                         vertices[baseIndex].Position.Z = MathHelper.Lerp(
-                            landscape.TerrainVertices[x + xPatch, y + t].Position.Z,
-                            landscape.TerrainVertices[x + xPatch, y + t + k].Position.Z,
+                            landscape.terrainVertices[x + xPatch, y + t].Position.Z,
+                            landscape.terrainVertices[x + xPatch, y + t + k].Position.Z,
                             (float)(yPatch % k) / k);
                     }
                     // Fix right edge
@@ -186,8 +186,8 @@ namespace Isles.Graphics
                         k = MagicLength[lowerLOD];
                         t = (yPatch / k) * k;
                         vertices[baseIndex].Position.Z = MathHelper.Lerp(
-                            landscape.TerrainVertices[x + xPatch, y + t].Position.Z,
-                            landscape.TerrainVertices[x + xPatch, y + t + k].Position.Z,
+                            landscape.terrainVertices[x + xPatch, y + t].Position.Z,
+                            landscape.terrainVertices[x + xPatch, y + t + k].Position.Z,
                             (float)(yPatch % k) / k);
                     }
                     // Fix bottom edge
@@ -197,8 +197,8 @@ namespace Isles.Graphics
                         k = MagicLength[lowerLOD];
                         t = (xPatch / k) * k;
                         vertices[baseIndex].Position.Z = MathHelper.Lerp(
-                            landscape.TerrainVertices[x + t, y + yPatch].Position.Z,
-                            landscape.TerrainVertices[x + t + k, y + yPatch].Position.Z,
+                            landscape.terrainVertices[x + t, y + yPatch].Position.Z,
+                            landscape.terrainVertices[x + t + k, y + yPatch].Position.Z,
                             (float)(xPatch % k) / k);
                     }
                     // Fix top edge
@@ -209,8 +209,8 @@ namespace Isles.Graphics
                         k = MagicLength[lowerLOD];
                         t = (xPatch / k) * k;
                         vertices[baseIndex].Position.Z = MathHelper.Lerp(
-                            landscape.TerrainVertices[x + t, y + yPatch].Position.Z,
-                            landscape.TerrainVertices[x + t + k, y + yPatch].Position.Z,
+                            landscape.terrainVertices[x + t, y + yPatch].Position.Z,
+                            landscape.terrainVertices[x + t + k, y + yPatch].Position.Z,
                             (float)(xPatch % k) / k);
                     } 
 

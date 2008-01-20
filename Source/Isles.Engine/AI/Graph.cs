@@ -244,7 +244,7 @@ namespace Isles.AI
 
             // HACK! HACK! Assume landscape is a square
             this.heightCostFactor = 1;
-            this.distanceCostFactor = landscape.Width / landscape.GridColumnCount;
+            this.distanceCostFactor = landscape.Size.X / landscape.GridCount.X;
         }
 
         /// <summary>
@@ -283,7 +283,7 @@ namespace Isles.AI
             get
             {
                 // Every landscape grid is considered to be a graph node
-                return landscape.GridColumnCount * landscape.GridRowCount;
+                return landscape.GridCount.X * landscape.GridCount.Y;
             }
         }
 
@@ -295,8 +295,8 @@ namespace Isles.AI
             get
             {
                 // Enumerate on all landscape grids
-                for (int y = 0; y < landscape.GridRowCount; y++)
-                    for (int x = 0; x < landscape.GridColumnCount; x++)
+                for (int y = 0; y < landscape.GridCount.Y; y++)
+                    for (int x = 0; x < landscape.GridCount.X; x++)
                         yield return landscape.Data[x, y];
             }
         }
@@ -308,8 +308,8 @@ namespace Isles.AI
         /// <returns></returns>
         public Landscape.Grid GetNode(int index)
         {
-            return landscape.Data[index / landscape.GridColumnCount,
-                                  index % landscape.GridColumnCount];
+            return landscape.Data[index / landscape.GridCount.X,
+                                  index % landscape.GridCount.X];
         }
 
         /// <summary>
@@ -318,8 +318,8 @@ namespace Isles.AI
         public Point IndexToGrid(int index)
         {
             return new Point(
-                index / landscape.GridColumnCount,
-                index % landscape.GridColumnCount);
+                index / landscape.GridCount.X,
+                index % landscape.GridCount.X);
         }
 
         /// <summary>
@@ -327,7 +327,7 @@ namespace Isles.AI
         /// </summary>
         public int GridToIndex(int x, int y)
         {
-            return y * landscape.GridColumnCount + x;
+            return y * landscape.GridCount.X + x;
         }
 
         /// <summary>
@@ -337,8 +337,8 @@ namespace Isles.AI
         {
             // Approximation
             return distanceCostFactor + Math.Abs(
-                landscape.GetHeight(x1, y1) -
-                landscape.GetHeight(x2, y2)) * heightCostFactor;
+                landscape.GetGridHeight(x1, y1) -
+                landscape.GetGridHeight(x2, y2)) * heightCostFactor;
         }
 
         /// <summary>
@@ -362,8 +362,8 @@ namespace Isles.AI
             // Our agents are walking at 8 directions,
             // so a node has 8 out-going edges at most.
 
-            int x = nodeIndex % landscape.GridColumnCount;
-            int y = nodeIndex / landscape.GridColumnCount;
+            int x = nodeIndex % landscape.GridCount.X;
+            int y = nodeIndex / landscape.GridCount.X;
 
             // 3 nodes on the left
             if (x > 0)
@@ -378,14 +378,14 @@ namespace Isles.AI
                         nodeIndex, GridToIndex(x - 1, y - 1),
                         EdgeCost(x, y, x - 1, y - 1) * Sqrt2);
 
-                if (y < landscape.GridRowCount - 1 && IsWalkableGrid(x - 1, y + 1))
+                if (y < landscape.GridCount.Y - 1 && IsWalkableGrid(x - 1, y + 1))
                     yield return new GraphEdge(
                         nodeIndex, GridToIndex(x - 1, y + 1),
                         EdgeCost(x, y, x - 1, y + 1) * Sqrt2);
             }
 
             // 3 nodes on the right
-            if (x < landscape.GridColumnCount - 1)
+            if (x < landscape.GridCount.X - 1)
             {
                 if (IsWalkableGrid(x + 1, y))
                     yield return new GraphEdge(
@@ -397,7 +397,7 @@ namespace Isles.AI
                         nodeIndex, GridToIndex(x + 1, y - 1),
                         EdgeCost(x, y, x + 1, y - 1) * Sqrt2);
 
-                if (y < landscape.GridRowCount - 1 && IsWalkableGrid(x + 1, y + 1))
+                if (y < landscape.GridCount.Y - 1 && IsWalkableGrid(x + 1, y + 1))
                     yield return new GraphEdge(
                         nodeIndex, GridToIndex(x + 1, y + 1),
                         EdgeCost(x, y, x + 1, y + 1) * Sqrt2);
@@ -410,7 +410,7 @@ namespace Isles.AI
                     EdgeCost(x, y, x, y - 1));
 
             // Lower node
-            if (y < landscape.GridRowCount - 1 && IsWalkableGrid(x, y + 1))
+            if (y < landscape.GridCount.Y - 1 && IsWalkableGrid(x, y + 1))
                 yield return new GraphEdge(
                     nodeIndex, GridToIndex(x, y + 1),
                     EdgeCost(x, y, x, y + 1));

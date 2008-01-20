@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
 <!--Isles world format-->
 <World Name="Isles" Description="Isles description" Landscape="Landscapes/Landscape" Level="Demo">
 
@@ -9,7 +11,10 @@
     
     Attributes: Name, Description Model, Position, Transform, Scale Velocity, Health MaxHealth,
                 ConstructionTime, BaseHeight, Wood, Gold, StoresWood, StoresGold, StoresFood
+                
+    Remarks: Object will use its default attributes stored in Config/Defaults.xml if you
+             do not overwrite it here.
   -->
-  <Tree Model="models/arrow" Position="1000, 1000, 0" Transform="40, 0, 0, 0, 0, 40, 0, 0, 0, 0, 100, 0, 0, 0, 100, 1" />
+  <Tree Position="1000, 1000, 0" />
   
 </World>

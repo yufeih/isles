@@ -18,11 +18,6 @@ namespace Isles.Graphics
     {
         #region Fields
         /// <summary>
-        /// Stores the height for every terrain vertex
-        /// </summary>
-        float[,] heightfield;
-
-        /// <summary>
         /// Effect used to render the terrain
         /// </summary>
         Effect terrainEffect;
@@ -68,9 +63,16 @@ namespace Isles.Graphics
         /// </summary>
         VertexDeclaration terrainVertexDeclaration;
 
+
         /// <summary>
-        /// Controls how the terrain mesh changes it's LOD
+        /// Gets or sets the error ratio when computing terrain LOD
         /// </summary>
+        public float TerrainErrorRatio
+        {
+            get { return terrainErrorRatio; }
+            set { terrainErrorRatio = value; }
+        }
+
         float terrainErrorRatio = 0.0012f;
 
         /// <summary>
@@ -160,8 +162,7 @@ namespace Isles.Graphics
             // Load effect
             terrainEffect = input.ContentManager.Load<Effect>("Effects/Terrain");
 
-            terrainBoundingBox = new BoundingBox(
-                new Vector3(0, 0, 0), new Vector3(width, depth, height));
+            terrainBoundingBox = new BoundingBox(Vector3.Zero, size);
 
             // Heightfield
             gridColumnCount = input.ReadInt32();
@@ -219,8 +220,8 @@ namespace Isles.Graphics
                 {
                     terrainVertices[x, y] = new TerrainVertex(
                         // Position
-                        new Vector3(x * width / (gridColumnCount - 1),
-                                    y * depth / (gridRowCount - 1), GetHeight(x, y)),
+                        new Vector3(x * size.X / (gridColumnCount - 1),
+                                    y * size.Y / (gridRowCount - 1), GetGridHeight(x, y)),
                         // Texture coordinate
                         new Vector2(x * 16.0f / (gridColumnCount - 1), y * 16.0f / (gridRowCount - 1)),
                         // Normal

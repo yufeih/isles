@@ -14,6 +14,7 @@ namespace Isles.Engine
 {
     /// <summary>
     /// Game settings
+    /// TODO: Refactor, move some of this to Isles.exe
     /// </summary>
     [Serializable()]
     public class Settings

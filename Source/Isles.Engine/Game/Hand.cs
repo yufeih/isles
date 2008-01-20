@@ -280,7 +280,7 @@ namespace Isles.Engine
         {
             if (state == HandState.Idle)
             {
-                if (spell.TriggerCast(this))
+                if (spell.Trigger(this))
                 {
                     state = HandState.Cast;
 

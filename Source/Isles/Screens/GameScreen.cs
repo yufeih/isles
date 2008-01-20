@@ -6,16 +6,14 @@
 
 using System;
 using System.IO;
+using System.Xml;
 using System.Collections.Generic;
 using System.Text;
-using System.Xml;
-using System.Xml.Serialization;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Isles.Engine;
 using Isles.Graphics;
-using Isles.UI;
+
 
 namespace Isles
 {
@@ -25,11 +23,6 @@ namespace Isles
     public partial class GameScreen : IScreen
     {
         #region Variables
-        /// <summary>
-        /// In game user interface
-        /// </summary>
-        GameUI ui;
-
         /// <summary>
         /// In game camera
         /// </summary>
@@ -71,14 +64,6 @@ namespace Isles
         }
 
         /// <summary>
-        /// Gets in game ui
-        /// </summary>
-        public GameUI UI
-        {
-            get { return ui; }
-        }
-
-        /// <summary>
         /// Gets game camera
         /// </summary>
         public GameCamera Camera
@@ -110,7 +95,6 @@ namespace Isles
         {
             game = BaseGame.Singleton;
             graphics = game.Graphics;
-            ui = new GameUI();
         }
 
         /// <summary>
@@ -132,9 +116,11 @@ namespace Isles
             doc.Load(levelFile);
 
             // Load game world
-            world = new GameWorld(doc.DocumentElement, loadContext);
+            world = new GameWorld();
+            world.Load(doc.DocumentElement, GameDefault.Default.WorldObjectDefaults, loadContext);
             world.SelectionTexture =
                 BaseGame.Singleton.Content.Load<Texture2D>("Textures/SpellAreaOfEffect");
+            world.UI = this;
 
             // Initialize hand
             hand = new Hand(world, "Models/Hand",
@@ -173,12 +159,6 @@ namespace Isles
         {
             // Initialize loading context
             loadContext = new Loading(graphics.GraphicsDevice);
-
-            // Initialize UI
-            ui = new GameUI();
-
-            // Initialize shadow mapping
-            //shadow = new ShadowMapEffect(game);
         }
 
         /// <summary>
@@ -221,7 +201,7 @@ namespace Isles
         public void Update(GameTime gameTime)
         {            
             // Update UI first
-            //UpdateUI(gameTime);
+            UpdateUI(gameTime);
 
             // Update world
             if (world != null)
@@ -247,7 +227,7 @@ namespace Isles
             // Force all point sprites to be drawed
             game.PointSprite.Present(gameTime);
             
-            //DrawUI(gameTime);
+            DrawUI(gameTime);
 
             // Draw god's hand at last
             if (hand != null)
@@ -273,8 +253,7 @@ namespace Isles
         {
             if (disposing)
             {
-                //if (ui != null)
-                //    ui.Dispose();
+
             }
         }
         #endregion

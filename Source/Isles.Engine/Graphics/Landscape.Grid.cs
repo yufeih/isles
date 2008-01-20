@@ -59,7 +59,7 @@ namespace Isles.Graphics
         float gridSizeOnXAxis, gridSizeOnYAxis;
 
         /// <summary>
-        /// Gets the width of grid
+        /// Gets the size.X of grid
         /// </summary>
         public int GridColumnCount
         {
@@ -75,7 +75,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Gets the width of grid
+        /// Gets the size.X of grid
         /// </summary>
         public float GridSizeOnXAxis
         {
@@ -88,6 +88,16 @@ namespace Isles.Graphics
         public float GridSizeOnYAxis
         {
             get { return gridSizeOnYAxis; }
+        }
+
+        public Vector2 GridSize
+        {
+            get { return new Vector2(gridSizeOnXAxis, gridSizeOnYAxis); }
+        }
+
+        public Point GridCount
+        {
+            get { return new Point(gridColumnCount, gridRowCount); }
         }
 
         /// <summary>
@@ -108,8 +118,8 @@ namespace Isles.Graphics
         {
             Data = new Grid[gridColumnCount, gridRowCount];
 
-            gridSizeOnXAxis = width / gridColumnCount;
-            gridSizeOnYAxis = depth / gridRowCount;
+            gridSizeOnXAxis = size.X / gridColumnCount;
+            gridSizeOnYAxis = size.Y / gridRowCount;
 
             // Initialize landscape type
             for (int x = 0; x < gridColumnCount; x++)
@@ -227,8 +237,8 @@ namespace Isles.Graphics
                 // Restrict to map border
                 pMin.X = pMin.X < 0 ? 0 : pMin.X;
                 pMin.Y = pMin.Y < 0 ? 0 : pMin.Y;
-                pMax.X = pMax.X > landscape.GridColumnCount ? landscape.GridColumnCount : pMax.X;
-                pMax.Y = pMax.Y > landscape.GridRowCount ? landscape.GridRowCount : pMax.Y;
+                pMax.X = pMax.X > landscape.GridCount.X ? landscape.GridCount.X : pMax.X;
+                pMax.Y = pMax.Y > landscape.GridCount.Y ? landscape.GridCount.Y : pMax.Y;
 
                 // Make sure max is greater than min
                 pMax.X = pMax.X < pMin.X ? pMin.X : pMax.X;

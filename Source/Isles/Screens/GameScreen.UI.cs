@@ -1,19 +1,25 @@
+//-----------------------------------------------------------------------------
+//  Isles v1.0
+//  
+//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
+//-----------------------------------------------------------------------------
+
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Isles.Engine;
+using Isles.Graphics;
 using Isles.UI;
 
-namespace Isles.UI
+namespace Isles
 {
     /// <summary>
-    /// In game user interface
+    /// This part of the GameScreen deals with in-game UI
     /// </summary>
-    public class GameUI
+    public partial class GameScreen : IGameUI
     {
         //#region Fields
         //public const int ButtonWidth = 80;
@@ -227,64 +233,45 @@ namespace Isles.UI
 
         //#region Update and Draw
 
-        //public override void Update(GameTime gameTime)
-        //{
-        //    // Scroll panel changed
-        //    if (addedToScrollPanel.Count != 0)
-        //    {
-        //        scrollPanel.Clear();
+        public void UpdateUI(GameTime gameTime)
+        {
+            //ui.Update(gameTime);
+        }
 
-        //        foreach (UIElement element in addedToScrollPanel)
-        //            scrollPanel.Add(element);
+        void DrawUI(GameTime gameTime)
+        {
+            //// Draw UI
+            //ui.Draw(gameTime);
 
-        //        addedToScrollPanel.Clear();
-        //    }
-
-        //    ui.Update(gameTime);
-
-        //    if (Input.MouseLeftButtonJustPressed && Pick() == null)
-        //    {
-        //        ResetScrollPanelElements();
-        //    }
-        //}
-
-        //void Draw(GameTime gameTime)
-        //{
-        //    // Draw UI
-        //    ui.Draw(gameTime);
-
-        //    if (entityManager.Selected != null)
-        //        entityManager.Selected.DrawStatus(
-        //            UIDisplay.GetRelativeRectangle(
-        //                statusRectangle, ui, ScaleMode.ScaleY, Anchor.BottomLeft));
-        //}
+            //if (entityManager.Selected != null)
+            //    entityManager.Selected.DrawStatus(
+            //        UIDisplay.GetRelativeRectangle(
+            //            statusRectangle, ui, ScaleMode.ScaleY, Anchor.BottomLeft));
+        }
         //#endregion
 
-        //#region Methods
-        //public Rectangle GetIcon(int index)
-        //{
-        //    return GetIcon(iconTexture, index);
-        //}
+        #region IGameUI
+        /// <summary>
+        /// Called when an entity is selected. Game UI should refresh
+        /// itself to match the new entities, e.g., status and spells.
+        /// </summary>
+        public void Select(Entity entity)
+        {
+        }
 
-        ///// <summary>
-        ///// Get the icon rectangle based on index
-        ///// </summary>
-        ///// <param name="index"></param>
-        ///// <returns></returns>
-        //public static Rectangle GetIcon(Texture2D uiTexture, int index)
-        //{
-        //    const int xCount = 4;
-        //    const int yCount = 8;
+        /// <summary>
+        /// Called when multiple entities are selected.
+        /// </summary>
+        public void SelectMultiple(IEnumerable<Entity> entities)
+        {
+        }
 
-        //    Rectangle rect;
-
-        //    rect.Width = uiTexture.Width / xCount;
-        //    rect.Height = uiTexture.Height / yCount;
-        //    rect.X = (index % xCount) * rect.Width;
-        //    rect.Y = (index / xCount) * rect.Height;
-
-        //    return rect;
-        //}
-        //#endregion
+        /// <summary>
+        /// Popup a message
+        /// </summary>
+        public void ShowMessage(MessageType type, string message, Vector2 position, Color color)
+        {
+        }
+        #endregion
     }
 }

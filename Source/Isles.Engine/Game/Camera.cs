@@ -154,9 +154,9 @@ namespace Isles.Engine
             this.landscape = landscape;
 
             // Center camera
-            FlyTo(new Vector3(landscape.Width / 2, landscape.Depth / 2, 0), true);
+            FlyTo(new Vector3(landscape.Size.X / 2, landscape.Size.Y / 2, 0), true);
             SpaceBounds = new BoundingBox(Vector3.Zero,
-                new Vector3(landscape.Width, landscape.Depth, 6 * landscape.Height));
+                new Vector3(landscape.Size.X, landscape.Size.Y, 6 * landscape.Size.Z));
         }
 
         /// <summary>

@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+
+<!--This file stores some game default attributes-->
+<GameDefault>
+  
+  <WorldObject>
+    
+    <!--Stores default attributes for game world object-->
+    <Tree Name="Tree" Description="A tree" Wood="200" Model="models/arrow" Transform="40, 0, 0, 0, 0, 40, 0, 0, 0, 0, 100, 0, 0, 0, 100, 1" />
+
+  </WorldObject>
+
+  <Spell>
+    
+    <!--Stores default attributes for spells-->
+    <Fireball Name="Fireball" Description="Fireball description" />
+    
+  </Spell>
+  
+</GameDefault>

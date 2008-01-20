@@ -368,6 +368,15 @@ namespace Isles.Engine
         }
 
         /// <summary>
+        /// Gets the spells of the entity
+        /// </summary>
+        /// <returns></returns>
+        public virtual IEnumerable<Spell> GetSpells()
+        {
+            return null;
+        }
+
+        /// <summary>
         /// Place the game entity somewhere on the ground using
         /// existing entity position and rotation
         /// </summary>
@@ -572,11 +581,6 @@ namespace Isles.Engine
         {
             throw new Exception("The method or operation is not implemented.");
         }
-
-        public override float? Intersects(Ray ray)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
         #endregion
 
         public BaseAgent(GameWorld world)
@@ -586,24 +590,4 @@ namespace Isles.Engine
         }
     }
     #endregion
-
-    ///// <summary>
-    ///// Draw all game entities
-    ///// </summary>
-    ///// <param name="gameTime"></param>
-    //public void Draw(GameTime gameTime)
-    //{
-    //    // Draw selection
-    //    if (selected != null)
-    //    {
-    //        float size = 2 *
-    //            Math.Max(selected.Size.X, selected.Size.Y);
-
-    //        screen.World.Landscape.DrawSurface(
-    //            selection,
-    //            new Vector2(selected.Position.X, selected.Position.Y),
-    //            new Vector2(size, size));
-    //    }
-    //}
-
 }

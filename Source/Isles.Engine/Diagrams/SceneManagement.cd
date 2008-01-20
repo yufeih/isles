@@ -10,68 +10,33 @@
   <Comment CommentText="Agent System:&#xD;&#xA;&#xD;&#xA;The base agent class derives from Entity class, it provides basic charactor manipulation functions, e.g., play animation, walk, perform actions... It also provides a goal-driven state machine mechanism to allow flexible and hierarchical behavior control.&#xD;&#xA;&#xD;&#xA;BaseAgent class will derive many different kinds of classes, e.g., Creature, Civilian, Hunter, Boss...&#xD;&#xA;&#xD;&#xA;BaseAgent class interacts with Isles.AI to get path finding service, interacts with Isles.IWorld to get to  know the world around it.">
     <Position X="10.521" Y="7.781" Height="2.604" Width="3.283" />
   </Comment>
-  <Class Name="Isles.Engine.WorldObject" Collapsed="true">
-    <Position X="4.25" Y="4.75" Width="1.5" />
+  <Class Name="Isles.Engine.BaseEntity" Collapsed="true">
+    <Position X="3" Y="6" Width="1.5" />
     <TypeIdentifier>
-      <FileName>Entity\Entity.cs</FileName>
-      <HashCode>AAQAEgAAAAAAAgAgAAAAIAQBACBEAAEgAAQBAAAEAII=</HashCode>
+      <FileName>Game\Entity.cs</FileName>
+      <HashCode>AAQAEgAAAAAAAgAgAAAAIAQBACBEAAEgAAQBAAAEAAI=</HashCode>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="Isles.Engine.Entity" Collapsed="true">
-    <Position X="5.75" Y="6.25" Width="1.5" />
+    <Position X="3" Y="7.25" Width="1.5" />
     <TypeIdentifier>
-      <FileName>Entity\Entity.cs</FileName>
-      <HashCode>gAAAgAAAAAAAgIAAAZCCCCIAAAQIgACACEAEAgMBEAM=</HashCode>
+      <FileName>Game\Entity.cs</FileName>
+      <HashCode>gAAAgAAACAAggIAAIZCCCCIAAARIgACACEoEAgMJEIM=</HashCode>
     </TypeIdentifier>
   </Class>
   <Class Name="Isles.Engine.BaseAgent" Collapsed="true">
-    <Position X="8.25" Y="7.75" Width="1.5" />
+    <Position X="3" Y="8.5" Width="1.5" />
     <TypeIdentifier>
-      <FileName>Entity\Agent.cs</FileName>
-      <HashCode>gAQAAAAAAAAAAgAAAAAAAAIAAAAAAAAAAAAAAAAAAIA=</HashCode>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Isles.Engine.Fireball" Collapsed="true">
-    <Position X="3" Y="6.25" Width="1.5" />
-    <TypeIdentifier>
-      <FileName>Spells\Fireball.cs</FileName>
-      <HashCode>AAQAAAAAAAAAAgAACAAAAAAAAAAAEgAAACAAAQAAAAA=</HashCode>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Isles.Engine.Building" Collapsed="true">
-    <Position X="3.5" Y="7.75" Width="1.5" />
-    <TypeIdentifier>
-      <FileName>Entity\Building.cs</FileName>
-      <HashCode>AAQACAAAACgAAkAIQRBjACIAAACAAACEiMgABAEIAIk=</HashCode>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Isles.Engine.Crop" Collapsed="true">
-    <Position X="3.5" Y="8.75" Width="1.5" />
-    <TypeIdentifier>
-      <FileName>Entity\Crop.cs</FileName>
-      <HashCode>gAQAAAAAAAAAAoAAAQAAACIAAAAgAgAEAEAAAAAAAIE=</HashCode>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Isles.Engine.Stone" Collapsed="true">
-    <Position X="3.5" Y="10" Width="1.5" />
-    <TypeIdentifier>
-      <FileName>Entity\Stone.cs</FileName>
-      <HashCode>AAQAAAAAAAAAAgAAAAADACIAAACAAACAgEgAAAAIAIE=</HashCode>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Isles.Engine.Tree" Collapsed="true">
-    <Position X="3.5" Y="11.25" Width="1.5" />
-    <TypeIdentifier>
-      <FileName>Entity\Tree.cs</FileName>
-      <HashCode>AAQAAAAAAAAAAgAAAAADACIAAACAAAAAgEgAAAAIAIE=</HashCode>
+      <FileName>Game\Entity.cs</FileName>
+      <HashCode>gAQAAAAAAAAAAgAAAAAAAAIAAAAAAAAAAAAAAAAAAAA=</HashCode>
     </TypeIdentifier>
   </Class>
   <Interface Name="Isles.Engine.IWorldObject">
     <Position X="2.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <FileName>Game\GameWorld.cs</FileName>
-      <HashCode>AAQAAAAAAAAAAgAgAAAAAAQAACBAAAAAAAABAAAAAIA=</HashCode>
+      <HashCode>AAQAAAAAAAAAAgAgAAAAAAAAACBAAAAAAAABAAAAAAA=</HashCode>
     </TypeIdentifier>
   </Interface>
 </ClassDiagram>

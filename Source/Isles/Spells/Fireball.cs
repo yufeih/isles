@@ -153,7 +153,7 @@ namespace Isles
     /// <summary>
     /// Fireball spell
     /// </summary>
-    public class FireballSpell : Spell
+    public class Fireball : Spell
     {
         /// <summary>
         /// Aim texture
@@ -161,12 +161,47 @@ namespace Isles
         Texture2D aim;
 
         /// <summary>
+        /// Spell name
+        /// </summary>
+        string name = "";
+
+        /// <summary>
+        /// Spell description
+        /// </summary>
+        string description = "";
+
+        /// <summary>
         /// Create a new spell. TODO: pass in a hand
         /// </summary>
-        public FireballSpell(GameWorld world, SpellSettings settings)
-            : base(world, settings)
+        public Fireball(GameWorld world)
+            : base(world)
         {
+            string value = "";
+            IDictionary<string, string> dictionary;
+
+            if (GameDefault.Default.SpellDefaults.TryGetValue(GetType().Name, out dictionary))
+            {
+                dictionary.TryGetValue("Name", out name);
+                dictionary.TryGetValue("Description", out description);
+            }                
+
             aim = world.Content.Load<Texture2D>("Textures/SpellAreaOfEffect");
+        }
+
+        /// <summary>
+        /// Gets the name of the spell
+        /// </summary>
+        public override string Name
+        {
+            get { return name; }
+        }
+
+        /// <summary>
+        /// Gets the description of the spell
+        /// </summary>
+        public override string Description
+        {
+            get { return description; }
         }
 
         /// <summary>

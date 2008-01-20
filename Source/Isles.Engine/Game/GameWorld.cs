@@ -73,56 +73,47 @@ namespace Isles.Engine
     }
     #endregion
 
+    #region IGameUI
+    /// <summary>
+    /// Describe the type of a game message
+    /// </summary>
+    public enum MessageType
+    {
+        Message, Warning, Error, Congratulation
+    }
+
+    /// <summary>
+    /// In game user interface
+    /// </summary>
+    public interface IGameUI
+    {
+        /// <summary>
+        /// Called when an entity is selected. Game UI should refresh
+        /// itself to match the new entities, e.g., status and spells.
+        /// </summary>
+        void Select(Entity entity);
+
+        /// <summary>
+        /// Called when multiple entities are selected.
+        /// </summary>
+        void SelectMultiple(IEnumerable<Entity> entities);
+
+        /// <summary>
+        /// Popup a message
+        /// </summary>
+        void ShowMessage(MessageType type, string message, Vector2 position, Color color);
+    }
+    #endregion
+
     #region GameWorld
     /// <summary>
     /// Represents the game world
     /// </summary>
     public class GameWorld
-    {
-        #region InternalList
-        /// <summary>
-        /// Internal linked list, allow safe deletion of objects
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <remarks>
-        /// Remove objects until update is called
-        /// </remarks>
-        protected sealed class InternalList<T> : IEnumerable<T>
-        {
-            private LinkedList<T> elements = new LinkedList<T>();
-            private List<T> pendingDeletes = new List<T>();
-
-            public IEnumerator<T> GetEnumerator()
-            {
-                return elements.GetEnumerator();
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
-
-            public void Add(T e)
-            {
-                elements.AddFirst(e);
-            }
-
-            public void Remove(T e)
-            {
-                pendingDeletes.Add(e);
-            }
-
-            public void Update()
-            {
-                foreach (T e in pendingDeletes)
-                    elements.Remove(e);
-
-                pendingDeletes.Clear();
-            }
-        }
-        #endregion
-        
+    {        
         #region Field
+        protected sealed class InternalList<T> : BroadcastList<T, LinkedList<T>> {}
+
         /// <summary>
         /// Enumerates all world objects
         /// </summary>
@@ -230,6 +221,18 @@ namespace Isles.Engine
         }
 
         protected ILevel level;
+
+
+        /// <summary>
+        /// Game UI, can be null
+        /// </summary>
+        public IGameUI UI
+        {
+            get { return ui; }
+            set { ui = value; }
+        }
+
+        protected IGameUI ui;
         #endregion
 
         #region Methods
@@ -238,12 +241,6 @@ namespace Isles.Engine
             this.content = BaseGame.Singleton.Content;
             this.levelContent = new ContentManager(BaseGame.Singleton.Services);
             this.levelContent.RootDirectory = content.RootDirectory;
-        }
-
-        public GameWorld(XmlElement node, Loading context)
-            : this()
-        {
-            Load(node, context);
         }
 
         /// <summary>
@@ -339,7 +336,10 @@ namespace Isles.Engine
         /// Load the game world from a file
         /// </summary>
         /// <param name="inStream"></param>
-        public virtual void Load(XmlElement node, Loading context)
+        public virtual void Load(
+            XmlElement node,
+            IDictionary<string, IDictionary<string, string>> defaults,
+            Loading context)
         {
             // Validate XML element
             if (node.Name != "World")
@@ -354,7 +354,7 @@ namespace Isles.Engine
 
             // Load world objects
             IWorldObject worldObject;
-            IDictionary<string, string> attributes = new Dictionary<string, string>();
+            Dictionary<string, string> attributes = new Dictionary<string, string>();
 
             foreach (XmlNode child in node.ChildNodes)
             {
@@ -366,6 +366,14 @@ namespace Isles.Engine
                     // Initialize object attributes from XML element
                     attributes.Clear();
 
+                    // Add default attributes
+                    if (defaults != null && defaults.ContainsKey(child.Name))
+                    {
+                        foreach (KeyValuePair<string, string> pair in defaults[child.Name])
+                            attributes.Add(pair.Key, pair.Value);
+                    }
+
+                    // Add custom attributes
                     foreach (XmlAttribute attribute in element.Attributes)
                         attributes.Add(attribute.Name, attribute.Value);
 
@@ -384,7 +392,7 @@ namespace Isles.Engine
             // Load new level
             level.Load(this, context);
 
-            Log.Write("Game world loaded.");
+            Log.Write("Game world loaded...");
         }
 
         /// <summary>

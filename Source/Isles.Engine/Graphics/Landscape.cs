@@ -20,70 +20,31 @@ namespace Isles.Graphics
     /// Uses Geometry Mipmapping to generate continously level of detailed terrain.
     /// Uses multi-pass technology to render different terrain layers (textures)
     /// </summary>
-    public partial class Landscape : IDisposable
+    public partial class Landscape : IDisposable, ILandscape
     {
-        #region Variables
-
+        #region Field
         /// <summary>
         /// Base game
         /// </summary>
         BaseGame game;
+
 
         /// <summary>
         /// Graphics device
         /// </summary>
         GraphicsDevice graphics;
 
-        /// <summary>
-        /// Terrain size (x, y, z)
-        /// </summary>
-        float width, depth, height;
-
-        #endregion
-
-        #region Properties
 
         /// <summary>
-        /// Gets or sets the effect used for rendering the terrain
+        /// Gets terrain size (x, y, z)
         /// </summary>
-        public Effect TerrainEffect
+        public Vector3 Size
         {
-            get { return terrainEffect; }
-            //set { terrainEffect = value; }
+            get { return size; }
         }
+    
+        Vector3 size;
 
-        /// <summary>
-        /// Gets the width of the landscape (x axis)
-        /// </summary>
-        public float Width
-        {
-            get { return width; }
-        }
-
-        /// <summary>
-        /// Gets or sets the error ratio when computing terrain LOD
-        /// </summary>
-        public float TerrainErrorRatio
-        {
-            get { return terrainErrorRatio; }
-            set { terrainErrorRatio = value; }
-        }
-
-        /// <summary>
-        /// Gets the depth of the landscape (y axis)
-        /// </summary>
-        public float Depth
-        {
-            get { return depth; }
-        }
-
-        /// <summary>
-        /// Gets the height of the landscape (z axis)
-        /// </summary>
-        public float Height
-        {
-            get { return height; }
-        }
 
         /// <summary>
         /// Gets the heightfield data of the landscape
@@ -93,13 +54,8 @@ namespace Isles.Graphics
             get { return heightfield; }
         }
 
-        /// <summary>
-        /// Gets terrain vertices
-        /// </summary>
-        public TerrainVertex[,] TerrainVertices
-        {
-            get { return terrainVertices; }
-        }
+        float[,] heightfield;
+
 
         /// <summary>
         /// Gets the number of patches on the x axis
@@ -140,9 +96,9 @@ namespace Isles.Graphics
         public Landscape(ContentReader input)
         {
             // Size info
-            width = input.ReadSingle();
-            depth = input.ReadSingle();
-            height = input.ReadSingle();
+            size.X = input.ReadSingle();
+            size.Y = input.ReadSingle();
+            size.Z = input.ReadSingle();
 
             // Initialize terrain
             ReadTerrainContent(input);
@@ -194,30 +150,30 @@ namespace Isles.Graphics
         public Vector2 GridToPosition(int x, int y)
         {
             return new Vector2(
-                x * width / (gridColumnCount - 1),
-                y * depth / (gridRowCount - 1) );
+                x * size.X / (gridColumnCount - 1),
+                y * size.Y / (gridRowCount - 1) );
         }
 
         public Point PositionToGrid(float x, float y)
         {
             return new Point(
-                (int)(x * (gridColumnCount - 1) / width),
-                (int)(y * (gridRowCount - 1) / depth) );
+                (int)(x * (gridColumnCount - 1) / size.X),
+                (int)(y * (gridRowCount - 1) / size.Y) );
         }
 
         /// <summary>
-        /// Gets the landscape height of a given point on the heightfield
+        /// Gets the landscape size.Z of a given point on the heightfield
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns></returns>
-        public float GetHeight(int x, int y)
+        public float GetGridHeight(int x, int y)
         {
             return heightfield[x, y];
         }
 
         /// <summary>
-        /// Gets the landscape height of any given point
+        /// Gets the landscape size.Z of any given point
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
@@ -228,17 +184,17 @@ namespace Isles.Graphics
             // We don't want to cause any exception here
             if (x < 0)
                 x = 0;
-            else if (x >= width)
-                x = width - 1;  // x can't be heightfieldWidth-1
+            else if (x >= size.X)
+                x = size.X - 1;  // x can't be heightfieldWidth-1
                                 // or there'll be an out of range
             if (y < 0)          // exception. So is y.
                 y = 0;
-            else if (y >= depth)
-                y = depth - 1;
+            else if (y >= size.Y)
+                y = size.Y - 1;
 
             // Rescale to our heightfield dimensions
-            x *= (gridColumnCount - 1) / width;
-            y *= (gridRowCount - 1) / depth;
+            x *= (gridColumnCount - 1) / size.X;
+            y *= (gridRowCount - 1) / size.Y;
 
             // Get the position ON the current tile (0.0-1.0)!!!
             float
@@ -326,33 +282,33 @@ namespace Isles.Graphics
             float k = ray.Direction.Y / ray.Direction.X;
             float invK = ray.Direction.X / ray.Direction.Y;
             float r = ray.Position.Y - ray.Position.X * k;
-            if (r >= 0 && r <= depth)
+            if (r >= 0 && r <= size.Y)
             {
                 points[i++] = new Vector3(0, r,
                     ray.Position.Z - ray.Position.X *
                     ray.Direction.Z / ray.Direction.X);
             }
-            r = ray.Position.Y + (width - ray.Position.X) * k;
-            if (r >= 0 && r <= depth)
+            r = ray.Position.Y + (size.X - ray.Position.X) * k;
+            if (r >= 0 && r <= size.Y)
             {
-                points[i++] = new Vector3(width, r,
-                    ray.Position.Z + (width - ray.Position.X) *
+                points[i++] = new Vector3(size.X, r,
+                    ray.Position.Z + (size.X - ray.Position.X) *
                     ray.Direction.Z / ray.Direction.X);
             }
             if (i < 2)
             {
                 r = ray.Position.X - ray.Position.Y * invK;
-                if (r >= 0 && r <= width)
+                if (r >= 0 && r <= size.X)
                     points[i++] = new Vector3(r, 0,
                         ray.Position.Z - ray.Position.Y *
                         ray.Direction.Z / ray.Direction.Y);
             }
             if (i < 2)
             {
-                r = ray.Position.X + (depth - ray.Position.Y) * invK;
-                if (r >= 0 && r <= width)
-                    points[i++] = new Vector3(r, depth,
-                        ray.Position.Z + (depth - ray.Position.Y) *
+                r = ray.Position.X + (size.Y - ray.Position.Y) * invK;
+                if (r >= 0 && r <= size.X)
+                    points[i++] = new Vector3(r, size.Y,
+                        ray.Position.Z + (size.Y - ray.Position.Y) *
                         ray.Direction.Z / ray.Direction.Y);
             }
             if (i < 2)
@@ -360,8 +316,8 @@ namespace Isles.Graphics
 
             // When ray position is inside the box, it should be one
             // of the starting point
-            bool inside = ray.Position.X > 0 && ray.Position.X < width &&
-                          ray.Position.Y > 0 && ray.Position.Y < depth;
+            bool inside = ray.Position.X > 0 && ray.Position.X < size.X &&
+                          ray.Position.Y > 0 && ray.Position.Y < size.Y;
 
             Vector3 v1 = Vector3.Zero, v2 = Vector3.Zero;
             // Sort the 2 points to make the line follow the direction
@@ -438,20 +394,20 @@ namespace Isles.Graphics
             // Compute z and dz
             float z = v1.Z, dz;
             //float dz = ray.Direction.Z *
-            //    (invert ? width / (heightfieldWidth - 1) :
-            //              depth / (heightfieldHeight - 1)) /
+            //    (invert ? size.X / (heightfieldWidth - 1) :
+            //              size.Y / (heightfieldHeight - 1)) /
             //    (new Vector2(ray.Direction.X, ray.Direction.Y).Length());
             if (invert)
             {
                 Vector2 v = Vector2.Normalize(new Vector2(ray.Direction.X, ray.Direction.Z));
                 v /= v.X;
-                dz = v.Y * width / (gridColumnCount - 1) / v.X;
+                dz = v.Y * size.X / (gridColumnCount - 1) / v.X;
             }
             else
             {
                 Vector2 v = Vector2.Normalize(new Vector2(ray.Direction.Y, ray.Direction.Z));
                 v /= v.X;
-                dz = v.Y * depth / (gridRowCount - 1) / v.X;
+                dz = v.Y * size.Y / (gridRowCount - 1) / v.X;
             }
             
             // Start drawing pixels
@@ -576,33 +532,33 @@ namespace Isles.Graphics
             float k = ray.Direction.Y / ray.Direction.X;
             float invK = ray.Direction.X / ray.Direction.Y;
             float r = ray.Position.Y - ray.Position.X * k;
-            if (r >= 0 && r <= depth)
+            if (r >= 0 && r <= size.Y)
             {
                 points[i++] = new Vector3(0, r,
                     ray.Position.Z - ray.Position.X *
                     ray.Direction.Z / ray.Direction.X);
             }
-            r = ray.Position.Y + (width - ray.Position.X) * k;
-            if (r >= 0 && r <= depth)
+            r = ray.Position.Y + (size.X - ray.Position.X) * k;
+            if (r >= 0 && r <= size.Y)
             {
-                points[i++] = new Vector3(width, r,
-                    ray.Position.Z + (width - ray.Position.X) *
+                points[i++] = new Vector3(size.X, r,
+                    ray.Position.Z + (size.X - ray.Position.X) *
                     ray.Direction.Z / ray.Direction.X);
             }
             if (i < 2)
             {
                 r = ray.Position.X - ray.Position.Y * invK;
-                if (r >= 0 && r <= width)
+                if (r >= 0 && r <= size.X)
                     points[i++] = new Vector3(r, 0,
                         ray.Position.Z - ray.Position.Y *
                         ray.Direction.Z / ray.Direction.Y);
             }
             if (i < 2)
             {
-                r = ray.Position.X + (depth - ray.Position.Y) * invK;
-                if (r >= 0 && r <= width)
-                    points[i++] = new Vector3(r, depth,
-                        ray.Position.Z + (depth - ray.Position.Y) *
+                r = ray.Position.X + (size.Y - ray.Position.Y) * invK;
+                if (r >= 0 && r <= size.X)
+                    points[i++] = new Vector3(r, size.Y,
+                        ray.Position.Z + (size.Y - ray.Position.Y) *
                         ray.Direction.Z / ray.Direction.Y);
             }
             if (i < 2)
@@ -610,8 +566,8 @@ namespace Isles.Graphics
 
             // When ray position is inside the box, it should be one
             // of the starting point
-            bool inside = ray.Position.X > 0 && ray.Position.X < width &&
-                          ray.Position.Y > 0 && ray.Position.Y < depth;
+            bool inside = ray.Position.X > 0 && ray.Position.X < size.X &&
+                          ray.Position.Y > 0 && ray.Position.Y < size.Y;
 
             Vector3 v1 = Vector3.Zero, v2 = Vector3.Zero;
             // Sort the 2 points to make the line follow the direction
@@ -642,8 +598,8 @@ namespace Isles.Graphics
                 }
             }
 
-            // Trace steps along your line and determine the height at each point,
-            // for each sample point look up the height of the terrain and determine
+            // Trace steps along your line and determine the size.Z at each point,
+            // for each sample point look up the size.Z of the terrain and determine
             // if the point on the line is above or below the terrain. Once you have
             // determined the two sampling points that are above and below the terrain
             // you can refine using binary searching.

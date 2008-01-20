@@ -5,7 +5,7 @@
     <Position X="0.5" Y="1.104" Height="3.271" Width="2.981" />
   </Comment>
   <Comment CommentText="GameWorld is a 2D representation of the game layout and all game entities (Remember all interactive game entity can be represented by a rectangle and rotation).&#xD;&#xA;&#xD;&#xA;It's used to realize major game logic, e.g., building position validation, AI path graph, path following (object avoidance)...&#xD;&#xA;&#xD;&#xA;GameWorld:&#xD;&#xA; - Landscape&#xD;&#xA; - ISceneManager&#xD;&#xA; - PathGraph&#xD;&#xA;&#xD;&#xA;Where do we place Landscape?">
-    <Position X="6.154" Y="4.396" Height="2.75" Width="3.929" />
+    <Position X="3.779" Y="5" Height="2.75" Width="3.929" />
   </Comment>
   <Comment CommentText="GameScene is a manager class for all game assets.&#xD;&#xA;">
     <Position X="0.5" Y="4.979" Height="2.365" Width="2.992" />
@@ -14,51 +14,33 @@
     <Position X="4.25" Y="2.25" Width="1.5" />
     <TypeIdentifier>
       <FileName>Game\Game.cs</FileName>
-      <HashCode>IBQiMBAEFnBQAxQBSABYgWggCADNiCgAzZAgQUAQBAc=</HashCode>
+      <HashCode>IBQiMBAEFnBQAxQBSABYgWggCQDNiCkAzZAgQUAQBAc=</HashCode>
     </TypeIdentifier>
   </Class>
-  <Class Name="Isles.Engine.GameScreen" Collapsed="true">
+  <Class Name="Isles.Engine.GameWorld" Collapsed="true">
     <Position X="6.25" Y="2.25" Width="1.5" />
     <TypeIdentifier>
-      <FileName>Screens\GameScreen.cs</FileName>
-      <HashCode>AJU2kAARQmkbFkDgEzJCBEESogmUKjgMBhAAAgUACgU=</HashCode>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" />
-  </Class>
-  <Class Name="Isles.Engine.GameIsles" Collapsed="true">
-    <Position X="4.25" Y="3.5" Width="1.5" />
-    <TypeIdentifier>
-      <FileName>Game\Game.cs</FileName>
-      <HashCode>AAAAAAAAIAAAACAAAAAAAAAAAAAAAAAACAAAAAAAAAA=</HashCode>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="Isles.Engine.GameWorld">
-    <Position X="8.5" Y="3.25" Width="1.5" />
-    <TypeIdentifier>
       <FileName>Game\GameWorld.cs</FileName>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AJYTgKAAAkiwFkBAAAAADAAAAAlKAVABCiEiQwAAEgI=</HashCode>
     </TypeIdentifier>
-  </Class>
-  <Class Name="Isles.Engine.GameScene" Collapsed="true">
-    <Position X="8.5" Y="2.25" Width="1.5" />
-    <TypeIdentifier>
-      <FileName>Game\GameScene.cs</FileName>
-      <HashCode>ABYBAAAAAAAQAkAAAAAABAAAAAACAAAAAiAAAAAAAAA=</HashCode>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" />
+    <NestedTypes>
+      <Class Name="Isles.Engine.GameWorld.InternalList&lt;T&gt;" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Game\GameWorld.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Delegate Name="Isles.Engine.GameWorld.Creator" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Game\GameWorld.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
   </Class>
   <Interface Name="Isles.Engine.IScreen" Collapsed="true">
     <Position X="6.25" Y="1" Width="1.5" />
     <TypeIdentifier>
       <FileName>Game\IScreen.cs</FileName>
       <HashCode>AAQAEAAAAAAAAgAAAAAAAAAAAAEEAAAAAAAAAAAAAAQ=</HashCode>
-    </TypeIdentifier>
-  </Interface>
-  <Interface Name="Isles.Engine.ISceneManager" Collapsed="true">
-    <Position X="8.5" Y="1" Width="1.5" />
-    <TypeIdentifier>
-      <FileName>Game\Scene.cs</FileName>
-      <HashCode>ABYBAAAAAAAQAkAAAAAABAAAAAACAAAAAiAAAAAAAAA=</HashCode>
     </TypeIdentifier>
   </Interface>
 </ClassDiagram>
