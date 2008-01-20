@@ -223,7 +223,7 @@ namespace Isles
         {
             // Make sure it's on the landscape
             if (position.X < 0 || position.Y < 0 ||
-                position.X > landscape.Width || position.Y > landscape.Depth)
+                position.X > landscape.Size.X || position.Y > landscape.Size.Y)
             {
                 return false;
             }
