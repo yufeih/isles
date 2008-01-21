@@ -50,9 +50,45 @@ namespace Isles.Engine
             return new Icon(new Rectangle(x * w, y * h, w, h));
         }
     }
+
+    /// <summary>
+    /// Describes a spell. Spells are identified by names, 
+    /// one spell has only one description for it.
+    /// </summary>
+    public abstract class SpellDescription
+    {
+        /// <summary>
+        /// Gets the name of the spell
+        /// </summary>
+        public abstract string Name { get; }
+
+        /// <summary>
+        /// Gets the description for the spell
+        /// </summary>
+        public abstract string Description { get; }
+
+        /// <summary>
+        /// Gets the spell icon.
+        /// </summary>
+        public virtual Icon? Icon
+        {
+            get { return null; }
+        }
+
+        /// <summary>
+        /// Gets the freeze time after the spell has been casted
+        /// </summary>
+        public virtual float FreezeTime
+        {
+            get { return 0; }
+        }
+
+        public abstract Spell Create(GameWorld world);
+    }
     
     /// <summary>
-    /// Controls how a spell is been casted
+    /// Base class for all game spells.
+    /// A new spell instance is created whenever a spell is been casted
     /// </summary>
     public abstract class Spell
     {
@@ -71,9 +107,17 @@ namespace Isles.Engine
         /// </summary>
         /// <param name="spellType"></param>
         /// <param name="creator"></param>
-        public static void Register(Type spellType, Creator creator)
+        public static void RegisterCreator(Type spellType, Creator creator)
         {
             creators.Add(spellType.Name, creator);
+        }
+
+        /// <summary>
+        /// Register a new spell creator
+        /// </summary>
+        public static void RegisterCreator(string spellName, Creator creator)
+        {
+            creators.Add(spellName, creator);
         }
 
         public static Spell Create(Type spellType, GameWorld world)
@@ -110,32 +154,6 @@ namespace Isles.Engine
         public Spell(GameWorld world)
         {
             this.world = world;
-        }
-
-        /// <summary>
-        /// Gets the name of the spell
-        /// </summary>
-        public abstract string Name { get; }
-
-        /// <summary>
-        /// Gets the description for the spell
-        /// </summary>
-        public abstract string Description { get; }
-
-        /// <summary>
-        /// Gets the spell icon.
-        /// </summary>
-        public virtual Icon? Icon
-        {
-            get { return null; }
-        }
-
-        /// <summary>
-        /// Gets the freeze time after the spell has been casted
-        /// </summary>
-        public virtual float FreezeTime
-        {
-            get { return 0; }
         }
 
         /// <summary>
