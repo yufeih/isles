@@ -60,16 +60,16 @@ namespace Isles.Engine
         void Draw(GameTime gameTime);
 
         /// <summary>
-        /// Write the scene object to a set of attributes
+        /// Write the scene object to an XML element
         /// </summary>
         /// <param name="writer"></param>
-        void Serialize(IDictionary<string, string> attributes);
+        void Serialize(XmlElement xml);
 
         /// <summary>
         /// Read and initialize the scene object from a set of attributes
         /// </summary>
         /// <param name="reader"></param>
-        void Deserialize(IDictionary<string, string> attributes);
+        void Deserialize(XmlElement xml);
     }
     #endregion
 
@@ -105,6 +105,36 @@ namespace Isles.Engine
     }
     #endregion
 
+    #region ILevel
+    /// <summary>
+    /// Interface for a game level
+    /// </summary>
+    public interface ILevel
+    {
+        /// <summary>
+        /// Load a game level
+        /// </summary>
+        void Load(GameWorld world, Loading progress);
+
+        /// <summary>
+        /// Unload a game level
+        /// </summary>
+        void Unload();
+
+        /// <summary>
+        /// Update level stuff
+        /// </summary>
+        /// <param name="gameTime"></param>
+        void Update(GameTime gameTime);
+
+        /// <summary>
+        /// Draw level stuff
+        /// </summary>
+        /// <param name="gameTime"></param>
+        void Draw(GameTime gameTime);
+    }
+    #endregion
+
     #region GameWorld
     /// <summary>
     /// Represents the game world
@@ -112,6 +142,11 @@ namespace Isles.Engine
     public class GameWorld
     {        
         #region Field
+        /// <summary>
+        /// Version of the game world
+        /// </summary>
+        public const int Version = 1;
+
         protected sealed class InternalList<T> : BroadcastList<T, LinkedList<T>> {}
 
         /// <summary>
@@ -156,7 +191,7 @@ namespace Isles.Engine
         /// <summary>
         /// Gets all highlighted entites
         /// </summary>
-        public List<Entity> Highlighted
+        public IEnumerable<Entity> Highlighted
         {
             get { return highlighted; }
         }
@@ -173,6 +208,7 @@ namespace Isles.Engine
         }
 
         protected Landscape landscape;
+        protected string landscapeFilename;
 
 
         /// <summary>
@@ -221,6 +257,7 @@ namespace Isles.Engine
         }
 
         protected ILevel level;
+        protected string levelName;
 
 
         /// <summary>
@@ -233,6 +270,9 @@ namespace Isles.Engine
         }
 
         protected IGameUI ui;
+
+        public string Name;
+        public string Description;
         #endregion
 
         #region Methods
@@ -275,7 +315,8 @@ namespace Isles.Engine
                 o.Update(gameTime);
 
             // Update level
-            level.Update(gameTime);
+            if (level != null)
+                level.Update(gameTime);
         }
 
         /// <summary>
@@ -294,7 +335,8 @@ namespace Isles.Engine
 
             DrawSelection(gameTime);
 
-            level.Draw(gameTime);
+            if (level != null)
+                level.Draw(gameTime);
         }
 
         private void DrawSelection(GameTime gameTime)
@@ -336,26 +378,30 @@ namespace Isles.Engine
         /// Load the game world from a file
         /// </summary>
         /// <param name="inStream"></param>
-        public virtual void Load(
-            XmlElement node,
-            IDictionary<string, IDictionary<string, string>> defaults,
-            Loading context)
+        public virtual void Load(XmlElement node, Loading context)
         {
             // Validate XML element
             if (node.Name != "World")
                 throw new Exception("Invalid world format.");
 
+            // Validate version
+            int version = -1;
+            if (!(int.TryParse(node.GetAttribute("Version"), out version) && version == Version))
+                throw new Exception("Invalid world version");
+
             // Load landscape
-            string landscapeFile = node.Attributes["Landscape"].InnerText;
-            if (landscapeFile == null)
+            landscapeFilename = node.GetAttribute("Landscape");
+            if (landscapeFilename == "")
                 throw new Exception("World does not have a landscape");
 
-            landscape = levelContent.Load<Landscape>(landscapeFile);
+            landscape = levelContent.Load<Landscape>(landscapeFilename);
+            
+            // Name & description
+            Name = node.GetAttribute("Name");
+            Description = node.GetAttribute("Description");
 
             // Load world objects
-            IWorldObject worldObject;
-            Dictionary<string, string> attributes = new Dictionary<string, string>();
-
+            int nObjects = 0;
             foreach (XmlNode child in node.ChildNodes)
             {
                 // Ignore comments and other stuff...
@@ -363,36 +409,23 @@ namespace Isles.Engine
 
                 if (element != null)
                 {
-                    // Initialize object attributes from XML element
-                    attributes.Clear();
-
-                    // Add default attributes
-                    if (defaults != null && defaults.ContainsKey(child.Name))
-                    {
-                        foreach (KeyValuePair<string, string> pair in defaults[child.Name])
-                            attributes.Add(pair.Key, pair.Value);
-                    }
-
-                    // Add custom attributes
-                    foreach (XmlAttribute attribute in element.Attributes)
-                        attributes.Add(attribute.Name, attribute.Value);
-
-                    worldObject = Create(child.Name, attributes);
+                    if (null != Create(child.Name, element))
+                        nObjects++;
                 }
             }
             
             // Find ILevel from level attribute
-            string levelName = node.Attributes["Level"].InnerText;
+            levelName = node.GetAttribute("Level");
 
-            if (levelName != null && levelDictionary.ContainsKey(levelName))
+            if (levelDictionary.ContainsKey(levelName))
+            {
                 level = levelDictionary[levelName];
-            else
-                level = new Level();
 
-            // Load new level
-            level.Load(this, context);
+                // Load new level
+                level.Load(this, context);
+            }
 
-            Log.Write("Game world loaded...");
+            Log.Write("Game world loaded [" + Name + "], " + nObjects + " objects...");
         }
 
         /// <summary>
@@ -401,7 +434,34 @@ namespace Isles.Engine
         /// <param name="outStream"></param>
         public virtual void Save(XmlElement node, Loading context)
         {
-            throw new NotImplementedException();
+            XmlElement child;
+            XmlElement header;
+            XmlDocument doc = node.OwnerDocument;
+
+            // Create a default comment
+            node.AppendChild(doc.CreateComment(
+                "Isles.Engine Generated World: " + DateTime.Now.ToString()));
+
+            // Append a new element as the root node of the world
+            node.AppendChild(header = doc.CreateElement("World"));
+
+            // Setup attributes
+            header.SetAttribute("Version", Version.ToString());
+            header.SetAttribute("Name", Name);
+            header.SetAttribute("Description", Description);
+            header.SetAttribute("Landscape", landscapeFilename);
+
+            if (level != null && levelName != null)
+                header.SetAttribute("Level", levelName);
+
+            // Serialize world objects
+            foreach (IWorldObject worldObject in worldObjects)
+            {
+                header.AppendChild(child = doc.CreateElement("FIXME: NAME"));
+                worldObject.Serialize(child);
+            }
+
+            Log.Write("Game world saved [" + Name + "], " + worldObjects.Count + " objects...");
         }
 
         /// <summary>
@@ -432,37 +492,45 @@ namespace Isles.Engine
         }
 
         /// <summary>
+        /// Register a world object creator
+        /// </summary>
+        public static void RegisterCreator(string typeName, Creator creator)
+        {
+            creators.Add(typeName, creator);
+        }
+
+        /// <summary>
         /// Create a new world object of a given type
         /// </summary>
         /// <param name="type"></param>
         /// <returns>null if the type is not supported</returns>
         public IWorldObject Create(Type type)
         {
-            return Create(type.Name);
-        }
-
-        public IWorldObject Create(Type type, IDictionary<string, string> attributes)
-        {
-            return Create(type.Name, attributes);
-        }
-
-        public IWorldObject Create(string typeName, IDictionary<string, string> attributes)
-        {
-            IWorldObject worldObject = Create(typeName);
-
-            // Deserialize world object
-            if (worldObject != null)
-                worldObject.Deserialize(attributes);
-
-            return worldObject;
+            return Create(type.Name, null);
         }
 
         /// <summary>
-        /// Create a new world object from a given type
+        /// Creates a new world object from a given type
         /// </summary>
         /// <param name="typeName"></param>
         /// <returns></returns>
         public IWorldObject Create(string typeName)
+        {
+            return Create(typeName, null);
+        }
+
+        public IWorldObject Create(Type type, XmlElement xml)
+        {
+            return Create(type.Name, xml);
+        }
+
+        /// <summary>
+        /// Creates a new world object of a given type
+        /// </summary>
+        /// <param name="typeName">Type of the object</param>
+        /// <param name="xml">A xml element describes the object</param>
+        /// <returns></returns>
+        public IWorldObject Create(string typeName, XmlElement xml)
         {
             // Lookup the creators table to find a suitable creator
             if (!creators.ContainsKey(typeName))
@@ -471,9 +539,30 @@ namespace Isles.Engine
             // Delegate to the creator
             IWorldObject worldObject = creators[typeName](this);
 
+            // Nothing created
+            if (worldObject == null)
+                return null;
+
+            // Find some default attributes for the object type
+            //if (worldObjectDefaults != null && worldObjectDefaults.ContainsKey(typeName))
+            //{
+            //    if (attributes == null)
+            //        attributes = new Dictionary<string, string>();
+
+            //    foreach (KeyValuePair<string, string> pair in worldObjectDefaults[typeName])
+            //    {
+            //        // DO NOT overwrite existing attributes
+            //        if (!attributes.ContainsKey(pair.Key))
+            //            attributes.Add(pair.Key, pair.Value);
+            //    }
+            //}
+
+            // Deserialize world object
+            if (xml != null)
+                worldObject.Deserialize(xml);
+            
             // Add the new object to the world
-            if (worldObject != null)
-                Add(worldObject);
+            Add(worldObject);
 
             return worldObject;
         }
@@ -493,7 +582,7 @@ namespace Isles.Engine
         /// <param name="worldObject"></param>
         public void Destroy(IWorldObject worldObject)
         {
-
+            worldObjects.Remove(worldObject);
         }
 
         /// <summary>
@@ -512,6 +601,10 @@ namespace Isles.Engine
                 obj.Selected = true;
                 selected.Add(obj);
             }
+
+            // Refact the selection event to UI
+            if (ui != null)
+                ui.Select(obj);
         }
 
         /// <summary>
@@ -529,6 +622,10 @@ namespace Isles.Engine
 
             foreach (Entity e in selected)
                 e.Selected = true;
+            
+            // Refact the selection event to UI
+            if (ui != null)
+                ui.SelectMultiple(objects);
         }
 
         /// <summary>
