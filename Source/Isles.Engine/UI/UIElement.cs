@@ -24,7 +24,7 @@ namespace Isles.UI
         /// <summary>
         /// Gets the reference area of an UI element.
         /// The reference area is used to determine the final
-        /// area of the UI element duo to resolusion changes
+        /// area of the UI element due to resolusion changes
         /// </summary>
         Rectangle Area { get; set; }
 
@@ -139,14 +139,6 @@ namespace Isles.UI
         /// Button hot region
         /// </summary>
         protected Rectangle sourceRectangle;
-
-        /// <summary>
-        /// Gets the reference area of the UI element
-        /// </summary>
-        public Rectangle ReferenceArea
-        {
-            get { return area; }
-        }
 
         /// <summary>
         /// Gets or sets button area
@@ -287,7 +279,7 @@ namespace Isles.UI
         /// <param name="gameTime"></param>
         public virtual void Update(GameTime gameTime)
         {
-            this.destinationRectangle = GetRelativeRectangle(area);
+            //this.destinationRectangle = GetRelativeRectangle(area);
         }
 
         /// <summary>
@@ -296,6 +288,7 @@ namespace Isles.UI
         /// <param name="gameTime"></param>
         public virtual void Draw(GameTime gameTime, SpriteBatch sprite)
         {
+            this.destinationRectangle = GetRelativeRectangle(area);
         }
 
         /// <summary>
@@ -390,9 +383,11 @@ namespace Isles.UI
         /// <param name="gameTime"></param>
         public override void Update(GameTime gameTime)
         {
+            elements.Update();
+
             if (!visible)
                 return;
-
+            
             base.Update(gameTime);
 
             foreach (IUIElement element in elements)
@@ -407,6 +402,8 @@ namespace Isles.UI
         {
             if (!visible)
                 return;
+
+            base.Draw(gameTime, sprite);
 
             if (texture != null)
                 sprite.Draw(texture, destinationRectangle, sourceRectangle, Color.White);
@@ -424,11 +421,20 @@ namespace Isles.UI
     /// </summary>
     public class ScrollPanel : Panel
     {
-        int current, max;
+        /// <summary>
+        /// Index of the left most UIElement shown currently
+        /// </summary>
+        int current;
+
+        /// <summary>
+        /// Max number of UIElement visible
+        /// </summary>
+        int max;
+
         int buttonWidth, scrollButtonWidth, buttonHeight;
 
-        public Button LeftScroll;
-        public Button RightScroll;
+        public Button Left;
+        public Button Right;
 
         public ScrollPanel(Rectangle area, int buttonWidth, int scrollButtonWidth)
             : base(area)
@@ -439,23 +445,19 @@ namespace Isles.UI
 
             current = 0;
 
-            LeftScroll = new Button(new Rectangle(
+            Left = new Button(new Rectangle(
                 0, 0, scrollButtonWidth, buttonHeight));
 
-            RightScroll = new Button(new Rectangle(
+            Right = new Button(new Rectangle(
                 scrollButtonWidth, 0, scrollButtonWidth, buttonHeight));
+            
+            Left.Parent = Right.Parent = this;
+            Left.Enabled = Right.Enabled = false;
+            Left.Anchor = Right.Anchor = Anchor.BottomLeft;
+            Left.ScaleMode = Right.ScaleMode = ScaleMode.ScaleY;
 
-            LeftScroll.Enabled = false;
-
-            LeftScroll.Parent = RightScroll.Parent = this;
-
-            LeftScroll.Anchor = RightScroll.Anchor = Anchor.BottomLeft;
-
-            LeftScroll.ScaleMode = ScaleMode.ScaleY;
-            RightScroll.ScaleMode = ScaleMode.ScaleY;
-
-            LeftScroll.Click += new EventHandler(LeftScroll_Click);
-            RightScroll.Click += new EventHandler(RightScroll_Click);
+            Left.Click += new EventHandler(LeftScroll_Click);
+            Right.Click += new EventHandler(RightScroll_Click);
         }
 
         void RightScroll_Click(object sender, EventArgs e)
@@ -465,10 +467,10 @@ namespace Isles.UI
                 if (current < elements.Count - max)
                 {
                     current++;
-                    LeftScroll.Enabled = true;
+                    Left.Enabled = true;
 
                     if (current == elements.Count - max)
-                        RightScroll.Enabled = false;
+                        Right.Enabled = false;
                 }
             }
         }
@@ -480,10 +482,10 @@ namespace Isles.UI
                 if (current > 0)
                 {
                     current--;
-                    RightScroll.Enabled = true;
+                    Right.Enabled = true;
 
                     if (current == 0)
-                        LeftScroll.Enabled = false;
+                        Left.Enabled = false;
                 }
             }
         }
@@ -492,33 +494,37 @@ namespace Isles.UI
         {
             UIElement e = element as UIElement;
 
-            if (e != null)
-            {
-                // Reset element area
-                Rectangle rect = new Rectangle(
-                    scrollButtonWidth + elements.Count * buttonWidth, 0,
-                    buttonWidth, buttonHeight);
-                
-                e.Area = rect;
-                e.Anchor = Anchor.BottomLeft;
-                e.ScaleMode = ScaleMode.ScaleY;
+            // Scroll panel works only with UIElement
+            if (e == null)
+                throw new ArgumentException();
 
-                if (elements.Count < max)
-                {
-                    rect.X += buttonWidth;
-                    RightScroll.Enabled = false;
-                }
-                else
-                {
-                    RightScroll.Enabled = true;
-                }
+            // Reset element area
+            Rectangle rect = new Rectangle(
+                scrollButtonWidth + (elements.Count - current) * buttonWidth,
+                0, buttonWidth, buttonHeight);
 
-                rect.Width = scrollButtonWidth;
+            e.Area = rect;
+            e.Anchor = Anchor.BottomLeft;
+            e.ScaleMode = ScaleMode.ScaleY;
 
-                RightScroll.Area = rect;
-            }
+            if (elements.Count < current + max)
+                Right.Enabled = false;
+            else
+                Right.Enabled = true;
+
+            rect.X += buttonWidth;
+            rect.Width = scrollButtonWidth;
+
+            Right.Area = rect;
 
             base.Add(element);
+        }
+
+        public override void Remove(IUIElement element)
+        {
+            base.Remove(element);
+
+            throw new NotImplementedException();
         }
 
         public override void Clear()
@@ -526,9 +532,9 @@ namespace Isles.UI
             current = 0;
             max = (destinationRectangle.Width - scrollButtonWidth * 2) / buttonWidth;
 
-            LeftScroll.Enabled = RightScroll.Enabled = false;
+            Left.Enabled = Right.Enabled = false;
 
-            RightScroll.Area = new Rectangle(
+            Right.Area = new Rectangle(
                 scrollButtonWidth, 0, scrollButtonWidth, buttonHeight);
 
             base.Clear();
@@ -539,17 +545,25 @@ namespace Isles.UI
             if (!visible)
                 return;
 
-            LeftScroll.Update(gameTime);
-            RightScroll.Update(gameTime);
+            Left.Update(gameTime);
+            Right.Update(gameTime);
+
+            base.Update(gameTime);
+        }
+
+        public override void Draw(GameTime gameTime, SpriteBatch sprite)
+        {
+            if (!visible)
+                return;
 
             Rectangle rect;
 
-            rect.X = scrollButtonWidth - buttonWidth * current;
+            rect.X = scrollButtonWidth;
             rect.Y = 0;
             rect.Width = buttonWidth;
             rect.Height = buttonHeight;
 
-            int n = current + max;
+            int n = current + max - 1;
             if (n > elements.Count)
                 n = elements.Count;
 
@@ -560,25 +574,19 @@ namespace Isles.UI
                     // Reset element area
                     elements.Elements[i].Visible = true;
                     elements.Elements[i].Area = rect;
+                    rect.X += buttonWidth;
                 }
                 else
                 {
                     elements.Elements[i].Visible = false;
                 }
-                
-                rect.X += buttonWidth;
             }
 
-            base.Update(gameTime);
-        }
+            rect.Width /= 2;
+            Right.Area = rect;
 
-        public override void Draw(GameTime gameTime, SpriteBatch sprite)
-        {
-            if (!visible)
-                return;
-
-            LeftScroll.Draw(gameTime, sprite);
-            RightScroll.Draw(gameTime, sprite);
+            Left.Draw(gameTime, sprite);
+            Right.Draw(gameTime, sprite);
 
             base.Draw(gameTime, sprite);
         }
@@ -660,6 +668,8 @@ namespace Isles.UI
         /// <param name="gameTime"></param>
         public override void Draw(GameTime gameTime, SpriteBatch sprite)
         {
+            base.Draw(gameTime, sprite);
+
             if (texture != null && visible)
             {
                 Color color = Color.White;
