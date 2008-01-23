@@ -73,6 +73,27 @@ namespace Isles.Engine
             return Matrix.Identity;
         }
         #endregion
+
+        #region ToString
+        public static string Vector2ToString(Vector2 v)
+        {
+            return v.X + ", " + v.Y;
+        }
+
+        public static string Vector3Tostring(Vector3 v)
+        {
+            return v.X + ", " + v.Y + ", " + v.Z;
+        }
+
+        public static string MatrixToString(Matrix m)
+        {
+            return
+                m.M11 + ", " + m.M12 + ", " + m.M13 + ", " + m.M14 + ", " +
+                m.M21 + ", " + m.M22 + ", " + m.M23 + ", " + m.M24 + ", " +
+                m.M31 + ", " + m.M32 + ", " + m.M33 + ", " + m.M34 + ", " +
+                m.M41 + ", " + m.M42 + ", " + m.M43 + ", " + m.M44;
+        }
+        #endregion
     }
     #endregion
 
@@ -168,36 +189,9 @@ namespace Isles.Engine
     #endregion
 
     #region Property
+#if MAYBEWEDONOTNEETTHIS
     /// <summary>
     /// A set of property to describe an object
-    /// 
-    /// 
-    /// We want to be able to do this:
-    /// 
-    /// GameDefault:
-    /// <Avator Model="models/avator">
-    ///     <Spells>
-    ///         <Fireball Level="1" />
-    ///         <Windwalk Level="1" />
-    ///     </Spells>
-    ///     <Items>
-    ///         <HealthPotion Power="300" />
-    ///         <HealthPotion Power="300" />
-    ///     </Items>
-    /// </Avator>
-    /// 
-    /// GameWorld:
-    /// 
-    /// This avator has 2 spells and 2 items
-    /// <Avator Position="1024, 512, 0" />
-    /// 
-    /// This avator has only 1 item
-    /// <Avator Position="1024, 512, 0">
-    ///     <Items>
-    ///         <ManaPotion Power="500" />
-    ///     </Items>
-    /// </Avator>
-    /// 
     /// </summary>
     public interface IProperty<TKey>
     {
@@ -443,5 +437,6 @@ namespace Isles.Engine
         }
         #endregion
     }
+#endif
     #endregion
 }
