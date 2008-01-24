@@ -43,6 +43,16 @@ namespace Isles.Engine
         public int Food;
 
         /// <summary>
+        /// A list of buildings allowed to build in this level
+        /// </summary>
+        public List<string> AvailableBuildings = new List<string>();
+
+        /// <summary>
+        /// A list of god's spells available
+        /// </summary>
+        public List<Spell> CurrentSpells = new List<Spell>();
+
+        /// <summary>
         /// Dependency list. Stores a key/bool pair. E.g., ["farmhouse", true] means that
         /// farmhouse is available.
         /// </summary>

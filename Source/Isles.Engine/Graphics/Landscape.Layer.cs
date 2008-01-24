@@ -167,7 +167,7 @@ namespace Isles.Graphics
                     v = GridToPosition(x, y);
                     if (x >= 0 && x < gridColumnCount &&
                         y >= 0 && y < gridRowCount && heightfield[x, y] > 0)
-                        z = heightfield[x, y];
+                        z = heightfield[x, y] + 0.5f; // Offset a little bit :)
                     else
                         z = 0;
 
@@ -197,7 +197,7 @@ namespace Isles.Graphics
             graphics.RenderState.AlphaBlendEnable = true;
             graphics.RenderState.DepthBufferWriteEnable = false;
             graphics.RenderState.DepthBufferFunction = CompareFunction.Always;
-            //graphics.RenderState.CullMode = CullMode.CullClockwiseFace;
+            graphics.RenderState.CullMode = CullMode.None;
             graphics.SamplerStates[0].AddressU = TextureAddressMode.Border;
             graphics.SamplerStates[0].AddressV = TextureAddressMode.Border;
 

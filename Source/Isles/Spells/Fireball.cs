@@ -8,8 +8,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Isles.Engine;
@@ -153,12 +155,17 @@ namespace Isles
     /// <summary>
     /// Fireball spell
     /// </summary>
-    public class Fireball : Spell
+    public class FireballSpell : Spell
     {
         /// <summary>
         /// Aim texture
         /// </summary>
         Texture2D aim;
+
+        /// <summary>
+        /// Spell hotkey
+        /// </summary>
+        Keys hotkey;
 
         /// <summary>
         /// Spell name
@@ -173,17 +180,18 @@ namespace Isles
         /// <summary>
         /// Create a new spell. TODO: pass in a hand
         /// </summary>
-        public Fireball(GameWorld world)
+        public FireballSpell(GameWorld world)
             : base(world)
         {
-            string value = "";
-            IDictionary<string, string> dictionary;
+            XmlElement xml;
 
-            if (GameDefault.Default.SpellDefaults.TryGetValue(GetType().Name, out dictionary))
+            if (GameDefault.Singleton.SpellDefaults.TryGetValue("Fireball", out xml))
             {
-                dictionary.TryGetValue("Name", out name);
-                dictionary.TryGetValue("Description", out description);
-            }                
+                name = xml.GetAttribute("Name");
+                description = xml.GetAttribute("Description");
+
+                hotkey = (Keys)Enum.Parse(typeof(Keys), xml.GetAttribute("Hotkey"));
+            }
 
             aim = world.Content.Load<Texture2D>("Textures/SpellAreaOfEffect");
         }
@@ -204,6 +212,11 @@ namespace Isles
             get { return description; }
         }
 
+        public override Keys Hotkey
+        {
+            get { return hotkey; }
+        }
+
         /// <summary>
         /// Draw the spell
         /// </summary>
@@ -212,14 +225,14 @@ namespace Isles
         {
             // Draw the aim texture
 
-            //Vector2 point, size;
+            Vector2 point, size;
 
-            //point.X = screen.CursorPosition.X;
-            //point.Y = screen.CursorPosition.Y;
+            point.X = hand.CursorPosition.X;
+            point.Y = hand.CursorPosition.Y;
 
-            //size.X = size.Y = 128;
+            size.X = size.Y = 128;
 
-            //World.Landscape.DrawSurface(aim, point, size);
+            world.Landscape.DrawSurface(aim, point, size);
         }
 
         /// <summary>
@@ -240,23 +253,23 @@ namespace Isles
                 return false;
             }
 
-            //Fireball fireball = new Fireball(world);
+            Fireball fireball = new Fireball(world);
 
-            //fireball.Position = hand.GetCastPosition();
+            fireball.Position = hand.Position;
 
-            //Vector3 speed = Vector3.Normalize(
-            //    screen.CursorPosition - fireball.Position) * 20;
+            Vector3 speed = Vector3.Normalize(
+                hand.CursorPosition - fireball.Position) * 20;
 
-            //// Add a little random factor
-            //Random random = new Random();
+            // Add a little random factor
+            Random random = new Random();
 
-            //speed.X += ((float)random.NextDouble() - 0.5f) / 2;
-            //speed.Y += ((float)random.NextDouble() - 0.5f) / 2;
-            //speed.Z += ((float)random.NextDouble() - 0.5f) / 2;
+            speed.X += ((float)random.NextDouble() - 0.5f) / 2;
+            speed.Y += ((float)random.NextDouble() - 0.5f) / 2;
+            speed.Z += ((float)random.NextDouble() - 0.5f) / 2;
 
-            //fireball.Velocity = speed;
+            fireball.Velocity = speed;
 
-            //World.Add(fireball);
+            world.Add(fireball);
 
             return false;
         }

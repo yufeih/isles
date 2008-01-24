@@ -27,8 +27,7 @@ namespace Isles
         /// <summary>
         /// Create a new farmland
         /// </summary>
-        public Farmland(GameWorld world)
-            : base(world)
+        public Farmland(GameWorld world) : base(world, null)
         {
             crop = new Crop(world, size);
         }

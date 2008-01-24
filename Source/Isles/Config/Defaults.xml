@@ -3,17 +3,79 @@
 <!--This file stores some game default attributes-->
 <GameDefault>
   
+  <!--Stores default attributes for game world object-->
   <WorldObject>
     
-    <!--Stores default attributes for game world object-->
-    <Tree Name="Tree" Description="A tree" Wood="200" Model="models/arrow" Transform="40, 0, 0, 0, 0, 40, 0, 0, 0, 0, 100, 0, 0, 0, 100, 1" />
+    <Tree
+      Name="Tree" Description="A tree" Wood="200" Model="models/arrow"
+      Transform="40, 0, 0, 0, 0, 40, 0, 0, 0, 0, 100, 0, 0, 0, 100, 1" />
+    
+    <Rock
+      Name="Rock" Description="A rock" Wood="200" Model="models/rock"
+      Transform="5, 0, 0, 0, 0, 5, 0, 0, 0, 0, 5, 0, 0, 0, 0, 1" />
 
+    <Townhall
+      Name="Town hall" Description="Center of the town" Model="models/storage"
+      Transform="1, 0, 0, 0, 0, 1, 0.06, 0, 0, 0, 1, 0, 0, 0, -18, 1">
+      
+      <Spell Name="PlantTree" />
+      
+    </Townhall>
+    
+    <Farmhouse
+      Name="Farm house" Description="A place to live" Model="models/tank"
+      Transform="0.06, 0, 0, 0, 0, -2.622683E-09, 0.06, 0, 0, -0.06, -2.622683E-09, 0, 0, 0, 0, 1"
+      Icon="1" Hotkey="T" ConstructionTime="20" Health="2000"
+      StoresWood="true" StoresFood="true" StoresGold="true"/>
+
+    <Farmland
+      Name="Farm house" Description="A place to live" Model="models/tank"
+      Transform="0.06, 0, 0, 0, 0, -2.622683E-09, 0.06, 0, 0, -0.06, -2.622683E-09, 0, 0, 0, 0, 1"
+      Icon="1" Hotkey="T" ConstructionTime="20" Health="2000"
+      StoresWood="true" StoresFood="true" StoresGold="true"/>
+
+    <Windmill
+      Name="Farm house" Description="A place to live" Model="models/tank"
+      Transform="0.06, 0, 0, 0, 0, -2.622683E-09, 0.06, 0, 0, -0.06, -2.622683E-09, 0, 0, 0, 0, 1"
+      Icon="1" Hotkey="T" ConstructionTime="20" Health="2000"
+      StoresWood="true" StoresFood="true" StoresGold="true"/>
+
+    <Storage
+      Name="Farm house" Description="A place to live" Model="models/tank"
+      Transform="0.06, 0, 0, 0, 0, -2.622683E-09, 0.06, 0, 0, -0.06, -2.622683E-09, 0, 0, 0, 0, 1"
+      Icon="1" Hotkey="T" ConstructionTime="20" Health="2000"
+      StoresWood="true" StoresFood="true" StoresGold="true"/>
+
+    <AltarOfPeace
+      Name="Farm house" Description="A place to live" Model="models/tank"
+      Transform="0.06, 0, 0, 0, 0, -2.622683E-09, 0.06, 0, 0, -0.06, -2.622683E-09, 0, 0, 0, 0, 1"
+      Icon="1" Hotkey="T" ConstructionTime="20" Health="2000"
+      StoresWood="true" StoresFood="true" StoresGold="true"/>
+
+    <AltarOfDestruction
+      Name="Farm house" Description="A place to live" Model="models/tank"
+      Transform="0.06, 0, 0, 0, 0, -2.622683E-09, 0.06, 0, 0, -0.06, -2.622683E-09, 0, 0, 0, 0, 1"
+      Icon="1" Hotkey="T" ConstructionTime="20" Health="2000"
+      StoresWood="true" StoresFood="true" StoresGold="true"/>
+    
   </WorldObject>
 
+  <!--Stores default attributes for spells-->
   <Spell>
     
-    <!--Stores default attributes for spells-->
-    <Fireball Name="Fireball" Description="Fireball description" />
+    <Fireball Name="Fireball" Description="Creates a destructive fireball" Icon="8" Hotkey="F" />
+
+    <Rain Name="Rain" Description="Creates a rain drop at a given area" Icon="14" Hotkey="R" />
+
+    <Blizzard Name="Blizzard" Description="Creates a destructive blizzard" Icon="14" Hotkey="B" />
+
+    <MagicShield Name="MagicShield" Description="Creates a magic shield to protect a unit" Icon="11" Hotkey="S" />
+
+    <Lighting Name="Lighting" Description="Creates a destructive lighting" Icon="9" Hotkey="L" />
+
+    <Blow Name="Blow" Description="Blows the enermies away from the island" Icon="13" Hotkey="W" />
+
+    <PlantTree Name="Plant a tree" Description="Plant a tree" Icon="0" Hotkey="T" />
     
   </Spell>
   

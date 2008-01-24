@@ -20,7 +20,7 @@ namespace Isles
     /// <summary>
     /// Represents a game screen
     /// </summary>
-    public partial class GameScreen : IScreen
+    public class GameScreen : IScreen
     {
         #region Variables
         /// <summary>
@@ -47,6 +47,11 @@ namespace Isles
         /// Loading bar
         /// </summary>
         Loading loadContext;
+
+        /// <summary>
+        /// Game screen UI
+        /// </summary>
+        GameUI ui;
 
         /// <summary>
         /// Graphcis device
@@ -90,11 +95,28 @@ namespace Isles
         #endregion
 
         #region Initialization
-
+        /// <summary>
+        /// Creates a new game screen.
+        /// NOTE: You can only create a game screen after graphics device
+        /// is created and initialized.
+        /// </summary>
         public GameScreen()
         {
             game = BaseGame.Singleton;
             graphics = game.Graphics;
+
+            if (graphics == null)
+                throw new InvalidOperationException();
+
+            loadContext = new Loading(graphics.GraphicsDevice);
+
+            ui = new GameUI(BaseGame.Singleton);
+
+            hand = new Hand(null, "Models/Hand",
+                Matrix.CreateScale(0.2f) *
+                Matrix.CreateRotationX(MathHelper.ToRadians(30)) *
+                Matrix.CreateRotationY(MathHelper.ToRadians(20)) *
+                Matrix.CreateTranslation(0, -12, 0));
         }
 
         /// <summary>
@@ -106,9 +128,6 @@ namespace Isles
             // Reset loading context
             loadContext.Reset();
 
-            // Reset everything
-            Reset();
-
             loadContext.Refresh(0, "Loading...");
 
             // Read XML scene content
@@ -117,17 +136,13 @@ namespace Isles
 
             // Load game world
             world = new GameWorld();
-            world.Load(doc.DocumentElement, GameDefault.Default.WorldObjectDefaults, loadContext);
+            world.Load(doc.DocumentElement, loadContext);
             world.SelectionTexture =
                 BaseGame.Singleton.Content.Load<Texture2D>("Textures/SpellAreaOfEffect");
-            world.UI = this;
+            world.UI = ui;
 
-            // Initialize hand
-            hand = new Hand(world, "Models/Hand",
-                Matrix.CreateScale(0.2f) *
-                Matrix.CreateRotationX(MathHelper.ToRadians(30)) *
-                Matrix.CreateRotationY(MathHelper.ToRadians(20)) *
-                Matrix.CreateTranslation(0, -12, 0));
+            // Reset everything
+            Reset();
 
             // Initialize camera
             gameCamera = new GameCamera(world.Landscape);
@@ -142,24 +157,19 @@ namespace Isles
         public void Reset()
         {
             if (hand != null)
-                hand.Reset();
+                hand.Reset(world);
 
-            if (world != null)
-                world.Reset();
+            if (ui != null)
+                ui.Reset(world, hand);
         }
 
-        #region Graphics Content
         /// <summary>
         /// Load your graphics content.  If loadAllContent is true, you should
         /// load content from both ResourceManagementMode pools.  Otherwise, just
         /// load ResourceManagementMode.Manual content.
         /// </summary>
         /// <param name="loadAllContent">Which type of content to load.</param>
-        public void LoadContent()
-        {
-            // Initialize loading context
-            loadContext = new Loading(graphics.GraphicsDevice);
-        }
+        public void LoadContent() { }
 
         /// <summary>
         /// Unload your graphics content.  If unloadAllContent is true, you should
@@ -167,12 +177,8 @@ namespace Isles
         /// unload ResourceManagementMode.Manual content.  Manual content will get
         /// Disposed by the GraphicsDevice during a Reset.
         /// </summary>
-        public void UnloadContent()
-        {
-
-        }
-        #endregion
-
+        /// <param name="unloadAllContent">Which type of content to unload.</param>
+        public void UnloadContent() { }
         #endregion
 
         #region Methods
@@ -193,7 +199,6 @@ namespace Isles
         #endregion
 
         #region Update and Draw
-
         /// <summary>
         /// Handle game updates
         /// </summary>
@@ -201,7 +206,8 @@ namespace Isles
         public void Update(GameTime gameTime)
         {            
             // Update UI first
-            UpdateUI(gameTime);
+            if (ui != null)
+                ui.Update(gameTime);
 
             // Update world
             if (world != null)
@@ -219,15 +225,17 @@ namespace Isles
         public void Draw(GameTime gameTime)
         {
             // Draw game world
-            world.Draw(gameTime);
+            if (world != null)
+                world.Draw(gameTime);
 
             // Force all billboards to be drawed before our UI is rendered
             game.Billboard.Present(gameTime);
 
             // Force all point sprites to be drawed
             game.PointSprite.Present(gameTime);
-            
-            DrawUI(gameTime);
+
+            if (ui != null)
+                ui.Draw(gameTime);
 
             // Draw god's hand at last
             if (hand != null)

@@ -14,20 +14,21 @@ namespace Isles.Engine
 {
     /// <summary>
     /// Game settings
-    /// TODO: Refactor, move some of this to Isles.exe
     /// </summary>
     [Serializable()]
     public class Settings
     {
+        #region General Settings
         /// <summary>
-        /// Filename of the default settings
+        /// Directory for game assets
         /// </summary>
-        public const string Filename = "Config/Settings.xml";
+        public string ContentDirectory = "Content";
 
         /// <summary>
-        /// Asset name of the default sprite font
+        /// Default game font
         /// </summary>
-        public const string DefaultFontFile = "Fonts/Default";
+        public string DefaultFont = "Fonts/Default";
+        #endregion
 
         #region Graphics Settings
 
@@ -135,42 +136,29 @@ namespace Isles.Engine
 
         #endregion
 
+        #region Method
         /// <summary>
         /// Create default game settings
         /// </summary>
         /// <param name="fromFile"></param>
         /// <returns></returns>
-        public static Settings CreateDefaultSettings(bool fromFile)
+        public static Settings CreateDefaultSettings(Stream stream)
         {
             Settings settings = new Settings();
 
-            if (!fromFile)
-            {
-                settings.Save();
+            if (stream == null)
                 return settings;
-            }
 
-            if (File.Exists(Filename))
-            {
-                // Initialize game settings from file
-                using (FileStream file = new FileStream(Filename, FileMode.Open))
-                {
-                    settings = (Settings)new XmlSerializer(typeof(Settings)).Deserialize(file);
-                }
-            }
-
-            return settings;
+            return (Settings)new XmlSerializer(typeof(Settings)).Deserialize(stream);
         }
 
         /// <summary>
         /// Save settings
         /// </summary>
-        public void Save()
+        public void Save(Stream stream)
         {
-            using (FileStream file = new FileStream(Filename, FileMode.Create))
-            {
-                new XmlSerializer(typeof(Settings)).Serialize(file, this);
-            }
+            new XmlSerializer(typeof(Settings)).Serialize(stream, this);
         }
+        #endregion
     }
 }

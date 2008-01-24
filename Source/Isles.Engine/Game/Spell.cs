@@ -29,10 +29,28 @@ namespace Isles.Engine
         public Rectangle Region;
 
         /// <summary>
+        /// Gets or sets the icon texture
+        /// </summary>
+        public Texture2D Texture;
+
+        /// <summary>
         /// For easy creation of icons
         /// </summary>
         public Icon(Rectangle region)
         {
+            Region = region;
+            Texture = null;
+        }
+
+        public Icon(Texture2D texture)
+        {
+            Texture = texture;
+            Region = new Rectangle(0, 0, texture.Width, texture.Height);
+        }
+
+        public Icon(Texture2D texture, Rectangle region)
+        {
+            Texture = texture;
             Region = region;
         }
 
@@ -40,50 +58,15 @@ namespace Isles.Engine
         /// Build an icon
         /// </summary>
         public static Icon FromTileTexture(
-            int n, int xCount, int yCount, int width, int height)
+            int n, int xCount, int yCount, Texture2D texture)
         {
             int x = n % xCount;
-            int y = n / yCount;
-            int w = width / xCount;
-            int h = height / yCount;
+            int y = n / xCount;
+            int w = texture.Width / xCount;
+            int h = texture.Height / yCount;
 
-            return new Icon(new Rectangle(x * w, y * h, w, h));
+            return new Icon(texture, new Rectangle(x * w, y * h, w, h));
         }
-    }
-
-    /// <summary>
-    /// Describes a spell. Spells are identified by names, 
-    /// one spell has only one description for it.
-    /// </summary>
-    public abstract class SpellDescription
-    {
-        /// <summary>
-        /// Gets the name of the spell
-        /// </summary>
-        public abstract string Name { get; }
-
-        /// <summary>
-        /// Gets the description for the spell
-        /// </summary>
-        public abstract string Description { get; }
-
-        /// <summary>
-        /// Gets the spell icon.
-        /// </summary>
-        public virtual Icon? Icon
-        {
-            get { return null; }
-        }
-
-        /// <summary>
-        /// Gets the freeze time after the spell has been casted
-        /// </summary>
-        public virtual float FreezeTime
-        {
-            get { return 0; }
-        }
-
-        public abstract Spell Create(GameWorld world);
     }
     
     /// <summary>
@@ -146,6 +129,11 @@ namespace Isles.Engine
         /// </summary>
         protected GameWorld world;
 
+        /// <summary>
+        /// Gods hand
+        /// </summary>
+        protected Hand hand;
+
         public Spell()
         {
 
@@ -154,6 +142,45 @@ namespace Isles.Engine
         public Spell(GameWorld world)
         {
             this.world = world;
+        }
+
+        /// <summary>
+        /// Gets the name of the spell
+        /// </summary>
+        public abstract string Name { get; }
+
+        /// <summary>
+        /// Gets the description for the spell
+        /// </summary>
+        public abstract string Description { get; }
+
+        /// <summary>
+        /// Gets the spell icon.
+        /// </summary>
+        public virtual Icon? Icon
+        {
+            get { return null; }
+        }
+
+        /// <summary>
+        /// Gets the hot key for the spell
+        /// </summary>
+        public virtual Keys Hotkey
+        {
+            get { return Keys.None; }
+        }
+
+        /// <summary>
+        /// Gets the freeze time after the spell has been casted
+        /// </summary>
+        public virtual float FreezeTime
+        {
+            get { return 0; }
+        }
+
+        public virtual float FreezeTimeElapsed
+        {
+            get { return 0; }
         }
 
         /// <summary>
@@ -181,6 +208,7 @@ namespace Isles.Engine
         /// </returns>
         public virtual bool Trigger(Hand hand)
         {
+            this.hand = hand;
             return true;
         }
 

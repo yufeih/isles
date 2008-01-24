@@ -99,6 +99,17 @@ namespace Isles.Engine
             set { name = value; }
         }
 
+        protected string classID;
+
+        /// <summary>
+        /// Gets or sets the class ID of this world object
+        /// </summary>
+        public string ClassID
+        {
+            get { return classID; }
+            set { classID = value; }
+        }
+
         #endregion
 
         /// <summary>
@@ -124,28 +135,31 @@ namespace Isles.Engine
 
         /// <summary>
         /// Write the scene object to an output stream
+        /// Serialized attributes: Name, Position, Velocity
         /// </summary>
         /// <param name="writer"></param>
-        public virtual void Serialize(IDictionary<string, string> attributes)
+        public virtual void Serialize(XmlElement xml)
         {
-            throw new NotImplementedException();
+            xml.SetAttribute("Name", name);
+            xml.SetAttribute("Position", Helper.Vector3Tostring(position));
+            xml.SetAttribute("Velocity", Helper.Vector3Tostring(velocity));
         }
 
         /// <summary>
-        /// Read and initialize the scene object from an input stream
+        /// Read and initialize the scene object from an input stream.
+        /// Deserialized attributes: Name, Position, Velocity
         /// </summary>
         /// <param name="reader"></param>
-        public virtual void Deserialize(IDictionary<string, string> attributes)
+        public virtual void Deserialize(XmlElement xml)
         {
-            string value = "";
+            string value;
 
-            if (attributes.TryGetValue("Name", out value))
-                name = value;
+            name = xml.GetAttribute("Name");
 
-            if (attributes.TryGetValue("Position", out value))
+            if ((value = xml.GetAttribute("Position")) != "")
                 position = Helper.StringToVector3(value);
 
-            if (attributes.TryGetValue("Velocity", out value))
+            if ((value = xml.GetAttribute("Velocity")) != "")
                 velocity = Helper.StringToVector3(value);
         }
     }
@@ -252,7 +266,7 @@ namespace Isles.Engine
         /// Constructor
         /// </summary>
         public Entity(GameWorld world)
-            : this(world, null)
+            : base(world)
         {
 
         }
@@ -263,28 +277,43 @@ namespace Isles.Engine
             this.model = model;
         }
 
-        public override void Deserialize(IDictionary<string, string> attributes)
+        /// <summary>
+        /// Serialized attributes: Description, Model, Transform, Scale
+        /// </summary>
+        /// <param name="xml"></param>
+        public override void Serialize(XmlElement xml)
         {
-            base.Deserialize(attributes);
+            base.Serialize(xml);
+
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Deserialized attributes: Description, Model, Transform, Scale, Rotation
+        /// </summary>
+        /// <param name="xml"></param>
+        public override void Deserialize(XmlElement xml)
+        {
+            base.Deserialize(xml);
 
             string value = "";
 
             // Get entity description
-            attributes.TryGetValue("Description", out description);                
+            description = xml.GetAttribute("Description");
 
             // Initialize model
-            if (attributes.TryGetValue("Model", out value))
+            if ((value = xml.GetAttribute("Model")) != "")
             {
                 GameModel newModel = // Treat game model as level content
                     new GameModel(world.LevelContent.Load<Model>(value));
 
                 Matrix transform = Matrix.Identity;
-                
+
                 // Get model transform
-                if (attributes.TryGetValue("Transform", out value))
+                if ((value = xml.GetAttribute("Transform")) != "")
                     transform = Helper.StringToMatrix(value);
 
-                if (attributes.TryGetValue("Scale", out value))
+                if ((value = xml.GetAttribute("Scale")) != "")
                     transform *= Matrix.CreateScale(Helper.StringToVector3(value));
 
                 if (transform != Matrix.Identity)
@@ -296,8 +325,19 @@ namespace Isles.Engine
                 SetModel(newModel);
             }
 
+            // Get rotation
+            float.TryParse(xml.GetAttribute("Rotation"), out rotation);
+
             // OLD CODE: Place the entity
             Place(world.Landscape);
+        }
+
+        /// <summary>
+        /// Get entity spells
+        /// </summary>
+        public virtual IEnumerable<Spell> Spells
+        {
+            get { return null; }
         }
 
         /// <summary>

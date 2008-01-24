@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -26,12 +27,19 @@ namespace Isles
         /// </summary>
         public Tree(GameWorld world) : base(world)
         {
+            XmlElement xml;
 
+            if (GameDefault.Singleton.
+                WorldObjectDefaults.TryGetValue(GetType().Name, out xml))
+            {
+                Deserialize(xml);
+            }
         }
 
-        public override void Deserialize(IDictionary<string, string> attributes)
+        public override void Deserialize(XmlElement xml)
         {
-            base.Deserialize(attributes);
+            // Deserialize models after default attributes are assigned
+            base.Deserialize(xml);
 
             // Fall on the ground
             position.Z = world.Landscape.GetHeight(position.X, position.Y);
@@ -181,9 +189,9 @@ namespace Isles
             // Highlight buildings that can store wood
             Building building = world.Pick() as Building;
             if (building != null && building.StoresWood)
-                world.Highlighted.Add(building);
+                world.Highlight(building);
             else
-                world.Highlighted.Clear();
+                world.Highlight(null);
 
             base.Follow(hand);
         }

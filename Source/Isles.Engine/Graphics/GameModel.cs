@@ -244,6 +244,9 @@ namespace Isles.Graphics
         /// <param name="centerZ">Whether Z value should be centered</param>
         public void CenterModel(bool centerZ)
         {
+            if (model == null)
+                return;
+
             // Compute offset
             Vector3 offset = -(boundingBox.Max + boundingBox.Min) / 2;
 
@@ -271,6 +274,9 @@ namespace Isles.Graphics
 
         public virtual void Draw(GameTime gameTime, BasicEffectSettings setupBasicEffect)
         {
+            if (model == null)
+                return;
+
             if (player != null)
             {
                 DrawSkinnedModel();

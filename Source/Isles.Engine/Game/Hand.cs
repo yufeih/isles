@@ -257,8 +257,10 @@ namespace Isles.Engine
         /// <summary>
         /// Reset hand state
         /// </summary>
-        public void Reset()
+        public void Reset(GameWorld world)
         {
+            this.world = world;
+
             state = HandState.Idle;
             topMost = true;
             distanceSmoother = 0;
@@ -380,6 +382,9 @@ namespace Isles.Engine
         #region Update and Draw
         public override void Update(GameTime gameTime)
         {
+            if (activeSpell != null)
+                activeSpell.Update(gameTime);
+
             RestrictCursor();
 
             UpdateCursor();
@@ -644,6 +649,10 @@ namespace Isles.Engine
 
         public override void Draw(GameTime gameTime, GameModel.BasicEffectSettings setupBasicEffect)
         {
+            // Draw current spell
+            if (activeSpell != null)
+                activeSpell.Draw(gameTime);
+
             // To make our hand top most, clear the depth buffer before rendering it.
             // In addition, make sure the hand is drawed last
             if (topMost)

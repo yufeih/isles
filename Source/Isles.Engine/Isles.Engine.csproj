@@ -70,7 +70,7 @@
     <Compile Include="Game\GameWorld.cs" />
     <Compile Include="Game\Hand.cs" />
     <Compile Include="Game\Input.cs" />
-    <Compile Include="Game\IScreen.cs" />
+    <Compile Include="Game\Interface.cs" />
     <Compile Include="Game\Log.cs" />
     <Compile Include="Game\Math2D.cs" />
     <Compile Include="Game\Profiler.cs" />
@@ -81,7 +81,6 @@
     <Compile Include="Graphics\Effects\BloomComponent.cs" />
     <Compile Include="Graphics\Effects\BloomSettings.cs" />
     <Compile Include="Graphics\GameModel.cs" />
-    <Compile Include="Graphics\ILandscape.cs" />
     <Compile Include="Graphics\Landscape.cs" />
     <Compile Include="Graphics\Landscape.Grid.cs" />
     <Compile Include="Graphics\Landscape.Layer.cs" />
@@ -97,7 +96,6 @@
     <Compile Include="Graphics\ShadowMapEffect.cs" />
     <Compile Include="Graphics\Text.cs" />
     <Compile Include="Graphics\Vertex.cs" />
-    <Compile Include="Game\Level.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Game\Settings.cs" />
     <Compile Include="Game\Spell.cs" />

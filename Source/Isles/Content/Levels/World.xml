@@ -1,20 +1,27 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
 <!--Isles world format-->
-<World Name="Isles" Description="Isles description" Landscape="Landscapes/Landscape" Level="Demo">
+<World Version="1" Name="Isles" Description="Isles description" Landscape="Landscapes/Landscape" Level="Demo">
 
   <!--
     Every object is an XML element.
     The element contains a name indicating object type and several object attributes.
     
-    Object Types: Tree, Building...
+    Object Types:
+      Tree, Building...
     
-    Attributes: Name, Description Model, Position, Transform, Scale Velocity, Health MaxHealth,
-                ConstructionTime, BaseHeight, Wood, Gold, StoresWood, StoresGold, StoresFood
+    Attributes:
+      Name, Description Model, Position, Rotation (radius), Transform, Scale Velocity,
+      Health MaxHealth, ConstructionTime, BaseHeight, Wood, Gold, StoresWood,
+      StoresGold, StoresFood
                 
-    Remarks: Object will use its default attributes stored in Config/Defaults.xml if you
-             do not overwrite it here.
+    Remarks:
+      Object will use its default attributes stored in Config/Defaults.xml if you
+      do not overwrite it here.
   -->
   <Tree Position="1000, 1000, 0" />
+  <Tree Position="1200, 1000, 0" />
+  <Townhall Position="900, 950, 0" Rotation="0.2"/>
+  <Farmhouse Position="950, 980, 0" />
   
 </World>

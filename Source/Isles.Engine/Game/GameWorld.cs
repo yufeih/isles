@@ -18,124 +18,6 @@ using Isles.Graphics;
 
 namespace Isles.Engine
 {
-    #region IWorldObject
-    /// <summary>
-    /// Interface for a class of object that can be load from a file
-    /// and drawed on the scene.
-    /// E.g., Fireballs, sparks, static rocks...
-    /// </summary>
-    public interface IWorldObject
-    {
-        /// <summary>
-        /// Gets the position of the scene object
-        /// </summary>
-        Vector3 Position { get; }
-
-        /// <summary>
-        /// Gets the axis-aligned bounding box of the scene object
-        /// </summary>
-        BoundingBox BoundingBox { get; }
-
-        /// <summary>
-        /// Gets or sets whether the position or bounding box of the
-        /// scene object has changed since last update.
-        /// </summary>
-        /// <remarks>
-        /// By marking the IsDirty property of a scene object, the scene
-        /// manager will be able to adjust its internal data structure
-        /// to adopt to the change of transformation.
-        /// </remarks>
-        bool IsDirty { get; set; }
-
-        /// <summary>
-        /// Update the scene object
-        /// </summary>
-        /// <param name="gameTime"></param>
-        void Update(GameTime gameTime);
-
-        /// <summary>
-        /// Draw the scene object
-        /// </summary>
-        /// <param name="gameTime"></param>
-        void Draw(GameTime gameTime);
-
-        /// <summary>
-        /// Write the scene object to an XML element
-        /// </summary>
-        /// <param name="writer"></param>
-        void Serialize(XmlElement xml);
-
-        /// <summary>
-        /// Read and initialize the scene object from a set of attributes
-        /// </summary>
-        /// <param name="reader"></param>
-        void Deserialize(XmlElement xml);
-    }
-    #endregion
-
-    #region IGameUI
-    /// <summary>
-    /// Describe the type of a game message
-    /// </summary>
-    public enum MessageType
-    {
-        Message, Warning, Error, Congratulation
-    }
-
-    /// <summary>
-    /// In game user interface
-    /// </summary>
-    public interface IGameUI
-    {
-        /// <summary>
-        /// Called when an entity is selected. Game UI should refresh
-        /// itself to match the new entities, e.g., status and spells.
-        /// </summary>
-        void Select(Entity entity);
-
-        /// <summary>
-        /// Called when multiple entities are selected.
-        /// </summary>
-        void SelectMultiple(IEnumerable<Entity> entities);
-
-        /// <summary>
-        /// Popup a message
-        /// </summary>
-        void ShowMessage(MessageType type, string message, Vector2 position, Color color);
-    }
-    #endregion
-
-    #region ILevel
-    /// <summary>
-    /// Interface for a game level
-    /// </summary>
-    public interface ILevel
-    {
-        /// <summary>
-        /// Load a game level
-        /// </summary>
-        void Load(GameWorld world, Loading progress);
-
-        /// <summary>
-        /// Unload a game level
-        /// </summary>
-        void Unload();
-
-        /// <summary>
-        /// Update level stuff
-        /// </summary>
-        /// <param name="gameTime"></param>
-        void Update(GameTime gameTime);
-
-        /// <summary>
-        /// Draw level stuff
-        /// </summary>
-        /// <param name="gameTime"></param>
-        void Draw(GameTime gameTime);
-    }
-    #endregion
-
-    #region GameWorld
     /// <summary>
     /// Represents the game world
     /// </summary>
@@ -378,7 +260,7 @@ namespace Isles.Engine
         /// Load the game world from a file
         /// </summary>
         /// <param name="inStream"></param>
-        public virtual void Load(XmlElement node, Loading context)
+        public virtual void Load(XmlElement node, ILoading context)
         {
             // Validate XML element
             if (node.Name != "World")
@@ -402,6 +284,7 @@ namespace Isles.Engine
 
             // Load world objects
             int nObjects = 0;
+            IWorldObject worldObject;
             foreach (XmlNode child in node.ChildNodes)
             {
                 // Ignore comments and other stuff...
@@ -409,7 +292,7 @@ namespace Isles.Engine
 
                 if (element != null)
                 {
-                    if (null != Create(child.Name, element))
+                    if ((worldObject = Create(child.Name, element)) != null)
                         nObjects++;
                 }
             }
@@ -432,7 +315,7 @@ namespace Isles.Engine
         /// Save the world to a file
         /// </summary>
         /// <param name="outStream"></param>
-        public virtual void Save(XmlElement node, Loading context)
+        public virtual void Save(XmlElement node, ILoading context)
         {
             XmlElement child;
             XmlElement header;
@@ -455,13 +338,19 @@ namespace Isles.Engine
                 header.SetAttribute("Level", levelName);
 
             // Serialize world objects
+            int nObjects = 0;
             foreach (IWorldObject worldObject in worldObjects)
             {
-                header.AppendChild(child = doc.CreateElement("FIXME: NAME"));
-                worldObject.Serialize(child);
+                if (worldObject.ClassID != null &&
+                   (child = doc.CreateElement(worldObject.ClassID)) != null)
+                {
+                    header.AppendChild(child);
+                    worldObject.Serialize(child);
+                    nObjects++;
+                }
             }
 
-            Log.Write("Game world saved [" + Name + "], " + worldObjects.Count + " objects...");
+            Log.Write("Game world saved [" + Name + "], " + nObjects + " objects...");
         }
 
         /// <summary>
@@ -543,19 +432,8 @@ namespace Isles.Engine
             if (worldObject == null)
                 return null;
 
-            // Find some default attributes for the object type
-            //if (worldObjectDefaults != null && worldObjectDefaults.ContainsKey(typeName))
-            //{
-            //    if (attributes == null)
-            //        attributes = new Dictionary<string, string>();
-
-            //    foreach (KeyValuePair<string, string> pair in worldObjectDefaults[typeName])
-            //    {
-            //        // DO NOT overwrite existing attributes
-            //        if (!attributes.ContainsKey(pair.Key))
-            //            attributes.Add(pair.Key, pair.Value);
-            //    }
-            //}
+            // Set object class ID
+            worldObject.ClassID = typeName;
 
             // Deserialize world object
             if (xml != null)
@@ -818,5 +696,4 @@ namespace Isles.Engine
         }
         #endregion
     }
-    #endregion
 }

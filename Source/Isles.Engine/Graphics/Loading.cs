@@ -9,13 +9,14 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Isles.Engine;
 
 namespace Isles.Graphics
 {
     /// <summary>
     /// Used to presents loading progress
     /// </summary>
-    public class Loading
+    public class Loading : ILoading
     {
         /// <summary>
         /// Game graphics
@@ -33,9 +34,7 @@ namespace Isles.Graphics
         string message = "Loading...";
 
         /// <summary>
-        /// Gets or sets current progress.
-        /// Progress value ranges from 0 to 100, when a value greater
-        /// or equal then 100 is assigned, the LoadComplete event is triggered
+        /// Gets current progress.
         /// </summary>
         public float Progress
         {

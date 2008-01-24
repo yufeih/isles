@@ -37,30 +37,27 @@ namespace Isles
             get { return gameScreen; }
         }
 
-        public GameIsles()
+        /// <summary>
+        /// Gets settins stream
+        /// </summary>
+        static Stream SettingsStream
         {
-            // Initialize screens
-            AddScreen("GameScreen", gameScreen = new GameScreen());
-
-            // Register world objects
-            GameWorld.RegisterCreator(typeof(Tree), delegate(GameWorld world)
-            {
-                return new Tree(world);
-            });
-
-            GameWorld.RegisterCreator(typeof(Building), delegate(GameWorld world)
-            {
-                return new Building(world);
-            });
-
-            GameWorld.RegisterCreator(typeof(Stone), delegate(GameWorld world)
-            {
-                return new Stone(world);
-            });
+            get { return new FileStream("Config/Settings.xml", FileMode.Open); }
         }
 
-        protected override void OnInitialized()
+        public GameIsles() : base(Settings.CreateDefaultSettings(SettingsStream))
         {
+
+        }
+
+        /// <summary>
+        /// Initialize everything here
+        /// </summary>
+        protected override void FirstTimeInitialize()
+        {
+            // Register everything
+            Register();
+
             // Start new level
             using (Stream stream = new FileStream("Content/Levels/World.xml", FileMode.Open))
             {
@@ -69,8 +66,46 @@ namespace Isles
 
             // Start game screen
             StartScreen(gameScreen);
+        }
 
-            base.OnInitialized();
+
+        private void Register()
+        {
+            // Register world objects
+            GameWorld.RegisterCreator("Tree", delegate(GameWorld world)
+            {
+                return new Tree(world);
+            });
+
+            GameWorld.RegisterCreator("Stone", delegate(GameWorld world)
+            {
+                return new Stone(world);
+            });
+
+            GameWorld.RegisterCreator("Townhall", delegate(GameWorld world)
+            {
+                return new Building(world, "Townhall");
+            });
+
+            GameWorld.RegisterCreator("Farmhouse", delegate(GameWorld world)
+            {
+                return new Building(world, "Farmhouse");
+            });
+
+
+            // Register levels
+            GameWorld.RegisterLevel("Demo", new Level());
+
+
+            // Register spells
+            Spell.RegisterCreator("Fireball", delegate(GameWorld world)
+            {
+                return new FireballSpell(world);
+            });
+
+
+            // Register screens
+            AddScreen("GameScreen", gameScreen = new GameScreen());
         }
     }
 }

@@ -8,6 +8,8 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -25,12 +27,6 @@ namespace Isles.Engine
     /// </summary>
     public class BaseGame : Microsoft.Xna.Framework.Game
     {
-        #region Constants
-
-        public const string Version = "1.04";
-
-        #endregion
-
         #region Variables
         /// <summary>
         /// XNA graphics device manager
@@ -403,8 +399,12 @@ namespace Isles.Engine
         #endregion
 
         #region Initialization
-
         public BaseGame()
+            : this(Settings.CreateDefaultSettings(null))
+        {
+        }
+
+        public BaseGame(Settings settings)
         {
             singleton = this;
 
@@ -412,16 +412,18 @@ namespace Isles.Engine
             Log.Initialize();
             Log.NewLine();
             Log.NewLine();
-            Log.Write("Isles version: " + Version, false);
+            Log.Write("Isles", false); // FIXME: + a version
             Log.Write("Date: " + DateTime.Now, false);
             Log.NewLine();
 
-            Content.RootDirectory = "Content";
+            // Initialize settings
+            if (settings == null)
+                settings = Settings.CreateDefaultSettings(null);
+            this.settings = settings;
+
+            Content.RootDirectory = settings.ContentDirectory;
 
             graphics = new GraphicsDeviceManager(this);
-
-            // Initialize settings  
-            settings = Settings.CreateDefaultSettings(true);
 
             graphics.IsFullScreen               = settings.Fullscreen;
             graphics.PreferredBackBufferWidth   = settings.ScreenWidth;
@@ -435,7 +437,8 @@ namespace Isles.Engine
 //#if DEBUG
             // Use variant time step to trace frame performance
             IsFixedTimeStep = false;
-            //TargetElapsedTime = new TimeSpan(200000);
+            //IsFixedTimeStep = true;
+            //TargetElapsedTime = new TimeSpan(2000000);
 //#endif
         }
 
@@ -611,7 +614,7 @@ namespace Isles.Engine
             }
         }
 
-        protected virtual void OnInitialized()
+        protected virtual void FirstTimeInitialize()
         {
         }
 
@@ -727,7 +730,7 @@ namespace Isles.Engine
             if (!initialized)
             {
                 initialized = true;
-                OnInitialized();
+                FirstTimeInitialize();
             }
 
             graphics.GraphicsDevice.Clear(backgroundColor);

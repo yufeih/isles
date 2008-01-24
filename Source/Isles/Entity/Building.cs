@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -170,45 +171,48 @@ namespace Isles
         /// <summary>
         /// Create a new building
         /// </summary>
-        public Building(GameWorld world) : base(world)
+        public Building(GameWorld world, string classID) : base(world)
         {
+            XmlElement xml;
+
+            if (GameDefault.Singleton.
+                WorldObjectDefaults.TryGetValue(classID, out xml))
+            {
+                Deserialize(xml);
+            }
         }
 
-        public override void Deserialize(IDictionary<string, string> attributes)
+        public override void Deserialize(XmlElement xml)
         {
-            base.Deserialize(attributes);
+            bool result;
 
-            string value = "";
-
-            if (attributes.TryGetValue("MaxHealth", out value))
-                health = maxHealth = float.Parse(value);
-
-            if (attributes.TryGetValue("Health", out value))
-                health = float.Parse(value);
-
-            if (health > maxHealth)
-                health = maxHealth;
-
-            if (attributes.TryGetValue("BaseHeight", out value))
-                baseHeight = float.Parse(value);
-
-            if (attributes.TryGetValue("ConstructionTime", out value))
-                ConstructionTime = float.Parse(value);
-
-            if (attributes.TryGetValue("Wood", out value))
-                Wood = int.Parse(value);
-
-            if (attributes.TryGetValue("Gold", out value))
-                Gold = int.Parse(value);
-
-            if (attributes.TryGetValue("StoresWood", out value))
+            if (bool.TryParse(xml.GetAttribute("StoresWood"), out result) && result)
                 Flag |= BuildingFlag.StoresWood;
 
-            if (attributes.TryGetValue("StoresGold", out value))
+            if (bool.TryParse(xml.GetAttribute("StoresGold"), out result) && result)
                 Flag |= BuildingFlag.StoresGold;
 
-            if (attributes.TryGetValue("StoresFood", out value))
+            if (bool.TryParse(xml.GetAttribute("StoresFood"), out result) && result)
                 Flag |= BuildingFlag.StoresFood;
+
+            int.TryParse(xml.GetAttribute("Wood"), out Wood);
+            int.TryParse(xml.GetAttribute("Gold"), out Gold);
+
+            float.TryParse(xml.GetAttribute("Health"), out health);
+            float.TryParse(xml.GetAttribute("MaxHealth"), out maxHealth);
+            float.TryParse(xml.GetAttribute("BaseHeight"), out baseHeight);
+            float.TryParse(xml.GetAttribute("ConstructionTime"), out ConstructionTime);
+
+            if (health > maxHealth)
+            {
+                if (maxHealth >= 0)
+                    health = maxHealth;
+                else
+                    maxHealth = health;
+            }
+
+            // Deserialize models after default attributes are assigned
+            base.Deserialize(xml);
         }
 
         /// <summary>

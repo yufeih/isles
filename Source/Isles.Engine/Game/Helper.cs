@@ -105,6 +105,83 @@ namespace Isles.Engine
     /// <remarks>
     /// Remove objects until update is called
     /// </remarks>
+    public class BroadcastList<TValue, TList>
+        : IEnumerable<TValue>, ICollection<TValue> where TList : ICollection<TValue>, new()
+    {
+        private bool isDirty = true;
+        private TList elements = new TList();
+        private TList copy = new TList();
+
+        public void Update()
+        {
+
+        }
+
+        public TList Elements
+        {
+            get { return elements; }
+        }
+
+        public IEnumerator<TValue> GetEnumerator()
+        {
+            // Copy a new list whiling iterating it
+            if (isDirty)
+            {
+                copy.Clear();
+                foreach (TValue e in elements)
+                    copy.Add(e);
+                isDirty = false;
+            }
+            
+            return copy.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public void Add(TValue e)
+        {
+            isDirty = true;
+            elements.Add(e);
+        }
+
+        public bool Remove(TValue e)
+        {
+            isDirty = true;
+            return elements.Remove(e);
+        }
+
+        public void Clear()
+        {
+            isDirty = true;
+            elements.Clear();
+        }
+
+        public bool IsReadOnly
+        {
+            get { return true; }
+        }
+
+        public int Count
+        {
+            get { return elements.Count; }
+        }
+
+        public bool Contains(TValue item)
+        {
+            return elements.Contains(item);
+        }
+
+        public void CopyTo(TValue[] array, int arrayIndex)
+        {
+            elements.CopyTo(array, arrayIndex);
+        }
+    }
+
+    #region Obsolute
+#if SOMETHINGSWRONGWITHTHIS
     public class BroadcastList<TValue, TList> 
         : IEnumerable<TValue>, ICollection<TValue> where TList : ICollection<TValue>, new()
     {
@@ -122,7 +199,6 @@ namespace Isles.Engine
             }
             else
             {
-
                 foreach (TValue e in pendingDeletes)
                     elements.Remove(e);
             }
@@ -186,6 +262,8 @@ namespace Isles.Engine
             elements.CopyTo(array, arrayIndex);
         }
     }
+#endif
+    #endregion
     #endregion
 
     #region Property
@@ -325,7 +403,7 @@ namespace Isles.Engine
             xml = element;
         }
 
-        #region IProperty<string> Members
+    #region IProperty<string> Members
         public string Name
         {
             get { return xml.Name; }

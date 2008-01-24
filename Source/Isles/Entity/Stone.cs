@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -49,18 +50,22 @@ namespace Isles
         /// Create a new stone
         /// </summary>
         public Stone(GameWorld world) : base (world)
-        { 
+        {
+            XmlElement xml;
 
+            if (GameDefault.Singleton.
+                WorldObjectDefaults.TryGetValue(GetType().Name, out xml))
+            {
+                Deserialize(xml);
+            }
         }
 
-        public override void Deserialize(IDictionary<string, string> attributes)
+        public override void Deserialize(XmlElement xml)
         {
-            base.Deserialize(attributes);
+            int.TryParse(xml.GetAttribute("Gold"), out Gold);
 
-            string value;
-
-            if (attributes.TryGetValue("Gold", out value))
-                Gold = int.Parse(value);
+            // Deserialize models after default attributes are assigned
+            base.Deserialize(xml);
         }
 
         /// <summary>

@@ -24,14 +24,14 @@ namespace Isles
         /// The key of the outer dictionary is the type name of a world object,
         /// the inner dictionary stores its default {attribute, value} pair.
         /// </summary>
-        public Dictionary<string, IDictionary<string, string>>
-            WorldObjectDefaults = new Dictionary<string, IDictionary<string, string>>();
+        public Dictionary<string, XmlElement>
+            WorldObjectDefaults = new Dictionary<string, XmlElement>();
 
         /// <summary>
         /// Gets or sets the default attributes for spells
         /// </summary>
-        public Dictionary<string, IDictionary<string, string>>
-            SpellDefaults = new Dictionary<string, IDictionary<string, string>>();
+        public Dictionary<string, XmlElement>
+            SpellDefaults = new Dictionary<string, XmlElement>();
 
         /// <summary>
         /// Load the game defaults from a stream
@@ -57,9 +57,7 @@ namespace Isles
 
                     if (child != null)
                     {
-                        WorldObjectDefaults.Add(child.Name, new Dictionary<string,string>());
-                        foreach (XmlAttribute attribute in child.Attributes)
-                            WorldObjectDefaults[child.Name].Add(attribute.Name, attribute.Value);
+                        WorldObjectDefaults.Add(child.Name, child);
                     }
                 }
             }
@@ -75,9 +73,7 @@ namespace Isles
 
                     if (child != null)
                     {
-                        SpellDefaults.Add(child.Name, new Dictionary<string, string>());
-                        foreach (XmlAttribute attribute in child.Attributes)
-                            SpellDefaults[child.Name].Add(attribute.Name, attribute.Value);
+                        SpellDefaults.Add(child.Name, child);
                     }
                 }
             }
@@ -92,13 +88,66 @@ namespace Isles
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Assign the default attributes to the xml element of a specific type.
+        /// </summary>
+        /// <remarks>
+        /// If there is an default XML element describing an avator like this:
+        /// 
+        /// <Avator Model="models/avator">
+        ///     <Spells>
+        ///         <Fireball Level="1" />
+        ///         <Windwalk Level="1" />
+        ///     </Spells>
+        ///     <Items>
+        ///         <HealthPotion Power="300" />
+        ///         <HealthPotion Power="300" />
+        ///     </Items>
+        /// </Avator>
+        /// 
+        /// The game world file only need to store its position, all other attributes
+        /// are appended using MergeAttributes automatically.
+        /// 
+        /// <Avator Position="1024, 512, 0" />
+        /// 
+        /// However for world object containing the child nodes, it's up to the client
+        /// to determine whether to keep the default settings or not. So in the XML
+        /// element below, the avator has only 1 item, the health potions and spells
+        /// are ignored.
+        /// 
+        /// <Avator Position="1024, 512, 0">
+        ///     <Items>
+        ///         <ManaPotion Power="500" />
+        ///     </Items>
+        /// </Avator>
+        /// 
+        /// This method only append default attributes that the target xml do not have.
+        /// </remarks>
+        public void MergeAttributes(string type, XmlElement xml)
+        {
+            if (xml == null || type == null)
+                return;
+
+            XmlElement value;
+
+            // Get default XML node describing the object type
+            if (WorldObjectDefaults.TryGetValue(type, out value))
+            {
+                foreach (XmlAttribute attribute in value.Attributes)
+                {
+                    if (!xml.HasAttribute(attribute.Name))
+                        xml.SetAttribute(attribute.Name, attribute.Value);
+                }
+            }
+        }
+
         private static GameDefault gameDefault;
 
         /// <summary>
         /// Create a game default from file
         /// </summary>
         /// <returns></returns>
-        public static GameDefault Default
+        public static GameDefault Singleton
         {
             get
             {
