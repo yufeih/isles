@@ -134,11 +134,6 @@ namespace Isles.Engine
         /// </summary>
         protected Hand hand;
 
-        public Spell()
-        {
-
-        }
-        
         public Spell(GameWorld world)
         {
             this.world = world;

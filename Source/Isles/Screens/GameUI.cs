@@ -275,7 +275,14 @@ namespace Isles
         public void Select(Entity entity)
         {
             if (null == entity)
+            {
                 SelectNull();
+            }
+            else
+            {
+                scrollPanel.Clear();
+                AddSpells(entity.Spells);
+            }
         }
 
         /// <summary>

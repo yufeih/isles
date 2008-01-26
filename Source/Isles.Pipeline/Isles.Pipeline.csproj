@@ -74,6 +74,10 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System.XML" />
+    <Reference Include="Xclna.Xna.Animation.Content, Version=1.0.2.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Xclna\Xclna.Xna.Animation.Content.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Landscape\Landscape.cs" />
@@ -87,9 +91,6 @@
     <Compile Include="SkinnedModel\SkinningData.cs" />
     <Compile Include="SkinnedModel\TypeReaders.cs" />
     <Compile Include="SkinnedModel\TypeWriters.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="License.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

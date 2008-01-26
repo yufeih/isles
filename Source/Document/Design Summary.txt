@@ -1,0 +1,22 @@
+Isles Design Summary
+--------------------
+Jan. 2008. (c) Nightin Game
+
+
+Welcome to Isles, the new world of real-time strategy game. As the god of a tribe, you are to explore and conquer the beautiful yet hostile island. Create settlements to attract followers and expand your territory. Use your mighty skills and power to make life better for your people. Protect the village and environment against intruders and hunters. Summon giant creatures to help fight against enemies and even more¡­
+
+Gameplay Features:
+
+- The god: You are playing the game in the god¡¯s first person perspective. The god creates and controls the world using his big hand, which interacts seamlessly with the game environment, such as pulling trees, drag and dropping objects and civilians. Much like the persistent character from a role-playing game, as more games are played, more powerful the god will be. New spells, items and creatures will be unlocked too.
+
+- Creatures: Unlike traditional RTS games, you have no direct mind-control over the people of your tribe, nor are you able to train and control large troops for battle. But you do, however, summon creatures to form a small team under your command. Each creature has its own special abilities and strategic advantages. A creature can carry items in its inventory to enhance its skills and power. It can also gain experience during combat and level up too.
+
+- Biosphere: The world of Isles is a tightly enclosed biosphere. The land is limited and the effect of environment change is exaggerated. Balance the proportion of farms, plants, vegetarians, predators and civilians to retain the food chain. However, the harmony can be easily destructed: hunters are killing lots of precious animals, and people are cutting down trees massively. Use the god¡¯s or creatures¡¯ special ability to help sustain the environment.
+
+
+Potential Features: (Depends on our schedule, these features are in consideration and will probably be incorporated into our game)
+
+- Graphics: Realistic rendering of ocean water and island landscape on the fly. Items appear on the real model of creature rag doll.
+- Physics: The hand can pick up assets like stones and throw them at the enemy or architectures.
+- AI: Civilians and enemies have their own minds, goals and personalities.
+- Multiplayer: Players corporate or fight against each other on a LAN.

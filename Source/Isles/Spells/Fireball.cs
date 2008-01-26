@@ -155,7 +155,7 @@ namespace Isles
     /// <summary>
     /// Fireball spell
     /// </summary>
-    public class FireballSpell : Spell
+    public class SpellFireball : Spell
     {
         /// <summary>
         /// Aim texture
@@ -180,7 +180,7 @@ namespace Isles
         /// <summary>
         /// Create a new spell. TODO: pass in a hand
         /// </summary>
-        public FireballSpell(GameWorld world)
+        public SpellFireball(GameWorld world)
             : base(world)
         {
             XmlElement xml;

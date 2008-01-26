@@ -100,7 +100,12 @@ namespace Isles
             // Register spells
             Spell.RegisterCreator("Fireball", delegate(GameWorld world)
             {
-                return new FireballSpell(world);
+                return new SpellFireball(world);
+            });
+
+            Spell.RegisterCreator("PlantTree", delegate(GameWorld world)
+            {
+                return new SpellPlantTree(world);
             });
 
 

@@ -225,6 +225,11 @@ namespace Isles.Engine
         protected float dragForce = 100;
 
         /// <summary>
+        /// A list of spells owned by this entity
+        /// </summary>
+        protected List<Spell> spells = new List<Spell>();
+
+        /// <summary>
         /// Gets or sets entity rotation
         /// </summary>
         public float Rotation
@@ -328,6 +333,19 @@ namespace Isles.Engine
             // Get rotation
             float.TryParse(xml.GetAttribute("Rotation"), out rotation);
 
+            // Get spells
+            XmlNodeList spellNodes = xml.SelectNodes("Spell");
+            foreach (XmlNode node in spellNodes)
+            {
+                XmlElement element = node as XmlElement;
+
+                if (element != null && 
+                   (value = element.GetAttribute("Class")) != "")
+                {
+                    spells.Add(Spell.Create(value, world));
+                }
+            }
+
             // OLD CODE: Place the entity
             Place(world.Landscape);
         }
@@ -337,7 +355,7 @@ namespace Isles.Engine
         /// </summary>
         public virtual IEnumerable<Spell> Spells
         {
-            get { return null; }
+            get { return spells; }
         }
 
         /// <summary>

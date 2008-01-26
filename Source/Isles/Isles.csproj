@@ -73,7 +73,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Screens\GameScreen.cs" />
     <Compile Include="Screens\GameUI.cs" />
-    <Compile Include="Spells\Build.cs" />
+    <Compile Include="Spells\Spell.cs" />
     <Compile Include="Spells\Fireball.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -85,7 +85,6 @@
     </Content>
     <Content Include="Game.ico" />
     <Content Include="GameThumbnail.png" />
-    <Content Include="License.txt" />
   </ItemGroup>
   <ItemGroup>
     <NestedContentProject Include="Content\Content.contentproj">
