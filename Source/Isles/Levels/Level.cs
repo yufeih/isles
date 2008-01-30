@@ -45,9 +45,7 @@ namespace Isles
             // Set available buildings
             world.GameLogic.AvailableBuildings.AddRange(new string[] 
             {
-                "Townhall", "Farmhouse", "Farmhouse", 
-                "Townhall", "Farmhouse", "Farmhouse", 
-                "Townhall", "Farmhouse", "Farmhouse", 
+                "Townhall", "Farmhouse", "Windmill", "Storage"
             });
 
             world.GameLogic.CurrentSpells.AddRange(new Spell[]

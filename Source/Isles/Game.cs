@@ -92,6 +92,15 @@ namespace Isles
                 return new Building(world, "Farmhouse");
             });
 
+            GameWorld.RegisterCreator("Windmill", delegate(GameWorld world)
+            {
+                return new Building(world, "Windmill");
+            });
+
+            GameWorld.RegisterCreator("Storage", delegate(GameWorld world)
+            {
+                return new Building(world, "Storage");
+            });
 
             // Register levels
             GameWorld.RegisterLevel("Demo", new Level());

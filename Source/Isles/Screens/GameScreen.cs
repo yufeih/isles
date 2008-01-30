@@ -113,7 +113,7 @@ namespace Isles
             ui = new GameUI(BaseGame.Singleton);
 
             hand = new Hand(null, "Models/Hand",
-                Matrix.CreateScale(0.2f) *
+                Matrix.CreateScale(0.02f) *
                 Matrix.CreateRotationX(MathHelper.ToRadians(30)) *
                 Matrix.CreateRotationY(MathHelper.ToRadians(20)) *
                 Matrix.CreateTranslation(0, -12, 0));

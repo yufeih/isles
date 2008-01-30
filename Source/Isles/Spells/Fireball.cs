@@ -255,7 +255,7 @@ namespace Isles
 
             Fireball fireball = new Fireball(world);
 
-            fireball.Position = hand.Position;
+            fireball.Position = hand.GetCastPosition();
 
             Vector3 speed = Vector3.Normalize(
                 hand.CursorPosition - fireball.Position) * 20;

@@ -17,7 +17,7 @@
     <Townhall
       Name="Town hall" Description="Center of the town" Model="models/storage"
       Transform="1, 0, 0, 0, 0, 1, 0.06, 0, 0, 0, 1, 0, 0, 0, -18, 1"
-      Icon="1" Hotkey="T" ConstructionTime="20" Health="2000"
+      Icon="1" Hotkey="T" ConstructionTime="20" Health="2000" BaseHeight="10"
       StoresWood="true" StoresFood="true" StoresGold="true">
       
       <Spell Class="PlantTree" />
@@ -27,37 +27,36 @@
     <Farmhouse
       Name="Farm house" Description="A place to live" Model="models/tank"
       Transform="0.06, 0, 0, 0, 0, -2.622683E-09, 0.06, 0, 0, -0.06, -2.622683E-09, 0, 0, 0, 0, 1"
-      Icon="1" Hotkey="H" ConstructionTime="20" Health="2000"
+      Icon="1" Hotkey="H" ConstructionTime="20" Health="2000" BaseHeight="10"
       StoresWood="true" StoresFood="true" StoresGold="true"/>
 
     <Farmland
-      Name="Farm house" Description="A place to live" Model="models/tank"
-      Transform="0.06, 0, 0, 0, 0, -2.622683E-09, 0.06, 0, 0, -0.06, -2.622683E-09, 0, 0, 0, 0, 1"
-      Icon="1" Hotkey="F" ConstructionTime="20" Health="2000"
+      Name="Farm house" Description="A place to live" Model="models/fang1"
+      Icon="5" Hotkey="F" ConstructionTime="20" Health="2000" BaseHeight="10"
       StoresWood="true" StoresFood="true" StoresGold="true"/>
 
     <Windmill
-      Name="Farm house" Description="A place to live" Model="models/tank"
-      Transform="0.06, 0, 0, 0, 0, -2.622683E-09, 0.06, 0, 0, -0.06, -2.622683E-09, 0, 0, 0, 0, 1"
-      Icon="1" Hotkey="W" ConstructionTime="20" Health="2000"
+      Name="Farm house" Description="A place to live" Model="models/fang1"
+      Transform="0.02, 0, 0, 0, 0, 0.02, 0, 0, 0, 0, 0.02, 0, 0, 0, 0, 1"
+      Icon="5" Hotkey="W" ConstructionTime="20" Health="2000" BaseHeight="10"
       StoresWood="true" StoresFood="true" StoresGold="true"/>
 
     <Storage
-      Name="Farm house" Description="A place to live" Model="models/tank"
-      Transform="0.06, 0, 0, 0, 0, -2.622683E-09, 0.06, 0, 0, -0.06, -2.622683E-09, 0, 0, 0, 0, 1"
-      Icon="1" Hotkey="S" ConstructionTime="20" Health="2000"
+      Name="Farm house" Description="A place to live" Model="models/fang2"
+      Transform="0.01, 0, 0, 0, 0, 0.01, 0, 0, 0, 0, 0.01, 0, 0, 0, 0, 1"
+      Icon="1" Hotkey="S" ConstructionTime="20" Health="2000" BaseHeight="10"
       StoresWood="true" StoresFood="true" StoresGold="true"/>
 
     <AltarOfPeace
       Name="Farm house" Description="A place to live" Model="models/tank"
       Transform="0.06, 0, 0, 0, 0, -2.622683E-09, 0.06, 0, 0, -0.06, -2.622683E-09, 0, 0, 0, 0, 1"
-      Icon="1" Hotkey="P" ConstructionTime="20" Health="2000"
+      Icon="1" Hotkey="P" ConstructionTime="20" Health="2000" BaseHeight="10"
       StoresWood="true" StoresFood="true" StoresGold="true"/>
 
     <AltarOfDestruction
       Name="Farm house" Description="A place to live" Model="models/tank"
       Transform="0.06, 0, 0, 0, 0, -2.622683E-09, 0.06, 0, 0, -0.06, -2.622683E-09, 0, 0, 0, 0, 1"
-      Icon="1" Hotkey="D" ConstructionTime="20" Health="2000"
+      Icon="1" Hotkey="D" ConstructionTime="20" Health="2000" BaseHeight="10"
       StoresWood="true" StoresFood="true" StoresGold="true"/>
     
   </WorldObject>

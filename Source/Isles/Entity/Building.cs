@@ -125,7 +125,7 @@ namespace Isles
             set { baseHeight = value; }
         }
 
-        protected float baseHeight = 50;
+        protected float baseHeight = 0;
 
 
         /// <summary>
@@ -236,11 +236,10 @@ namespace Isles
             List<Entity> entities = new List<Entity>(2);
 
             float z = landscape.GetHeight(position.X, position.Y);
-            foreach (Point grid in new Landscape.GridEnumerator(
-                landscape, model.BoundingBox.Min, model.BoundingBox.Max, position, rotation))
+            foreach (Point grid in landscape.EnumerateGrid(position, size))
             {
-                //if (!IsValidGrid(landscape, grid, z))
-                //    return false;
+                if (!IsValidGrid(landscape, grid, z))
+                    return false;
 
                 foreach (Entity entity in landscape.Data[grid.X, grid.Y].Owners)
                 {
@@ -275,12 +274,17 @@ namespace Isles
         bool IsValidGrid(Landscape landscape, Point grid, float z)
         {
             // Should be on the ground and not owned by others
-            if (landscape.Data[grid.X, grid.Y].Type != LandscapeType.Ground/* ||
-                landscape.Data[grid.X, grid.Y].Owners.Count != 0*/)
+            //if (landscape.Data[grid.X, grid.Y].Type != LandscapeType.Ground/* ||
+            //    landscape.Data[grid.X, grid.Y].Owners.Count != 0*/)
+            //    return false;
+
+            // Shouldn't be on the water
+            if (landscape.HeightField[grid.X, grid.Y] < 0)
                 return false;
 
             // Shouldn't be on somewhere too rough
-            if (z - landscape.HeightField[grid.X, grid.Y] > baseHeight)
+            const float Cos30 = 0.8660254037f;
+            if (Vector3.Dot(landscape.NormalField[grid.X, grid.Y], Vector3.UnitZ) < Cos30)
                 return false;
             
             return true;
@@ -315,11 +319,8 @@ namespace Isles
             // Fall on the ground
             position.Z = landscape.GetHeight(position.X, position.Y);
 
-            Landscape.GridEnumerator grids = new Landscape.GridEnumerator(
-                landscape, model.BoundingBox.Min, model.BoundingBox.Max, position, rotation);
-
             // Change grid owner
-            foreach (Point grid in grids)
+            foreach (Point grid in landscape.EnumerateGrid(position, size))
                 landscape.Data[grid.X, grid.Y].Owners.Add(this);
 
             // Set state to constructing
@@ -335,12 +336,8 @@ namespace Isles
         /// <returns>Success or not</returns>
         public override bool Pickup(Landscape landscape)
         {
-            // Set everything back to null
-            Landscape.GridEnumerator grids = new Landscape.GridEnumerator(
-                landscape, model.BoundingBox.Min, model.BoundingBox.Max, position, rotation);
-
             // Change grid owner
-            foreach (Point grid in grids)
+            foreach (Point grid in landscape.EnumerateGrid(position, size))
             {
                 System.Diagnostics.Debug.Assert(landscape.Data[grid.X, grid.Y].Owners.Contains(this));
 
