@@ -52,10 +52,10 @@ float4 PS( VS_OUTPUT In ) : COLOR
     float2 displacement = tex2D(DistortionSampler, DisplacementScroll + In.UV / 3);
     
     // Offset the main texture coordinates.
-    In.UV += displacement * 0.2 - 0.15;
+    In.UV += displacement * 0.06;// - 0.15;
     
     float4 result = tex2D(ColorSampler,In.UV);
-    result.a = 0.5f;
+    //result.a = 0.5f;
     return result;
 }
 

@@ -97,20 +97,26 @@ void VS(
     float2 UV		: TEXCOORD0,
     out float4 oPos	: POSITION,
     out float2 oUV	: TEXCOORD0,
+    out float oZ	: TEXCOORD1,
     out float4 oColor : COLOR0)
 {	
     oPos = mul(Pos, WorldViewProj);
     oUV = UV;
     oColor = saturate(dot(Normal, -normalize(LightDir))) * LightColor;
+    oZ = Pos.z;
 }
 
 float4 PS( 
     float4 Color : COLOR0,
-    float2 UV: TEXCOORD0 ) : COLOR
+    float2 UV: TEXCOORD0,
+    float Z: TEXCOORD1 ) : COLOR
 {
-    float4 map = tex2D(ColorSampler, UV);
-    float4 result = AmbiColor + SurfColor * map * (Color);
-    result.a = tex2D(AlphaSampler, UV / 16).a;
+    //float4 map = tex2D(ColorSampler, UV);
+    //float4 result = AmbiColor + SurfColor * map * (Color);
+    //result.a = tex2D(AlphaSampler, UV / 16).a;
+    //return result;
+    float4 result = tex2D(ColorSampler, UV / 16) * tex2D(AlphaSampler, UV * 2) * 2;
+    result.a = (Z < 0) ? (1+Z*.05) : 1;
     return result;
 }
 
@@ -140,8 +146,8 @@ VS_OUTPUT VSNormalMapping(
 
 float4 PSNormalMapping( VS_OUTPUT In ) : COLOR
 {    
-    float4 map = tex2D(ColorSampler,In.UV);
-    float3 bumps = Bumpy * (tex2D(NormalSampler,In.UV).xyz-(0.5).xxx);
+    float4 map = tex2D(ColorSampler, In.UV);
+    float3 bumps = Bumpy * (tex2D(NormalSampler,In.UV * 2).xyz-(0.5).xxx);
     
     float3 Ln = normalize(In.LightVec);
     float3 Nn = normalize(In.WorldNormal);
@@ -239,7 +245,7 @@ technique ShadowMapping
 		AlphaBlendEnable = true;
         SrcBlend = SrcAlpha;
         DestBlend = InvSrcAlpha;
-        
+               
 		//Cullmode = CW;
 		//Fillmode = Wireframe;
 		

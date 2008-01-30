@@ -28,6 +28,7 @@ namespace Isles.Pipeline
         #region Fields
         string heightmap;
         string waterTexture;
+        float earthRadius;
         string skyBox;
         List<Layer> layers = new List<Layer>();
         List<Vegetation> vegetations = new List<Vegetation>();
@@ -60,6 +61,12 @@ namespace Isles.Pipeline
         {
             get { return waterTexture; }
             set { waterTexture = value; }
+        }
+
+        public float EarthRadius
+        {
+            get { return earthRadius; }
+            set { earthRadius = value; }
         }
 
         public string SkyBox
@@ -439,6 +446,7 @@ namespace Isles.Pipeline
                 layers[i].Write(output);
 
             // water model
+            output.Write(earthRadius);
             output.WriteExternalReference<TextureContent>(waterColorTexture);
             output.WriteExternalReference<TextureCubeContent>(skyBoxCubeTexture);
 
