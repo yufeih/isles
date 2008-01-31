@@ -51,11 +51,21 @@ namespace Isles.Graphics
         /// </summary>
         public float[,] HeightField
         {
-            get { return heightfield; }
+            get { return heightField; }
         }
 
-        float[,] heightfield;
+        float[,] heightField;
 
+
+        /// <summary>
+        /// Gets the normal field of the landscape
+        /// </summary>
+        public Vector3[,] NormalField
+        {
+            get { return normalField; }
+        }
+
+        Vector3[,] normalField;
 
         /// <summary>
         /// Gets the number of patches on the x axis
@@ -169,7 +179,7 @@ namespace Isles.Graphics
         /// <returns></returns>
         public float GetGridHeight(int x, int y)
         {
-            return heightfield[x, y];
+            return heightField[x, y];
         }
 
         /// <summary>
@@ -218,9 +228,9 @@ namespace Isles.Graphics
                 //      \|
                 //  2    3
                 return
-                    heightfield[ix1, iy1] + // 1
-                    (1.0f - fX) * (heightfield[ix2, iy1] - heightfield[ix1, iy1]) + // 0
-                    (1.0f - fY) * (heightfield[ix1, iy2] - heightfield[ix1, iy1]); // 3
+                    heightField[ix1, iy1] + // 1
+                    (1.0f - fX) * (heightField[ix2, iy1] - heightField[ix1, iy1]) + // 0
+                    (1.0f - fY) * (heightField[ix1, iy2] - heightField[ix1, iy1]); // 3
             }
             // we are on triangle 1 !!
             //  0     1
@@ -231,9 +241,32 @@ namespace Isles.Graphics
             //  |    \
             //  2_____3
             return
-                heightfield[ix2, iy2] + // 2
-                fX * (heightfield[ix1, iy2] - heightfield[ix2, iy2]) +    // 3
-                fY * (heightfield[ix2, iy1] - heightfield[ix2, iy2]); // 0
+                heightField[ix2, iy2] + // 2
+                fX * (heightField[ix1, iy2] - heightField[ix2, iy2]) +    // 3
+                fY * (heightField[ix2, iy1] - heightField[ix2, iy2]); // 0
+        }
+
+        /// <summary>
+        /// Gets the normal of a grid
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public Vector3 GetNormal(int x, int y)
+        {
+            return normalField[x, y];
+        }
+
+        /// <summary>
+        /// Gets the normal of the terrain from a world position
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public Vector3 GetNormal(float x, float y)
+        {
+            Point grid = PositionToGrid(x, y);
+            return normalField[grid.X, grid.Y];
         }
 
         /// <summary>
@@ -419,11 +452,11 @@ namespace Isles.Graphics
                     y > 0 && y < gridRowCount - 1)
                 {
                     track.Add(new VertexPositionColor(new Vector3(
-                        GridToPosition(x, y), heightfield[x, y]), Color.White));
+                        GridToPosition(x, y), heightField[x, y]), Color.White));
                     //Log.Write("x: " + x + "\ty: " + y + "\tz: " + z + "\theight: " + heightfield[x, y], false);
 
                     // Test a pixel
-                    if (heightfield[x, y] >= z)
+                    if (heightField[x, y] >= z)
                     {
                         // Find the first intersection, we
                         // need a precise value of the position
@@ -445,13 +478,13 @@ namespace Isles.Graphics
                             max.Y = min.Y + 1;
 
                             v[0] = new Vector3(
-                                GridToPosition(min.X, min.Y), heightfield[min.X, min.Y]);
+                                GridToPosition(min.X, min.Y), heightField[min.X, min.Y]);
                             v[1] = new Vector3(
-                                GridToPosition(max.X, min.Y), heightfield[max.X, min.Y]);
+                                GridToPosition(max.X, min.Y), heightField[max.X, min.Y]);
                             v[2] = new Vector3(
-                                GridToPosition(min.X, max.Y), heightfield[min.X, max.Y]);
+                                GridToPosition(min.X, max.Y), heightField[min.X, max.Y]);
                             v[3] = new Vector3(
-                                GridToPosition(max.X, max.Y), heightfield[max.X, max.Y]);
+                                GridToPosition(max.X, max.Y), heightField[max.X, max.Y]);
 
                             // Test the first triangles
                             Plane plane = new Plane(v[0], v[1], v[3]);
@@ -482,7 +515,7 @@ namespace Isles.Graphics
 
                         // Any way, return an approximate value
                         //Log.Write(ray.ToString());
-                        return new Vector3(GridToPosition(x, y), heightfield[x, y]);
+                        return new Vector3(GridToPosition(x, y), heightField[x, y]);
                     }
                 }
 
@@ -765,9 +798,11 @@ namespace Isles.Graphics
             graphics.RenderState.CullMode = CullMode.CullClockwiseFace;
 
             DrawSky(gameTime);
-            DrawTerrain(Matrix.Identity, null);
             DrawWater(gameTime);
-            DrawVegetation(gameTime);
+            DrawTerrain(Matrix.Identity, null);
+
+            // FIXME but this grass is soo ugly...
+            //DrawVegetation(gameTime);
             
             graphics.RenderState.DepthBufferEnable = true;
             graphics.RenderState.DepthBufferWriteEnable = true;
