@@ -79,5 +79,20 @@ This is still a preliminary version of Isles, most of the gameplay and graphics 
 5. Contact
 ----------
 
-<HUANG Yufei, zt.nightin@gmail.com>
-<MENG Biping, mbp24645860@yahoo.com.cn>
+- Designer, Lead Programmer
+
+	<HUANG Yufei, zt.nightin@gmail.com>
+	
+- AI & Network Programmer
+
+	<MENG Biping, mbp24645860@yahoo.com.cn>
+	
+- Lead Artist, Animator
+
+	<ZHOU Yue, citizenzhouyue@163.com>
+
+- 2D & Concept Art
+	
+	<QIU Yuqi, t_j_s_@126.com>
+
+   

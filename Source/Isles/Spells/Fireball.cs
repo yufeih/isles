@@ -85,7 +85,7 @@ namespace Isles
                 position += velocity;
 
                 // Destroy anyway if we're too far away
-                if (Position.LengthSquared() > 1e7)
+                if (Position.LengthSquared() > 1e8)
                     world.Destroy(this);
             }
 
@@ -137,14 +137,13 @@ namespace Isles
             billboard.Texture = texture[(int)frame];
             billboard.Normal = Vector3.Zero;
             billboard.Position = position;
-            billboard.Size.X = billboard.Size.Y = 128;
+            billboard.Size.X = billboard.Size.Y = explode ? 64 : 128;
             billboard.SourceRectangle = Billboard.DefaultSourceRectangle;
+            billboard.Type = BillboardType.CenterOriented;
 
             // Turn off depth buffer when exploding
-            if (explode)
-                billboard.Type = BillboardType.CenterOriented;
-            else
-                billboard.Type = BillboardType.CenterOriented | BillboardType.DepthBufferEnable;
+            if (!explode)
+                billboard.Type |= BillboardType.DepthBufferEnable;
 
             BaseGame.Singleton.Billboard.Draw(billboard);
         }
@@ -166,6 +165,11 @@ namespace Isles
         /// Spell hotkey
         /// </summary>
         Keys hotkey;
+
+        /// <summary>
+        /// Spell icon
+        /// </summary>
+        Icon icon;
 
         /// <summary>
         /// Spell name
@@ -191,6 +195,10 @@ namespace Isles
                 description = xml.GetAttribute("Description");
 
                 hotkey = (Keys)Enum.Parse(typeof(Keys), xml.GetAttribute("Hotkey"));
+
+                int n;
+                if (int.TryParse(xml.GetAttribute("Icon"), out n))
+                    icon = new Icon(GameUI.GetDefaultIconRectangle(n));
             }
 
             aim = world.Content.Load<Texture2D>("Textures/SpellAreaOfEffect");
@@ -217,6 +225,11 @@ namespace Isles
             get { return hotkey; }
         }
 
+        public override Icon? Icon
+        {
+            get { return icon; }
+        }
+
         /// <summary>
         /// Draw the spell
         /// </summary>
@@ -230,7 +243,7 @@ namespace Isles
             point.X = hand.CursorPosition.X;
             point.Y = hand.CursorPosition.Y;
 
-            size.X = size.Y = 128;
+            size.X = size.Y = 64;
 
             world.Landscape.DrawSurface(aim, point, size);
         }

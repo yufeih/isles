@@ -49,7 +49,7 @@ namespace Isles.Graphics
 
             // Create vb / ib
             const int CellCount = 16;
-            const int TextureRepeat = 4;
+            const int TextureRepeat = 8;
 
             waterVertexCount = (CellCount + 1) * (CellCount + 1);
             waterPrimitiveCount = CellCount * CellCount * 2;
@@ -123,7 +123,8 @@ namespace Isles.Graphics
             waterEffect.Parameters["ColorTexture"].SetValue(waterTexture);
             waterEffect.Parameters["DistortionTexture"].SetValue(waterDstortion);
             waterEffect.Parameters["WorldViewProj"].SetValue(game.ViewProjection);
-            waterEffect.Parameters["DisplacementScroll"].SetValue(MoveInCircle(gameTime, 0.01f));
+            WaterEffect.Parameters["WorldView"].SetValue(game.View);
+            waterEffect.Parameters["DisplacementScroll"].SetValue(MoveInCircle(gameTime, 0.02f));
 
             waterEffect.Begin();
             foreach (EffectPass pass in waterEffect.CurrentTechnique.Passes)

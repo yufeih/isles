@@ -285,6 +285,10 @@ namespace Isles.Graphics
 
             model.CopyAbsoluteBoneTransformsTo(bones);
 
+            // Turn on alpha blending
+            game.GraphicsDevice.RenderState.AlphaBlendEnable = true;
+            game.GraphicsDevice.RenderState.AlphaTestEnable = true;
+
             // Draw plain mesh
             foreach (ModelMesh mesh in model.Meshes)
             {

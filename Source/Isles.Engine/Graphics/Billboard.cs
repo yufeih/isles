@@ -241,7 +241,7 @@ namespace Isles.Graphics
 
             int baseIndex = 0, baseVertex = 0;
             int begin = 0, end = 0;
-            for (int i = 0; i <= billboards.Count; i++)
+            for (int i = 1; i <= billboards.Count; i++)
             {
                 // We are at the end of the chunk
                 if (i != billboards.Count &&    // End of list
@@ -251,6 +251,8 @@ namespace Isles.Graphics
                 }
 
                 end = i;
+                if (i != billboards.Count)
+                    texture = billboards[i].Texture;
 
                 // Setup graphics device
                 game.GraphicsDevice.Vertices[0].SetSource(null, 0, 0);

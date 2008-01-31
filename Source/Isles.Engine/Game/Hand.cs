@@ -249,7 +249,8 @@ namespace Isles.Engine
         {
             this.world = world;
 
-            model.Root.Transform = transform;
+            //model.Root.Transform = transform;
+            model.Root.Transform *= transform;
 
             Refresh();
         }
@@ -320,11 +321,12 @@ namespace Isles.Engine
         /// <returns></returns>
         public Vector3 GetCastPosition()
         {
-            Ray ray = game.Unproject(
-                game.ScreenWidth - 100,
-                game.ScreenHeight - 100);
+            //Ray ray = game.Unproject(
+            //    game.ScreenWidth - 100,
+            //    game.ScreenHeight - 100);
 
-            return ray.Position + ray.Direction * 20;
+            //return ray.Position + ray.Direction * 20;
+            return position;
         }
 
         /// <summary>
@@ -573,7 +575,7 @@ namespace Isles.Engine
             if (state == HandState.Cast || state == HandState.Casting)
             {
                 // Draw back the hand
-                position = Vector3.Transform(new Vector3(50, -20, -200), game.ViewInverse);
+                position = Vector3.Transform(new Vector3(15, -10, -60), game.ViewInverse);
                 //positionSmoother = Vector3.Transform(new Vector3(50, -20, -200), game.ViewInverse);
                 //position += (positionSmoother - position) * (float)(
                 //        gameTime.ElapsedGameTime.TotalMilliseconds * 0.02f);
@@ -657,6 +659,8 @@ namespace Isles.Engine
             // In addition, make sure the hand is drawed last
             if (topMost)
                 game.GraphicsDevice.Clear(ClearOptions.DepthBuffer, Color.White, 1.0f, 0);
+
+            game.GraphicsDevice.RenderState.DepthBufferEnable = true;
             
             // Make our hand face the cursor
             //if (state == HandState.Cast || state == HandState.Casting)

@@ -7,54 +7,62 @@
   <WorldObject>
     
     <Tree
-      Name="Tree" Description="A tree" Wood="200" Model="models/arrow"
-      Transform="40, 0, 0, 0, 0, 40, 0, 0, 0, 0, 100, 0, 0, 0, 100, 1" />
+      Name="Tree" Description="This tree helps keep the
+environment of this island." Wood="200" Model="models/alphapalm"
+      Transform="2, 0, 0, 0, 0, -4.371139E-08, 2, 0, 0, -2, -0.00000004371139, 0, 0, 0, 0, 1" />
     
     <Rock
       Name="Rock" Description="A rock" Wood="200" Model="models/rock"
       Transform="5, 0, 0, 0, 0, 5, 0, 0, 0, 0, 5, 0, 0, 0, 0, 1" />
 
     <Townhall
-      Name="Town hall" Description="Center of the town" Model="models/storage"
-      Transform="1, 0, 0, 0, 0, 1, 0.06, 0, 0, 0, 1, 0, 0, 0, -18, 1"
-      Icon="1" Hotkey="T" ConstructionTime="20" Health="2000" BaseHeight="10"
-      StoresWood="true" StoresFood="true" StoresGold="true">
+      Name="Town hall" Description="Center of the town.
+Drop a tree onto this
+to gather wood.
+Click the icon to plant a
+tree." Model="models/fang2"
+      Transform="0.02, 0, 0, 0, 0, 0.02, 0, 0, 0, 0, 0.02, 0, 0, 0, 0, 1"
+      Icon="1" Hotkey="T" ConstructionTime="10" Health="2000" BaseHeight="10"
+      StoresWood="true" StoresFood="true" StoresGold="true" Wood="275" Gold="250">
       
       <Spell Class="PlantTree" />
       
     </Townhall>
     
     <Farmhouse
-      Name="Farm house" Description="A place to live" Model="models/tank"
-      Transform="0.06, 0, 0, 0, 0, -2.622683E-09, 0.06, 0, 0, -0.06, -2.622683E-09, 0, 0, 0, 0, 1"
-      Icon="1" Hotkey="H" ConstructionTime="20" Health="2000" BaseHeight="10"
-      StoresWood="true" StoresFood="true" StoresGold="true"/>
+      Name="Farm house" Description="A place to live" Model="models/fang1"
+      Transform="0.04, 0, 0, 0, 0, 0.04, 0, 0, 0, 0, 0.04, 0, 0, 0, 0, 1"
+      Icon="4" Hotkey="H" ConstructionTime="5" Health="2000" BaseHeight="10"
+      StoresWood="false" StoresFood="false" StoresGold="false" Wood="125" Gold="50"/>
 
     <Farmland
-      Name="Farm house" Description="A place to live" Model="models/fang1"
-      Icon="5" Hotkey="F" ConstructionTime="20" Health="2000" BaseHeight="10"
+      Name="Farmland" Description="A place to grow crops" Model="models/fang1"
+      Icon="5" Hotkey="F" ConstructionTime="5" Health="2000" BaseHeight="10"
       StoresWood="true" StoresFood="true" StoresGold="true"/>
 
     <Windmill
-      Name="Farm house" Description="A place to live" Model="models/fang1"
+      Name="Windmill" Description="A place to store food" Model="models/fang2"
       Transform="0.02, 0, 0, 0, 0, 0.02, 0, 0, 0, 0, 0.02, 0, 0, 0, 0, 1"
-      Icon="5" Hotkey="W" ConstructionTime="20" Health="2000" BaseHeight="10"
-      StoresWood="true" StoresFood="true" StoresGold="true"/>
+      Icon="5" Hotkey="W" ConstructionTime="8" Health="2000" BaseHeight="10"
+      StoresWood="false" StoresFood="true" StoresGold="false" Wood="230" Gold="168"/>
 
     <Storage
-      Name="Farm house" Description="A place to live" Model="models/fang2"
-      Transform="0.01, 0, 0, 0, 0, 0.01, 0, 0, 0, 0, 0.01, 0, 0, 0, 0, 1"
-      Icon="1" Hotkey="S" ConstructionTime="20" Health="2000" BaseHeight="10"
-      StoresWood="true" StoresFood="true" StoresGold="true"/>
+      Name="Store house" Description="A place to store wood and
+gold.
+Drop a tree or gold onto
+this." Model="models/storage"
+      Transform="0.2, 0, 0, 0, 0, 0.2, 0, 0, 0, 0, 0.2, 0, 0, 0, -2, 1"
+      Icon="2" Hotkey="S" ConstructionTime="8" Health="2000" BaseHeight="10"
+      StoresWood="true" StoresFood="false" StoresGold="true" Wood="250" Gold="125"/>
 
     <AltarOfPeace
-      Name="Farm house" Description="A place to live" Model="models/tank"
+      Name="Altar of Peace" Description="A place to where people pray for peace" Model="models/tank"
       Transform="0.06, 0, 0, 0, 0, -2.622683E-09, 0.06, 0, 0, -0.06, -2.622683E-09, 0, 0, 0, 0, 1"
       Icon="1" Hotkey="P" ConstructionTime="20" Health="2000" BaseHeight="10"
       StoresWood="true" StoresFood="true" StoresGold="true"/>
 
     <AltarOfDestruction
-      Name="Farm house" Description="A place to live" Model="models/tank"
+      Name="Altar of destruction" Description="A place to where people pray for power" Model="models/tank"
       Transform="0.06, 0, 0, 0, 0, -2.622683E-09, 0.06, 0, 0, -0.06, -2.622683E-09, 0, 0, 0, 0, 1"
       Icon="1" Hotkey="D" ConstructionTime="20" Health="2000" BaseHeight="10"
       StoresWood="true" StoresFood="true" StoresGold="true"/>

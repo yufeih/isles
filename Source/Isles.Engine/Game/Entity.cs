@@ -154,7 +154,8 @@ namespace Isles.Engine
         {
             string value;
 
-            name = xml.GetAttribute("Name");
+            if (xml.HasAttribute("Name"))
+                name = xml.GetAttribute("Name");
 
             if ((value = xml.GetAttribute("Position")) != "")
                 position = Helper.StringToVector3(value);
@@ -304,7 +305,8 @@ namespace Isles.Engine
             string value = "";
 
             // Get entity description
-            description = xml.GetAttribute("Description");
+            if (xml.HasAttribute("Description"))
+                description = xml.GetAttribute("Description");
 
             // Initialize model
             if ((value = xml.GetAttribute("Model")) != "")
@@ -370,7 +372,10 @@ namespace Isles.Engine
 
             // Compute size based on game model
             if (model != null)
+            {
+                // FIXME: This is incorrect!!!
                 size = model.BoundingBox.Max - model.BoundingBox.Min;
+            }
         }
 
         /// <summary>
@@ -421,8 +426,20 @@ namespace Isles.Engine
         {
             // Transform position to projection space
             //Vector3 p = Vector3.Transform(position, viewProjection);
-            BoundingFrustum f = new BoundingFrustum(viewProjection);
-            return (f.Contains(position) == ContainmentType.Contains);
+            //BoundingFrustum f = new BoundingFrustum(viewProjection);
+
+            //if (f.Contains(position) == ContainmentType.Contains)
+            {
+                // Distance to the eye
+                if (Vector3.Subtract(
+                    position, BaseGame.Singleton.Eye).LengthSquared() <
+                    BaseGame.Singleton.Settings.ViewDistanceSquared)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>

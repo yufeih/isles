@@ -38,9 +38,9 @@ namespace Isles
         public virtual void Load(GameWorld world, ILoading progress)
         {
             // Set initial money
-            world.GameLogic.Wood = 40000;
-            world.GameLogic.Gold = 40000;
-            world.GameLogic.Food = 50000;
+            world.GameLogic.Wood = 1000;
+            world.GameLogic.Gold = 1000;
+            world.GameLogic.Food = 0;
 
             // Set available buildings
             world.GameLogic.AvailableBuildings.AddRange(new string[] 

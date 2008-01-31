@@ -1,6 +1,7 @@
 
 
 float4x4 ViewInv;
+float4x4 WorldView;
 float4x4 WorldViewProj;
 float4x4 LightWorldViewProj;
 
@@ -8,6 +9,9 @@ float4x4 LightWorldViewProj;
 float3 LightPos = { 500, 500, 1000 };
 float3 LightDir = { 0, 0, -1 };
 float4 LightColor = { 1, 1, 1, 1.0 };
+
+float DetailedTextureStart = 200;
+float DetailedTextureThickness = 400;
 
 texture ColorTexture;
 texture AlphaTexture;
@@ -98,16 +102,18 @@ void VS(
     out float4 oPos	: POSITION,
     out float2 oUV	: TEXCOORD0,
     out float oZ	: TEXCOORD1,
-    out float4 oColor : COLOR0)
+    out float oDetailedAlpha : COLOR0)
 {	
     oPos = mul(Pos, WorldViewProj);
     oUV = UV;
-    oColor = saturate(dot(Normal, -normalize(LightDir))) * LightColor;
+    
+    float4 viewPos = mul(Pos, WorldView);
+    oDetailedAlpha = 1 - saturate((-viewPos.z - DetailedTextureStart) / DetailedTextureThickness);
     oZ = Pos.z;
 }
 
 float4 PS( 
-    float4 Color : COLOR0,
+    float DetailedAlpha : COLOR0,
     float2 UV: TEXCOORD0,
     float Z: TEXCOORD1 ) : COLOR
 {
@@ -115,7 +121,8 @@ float4 PS(
     //float4 result = AmbiColor + SurfColor * map * (Color);
     //result.a = tex2D(AlphaSampler, UV / 16).a;
     //return result;
-    float4 result = tex2D(ColorSampler, UV / 16) * tex2D(AlphaSampler, UV * 2) * 2;
+    float4 map = tex2D(ColorSampler, UV / 16);
+    float4 result = lerp(map, map * tex2D(AlphaSampler, UV * 2) * 2, DetailedAlpha);
     result.a = (Z < 0) ? (1+Z*.05) : 1;
     return result;
 }

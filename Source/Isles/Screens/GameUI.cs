@@ -71,9 +71,32 @@ namespace Isles
         List<Button> spellButtons = new List<Button>();
 
         /// <summary>
-        /// UI texture
+        /// UI textures
         /// </summary>
-        Texture2D iconTexture;
+        Texture2D iconTexture, uiTexture;
+
+        readonly float[] statisticsTextX =
+        {
+            4.6f / 24.25f, 11.6f / 24.25f, 18.3f / 24.25f
+        };
+
+        readonly Rectangle statisticsDestination = new Rectangle(
+            400, 2, 400, 36);
+
+        readonly Rectangle statisticsSource = new Rectangle(
+            0, 0, 690, 64);
+
+        readonly Rectangle statusDestination = new Rectangle(
+                5, 495, 150, 120);
+
+        readonly Rectangle statusSource = new Rectangle(
+            0, 62, 256, 256);
+
+        readonly Rectangle signSource = new Rectangle(
+            246, 80, 236, 226);
+
+        readonly Color textColor = Color.Black;//new Color(80, 42, 0);
+        readonly Color textColorDark = Color.Black;
 
         /// <summary>
         /// Gets UI icon texture
@@ -98,8 +121,9 @@ namespace Isles
             // Create a new UI display
             ui = new UIDisplay(BaseGame.Singleton);
 
-            // Load our icons
+            // Load UI textures
             iconTexture = game.Content.Load<Texture2D>("UI/Icons");
+            uiTexture = game.Content.Load<Texture2D>("UI/ui");
 
             Reset(null, null);
         }
@@ -118,6 +142,20 @@ namespace Isles
         }
 
         /// <summary>
+        /// Gets the default icon rectangle
+        /// </summary>
+        /// <returns></returns>
+        public static Rectangle GetDefaultIconRectangle(int n)
+        {
+            int x = n % IconTextureColumnCount;
+            int y = n / IconTextureColumnCount;
+            int w = 1024 / IconTextureColumnCount;
+            int h = 1024 / IconTextureRowCount;
+
+            return new Rectangle(x * w, y * h, w, h);
+        }
+
+        /// <summary>
         /// Reset the game UI 
         /// </summary>
         public void Reset(GameWorld world, Hand hand)
@@ -127,7 +165,7 @@ namespace Isles
 
             ui.Clear();
             ui.Add(scrollPanel = new ScrollPanel(new Rectangle(
-                20, 580 - ButtonHeight, 640, ButtonHeight),
+                160, 580 - ButtonHeight, 600, ButtonHeight),
                 ButtonWidth, ScrollButtonWidth));
 
             // Init scroll panel
@@ -260,10 +298,48 @@ namespace Isles
             // Draw UI
             ui.Draw(gameTime);
 
+            // Draw status
             //if (entityManager.Selected != null)
             //    entityManager.Selected.DrawStatus(
             //        UIDisplay.GetRelativeRectangle(
             //            statusRectangle, ui, ScaleMode.ScaleY, Anchor.BottomLeft));
+
+            // Draw statistics
+            Rectangle dest = UIDisplay.GetRelativeRectangle(
+                statisticsDestination, ui, ScaleMode.ScaleX, Anchor.TopRight);
+            float y = dest.Y + dest.Height / 2 - 10;
+
+            Rectangle status = UIDisplay.GetRelativeRectangle(
+                statusDestination, ui, ScaleMode.ScaleX, Anchor.BottomLeft);
+
+            ui.Sprite.Begin();
+
+            ui.Sprite.Draw(uiTexture, dest, statisticsSource, Color.White);
+            ui.Sprite.Draw(uiTexture, status, statusSource, Color.White); 
+
+            ui.Sprite.DrawString(Text.Font, World.GameLogic.Wood.ToString(),
+                new Vector2(dest.X + dest.Width * statisticsTextX[0], y), textColor);
+            ui.Sprite.DrawString(Text.Font, World.GameLogic.Gold.ToString(),
+                new Vector2(dest.X + dest.Width * statisticsTextX[1], y), textColor);
+            ui.Sprite.DrawString(Text.Font, World.GameLogic.Food.ToString(),
+                new Vector2(dest.X + dest.Width * statisticsTextX[2], y), textColor);
+
+            if (World.Selected.Count == 1)
+            {
+                ui.Sprite.DrawString(Text.Font, World.Selected[0].Name,
+                    new Vector2(status.X + 8, status.Y + 8), textColor,
+                    0, Vector2.Zero, 0.8f, SpriteEffects.None, 0);
+
+                ui.Sprite.DrawString(Text.Font, World.Selected[0].Description,
+                    new Vector2(status.X + 8, status.Y + 28), textColor,
+                    0, Vector2.Zero, 0.6f, SpriteEffects.None, 0);
+            }
+            else
+            {
+                ui.Sprite.Draw(uiTexture, status, signSource, Color.White);
+            }
+
+            ui.Sprite.End();
         }
         #endregion
 

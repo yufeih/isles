@@ -282,6 +282,8 @@ namespace Isles.Engine
             Name = node.GetAttribute("Name");
             Description = node.GetAttribute("Description");
 
+            context.Refresh(10);
+
             // Load world objects
             int nObjects = 0;
             IWorldObject worldObject;
@@ -295,8 +297,12 @@ namespace Isles.Engine
                     if ((worldObject = Create(child.Name, element)) != null)
                         nObjects++;
                 }
+
+                context.Refresh(10 + (int)(80 * nObjects / node.ChildNodes.Count));
             }
-            
+
+            context.Refresh(90);
+
             // Find ILevel from level attribute
             levelName = node.GetAttribute("Level");
 

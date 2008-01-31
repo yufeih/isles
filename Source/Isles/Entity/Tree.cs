@@ -60,6 +60,9 @@ namespace Isles
         /// <param name="gameTime"></param>
         public override void Draw(GameTime gameTime)
         {
+            if (!VisibilityTest(BaseGame.Singleton.ViewProjection))
+                return;
+
             Matrix transform = Matrix.CreateRotationZ(rotation);
             transform.Translation = position;
             model.Transform = transform;

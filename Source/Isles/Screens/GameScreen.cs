@@ -113,10 +113,9 @@ namespace Isles
             ui = new GameUI(BaseGame.Singleton);
 
             hand = new Hand(null, "Models/Hand",
-                Matrix.CreateScale(0.02f) *
+                Matrix.CreateScale(2) *
                 Matrix.CreateRotationX(MathHelper.ToRadians(30)) *
-                Matrix.CreateRotationY(MathHelper.ToRadians(20)) *
-                Matrix.CreateTranslation(0, -12, 0));
+                Matrix.CreateRotationY(MathHelper.ToRadians(-10)));
         }
 
         /// <summary>
@@ -140,6 +139,8 @@ namespace Isles
             world.SelectionTexture =
                 BaseGame.Singleton.Content.Load<Texture2D>("Textures/SpellAreaOfEffect");
             world.UI = ui;
+
+            loadContext.Refresh(100);
 
             // Reset everything
             Reset();
@@ -216,6 +217,31 @@ namespace Isles
             // Update our big hand
             if (hand != null)
                 hand.Update(gameTime);
+
+            // Test -- Save the world
+            if (Input.KeyboardKeyJustPressed(Microsoft.Xna.Framework.Input.Keys.Enter))
+            {
+                Random random = new Random();
+
+                foreach (IWorldObject worldObject in world.WorldObjects)
+                {
+                    if (worldObject.ClassID == "Tree")
+                    {
+                        Log.Write("<Tree Position=\"" + Helper.Vector3Tostring(worldObject.Position) +
+                            "\" Rotation=\"" + random.NextDouble() * Math.PI * 2 +
+                            "\" Scale=\"" + (0.9 +random.NextDouble() * 0.2) + ", " +
+                            (0.9 +random.NextDouble() * 0.2) + ", " + 
+                            (0.7 +random.NextDouble() * 0.6) + "\" />", false);
+                    }
+                    else
+                    {
+                        Log.Write("<" + worldObject.ClassID +
+                            " Position=\"" + Helper.Vector3Tostring(worldObject.Position) +
+                            "\" Rotation=\"" + (worldObject as Entity).Rotation.ToString() + "\" />", false);
+                    
+                    }
+                }
+            }
         }
 
         /// <summary>

@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using Microsoft.Xna.Framework;
 using Isles.Engine;
 
 namespace Isles
@@ -18,6 +19,7 @@ namespace Isles
         /// </summary>
         static void Main(string[] args)
         {
+
 #if !DEBUG
             try
             {

@@ -122,7 +122,7 @@ namespace Isles.Engine
                 return;
             
             // Try if we can do without saving state changes
-            Graphics.Text.DrawString("FPS: " + fpsInterpolated, 14, new Vector2(0, 0), Color.White);
+            Graphics.Text.DrawString("FPS: " + fpsInterpolated, 16, new Vector2(0, 0), Color.White);
         }
     }
 }

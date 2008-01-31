@@ -166,8 +166,8 @@ namespace Isles.Graphics
                 {
                     v = GridToPosition(x, y);
                     if (x >= 0 && x < gridColumnCount &&
-                        y >= 0 && y < gridRowCount && heightfield[x, y] > 0)
-                        z = heightfield[x, y] + 0.5f; // Offset a little bit :)
+                        y >= 0 && y < gridRowCount && heightField[x, y] > 0)
+                        z = heightField[x, y] + 0.5f; // Offset a little bit :)
                     else
                         z = 0;
 
@@ -196,7 +196,7 @@ namespace Isles.Graphics
             // Enable alpha blending :)
             graphics.RenderState.AlphaBlendEnable = true;
             graphics.RenderState.DepthBufferWriteEnable = false;
-            graphics.RenderState.DepthBufferFunction = CompareFunction.Always;
+            //graphics.RenderState.DepthBufferFunction = CompareFunction.Always;
             graphics.RenderState.CullMode = CullMode.None;
             graphics.SamplerStates[0].AddressU = TextureAddressMode.Border;
             graphics.SamplerStates[0].AddressV = TextureAddressMode.Border;
@@ -221,7 +221,7 @@ namespace Isles.Graphics
             // Restore settings
             graphics.RenderState.AlphaBlendEnable = false;
             graphics.RenderState.DepthBufferWriteEnable = true;
-            graphics.RenderState.DepthBufferFunction = CompareFunction.LessEqual;
+            //graphics.RenderState.DepthBufferFunction = CompareFunction.LessEqual;
             graphics.SamplerStates[0].AddressU = TextureAddressMode.Wrap;
             graphics.SamplerStates[0].AddressV = TextureAddressMode.Wrap;
         }

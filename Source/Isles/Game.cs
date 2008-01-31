@@ -101,6 +101,17 @@ namespace Isles
             {
                 return new Building(world, "Storage");
             });
+            
+            GameWorld.RegisterCreator("AltarOfPeace", delegate(GameWorld world)
+            {
+                return new Building(world, "AltarOfPeace");
+            });
+
+            GameWorld.RegisterCreator("AltarOfDestruction", delegate(GameWorld world)
+            {
+                return new Building(world, "AltarOfDestruction");
+            });
+
 
             // Register levels
             GameWorld.RegisterLevel("Demo", new Level());

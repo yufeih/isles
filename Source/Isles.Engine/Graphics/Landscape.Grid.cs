@@ -125,13 +125,32 @@ namespace Isles.Graphics
             for (int x = 0; x < gridColumnCount; x++)
                 for (int y = 0; y < gridRowCount; y++)
                 {
-                    Data[x, y].Type = heightfield[x, y] > 0 ?
+                    Data[x, y].Type = heightField[x, y] > 0 ?
                         LandscapeType.Ground : LandscapeType.Water;
 
                     Data[x, y].Owners = new List<Entity>(2);
                 }
         }
 
+        public IEnumerable<Point> EnumerateGrid(Vector3 position, Vector3 size)
+        {
+            Point min = PositionToGrid(position.X - size.X / 2, position.Y - size.Y / 2);
+            Point max = PositionToGrid(position.X + size.X / 2, position.Y + size.Y / 2);
+
+            if (min.X < 0)
+                min.X = 0;
+            if (min.Y < 0)
+                min.Y = 0;
+
+            if (max.X >= gridColumnCount)
+                max.X = gridColumnCount - 1;
+            if (max.Y >= gridRowCount)
+                max.Y = gridRowCount - 1;
+
+            for (int y = min.Y; y <= max.Y; y++)
+                for (int x = min.X; x <= max.X; x++)
+                    yield return new Point(x, y);
+        }
         #endregion
 
         #region GridEnumerator
@@ -140,7 +159,7 @@ namespace Isles.Graphics
         /// Enumerate all the grid points that falls inside a 
         /// rectangle on the XY plane.
         /// </summary>
-        public class GridEnumerator : IEnumerable<Point>
+        private class GridEnumerator : IEnumerable<Point>
         {
             Matrix inverse;
             Point pMin, pMax;

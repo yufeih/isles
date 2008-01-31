@@ -532,7 +532,6 @@ namespace Isles.Pipeline
                     tangentData[x, y] = Vector3.Cross(helperVector, normalData[x, y]);
                 }
             #endregion
-
         }
 
         #endregion

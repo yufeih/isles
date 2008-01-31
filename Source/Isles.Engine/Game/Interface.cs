@@ -78,6 +78,8 @@ namespace Isles.Engine
         /// </summary>
         float Progress { get; }
 
+        void Refresh(float newProgress);
+
         /// <summary>
         /// Refresh the loading screen with the new progress and message
         /// </summary>
