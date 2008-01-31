@@ -297,10 +297,10 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </None>
-    <Content Include="Levels\World.xml">
+    <None Include="Levels\World.xml">
       <Name>World</Name>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </None>
     <Compile Include="UI\UI.png">
       <Name>UI</Name>
       <Importer>TextureImporter</Importer>
@@ -391,6 +391,16 @@
     </None>
     <None Include="Models\fang1.jpg">
       <Name>fang1</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </None>
+    <None Include="Models\Palm.tga">
+      <Name>Palm</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </None>
+    <None Include="Models\PalmLeave.tga">
+      <Name>PalmLeave</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </None>
