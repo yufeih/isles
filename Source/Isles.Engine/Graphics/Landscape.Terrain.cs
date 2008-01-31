@@ -106,6 +106,7 @@ namespace Isles.Graphics
             Matrix viewInv = Matrix.Invert(game.View);
             terrainEffect.Parameters["ViewInv"].SetValue(viewInv);
             terrainEffect.Parameters["WorldViewProj"].SetValue(game.ViewProjection);
+            terrainEffect.Parameters["WorldView"].SetValue(game.View);
 
             if (shadowMap != null)
             {
@@ -130,7 +131,7 @@ namespace Isles.Graphics
                 for (int i = 0; i < layers.Count; i++)
                 {
                     // Disable alpha blending when drawing our first layer
-                    graphics.RenderState.AlphaBlendEnable = (i != 0);
+                    graphics.RenderState.AlphaBlendEnable = true;//(i != 0);
 
                     // It turns out that set indices are soo expensive when drawing
                     // the terrain with simple shaders. But for complex shaders, such
@@ -167,19 +168,23 @@ namespace Isles.Graphics
             // Heightfield
             gridColumnCount = input.ReadInt32();
             gridRowCount = input.ReadInt32();
-            heightfield = new float[gridColumnCount, gridRowCount];
+            heightField = new float[gridColumnCount, gridRowCount];
             for (int y = 0; y < gridRowCount; y++)
                 for (int x = 0; x < gridColumnCount; x++)
                 {
                     // Remember how we write heighfield data
-                    heightfield[x, y] = input.ReadSingle();
+                    heightField[x, y] = input.ReadSingle();
+
+                    // TEST: Lower vertices under water
+                    if (heightField[x, y] < 0)
+                        heightField[x, y] *= 1.4f;
                 }
 
             // Normals
-            Vector3[,] normalData = new Vector3[gridColumnCount, gridRowCount];
+            normalField = new Vector3[gridColumnCount, gridRowCount];
             for (int y = 0; y < gridRowCount; y++)
                 for (int x = 0; x < gridColumnCount; x++)
-                    normalData[x, y] = input.ReadVector3();
+                    normalField[x, y] = input.ReadVector3();
 
             // Tangents
             Vector3[,] tangentData = new Vector3[gridColumnCount, gridRowCount];
@@ -225,7 +230,7 @@ namespace Isles.Graphics
                         // Texture coordinate
                         new Vector2(x * 16.0f / (gridColumnCount - 1), y * 16.0f / (gridRowCount - 1)),
                         // Normal
-                        normalData[x, y],
+                        normalField[x, y],
                         // Tangent
                         tangentData[x, y]
                     );

@@ -52,7 +52,6 @@ namespace Isles.Graphics
             // Reset previous render states
             graphics.RenderState.DepthBufferEnable = true;
             graphics.RenderState.DepthBufferWriteEnable = true;
-            //graphics.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
         }
         
         /// <summary>

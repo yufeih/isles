@@ -433,11 +433,11 @@ namespace Isles.Engine
             graphics.MinimumVertexShaderProfile = ShaderProfile.VS_1_1;
 
             // Show cursor
-            IsMouseVisible = true;
+            IsMouseVisible = settings.IsMouseVisible;
 //#if DEBUG
             // Use variant time step to trace frame performance
-            IsFixedTimeStep = false;
-            //IsFixedTimeStep = true;
+            //IsFixedTimeStep = false;
+            IsFixedTimeStep = settings.IsFixedTimeStep;
             //TargetElapsedTime = new TimeSpan(2000000);
 //#endif
         }
@@ -475,10 +475,25 @@ namespace Isles.Engine
 
             if (settings.EnableScreenshot)
                 Components.Add(screenshotCapturer = new ScreenshotCapturer(this));
+
             if (settings.EnableProfile)
                 Components.Add(profiler = new Profiler(this));
-            if (settings.BloomEffect)
-                Components.Add(new BloomComponent(this));
+
+            if (settings.BloomSettings != null &&
+                settings.BloomSettings.Enabled)
+            {
+                BloomComponent bloom = new BloomComponent(this);
+                bloom.Settings = new BloomSettings(
+                    settings.BloomSettings.Type,
+                    settings.BloomSettings.Threshold,
+                    settings.BloomSettings.Blur,
+                    settings.BloomSettings.BloomIntensity,
+                    settings.BloomSettings.BaseIntensity,
+                    settings.BloomSettings.BloomSaturation,
+                    settings.BloomSettings.BaseSaturation);
+
+                Components.Add(bloom);
+            }
 
             base.Initialize();
         }

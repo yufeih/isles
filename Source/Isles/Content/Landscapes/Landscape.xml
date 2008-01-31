@@ -2,27 +2,18 @@
 <Landscape>
 	<Width>2048</Width>
 	<Depth>2048</Depth>
-	<Height>256</Height>
-	<BaseHeight>-8</BaseHeight>
-	<Heightmap>Terrain.bmp</Heightmap>
-	<WaterTexture>water.jpg</WaterTexture>
-	<SkyBox>skyCubeMap.dds</SkyBox>
+	<Height>500</Height>
+	<BaseHeight>-156</BaseHeight>
+	<Heightmap>Testheightmap.bmp</Heightmap>
+	<WaterTexture>water.png</WaterTexture>
+  <EarthRadius>80000</EarthRadius>
+	<SkyBox>testsky2.dds</SkyBox>
 	<LayerCollection>
 		<Layer>
-			<ColorTexture>terrainsnow01.dds</ColorTexture>
-			<AlphaTexture>Layer0Alpha.tga</AlphaTexture>
-			<NormalTexture>terrainsnow01_n.dds</NormalTexture>
+			<ColorTexture>test.bmp</ColorTexture>
+			<AlphaTexture>LandscapeDetail.tga</AlphaTexture>
+			<NormalTexture>LandscapeDetail.tga</NormalTexture>
 		</Layer>
-    <Layer>
-      <ColorTexture>Textures/Grass.png</ColorTexture>
-      <AlphaTexture>Layer1Alpha.tga</AlphaTexture>
-      <NormalTexture>Layer0Normal.dds</NormalTexture>
-    </Layer>
-    <Layer>
-      <ColorTexture>terrainjmgrassdirt.dds</ColorTexture>
-      <AlphaTexture>Layer2Alpha.tga</AlphaTexture>
-      <NormalTexture>terrainjmgrassdirt_n.dds</NormalTexture>
-    </Layer>
 	</LayerCollection>
 	<VegetationCollection>
 		<Vegetation>

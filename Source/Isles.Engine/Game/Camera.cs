@@ -53,6 +53,10 @@ namespace Isles.Engine
 
         protected GraphicsDevice device;
 
+        protected float nearPlane = 1;
+        protected float farPlane = 10000;
+        protected float fieldOfView = MathHelper.PiOver4;
+
         /// <summary>
         /// Gets camera view matrix. Can't be set due to consistency
         /// </summary>
@@ -72,17 +76,17 @@ namespace Isles.Engine
         public Camera(GraphicsDevice graphics)
         {
             device = graphics;
-            graphics.DeviceReset += new EventHandler(Graphics_DeviceReset);
+            graphics.DeviceReset += new EventHandler(ResetProjection);
             view = Matrix.CreateLookAt(eye, lookAt, up);
-            Graphics_DeviceReset(null, EventArgs.Empty);
+            ResetProjection(null, EventArgs.Empty);
 
             Log.Write("Camera Initialized...");
         }
         
-        void Graphics_DeviceReset(object sender, EventArgs e)
+        protected void ResetProjection(object sender, EventArgs e)
         {
             projection = Matrix.CreatePerspectiveFieldOfView(
-                MathHelper.PiOver4, (float)device.Viewport.Width / device.Viewport.Height, 1, 5000);
+                MathHelper.PiOver4, (float)device.Viewport.Width / device.Viewport.Height, 1, 10000);
         }
         
         /// <summary>
@@ -101,12 +105,13 @@ namespace Isles.Engine
     /// </summary>
     public class GameCamera : Camera
     {
-        const float NavigateAreaSize = 10;
-        const float WheelFactor = 0.1f;
-        const float SpeedHeightFactor = 1.25f;
-        const float InitialHeight = 100.0f;
-        const float RotationFactorX = MathHelper.PiOver2 / 300;
-        const float RotationFactorY = MathHelper.PiOver2 / 150;
+        float minHeightAboveGround = 10.0f;
+        float navigateAreaSize = 10;
+        float wheelFactor = 0.1f;
+        float speedHeightFactor = 1.25f;
+        float initialHeight = 100.0f;
+        float rotationFactorX = MathHelper.PiOver2 / 300;
+        float rotationFactorY = MathHelper.PiOver2 / 150;
 
         bool dragging = false;
         bool disableSmootherForOneFrame = true;
@@ -123,16 +128,13 @@ namespace Isles.Engine
         Vector3 lookAtSmoother = new Vector3();
 
         float minRoll = MathHelper.ToRadians(10);
-        float maxRoll = MathHelper.ToRadians(40);
+        float maxRoll = MathHelper.ToRadians(80);
 
-        float minRadius = 50.0f;
+        float minRadius = 10.0f;
         float maxRadius = 1500.0f;
 
         float startRoll, startPitch;
-        //float arcBallRadius;
-        //bool dragFartherHalf;
         Point startMousePosition;
-        //Vector2 startSpherePosition;
 
         Vector3 direction = Vector3.Zero;
 
@@ -152,6 +154,32 @@ namespace Isles.Engine
         {
             this.game = BaseGame.Singleton;
             this.landscape = landscape;
+
+            // Initialize camera from settings
+            Settings.Camera cameraSettings = game.Settings.CameraSettings;
+
+            fieldOfView = cameraSettings.FieldOfView;
+            nearPlane = cameraSettings.NearPlane;
+            farPlane = cameraSettings.FarPlane;
+            minHeightAboveGround = cameraSettings.MinHeightAboveGround;
+            navigateAreaSize = cameraSettings.NavigationAreaSize;
+            wheelFactor = cameraSettings.WheelFactor;
+            speedHeightFactor = cameraSettings.ScrollHeightFactor;
+            initialHeight = cameraSettings.InitialHeight;
+            rotationFactorX = cameraSettings.RotationFactorX;
+            rotationFactorY = cameraSettings.RotationFactorY;
+            baseSpeed = cameraSettings.BaseSpeed;
+            radius = cameraSettings.Radius;
+            roll = cameraSettings.Roll;
+            pitch = cameraSettings.Pitch;
+            minRoll = cameraSettings.MinRoll;
+            maxRoll = cameraSettings.MaxRoll;
+            minRadius = cameraSettings.MinRadius;
+            maxRadius = cameraSettings.MaxRadius;
+            
+            // Apply changes
+            ResetProjection(null, EventArgs.Empty);
+
 
             // Center camera
             FlyTo(new Vector3(landscape.Size.X / 2, landscape.Size.Y / 2, 0), true);
@@ -191,8 +219,10 @@ namespace Isles.Engine
         public override void Update(GameTime gameTime)
         {
             float elapsedTime = (float)(gameTime.ElapsedGameTime.TotalMilliseconds);
-            float heightFactor = ( radius - InitialHeight) / spaceBounds.Max.Z;
+            float heightFactor = ( radius - initialHeight) / spaceBounds.Max.Z;
             float smoother = (float)(0.003f * gameTime.ElapsedGameTime.TotalMilliseconds);
+
+            //Log.Write(elapsedTime.ToString());
 
             // Start adjusting view
             // Press middle button or Press left and right button
@@ -204,14 +234,6 @@ namespace Isles.Engine
                 startRoll = rollSmoother;
                 startPitch = pitchSmoother;
                 startMousePosition = Input.MousePosition;
-                /*
-                Vector3 cursor = gameScreen.CursorPosition;
-                Vector3 arc = cursor - lookAt;
-                Vector3 view = lookAt - game.PickRay.Position;
-                arcBallRadius = arc.Length();
-                dragFartherHalf = (Vector3.Dot(arc, view) > 0);
-                startSpherePosition = XYZToSphere(arc);
-                 */
             }
             else if (Input.MouseRightButtonJustReleased ||
                      Input.MouseLeftButtonJustReleased ||
@@ -224,22 +246,10 @@ namespace Isles.Engine
                    (Input.MouseMiddleButtonPressed ||
                    (Input.MouseLeftButtonPressed && Input.MouseRightButtonPressed)))
             {
-                /*
-                // Ray sphere test
-                Vector3 eyeToLookAt = lookAt - game.PickRay.Position;
-                float a = Vector3.Dot(eyeToLookAt, game.PickRay.Direction);
-                float b = Vector3.Subtract(a * game.PickRay.Direction, eyeToLookAt).Length();
-                float c = (float)Math.Sqrt((float)(arcBallRadius * arcBallRadius - b * b));
-                Vector3 final = game.PickRay.Position + game.PickRay.Direction *
-                                (dragFartherHalf ? a + c : a - c);
-
-                // Transform to sphere coordinate system
-                Vector2 offset = XYZToSphere(final - lookAt) - startSpherePosition;
-                */
                 pitch = startPitch +
-                    (Input.MousePosition.X - startMousePosition.X) * RotationFactorX;
+                    (Input.MousePosition.X - startMousePosition.X) * rotationFactorX;
                 roll = startRoll -
-                    (Input.MousePosition.Y - startMousePosition.Y) * RotationFactorY;
+                    (Input.MousePosition.Y - startMousePosition.Y) * rotationFactorY;
             }
             else
             {
@@ -247,11 +257,11 @@ namespace Isles.Engine
                 float yDelta = 0;
                 bool xMove = false;
                 bool yMove = false;
-                speed = baseSpeed + heightFactor * SpeedHeightFactor;
+                speed = baseSpeed + heightFactor * speedHeightFactor;
 
                 // Navigation
                 if (Input.Keyboard.IsKeyDown(Keys.A) ||
-                    Input.MousePosition.X < NavigateAreaSize)
+                    Input.MousePosition.X < navigateAreaSize)
                 {
                     xMove = true;
                     xDelta =  (float)(speed * Math.Sin(pitchSmoother)) * elapsedTime;
@@ -259,7 +269,7 @@ namespace Isles.Engine
                 }
                 else if (
                     Input.Keyboard.IsKeyDown(Keys.D) ||
-                    Input.MousePosition.X > game.ScreenWidth - NavigateAreaSize)
+                    Input.MousePosition.X > game.ScreenWidth - navigateAreaSize)
                 {
                     xMove = true;
                     xDelta -= (float)(speed * Math.Sin(pitchSmoother)) * elapsedTime;
@@ -267,7 +277,7 @@ namespace Isles.Engine
                 }
 
                 if (Input.Keyboard.IsKeyDown(Keys.W) ||
-                    Input.MousePosition.Y < NavigateAreaSize)
+                    Input.MousePosition.Y < navigateAreaSize)
                 {
                     yMove = true;
                     xDelta -= (float)(speed * Math.Cos(pitchSmoother)) * elapsedTime;
@@ -275,7 +285,7 @@ namespace Isles.Engine
                 }
                 else if (
                     Input.Keyboard.IsKeyDown(Keys.S) ||
-                    Input.MousePosition.Y > game.ScreenHeight - NavigateAreaSize)
+                    Input.MousePosition.Y > game.ScreenHeight - navigateAreaSize)
                 {
                     yMove = true;
                     xDelta += (float)(speed * Math.Cos(pitchSmoother)) * elapsedTime;
@@ -296,14 +306,14 @@ namespace Isles.Engine
 
             // Adjust roll/pitch using arrow keys
             if (Input.Keyboard.IsKeyDown(Keys.Left))
-                pitch -= 0.4f * RotationFactorX * elapsedTime;
+                pitch -= 0.4f * rotationFactorX * elapsedTime;
             else if (Input.Keyboard.IsKeyDown(Keys.Right))
-                pitch += 0.4f * RotationFactorX * elapsedTime;
+                pitch += 0.4f * rotationFactorX * elapsedTime;
 
             if (Input.Keyboard.IsKeyDown(Keys.Up))
-                roll += 0.2f * RotationFactorY * elapsedTime;
+                roll += 0.2f * rotationFactorY * elapsedTime;
             else if (Input.Keyboard.IsKeyDown(Keys.Down))
-                roll -= 0.2f * RotationFactorY * elapsedTime;
+                roll -= 0.2f * rotationFactorY * elapsedTime;
 
             // Restrict roll
             if (roll < minRoll)
@@ -312,7 +322,7 @@ namespace Isles.Engine
                 roll = maxRoll;
             
             // Adjust view distance (radius) using mouse wheel or '+', '-' button
-            radius -= Input.MouseWheelDelta * WheelFactor * (10 * heightFactor + 1);
+            radius -= Input.MouseWheelDelta * wheelFactor * (10 * heightFactor + 1);
             if (Input.Keyboard.IsKeyDown(Keys.PageUp))
                 radius += 0.5f * elapsedTime;
             else if (Input.Keyboard.IsKeyDown(Keys.PageDown))
@@ -353,7 +363,9 @@ namespace Isles.Engine
             // Avoid collision with heightmap
             if (landscape != null)
             {
-                float height = landscape.GetHeight(eye.X, eye.Y) * 1.2f;
+                float height = landscape.GetHeight(eye.X, eye.Y) +minHeightAboveGround;
+                if (height < minHeightAboveGround)
+                    height = minHeightAboveGround;;
                 eye.Z = eye.Z * (spaceBounds.Max.Z - height) / spaceBounds.Max.Z + height;
             }
 

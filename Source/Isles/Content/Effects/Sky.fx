@@ -40,7 +40,7 @@ VS_OUTPUT VS(float4 Position  : POSITION)
     
     // However, we need the translation for the projection
     Out.Position = mul(float4(pos, 1.0f), Projection);
-    Out.Position.y = Out.Position.y * 0.6;
+    Out.Position.y = Out.Position.y - 10;
     
     // Just use the positions to infer the texture coordinates
     // Swap y and z because we use +z as up

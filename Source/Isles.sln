@@ -12,9 +12,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isles.Engine", "Isles.Engin
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Document", "Document", "{4929D1D5-DC02-4C45-B94B-39870D742108}"
 	ProjectSection(SolutionItems) = preProject
+		Changelog.txt = Changelog.txt
 		Document\Design Summary.txt = Document\Design Summary.txt
 		Document\License.txt = Document\License.txt
-		Document\Readme.txt = Document\Readme.txt
+		Document\Readme - Game.txt = Document\Readme - Game.txt
+		Readme - Source.txt = Readme - Source.txt
 	EndProjectSection
 EndProject
 Global

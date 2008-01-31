@@ -9,6 +9,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
+using Microsoft.Xna.Framework;
 
 namespace Isles.Engine
 {
@@ -28,110 +29,69 @@ namespace Isles.Engine
         /// Default game font
         /// </summary>
         public string DefaultFont = "Fonts/Default";
+        public string PlayerName = "Unnamed";
+        public bool EnableScreenshot = true;
+        public bool EnableProfile = true;
+        public bool IsMouseVisible = false;
+        public bool IsFixedTimeStep = true;
+        public Camera CameraSettings;
+
+        [Serializable()]
+        public class Camera
+        {
+            public float FieldOfView = MathHelper.PiOver4;
+            public float FarPlane = 10000;
+            public float NearPlane = 1;
+
+            public float MinHeightAboveGround = 10.0f;
+            public float NavigationAreaSize = 10;
+            public float WheelFactor = 0.1f;
+            public float ScrollHeightFactor = 1.25f;
+            public float InitialHeight = 100.0f;
+            public float RotationFactorX = MathHelper.PiOver2 / 300;
+            public float RotationFactorY = MathHelper.PiOver2 / 150;
+
+            public float BaseSpeed = 0.15f;
+            public float Radius = 200.0f;
+            public float Roll = MathHelper.PiOver4;
+            public float Pitch = -MathHelper.PiOver4;
+
+            public float MinRoll = MathHelper.ToRadians(10);
+            public float MaxRoll = MathHelper.ToRadians(80);
+
+            public float MinRadius = 10.0F;
+            public float MaxRadius = 1500.0f;
+        }
         #endregion
 
         #region Graphics Settings
 
-        int screenWidth = 960;
-        int screenHeight = 600;
-        bool fullscreen = false;
-        bool bloomEffect = false;
-        bool normalMappedTerrain = false;
+        public int ScreenWidth = 960;
+        public int ScreenHeight = 600;
+        public bool Fullscreen = false;
+        public bool NormalMappedTerrain = false;
+        public BloomEffect BloomSettings;
+        public float ViewDistanceSquared = 800;
 
         // We want to trace frame performance, so turn off V'Sync
 #if DEBUG
-        bool vsync = false;
+        public bool VSync = false;
 #else
-        bool vsync = false;
+        public bool VSync = false;
 #endif
 
-        /// <summary>
-        /// Screen width
-        /// </summary>
-        public int ScreenWidth
+        [Serializable()]
+        public class BloomEffect
         {
-            get { return screenWidth; }
-            set { screenWidth = value; }
-        }
+            public bool Enabled = false;
+            public string Type = "Saturated";
+            public float Threshold = 0.25f;
+            public float Blur = 2;
+            public float BloomIntensity = 1;
+            public float BaseIntensity = 1;
+            public float BloomSaturation = 2;
+            public float BaseSaturation = 0;
 
-        /// <summary>
-        /// Screen height
-        /// </summary>
-        public int ScreenHeight
-        {
-            get { return screenHeight; }
-            set { screenHeight = value; }
-        }
-
-        /// <summary>
-        /// Whether the game is running on full screen mode
-        /// </summary>
-        public bool Fullscreen
-        {
-            get { return fullscreen; }
-            set { fullscreen = value; }
-        }
-
-        /// <summary>
-        /// Synchronize With Vertical Retrace
-        /// </summary>
-        public bool VSync
-        {
-            get { return vsync; }
-            set { vsync = value; }
-        }
-
-        /// <summary>
-        /// Gets or sets whether normal mapping is used when rendering terrain
-        /// </summary>
-        public bool NormalMappedTerrain
-        {
-            get { return normalMappedTerrain; }
-            set { normalMappedTerrain = value; }
-        }
-
-        /// <summary>
-        /// Gets or sets whether bloom post processing is turned on
-        /// </summary>
-        public bool BloomEffect
-        {
-            get { return bloomEffect; }
-            set { bloomEffect = value; }
-        }
-
-        #endregion
-
-        #region Game play settings
-
-        string playerName = "Unnamed";
-        bool enableScreenshot = true;
-        bool enablePofile = true;
-
-        /// <summary>
-        /// God name
-        /// </summary>
-        public string PlayerName
-        {
-            get { return playerName; }
-            set { playerName = value; }
-        }
-
-        /// <summary>
-        /// Gets or sets whether the game performance will be profiled
-        /// </summary>
-        public bool EnableProfile
-        {
-            get { return enablePofile; }
-            set { enablePofile = value; }
-        }
-
-        /// <summary>
-        /// Gets or sets whether it is allowed to capture screen shot
-        /// </summary>
-        public bool EnableScreenshot
-        {
-            get { return enableScreenshot; }
-            set { enableScreenshot = value; }
         }
 
         #endregion
