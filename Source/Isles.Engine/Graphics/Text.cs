@@ -151,5 +151,40 @@ namespace Isles.Graphics
             // Clear all string in this frame
             values.Clear();
         }
+        
+        /// <summary>
+        /// Each charactor has a different with and height. But sadly SpriteFont
+        /// hides all those charactor map and cropping stuff inside, making it
+        /// difficult to measure and format text ourself.
+        /// Unless you have any better idea, just use a fixed charactor width and
+        /// height. This would yield incorrect result.
+        /// </summary>
+        public const int CharactorWidth = 10;
+        public const int CharactorHeight = 25;
+
+        /// <summary>
+        /// Format the given text to make it fit in a rectangle area
+        /// </summary>
+        /// <returns>The formatted text</returns>
+        /// <example>
+        /// FormatString("ABCD", 20): "AB\nCD"
+        /// </example>
+        public static string FormatString(string text, int width)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Format the given text to make it fit in a rectangle area.
+        /// Clip and append "..." at the end if the text excceed the rectangle.
+        /// </summary>
+        /// <example>
+        /// FormatString("ABCDEFGH", 40, 50)    : "ABCD\nEFGH"
+        /// FormatString("ABCDEFGHIJ", 40, 50)  : "ABCD\nE..."
+        /// </example>
+        public static string FormatString(string text, int width, int height)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
