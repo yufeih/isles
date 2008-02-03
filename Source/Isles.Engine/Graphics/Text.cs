@@ -171,7 +171,32 @@ namespace Isles.Graphics
         /// </example>
         public static string FormatString(string text, int width)
         {
-            throw new NotImplementedException();
+            StringBuilder rtvSB = new StringBuilder();
+            
+            //Charactors per line
+            int charNumPerLine = width / CharactorWidth;
+            
+            if(charNumPerLine == 0)
+            {
+                throw new Exception("No enough space for even one charactor per line.");
+            }
+
+            //Num of lines
+            int lineNum = text.Length / charNumPerLine;
+            if(text.Length % charNumPerLine != 0)
+            {
+                lineNum++;
+            }
+
+            //Construct the formatted string
+            for (int i = 0; i < lineNum - 1; i++)
+            {
+                rtvSB.Append(text.Substring(i * charNumPerLine, charNumPerLine));
+                rtvSB.Append('\n');
+            }
+            rtvSB.Append(text.Substring( (lineNum - 1)* charNumPerLine));
+
+            return rtvSB.ToString();
         }
 
         /// <summary>
@@ -184,7 +209,24 @@ namespace Isles.Graphics
         /// </example>
         public static string FormatString(string text, int width, int height)
         {
-            throw new NotImplementedException();
+            //Mux num of chars that can be held in this rectangle
+            int muxChars = (height / CharactorHeight) * (width / CharactorWidth) ;
+
+            if (muxChars < 3)
+            {
+                throw new Exception("No enough space for even \"...\"");
+            }
+
+            bool exceed = text.Length > muxChars;
+
+            if (exceed)
+            {
+                return FormatString(text.Substring(0, muxChars - 3) + "...", width);
+            }
+            else
+            {
+                return FormatString(text, width);
+            }
         }
     }
 }
