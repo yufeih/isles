@@ -169,35 +169,87 @@ namespace Isles.Graphics
         /// <returns>The formatted text</returns>
         /// <example>
         /// FormatString("ABCD", 20): "AB\nCD"
-        /// FormatString("What is your name?", 100): "What is\nyour name?"
+        /// FormatString("What is your name?", 100): "What is \nyour name?"
         /// </example>
         public static string FormatString(string text, int width)
         {
-            StringBuilder rtvSB = new StringBuilder();
-            
+
             //Charactors per line
             int charNumPerLine = width / CharactorWidth;
-            
-            if(charNumPerLine == 0)
+
+            //Identify the line count
+            int currentLine = 0;
+
+            //Charactor nums in the currently processed line
+            int charNumInCurrentLine = 0;
+
+            //Identify whether the next word is the first word in its line
+            bool firstWordInLine = true;
+
+            //Iterate words in the text
+            WordIterator wi = new WordIterator(text);
+
+            //Return value
+            StringBuilder rtvSB = new StringBuilder();
+
+            //Store each word in the text
+            string str = wi.NextWord();
+
+            if (str == null)
             {
-                throw new Exception("No enough space for even one charactor per line.");
+                return "";
             }
 
-            //Num of lines
-            int lineNum = text.Length / charNumPerLine;
-            if(text.Length % charNumPerLine != 0)
+            //Arrange each word in the formatted lines
+            while (str != null)
             {
-                lineNum++;
+                if (firstWordInLine)
+                {
+                    rtvSB.Append(str);
+                    if (str[str.Length - 1] != '\n')
+                    {
+                        charNumInCurrentLine += str.Length;
+                        firstWordInLine = false;
+                    }
+                    else
+                    {
+                        currentLine++;
+                        charNumInCurrentLine = 0;
+                    }
+                }
+                else
+                {
+                    if ((str[str.Length - 1] != ' ' && str[str.Length - 1] != '\n'
+                        && charNumInCurrentLine + str.Length > charNumPerLine) ||
+                        ((str[str.Length - 1] == ' ' || str[str.Length - 1] == '\n')
+                        && charNumInCurrentLine + str.Length - 1 > charNumPerLine))
+                    {
+                        currentLine++;
+                        charNumInCurrentLine = 0;
+                        firstWordInLine = true;
+                        if (rtvSB[rtvSB.Length - 1] != '\n')
+                        {
+                            rtvSB.Append('\n');
+                        }
+                        continue;
+                    }
+                    else
+                    {
+                        rtvSB.Append(str);
+                        if (str[str.Length - 1] != '\n')
+                        {
+                            charNumInCurrentLine += str.Length;
+                        }
+                        else
+                        {
+                            currentLine++;
+                            charNumInCurrentLine = 0;
+                            firstWordInLine = true;
+                        }
+                    }
+                }
+                str = wi.NextWord();
             }
-
-            //Construct the formatted string
-            for (int i = 0; i < lineNum - 1; i++)
-            {
-                rtvSB.Append(text.Substring(i * charNumPerLine, charNumPerLine));
-                rtvSB.Append('\n');
-            }
-            rtvSB.Append(text.Substring( (lineNum - 1)* charNumPerLine));
-
             return rtvSB.ToString();
         }
 
@@ -212,23 +264,194 @@ namespace Isles.Graphics
         public static string FormatString(string text, int width, int height)
         {
             //Mux num of chars that can be held in this rectangle
-            int muxChars = (height / CharactorHeight) * (width / CharactorWidth) ;
-
-            if (muxChars < 3)
+            int muxLineNum = height / CharactorHeight;
+            if (muxLineNum == 0)
             {
-                throw new Exception("No enough space for even \"...\"");
+                muxLineNum = 1;
+            }
+            //Charactors per line
+            int charNumPerLine = width / CharactorWidth;
+
+            //Identify the line count
+            int currentLine = 0;
+
+            //Charactor nums in the currently processed line
+            int charNumInCurrentLine = 0;
+
+            //Identify whether the next word is the first word in its line
+            bool firstWordInLine = true;
+
+            //Iterate words in the text
+            WordIterator wi = new WordIterator(text);
+
+            //Return value
+            StringBuilder rtvSB = new StringBuilder();
+
+            //Store each word in the text
+            string str = wi.NextWord();
+
+            if (str == null)
+            {
+                return "";
             }
 
-            bool exceed = text.Length > muxChars;
+            //Arrange each word in the formatted lines
+            while (str != null)
+            {
+                if (currentLine == muxLineNum - 1)//Last line
+                {
+                    //Append "..." to the text ending with ' ' when exceeding
+                    if ((str[str.Length - 1] != ' ' && charNumInCurrentLine + str.Length + 3 > charNumPerLine) ||
+                        (str[str.Length - 1] == ' ' && charNumInCurrentLine + str.Length + 2 > charNumPerLine))
+                    {
+                        if (rtvSB[rtvSB.Length - 1] == ' ')
+                        {
+                            rtvSB[rtvSB.Length - 1] = '.';
+                            rtvSB.Append("..");
+                        }
+                        else
+                        {
+                            rtvSB.Append("...");
+                        }
+                        break;
+                    }
+                    //Append "..." to the text ending with '\n'
+                    if (str[str.Length - 1] == '\n')
+                    {
+                        rtvSB.Append(str);
+                        rtvSB[rtvSB.Length - 1] = ' ';
+                        rtvSB.Append("...");
+                        break;
+                    }
+                }
+                if (firstWordInLine)
+                {
+                    rtvSB.Append(str);
+                    if (str[str.Length - 1] != '\n')
+                    {
+                        charNumInCurrentLine += str.Length;
+                        firstWordInLine = false;
+                    }
+                    else
+                    {
+                        currentLine++;
+                        charNumInCurrentLine = 0;
+                    }
+                }
+                else
+                {
+                    if ((str[str.Length - 1] != ' ' && str[str.Length - 1] != '\n'
+                         && charNumInCurrentLine + str.Length > charNumPerLine) ||
+                         ((str[str.Length - 1] == ' ' || str[str.Length - 1] == '\n')
+                         && charNumInCurrentLine + str.Length - 1 > charNumPerLine))
+                    {
+                        currentLine++;
+                        charNumInCurrentLine = 0;
+                        firstWordInLine = true;
+                        if (rtvSB[rtvSB.Length - 1] != '\n')
+                        {
+                            rtvSB.Append('\n');
+                        }
+                        continue;
+                    }
+                    else
+                    {
+                        rtvSB.Append(str);
+                        if (str[str.Length - 1] != '\n')
+                        {
+                            charNumInCurrentLine += str.Length;
+                        }
+                        else
+                        {
+                            currentLine++;
+                            charNumInCurrentLine = 0;
+                            firstWordInLine = true;
+                        }
+                    }
+                }
+                str = wi.NextWord();
+            }
+            return rtvSB.ToString();
+        }
 
-            if (exceed)
+
+        /// <summary>
+        /// Used to Iterate each word in the text. 
+        /// This class is designed to help to implement FormatString.
+        /// A word here is defined as a sequence of characters without '\n' and ' '
+        /// or with only the last being '\n' or ' '.
+        /// eg. "word \n " is combination of 3 words: "word ", "\n", " ".
+        /// </summary>
+        class WordIterator
+        {
+            /// <summary>
+            /// Hold the text to be processed
+            /// </summary>
+            string text;
+
+            /// <summary>
+            /// Identify the index of the first char of the next word
+            /// </summary>
+            int currentIndex;
+
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="text">initialize the text</param>
+            public WordIterator(string text)
             {
-                return FormatString(text.Substring(0, muxChars - 3) + "...", width);
+                this.text = text;
+                currentIndex = 0;
             }
-            else
+
+            /// <summary>
+            /// Get the next word in the text
+            /// </summary>
+            /// <returns>next word</returns>
+            public string NextWord()
             {
-                return FormatString(text, width);
+                int i;
+                string rtvStr;
+                if (currentIndex >= text.Length)
+                {
+                    return null;
+                }
+                for (i = currentIndex; i < text.Length; i++)
+                {
+                    if (text[i] == ' ' || text[i] == '\n')
+                    {
+                        break;
+                    }
+                }
+                if (i == text.Length)
+                {
+                    rtvStr = text.Substring(currentIndex);
+                }
+                else
+                {
+                    rtvStr = text.Substring(currentIndex, i - currentIndex + 1);
+                }
+                currentIndex = i + 1;
+                return rtvStr;
             }
+
+            /// <summary>
+            /// Reset currentIndex to 0
+            /// </summary>
+            public void Reset()
+            {
+                currentIndex = 0;
+            }
+
+            /// <summary>
+            /// Get or set the currentIndex
+            /// </summary>
+            public int CurrentIndex
+            {
+                get { return currentIndex; }
+                set { currentIndex = value; }
+            }
+
         }
     }
 }
