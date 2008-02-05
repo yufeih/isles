@@ -157,6 +157,54 @@ namespace Isles.Engine
     }
     #endregion
 
+    #region ISceneManager
+    /// <summary>
+    /// Interface to manage IWorldObject instances
+    /// </summary>
+    public interface ISceneManager
+    {
+        /// <summary>
+        /// Test to see if a point intersects a world object
+        /// </summary>
+        bool PointSceneIntersects(Vector3 point);
+
+        /// <summary>
+        /// Test to see if a ray intersects a world object
+        /// </summary>
+        bool RaySceneIntersects(Ray ray);
+
+        /// <summary>
+        /// Test to see if two world object intersects
+        /// </summary>
+        bool ObjectIntersects(IWorldObject object1, IWorldObject object2);
+
+        /// <summary>
+        /// Gets all world objects occupying a specific point
+        /// </summary>
+        IEnumerable<IWorldObject> ObjectsFromPoint(Vector3 point);
+
+        /// <summary>
+        /// Gets all world objects intersects with a specific ray
+        /// </summary>
+        IEnumerable<IWorldObject> ObjectsFromRay(Ray ray);
+
+        /// <summary>
+        /// Gets all world objects falling inside a bounding box region
+        /// </summary>
+        IEnumerable<IWorldObject> ObjectsFromRegion(BoundingBox boundingBox);
+
+        /// <summary>
+        /// Gets all world objects falling inside a bounding frustum region
+        /// </summary>
+        IEnumerable<IWorldObject> ObjectsFromRegion(BoundingFrustum boundingFrustum);
+
+        /// <summary>
+        /// Gets a world object from its name
+        /// </summary>
+        IWorldObject ObjectFromName(string name);
+    }
+    #endregion
+
     #region IGameUI
     /// <summary>
     /// Describe the type of a game message

@@ -28,6 +28,7 @@ namespace Isles.Pipeline
         #region Fields
         string heightmap;
         string waterTexture;
+        string waterBumpTexture;
         float earthRadius;
         string skyBox;
         List<Layer> layers = new List<Layer>();
@@ -43,6 +44,7 @@ namespace Isles.Pipeline
         List<int>[] patchGroups;
 
         ExternalReference<TextureContent> waterColorTexture;
+        ExternalReference<TextureContent> waterBumpTextureContent;
         ExternalReference<TextureCubeContent> skyBoxCubeTexture;
 
         [NonSerialized()]
@@ -61,6 +63,12 @@ namespace Isles.Pipeline
         {
             get { return waterTexture; }
             set { waterTexture = value; }
+        }
+
+        public string WaterBumpTexture
+        {
+            get { return waterBumpTexture; }
+            set { waterBumpTexture = value; }
         }
 
         public float EarthRadius
@@ -389,6 +397,10 @@ namespace Isles.Pipeline
                 new ExternalReference<TextureContent>(
                 Path.Combine(directory, waterTexture)), null);
 
+            waterBumpTextureContent = context.BuildAsset<TextureContent, TextureContent>(
+                new ExternalReference<TextureContent>(
+                Path.Combine(directory, waterBumpTexture)), null);
+
             // Skybox cube texture
             skyBoxCubeTexture = context.BuildAsset<TextureCubeContent, TextureCubeContent>(
                 new ExternalReference<TextureCubeContent>(
@@ -448,6 +460,7 @@ namespace Isles.Pipeline
             // water model
             output.Write(earthRadius);
             output.WriteExternalReference<TextureContent>(waterColorTexture);
+            output.WriteExternalReference<TextureContent>(waterBumpTextureContent);
             output.WriteExternalReference<TextureCubeContent>(skyBoxCubeTexture);
 
             // write vegetation

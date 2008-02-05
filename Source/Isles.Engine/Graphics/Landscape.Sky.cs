@@ -31,7 +31,7 @@ namespace Isles.Graphics
         {
         }
 
-        void DrawSky(GameTime gameTime)
+        void DrawSky(GameTime gameTime, Matrix view, Matrix projection)
         {
             // Don't use or write to the z buffer
             graphics.RenderState.DepthBufferEnable = false;
@@ -42,8 +42,8 @@ namespace Isles.Graphics
             graphics.RenderState.AlphaBlendEnable = false;
 
             skyEffect.Parameters["CubeTexture"].SetValue(skyTexture);
-            skyEffect.Parameters["View"].SetValue(game.View);
-            skyEffect.Parameters["Projection"].SetValue(game.Projection);
+            skyEffect.Parameters["View"].SetValue(view);
+            skyEffect.Parameters["Projection"].SetValue(projection);
 
             // Override model's effect and render
             skyModel.Meshes[0].MeshParts[0].Effect = skyEffect;

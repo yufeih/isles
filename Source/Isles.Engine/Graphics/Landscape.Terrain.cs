@@ -92,6 +92,47 @@ namespace Isles.Graphics
             LoadManualContent();
         }
 
+        /// <summary>
+        /// This drawing method is used for generating water reflection
+        /// </summary>
+        void DrawTerrain(Matrix view, Matrix projection)
+        {
+            if (terrainVertexCount == 0 || layers.Count <= 0)
+                return;
+
+            graphics.VertexDeclaration = terrainVertexDeclaration;
+            graphics.Vertices[0].SetSource(
+                terrainVertexBuffer, 0, TerrainVertex.SizeInBytes);
+
+            // FIXME: There's a conflict here, originally, terrain rendering
+            // uses several tiled textures called layers. But now, there is
+            // only one large terrain texture.
+            graphics.Indices = terrainIndexBufferSet[0];
+
+            terrainEffect.Parameters["WorldViewProj"].SetValue(view * projection);
+            terrainEffect.CurrentTechnique = terrainEffect.Techniques["Fast"];
+            terrainEffect.Parameters["ColorTexture"].SetValue(layers[0].ColorTexture);
+
+            terrainEffect.Begin();
+            foreach (EffectPass pass in terrainEffect.CurrentTechnique.Passes)
+            {
+                pass.Begin();
+
+                for (int i = 0; i < layers.Count; i++)
+                {
+                    graphics.DrawIndexedPrimitives(
+                        PrimitiveType.TriangleList,
+                        0, 0, (int)terrainVertexCount,
+                        0, (int)terrainIndexCount[0] / 3);
+                }
+                pass.End();
+            }
+            terrainEffect.End();
+        }
+
+        /// <summary>
+        /// This method draws the terrain with a higher precision
+        /// </summary>
         void DrawTerrain(Matrix lightViewProjection, Texture shadowMap)
         {
             if (terrainVertexCount == 0)

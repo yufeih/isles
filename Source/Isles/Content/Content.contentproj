@@ -421,6 +421,13 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Landscapes\water_normalmap.jpg">
+      <Name>water_normalmap</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
     <Folder Include="Creatures\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\v2.0\Microsoft.Xna.GameStudio.ContentPipeline.targets" />

@@ -70,6 +70,7 @@ namespace Isles.Engine
         public int ScreenHeight = 600;
         public bool Fullscreen = false;
         public bool NormalMappedTerrain = false;
+        public bool RealisticWater = false;
         public BloomEffect BloomSettings;
         public float ViewDistanceSquared = 800;
 

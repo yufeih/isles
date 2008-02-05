@@ -127,6 +127,28 @@ float4 PS(
     return result;
 }
 
+
+void VSFast(
+	float4 Pos		: POSITION,
+	float2 UV		: TEXCOORD0,
+	out float4 oPos	: POSITION,
+	out float2 oUV	: TEXCOORD0,
+	out float oZ	: TEXCOORD1)
+{
+	oPos = mul(Pos, WorldViewProj);
+	oUV = UV / 16;
+	oZ = Pos.z;
+}
+
+
+float4 PSFast(
+	float2 UV	: TEXCOORD0,
+	float z		: TEXCOORD1) : COLOR0
+{
+	return z > 0 ? tex2D(ColorSampler, UV) : 0;
+}
+
+
 VS_OUTPUT VSNormalMapping(
     float4 Pos  : POSITION, 
     float4 Color : COLOR0,
@@ -258,5 +280,23 @@ technique ShadowMapping
 		
         vertexShader = compile vs_2_0 VSShadowMapping();
         pixelShader = compile ps_2_0 PSShadowMapping();
+	}
+}
+
+
+technique Fast
+{
+	pass P0
+	{
+		AlphaBlendEnable = true;
+        SrcBlend = SrcAlpha;
+        DestBlend = InvSrcAlpha;
+        
+		Cullmode = None;
+		ZEnable = true;
+		AlphaTestEnable = true;
+		
+		vertexShader = compile vs_1_1 VSFast();
+		pixelShader = compile ps_1_1 PSFast();
 	}
 }

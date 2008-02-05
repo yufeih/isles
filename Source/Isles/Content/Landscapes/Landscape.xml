@@ -6,7 +6,8 @@
 	<BaseHeight>-156</BaseHeight>
 	<Heightmap>Testheightmap.bmp</Heightmap>
 	<WaterTexture>water.png</WaterTexture>
-  <EarthRadius>80000</EarthRadius>
+  <WaterBumpTexture>water_normalmap.jpg</WaterBumpTexture>
+  <EarthRadius>65000</EarthRadius>
 	<SkyBox>testsky2.dds</SkyBox>
 	<LayerCollection>
 		<Layer>

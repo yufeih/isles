@@ -163,11 +163,13 @@ namespace Isles.Graphics
         public const int CharactorHeight = 25;
 
         /// <summary>
-        /// Format the given text to make it fit in a rectangle area
+        /// Format the given text to make it fit in a rectangle area.
+        /// What if we could recognize and split english word?
         /// </summary>
         /// <returns>The formatted text</returns>
         /// <example>
         /// FormatString("ABCD", 20): "AB\nCD"
+        /// FormatString("What is your name?", 100): "What is\nyour name?"
         /// </example>
         public static string FormatString(string text, int width)
         {

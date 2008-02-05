@@ -207,6 +207,7 @@ namespace Isles.Engine
         /// <param name="gameTime"></param>
         public void Draw(GameTime gameTime)
         {
+            landscape.PreDraw(gameTime);
             landscape.Draw(gameTime);
 
             foreach (IWorldObject o in worldObjects)

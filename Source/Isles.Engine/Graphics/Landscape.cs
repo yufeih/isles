@@ -795,9 +795,7 @@ namespace Isles.Graphics
         /// <param name="gameTime"></param>
         public void Draw(GameTime gameTime)
         {
-            graphics.RenderState.CullMode = CullMode.CullClockwiseFace;
-
-            DrawSky(gameTime);
+            DrawSky(gameTime, game.View, game.Projection);
             DrawWater(gameTime);
             DrawTerrain(Matrix.Identity, null);
 
@@ -814,15 +812,25 @@ namespace Isles.Graphics
         {
             graphics.RenderState.CullMode = CullMode.CullClockwiseFace;
 
-            DrawSky(gameTime);
-            DrawTerrain(lightViewProjection, shadowMap);
+            DrawSky(gameTime, game.View, game.Projection);
             DrawWater(gameTime);
-            DrawVegetation(gameTime);
+            DrawTerrain(lightViewProjection, shadowMap);
+            //DrawVegetation(gameTime);
 
             graphics.RenderState.DepthBufferEnable = true;
             graphics.RenderState.DepthBufferWriteEnable = true;
             graphics.RenderState.CullMode = CullMode.None;
             graphics.RenderState.AlphaBlendEnable = false;
+        }
+
+        /// <summary>
+        /// Draw landscape into an environment map.
+        /// Call this before anything is drawed.
+        /// </summary>
+        /// <param name="gameTime"></param>
+        public void PreDraw(GameTime gameTime)
+        {
+            UpdateWaterReflectionAndRefraction(gameTime);
         }
 
         #endregion

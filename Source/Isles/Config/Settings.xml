@@ -5,7 +5,7 @@
   
   <!--General settings-->
   <PlayerName>Unnamed</PlayerName>
-	<EnableProfile>false</EnableProfile>
+	<EnableProfile>true</EnableProfile>
   <EnableScreenshot>true</EnableScreenshot>
   <IsMouseVisible>false</IsMouseVisible>
   <IsFixedTimeStep>true</IsFixedTimeStep>
@@ -23,7 +23,7 @@
     <RotationFactorY>0.0104719755119</RotationFactorY>
     <BaseSpeed>0.08</BaseSpeed>
     <ScrollHeightFactor>1.25</ScrollHeightFactor>
-    <Radius>200</Radius>
+    <Radius>2000</Radius>
     <Roll>0.78539816339</Roll>
     <Pitch>-0.78539816339</Pitch>
     <MinRoll>0.17453292519</MinRoll>
@@ -38,12 +38,13 @@
   <Fullscreen>false</Fullscreen>
   <VSync>false</VSync>
   <NormalMappedTerrain>false</NormalMappedTerrain>
+  <RealisticWater>true</RealisticWater>
   <ViewDistanceSquared>500000</ViewDistanceSquared>
   <BloomSettings>
     <Enabled>true</Enabled>
     <Type>Saturated</Type>
     <Blur>1.5</Blur>
-    <Threshold>0.5</Threshold>
+    <Threshold>0.75</Threshold>
     <BloomIntensity>1.2</BloomIntensity>
     <BaseIntensity>1</BaseIntensity>
     <BloomSaturation>1</BloomSaturation>

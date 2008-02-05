@@ -16,16 +16,58 @@ namespace Isles.Graphics
 {
     public partial class Landscape
     {
+        /// <summary>
+        /// The water is part of a spherical surface to make it look vast.
+        /// But during rendering, e.g., for computing reflection and refraction,
+        /// the water is treated as a flat plane with the height of zero.
+        /// This value determines the shape of the surface
+        /// </summary>
         float earthRadius;
+
+        /// <summary>
+        /// A static texture applied to the water surface
+        /// </summary>
         Texture waterTexture;
+
+        /// <summary>
+        /// This texture is used as a bump map to simulate water
+        /// </summary>
         Texture waterDstortion;
+
+        /// <summary>
+        /// Render target used to draw the reflection & refraction texture
+        /// </summary>
+        RenderTarget2D waterRenderTarget;
+
+        /// <summary>
+        /// Depth stencil buffer used when drawing reflection and refraction
+        /// </summary>
+        DepthStencilBuffer waterDepthStencil;
+        
+        /// <summary>
+        /// This texture is generated each frame for water reflection color sampling
+        /// </summary>
+        Texture2D waterReflection;
+
+        /// <summary>
+        /// This texture is generated each frame for water refraction color sampling
+        /// </summary>
+        Texture2D waterRefraction;
+
+        /// <summary>
+        /// See Effects/Water.fx
+        /// </summary>
         Effect waterEffect;
+
+        /// <summary>
+        /// Water mesh
+        /// </summary>
         int waterVertexCount;
         int waterPrimitiveCount;
 
         VertexBuffer waterVertices;
         IndexBuffer waterIndices;
-
+        
         VertexDeclaration waterVertexDeclaration;
 
         public Effect WaterEffect
@@ -38,12 +80,20 @@ namespace Isles.Graphics
         {
             earthRadius = input.ReadSingle();
             waterTexture = input.ReadExternalReference<Texture>();
+            waterDstortion = input.ReadExternalReference<Texture>();
             waterEffect = input.ContentManager.Load<Effect>("Effects/Water");
-            waterDstortion = input.ContentManager.Load<Texture>("Textures/Distortion");
         }
 
         void InitializeWater()
         {
+            // Reflection & Refraction textures
+            waterRenderTarget = new RenderTarget2D(
+                graphics, 1024, 1024, 0, SurfaceFormat.Color, RenderTargetUsage.DiscardContents);
+
+            waterDepthStencil = new DepthStencilBuffer(
+                graphics, 1024, 1024, graphics.DepthStencilBuffer.Format);
+
+            // Initialize water mesh
             waterVertexDeclaration = new VertexDeclaration(
                 graphics, VertexPositionTexture.VertexElements);
 
@@ -81,6 +131,7 @@ namespace Isles.Graphics
                     // Make the water a sphere surface
                     vertexData[i].Position.Z = highest - earthRadius +
                         (float)Math.Sqrt(earthRadius * earthRadius - len * len);
+                    //vertexData[i].Position.Z = 0;
 
                     vertexData[i].TextureCoordinate.X = (float)x * TextureRepeat / CellCount;
                     vertexData[i].TextureCoordinate.Y = (float)y * TextureRepeat / CellCount;
@@ -114,17 +165,60 @@ namespace Isles.Graphics
             waterIndices.SetData<short>(indexData);
         }
 
+        void UpdateWaterReflectionAndRefraction(GameTime gameTime)
+        {
+            if (!game.Settings.RealisticWater)
+                return;
+
+            DepthStencilBuffer prevDepth = graphics.DepthStencilBuffer;
+            graphics.DepthStencilBuffer = waterDepthStencil;
+            graphics.SetRenderTarget(0, waterRenderTarget);
+
+            graphics.Clear(Color.White);
+           
+            // Create a reflection view matrix
+            Matrix viewReflect = Matrix.Multiply(
+                Matrix.CreateReflection(new Plane(Vector3.UnitZ, 0)), game.View);
+
+            DrawSky(gameTime, viewReflect, game.Projection);
+            DrawTerrain(viewReflect, game.Projection);
+
+            // Reset render target
+            graphics.SetRenderTarget(0, null);
+            graphics.DepthStencilBuffer = prevDepth;
+
+            // Retrieve reflection texture
+            waterReflection = waterRenderTarget.GetTexture();
+
+            //if (gameTime.TotalRealTime.Seconds >= 6)
+            //{
+            //    waterReflection.Save("Reflection.png", ImageFileFormat.Png);
+            //}
+        }
+
         void DrawWater(GameTime gameTime)
         {
+            // Draw water mesh
             graphics.Indices = waterIndices;
             graphics.VertexDeclaration = waterVertexDeclaration;
             graphics.Vertices[0].SetSource(waterVertices, 0, VertexPositionTexture.SizeInBytes);
 
-            waterEffect.Parameters["ColorTexture"].SetValue(waterTexture);
+            if (game.Settings.RealisticWater)
+            {
+                WaterEffect.CurrentTechnique = WaterEffect.Techniques["Realisic"];
+                WaterEffect.Parameters["ReflectionTexture"].SetValue(waterReflection);
+            }
+            else
+            {
+                WaterEffect.CurrentTechnique = WaterEffect.Techniques["Default"];
+                waterEffect.Parameters["ColorTexture"].SetValue(waterTexture);
+            }
+
             waterEffect.Parameters["DistortionTexture"].SetValue(waterDstortion);
+            WaterEffect.Parameters["ViewInverse"].SetValue(game.ViewInverse);
             waterEffect.Parameters["WorldViewProj"].SetValue(game.ViewProjection);
             WaterEffect.Parameters["WorldView"].SetValue(game.View);
-            waterEffect.Parameters["DisplacementScroll"].SetValue(MoveInCircle(gameTime, 0.02f));
+            waterEffect.Parameters["DisplacementScroll"].SetValue(MoveInCircle(gameTime, 0.005f));
 
             waterEffect.Begin();
             foreach (EffectPass pass in waterEffect.CurrentTechnique.Passes)
