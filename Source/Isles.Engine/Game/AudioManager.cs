@@ -97,9 +97,14 @@ namespace Isles.Engine
             {
                 if (disposing)
                 {
-                    soundBank.Dispose();
-                    waveBank.Dispose();
-                    audioEngine.Dispose();
+                    if (soundBank != null)
+                        soundBank.Dispose();
+
+                    if (waveBank != null)
+                        waveBank.Dispose();
+
+                    if (audioEngine != null)
+                        audioEngine.Dispose();
                 }
             }
             finally

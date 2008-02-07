@@ -11,39 +11,17 @@
       Tree, Building...
     
     Attributes:
-      Name, Description, Model, Position, Rotation (radius), Transform, Scale Velocity,
+      Name, Description, Model, Position, Rotation (angle), RotationX, RotationY, Scale (x, y, z),
       Health, MaxHealth, ConstructionTime, BaseHeight, Wood, Gold, StoresWood,
-      StoresGold, StoresFood...
+      StoresGold, StoresFood, ClipWalk, ClipRun...
                 
     Remarks:
       Object will use its default attributes stored in Config/Defaults.xml if you
       do not overwrite it here.
   -->
+  <Tree Position="1400, 1300, 0" />
 
-  <Tree Position="1088.396, 1496.589, 47.92157" Rotation="0.897556432731784" Scale="0.934001929887571, 0.952733553691177, 1.28742626122545" />
-  <Tree Position="1118.412, 1407.956, 36.14619" Rotation="5.92792179864589" Scale="0.906953316278268, 0.950749916979461, 1.22701168159349" />
-  <Townhall Position="900, 950, 0" Rotation="0.2" />
-  <Townhall Position="1086.783, 1419.163, 40.07843" Rotation="-1.196463" />
-  <Farmhouse Position="1070.453, 1421.348, 39.04936" Rotation="-0.5123893" />
-  <Windmill Position="1058.572, 1428.328, 36.78732" Rotation="0.598419" />
-  <Storage Position="1099.559, 1433.423, 41.16692" Rotation="1.088283" />
-  <Townhall Position="1097.371, 1447.183, 43.79982" Rotation="0.610726" />
-  <Farmhouse Position="1086.065, 1457.286, 44" Rotation="-0.4048917" />
-  <Storage Position="1072.185, 1457.684, 43.5873" Rotation="0.5070986" />
-  <Farmhouse Position="1059.39, 1449.153, 39.23112" Rotation="0.9827937" />
-  <Tree Position="1078.492, 1438.694, 41.6696" Rotation="4.3599170845456" Scale="1.01035917033924, 1.0989983425471, 0.880130481338189" />
-  <Tree Position="1075.964, 1385.913, 32.18369" Rotation="1.8587595098657" Scale="1.01613378325297, 1.06562333161273, 1.12915384659039" />
-  <Tree Position="1106.07, 1395.237, 34.48229" Rotation="3.87055670287073" Scale="0.91482626461183, 0.904310755247395, 0.864618460258757" />
-  <Tree Position="1110.998, 1412.987, 37.37928" Rotation="4.33861209652598" Scale="0.983709081487595, 1.0369925530334, 0.791067499896077" />
-  <Tree Position="1022.898, 1397.128, 28.31373" Rotation="3.20809447667148" Scale="1.01528439666856, 0.935130700857905, 1.19097740542655" />
-  <Tree Position="1136.191, 1424.733, 42.21898" Rotation="5.90331331923821" Scale="1.09875637218298, 0.93270177293229, 0.931033983561692" />
-  <Townhall Position="510.2944, 1299.039, 23.97412" Rotation="-0.3805063" />
-  <Windmill Position="504.0215, 1283.482, 24.39216" Rotation="0.5070986" />
-  <Storage Position="521.9725, 1286.328, 24.39216" Rotation="-1.328588" />
-  <Farmhouse Position="522.3259, 1311.76, 24.90345" Rotation="0.4899573" />
-  <Tree Position="532.261, 1286.302, 24.39216" Rotation="4.62699649979392" Scale="0.974598789529222, 0.926642012887933, 0.867935026515245" />
-  <Tree Position="469.3572, 1270.884, 29.2349" Rotation="2.27950611653234" Scale="0.91484516040182, 0.949200367671065, 0.737849044538033" />
-  <Tree Position="504.5604, 1263.694, 26.42792" Rotation="0.10154086012311" Scale="0.939329525753544, 1.03219053239198, 1.09840212212801" />
-  <Tree Position="511.4389, 1334.26, 27.88735" Rotation="6.1911825646818" Scale="1.03311861917987, 1.09963280484063, 0.757982284882098" />
-
+  <!--Create a test dude charactor-->
+  <Dude Position="1300, 1300, 0"/>
+  
 </World>

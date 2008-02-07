@@ -52,7 +52,7 @@ namespace Isles.Graphics
         /// <summary>
         /// This texture is generated each frame for water refraction color sampling
         /// </summary>
-        Texture2D waterRefraction;
+        //Texture2D waterRefraction;
 
         /// <summary>
         /// See Effects/Water.fx

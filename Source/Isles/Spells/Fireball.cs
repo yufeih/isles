@@ -26,6 +26,16 @@ namespace Isles
     public class Fireball : BaseEntity
     {
         /// <summary>
+        /// Gets or sets the velocity of the fireball
+        /// </summary>        
+        public override Vector3 Velocity
+        {
+            get { return velocity; }
+        }
+
+        Vector3 velocity;
+
+        /// <summary>
         /// Whether the fireball is exploding
         /// </summary>
         bool explode = false;
@@ -54,9 +64,11 @@ namespace Isles
         /// Create a fireball entity
         /// </summary>
         /// <param name="screen"></param>
-        public Fireball(GameWorld world)
+        public Fireball(GameWorld world, Vector3 initialVelocity)
             : base(world)
         {
+            velocity = initialVelocity;
+
             texture = new Texture2D[FireBallTextureFrames];
 
             for (int i = 0; i < FireBallTextureFrames; i++)
@@ -82,7 +94,7 @@ namespace Isles
                 velocity += world.GameLogic.Gravity * 0.08f *
                     (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-                position += velocity;
+                Position += velocity;
 
                 // Destroy anyway if we're too far away
                 if (Position.LengthSquared() > 1e8)
@@ -93,7 +105,7 @@ namespace Isles
             float height = world.Landscape.GetHeight(Position.X, Position.Y);
             if (height > Position.Z)
             {
-                //position.Z = height;
+                //Position.Z = height;
                 explode = true;
             }
 
@@ -115,7 +127,7 @@ namespace Isles
             //    Ray ray;
 
             //    ray.Position = screen.Game.Eye;
-            //    Vector3 v = position - ray.Position;
+            //    Vector3 v = Position - ray.Position;
             //    ray.Direction = Vector3.Normalize(v);
 
             //    Vector3? result = screen.Landscape.Intersects(ray);
@@ -136,7 +148,7 @@ namespace Isles
 
             billboard.Texture = texture[(int)frame];
             billboard.Normal = Vector3.Zero;
-            billboard.Position = position;
+            billboard.Position = Position;
             billboard.Size.X = billboard.Size.Y = explode ? 64 : 128;
             billboard.SourceRectangle = Billboard.DefaultSourceRectangle;
             billboard.Type = BillboardType.CenterOriented;
@@ -266,12 +278,8 @@ namespace Isles
                 return false;
             }
 
-            Fireball fireball = new Fireball(world);
-
-            fireball.Position = hand.GetCastPosition();
-
             Vector3 speed = Vector3.Normalize(
-                hand.CursorPosition - fireball.Position) * 20;
+                hand.CursorPosition - hand.GetCastPosition()) * 20;
 
             // Add a little random factor
             Random random = new Random();
@@ -280,7 +288,9 @@ namespace Isles
             speed.Y += ((float)random.NextDouble() - 0.5f) / 2;
             speed.Z += ((float)random.NextDouble() - 0.5f) / 2;
 
-            fireball.Velocity = speed;
+            Fireball fireball = new Fireball(world, speed);
+
+            fireball.Position = hand.GetCastPosition();
 
             world.Add(fireball);
 

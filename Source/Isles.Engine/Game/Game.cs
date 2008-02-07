@@ -422,6 +422,7 @@ namespace Isles.Engine
             this.settings = settings;
 
             Content.RootDirectory = settings.ContentDirectory;
+            Log.Write("Content Direction:" + settings.ContentDirectory +"...");
 
             graphics = new GraphicsDeviceManager(this);
 
@@ -472,12 +473,19 @@ namespace Isles.Engine
 
             // Initialize sound
             Components.Add(sound = new AudioManager(this));
+            Log.Write("Sound Initialized...");
 
             if (settings.EnableScreenshot)
+            {
                 Components.Add(screenshotCapturer = new ScreenshotCapturer(this));
+                Log.Write("Screenshot Capturer Initialized...");
+            }
 
             if (settings.EnableProfile)
+            {
                 Components.Add(profiler = new Profiler(this));
+                Log.Write("Profiler Initialized...");
+            }
 
             if (settings.BloomSettings != null &&
                 settings.BloomSettings.Enabled)
@@ -493,6 +501,7 @@ namespace Isles.Engine
                     settings.BloomSettings.BaseSaturation);
 
                 Components.Add(bloom);
+                Log.Write("Bloom Effect Initialized...");
             }
 
             base.Initialize();
@@ -502,7 +511,9 @@ namespace Isles.Engine
         {
             screenWidth = GraphicsDevice.Viewport.Width;
             screenHeight = GraphicsDevice.Viewport.Height;
-            
+
+            Log.Write("Device Reset <" + screenWidth + ", " + screenHeight + ">...");
+
             // Re-Set device
             // Restore z buffer state
             GraphicsDevice.RenderState.DepthBufferEnable = true;
@@ -525,9 +536,13 @@ namespace Isles.Engine
         {
             // Initialize text
             Text.Initialize(this);
+            Log.Write("Text Initialized...");
 
             billboard = new BillboardManager(this);
+            Log.Write("Billboard Initialized...");
+
             pointSprite = new PointSpriteManager(this);
+            Log.Write("PointSprite Initialized...");
 
             // Notify all screens to load contents
             foreach (KeyValuePair<string, IScreen> screen in screens)
@@ -777,8 +792,6 @@ namespace Isles.Engine
         {
             if (disposing)
             {
-
-
                 if (profiler != null)
                     profiler.Dispose();
 

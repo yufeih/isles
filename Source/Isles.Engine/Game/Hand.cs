@@ -226,8 +226,8 @@ namespace Isles.Engine
             this.world = world;
         }
 
-        public Hand(GameWorld world, Model model)
-            : base(model)
+        public Hand(GameWorld world, Model Model)
+            : base(Model)
         {
             this.world = world;
         }
@@ -240,8 +240,6 @@ namespace Isles.Engine
             : base(BaseGame.Singleton.Content.Load<Model>(modelFilename))
         {
             this.world = world;
-
-            //screen.Game.IsMouseVisible = false;
         }
 
         public Hand(GameWorld world, string modelFilename, Matrix transform)
@@ -249,9 +247,7 @@ namespace Isles.Engine
         {
             this.world = world;
 
-            //model.Root.Transform = transform;
-            model.Root.Transform *= transform;
-
+            Model.Root.Transform *= transform;
             Refresh();
         }
 
@@ -599,7 +595,7 @@ namespace Isles.Engine
         private void UpdateCursor()
         {
             // Update game cursor position
-            Nullable<Vector3> hitPoint = world.Landscape.Intersects(game.PickRay);
+            Nullable<Vector3> hitPoint = world.Landscape.Pick();
             if (hitPoint.HasValue)
             {
                 cursorPosition = hitPoint.Value;
@@ -675,7 +671,7 @@ namespace Isles.Engine
             //else
             {
                 // Update hand position
-                transform = Matrix.CreateTranslation(Vector3.Transform(position, game.View));            
+                Transform = Matrix.CreateTranslation(Vector3.Transform(position, game.View));            
             }
 
             if (!visible)
@@ -683,14 +679,14 @@ namespace Isles.Engine
 
             if (player == null)
             {
-                model.CopyAbsoluteBoneTransformsTo(bones);
+                Model.CopyAbsoluteBoneTransformsTo(bones);
 
                 // Draw plain mesh
-                foreach (ModelMesh mesh in model.Meshes)
+                foreach (ModelMesh mesh in Model.Meshes)
                 {
                     foreach (BasicEffect effect in mesh.Effects)
                     {
-                        effect.World = bones[mesh.ParentBone.Index] * transform;
+                        effect.World = bones[mesh.ParentBone.Index] * Transform;
                         effect.View = Matrix.Identity;
                         effect.Projection = game.Projection;
                         effect.EnableDefaultLighting();
@@ -708,7 +704,7 @@ namespace Isles.Engine
                 Matrix[] bones = player.GetSkinTransforms();
 
                 // Render the skinned mesh.
-                foreach (ModelMesh mesh in model.Meshes)
+                foreach (ModelMesh mesh in Model.Meshes)
                 {
                     foreach (Effect effect in mesh.Effects)
                     {

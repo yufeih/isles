@@ -292,6 +292,22 @@ namespace Isles.Graphics
         }
 
         /// <summary>
+        /// Cached pick position. Remember to set it to null each frame.
+        /// </summary>
+        Vector3? picked = null;
+
+        /// <summary>
+        /// Gets the current point of the terrain picked by the cursor
+        /// </summary>
+        public Vector3? Pick()
+        {
+            if (picked != null)
+                return picked;
+
+            return Intersects(game.PickRay);
+        }
+        
+        /// <summary>
         /// Checks whether a ray intersects the terrain mesh
         /// </summary>
         /// <remarks>
@@ -688,6 +704,9 @@ namespace Isles.Graphics
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
+            // Set picked to null
+            picked = null;
+
             // Get current view frustum from camera
             BoundingFrustum viewFrustum = game.ViewFrustum;
 

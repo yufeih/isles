@@ -330,7 +330,10 @@ namespace Isles
                     new Vector2(status.X + 8, status.Y + 8), textColor,
                     0, Vector2.Zero, 0.8f, SpriteEffects.None, 0);
 
-                ui.Sprite.DrawString(Text.Font, World.Selected[0].Description,
+                string desc = Text.FormatString(
+                    World.Selected[0].Description, (int)(status.Width / 0.6f), status.Height);
+
+                ui.Sprite.DrawString(Text.Font, desc,
                     new Vector2(status.X + 8, status.Y + 28), textColor,
                     0, Vector2.Zero, 0.6f, SpriteEffects.None, 0);
             }

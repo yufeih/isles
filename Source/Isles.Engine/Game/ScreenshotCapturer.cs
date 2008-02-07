@@ -46,8 +46,6 @@ namespace Isles.Engine
         {
             game = setGame;
             screenshotNum = GetCurrentScreenshotNum();
-
-            Log.Write("Screenshot Capturer Initialized...");
         }
         #endregion
 
@@ -62,7 +60,7 @@ namespace Isles.Engine
         {
             return ScreenshotsDirectory + "/" +
                 game.Window.Title + " Screenshot " +
-                num.ToString("0000") + ".png";
+                num.ToString("0000") + ".jpg";
         }
         #endregion
 
@@ -153,7 +151,7 @@ namespace Isles.Engine
 
                     dstTexture.Save(
                         ScreenshotNameBuilder(screenshotNum),
-                        ImageFileFormat.Png);
+                        ImageFileFormat.Jpg);
 
                     Log.Write("Screen shot captured: " + ScreenshotNameBuilder(screenshotNum));
                 }

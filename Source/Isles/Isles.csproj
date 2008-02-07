@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entity\Building.cs" />
+    <Compile Include="Entity\Charactor.cs" />
     <Compile Include="Entity\Crop.cs" />
     <Compile Include="Entity\Farmland.cs" />
     <Compile Include="Entity\Stone.cs" />

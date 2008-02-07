@@ -164,6 +164,23 @@ namespace Isles.Engine
     public interface ISceneManager
     {
         /// <summary>
+        /// Adds a new world object
+        /// </summary>
+        /// <param name="worldObject"></param>
+        void Add(IWorldObject worldObject);
+
+        /// <summary>
+        /// Destroy a world object
+        /// </summary>
+        /// <param name="worldObject"></param>
+        void Destroy(IWorldObject worldObject);
+
+        /// <summary>
+        /// Clear all world objects
+        /// </summary>
+        void Clear();
+
+        /// <summary>
         /// Test to see if a point intersects a world object
         /// </summary>
         bool PointSceneIntersects(Vector3 point);
@@ -197,6 +214,11 @@ namespace Isles.Engine
         /// Gets all world objects falling inside a bounding frustum region
         /// </summary>
         IEnumerable<IWorldObject> ObjectsFromRegion(BoundingFrustum boundingFrustum);
+
+        /// <summary>
+        /// Gets all world objects that are near the point (Not always intersects).
+        /// </summary>
+        IEnumerable<IWorldObject> GetNearbyObjects(Vector3 position);
 
         /// <summary>
         /// Gets a world object from its name

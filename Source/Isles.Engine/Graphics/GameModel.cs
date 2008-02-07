@@ -24,19 +24,29 @@ namespace Isles.Graphics
         protected BaseGame game;
 
         /// <summary>
-        /// Model bounding box
+        /// Model axis aligned bounding box
         /// </summary>
-        protected BoundingBox boundingBox;
+        BoundingBox boundingBox;
+        
+        /// <summary>
+        /// Bounding box of the xna model. (Not always axis aligned)
+        /// </summary>
+        BoundingBox orientedBoundingBox;
+
+        /// <summary>
+        /// Whether we should refresh our axis aligned bounding box
+        /// </summary>
+        bool isBoundingBoxDirty = true;
 
         /// <summary>
         /// Model world transform
         /// </summary>
-        protected Matrix transform = Matrix.Identity;
+        Matrix transform = Matrix.Identity;
 
         /// <summary>
         /// XNA model class
         /// </summary>
-        protected Model model;
+        Model model;
 
         /// <summary>
         /// Hold all models bones
@@ -69,23 +79,24 @@ namespace Isles.Graphics
         public Matrix Transform
         {
             get { return transform; }
-            set { transform = value; }
+            set { transform = value; isBoundingBoxDirty = true; }
         }
 
         /// <summary>
-        /// Gets game model bounding box
+        /// Gets the axis aligned bounding box of this model
         /// </summary>
         public BoundingBox BoundingBox
         {
-            get { return boundingBox; }
-        }
+            get
+            {
+                if (isBoundingBoxDirty)
+                {
+                    boundingBox = AABBFromOBB(orientedBoundingBox, transform);
+                    isBoundingBoxDirty = false;
+                }
 
-        /// <summary>
-        /// Gets XNA model
-        /// </summary>
-        public Model Model
-        {
-            get { return model; }
+                return boundingBox;
+            }
         }
 
         /// <summary>
@@ -93,23 +104,7 @@ namespace Isles.Graphics
         /// </summary>
         public bool IsAnimatedModel
         {
-            get { return Animation != null; }
-        }
-
-        /// <summary>
-        /// Gets model animation
-        /// </summary>
-        public AnimationPlayer Animation
-        {
-            get { return player; }
-        }
-
-        /// <summary>
-        /// Gets model skinning data
-        /// </summary>
-        public SkinningData SkinningData
-        {
-            get { return skin; }
+            get { return skin != null; }
         }
 
         /// <summary>
@@ -119,6 +114,15 @@ namespace Isles.Graphics
         {
             get { return effect; }
             set { effect = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the xna model.
+        /// </summary>
+        public Model Model
+        {
+            get { return model; }
+            set { model = value; Refresh(); }
         }
         #endregion
 
@@ -133,13 +137,15 @@ namespace Isles.Graphics
         public GameModel(Model model)
             : this()
         {
-            SetModel(model);
+            // Make sure this is the upper case Model
+            Model = model;
         }
 
         public GameModel(string modelAssetname)
             : this()
         {
-            SetModel(game.Content.Load<Model>(modelAssetname));
+            // Make sure this is the upper case Model
+            Model = game.Content.Load<Model>(modelAssetname);
         }
 
         /// <summary>
@@ -148,36 +154,8 @@ namespace Isles.Graphics
         /// <param name="modelFilename"></param>
         public void Load(string modelAssetname)
         {
-            SetModel(game.Content.Load<Model>(modelAssetname));
-        }
-
-        public void SetModel(Model model)
-        {
-            this.model = model;
-
-            if (model != null)
-            {
-                // Adjust bone array size
-                if (bones.Length < model.Bones.Count)
-                    bones = new Matrix[model.Bones.Count];
-
-                skin = model.Tag as SkinningData;
-
-                if (skin != null)
-                {
-                    player = new AnimationPlayer(skin);
-
-                    // Play the first animation clip
-                    IEnumerator<KeyValuePair<string, AnimationClip>> enumerator =
-                        skin.AnimationClips.GetEnumerator();
-
-                    if (enumerator.MoveNext())
-                        player.StartClip(enumerator.Current.Value);
-                }
-            }
-
-            // Compute model bounding box.
-            boundingBox = ComputeBoundingBox(model);
+            // Make sure this is the upper case Model
+            Model = game.Content.Load<Model>(modelAssetname);
         }
 
         /// <summary>
@@ -187,21 +165,42 @@ namespace Isles.Graphics
         /// </summary>
         public void Refresh()
         {
-            boundingBox = ComputeBoundingBox(model);
+            if (model != null)
+            {
+                // Adjust bone array size
+                if (bones.Length < model.Bones.Count)
+                    bones = new Matrix[model.Bones.Count];
+
+                player = null;
+                skin = model.Tag as SkinningData;
+
+                if (skin != null)
+                {
+                    player = new AnimationPlayer(skin);
+
+                    // Play the first animation clip
+                    PlayAnimation();
+                }
+            }
+
+            // Compute model bounding box.
+            orientedBoundingBox = OBBFromModel(model);
+            isBoundingBoxDirty = true;
         }
 
         /// <summary>
-        /// Compute bounding box for the model.
-        /// NOTE: This method probably DO NOT work for animated mesh
+        /// Compute bounding box for the specified xna model.
         /// </summary>
-        public static BoundingBox ComputeBoundingBox(Model model)
+        protected static BoundingBox OBBFromModel(Model model)
         {
             if (null == model)
                 return new BoundingBox(Vector3.Zero, Vector3.Zero);
 
+            const float FloatMax = 1000000;
+
             // Compute bounding box
-            Vector3 min = new Vector3(1000, 1000, 1000);
-            Vector3 max = new Vector3(-1000, -1000, -1000);
+            Vector3 min = new Vector3(FloatMax, FloatMax, FloatMax);
+            Vector3 max = new Vector3(-FloatMax, -FloatMax, -FloatMax);
 
             Matrix[] bones = new Matrix[model.Bones.Count];
             model.CopyAbsoluteBoneTransformsTo(bones);
@@ -238,6 +237,45 @@ namespace Isles.Graphics
             return new BoundingBox(min, max);
         }
 
+
+        /// <summary>
+        /// Compute the axis aligned bounding box from an oriented bounding box
+        /// </summary>
+        public static BoundingBox AABBFromOBB(BoundingBox box, Matrix transform)
+        {
+            const float FloatMax = 1000000;
+
+            // Find the 8 corners
+            Vector3[] corners = box.GetCorners();
+
+            // Compute bounding box
+            Vector3 min = new Vector3(FloatMax, FloatMax, FloatMax);
+            Vector3 max = new Vector3(-FloatMax, -FloatMax, -FloatMax);
+
+            foreach (Vector3 c in corners)
+            {
+                Vector3 v = Vector3.Transform(c, transform);
+
+                if (v.X < min.X)
+                    min.X = v.X;
+                if (v.X > max.X)
+                    max.X = v.X;
+
+                if (v.Y < min.Y)
+                    min.Y = v.Y;
+                if (v.Y > max.Y)
+                    max.Y = v.Y;
+
+                if (v.Z < min.Z)
+                    min.Z = v.Z;
+                if (v.Z > max.Z)
+                    max.Z = v.Z;
+            }
+
+            return new BoundingBox(min, max);
+        }
+        
+
         /// <summary>
         /// Center the model
         /// </summary>
@@ -257,8 +295,57 @@ namespace Isles.Graphics
             model.Root.Transform *= Matrix.CreateTranslation(offset);
 
             // Reset bounding box
-            boundingBox.Max += offset;
-            boundingBox.Min += offset;
+            orientedBoundingBox.Max += offset;
+            orientedBoundingBox.Min += offset;
+            
+            // Mark dirty
+            isBoundingBoxDirty = true;
+        }
+
+        /// <summary>
+        /// Play the default animation
+        /// </summary>
+        /// <returns>Succeeded or not</returns>
+        public bool PlayAnimation()
+        {
+            if (player == null)
+                return false;
+
+            IEnumerator<KeyValuePair<string, AnimationClip>> enumerator =
+                skin.AnimationClips.GetEnumerator();
+
+            if (enumerator.MoveNext())
+                player.StartClip(enumerator.Current.Value);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Play an animation clip
+        /// </summary>
+        /// <param name="clipName">
+        /// Clip name.
+        /// </param>
+        /// <returns>Succeeded or not</returns>
+        public bool PlayAnimation(string clipName)
+        {
+            if (player == null)
+                return false;
+
+            if (clipName == null)
+                return false;
+
+            // Play the animation clip with the specified name
+            AnimationClip clip;
+
+            if (skin.AnimationClips.TryGetValue(clipName, out clip))
+            {
+                player.StartClip(clip);
+                return true;
+            }
+            
+            // TODO: Stop the animation
+            return false;
         }
 
         public virtual void Update(GameTime gameTime)

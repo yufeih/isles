@@ -1,3 +1,9 @@
+//-----------------------------------------------------------------------------
+//  Isles v1.0
+//  
+//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
+//-----------------------------------------------------------------------------
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -29,7 +35,7 @@ namespace Isles
         /// </summary>
         public Farmland(GameWorld world) : base(world, null)
         {
-            crop = new Crop(world, size);
+            crop = new Crop(world, Size);
         }
 
         /// <summary>

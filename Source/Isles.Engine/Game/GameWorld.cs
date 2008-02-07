@@ -21,7 +21,7 @@ namespace Isles.Engine
     /// <summary>
     /// Represents the game world
     /// </summary>
-    public class GameWorld
+    public class GameWorld : ISceneManager
     {        
         #region Field
         /// <summary>
@@ -231,13 +231,13 @@ namespace Isles.Engine
             {
                 if (e != null)
                 {
-                    float size = 2 *
-                        Math.Max(e.Size.X, e.Size.Y);
+                    Vector3 size = e.Size;
+                    float radius = Math.Max(size.X, size.Y) * 1.5f;
 
                     landscape.DrawSurface(
                         SelectionTexture,
                         new Vector2(e.Position.X, e.Position.Y),
-                        new Vector2(size, size));
+                        new Vector2(radius, radius));
                 }
             }
         }
@@ -453,24 +453,6 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Adds a new world object
-        /// </summary>
-        /// <param name="worldObject"></param>
-        public void Add(IWorldObject worldObject)
-        {
-            worldObjects.Add(worldObject);
-        }
-        
-        /// <summary>
-        /// Destroy a scene object
-        /// </summary>
-        /// <param name="worldObject"></param>
-        public void Destroy(IWorldObject worldObject)
-        {
-            worldObjects.Remove(worldObject);
-        }
-
-        /// <summary>
         /// Select a world object, pass null to deselect everything
         /// </summary>
         /// <param name="select"></param>
@@ -666,41 +648,82 @@ namespace Isles.Engine
         }
         #endregion
 
-        #region NotImplemented
+        #region ISceneManager Members
+
+        /// <summary>
+        /// Adds a new world object
+        /// </summary>
+        /// <param name="worldObject"></param>
+        public void Add(IWorldObject worldObject)
+        {
+            worldObjects.Add(worldObject);
+        }
+
+        /// <summary>
+        /// Destroy a scene object
+        /// </summary>
+        /// <param name="worldObject"></param>
+        public void Destroy(IWorldObject worldObject)
+        {
+            worldObjects.Remove(worldObject);
+        }
+
+        public void Clear()
+        {
+            worldObjects.Clear();
+        }
+        
+        /// <summary>
+        /// Test to see if a point intersects a world object
+        /// </summary>
         public bool PointSceneIntersects(Vector3 point)
         {
-            throw new Exception("The method or operation is not implemented.");
+            throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Test to see if a ray intersects a world object
+        /// </summary>
         public bool RaySceneIntersects(Ray ray)
         {
-            throw new Exception("The method or operation is not implemented.");
+            throw new NotImplementedException();
         }
 
-        public bool SceneObjectIntersects(IWorldObject object1, IWorldObject object2)
+        public bool ObjectIntersects(IWorldObject object1, IWorldObject object2)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<IWorldObject> ObjectsFromPoint(Vector3 point)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public IEnumerable<IWorldObject> SceneObjectsFromPoint(Vector3 point)
+        public IEnumerable<IWorldObject> ObjectsFromRay(Ray ray)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public IEnumerable<IWorldObject> SceneObjectsFromRay(Ray ray)
+        public IEnumerable<IWorldObject> ObjectsFromRegion(BoundingBox boundingBox)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public IEnumerable<IWorldObject> SceneObjectsFromRegion(BoundingBox boundingBox)
+        public IEnumerable<IWorldObject> ObjectsFromRegion(BoundingFrustum boundingFrustum)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public IWorldObject SceneObjectFromName(string name)
+        public IEnumerable<IWorldObject> GetNearbyObjects(Vector3 position)
         {
             throw new Exception("The method or operation is not implemented.");
         }
+
+        public IWorldObject ObjectFromName(string name)
+        {
+            throw new Exception("The method or operation is not implemented.");
+        }
+
         #endregion
     }
 }

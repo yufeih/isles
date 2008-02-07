@@ -24,6 +24,8 @@ namespace Isles
     /// </summary>
     public class GameIsles : BaseGame
     {
+        const string ConfigFile = "Config/Settings.xml";
+
         /// <summary>
         /// Game screen
         /// </summary>
@@ -42,13 +44,17 @@ namespace Isles
         /// </summary>
         static Stream SettingsStream
         {
-            get { return new FileStream("Config/Settings.xml", FileMode.Open); }
+            get
+            {
+                if (File.Exists(ConfigFile))
+                    return new FileStream(ConfigFile, FileMode.Open);
+                return null;
+            }
         }
 
-        public GameIsles() : base(Settings.CreateDefaultSettings(SettingsStream))
-        {
+        public GameIsles()
+            : base(Settings.CreateDefaultSettings(SettingsStream)) { }
 
-        }
 
         /// <summary>
         /// Initialize everything here
@@ -110,6 +116,11 @@ namespace Isles
             GameWorld.RegisterCreator("AltarOfDestruction", delegate(GameWorld world)
             {
                 return new Building(world, "AltarOfDestruction");
+            });
+
+            GameWorld.RegisterCreator("Dude", delegate(GameWorld world)
+            {
+                return new Charactor(world, "Dude");
             });
 
 

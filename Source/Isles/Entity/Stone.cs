@@ -1,3 +1,9 @@
+//-----------------------------------------------------------------------------
+//  Isles v1.0
+//  
+//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
+//-----------------------------------------------------------------------------
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -74,7 +80,7 @@ namespace Isles
         /// <param name="gameTime"></param>
         public override void Update(GameTime gameTime)
         {
-            model.Update(gameTime);
+            Model.Update(gameTime);
         }
 
         /// <summary>
@@ -83,10 +89,10 @@ namespace Isles
         /// <param name="gameTime"></param>
         public override void Draw(GameTime gameTime)
         {
-            Matrix transform = Matrix.CreateRotationZ(rotation);
-            transform.Translation = position;
-            model.Transform = transform;
-            model.Draw(gameTime, delegate(BasicEffect effect)
+            Matrix transform = Matrix.CreateRotationZ(Rotation);
+            transform.Translation = Position;
+            Model.Transform = transform;
+            Model.Draw(gameTime, delegate(BasicEffect effect)
             {
                 if (Selected)
                     effect.DiffuseColor = Vector3.UnitY;
@@ -99,15 +105,15 @@ namespace Isles
 
         /// <summary>
         /// Draw the stone use an effect to show that the current
-        /// position is invalid
+        /// Position is invalid
         /// </summary>
         /// <param name="gameTime"></param>
         public void DrawInvalid(GameTime gameTime)
         {
-            Matrix transform = Matrix.CreateRotationZ(rotation);
-            transform.Translation = position;
-            model.Transform = transform;
-            model.Draw(gameTime, delegate(BasicEffect effect)
+            Matrix transform = Matrix.CreateRotationZ(Rotation);
+            transform.Translation = Position;
+            Model.Transform = transform;
+            Model.Draw(gameTime, delegate(BasicEffect effect)
             {
                 effect.DiffuseColor = Vector3.UnitX;
             });
@@ -119,16 +125,17 @@ namespace Isles
         /// <returns>Success or not</returns>
         public override bool Place(Landscape landscape, Vector3 newPosition, float newRotation)
         {
-            position = newPosition;
-            rotation = newRotation;
+            Position = newPosition;
+            Rotation = newRotation;
 
             // Fall on the ground
-            position.Z = landscape.GetHeight(position.X, position.Y);
+            Position = new Vector3(
+                Position.X, Position.Y, landscape.GetHeight(Position.X, Position.Y));
 
             // A stone only covers one grid :)
             // FIXME: One grid is not large enough for picking...
             //        Find a way to deal with it!!!
-            Point grid = landscape.PositionToGrid(position.X, position.Y);
+            Point grid = landscape.PositionToGrid(Position.X, Position.Y);
 
             if (!landscape.IsValidGrid(grid))
                 return false;
@@ -149,7 +156,7 @@ namespace Isles
         /// <returns>Success or not</returns>
         public override bool Pickup(Landscape landscape)
         {
-            Point grid = landscape.PositionToGrid(position.X, position.Y);
+            Point grid = landscape.PositionToGrid(Position.X, Position.Y);
 
             System.Diagnostics.Debug.Assert(landscape.Data[grid.X, grid.Y].Owners.Contains(this));
 
@@ -162,13 +169,13 @@ namespace Isles
         /// </summary>
         /// <param name="ray">Target ray</param>
         /// <returns>
-        /// Distance from the intersection point to the ray starting position,
+        /// Distance from the intersection point to the ray starting Position,
         /// Null if there's no intersection.
         /// </returns>
         public override Nullable<float> Intersects(Ray ray)
         {
             // Transform ray to object space
-            Matrix worldInverse = Matrix.Invert(model.Transform);
+            Matrix worldInverse = Matrix.Invert(Model.Transform);
             Vector3 newPosition = Vector3.Transform(ray.Position, worldInverse);
             Vector3 newTarget = Vector3.Transform(ray.Position + ray.Direction, worldInverse);
             Ray newRay = new Ray(newPosition, newTarget - newPosition);
@@ -176,7 +183,7 @@ namespace Isles
             // Perform a bounding box intersection...
             //
             // HACK HACK!!! We need a mstone accurate algorithm :)
-            return newRay.Intersects(model.BoundingBox);
+            return newRay.Intersects(Model.BoundingBox);
         }
 
         public override void Follow(Hand hand)
@@ -207,7 +214,7 @@ namespace Isles
 
             // Otherwise, overwrite rotating behavior,
             // we want to throw the stone
-            mouseBeginDropRotation = rotation;
+            mouseBeginDropRotation = Rotation;
             mouseBeginDropPosition = Input.MousePosition;
             mouseBeginDropPosition.Y -= 10;
             return true;
@@ -218,7 +225,7 @@ namespace Isles
         /// </summary>
         public override void Dropping(Hand hand, Entity entity, bool leftButton)
         {
-            rotation = mouseBeginDropRotation + MathHelper.PiOver2 + (float)Math.Atan2(
+            Rotation = mouseBeginDropRotation + MathHelper.PiOver2 + (float)Math.Atan2(
                 -(double)(Input.MousePosition.Y - mouseBeginDropPosition.Y),
                  (double)(Input.MousePosition.X - mouseBeginDropPosition.X));
         }

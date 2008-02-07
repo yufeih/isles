@@ -10,8 +10,8 @@ float3 LightPos = { 500, 500, 1000 };
 float3 LightDir = { 0, 0, -1 };
 float4 LightColor = { 1, 1, 1, 1.0 };
 
-float DetailedTextureStart = 200;
-float DetailedTextureThickness = 400;
+float DetailedTextureStart = 150;
+float DetailedTextureThickness = 250;
 
 texture ColorTexture;
 texture AlphaTexture;

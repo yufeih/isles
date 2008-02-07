@@ -1,3 +1,9 @@
+//-----------------------------------------------------------------------------
+//  Isles v1.0
+//  
+//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
+//-----------------------------------------------------------------------------
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -75,7 +81,13 @@ namespace Isles
         public float MaxHealth
         {
             get { return maxHealth; }
-            set { maxHealth = value; }
+
+            set
+            {
+                maxHealth = (value > 0 ? value : 0);
+                if (health > 0)
+                    health = maxHealth;
+            }
         }
 
         protected float maxHealth = 100;
@@ -175,8 +187,7 @@ namespace Isles
         {
             XmlElement xml;
 
-            if (GameDefault.Singleton.
-                WorldObjectDefaults.TryGetValue(classID, out xml))
+            if (GameDefault.Singleton.WorldObjectDefaults.TryGetValue(classID, out xml))
             {
                 Deserialize(xml);
             }
@@ -226,8 +237,8 @@ namespace Isles
         public bool IsValidLocation(Landscape landscape)
         {
             // Make sure it's on the landscape
-            if (position.X < 0 || position.Y < 0 ||
-                position.X > landscape.Size.X || position.Y > landscape.Size.Y)
+            if (Position.X < 0 || Position.Y < 0 ||
+                Position.X > landscape.Size.X || Position.Y > landscape.Size.Y)
             {
                 return false;
             }
@@ -235,8 +246,8 @@ namespace Isles
             // Keep track of entities
             List<Entity> entities = new List<Entity>(2);
 
-            float z = landscape.GetHeight(position.X, position.Y);
-            foreach (Point grid in landscape.EnumerateGrid(position, size))
+            float z = landscape.GetHeight(Position.X, Position.Y);
+            foreach (Point grid in landscape.EnumerateGrid(Position, Size))
             {
                 if (!IsValidGrid(landscape, grid, z))
                     return false;
@@ -247,9 +258,9 @@ namespace Isles
                     {
                         // Rectangle intersection test
                         if (Math2D.RectangleIntersects(
-                            new Vector2(-size.X / 2, -size.Y / 2),
-                            new Vector2(size.X / 2, size.Y / 2),
-                            new Vector2(position.X, position.Y), rotation,
+                            new Vector2(-Size.X / 2, -Size.Y / 2),
+                            new Vector2(Size.X / 2, Size.Y / 2),
+                            new Vector2(Position.X, Position.Y), Rotation,
                             new Vector2(-entity.Size.X / 2, -entity.Size.Y / 2),
                             new Vector2(entity.Size.X / 2, entity.Size.Y / 2),
                             new Vector2(entity.Position.X, entity.Position.Y),
@@ -309,18 +320,19 @@ namespace Isles
         /// <returns>Success or not</returns>
         public override bool Place(Landscape landscape, Vector3 newPosition, float newRotation)
         {
-            // Store new position/rotation
-            position = newPosition;
-            rotation = newRotation;
+            // Store new Position/Rotation
+            Position = newPosition;
+            Rotation = newRotation;
 
             if (!IsValidLocation(landscape))
                 return false;
 
             // Fall on the ground
-            position.Z = landscape.GetHeight(position.X, position.Y);
+            Position = new Vector3(
+                Position.X, Position.Y, landscape.GetHeight(Position.X, Position.Y));
 
             // Change grid owner
-            foreach (Point grid in landscape.EnumerateGrid(position, size))
+            foreach (Point grid in landscape.EnumerateGrid(Position, Size))
                 landscape.Data[grid.X, grid.Y].Owners.Add(this);
 
             // Set state to constructing
@@ -337,7 +349,7 @@ namespace Isles
         public override bool Pickup(Landscape landscape)
         {
             // Change grid owner
-            foreach (Point grid in landscape.EnumerateGrid(position, size))
+            foreach (Point grid in landscape.EnumerateGrid(Position, Size))
             {
                 System.Diagnostics.Debug.Assert(landscape.Data[grid.X, grid.Y].Owners.Contains(this));
 
@@ -351,7 +363,7 @@ namespace Isles
         public override void EndDrag(Hand hand)
         {
             // Nothing will be dragged, since we can't change
-            // a building's position once placed :)
+            // a building's Position once placed :)
         }
 
         public override void Follow(Hand hand)
@@ -379,15 +391,6 @@ namespace Isles
             base.Dropping(hand, entity, leftButton);
         }
 
-        public override bool EndDrop(Hand hand, Entity entity, bool leftButton)
-        {
-            if (!Place(world.Landscape))
-            {
-                // Drop failed, removes it
-                world.Destroy(this);
-            }
-            return true;
-        }
         #endregion
 
         #region Update & Draw
@@ -405,7 +408,7 @@ namespace Isles
         /// <param name="gameTime"></param>
         public override void Update(GameTime gameTime)
         {
-            model.Update(gameTime);
+            Model.Update(gameTime);
 
             if (state == BuildingState.Constructing)
             {
@@ -486,10 +489,8 @@ namespace Isles
 
             if (isValidLocation)
             {
-                Matrix transform = Matrix.CreateRotationZ(rotation);
-                transform.Translation = position;
-                model.Transform = transform;
-                model.Draw(gameTime, delegate(BasicEffect effect)
+                Model.Transform = Transform;
+                Model.Draw(gameTime, delegate(BasicEffect effect)
                 {
                     if (Selected)
                         effect.DiffuseColor = Vector3.UnitY;
@@ -507,15 +508,13 @@ namespace Isles
 
         /// <summary>
         /// Draw the building use an effect to show that the current
-        /// position is invalid
+        /// Position is invalid
         /// </summary>
         /// <param name="gameTime"></param>
         public void DrawInvalid(GameTime gameTime)
         {
-            Matrix transform = Matrix.CreateRotationZ(rotation);
-            transform.Translation = position;
-            model.Transform = transform;
-            model.Draw(gameTime, delegate(BasicEffect effect)
+            Model.Transform = Transform;
+            Model.Draw(gameTime, delegate(BasicEffect effect)
             {
                 effect.DiffuseColor = Vector3.UnitX;
             });

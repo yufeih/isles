@@ -59,8 +59,6 @@ namespace Isles.Graphics
             font = game.Content.Load<SpriteFont>(game.Settings.DefaultFont);
             sprite = new SpriteBatch(game.GraphicsDevice);
             basicEffect = new BasicEffect(game.GraphicsDevice, null);
-
-            Log.Write("Text Initialized...");
         }
 
         /// <summary>

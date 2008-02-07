@@ -19,7 +19,6 @@ namespace Isles
         /// </summary>
         static void Main(string[] args)
         {
-
 #if !DEBUG
             try
             {

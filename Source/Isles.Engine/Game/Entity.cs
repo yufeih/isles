@@ -29,24 +29,31 @@ namespace Isles.Engine
         /// <summary>
         /// Gets or sets the 3D position of the entity.
         /// </summary>
-        public Vector3 Position
+        public virtual Vector3 Position
         {
             get { return position; }
-            set { position = value; IsDirty = true; }
+
+            set
+            {
+                position = value;
+                IsDirty = true;
+
+                OnPositionChanged();
+            }
         }
 
-        protected Vector3 position;
+        protected virtual void OnPositionChanged() { }
+
+        Vector3 position;
         
 
         /// <summary>
         /// Gets or sets which way the entity is facing.
         /// </summary>
-        public Vector3 Forward
+        public virtual Vector3 Forward
         {
-            get { return forward; }
+            get { return Vector3.UnitZ; }
         }
-
-        protected Vector3 forward;
 
 
         /// <summary>
@@ -61,16 +68,13 @@ namespace Isles.Engine
         /// <summary>
         /// Gets or sets how fast this entity is moving.
         /// </summary>
-        public Vector3 Velocity
+        public virtual Vector3 Velocity
         {
-            get { return velocity; }
-            set { velocity = value; }
+            get { return Vector3.Zero; }
         }
+        
 
-        protected Vector3 velocity;
-
-
-        protected bool isDirty = false;
+        bool isDirty = false;
 
         public bool IsDirty
         {
@@ -78,17 +82,16 @@ namespace Isles.Engine
             set { isDirty = value; }
         }
 
-        protected BoundingBox boundingBox;
-
-        public BoundingBox BoundingBox
+        
+        public virtual BoundingBox BoundingBox
         {
-            get { return boundingBox; }
+            get { return new BoundingBox(position, position); }
         }
 
         /// <summary>
         /// Name of our game entity
         /// </summary>
-        protected string name;
+        string name;
 
         /// <summary>
         /// Gets or sets entity name
@@ -99,7 +102,7 @@ namespace Isles.Engine
             set { name = value; }
         }
 
-        protected string classID;
+        string classID;
 
         /// <summary>
         /// Gets or sets the class ID of this world object
@@ -142,7 +145,6 @@ namespace Isles.Engine
         {
             xml.SetAttribute("Name", name);
             xml.SetAttribute("Position", Helper.Vector3Tostring(position));
-            xml.SetAttribute("Velocity", Helper.Vector3Tostring(velocity));
         }
 
         /// <summary>
@@ -158,10 +160,8 @@ namespace Isles.Engine
                 name = xml.GetAttribute("Name");
 
             if ((value = xml.GetAttribute("Position")) != "")
-                position = Helper.StringToVector3(value);
-
-            if ((value = xml.GetAttribute("Velocity")) != "")
-                velocity = Helper.StringToVector3(value);
+                // Note this should be the upper case Position!!!
+                Position = Helper.StringToVector3(value);
         }
     }
     #endregion
@@ -190,62 +190,66 @@ namespace Isles.Engine
 
         protected string description;
 
+
         /// <summary>
         /// Gets the model of the entity
         /// </summary>
         public GameModel Model
         {
             get { return model; }
+            set { model = value; model.CenterModel(false); IsDirty = true; }
         }
 
-        protected GameModel model;
-        
-        /// <summary>
-        /// Entitis can only rotate on the XY plane :(
-        /// </summary>
-        protected float rotation;
+        GameModel model;
+
 
         /// <summary>
-        /// Size of the entity in object space
-        /// </summary>
-        protected Vector3 size;
-
-        /// <summary>
-        /// Gets or sets Whether this entity has been selected
-        /// </summary>
-        protected bool selected;
-
-        /// <summary>
-        /// Gets or sets whether this entity has been highlighted. E.g. Mouse over
-        /// </summary>
-        protected bool highlighted;
-
-        /// <summary>
-        /// Forces needed to drag this entity
-        /// </summary>
-        protected float dragForce = 100;
-
-        /// <summary>
-        /// A list of spells owned by this entity
-        /// </summary>
-        protected List<Spell> spells = new List<Spell>();
-
-        /// <summary>
-        /// Gets or sets entity rotation
+        /// Gets or sets entity rotation on the XY plane, in radius.
         /// </summary>
         public float Rotation
         {
             get { return rotation; }
-            set { rotation = value; }
+            set { rotation = value; IsDirty = true; }
         }
 
+        float rotation = 0;
+
+
         /// <summary>
-        /// Gets the size of the entity in object space
+        /// Gets or sets entity rotation on the X axis
         /// </summary>
-        public Vector3 Size
+        public float RotationX
         {
-            get { return size; }
+            get { return rotationX; }
+            set { rotationX = value; IsDirty = true; }
         }
+
+        float rotationX = 0;
+
+
+        /// <summary>
+        /// Gets or sets entity rotation on the Y axis
+        /// </summary>
+        public float RotationY
+        {
+            get { return rotationY; }
+            set { rotationY = value; IsDirty = true; }
+        }
+
+        float rotationY = 0;
+
+
+        /// <summary>
+        /// Gets or set entity scale
+        /// </summary>
+        public Vector3 Scale
+        {
+            get { return scale; }
+            set { scale = value; IsDirty = true; }
+        }
+        
+        Vector3 scale = Vector3.One;
+
 
         /// <summary>
         /// Gets or sets Whether this entity has been selected
@@ -256,6 +260,53 @@ namespace Isles.Engine
             set { selected = value; if (selected == value) OnSelectStateChanged(); }
         }
 
+        bool selected;
+
+
+        /// <summary>
+        /// Gets model transform
+        /// </summary>
+        public Matrix Transform
+        {
+            get
+            {
+                if (IsDirty)
+                {
+                    transform = // Build transform from SRT values
+                                // Bug: Something's wrong with Matrix.CreateFromYawPitchRoll
+                        Matrix.CreateScale(scale) *
+                        //Matrix.CreateFromYawPitchRoll(rotationY, rotationX, rotation) *
+                        Matrix.CreateRotationX(rotationX) *
+                        Matrix.CreateRotationY(rotationY) *
+                        Matrix.CreateRotationZ(rotation) *
+                        Matrix.CreateTranslation(Position);
+                }
+
+                return transform;
+            }
+        }
+
+        Matrix transform;
+
+
+        /// <summary>
+        /// Returns the axis aligned bounding box of the game model
+        /// </summary>
+        public override BoundingBox BoundingBox
+        {
+            get { return model != null ? model.BoundingBox : new BoundingBox(); }
+        }
+
+
+        /// <summary>
+        /// Gets the size of the entity
+        /// </summary>
+        public virtual Vector3 Size
+        {
+            get { return model.BoundingBox.Max - model.BoundingBox.Min; }
+        }
+
+
         /// <summary>
         /// Gets or sets whether this entity has been highlighted. E.g. Mouse over
         /// </summary>
@@ -265,6 +316,20 @@ namespace Isles.Engine
             set { highlighted = value; if (highlighted == value) OnHighlightStateChanged(); }
         }
 
+
+        bool highlighted;
+
+
+        /// <summary>
+        /// Forces needed to drag this entity
+        /// </summary>
+        protected float dragForce = 100;
+
+        /// <summary>
+        /// A list of spells owned by this entity
+        /// </summary>
+        protected List<Spell> spells = new List<Spell>();
+        
         #endregion
 
         #region Methods
@@ -280,7 +345,8 @@ namespace Isles.Engine
         public Entity(GameWorld world, GameModel model)
             : base(world)
         {
-            this.model = model;
+            // Note assign to the upper case Model
+            Model = model;
         }
 
         /// <summary>
@@ -295,7 +361,8 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Deserialized attributes: Description, Model, Transform, Scale, Rotation
+        /// Deserialized attributes: Description, Model, Position, Scale,
+        /// Rotation, RotationX, RotationY
         /// </summary>
         /// <param name="xml"></param>
         public override void Deserialize(XmlElement xml)
@@ -308,34 +375,30 @@ namespace Isles.Engine
             if (xml.HasAttribute("Description"))
                 description = xml.GetAttribute("Description");
 
-            // Initialize model
+            // Treat game model as level content
             if ((value = xml.GetAttribute("Model")) != "")
-            {
-                GameModel newModel = // Treat game model as level content
-                    new GameModel(world.LevelContent.Load<Model>(value));
+                Model = new GameModel(world.LevelContent.Load<Model>(value));
+            
+            // Get entity rotation & scale
+            if ((value = xml.GetAttribute("Rotation")) != "")
+                Rotation = MathHelper.ToRadians(float.Parse(value));
 
-                Matrix transform = Matrix.Identity;
+            if ((value = xml.GetAttribute("RotationX")) != "")
+                RotationX = MathHelper.ToRadians(float.Parse(value));
 
-                // Get model transform
-                if ((value = xml.GetAttribute("Transform")) != "")
-                    transform = Helper.StringToMatrix(value);
+            if ((value = xml.GetAttribute("RotationY")) != "")
+                RotationY = MathHelper.ToRadians(float.Parse(value));
 
-                if ((value = xml.GetAttribute("Scale")) != "")
-                    transform *= Matrix.CreateScale(Helper.StringToVector3(value));
+            if ((value = xml.GetAttribute("Scale")) != "")
+                Scale = Helper.StringToVector3(value);
 
-                if (transform != Matrix.Identity)
-                {
-                    newModel.Model.Root.Transform = transform;
-                    newModel.Refresh();
-                }
+            // Fall on the ground
+            //Fall();
 
-                SetModel(newModel);
-            }
+            // FIXME: Place it
+            Place();
 
-            // Get rotation
-            float.TryParse(xml.GetAttribute("Rotation"), out rotation);
-
-            // Get spells
+            // Get entity spells
             XmlNodeList spellNodes = xml.SelectNodes("Spell");
             foreach (XmlNode node in spellNodes)
             {
@@ -347,10 +410,8 @@ namespace Isles.Engine
                     spells.Add(Spell.Create(value, world));
                 }
             }
-
-            // OLD CODE: Place the entity
-            Place(world.Landscape);
         }
+
 
         /// <summary>
         /// Get entity spells
@@ -360,23 +421,6 @@ namespace Isles.Engine
             get { return spells; }
         }
 
-        /// <summary>
-        /// Set the model of the entity
-        /// </summary>
-        public virtual void SetModel(GameModel model)
-        {
-            this.model = model;
-
-            // Center game model by default
-            this.model.CenterModel(false);
-
-            // Compute size based on game model
-            if (model != null)
-            {
-                // FIXME: This is incorrect!!!
-                size = model.BoundingBox.Max - model.BoundingBox.Min;
-            }
-        }
 
         /// <summary>
         /// Transform a point from world space to local space
@@ -391,8 +435,8 @@ namespace Isles.Engine
             v.X = p.X;
             v.Y = p.Y;
 
-            pos.X = position.X;
-            pos.Y = position.Y;
+            pos.X = Position.X;
+            pos.Y = Position.Y;
 
             return new Vector3(
                 Math2D.WorldToLocal(v, pos, rotation), p.Z);
@@ -411,8 +455,8 @@ namespace Isles.Engine
             v.X = p.X;
             v.Y = p.Y;
 
-            pos.X = position.X;
-            pos.Y = position.Y;
+            pos.X = Position.X;
+            pos.Y = Position.Y;
 
             return new Vector3(
                 Math2D.LocalToWorld(v, pos, rotation), p.Z);
@@ -432,7 +476,7 @@ namespace Isles.Engine
             {
                 // Distance to the eye
                 if (Vector3.Subtract(
-                    position, BaseGame.Singleton.Eye).LengthSquared() <
+                    Position, BaseGame.Singleton.Eye).LengthSquared() <
                     BaseGame.Singleton.Settings.ViewDistanceSquared)
                 {
                     return true;
@@ -452,21 +496,58 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Place the game entity somewhere on the ground using
-        /// existing entity position and rotation
+        /// Avoid invoking Fall & OnPositionChanged recurisively
         /// </summary>
-        public bool Place(Landscape landscape)
+        bool falling;
+
+        /// <summary>
+        /// Change the entity z value to make it laying on the ground
+        /// </summary>
+        public virtual void Fall()
         {
-            return Place(landscape, position, rotation);
+            falling = true;
+            Position = new Vector3(Position.X, Position.Y,
+                world.Landscape.GetHeight(Position.X, Position.Y));
         }
         
         /// <summary>
-        /// Place the game entity somewhere on the ground
+        /// Make the entity alway on the ground
+        /// </summary>
+        protected override void OnPositionChanged()
+        {
+            if (!falling)
+            {
+                Fall();
+                falling = false;
+            }
+        }
+
+        public bool Place()
+        {
+            return Place(world.Landscape);
+        }
+
+        public bool Place(Landscape landscape)
+        {
+            return Place(landscape, Position, rotation);
+        }
+        
+        /// <summary>
+        /// Place the game entity somewhere on the ground.
+        /// Entities can not be drag and dropped until they are placed on the ground.
         /// </summary>
         /// <returns>Success or not</returns>
         public virtual bool Place(Landscape landscape, Vector3 newPosition, float newRotation)
         {
-            return false;
+            // Store new Position/Rotation
+            Position = newPosition;
+            Rotation = newRotation;
+            
+            // Change grid owner
+            foreach (Point grid in landscape.EnumerateGrid(Position, Size))
+                landscape.Data[grid.X, grid.Y].Owners.Add(this);
+            
+            return true;
         }
 
         /// <summary>
@@ -498,6 +579,23 @@ namespace Isles.Engine
             return region;
         }
 
+        public override void Update(GameTime gameTime)
+        {
+            if (model != null)
+                model.Update(gameTime);
+        }
+
+        public override void Draw(GameTime gameTime)
+        {
+            if (model != null && VisibilityTest(BaseGame.Singleton.ViewProjection))
+            {
+                if (IsDirty)
+                    model.Transform = Transform;
+
+                model.Draw(gameTime);
+            }
+        }
+
         /// <summary>
         /// Tests whether the object occupies the specified point.
         /// </summary>
@@ -505,15 +603,8 @@ namespace Isles.Engine
         /// <returns></returns>
         public virtual bool Intersects(Vector3 point)
         {
-            if (null == model)
-                return false;
-
-            // Transform point to object space
-            Matrix worldInverse = Matrix.Invert(model.Transform);
-            Vector3 newPosition = Vector3.Transform(point, worldInverse);
-
-            // Performs a bounding box test
-            return model.BoundingBox.Contains(newPosition) == ContainmentType.Contains;
+            // Performs an axis aligned bounding box intersection test
+            return BoundingBox.Contains(point) == ContainmentType.Contains;
         }
 
         /// <summary>
@@ -523,17 +614,8 @@ namespace Isles.Engine
         /// <returns></returns>
         public virtual float? Intersects(Ray ray)
         {
-            if (null == model)
-                return null;
-
-            // Transform ray to object space
-            Matrix worldInverse = Matrix.Invert(model.Transform);
-            Vector3 newPosition = Vector3.Transform(ray.Position, worldInverse);
-            Vector3 newTarget = Vector3.Transform(ray.Position + ray.Direction, worldInverse);
-            Ray newRay = new Ray(newPosition, newTarget - newPosition);
-
-            // Perform a bounding box intersection...
-            return newRay.Intersects(model.BoundingBox);
+            // Performs an axis aligned bounding box intersection test
+            return ray.Intersects(model.BoundingBox);
         }
         
         #region Drag & Drop
@@ -568,7 +650,7 @@ namespace Isles.Engine
         /// </summary>
         public virtual void Follow(Hand hand)
         {
-            position = hand.Position;
+            Position = hand.Position;
         }
 
         protected Point mouseBeginDropPosition;
@@ -593,7 +675,7 @@ namespace Isles.Engine
         public virtual bool BeginDrop(Hand hand, Entity entity, bool leftButton)
         {
             // Otherwise, place it on the ground
-            mouseBeginDropRotation = rotation;
+            mouseBeginDropRotation = Rotation;
             mouseBeginDropPosition = Input.MousePosition;
             mouseBeginDropPosition.Y -= 10;
             return true; 
@@ -604,7 +686,7 @@ namespace Isles.Engine
         /// </summary>
         public virtual void Dropping(Hand hand, Entity entity, bool leftButton)
         {
-            rotation = mouseBeginDropRotation + MathHelper.PiOver2 + (float)Math.Atan2(
+            Rotation = mouseBeginDropRotation + MathHelper.PiOver2 + (float)Math.Atan2(
                 -(double)(Input.MousePosition.Y - mouseBeginDropPosition.Y),
                  (double)(Input.MousePosition.X - mouseBeginDropPosition.X));
         }
@@ -620,7 +702,12 @@ namespace Isles.Engine
         /// </returns>
         public virtual bool EndDrop(Hand hand, Entity entity, bool leftButton)
         {
-            return false;
+            if (!Place(world.Landscape))
+            {
+                world.Destroy(this);
+            }
+
+            return true;
         }
         #endregion
         #endregion
@@ -634,35 +721,176 @@ namespace Isles.Engine
     /// </summary>
     public class BaseAgent : Entity
     {
-        #region Entity
+        #region Field
+
+        /// <summary>
+        /// Agent state machine
+        /// </summary>
+        public StateMachine<BaseAgent> StateMachine
+        {
+            get { return stateMachine; }
+        }
+
+        protected StateMachine<BaseAgent> stateMachine;
+
+        /// <summary>
+        /// Common animation names
+        /// </summary>
+        protected string clipWalk, clipRun;
+
+        /// <summary>
+        /// Gets or sets max health of the agent
+        /// </summary>
+        public virtual float MaxHealth
+        {
+            get { return maxHealth; }
+
+            set
+            {
+                maxHealth = (value > 0 ? value : 0);
+                if (health > 0)
+                    health = maxHealth;
+            }
+        }
+
+        float maxHealth = 100;
+
+        /// <summary>
+        /// Gets or sets the health of the building
+        /// </summary>
+        public virtual float Health
+        {
+            get { return health; }
+
+            set
+            {
+                if (value < 0)
+                    health = 0;
+                else if (value > maxHealth)
+                    health = maxHealth;
+                else
+                    health = value;
+            }
+        }
+
+        float health = 100;
+
+        #endregion
+
+        #region Methods
+        
+        public BaseAgent(GameWorld world)
+            : base(world)
+        {
+            stateMachine = new StateMachine<BaseAgent>(this);
+        }
+
+        /// <summary>
+        /// Deserialized attributes: Health, MaxHealth, ClipWalk, ClipRun
+        /// </summary>
+        /// <param name="xml"></param>
+        public override void Deserialize(XmlElement xml)
+        {
+            if (xml.HasAttribute("ClipWalk"))
+                clipWalk = xml.GetAttribute("ClipWalk");
+
+            if (xml.HasAttribute("ClipRun"))
+                clipRun = xml.GetAttribute("ClipRun");
+
+            float.TryParse(xml.GetAttribute("Health"), out health);
+            float.TryParse(xml.GetAttribute("MaxHealth"), out maxHealth);
+
+            if (health > maxHealth)
+            {
+                if (maxHealth >= 0)
+                    health = maxHealth;
+                else
+                    maxHealth = health;
+            }
+
+            base.Deserialize(xml);
+        }
+
+        /// <summary>
+        /// Called when the agent is dragged by the hand
+        /// </summary>
         public override bool BeginDrag(Hand hand)
         {
             // Agents can't be dragged
             return false;
         }
 
+        /// <summary>
+        /// Called when the agent is dropped by the hand
+        /// </summary>
         public override bool BeginDrop(Hand hand, Entity entity, bool leftButton)
         {
             // Agents can't be dropped
             return false;
         }
+        
+        /// <summary>
+        /// Move the agent to the specific location
+        /// </summary>
+        public bool MoveTo(Vector3 location)
+        {
 
+            return true;
+        }
+
+        /// <summary>
+        /// Move the agent towards the specific entity
+        /// </summary>
+        public bool MoveTo(Entity target)
+        {
+
+            return true;
+        }
+
+        /// <summary>
+        /// Attack the specific entity
+        /// </summary>
+        public bool Attack(Entity target)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Move and attack the agent the specific location
+        /// </summary>
+        public bool AttackTo(Vector3 location)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Update the agent. If the agent is selected, handle mouse events.
+        /// </summary>
         public override void Update(GameTime gameTime)
         {
-            throw new Exception("The method or operation is not implemented.");
-        }
+            // Move the agent
+            if (Selected && Input.MouseRightButtonJustPressed)
+            {
+                Input.SuppressMouseEvent();
 
-        public override void Draw(GameTime gameTime)
-        {
-            throw new Exception("The method or operation is not implemented.");
+                Entity picked = world.Pick();
+
+                if (picked != null)
+                {
+                    MoveTo(picked);
+                }
+                else
+                {
+                    Vector3? location = world.Landscape.Pick();
+
+                    if (location.HasValue)
+                        MoveTo(location.Value);
+                }
+            }
+
+            base.Update(gameTime);
         }
         #endregion
-
-        public BaseAgent(GameWorld world)
-            : base(world)
-        {
-
-        }
     }
     #endregion
 }
