@@ -1,3 +1,9 @@
+//-----------------------------------------------------------------------------
+//  Isles v1.0
+//  
+//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
+//-----------------------------------------------------------------------------
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -43,24 +49,24 @@ namespace Isles
         public Crop(GameWorld world, Vector3 size)
             : base(world)
         {
-            this.size = size;
+            // FIXME : Size...
 
             texture = world.LevelContent.Load<Texture2D>("Textures/Vegetation/Crop2");
 
             Random random = new Random();
 
             billboards = new Billboard[
-                (int)(size.X * CropDensity), (int)(size.Y * CropDensity)];
+                (int)(Size.X * CropDensity), (int)(Size.Y * CropDensity)];
 
             int xCount = billboards.GetLength(0);
             int yCount = billboards.GetLength(1);
 
-            Vector3 fieldSize = CropDensity * size;
+            Vector3 fieldSize = CropDensity * Size;
 
             fieldSize.X *= (xCount - 1);
             fieldSize.Y *= (yCount - 1);
 
-            Vector3 basePosition = -size/2 + (size - fieldSize) / 2;
+            Vector3 basePosition = -Size/2 + (Size - fieldSize) / 2;
 
             for (int y = 0; y < yCount; y++)
                 for (int x = 0; x < xCount; x++)
@@ -77,14 +83,14 @@ namespace Isles
                     billboards[x, y].Size.X = BillboardSize * (float)(1 + random.NextDouble() * RandomFactor);
                     billboards[x, y].Size.Y = BillboardSize * (float)(1 + random.NextDouble() * RandomFactor);
 
-                    billboards[x, y].Position.X = size.X * x * CropDensity + basePosition.X;
-                    billboards[x, y].Position.Y = size.Y * y * CropDensity + basePosition.Y;
+                    billboards[x, y].Position.X = Size.X * x * CropDensity + basePosition.X;
+                    billboards[x, y].Position.Y = Size.Y * y * CropDensity + basePosition.Y;
 
                     billboards[x, y].Position.X += (float)(-0.5f + random.NextDouble()) *
-                        RandomFactor * CropDensity * size.X;
+                        RandomFactor * CropDensity * Size.X;
 
                     billboards[x, y].Position.Y += (float)(-0.5f + random.NextDouble()) *
-                        RandomFactor * CropDensity * size.Y;
+                        RandomFactor * CropDensity * Size.Y;
 
                     // Get height
                     billboards[x, y].Position.Z = 0;
@@ -102,8 +108,8 @@ namespace Isles
         /// <remarks>Crop can only be placed once</remarks>
         public override bool Place(Landscape landscape, Vector3 newPosition, float newRotation)
         {
-            position = newPosition;
-            rotation = newRotation;
+            Position = newPosition;
+            Rotation = newRotation;
 
             // Change the crop position
             for (int y = 0; y < billboards.GetLength(1); y++)
