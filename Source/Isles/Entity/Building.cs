@@ -305,58 +305,42 @@ namespace Isles
         /// Place the game entity somewhere on the ground and complete it immediately
         /// </summary>
         /// <returns>Success or not</returns>
-        public bool PlaceAndCompleteBuild(Landscape landscape, Vector3 newPosition, float newRotation)
-        {
-            if (!Place(landscape, newPosition, newRotation))
-                return false;
+        //public bool PlaceAndCompleteBuild(Landscape landscape, Vector3 newPosition, float newRotation)
+        //{
+        //    if (!Place(landscape, newPosition, newRotation))
+        //        return false;
 
-            CompleteBuild();
-            return true;
-        }
+        //    CompleteBuild();
+        //    return true;
+        //}
 
         /// <summary>
         /// Place the game entity somewhere on the ground
         /// </summary>
         /// <returns>Success or not</returns>
-        public override bool Place(Landscape landscape, Vector3 newPosition, float newRotation)
-        {
-            // Store new Position/Rotation
-            Position = newPosition;
-            Rotation = newRotation;
+        //public override bool Place(Landscape landscape, Vector3 newPosition, float newRotation)
+        //{
+        //    // Store new Position/Rotation
+        //    Position = newPosition;
+        //    Rotation = newRotation;
 
-            if (!IsValidLocation(landscape))
-                return false;
+        //    if (!IsValidLocation(landscape))
+        //        return false;
 
-            // Fall on the ground
-            Position = new Vector3(
-                Position.X, Position.Y, landscape.GetHeight(Position.X, Position.Y));
+        //    // Fall on the ground
+        //    Position = new Vector3(
+        //        Position.X, Position.Y, landscape.GetHeight(Position.X, Position.Y));
 
-            // Change grid owner
-            foreach (Point grid in landscape.EnumerateGrid(Position, Size))
-                landscape.Data[grid.X, grid.Y].Owners.Add(this);
+        //    // Change grid owner
+        //    foreach (Point grid in landscape.EnumerateGrid(Position, Size))
+        //        landscape.Data[grid.X, grid.Y].Owners.Add(this);
 
-            // Set state to constructing
-            state = BuildingState.Constructing;
-            startTime = BaseGame.Singleton.CurrentGameTime.TotalGameTime.TotalSeconds;
+        //    // Set state to constructing
+        //    state = BuildingState.Constructing;
+        //    startTime = BaseGame.Singleton.CurrentGameTime.TotalGameTime.TotalSeconds;
 
-            return true;
-        }
-
-        /// <summary>
-        /// Remove the game entity from the landscape
-        /// </summary>
-        /// <returns>Success or not</returns>
-        public override bool Pickup(Landscape landscape)
-        {
-            // Change grid owner
-            foreach (Point grid in landscape.EnumerateGrid(Position, Size))
-            {
-                System.Diagnostics.Debug.Assert(landscape.Data[grid.X, grid.Y].Owners.Contains(this));
-
-                landscape.Data[grid.X, grid.Y].Owners.Remove(this);
-            }
-            return true;
-        }
+        //    return true;
+        //}
         #endregion
 
         #region Drag & Drop

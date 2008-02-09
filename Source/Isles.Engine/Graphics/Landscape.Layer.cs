@@ -165,8 +165,8 @@ namespace Isles.Graphics
                 for (int x = pMin.X; x <= pMax.X; x++)
                 {
                     v = GridToPosition(x, y);
-                    if (x >= 0 && x < gridColumnCount &&
-                        y >= 0 && y < gridRowCount && heightField[x, y] > 0)
+                    if (x >= 0 && x < gridCountOnXAxis &&
+                        y >= 0 && y < gridCountOnYAxis && heightField[x, y] > 0)
                         z = heightField[x, y] + 0.5f; // Offset a little bit :)
                     else
                         z = 0;

@@ -24,11 +24,6 @@ namespace Isles.Engine
     /// </summary>
     public interface IState<T>
     {
-        /// <returns>
-        /// Gets Whether the state has finished (or goal finished). 
-        /// </returns>
-        bool Finished { get; }
-
         /// <summary>
         /// Called when this state is been activated
         /// </summary>
@@ -42,7 +37,10 @@ namespace Isles.Engine
         /// <summary>
         /// Perform any updates for this state
         /// </summary>
-        void Update(T owner, GameTime gameTime);
+        /// <returns>
+        /// True indicates keeping the state alive
+        /// </returns>
+        bool Update(T owner, GameTime gameTime);
 
         /// <summary>
         /// Perform any drawings for thsi state
@@ -137,6 +135,29 @@ namespace Isles.Engine
             if (previousState != null)
                 ChangeState(previousState);
         }
+
+        /// <summary>
+        /// Update the state machine
+        /// </summary>
+        public void Update(GameTime gameTime)
+        {
+            if (currentState != null)
+            {
+                if (!currentState.Update(stateMachineOwner, gameTime))
+                {
+                    ChangeState(null);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Perform any drawing functions
+        /// </summary>
+        public void Draw(GameTime gameTime)
+        {
+            if (currentState != null)
+                currentState.Draw(stateMachineOwner, gameTime);
+        }
     }
 
     #endregion
@@ -149,13 +170,7 @@ namespace Isles.Engine
     /// </summary>
     public class StateComposite<T> : IState<T>
     {
-        protected bool finished = false;
         protected List<IState<T>> states = new List<IState<T>>();
-
-        public bool Finished
-        {
-            get { return finished; }
-        }
 
         /// <remarks>
         /// Should be called before attaching this state to a state machine
@@ -177,18 +192,17 @@ namespace Isles.Engine
                 state.Exit(owner);
         }
 
-        public void Update(T owner, GameTime gameTime)
+        public bool Update(T owner, GameTime gameTime)
         {
-            finished = true;
+            bool alive = false;
 
             foreach (IState<T> state in states)
             {
-                if (!state.Finished)
-                {
-                    state.Update(owner, gameTime);
-                    finished = false;
-                }
+                if (state.Update(owner, gameTime))
+                    alive = true;
             }
+
+            return alive;
         }
 
         public void Draw(T owner, GameTime gameTime)
@@ -205,13 +219,7 @@ namespace Isles.Engine
     /// </summary>
     public class StateSequential<T> : IState<T>
     {
-        protected bool finished = false;
         protected Queue<IState<T>> states = new Queue<IState<T>>();
-
-        public bool Finished
-        {
-            get { return finished; }
-        }
 
         /// <remarks>
         /// Should be called before attaching this state to a state machine
@@ -228,36 +236,107 @@ namespace Isles.Engine
 
         public void Enter(T owner)
         {
-            states.Peek().Enter(owner);
+            if (states.Count > 0)
+                states.Peek().Enter(owner);
         }
 
         public void Exit(T owner)
         {
-            states.Peek().Exit(owner);
+            if (states.Count > 0)
+                states.Peek().Exit(owner);
         }
 
-        public void Update(T owner, GameTime gameTime)
+        public bool Update(T owner, GameTime gameTime)
         {
-            states.Peek().Update(owner, gameTime);
+            if (states.Count <= 0)
+                return false;
 
-            if (states.Peek().Finished)
+            // If the current state is dead
+            if (!states.Peek().Update(owner, gameTime))
             {
+                states.Dequeue().Exit(owner);
+
                 // Switch to next state
                 if (states.Count > 0)
-                {
-                    states.Dequeue().Exit(owner);
                     states.Peek().Enter(owner);
-                }
                 else
-                {
-                    finished = true;
-                }
+                    return false;
             }
+
+            return true;
         }
 
         public void Draw(T owner, GameTime gameTime)
         {
-            states.Peek().Draw(owner, gameTime);
+            if (states.Count > 0)
+                states.Peek().Draw(owner, gameTime);
+        }
+    }
+
+    #endregion
+
+    #region AgentStates
+
+    /// <summary>
+    /// The agent is in a moving state
+    /// </summary>
+    public class StateMove : IState<BaseAgent>
+    {
+        GameWorld world;
+        Vector3 destination;
+
+        public StateMove(GameWorld world, Vector3 destination)
+        {
+            this.world = world;
+            this.destination = destination;
+                        
+            destination.Z = // Fall the destination on the ground
+                world.Landscape.GetHeight(destination.X, destination.Y);
+        }
+
+        public void Enter(BaseAgent owner)
+        {
+            // Change agent animation
+            owner.PlayAnimation("Walk");
+        }
+
+        public void Exit(BaseAgent owner)
+        {
+
+        }
+
+        public bool Update(BaseAgent owner, GameTime gameTime)
+        {
+            // This is a really simple one
+            if (Vector3.Subtract(owner.Position, destination).LengthSquared() < 1)
+                // Finished moving
+                return false;
+
+            // This is a really simple collision detection
+            foreach (IWorldObject o in world.GetNearbyObjects(owner.BoundingBox))
+            {
+                Entity e =  o as Entity;
+
+                // Make sure we are not testing with ourself
+                if (e != owner && e != null &&
+                    Outline.Intersects(e.Outline, owner.Outline) != ContainmentType.Disjoint)
+                {
+                    // A collision occured, destroy this agent
+                    world.Destroy(owner);
+                }
+            }
+
+            // Moves the agent towards the target.
+            // Note that when set the position of an entity, its Z value is
+            // automatically adjusted to fit the height of the landscape.
+            owner.Position += Vector3.Normalize(destination - owner.Position);
+
+            return true;
+        }
+
+        public void Draw(BaseAgent owner, GameTime gameTime)
+        {
+
         }
     }
 

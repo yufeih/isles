@@ -122,7 +122,21 @@ namespace Isles.Engine
         /// manager will be able to adjust its internal data structure
         /// to adopt to the change of transformation.
         /// </remarks>
-        bool IsDirty { get; set; }
+        /// <value>
+        /// null if the bounding box is not dirty. Otherwise, return
+        /// the old bounding box.
+        /// </value>
+        BoundingBox? DirtyBoundingBox { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether this world object is active
+        /// </summary>
+        /// <remarks>
+        /// This property is internally used by ISceneManager.
+        /// If you want to active or deactive a world object, call
+        /// ISceneManager.Active or ISceneManager.Deactive instead.
+        /// </remarks>
+        bool IsActive { get; set; }
 
         /// <summary>
         /// Every world object belongs to a class represented by a string.
@@ -166,7 +180,9 @@ namespace Isles.Engine
         /// <summary>
         /// Adds a new world object
         /// </summary>
-        /// <param name="worldObject"></param>
+        /// <param name="needInteraction">
+        /// If false, functions like point scene intersects may ignore this object
+        /// </param>
         void Add(IWorldObject worldObject);
 
         /// <summary>
@@ -179,6 +195,19 @@ namespace Isles.Engine
         /// Clear all world objects
         /// </summary>
         void Clear();
+
+        /// <summary>
+        /// Activate a world object
+        /// </summary>
+        /// <remarks>
+        /// Thoses intersection functions below only deals with active objects
+        /// </remarks>
+        void Activate(IWorldObject worldObject);
+
+        /// <summary>
+        /// Deactivate a world object
+        /// </summary>
+        void Deactivate(IWorldObject worldObject);
 
         /// <summary>
         /// Test to see if a point intersects a world object
@@ -219,6 +248,11 @@ namespace Isles.Engine
         /// Gets all world objects that are near the point (Not always intersects).
         /// </summary>
         IEnumerable<IWorldObject> GetNearbyObjects(Vector3 position);
+
+        /// <summary>
+        /// Gets all world objects that are near a bounding box volume
+        /// </summary>
+        IEnumerable<IWorldObject> GetNearbyObjects(BoundingBox volume);
 
         /// <summary>
         /// Gets a world object from its name

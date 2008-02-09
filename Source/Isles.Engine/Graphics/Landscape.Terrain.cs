@@ -197,6 +197,11 @@ namespace Isles.Graphics
                 pass.End();
             }
             terrainEffect.End();
+
+            graphics.RenderState.DepthBufferEnable = true;
+            graphics.RenderState.DepthBufferWriteEnable = true;
+            graphics.RenderState.CullMode = CullMode.None;
+            graphics.RenderState.AlphaBlendEnable = false;
         }
 
         void ReadTerrainContent(ContentReader input)
@@ -207,11 +212,11 @@ namespace Isles.Graphics
             terrainBoundingBox = new BoundingBox(Vector3.Zero, size);
 
             // Heightfield
-            gridColumnCount = input.ReadInt32();
-            gridRowCount = input.ReadInt32();
-            heightField = new float[gridColumnCount, gridRowCount];
-            for (int y = 0; y < gridRowCount; y++)
-                for (int x = 0; x < gridColumnCount; x++)
+            gridCountOnXAxis = input.ReadInt32();
+            gridCountOnYAxis = input.ReadInt32();
+            heightField = new float[gridCountOnXAxis, gridCountOnYAxis];
+            for (int y = 0; y < gridCountOnYAxis; y++)
+                for (int x = 0; x < gridCountOnXAxis; x++)
                 {
                     // Remember how we write heighfield data
                     heightField[x, y] = input.ReadSingle();
@@ -222,15 +227,15 @@ namespace Isles.Graphics
                 }
 
             // Normals
-            normalField = new Vector3[gridColumnCount, gridRowCount];
-            for (int y = 0; y < gridRowCount; y++)
-                for (int x = 0; x < gridColumnCount; x++)
+            normalField = new Vector3[gridCountOnXAxis, gridCountOnYAxis];
+            for (int y = 0; y < gridCountOnYAxis; y++)
+                for (int x = 0; x < gridCountOnXAxis; x++)
                     normalField[x, y] = input.ReadVector3();
 
             // Tangents
-            Vector3[,] tangentData = new Vector3[gridColumnCount, gridRowCount];
-            for (int y = 0; y < gridRowCount; y++)
-                for (int x = 0; x < gridColumnCount; x++)
+            Vector3[,] tangentData = new Vector3[gridCountOnXAxis, gridCountOnYAxis];
+            for (int y = 0; y < gridCountOnYAxis; y++)
+                for (int x = 0; x < gridCountOnXAxis; x++)
                     tangentData[x, y] = input.ReadVector3();
 
             // Patches
@@ -259,17 +264,17 @@ namespace Isles.Graphics
 
             // Initialize terrain vertices
             terrainVertices =
-                new TerrainVertex[gridColumnCount, gridRowCount];
+                new TerrainVertex[gridCountOnXAxis, gridCountOnYAxis];
 
-            for (int x = 0; x < gridColumnCount; x++)
-                for (int y = 0; y < gridRowCount; y++)
+            for (int x = 0; x < gridCountOnXAxis; x++)
+                for (int y = 0; y < gridCountOnYAxis; y++)
                 {
                     terrainVertices[x, y] = new TerrainVertex(
                         // Position
-                        new Vector3(x * size.X / (gridColumnCount - 1),
-                                    y * size.Y / (gridRowCount - 1), GetGridHeight(x, y)),
+                        new Vector3(x * size.X / (gridCountOnXAxis - 1),
+                                    y * size.Y / (gridCountOnYAxis - 1), GetGridHeight(x, y)),
                         // Texture coordinate
-                        new Vector2(x * 16.0f / (gridColumnCount - 1), y * 16.0f / (gridRowCount - 1)),
+                        new Vector2(x * 16.0f / (gridCountOnXAxis - 1), y * 16.0f / (gridCountOnYAxis - 1)),
                         // Normal
                         normalField[x, y],
                         // Tangent

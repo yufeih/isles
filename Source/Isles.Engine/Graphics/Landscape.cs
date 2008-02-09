@@ -160,15 +160,15 @@ namespace Isles.Graphics
         public Vector2 GridToPosition(int x, int y)
         {
             return new Vector2(
-                x * size.X / (gridColumnCount - 1),
-                y * size.Y / (gridRowCount - 1) );
+                x * size.X / (gridCountOnXAxis - 1),
+                y * size.Y / (gridCountOnYAxis - 1) );
         }
 
         public Point PositionToGrid(float x, float y)
         {
             return new Point(
-                (int)(x * (gridColumnCount - 1) / size.X),
-                (int)(y * (gridRowCount - 1) / size.Y) );
+                (int)(x * (gridCountOnXAxis - 1) / size.X),
+                (int)(y * (gridCountOnYAxis - 1) / size.Y) );
         }
 
         /// <summary>
@@ -203,8 +203,8 @@ namespace Isles.Graphics
                 y = size.Y - 1;
 
             // Rescale to our heightfield dimensions
-            x *= (gridColumnCount - 1) / size.X;
-            y *= (gridRowCount - 1) / size.Y;
+            x *= (gridCountOnXAxis - 1) / size.X;
+            y *= (gridCountOnYAxis - 1) / size.Y;
 
             // Get the position ON the current tile (0.0-1.0)!!!
             float
@@ -450,13 +450,13 @@ namespace Isles.Graphics
             {
                 Vector2 v = Vector2.Normalize(new Vector2(ray.Direction.X, ray.Direction.Z));
                 v /= v.X;
-                dz = v.Y * size.X / (gridColumnCount - 1) / v.X;
+                dz = v.Y * size.X / (gridCountOnXAxis - 1) / v.X;
             }
             else
             {
                 Vector2 v = Vector2.Normalize(new Vector2(ray.Direction.Y, ray.Direction.Z));
                 v /= v.X;
-                dz = v.Y * size.Y / (gridRowCount - 1) / v.X;
+                dz = v.Y * size.Y / (gridCountOnYAxis - 1) / v.X;
             }
             
             // Start drawing pixels
@@ -464,8 +464,8 @@ namespace Isles.Graphics
             {
                 // Don't test bounding vertices to ease the generation
                 // of precise intersection point :)
-                if (x > 0 && x < gridColumnCount - 1 &&
-                    y > 0 && y < gridRowCount - 1)
+                if (x > 0 && x < gridCountOnXAxis - 1 &&
+                    y > 0 && y < gridCountOnYAxis - 1)
                 {
                     track.Add(new VertexPositionColor(new Vector3(
                         GridToPosition(x, y), heightField[x, y]), Color.White));
@@ -819,12 +819,36 @@ namespace Isles.Graphics
             DrawTerrain(Matrix.Identity, null);
 
             // FIXME but this grass is soo ugly...
-            //DrawVegetation(gameTime);
-            
-            graphics.RenderState.DepthBufferEnable = true;
-            graphics.RenderState.DepthBufferWriteEnable = true;
-            graphics.RenderState.CullMode = CullMode.None;
-            graphics.RenderState.AlphaBlendEnable = false;
+            DrawVegetation(gameTime);
+            DrawGridStates();
+        }
+
+        private void DrawGridStates()
+        {
+            float offset = 0;
+            for (int y = 0; y < gridCountOnYAxis; y++)
+                for (int x = 0; x < gridCountOnXAxis; x++)
+                {
+                    if (Data[x, y].Owners != null &&
+                        Data[x, y].Owners.Count >= 0)
+                    {
+
+                        foreach (Entity e in Data[x, y].Owners)
+                        {
+                            //Vector2 v = GridToPosition(x, y);
+                            //Vector3 pos = graphics.Viewport.Project(
+                            //    new Vector3(v.X, v.Y, GetHeight(x, y)),
+                            //    game.Projection, game.View, Matrix.Identity);
+
+                            //pos.Y += (offset += 10);
+
+                            Text.DrawString(
+                                e.Name, 14,
+                                new Vector2(0, 20 + (offset += 10)),
+                                Color.White);
+                        }
+                    }
+                }
         }
 
         public void Draw(GameTime gameTime, Matrix lightViewProjection, Texture shadowMap)

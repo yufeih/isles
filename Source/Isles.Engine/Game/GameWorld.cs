@@ -49,17 +49,6 @@ namespace Isles.Engine
 
 
         /// <summary>
-        /// Enumerates all game entities
-        /// </summary>
-        public IEnumerable<Entity> Entities
-        {
-            get { return entities; }
-        }
-
-        protected InternalList<Entity> entities = new InternalList<Entity>();
-
-
-        /// <summary>
         /// Gets all selected entities
         /// </summary>
         public List<Entity> Selected
@@ -184,7 +173,6 @@ namespace Isles.Engine
 
             // Update internal lists
             worldObjects.Update();
-            entities.Update();
 
             // Update landscape
             landscape.Update(gameTime);
@@ -193,12 +181,12 @@ namespace Isles.Engine
             foreach (IWorldObject o in worldObjects)
                 o.Update(gameTime);
 
-            foreach (Entity o in entities)
-                o.Update(gameTime);
-
             // Update level
             if (level != null)
                 level.Update(gameTime);
+
+            // Update scene manager internal structure
+            UpdateSceneManager();
         }
 
         /// <summary>
@@ -211,9 +199,6 @@ namespace Isles.Engine
             landscape.Draw(gameTime);
 
             foreach (IWorldObject o in worldObjects)
-                o.Draw(gameTime);
-
-            foreach (Entity o in entities)
                 o.Draw(gameTime);
 
             DrawSelection(gameTime);
@@ -653,7 +638,6 @@ namespace Isles.Engine
         /// <summary>
         /// Adds a new world object
         /// </summary>
-        /// <param name="worldObject"></param>
         public void Add(IWorldObject worldObject)
         {
             worldObjects.Add(worldObject);
@@ -665,6 +649,23 @@ namespace Isles.Engine
         /// <param name="worldObject"></param>
         public void Destroy(IWorldObject worldObject)
         {
+            // Deactivate the object
+            if (worldObject.IsActive)
+                Deactivate(worldObject);
+
+            // Remove it from selected and highlighed
+            Entity e = worldObject as Entity;
+
+            if (e != null)
+            {
+                if (selected.Contains(e))
+                    selected.Remove(e);
+
+                if (highlighted.Contains(e))
+                    highlighted.Remove(e);
+            }
+
+            // Finally, remove it from object list
             worldObjects.Remove(worldObject);
         }
 
@@ -672,7 +673,77 @@ namespace Isles.Engine
         {
             worldObjects.Clear();
         }
+
+        /// <summary>
+        /// Activate a world object
+        /// </summary>
+        public void Activate(IWorldObject worldObject)
+        {
+            if (worldObject == null)
+                throw new ArgumentNullException();
+
+            if (worldObject.IsActive)
+                throw new InvalidOperationException();
+
+            worldObject.IsActive = true;
+
+            foreach (Point grid in landscape.EnumerateGrid(worldObject.BoundingBox))
+            {
+                System.Diagnostics.Debug.Assert(
+                    !landscape.Data[grid.X, grid.Y].Owners.Contains(worldObject));
+
+                landscape.Data[grid.X, grid.Y].Owners.Add(worldObject);
+            }
+        }
+
+        /// <summary>
+        /// Deactivate a world object
+        /// </summary>
+        public void Deactivate(IWorldObject worldObject)
+        {
+            if (worldObject == null)
+                throw new ArgumentNullException();
+
+            if (!worldObject.IsActive)
+                throw new InvalidOperationException();
+
+            worldObject.IsActive = false;
+
+            foreach (Point grid in landscape.EnumerateGrid(worldObject.BoundingBox))
+            {
+                System.Diagnostics.Debug.Assert(
+                    landscape.Data[grid.X, grid.Y].Owners.Contains(worldObject));
+
+                landscape.Data[grid.X, grid.Y].Owners.Remove(worldObject);
+            }
+        }
         
+        void UpdateSceneManager()
+        {
+            // For all active objects, change the grids it owns if its
+            // bounding box is dirty, making it up to date.
+            foreach (IWorldObject o in worldObjects)
+            {
+                if (o.IsActive && o.DirtyBoundingBox.HasValue)
+                {
+                    // Remove old grids
+                    foreach (Point grid in
+                        landscape.EnumerateGrid(o.DirtyBoundingBox.Value))
+
+                        landscape.Data[grid.X, grid.Y].Owners.Remove(o);
+
+                    // Add to new grids
+                    foreach (Point grid in
+                        landscape.EnumerateGrid(o.BoundingBox))
+
+                        landscape.Data[grid.X, grid.Y].Owners.Add(o);
+
+                    // Make the dirty bounding box clean
+                    o.DirtyBoundingBox = null;
+                }
+            }
+        }
+
         /// <summary>
         /// Test to see if a point intersects a world object
         /// </summary>
@@ -716,7 +787,23 @@ namespace Isles.Engine
 
         public IEnumerable<IWorldObject> GetNearbyObjects(Vector3 position)
         {
-            throw new Exception("The method or operation is not implemented.");
+            Point grid = landscape.PositionToGrid(position.X, position.Y);
+
+            return landscape.Data[grid.X, grid.Y].Owners;
+        }
+
+        public IEnumerable<IWorldObject> GetNearbyObjects(BoundingBox volume)
+        {
+            List<IWorldObject> set = new List<IWorldObject>(4);
+
+            foreach (Point grid in landscape.EnumerateGrid(volume))
+            {
+                foreach (IWorldObject o in landscape.Data[grid.X, grid.Y].Owners)
+                    if (!set.Contains(o))
+                        set.Add(o);
+            }
+
+            return set;
         }
 
         public IWorldObject ObjectFromName(string name)

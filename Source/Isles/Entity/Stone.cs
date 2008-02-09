@@ -120,51 +120,6 @@ namespace Isles
         }
 
         /// <summary>
-        /// Place the stone at a new location
-        /// </summary>
-        /// <returns>Success or not</returns>
-        public override bool Place(Landscape landscape, Vector3 newPosition, float newRotation)
-        {
-            Position = newPosition;
-            Rotation = newRotation;
-
-            // Fall on the ground
-            Position = new Vector3(
-                Position.X, Position.Y, landscape.GetHeight(Position.X, Position.Y));
-
-            // A stone only covers one grid :)
-            // FIXME: One grid is not large enough for picking...
-            //        Find a way to deal with it!!!
-            Point grid = landscape.PositionToGrid(Position.X, Position.Y);
-
-            if (!landscape.IsValidGrid(grid))
-                return false;
-
-            if (landscape.Data[grid.X, grid.Y].Owners.Count != 0)
-                return false;
-
-            if (landscape.Data[grid.X, grid.Y].Type != LandscapeType.Ground)
-                return false;
-
-            landscape.Data[grid.X, grid.Y].Owners.Add(this);
-            return true;
-        }
-
-        /// <summary>
-        /// Remove the game entity from the landscape
-        /// </summary>
-        /// <returns>Success or not</returns>
-        public override bool Pickup(Landscape landscape)
-        {
-            Point grid = landscape.PositionToGrid(Position.X, Position.Y);
-
-            System.Diagnostics.Debug.Assert(landscape.Data[grid.X, grid.Y].Owners.Contains(this));
-
-            landscape.Data[grid.X, grid.Y].Owners.Remove(this);
-            return true;
-        }
-
-        /// <summary>
         /// Ray intersection test
         /// </summary>
         /// <param name="ray">Target ray</param>
@@ -212,41 +167,9 @@ namespace Isles
                 return false;
             }
 
-            // Otherwise, overwrite rotating behavior,
-            // we want to throw the stone
-            mouseBeginDropRotation = Rotation;
-            mouseBeginDropPosition = Input.MousePosition;
-            mouseBeginDropPosition.Y -= 10;
-            return true;
-        }
-
-        /// <summary>
-        /// Called when the user is dropping the entity
-        /// </summary>
-        public override void Dropping(Hand hand, Entity entity, bool leftButton)
-        {
-            Rotation = mouseBeginDropRotation + MathHelper.PiOver2 + (float)Math.Atan2(
-                -(double)(Input.MousePosition.Y - mouseBeginDropPosition.Y),
-                 (double)(Input.MousePosition.X - mouseBeginDropPosition.X));
-        }
-
-        /// <summary>
-        /// Called when the user decided to drop this entity (button just released)
-        /// </summary>
-        /// <param name="entity">
-        /// The target entity to be drop to (can be null).
-        /// </param>
-        /// <returns>
-        /// Whether the hand should drop this entity
-        /// </returns>
-        public override bool EndDrop(Hand hand, Entity entity, bool leftButton)
-        {
-            if (!Place(world.Landscape))
-            {
-                // Drop failed, removes it
-                world.Destroy(this);
-            }
-            return true;
+            // Otherwise place the stone.
+            // TODO: Can we throw it away?
+            return base.BeginDrop(hand, entity, leftButton);
         }
 
         #endregion

@@ -35,14 +35,11 @@ namespace Isles.Engine
 
             set
             {
+                // Mark bounding box dirty, save the old bounding box
+                dirtyBoundingBox = BoundingBox;
                 position = value;
-                IsDirty = true;
-
-                OnPositionChanged();
             }
         }
-
-        protected virtual void OnPositionChanged() { }
 
         Vector3 position;
         
@@ -74,24 +71,28 @@ namespace Isles.Engine
         }
         
 
-        bool isDirty = false;
+        BoundingBox? dirtyBoundingBox;
 
-        public bool IsDirty
+        public BoundingBox? DirtyBoundingBox
         {
-            get { return isDirty; }
-            set { isDirty = value; }
+            get { return dirtyBoundingBox; }
+            set { dirtyBoundingBox = value; }
         }
 
+
+        /// <summary>
+        /// Gets whether this entity has changed its transform
+        /// </summary>
+        public bool IsDirty
+        {
+            get { return dirtyBoundingBox != null; }
+        }
         
         public virtual BoundingBox BoundingBox
         {
             get { return new BoundingBox(position, position); }
         }
 
-        /// <summary>
-        /// Name of our game entity
-        /// </summary>
-        string name;
 
         /// <summary>
         /// Gets or sets entity name
@@ -102,7 +103,8 @@ namespace Isles.Engine
             set { name = value; }
         }
 
-        string classID;
+        string name;
+        
 
         /// <summary>
         /// Gets or sets the class ID of this world object
@@ -111,6 +113,18 @@ namespace Isles.Engine
         {
             get { return classID; }
             set { classID = value; }
+        }
+
+        string classID;
+
+
+        /// <summary>
+        /// Gets or sets whether this world object is active
+        /// </summary>
+        public virtual bool IsActive
+        {
+            get { return false; }
+            set { throw new Exception("Base entity is inactive by default"); }
         }
 
         #endregion
@@ -197,10 +211,30 @@ namespace Isles.Engine
         public GameModel Model
         {
             get { return model; }
-            set { model = value; model.CenterModel(false); IsDirty = true; }
+
+            set
+            {
+                MarkDirty();
+                model = value;
+                model.CenterModel(false);
+            }
         }
 
         GameModel model;
+
+
+        /// <summary>
+        /// Gets or sets entity position.
+        /// </summary>
+        public override Vector3 Position
+        {
+            set
+            {
+                MarkDirty();
+                base.Position = new Vector3(value.X, value.Y,
+                    world.Landscape.GetHeight(value.X, value.Y));
+            }
+        }
 
 
         /// <summary>
@@ -209,7 +243,7 @@ namespace Isles.Engine
         public float Rotation
         {
             get { return rotation; }
-            set { rotation = value; IsDirty = true; }
+            set { MarkDirty(); rotation = value; }
         }
 
         float rotation = 0;
@@ -221,7 +255,7 @@ namespace Isles.Engine
         public float RotationX
         {
             get { return rotationX; }
-            set { rotationX = value; IsDirty = true; }
+            set { MarkDirty(); rotationX = value; }
         }
 
         float rotationX = 0;
@@ -233,7 +267,7 @@ namespace Isles.Engine
         public float RotationY
         {
             get { return rotationY; }
-            set { rotationY = value; IsDirty = true; }
+            set { MarkDirty(); rotationY = value; }
         }
 
         float rotationY = 0;
@@ -245,7 +279,7 @@ namespace Isles.Engine
         public Vector3 Scale
         {
             get { return scale; }
-            set { scale = value; IsDirty = true; }
+            set { MarkDirty(); scale = value; }
         }
         
         Vector3 scale = Vector3.One;
@@ -270,7 +304,7 @@ namespace Isles.Engine
         {
             get
             {
-                if (IsDirty)
+                if (isTransformDirty)
                 {
                     transform = // Build transform from SRT values
                                 // Bug: Something's wrong with Matrix.CreateFromYawPitchRoll
@@ -287,6 +321,16 @@ namespace Isles.Engine
         }
 
         Matrix transform;
+
+        protected bool isTransformDirty = true;
+
+        /// <summary>
+        /// Mark both bounding box and transform
+        /// </summary>
+        void MarkDirty()
+        {
+            isTransformDirty = true;
+        }
 
 
         /// <summary>
@@ -321,6 +365,34 @@ namespace Isles.Engine
 
 
         /// <summary>
+        /// Gets entity outline
+        /// </summary>
+        public Outline Outline
+        {
+            get { return outline; }
+        }
+
+        Outline outline = Outline.Empty;
+
+        
+        /// <summary>
+        /// Gets or sets whether this world object is active
+        /// </summary>
+        /// <remarks>
+        /// This property is internally used by ISceneManager.
+        /// If you want to active or deactive a world object, call
+        /// ISceneManager.Active or ISceneManager.Deactive instead.
+        /// </remarks>
+        public override bool IsActive
+        {
+            get { return isActive; }
+            set { isActive = value; }
+        }
+
+        bool isActive;
+
+
+        /// <summary>
         /// Forces needed to drag this entity
         /// </summary>
         protected float dragForce = 100;
@@ -339,7 +411,8 @@ namespace Isles.Engine
         public Entity(GameWorld world)
             : base(world)
         {
-
+            // Entities are activated by default
+            world.Activate(this);
         }
         
         public Entity(GameWorld world, GameModel model)
@@ -347,6 +420,9 @@ namespace Isles.Engine
         {
             // Note assign to the upper case Model
             Model = model;
+
+            // Entities are activated by default
+            world.Activate(this);
         }
 
         /// <summary>
@@ -391,12 +467,6 @@ namespace Isles.Engine
 
             if ((value = xml.GetAttribute("Scale")) != "")
                 Scale = Helper.StringToVector3(value);
-
-            // Fall on the ground
-            //Fall();
-
-            // FIXME: Place it
-            Place();
 
             // Get entity spells
             XmlNodeList spellNodes = xml.SelectNodes("Spell");
@@ -496,70 +566,6 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Avoid invoking Fall & OnPositionChanged recurisively
-        /// </summary>
-        bool falling;
-
-        /// <summary>
-        /// Change the entity z value to make it laying on the ground
-        /// </summary>
-        public virtual void Fall()
-        {
-            falling = true;
-            Position = new Vector3(Position.X, Position.Y,
-                world.Landscape.GetHeight(Position.X, Position.Y));
-        }
-        
-        /// <summary>
-        /// Make the entity alway on the ground
-        /// </summary>
-        protected override void OnPositionChanged()
-        {
-            if (!falling)
-            {
-                Fall();
-                falling = false;
-            }
-        }
-
-        public bool Place()
-        {
-            return Place(world.Landscape);
-        }
-
-        public bool Place(Landscape landscape)
-        {
-            return Place(landscape, Position, rotation);
-        }
-        
-        /// <summary>
-        /// Place the game entity somewhere on the ground.
-        /// Entities can not be drag and dropped until they are placed on the ground.
-        /// </summary>
-        /// <returns>Success or not</returns>
-        public virtual bool Place(Landscape landscape, Vector3 newPosition, float newRotation)
-        {
-            // Store new Position/Rotation
-            Position = newPosition;
-            Rotation = newRotation;
-            
-            // Change grid owner
-            foreach (Point grid in landscape.EnumerateGrid(Position, Size))
-                landscape.Data[grid.X, grid.Y].Owners.Add(this);
-            
-            return true;
-        }
-
-        /// <summary>
-        /// Pick up the game entity from the landscape
-        /// </summary>
-        /// <returns>Success or not</returns>
-        public virtual bool Pickup(Landscape landscape)
-        {
-            return false;
-        }
-
-        /// <summary>
         /// Called when the entity highlighted state changed
         /// </summary>
         protected virtual void OnHighlightStateChanged() { }
@@ -581,6 +587,22 @@ namespace Isles.Engine
 
         public override void Update(GameTime gameTime)
         {
+            if (isTransformDirty)
+            {
+                // Store the old bounding box
+                DirtyBoundingBox = BoundingBox;
+
+                // Update model transform, this will update the bounding box
+                model.Transform = Transform;
+
+                // By default, the outline of an entity is a circle
+                outline.SetCircle(
+                    new Vector2(Position.X, Position.Y),
+                    (Size.X + Size.Y) / 2);
+
+                isTransformDirty = false;
+            }
+
             if (model != null)
                 model.Update(gameTime);
         }
@@ -589,9 +611,6 @@ namespace Isles.Engine
         {
             if (model != null && VisibilityTest(BaseGame.Singleton.ViewProjection))
             {
-                if (IsDirty)
-                    model.Transform = Transform;
-
                 model.Draw(gameTime);
             }
         }
@@ -640,7 +659,7 @@ namespace Isles.Engine
             // Pick up then entity only when the hand has enough power
             if (hand.Power >= dragForce)
             {
-                Pickup(world.Landscape);
+                world.Deactivate(this);
                 hand.Drag(this);
             }
         }
@@ -702,11 +721,12 @@ namespace Isles.Engine
         /// </returns>
         public virtual bool EndDrop(Hand hand, Entity entity, bool leftButton)
         {
-            if (!Place(world.Landscape))
-            {
-                world.Destroy(this);
-            }
+            //if (!Place(world.Landscape))
+            //{
+            //    world.Destroy(this);
+            //}
 
+            world.Activate(this);
             return true;
         }
         #endregion
@@ -734,9 +754,9 @@ namespace Isles.Engine
         protected StateMachine<BaseAgent> stateMachine;
 
         /// <summary>
-        /// Common animation names
+        /// Map from animation type to model clip name
         /// </summary>
-        protected string clipWalk, clipRun;
+        protected IDictionary<string, string> clipMap = new Dictionary<string, string>();
 
         /// <summary>
         /// Gets or sets max health of the agent
@@ -786,16 +806,37 @@ namespace Isles.Engine
         }
 
         /// <summary>
+        /// Play the animation of a given type.
+        /// </summary>
+        /// <param name="type">
+        /// Example types: walk, run, attach...
+        /// </param>
+        /// <remarks>
+        /// This method differs from Model.PlayAnimation in that type is fixed 
+        /// and used all over the game.
+        /// E.g., a animation of type "walk" may have the name "Take 001" in the model.
+        /// </remarks>
+        public void PlayAnimation(string type)
+        {
+            string clip;
+
+            if (clipMap.TryGetValue(type, out clip))
+            {
+                Model.PlayAnimation(clip);
+            }
+        }
+
+        /// <summary>
         /// Deserialized attributes: Health, MaxHealth, ClipWalk, ClipRun
         /// </summary>
         /// <param name="xml"></param>
         public override void Deserialize(XmlElement xml)
         {
             if (xml.HasAttribute("ClipWalk"))
-                clipWalk = xml.GetAttribute("ClipWalk");
+                clipMap.Add("Walk", xml.GetAttribute("ClipWalk"));
 
             if (xml.HasAttribute("ClipRun"))
-                clipRun = xml.GetAttribute("ClipRun");
+                clipMap.Add("Run", xml.GetAttribute("ClipRun"));
 
             float.TryParse(xml.GetAttribute("Health"), out health);
             float.TryParse(xml.GetAttribute("MaxHealth"), out maxHealth);
@@ -834,7 +875,8 @@ namespace Isles.Engine
         /// </summary>
         public bool MoveTo(Vector3 location)
         {
-
+            // Change agent to move state
+            stateMachine.ChangeState(new StateMove(world, location));
             return true;
         }
 
@@ -852,6 +894,19 @@ namespace Isles.Engine
         /// </summary>
         public bool Attack(Entity target)
         {
+            // StateSequential<T> may came to help here.
+            // For the attack state, it contains two sequential states:
+            // E.g., StateMoveToTarget, StateAttackTarget.
+            // StateSequential will execute StateAttackTarget immediately
+            // StateMoveToTarget has finished (near enough to the target)
+            //
+            // Example code:
+            //
+            //      StateSequential<BaseAgent> sequential = new StateSequential<BaseAgent>();
+            //      sequential.Add(new StateMoveToTarget());
+            //      sequential.Add(new StateAttackTarget());
+            //      stateMachine.ChangeState(sequential);
+
             throw new NotImplementedException();
         }
 
@@ -888,7 +943,18 @@ namespace Isles.Engine
                 }
             }
 
+            // Update state machine
+            stateMachine.Update(gameTime);
+
             base.Update(gameTime);
+        }
+
+        public override void Draw(GameTime gameTime)
+        {
+            // Draw state machine
+            stateMachine.Draw(gameTime);
+
+            base.Draw(gameTime);
         }
         #endregion
     }

@@ -14,6 +14,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Engine
 {
+    #region Math2D
     /// <summary>
     /// Helper class for 2D math and geometries
     /// 
@@ -653,5 +654,107 @@ namespace Isles.Engine
         }
         #endregion
     }
+    #endregion
+    
+    #region Outline
+    /// <summary>
+    /// Types of outline
+    /// </summary>
+    public enum OutlineType
+    {
+        Empty, Circle, Rectangle
+    }
 
+    /// <summary>
+    /// Represents a 2D shape that you can do collision detection
+    /// </summary>
+    public class Outline
+    {
+        /// <summary>
+        /// Empty outline
+        /// </summary>
+        public static Outline Empty = new Outline();
+
+        /// <summary>
+        /// Gets the outline type
+        /// </summary>
+        public OutlineType Type
+        {
+            get { return type; }
+        }
+
+        OutlineType type = OutlineType.Empty;
+
+        /// <summary>
+        /// Gets the position of the outline
+        /// </summary>
+        public Vector2 Position
+        {
+            get { return position; }
+        }
+
+        Vector2 position;
+
+        /// <summary>
+        /// Gets the radius of the circle
+        /// </summary>
+        public float Radius
+        {
+            get { return radius; }
+        }
+
+        float radius;
+
+        /// <summary>
+        /// Creates a dummy outline
+        /// </summary>
+        public Outline()
+        {
+        }
+
+        /// <summary>
+        /// Creates a new circle outline
+        /// </summary>
+        public Outline(Vector2 position, float radius)
+        {
+            SetCircle(position, radius);
+        }
+
+        /// <summary>
+        /// Setup a circle outline
+        /// </summary>
+        public void SetCircle(Vector2 position, float radius)
+        {
+            this.type = OutlineType.Circle;
+            this.position = position;
+            this.radius = radius;
+        }
+
+        /// <summary>
+        /// Tests to see if two outline intersects
+        /// </summary>
+        public static ContainmentType Intersects(Outline o1, Outline o2)
+        {
+            if (null == o1 || null == o2)
+                throw new ArgumentNullException();
+
+            // Ignore dummy outlines
+            if (o1.type == OutlineType.Empty ||
+                o2.type == OutlineType.Empty)
+            {
+                return ContainmentType.Disjoint;
+            }
+
+            // Test by cases
+            if (o1.type == OutlineType.Circle &&
+                o2.type == OutlineType.Circle)
+            {
+                return Math2D.CircleIntersects(
+                    o1.position, o1.radius, o2.position, o2.radius);
+            }
+
+            throw new NotImplementedException();
+        }
+    }
+    #endregion
 }

@@ -106,25 +106,25 @@ namespace Isles
         /// Place the crop, crops doesn't add itself to grid data.
         /// </summary>
         /// <remarks>Crop can only be placed once</remarks>
-        public override bool Place(Landscape landscape, Vector3 newPosition, float newRotation)
-        {
-            Position = newPosition;
-            Rotation = newRotation;
+        //public override bool Place(Landscape landscape, Vector3 newPosition, float newRotation)
+        //{
+        //    Position = newPosition;
+        //    Rotation = newRotation;
 
-            // Change the crop position
-            for (int y = 0; y < billboards.GetLength(1); y++)
-                for (int x = 0; x < billboards.GetLength(0); x++)
-                {
-                    billboards[x, y].Position = LocalToWorld(billboards[x, y].Position);
+        //    // Change the crop position
+        //    for (int y = 0; y < billboards.GetLength(1); y++)
+        //        for (int x = 0; x < billboards.GetLength(0); x++)
+        //        {
+        //            billboards[x, y].Position = LocalToWorld(billboards[x, y].Position);
 
-                    // Get height
-                    billboards[x, y].Position.Z = world.Landscape.GetHeight(
-                        billboards[x, y].Position.X, billboards[x, y].Position.Y);
-                }
+        //            // Get height
+        //            billboards[x, y].Position.Z = world.Landscape.GetHeight(
+        //                billboards[x, y].Position.X, billboards[x, y].Position.Y);
+        //        }
 
-            // Can't be place at other place
-            return false;
-        }
+        //    // Can't be place at other place
+        //    return false;
+        //}
 
         /// <summary>
         /// Draw the crop
@@ -136,16 +136,6 @@ namespace Isles
             {
                 BaseGame.Singleton.Billboard.Draw(b);
             }
-        }
-
-        /// <summary>
-        /// Remove the game entity from the landscape
-        /// </summary>
-        /// <returns>Success or not</returns>
-        public override bool Pickup(Landscape landscape)
-        {
-            // Crops can't be picked up
-            return false;
         }
 
         /// <summary>

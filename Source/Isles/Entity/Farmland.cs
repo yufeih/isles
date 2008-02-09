@@ -65,14 +65,14 @@ namespace Isles
                 crop.Draw(gameTime);
         }
 
-        public override bool Place(Landscape landscape, Vector3 newPosition, float newRotation)
-        {
-            // Place crop
-            crop.Place(landscape, newPosition, newRotation);
+        //public override bool Place(Landscape landscape, Vector3 newPosition, float newRotation)
+        //{
+        //    // Place crop
+        //    crop.Place(landscape, newPosition, newRotation);
 
-            // Place this building
-            return base.Place(landscape, newPosition, newRotation);
-        }
+        //    // Place this building
+        //    return base.Place(landscape, newPosition, newRotation);
+        //}
 
         /// <summary>
         /// Delegate to crop

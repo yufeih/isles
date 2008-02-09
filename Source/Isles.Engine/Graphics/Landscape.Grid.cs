@@ -40,7 +40,7 @@ namespace Isles.Graphics
             /// <summary>
             /// Owners of this grid, allow overlapping
             /// </summary>
-            public List<Entity> Owners;
+            public List<IWorldObject> Owners;
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Isles.Graphics
         /// <summary>
         /// Describes the size of heightfield
         /// </summary>
-        int gridColumnCount, gridRowCount;
+        int gridCountOnXAxis, gridCountOnYAxis;
 
         /// <summary>
         /// Describes the size of heightfield
@@ -59,19 +59,19 @@ namespace Isles.Graphics
         float gridSizeOnXAxis, gridSizeOnYAxis;
 
         /// <summary>
-        /// Gets the size.X of grid
+        /// Gets the width of grid
         /// </summary>
-        public int GridColumnCount
+        public int GridCountOnXAxis
         {
-            get { return gridColumnCount; }
+            get { return gridCountOnXAxis; }
         }
 
         /// <summary>
         /// Gets the height of grid
         /// </summary>
-        public int GridRowCount
+        public int GridCountOnYAxis
         {
-            get { return gridRowCount; }
+            get { return gridCountOnYAxis; }
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace Isles.Graphics
 
         public Point GridCount
         {
-            get { return new Point(gridColumnCount, gridRowCount); }
+            get { return new Point(gridCountOnXAxis, gridCountOnYAxis); }
         }
 
         /// <summary>
@@ -107,8 +107,8 @@ namespace Isles.Graphics
         /// <returns></returns>
         public bool IsValidGrid(Point grid)
         {
-            return grid.X >= 0 && grid.X < gridColumnCount &&
-                   grid.Y >= 0 && grid.Y < gridRowCount;
+            return grid.X >= 0 && grid.X < gridCountOnXAxis &&
+                   grid.Y >= 0 && grid.Y < gridCountOnYAxis;
         }
 
         /// <summary>
@@ -116,19 +116,19 @@ namespace Isles.Graphics
         /// </summary>
         void InitializeGrid()
         {
-            Data = new Grid[gridColumnCount, gridRowCount];
+            Data = new Grid[gridCountOnXAxis, gridCountOnYAxis];
 
-            gridSizeOnXAxis = size.X / gridColumnCount;
-            gridSizeOnYAxis = size.Y / gridRowCount;
+            gridSizeOnXAxis = size.X / gridCountOnXAxis;
+            gridSizeOnYAxis = size.Y / gridCountOnYAxis;
 
             // Initialize landscape type
-            for (int x = 0; x < gridColumnCount; x++)
-                for (int y = 0; y < gridRowCount; y++)
+            for (int x = 0; x < gridCountOnXAxis; x++)
+                for (int y = 0; y < gridCountOnYAxis; y++)
                 {
                     Data[x, y].Type = heightField[x, y] > 0 ?
                         LandscapeType.Ground : LandscapeType.Water;
 
-                    Data[x, y].Owners = new List<Entity>(2);
+                    Data[x, y].Owners = new List<IWorldObject>(2);
                 }
         }
 
@@ -142,10 +142,30 @@ namespace Isles.Graphics
             if (min.Y < 0)
                 min.Y = 0;
 
-            if (max.X >= gridColumnCount)
-                max.X = gridColumnCount - 1;
-            if (max.Y >= gridRowCount)
-                max.Y = gridRowCount - 1;
+            if (max.X >= gridCountOnXAxis)
+                max.X = gridCountOnXAxis - 1;
+            if (max.Y >= gridCountOnYAxis)
+                max.Y = gridCountOnYAxis - 1;
+
+            for (int y = min.Y; y <= max.Y; y++)
+                for (int x = min.X; x <= max.X; x++)
+                    yield return new Point(x, y);
+        }
+
+        public IEnumerable<Point> EnumerateGrid(BoundingBox boundingBox)
+        {
+            Point min = PositionToGrid(boundingBox.Min.X, boundingBox.Min.Y);
+            Point max = PositionToGrid(boundingBox.Max.X, boundingBox.Max.Y);
+
+            if (min.X < 0)
+                min.X = 0;
+            if (min.Y < 0)
+                min.Y = 0;
+
+            if (max.X >= gridCountOnXAxis)
+                max.X = gridCountOnXAxis - 1;
+            if (max.Y >= gridCountOnYAxis)
+                max.Y = gridCountOnYAxis - 1;
 
             for (int y = min.Y; y <= max.Y; y++)
                 for (int x = min.X; x <= max.X; x++)

@@ -96,51 +96,6 @@ namespace Isles
             });
         }
 
-        /// <summary>
-        /// Place the tree at a new location
-        /// </summary>
-        /// <returns>Success or not</returns>
-        public override bool Place(Landscape landscape, Vector3 newPosition, float newRotation)
-        {
-            Position = newPosition;
-            Rotation = newRotation;
-
-            // Fall on the ground
-            Position = new Vector3(
-                Position.X, Position.Y, landscape.GetHeight(Position.X, Position.Y));
-
-            // A tree only covers one grid :)
-            // FIXME: One grid is not large enough for picking...
-            //        Find a way to deal with it!!!
-            Point grid = landscape.PositionToGrid(Position.X, Position.Y);
-
-            if (!landscape.IsValidGrid(grid))
-                return false;
-
-            if (landscape.Data[grid.X, grid.Y].Owners.Count != 0)
-                return false;
-
-            if (landscape.Data[grid.X, grid.Y].Type != LandscapeType.Ground)
-                return false;
-
-            landscape.Data[grid.X, grid.Y].Owners.Add(this);
-            return true;
-        }
-
-        /// <summary>
-        /// Remove the game entity from the landscape
-        /// </summary>
-        /// <returns>Success or not</returns>
-        public override bool Pickup(Landscape landscape)
-        {
-            Point grid = landscape.PositionToGrid(Position.X, Position.Y);
-
-            System.Diagnostics.Debug.Assert(landscape.Data[grid.X, grid.Y].Owners.Contains(this));
-
-            landscape.Data[grid.X, grid.Y].Owners.Remove(this);
-            return true;
-        }
-
         public override bool BeginDrop(Hand hand, Entity entity, bool leftButton)
         {
             // If dropped on a wood storage, add to our total wood amount,
