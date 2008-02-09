@@ -645,7 +645,7 @@ namespace Isles.Engine
         }
         #endregion
 
-        public override void Draw(GameTime gameTime, GameModel.BasicEffectSettings setupBasicEffect)
+        public override void Draw(GameTime gameTime)
         {
             // Draw current spell
             if (activeSpell != null)
@@ -690,9 +690,6 @@ namespace Isles.Engine
                         effect.View = Matrix.Identity;
                         effect.Projection = game.Projection;
                         effect.EnableDefaultLighting();
-
-                        if (setupBasicEffect != null)
-                            setupBasicEffect(effect);
                     }
 
                     mesh.Draw();

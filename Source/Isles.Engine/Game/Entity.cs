@@ -411,7 +411,7 @@ namespace Isles.Engine
         public Entity(GameWorld world)
             : base(world)
         {
-            // Entities are activated by default
+            // Entities are active by default
             world.Activate(this);
         }
         
@@ -421,7 +421,7 @@ namespace Isles.Engine
             // Note assign to the upper case Model
             Model = model;
 
-            // Entities are activated by default
+            // Entities are active by default
             world.Activate(this);
         }
 

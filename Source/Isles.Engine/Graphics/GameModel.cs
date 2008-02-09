@@ -69,11 +69,6 @@ namespace Isles.Graphics
         protected SkinningData skin;
 
         /// <summary>
-        /// Setup model basic effect
-        /// </summary>
-        public delegate void BasicEffectSettings(BasicEffect effect);
-
-        /// <summary>
         /// Gets or sets model world transform
         /// </summary>
         public Matrix Transform
@@ -354,12 +349,7 @@ namespace Isles.Graphics
                 player.Update(gameTime.ElapsedGameTime, true, transform);
         }
 
-        public void Draw(GameTime gameTime)
-        {
-            Draw(gameTime, null);
-        }
-
-        public virtual void Draw(GameTime gameTime, BasicEffectSettings setupBasicEffect)
+        public virtual void Draw(GameTime gameTime)
         {
             if (model == null)
                 return;
@@ -376,7 +366,7 @@ namespace Isles.Graphics
             game.GraphicsDevice.RenderState.AlphaBlendEnable = true;
             game.GraphicsDevice.RenderState.AlphaTestEnable = true;
 
-            // Draw plain mesh
+            // Draw plain using model effect
             foreach (ModelMesh mesh in model.Meshes)
             {
                 foreach (BasicEffect effect in mesh.Effects)
@@ -384,9 +374,6 @@ namespace Isles.Graphics
                     effect.World = bones[mesh.ParentBone.Index] * transform;
                     effect.View = game.View;
                     effect.Projection = game.Projection;
-
-                    if (setupBasicEffect != null)
-                        setupBasicEffect(effect);
                 }
 
                 mesh.Draw();

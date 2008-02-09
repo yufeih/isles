@@ -244,33 +244,14 @@ namespace Isles
             }
 
             // Keep track of entities
-            List<Entity> entities = new List<Entity>(2);
-
-            float z = landscape.GetHeight(Position.X, Position.Y);
-            foreach (Point grid in landscape.EnumerateGrid(Position, Size))
+            foreach (IWorldObject o in world.GetNearbyObjects(BoundingBox))
             {
-                if (!IsValidGrid(landscape, grid, z))
-                    return false;
+                Entity e = o as Entity;
 
-                foreach (Entity entity in landscape.Data[grid.X, grid.Y].Owners)
+                if (e != this && e != null &&
+                    Outline.Intersects(Outline, e.Outline) != ContainmentType.Disjoint)
                 {
-                    if (!entities.Contains(entity))
-                    {
-                        // Rectangle intersection test
-                        if (Math2D.RectangleIntersects(
-                            new Vector2(-Size.X / 2, -Size.Y / 2),
-                            new Vector2(Size.X / 2, Size.Y / 2),
-                            new Vector2(Position.X, Position.Y), Rotation,
-                            new Vector2(-entity.Size.X / 2, -entity.Size.Y / 2),
-                            new Vector2(entity.Size.X / 2, entity.Size.Y / 2),
-                            new Vector2(entity.Position.X, entity.Position.Y),
-                            entity.Rotation) != ContainmentType.Disjoint)
-                        {
-                            return false;
-                        }
-
-                        entities.Add(entity);
-                    }
+                    return false;
                 }
             }
             
@@ -392,8 +373,6 @@ namespace Isles
         /// <param name="gameTime"></param>
         public override void Update(GameTime gameTime)
         {
-            Model.Update(gameTime);
-
             if (state == BuildingState.Constructing)
             {
                 if (ConstructionTime > 0)
@@ -451,6 +430,8 @@ namespace Isles
                     state = BuildingState.Constructing;
                 }
             }
+
+            base.Update(gameTime);
         }
 
         private void CompleteBuild()
@@ -460,48 +441,6 @@ namespace Isles
 
             // Building finished, update dependencies
             world.GameLogic.Dependencies[Name] = true;
-        }
-
-        /// <summary>
-        /// Draw the building
-        /// </summary>
-        /// <param name="gameTime"></param>
-        public override void Draw(GameTime gameTime)
-        {
-            if (!VisibilityTest(BaseGame.Singleton.ViewProjection))
-                return;
-
-            if (isValidLocation)
-            {
-                Model.Transform = Transform;
-                Model.Draw(gameTime, delegate(BasicEffect effect)
-                {
-                    if (Selected)
-                        effect.DiffuseColor = Vector3.UnitY;
-                    else if (Highlighted)
-                        effect.DiffuseColor = Vector3.UnitZ;
-                    else
-                        effect.DiffuseColor = Vector3.One;
-                });
-            }
-            else
-            {
-                DrawInvalid(gameTime);
-            }
-        }
-
-        /// <summary>
-        /// Draw the building use an effect to show that the current
-        /// Position is invalid
-        /// </summary>
-        /// <param name="gameTime"></param>
-        public void DrawInvalid(GameTime gameTime)
-        {
-            Model.Transform = Transform;
-            Model.Draw(gameTime, delegate(BasicEffect effect)
-            {
-                effect.DiffuseColor = Vector3.UnitX;
-            });
         }
 
         public override Rectangle DrawStatus(Rectangle region)

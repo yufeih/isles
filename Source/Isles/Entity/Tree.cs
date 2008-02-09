@@ -46,40 +46,6 @@ namespace Isles
         {
             // Deserialize models after default attributes are assigned
             base.Deserialize(xml);
-
-            // Fall on the ground
-            Position = new Vector3(
-                Position.X, Position.Y, world.Landscape.GetHeight(Position.X, Position.Y));
-        }
-
-        /// <summary>
-        /// Update
-        /// </summary>
-        /// <param name="gameTime"></param>
-        public override void Update(GameTime gameTime)
-        {
-            Model.Update(gameTime);
-        }
-
-        /// <summary>
-        /// Draw the tree
-        /// </summary>
-        /// <param name="gameTime"></param>
-        public override void Draw(GameTime gameTime)
-        {
-            if (!VisibilityTest(BaseGame.Singleton.ViewProjection))
-                return;
-
-            Model.Transform = Transform;
-            Model.Draw(gameTime, delegate(BasicEffect effect)
-            {
-                if (Selected)
-                    effect.DiffuseColor = Vector3.UnitY;
-                else if (Highlighted)
-                    effect.DiffuseColor = Vector3.UnitZ;
-                else
-                    effect.DiffuseColor = Vector3.One;
-            });
         }
 
         /// <summary>
@@ -89,11 +55,7 @@ namespace Isles
         /// <param name="gameTime"></param>
         public void DrawInvalid(GameTime gameTime)
         {
-            Model.Transform = Transform;
-            Model.Draw(gameTime, delegate(BasicEffect effect)
-            {
-                effect.DiffuseColor = Vector3.UnitX;
-            });
+            Model.Draw(gameTime);
         }
 
         public override bool BeginDrop(Hand hand, Entity entity, bool leftButton)

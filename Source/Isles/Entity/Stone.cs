@@ -84,42 +84,6 @@ namespace Isles
         }
 
         /// <summary>
-        /// Draw the stone
-        /// </summary>
-        /// <param name="gameTime"></param>
-        public override void Draw(GameTime gameTime)
-        {
-            Matrix transform = Matrix.CreateRotationZ(Rotation);
-            transform.Translation = Position;
-            Model.Transform = transform;
-            Model.Draw(gameTime, delegate(BasicEffect effect)
-            {
-                if (Selected)
-                    effect.DiffuseColor = Vector3.UnitY;
-                else if (Highlighted)
-                    effect.DiffuseColor = Vector3.UnitZ;
-                else
-                    effect.DiffuseColor = Vector3.One;
-            });
-        }
-
-        /// <summary>
-        /// Draw the stone use an effect to show that the current
-        /// Position is invalid
-        /// </summary>
-        /// <param name="gameTime"></param>
-        public void DrawInvalid(GameTime gameTime)
-        {
-            Matrix transform = Matrix.CreateRotationZ(Rotation);
-            transform.Translation = Position;
-            Model.Transform = transform;
-            Model.Draw(gameTime, delegate(BasicEffect effect)
-            {
-                effect.DiffuseColor = Vector3.UnitX;
-            });
-        }
-
-        /// <summary>
         /// Ray intersection test
         /// </summary>
         /// <param name="ray">Target ray</param>

@@ -20,6 +20,7 @@
       do not overwrite it here.
   -->
   <Tree Position="1400, 1300, 0" />
+  <Townhall Position="1200, 1300, 0" />
 
   <!--Create a test dude charactor-->
   <Dude Position="1300, 1300, 0"/>
