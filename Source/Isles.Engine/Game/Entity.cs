@@ -638,6 +638,21 @@ namespace Isles.Engine
             if (model != null && VisibilityTest(BaseGame.Singleton.ViewProjection))
             {
                 model.Draw(gameTime);
+
+                /*
+                int bone = model.GetBone("R_Thumb2");
+                
+                if (bone >= 0)
+                {
+                    Matrix mx = model.GetBoneTransform(bone);
+
+                    Vector3 v = BaseGame.Singleton.GraphicsDevice.Viewport.Project(
+                        mx.Translation, BaseGame.Singleton.Projection,
+                        BaseGame.Singleton.View, Matrix.Identity);
+
+                    Text.DrawString("Hehe, Im here", 16, new Vector2(v.X, v.Y), Color.White);
+                }
+                 */
             }
         }
 
