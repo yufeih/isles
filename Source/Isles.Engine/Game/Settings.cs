@@ -61,6 +61,9 @@ namespace Isles.Engine
 
             public float MinRadius = 10.0F;
             public float MaxRadius = 1500.0f;
+
+            public float InitialXPosition = 0;
+            public float InitialYPosition = 0;
         }
         #endregion
 

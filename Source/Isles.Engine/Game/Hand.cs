@@ -334,6 +334,10 @@ namespace Isles.Engine
             if (state != HandState.Idle || entity == null)
                 return false;
 
+            // Deactivate the entity
+            world.Deactivate(entity);
+
+            // Add the entity
             entities.Push(entity);
 
             // Change the game state to Carrying
@@ -370,6 +374,7 @@ namespace Isles.Engine
                     activeEntity = entities.Peek();
                 }
 
+                world.Activate(entity);
                 return entity;
             }
 

@@ -15,6 +15,43 @@ using Isles.Engine;
 
 namespace Isles.Graphics
 {
+    #region Material
+    /// <summary>
+    /// Material for every game model
+    /// </summary>
+    /// <remarks>
+    /// GameModel Initialization
+    ///     -> Fill material from game model effect settings
+    ///         Skinned/Animated model, Transparency, Textures
+    ///     -> Deserialize/Serialize material settings from external xml DOM
+    ///         This is not a requirement
+    ///     -> Programatically change material settings
+    ///         By manipulating game model material property directly
+    /// 
+    /// GameModel:
+    ///     - Retrieve model hierarchy / model part by name
+    ///     - Gets or sets individual bone trasform / position
+    ///     - Assign different materials to individual mesh part
+    /// </remarks>
+    public class Material
+    {
+        public Effect Effect;
+
+        public Texture2D BaseTexture;
+        public Texture2D NormalTexture;
+
+        public Color AmbientColor;
+        public Color DiffuseColor;
+        public Color SpecularColor;
+
+        public float Alpha;
+        public float SpecularPower;
+
+        public bool IsTransparent;
+    }
+    #endregion
+
+    #region GameModel
     public class GameModel
     {
         #region Fields
@@ -277,24 +314,26 @@ namespace Isles.Graphics
         /// <param name="centerZ">Whether Z value should be centered</param>
         public void CenterModel(bool centerZ)
         {
-            if (model == null)
-                return;
-
-            // Compute offset
-            Vector3 offset = -(boundingBox.Max + boundingBox.Min) / 2;
-
-            if (!centerZ)
-                offset.Z = 0;
-
-            // Update model transform
-            model.Root.Transform *= Matrix.CreateTranslation(offset);
-
-            // Reset bounding box
-            orientedBoundingBox.Max += offset;
-            orientedBoundingBox.Min += offset;
+            // FIXME
             
-            // Mark dirty
-            isBoundingBoxDirty = true;
+            //if (model == null)
+            //    return;
+                        
+            //// Compute offset
+            //Vector3 offset = -(orientedBoundingBox.Max + orientedBoundingBox.Min) / 2;
+
+            //if (!centerZ)
+            //    offset.Z = 0;
+
+            //// Update model transform
+            //model.Root.Transform *= Matrix.CreateTranslation(offset);
+
+            //// Reset bounding box
+            //orientedBoundingBox.Max += offset;
+            //orientedBoundingBox.Min += offset;
+            
+            //// Mark dirty
+            //isBoundingBoxDirty = true;
         }
 
         /// <summary>
@@ -417,4 +456,5 @@ namespace Isles.Graphics
 
         #endregion
     }
+    #endregion
 }

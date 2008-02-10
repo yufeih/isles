@@ -114,19 +114,16 @@ namespace Isles.Engine
         BoundingBox BoundingBox { get; }
 
         /// <summary>
-        /// Gets or sets whether the position or bounding box of the
-        /// scene object has changed since last update.
+        /// Gets or sets whether the dirty bounding box
         /// </summary>
-        /// <remarks>
+        BoundingBox DirtyBoundingBox { get; set; }
+
+        /// <summary>
         /// By marking the IsDirty property of a scene object, the scene
         /// manager will be able to adjust its internal data structure
         /// to adopt to the change of transformation.
-        /// </remarks>
-        /// <value>
-        /// null if the bounding box is not dirty. Otherwise, return
-        /// the old bounding box.
-        /// </value>
-        BoundingBox? DirtyBoundingBox { get; set; }
+        /// </summary>
+        bool IsDirty { get; set;}
 
         /// <summary>
         /// Gets or sets whether this world object is active

@@ -182,7 +182,8 @@ namespace Isles.Engine
 
 
             // Center camera
-            FlyTo(new Vector3(landscape.Size.X / 2, landscape.Size.Y / 2, 0), true);
+            FlyTo(new Vector3(
+                cameraSettings.InitialXPosition, cameraSettings.InitialYPosition, 0), true);
             SpaceBounds = new BoundingBox(Vector3.Zero,
                 new Vector3(landscape.Size.X, landscape.Size.Y, 6 * landscape.Size.Z));
         }

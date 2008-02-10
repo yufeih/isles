@@ -683,7 +683,7 @@ namespace Isles.Engine
                 throw new ArgumentNullException();
 
             if (worldObject.IsActive)
-                throw new InvalidOperationException();
+                return;
 
             worldObject.IsActive = true;
 
@@ -694,6 +694,9 @@ namespace Isles.Engine
 
                 landscape.Data[grid.X, grid.Y].Owners.Add(worldObject);
             }
+
+            worldObject.DirtyBoundingBox = worldObject.BoundingBox;
+            worldObject.IsDirty = false;
         }
 
         /// <summary>
@@ -705,17 +708,20 @@ namespace Isles.Engine
                 throw new ArgumentNullException();
 
             if (!worldObject.IsActive)
-                throw new InvalidOperationException();
+                return;
 
             worldObject.IsActive = false;
 
-            foreach (Point grid in landscape.EnumerateGrid(worldObject.BoundingBox))
+            foreach (Point grid in landscape.EnumerateGrid(
+                worldObject.IsDirty ? worldObject.DirtyBoundingBox : worldObject.BoundingBox))
             {
                 System.Diagnostics.Debug.Assert(
                     landscape.Data[grid.X, grid.Y].Owners.Contains(worldObject));
 
                 landscape.Data[grid.X, grid.Y].Owners.Remove(worldObject);
             }
+
+            worldObject.IsDirty = false;
         }
         
         void UpdateSceneManager()
@@ -724,22 +730,33 @@ namespace Isles.Engine
             // bounding box is dirty, making it up to date.
             foreach (IWorldObject o in worldObjects)
             {
-                if (o.IsActive && o.DirtyBoundingBox.HasValue)
+                if (o.IsActive && o.IsDirty)
                 {
                     // Remove old grids
                     foreach (Point grid in
-                        landscape.EnumerateGrid(o.DirtyBoundingBox.Value))
+                        landscape.EnumerateGrid(o.DirtyBoundingBox))
+                    {
+                        System.Diagnostics.Debug.Assert(
+                            landscape.Data[grid.X, grid.Y].Owners.Contains(o));
 
                         landscape.Data[grid.X, grid.Y].Owners.Remove(o);
+                    }
 
                     // Add to new grids
                     foreach (Point grid in
                         landscape.EnumerateGrid(o.BoundingBox))
+                    {
+                        System.Diagnostics.Debug.Assert(
+                           !landscape.Data[grid.X, grid.Y].Owners.Contains(o));
 
                         landscape.Data[grid.X, grid.Y].Owners.Add(o);
+                    }
+
+                    // Change dirty bounding box
+                    o.DirtyBoundingBox = o.BoundingBox;
 
                     // Make the dirty bounding box clean
-                    o.DirtyBoundingBox = null;
+                    o.IsDirty = false;
                 }
             }
         }

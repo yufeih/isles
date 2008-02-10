@@ -30,6 +30,8 @@
     <MaxRoll>1.39626340159</MaxRoll>
     <MinRadius>10</MinRadius>
     <MaxRadius>1500</MaxRadius>
+    <InitialXPosition>1300</InitialXPosition>
+    <InitialYPosition>1300</InitialYPosition>
   </CameraSettings>
   
   <!--Graphics settings-->

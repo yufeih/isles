@@ -36,7 +36,7 @@ namespace Isles.Engine
             set
             {
                 // Mark bounding box dirty, save the old bounding box
-                dirtyBoundingBox = BoundingBox;
+                IsDirty = true;
                 position = value;
             }
         }
@@ -69,25 +69,30 @@ namespace Isles.Engine
         {
             get { return Vector3.Zero; }
         }
-        
 
-        BoundingBox? dirtyBoundingBox;
 
-        public BoundingBox? DirtyBoundingBox
+        /// <summary>
+        /// By marking the IsDirty property of a scene object, the scene
+        /// manager will be able to adjust its internal data structure
+        /// to adopt to the change of transformation.
+        /// </summary>
+        public virtual bool IsDirty
         {
-            get { return dirtyBoundingBox; }
-            set { dirtyBoundingBox = value; }
+            get { return false; }
+            set { }
         }
 
 
         /// <summary>
-        /// Gets whether this entity has changed its transform
+        /// Gets or sets whether the dirty bounding box
         /// </summary>
-        public bool IsDirty
+        public virtual BoundingBox DirtyBoundingBox
         {
-            get { return dirtyBoundingBox != null; }
+            get { return new BoundingBox(); }
+            set { }
         }
-        
+
+
         public virtual BoundingBox BoundingBox
         {
             get { return new BoundingBox(position, position); }
@@ -314,6 +319,8 @@ namespace Isles.Engine
                         Matrix.CreateRotationY(rotationY) *
                         Matrix.CreateRotationZ(rotation) *
                         Matrix.CreateTranslation(Position);
+
+                    isTransformDirty = false;
                 }
 
                 return transform;
@@ -322,13 +329,26 @@ namespace Isles.Engine
 
         Matrix transform;
 
-        protected bool isTransformDirty = true;
+
+        /// <summary>
+        /// Interface member for IWorldObject
+        /// </summary>
+        public override bool IsDirty
+        {
+            get { return isDirty; }
+            set { isDirty = value; }
+        }
+
+        bool isDirty = true;
+        bool isTransformDirty = true;
+
 
         /// <summary>
         /// Mark both bounding box and transform
         /// </summary>
         void MarkDirty()
         {
+            isDirty = true;
             isTransformDirty = true;
         }
 
@@ -340,6 +360,17 @@ namespace Isles.Engine
         {
             get { return model != null ? model.BoundingBox : new BoundingBox(); }
         }
+
+        /// <summary>
+        /// Gets or sets the dirty bounding box
+        /// </summary>
+        public override BoundingBox DirtyBoundingBox
+        {
+            get { return dirtyBoundingBox; }
+            set { dirtyBoundingBox = value; }
+        }
+
+        BoundingBox dirtyBoundingBox = new BoundingBox();
 
 
         /// <summary>
@@ -587,11 +618,8 @@ namespace Isles.Engine
 
         public override void Update(GameTime gameTime)
         {
-            if (isTransformDirty)
+            if (isDirty)
             {
-                // Store the old bounding box
-                DirtyBoundingBox = BoundingBox;
-
                 // Update model transform, this will update the bounding box
                 model.Transform = Transform;
 
@@ -599,8 +627,6 @@ namespace Isles.Engine
                 outline.SetCircle(
                     new Vector2(Position.X, Position.Y),
                     (Size.X + Size.Y) / 2);
-
-                isTransformDirty = false;
             }
 
             if (model != null)
@@ -658,10 +684,7 @@ namespace Isles.Engine
         {
             // Pick up then entity only when the hand has enough power
             if (hand.Power >= dragForce)
-            {
-                world.Deactivate(this);
                 hand.Drag(this);
-            }
         }
 
         /// <summary>
@@ -725,8 +748,6 @@ namespace Isles.Engine
             //{
             //    world.Destroy(this);
             //}
-
-            world.Activate(this);
             return true;
         }
         #endregion
@@ -809,12 +830,12 @@ namespace Isles.Engine
         /// Play the animation of a given type.
         /// </summary>
         /// <param name="type">
-        /// Example types: walk, run, attach...
+        /// Example types: Idle, Walk, Run, Attack...
         /// </param>
         /// <remarks>
         /// This method differs from Model.PlayAnimation in that type is fixed 
         /// and used all over the game.
-        /// E.g., a animation of type "walk" may have the name "Take 001" in the model.
+        /// E.g., a animation of type "Walk" may have the name "Take 001" in the model.
         /// </remarks>
         public void PlayAnimation(string type)
         {
