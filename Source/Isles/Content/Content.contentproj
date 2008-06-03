@@ -81,11 +81,6 @@
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </Compile>
-    <Compile Include="Effects\MipmappedTerrain.fx">
-      <Name>MipmappedTerrain</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>EffectProcessor</Processor>
-    </Compile>
     <Compile Include="Effects\Water.fx">
       <Name>Water</Name>
       <Importer>EffectImporter</Importer>
@@ -117,11 +112,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Landscapes\water.png">
-      <Name>water</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
     <None Include="Levels\World.xml">
       <Name>World</Name>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -131,33 +121,8 @@
     <None Include="Fonts\kooten.ttf">
       <Name>kooten</Name>
     </None>
-    <None Include="Landscapes\TestSky2.dds">
-      <Name>TestSky2</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Effects\Graphics2D.fx">
-      <Name>Graphics2D</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>EffectProcessor</Processor>
-    </Compile>
-    <None Include="Effects\Common.fxh">
-      <Name>Common</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>EffectProcessor</Processor>
-    </None>
-    <Compile Include="Effects\ParticleEffect.fx">
-      <Name>ParticleEffect</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>EffectProcessor</Processor>
-    </Compile>
-    <None Include="Landscapes\water_normalmap.jpg">
-      <Name>water_normalmap</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
     <Compile Include="Textures\Fadeout.tga">
       <Name>Fadeout</Name>
       <Importer>TextureImporter</Importer>
@@ -174,18 +139,6 @@
       <Name>smoke</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Effects\DisortionDisappear.fx">
-      <Name>DisortionDisappear</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>EffectProcessor</Processor>
-    </Compile>
-    <Compile Include="Effects\TiledTerrain.fx">
-      <Name>TiledTerrain</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>EffectProcessor</Processor>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -217,73 +170,11 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Landscapes\isles.bmp">
-      <Name>isles</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Cursors\LightedCursor.cur">
-      <Name>LightedCursor</Name>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Cursors\NormalCursor.cur">
-      <Name>NormalCursor</Name>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Landscapes\caodi.PNG">
-      <Name>caodi</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-    <None Include="Landscapes\daolu.png">
-      <Name>daolu</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-    <None Include="Landscapes\shadi.png">
-      <Name>shadi</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Effects\Surface.fx">
-      <Name>Surface</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>EffectProcessor</Processor>
-    </Compile>
-    <None Include="Landscapes\2.bmp">
-      <Name>2</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-    <None Include="Landscapes\3.bmp">
-      <Name>3</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Charactors\Hunter\Hunter.X">
-      <Name>Hunter</Name>
-      <Importer>XImporter</Importer>
-      <Processor>GameModelProcessor</Processor>
-      <ProcessorParameters_GenerateTangentFrames>True</ProcessorParameters_GenerateTangentFrames>
-    </Compile>
     <Compile Include="Models\Buildings\Goldmine.X">
       <Name>Goldmine</Name>
       <Importer>XImporter</Importer>
       <Processor>GameModelProcessor</Processor>
       <ProcessorParameters_GenerateTangentFrames>True</ProcessorParameters_GenerateTangentFrames>
-    </Compile>
-    <Compile Include="Effects\Disappear.fx">
-      <Name>Disappear</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>EffectProcessor</Processor>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -390,62 +281,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Cursors\attack.ani">
-      <Name>attack</Name>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Cursors\default.ani">
-      <Name>default</Name>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Cursors\gather_weapon.ani">
-      <Name>gather_weapon</Name>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Cursors\target_green.ani">
-      <Name>target_green</Name>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Cursors\target_neutral.ani">
-      <Name>target_neutral</Name>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Cursors\target_red.ani">
-      <Name>target_red</Name>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Cursors\screen_bottom.cur">
-      <Name>screen_bottom</Name>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Cursors\screen_left.cur">
-      <Name>screen_left</Name>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Cursors\screen_move.cur">
-      <Name>screen_move</Name>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Cursors\screen_right.cur">
-      <Name>screen_right</Name>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Cursors\screen_rotate.cur">
-      <Name>screen_rotate</Name>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Cursors\screen_top.cur">
-      <Name>screen_top</Name>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Cursors\target_disable.cur">
-      <Name>target_disable</Name>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Models\Palm.tga">
       <Name>Palm</Name>
       <Importer>TextureImporter</Importer>
@@ -467,13 +302,6 @@
   <ItemGroup>
     <Compile Include="Textures\SelectionAreaLarge.png">
       <Name>SelectionAreaLarge</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Landscapes\ruined.dds">
-      <Name>ruined</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
@@ -563,20 +391,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Charactors\Follower\follower.X">
-      <Name>follower</Name>
-      <Importer>XImporter</Importer>
-      <Processor>GameModelProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Charactors\Follower\tietu_nongmin.bmp">
-      <Name>tietu_nongmin</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="UI\Snapshots.png">
       <Name>Snapshots</Name>
       <Importer>TextureImporter</Importer>
@@ -634,11 +448,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Charactors\Hunter\yuancheng.jpg">
-      <Name>yuancheng</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
     <Compile Include="Models\box.X">
       <Name>box</Name>
       <Importer>XImporter</Importer>
@@ -665,30 +474,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Charactors\Sorceress\Sorceress.X">
-      <Name>Sorceress</Name>
-      <Importer>XImporter</Importer>
-      <Processor>GameModelProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Charactors\Militia\militia.X">
-      <Name>militia</Name>
-      <Importer>XImporter</Importer>
-      <Processor>GameModelProcessor</Processor>
-    </Compile>
-    <None Include="Charactors\Sorceress\tuzhu_huonv.bmp">
-      <Name>tuzhu_huonv</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Charactors\Militia\tietu_jinzhant.bmp">
-      <Name>tietu_jinzhant</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
     <Compile Include="Models\rally.X">
       <Name>rally</Name>
       <Importer>XImporter</Importer>
@@ -713,20 +498,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Charactors\Hellfire\hellfire.X">
-      <Name>hellfire</Name>
-      <Importer>XImporter</Importer>
-      <Processor>GameModelProcessor</Processor>
-    </Compile>
     <None Include="Models\toetu_ mutou.bmp">
       <Name>toetu_ mutou</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Charactors\Hellfire\zhaohuanshou.bmp">
-      <Name>zhaohuanshou</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </None>
@@ -788,11 +561,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Landscapes\White.bmp">
-      <Name>White</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
     <Compile Include="Models\cube.x">
       <Name>cube</Name>
       <Importer>XImporter</Importer>
@@ -1207,6 +975,194 @@
     </Compile>
     <Compile Include="Audios\Waves\Music\win.wav">
       <Name>win</Name>
+    </Compile>
+    <Compile Include="Charactors\Follower\follower.X">
+      <Name>follower</Name>
+      <Importer>XImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Charactors\Follower\tietu_nongmin.bmp">
+      <Name>tietu_nongmin</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Charactors\Hellfire\hellfire.X">
+      <Name>hellfire</Name>
+      <Importer>XImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Charactors\Hellfire\zhaohuanshou.bmp">
+      <Name>zhaohuanshou</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Charactors\Hunter\Hunter.X">
+      <Name>Hunter</Name>
+      <Importer>XImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Charactors\Hunter\yuancheng.jpg">
+      <Name>yuancheng</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Charactors\Militia\militia.X">
+      <Name>militia</Name>
+      <Importer>XImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Charactors\Militia\tietu_jinzhant.bmp">
+      <Name>tietu_jinzhant</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Charactors\Sorceress\Sorceress.X">
+      <Name>Sorceress</Name>
+      <Importer>XImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Charactors\Sorceress\tuzhu_huonv.bmp">
+      <Name>tuzhu_huonv</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Cursors\attack.ani">
+      <Name>attack</Name>
+    </Compile>
+    <Compile Include="Cursors\default.ani">
+      <Name>default</Name>
+    </Compile>
+    <Compile Include="Cursors\gather_weapon.ani">
+      <Name>gather_weapon</Name>
+    </Compile>
+    <Compile Include="Cursors\LightedCursor.cur">
+      <Name>LightedCursor</Name>
+    </Compile>
+    <Compile Include="Cursors\NormalCursor.cur">
+      <Name>NormalCursor</Name>
+    </Compile>
+    <Compile Include="Cursors\screen_bottom.cur">
+      <Name>screen_bottom</Name>
+    </Compile>
+    <Compile Include="Cursors\screen_left.cur">
+      <Name>screen_left</Name>
+    </Compile>
+    <Compile Include="Cursors\screen_move.cur">
+      <Name>screen_move</Name>
+    </Compile>
+    <Compile Include="Cursors\screen_right.cur">
+      <Name>screen_right</Name>
+    </Compile>
+    <Compile Include="Cursors\screen_rotate.cur">
+      <Name>screen_rotate</Name>
+    </Compile>
+    <Compile Include="Cursors\screen_top.cur">
+      <Name>screen_top</Name>
+    </Compile>
+    <Compile Include="Cursors\target_disable.cur">
+      <Name>target_disable</Name>
+    </Compile>
+    <Compile Include="Cursors\target_green.ani">
+      <Name>target_green</Name>
+    </Compile>
+    <Compile Include="Cursors\target_neutral.ani">
+      <Name>target_neutral</Name>
+    </Compile>
+    <Compile Include="Cursors\target_red.ani">
+      <Name>target_red</Name>
+    </Compile>
+    <Compile Include="Effects\Disappear.fx">
+      <Name>Disappear</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+    <Compile Include="Effects\DisortionDisappear.fx">
+      <Name>DisortionDisappear</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+    <Compile Include="Effects\Graphics2D.fx">
+      <Name>Graphics2D</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+    <Compile Include="Effects\MipmappedTerrain.fx">
+      <Name>MipmappedTerrain</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+    <Compile Include="Effects\ParticleEffect.fx">
+      <Name>ParticleEffect</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+    <Compile Include="Effects\Surface.fx">
+      <Name>Surface</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+    <Compile Include="Effects\TiledTerrain.fx">
+      <Name>TiledTerrain</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+    <Compile Include="Effects\Common.fxh">
+      <Name>Common</Name>
+    </Compile>
+    <Compile Include="Landscapes\ruined.dds">
+      <Name>ruined</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Landscapes\White.bmp">
+      <Name>White</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Landscapes\2.bmp">
+      <Name>2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Landscapes\3.bmp">
+      <Name>3</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Landscapes\caodi.PNG">
+      <Name>caodi</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Landscapes\daolu.png">
+      <Name>daolu</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Landscapes\isles.bmp">
+      <Name>isles</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Landscapes\shadi.png">
+      <Name>shadi</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Landscapes\TestSky2.dds">
+      <Name>TestSky2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Landscapes\water.png">
+      <Name>water</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Landscapes\water_normalmap.jpg">
+      <Name>water_normalmap</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
     </Compile>
     <None Include="Models\1.jpg">
       <Name>1</Name>
