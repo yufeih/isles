@@ -11,7 +11,8 @@
     <XnaFrameworkVersion>v2.0</XnaFrameworkVersion>
     <XnaPlatform>Windows</XnaPlatform>
     <XnaCrossPlatformGroupID>516102e0-a111-4a12-802a-01ae6f74018e</XnaCrossPlatformGroupID>
-    <ApplicationIcon>gamethumbnail.ico</ApplicationIcon>
+    <ApplicationIcon>
+    </ApplicationIcon>
     <Thumbnail>GameThumbnail.png</Thumbnail>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
@@ -86,41 +87,79 @@
     <Compile Include="Editor\ParticleGenerator.Designer.cs">
       <DependentUpon>ParticleGenerator.cs</DependentUpon>
     </Compile>
+    <Compile Include="Editor\ShadowEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editor\ShadowEditor.Designer.cs">
+      <DependentUpon>ShadowEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Editor\WorldEditor.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Editor\WorldEditor.Designer.cs">
       <DependentUpon>WorldEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="Game\Building.cs" />
-    <Compile Include="Game\Charactor.cs" />
-    <Compile Include="Game\Game.cs" />
-    <Compile Include="Game\GameDefault.cs" />
-    <Compile Include="Game\GameObject.cs" />
-    <Compile Include="Game\Goal.cs" />
-    <Compile Include="Game\Level.cs" />
-    <Compile Include="Game\Network.cs" />
-    <Compile Include="Game\ParticalEffects.cs" />
-    <Compile Include="Game\Player.cs" />
-    <Compile Include="Game\Replay.cs" />
-    <Compile Include="Game\Spell.cs" />
-    <Compile Include="Game\State.cs" />
+    <Compile Include="Game\Building.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Game\Charactor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Game\Game.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Game\GameDefault.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Game\GameObject.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Game\Goal.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Game\Level.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Game\Network.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Game\ParticalEffects.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Game\Player.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Game\Replay.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Game\Spell.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Game\State.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Screens\GameScreen.cs" />
     <Compile Include="Screens\GameUI.cs" />
-    <Compile Include="Screens\MiniMap.cs" />
-    <Compile Include="Screens\ReadmePanel.cs" />
-    <Compile Include="Screens\TipBox.cs" />
-    <Compile Include="Screens\TitleScreen.cs" />
+    <Compile Include="Screens\MiniMap.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Screens\ReadmePanel.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Screens\TipBox.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Screens\TitleScreen.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />
     <Content Include="gamethumbnail.ico" />
     <Content Include="GameThumbnail.png" />
-    <Content Include="Settings.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Settings.xml" />
   </ItemGroup>
   <ItemGroup>
     <NestedContentProject Include="Content\Content.contentproj">
@@ -140,24 +179,28 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Editor\BloomEditor.resx">
-      <SubType>Designer</SubType>
       <DependentUpon>BloomEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\IntensityEditor.resx">
-      <SubType>Designer</SubType>
       <DependentUpon>IntensityEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\ParticleEditor.resx">
-      <SubType>Designer</SubType>
       <DependentUpon>ParticleEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\ParticleGenerator.resx">
-      <SubType>Designer</SubType>
       <DependentUpon>ParticleGenerator.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editor\ShadowEditor.resx">
+      <DependentUpon>ShadowEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Editor\WorldEditor.resx">
-      <SubType>Designer</SubType>
       <DependentUpon>WorldEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

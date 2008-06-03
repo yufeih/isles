@@ -64,41 +64,75 @@
     <Compile Include="AI\Graph.cs" />
     <Compile Include="AI\PathManager.cs" />
     <Compile Include="AI\PriorityQueue.cs" />
-    <Compile Include="Game\ContentManager.cs" />
+    <Compile Include="Game\Assets.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Game\ContentManager.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Game\Entity.cs" />
     <Compile Include="Game\AudioManager.cs" />
     <Compile Include="Game\Camera.cs" />
-    <Compile Include="Game\Event.cs" />
+    <Compile Include="Game\Event.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Game\Game.cs" />
     <Compile Include="Game\GameWorld.cs" />
     <Compile Include="Game\Input.cs" />
     <Compile Include="Game\Interface.cs" />
-    <Compile Include="Game\Assets.cs" />
     <Compile Include="Game\Math2D.cs" />
-    <Compile Include="Game\Movement.cs" />
     <Compile Include="Game\Helper.cs" />
+    <Compile Include="Game\Movement.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Game\Win32.cs" />
-    <Compile Include="Graphics\BaseLandscape.cs" />
+    <Compile Include="Graphics\BaseLandscape.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Graphics\Billboard.cs" />
-    <Compile Include="Graphics\BloomEffect.cs" />
-    <Compile Include="Graphics\Environment.cs" />
+    <Compile Include="Graphics\BloomEffect.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Graphics\Environment.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Graphics\GameModel.cs" />
-    <Compile Include="Graphics\GameModel.Manager.cs" />
+    <Compile Include="Graphics\GameModel.Manager.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Graphics\Graphics2D.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Graphics\Landscape.cs" />
     <Compile Include="Graphics\Loading.cs" />
-    <Compile Include="Graphics\MipmappedLandscape.cs" />
-    <Compile Include="Graphics\ParticleSystem.cs" />
+    <Compile Include="Graphics\MipmappedLandscape.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Graphics\ParticleSystem.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Graphics\PointSprite.cs" />
-    <Compile Include="Graphics\ShadowEffect.cs" />
-    <Compile Include="Graphics\Graphics2D.cs" />
-    <Compile Include="Graphics\TiledLandscape.cs" />
-    <Compile Include="Graphics\TrailEffect.cs" />
+    <Compile Include="Graphics\ShadowEffect.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Graphics\TiledLandscape.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Graphics\TrailEffect.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Graphics\Vertex.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Game\Settings.cs" />
-    <Compile Include="UI\Button.cs" />
-    <Compile Include="UI\Panel.cs" />
-    <Compile Include="UI\ProgressBar.cs" />
+    <Compile Include="UI\Button.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UI\Panel.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UI\ProgressBar.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="UI\UIDisplay.cs" />
     <Compile Include="UI\UIElement.cs" />
   </ItemGroup>
