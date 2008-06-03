@@ -526,30 +526,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Audios\Waves\Effects\badluck.wav">
-      <Name>badluck</Name>
-    </None>
-    <None Include="Audios\Waves\Effects\invalid.wav">
-      <Name>invalid</Name>
-    </None>
-    <None Include="Audios\Waves\Effects\ok.wav">
-      <Name>ok</Name>
-    </None>
-    <None Include="Audios\Waves\Effects\place.wav">
-      <Name>place</Name>
-    </None>
-    <None Include="Audios\Waves\Effects\treasure.wav">
-      <Name>treasure</Name>
-    </None>
-    <None Include="Audios\Waves\Music\islander.wav">
-      <Name>islander</Name>
-    </None>
-    <None Include="Audios\Waves\Music\menu.wav">
-      <Name>menu</Name>
-    </None>
-    <None Include="Audios\Waves\Music\steamer.wav">
-      <Name>steamer</Name>
-    </None>
     <None Include="Models\Buildings\tietu_fangyu1.bmp">
       <Name>tietu_fangyu1</Name>
       <Importer>TextureImporter</Importer>
@@ -594,304 +570,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Audios\Isles.xap">
-      <Name>Isles</Name>
-      <Importer>XactImporter</Importer>
-      <Processor>XactProcessor</Processor>
-    </Compile>
     <None Include="Charactors\Follower\tietu_nongmin.bmp">
       <Name>tietu_nongmin</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Audios\Waves\Buildings\altar.wav">
-      <Name>altar</Name>
-    </None>
-    <None Include="Audios\Waves\Buildings\barracks.wav">
-      <Name>barracks</Name>
-    </None>
-    <None Include="Audios\Waves\Buildings\farm.wav">
-      <Name>farm</Name>
-    </None>
-    <None Include="Audios\Waves\Buildings\lumbermill.wav">
-      <Name>lumbermill</Name>
-    </None>
-    <None Include="Audios\Waves\Buildings\tower.wav">
-      <Name>tower</Name>
-    </None>
-    <None Include="Audios\Waves\Buildings\townhall.wav">
-      <Name>townhall</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Fire\punish.wav">
-      <Name>punish</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Follower\ChopWood_01.wav">
-      <Name>ChopWood_01</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Follower\ChopWood_02.wav">
-      <Name>ChopWood_02</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Follower\ChopWood_03.wav">
-      <Name>ChopWood_03</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Follower\ChopWood_04.wav">
-      <Name>ChopWood_04</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Hellfire\Hellfire_01.wav">
-      <Name>Hellfire_01</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Hellfire\Hellfire_02.wav">
-      <Name>Hellfire_02</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Hellfire\Hellfire_03.wav">
-      <Name>Hellfire_03</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Hellfire\Hellfire_04.wav">
-      <Name>Hellfire_04</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Hellfire\Hellfire_05.wav">
-      <Name>Hellfire_05</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Hellfire\Hellfire_06.wav">
-      <Name>Hellfire_06</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Hellfire\Hellfire_07.wav">
-      <Name>Hellfire_07</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Hunter\hunter_01.wav">
-      <Name>hunter_01</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Hunter\Launch_01.wav">
-      <Name>Launch_01</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Hunter\Launch_02.wav">
-      <Name>Launch_02</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Hunter\Launch_03.wav">
-      <Name>Launch_03</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Hunter\MissileHit.wav">
-      <Name>MissileHit</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\bone_01.wav">
-      <Name>bone_01</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\bone_02.wav">
-      <Name>bone_02</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\bone_03.wav">
-      <Name>bone_03</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\bone_04.wav">
-      <Name>bone_04</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\bone_05.wav">
-      <Name>bone_05</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\fireball_cast.wav">
-      <Name>fireball_cast</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\fireball_hit.wav">
-      <Name>fireball_hit</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\flesh_01.wav">
-      <Name>flesh_01</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\flesh_02.wav">
-      <Name>flesh_02</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\flesh_03.wav">
-      <Name>flesh_03</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\flesh_04.wav">
-      <Name>flesh_04</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\flesh_05.wav">
-      <Name>flesh_05</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\fur_01.wav">
-      <Name>fur_01</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\fur_02.wav">
-      <Name>fur_02</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\fur_03.wav">
-      <Name>fur_03</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\fur_04.wav">
-      <Name>fur_04</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\fur_05.wav">
-      <Name>fur_05</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\sword_01.wav">
-      <Name>sword_01</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\sword_02.wav">
-      <Name>sword_02</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\sword_03.wav">
-      <Name>sword_03</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\sword_04.wav">
-      <Name>sword_04</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\sword_05.wav">
-      <Name>sword_05</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\sword_06.wav">
-      <Name>sword_06</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\tower_missile_launch_01.wav">
-      <Name>tower_missile_launch_01</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\tower_missile_launch_02.wav">
-      <Name>tower_missile_launch_02</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\tower_missile_launch_03.wav">
-      <Name>tower_missile_launch_03</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\wood_01.wav">
-      <Name>wood_01</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\wood_02.wav">
-      <Name>wood_02</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\wood_03.wav">
-      <Name>wood_03</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\wood_04.wav">
-      <Name>wood_04</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\wood_05.wav">
-      <Name>wood_05</Name>
-    </None>
-    <None Include="Audios\Waves\Combat\wood_06.wav">
-      <Name>wood_06</Name>
-    </None>
-    <None Include="Audios\Waves\Effects\complete.wav">
-      <Name>complete</Name>
-    </None>
-    <None Include="Audios\Waves\Effects\credit.wav">
-      <Name>credit</Name>
-    </None>
-    <None Include="Audios\Waves\Effects\damage_01.wav">
-      <Name>damage_01</Name>
-    </None>
-    <None Include="Audios\Waves\Effects\damage_02.wav">
-      <Name>damage_02</Name>
-    </None>
-    <None Include="Audios\Waves\Effects\death.wav">
-      <Name>death</Name>
-    </None>
-    <None Include="Audios\Waves\Effects\explosion_01.wav">
-      <Name>explosion_01</Name>
-    </None>
-    <None Include="Audios\Waves\Effects\explosion_02.wav">
-      <Name>explosion_02</Name>
-    </None>
-    <None Include="Audios\Waves\Effects\hawk.wav">
-      <Name>hawk</Name>
-    </None>
-    <None Include="Audios\Waves\Effects\rally.wav">
-      <Name>rally</Name>
-    </None>
-    <None Include="Audios\Waves\Music\lose.wav">
-      <Name>lose</Name>
-    </None>
-    <None Include="Audios\Waves\Music\win.wav">
-      <Name>win</Name>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Audios\Waves\Effects\explosion_03.wav">
-      <Name>explosion_03</Name>
-    </None>
-    <None Include="Audios\Waves\Effects\explosion_04.wav">
-      <Name>explosion_04</Name>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Audios\Waves\Effects\morefarms_01.wav">
-      <Name>morefarms_01</Name>
-    </None>
-    <None Include="Audios\Waves\Effects\morefarms_02.wav">
-      <Name>morefarms_02</Name>
-    </None>
-    <None Include="Audios\Waves\Effects\notenoughgold.wav">
-      <Name>notenoughgold</Name>
-    </None>
-    <None Include="Audios\Waves\Effects\notenoughlumber.wav">
-      <Name>notenoughlumber</Name>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Audios\Waves\Effects\underattack_01.wav">
-      <Name>underattack_01</Name>
-    </None>
-    <None Include="Audios\Waves\Effects\underattack_02.wav">
-      <Name>underattack_02</Name>
-    </None>
-    <None Include="Audios\Waves\Effects\underattack_03.wav">
-      <Name>underattack_03</Name>
-    </None>
-    <None Include="Audios\Waves\Effects\upgradecomplete_01.wav">
-      <Name>upgradecomplete_01</Name>
-    </None>
-    <None Include="Audios\Waves\Effects\upgradecomplete_02.wav">
-      <Name>upgradecomplete_02</Name>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Audios\Waves\Effects\cannotbuild_01.wav">
-      <Name>cannotbuild_01</Name>
-    </None>
-    <None Include="Audios\Waves\Effects\cannotbuild_02.wav">
-      <Name>cannotbuild_02</Name>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Audios\Waves\Charactors\Follower\Follower_01.wav">
-      <Name>Follower_01</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Follower\Follower_02.wav">
-      <Name>Follower_02</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Follower\Follower_03.wav">
-      <Name>Follower_03</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Follower\Follower_04.wav">
-      <Name>Follower_04</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Follower\Follower_05.wav">
-      <Name>Follower_05</Name>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Audios\Waves\Charactors\Hunter\Hunter_02.wav">
-      <Name>Hunter_02</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Hunter\Hunter_03.wav">
-      <Name>Hunter_03</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Hunter\Hunter_05.wav">
-      <Name>Hunter_05</Name>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Audios\Waves\Charactors\Militia\Militia_01.wav">
-      <Name>Militia_01</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Militia\Militia_02.wav">
-      <Name>Militia_02</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Militia\Militia_03.wav">
-      <Name>Militia_03</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Militia\Militia_04.wav">
-      <Name>Militia_04</Name>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -902,40 +584,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Audios\Waves\Effects\TreeFall_01.wav">
-      <Name>TreeFall_01</Name>
-    </None>
-    <None Include="Audios\Waves\Effects\TreeFall_02.wav">
-      <Name>TreeFall_02</Name>
-    </None>
-    <None Include="Audios\Waves\Effects\TreeFall_03.wav">
-      <Name>TreeFall_03</Name>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Audios\Waves\Charactors\Follower\FollowerDie.wav">
-      <Name>FollowerDie</Name>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Audios\Waves\Charactors\Hunter\HunterDie.wav">
-      <Name>HunterDie</Name>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Audios\Waves\Charactors\Militia\MilitiaDie.wav">
-      <Name>MilitiaDie</Name>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Readme.txt">
       <Name>Readme</Name>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Audios\Waves\Combat\fireball_cast_02.wav">
-      <Name>fireball_cast_02</Name>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -947,30 +598,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Audios\Waves\Charactors\Fire\Flame_01.wav">
-      <Name>Flame_01</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Fire\Flame_02.wav">
-      <Name>Flame_02</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Fire\Flame_03.wav">
-      <Name>Flame_03</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Fire\Flame_04.wav">
-      <Name>Flame_04</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Fire\Flame_05.wav">
-      <Name>Flame_05</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Fire\Flame_06.wav">
-      <Name>Flame_06</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Fire\Flame_07.wav">
-      <Name>Flame_07</Name>
-    </None>
-    <None Include="Audios\Waves\Charactors\Fire\Flame_08.wav">
-      <Name>Flame_08</Name>
-    </None>
     <Compile Include="Models\Buildings\Lumbermill.X">
       <Name>Lumbermill</Name>
       <Importer>XImporter</Importer>
@@ -1234,6 +861,353 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Audios\Isles.xap">
+      <Name>Isles</Name>
+      <Importer>XactImporter</Importer>
+      <Processor>XactProcessor</Processor>
+    </Compile>
+    <Compile Include="Audios\Waves\Buildings\altar.wav">
+      <Name>altar</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Buildings\barracks.wav">
+      <Name>barracks</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Buildings\farm.wav">
+      <Name>farm</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Buildings\lumbermill.wav">
+      <Name>lumbermill</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Buildings\tower.wav">
+      <Name>tower</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Buildings\townhall.wav">
+      <Name>townhall</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Fire\Flame_01.wav">
+      <Name>Flame_01</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Fire\Flame_02.wav">
+      <Name>Flame_02</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Fire\Flame_03.wav">
+      <Name>Flame_03</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Fire\Flame_04.wav">
+      <Name>Flame_04</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Fire\Flame_05.wav">
+      <Name>Flame_05</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Fire\Flame_06.wav">
+      <Name>Flame_06</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Fire\Flame_07.wav">
+      <Name>Flame_07</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Fire\Flame_08.wav">
+      <Name>Flame_08</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Fire\punish.wav">
+      <Name>punish</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Follower\ChopWood_01.wav">
+      <Name>ChopWood_01</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Follower\ChopWood_02.wav">
+      <Name>ChopWood_02</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Follower\ChopWood_03.wav">
+      <Name>ChopWood_03</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Follower\ChopWood_04.wav">
+      <Name>ChopWood_04</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Follower\FollowerDie.wav">
+      <Name>FollowerDie</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Follower\Follower_01.wav">
+      <Name>Follower_01</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Follower\Follower_02.wav">
+      <Name>Follower_02</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Follower\Follower_03.wav">
+      <Name>Follower_03</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Follower\Follower_04.wav">
+      <Name>Follower_04</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Follower\Follower_05.wav">
+      <Name>Follower_05</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Hellfire\Hellfire_01.wav">
+      <Name>Hellfire_01</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Hellfire\Hellfire_02.wav">
+      <Name>Hellfire_02</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Hellfire\Hellfire_03.wav">
+      <Name>Hellfire_03</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Hellfire\Hellfire_04.wav">
+      <Name>Hellfire_04</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Hellfire\Hellfire_05.wav">
+      <Name>Hellfire_05</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Hellfire\Hellfire_06.wav">
+      <Name>Hellfire_06</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Hellfire\Hellfire_07.wav">
+      <Name>Hellfire_07</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Hunter\HunterDie.wav">
+      <Name>HunterDie</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Hunter\hunter_01.wav">
+      <Name>hunter_01</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Hunter\Hunter_02.wav">
+      <Name>Hunter_02</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Hunter\Hunter_03.wav">
+      <Name>Hunter_03</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Hunter\Hunter_05.wav">
+      <Name>Hunter_05</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Hunter\Launch_01.wav">
+      <Name>Launch_01</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Hunter\Launch_02.wav">
+      <Name>Launch_02</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Hunter\Launch_03.wav">
+      <Name>Launch_03</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Hunter\MissileHit.wav">
+      <Name>MissileHit</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Militia\MilitiaDie.wav">
+      <Name>MilitiaDie</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Militia\Militia_01.wav">
+      <Name>Militia_01</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Militia\Militia_02.wav">
+      <Name>Militia_02</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Militia\Militia_03.wav">
+      <Name>Militia_03</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Charactors\Militia\Militia_04.wav">
+      <Name>Militia_04</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\bone_01.wav">
+      <Name>bone_01</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\bone_02.wav">
+      <Name>bone_02</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\bone_03.wav">
+      <Name>bone_03</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\bone_04.wav">
+      <Name>bone_04</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\bone_05.wav">
+      <Name>bone_05</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\fireball_cast.wav">
+      <Name>fireball_cast</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\fireball_cast_02.wav">
+      <Name>fireball_cast_02</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\fireball_hit.wav">
+      <Name>fireball_hit</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\flesh_01.wav">
+      <Name>flesh_01</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\flesh_02.wav">
+      <Name>flesh_02</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\flesh_03.wav">
+      <Name>flesh_03</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\flesh_04.wav">
+      <Name>flesh_04</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\flesh_05.wav">
+      <Name>flesh_05</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\fur_01.wav">
+      <Name>fur_01</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\fur_02.wav">
+      <Name>fur_02</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\fur_03.wav">
+      <Name>fur_03</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\fur_04.wav">
+      <Name>fur_04</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\fur_05.wav">
+      <Name>fur_05</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\sword_01.wav">
+      <Name>sword_01</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\sword_02.wav">
+      <Name>sword_02</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\sword_03.wav">
+      <Name>sword_03</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\sword_04.wav">
+      <Name>sword_04</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\sword_05.wav">
+      <Name>sword_05</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\sword_06.wav">
+      <Name>sword_06</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\tower_missile_launch_01.wav">
+      <Name>tower_missile_launch_01</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\tower_missile_launch_02.wav">
+      <Name>tower_missile_launch_02</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\tower_missile_launch_03.wav">
+      <Name>tower_missile_launch_03</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\wood_01.wav">
+      <Name>wood_01</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\wood_02.wav">
+      <Name>wood_02</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\wood_03.wav">
+      <Name>wood_03</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\wood_04.wav">
+      <Name>wood_04</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\wood_05.wav">
+      <Name>wood_05</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Combat\wood_06.wav">
+      <Name>wood_06</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\badluck.wav">
+      <Name>badluck</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\cannotbuild_01.wav">
+      <Name>cannotbuild_01</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\cannotbuild_02.wav">
+      <Name>cannotbuild_02</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\complete.wav">
+      <Name>complete</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\credit.wav">
+      <Name>credit</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\damage_01.wav">
+      <Name>damage_01</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\damage_02.wav">
+      <Name>damage_02</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\death.wav">
+      <Name>death</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\explosion_01.wav">
+      <Name>explosion_01</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\explosion_02.wav">
+      <Name>explosion_02</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\explosion_03.wav">
+      <Name>explosion_03</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\explosion_04.wav">
+      <Name>explosion_04</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\hawk.wav">
+      <Name>hawk</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\invalid.wav">
+      <Name>invalid</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\morefarms_01.wav">
+      <Name>morefarms_01</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\morefarms_02.wav">
+      <Name>morefarms_02</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\notenoughgold.wav">
+      <Name>notenoughgold</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\notenoughlumber.wav">
+      <Name>notenoughlumber</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\ok.wav">
+      <Name>ok</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\place.wav">
+      <Name>place</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\rally.wav">
+      <Name>rally</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\treasure.wav">
+      <Name>treasure</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\TreeFall_01.wav">
+      <Name>TreeFall_01</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\TreeFall_02.wav">
+      <Name>TreeFall_02</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\TreeFall_03.wav">
+      <Name>TreeFall_03</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\underattack_01.wav">
+      <Name>underattack_01</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\underattack_02.wav">
+      <Name>underattack_02</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\underattack_03.wav">
+      <Name>underattack_03</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\upgradecomplete_01.wav">
+      <Name>upgradecomplete_01</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Effects\upgradecomplete_02.wav">
+      <Name>upgradecomplete_02</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Music\islander.wav">
+      <Name>islander</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Music\lose.wav">
+      <Name>lose</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Music\menu.wav">
+      <Name>menu</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Music\steamer.wav">
+      <Name>steamer</Name>
+    </Compile>
+    <Compile Include="Audios\Waves\Music\win.wav">
+      <Name>win</Name>
+    </Compile>
     <None Include="Models\1.jpg">
       <Name>1</Name>
       <Importer>TextureImporter</Importer>
