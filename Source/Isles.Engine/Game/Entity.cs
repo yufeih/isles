@@ -1,3 +1,9 @@
+//-----------------------------------------------------------------------------
+//  Isles v1.0
+//  
+//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
+//-----------------------------------------------------------------------------
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,11 +17,236 @@ using Isles.Graphics;
 
 namespace Isles.Engine
 {
+    #region IState
+    public enum StateResult
+    {
+        Active, Inactive, Completed, Failed,
+    }
+
+    public interface IState : IEventListener
+    {
+        void Terminate();
+
+        /// <summary>
+        /// Perform any updates for this state
+        /// </summary>
+        /// <returns>
+        /// True indicates keeping the state alive
+        /// </returns>
+        StateResult Update(GameTime gameTime);
+
+        /// <summary>
+        /// Perform any drawings for this state
+        /// </summary>
+        void Draw(GameTime gameTime);
+    }
+
+    #endregion
+
+    #region General Purpose States
+    /// <summary>
+    /// Base state
+    /// </summary>
+    public abstract class BaseState : IState
+    {
+        protected StateResult State = StateResult.Inactive;
+
+        public abstract void Activate();
+        public abstract void Terminate();
+
+        protected void ActivateIfInactive()
+        {
+            if (State == StateResult.Inactive)
+            {
+                Activate();
+                State = StateResult.Active;
+            }
+        }
+
+        public virtual void Draw(GameTime gameTime)
+        {
+        }
+
+        public virtual StateResult Update(GameTime gameTime)
+        {
+            return StateResult.Completed;
+        }
+
+        public virtual EventResult HandleEvent(EventType type, object sender, object tag)
+        {
+            return EventResult.Unhandled;
+        }
+    }
+
+
+    /// <summary>
+    /// Represents a composite game state.
+    /// All child states will be executed.
+    /// </summary>
+    public class StateComposite : BaseState
+    {
+        public override void Activate() { }
+        public override void Terminate() { }
+
+        protected LinkedList<IState> SubStates = new LinkedList<IState>();
+
+        /// <remarks>
+        /// Should be called before attaching this state to a state machine
+        /// </remarks>
+        public void Add(IState state)
+        {
+            SubStates.AddLast(state);
+        }
+
+        /// <summary>
+        /// Clear all sub states
+        /// </summary>
+        public void Clear()
+        {
+            SubStates.Clear();
+        }
+
+        /// <summary>
+        /// Update the composite state
+        /// </summary>
+        /// <remarks>
+        /// If one of the substates failed, the whole composite state failed.
+        /// If all of the substates completed, the whole composite state complete.
+        /// </remarks>
+        public override StateResult Update(GameTime gameTime)
+        {
+            ActivateIfInactive();
+
+            LinkedListNode<IState> current = SubStates.First;
+
+            StateResult compositeResult = StateResult.Completed;
+
+            while (current != null)
+            {
+                StateResult result = current.Value.Update(gameTime);
+
+                if (result == StateResult.Failed)
+                {
+                    // The whole state fails
+                    SubStates.Clear();
+                    return StateResult.Failed;
+                }
+
+                if (result != StateResult.Completed)
+                {
+                    // The whole state continues
+                    LinkedListNode<IState> next = current.Next;
+                    SubStates.Remove(current);
+                    current = next;
+                    compositeResult = StateResult.Active;
+                }
+
+                // Move on to the next state
+                current = current.Next;
+            }
+
+            return compositeResult;
+        }
+
+        public override void Draw(GameTime gameTime)
+        {
+            foreach (IState state in SubStates)
+                state.Draw(gameTime);
+        }
+
+        public override EventResult HandleEvent(EventType type, object sender, object tag)
+        {
+            // Pass to all sub states
+            foreach (IState state in SubStates)
+                if (state.HandleEvent(type, state, tag) == EventResult.Handled)
+                    return EventResult.Handled;
+
+            return EventResult.Unhandled;
+        }
+    }
+
+
+    /// <summary>
+    /// Represents a sequence of game states.
+    /// Swith to the next state once the current state has completed
+    /// </summary>
+    public class StateSequential : BaseState
+    {
+        public override void Activate() { }
+        public override void Terminate() { }
+
+        protected LinkedList<IState> SubStates = new LinkedList<IState>();
+
+        /// <remarks>
+        /// Should be called before attaching this state to a state machine
+        /// </remarks>
+        public void Add(IState state)
+        {
+            SubStates.AddLast(state);
+        }
+
+        public void Clear()
+        {
+            SubStates.Clear();
+        }
+
+        /// <remarks>
+        /// Derived classes must call base.Update first in their update functions.
+        /// </remarks>
+        public override StateResult Update(GameTime gameTime)
+        {
+            ActivateIfInactive();
+
+            LinkedListNode<IState> current = SubStates.First;
+
+            if (current != null)
+            {
+                StateResult result = current.Value.Update(gameTime);
+
+                if (result == StateResult.Failed)
+                {
+                    // The whole state failed
+                    SubStates.Clear();
+                    return StateResult.Failed;
+                }
+
+                if (result == StateResult.Completed)
+                {
+                    // Switch to the next state
+                    SubStates.Remove(current);
+                    return SubStates.Count > 0 ? StateResult.Active :
+                                                 StateResult.Completed;
+                }
+
+                // The current state is still active
+                return StateResult.Active;
+            }
+
+            return StateResult.Completed;
+        }
+
+        public override void Draw(GameTime gameTime)
+        {
+            // Only draw the first state
+            if (SubStates.First != null)
+                SubStates.First.Value.Draw(gameTime);
+        }
+
+        public override EventResult HandleEvent(EventType type, object sender, object tag)
+        {
+            // Only pass to the first state
+            if (SubStates.First != null)
+                return SubStates.First.Value.HandleEvent(type, sender, tag);
+            return EventResult.Unhandled;
+        }
+    }
+    #endregion
+
     #region BaseEntity
     /// <summary>
     /// Base world object
     /// </summary>
-    public abstract class BaseEntity : IWorldObject, IAudioEmitter
+    public abstract class BaseEntity : IWorldObject, IAudioEmitter, IEventListener
     {
         #region Field
 
@@ -24,7 +255,12 @@ namespace Isles.Engine
         /// <summary>
         /// Game world
         /// </summary>
-        protected GameWorld world;
+        public GameWorld World
+        {
+            get { return world; }
+        }
+
+        GameWorld world;
 
         /// <summary>
         /// Gets or sets the 3D position of the entity.
@@ -46,6 +282,7 @@ namespace Isles.Engine
 
         /// <summary>
         /// Gets or sets which way the entity is facing.
+        /// Used for 3D sound.
         /// </summary>
         public virtual Vector3 Forward
         {
@@ -55,6 +292,7 @@ namespace Isles.Engine
 
         /// <summary>
         /// Gets or sets the orientation of this entity.
+        /// Used for 3D sound.
         /// </summary>
         public Vector3 Up
         {
@@ -64,10 +302,12 @@ namespace Isles.Engine
 
         /// <summary>
         /// Gets or sets how fast this entity is moving.
+        /// Used for 3D sound.
         /// </summary>
         public virtual Vector3 Velocity
         {
             get { return Vector3.Zero; }
+            set { }
         }
 
 
@@ -82,20 +322,20 @@ namespace Isles.Engine
             set { }
         }
 
-
         /// <summary>
-        /// Gets or sets whether the dirty bounding box
+        /// Gets or sets scene manager data
         /// </summary>
-        public virtual BoundingBox DirtyBoundingBox
+        public object SceneManagerTag
         {
-            get { return new BoundingBox(); }
-            set { }
+            get { return sceneManagerTag; }
+            set { sceneManagerTag = value; }
         }
 
+        object sceneManagerTag;
 
         public virtual BoundingBox BoundingBox
         {
-            get { return new BoundingBox(position, position); }
+            get { return new BoundingBox(); }
         }
 
 
@@ -156,6 +396,42 @@ namespace Isles.Engine
         public abstract void Draw(GameTime gameTime);
 
         /// <summary>
+        /// Called when this entity is been add to the world
+        /// </summary>
+        public virtual void OnCreate() { }
+
+        /// <summary>
+        /// Called when this entity is been destroyed
+        /// </summary>
+        public virtual void OnDestroy() { }
+
+        /// <summary>
+        /// Draw the scene object to a shadow map
+        /// </summary>
+        public virtual void DrawShadowMap(GameTime gameTime, ShadowEffect shadow)
+        {
+            // Nothing is drawed
+        }
+
+        /// <summary>
+        /// Draw the scene object to a reflection map
+        /// </summary>
+        public virtual void DrawReflection(GameTime gameTime, Matrix view, Matrix projection)
+        {
+            // Nothing is drawed
+        }
+
+        /// <summary>
+        /// Make the entity fall on the ground
+        /// </summary>
+        public void Fall()
+        {
+            Position = new Vector3(Position.X,
+                                   Position.Y,
+                                   World.Landscape.GetHeight(Position.X, Position.Y));
+        }
+
+        /// <summary>
         /// Write the scene object to an output stream
         /// Serialized attributes: Name, Position, Velocity
         /// </summary>
@@ -182,11 +458,18 @@ namespace Isles.Engine
                 // Note this should be the upper case Position!!!
                 Position = Helper.StringToVector3(value);
         }
+
+        /// <summary>
+        /// Handle events
+        /// </summary>
+        public virtual EventResult HandleEvent(EventType type, object sender, object tag)
+        {
+            return EventResult.Unhandled;
+        }
     }
     #endregion
 
     #region Entity
-
     /// <summary>
     /// Base class for all pickable game entities
     /// </summary>
@@ -199,16 +482,28 @@ namespace Isles.Engine
 
         #region Field
         /// <summary>
-        /// Gets or sets entity description
+        /// Gets or sets the state of the agent
         /// </summary>
-        public string Description
+        public IState State
         {
-            get { return description; }
-            set { description = value; }
+            get { return state; }
+
+            set
+            {
+                IState resultState = null;
+
+                if (OnStateChanged(value, ref resultState))
+                {
+                    if (state != null)
+                        state.Terminate();
+                    state = resultState;
+                }
+            }
         }
 
-        protected string description;
+        IState state;
 
+        protected virtual bool OnStateChanged(IState newState, ref IState resultState) { return true; }
 
         /// <summary>
         /// Gets the model of the entity
@@ -221,7 +516,6 @@ namespace Isles.Engine
             {
                 MarkDirty();
                 model = value;
-                model.CenterModel(false);
             }
         }
 
@@ -229,78 +523,72 @@ namespace Isles.Engine
 
 
         /// <summary>
+        /// Gets or sets whether this entity is visible
+        /// </summary>
+        public bool Visible
+        {
+            get { return visible; }
+            set { visible = value; }
+        }
+
+        bool visible = true;
+
+
+        /// <summary>
+        /// Gets or sets whether the entity is within the view frustum
+        /// </summary>
+        public bool WithinViewFrustum
+        {
+            get { return withinViewFrustum; }
+        }
+
+        bool withinViewFrustum;
+
+
+        /// <summary>
         /// Gets or sets entity position.
         /// </summary>
         public override Vector3 Position
         {
-            set
-            {
-                MarkDirty();
-                base.Position = new Vector3(value.X, value.Y,
-                    world.Landscape.GetHeight(value.X, value.Y));
-            }
+            get { return base.Position; }
+            set { MarkDirty(); base.Position = value; }
         }
 
 
         /// <summary>
-        /// Gets or sets entity rotation on the XY plane, in radius.
+        /// Gets or sets entity rotation
         /// </summary>
-        public float Rotation
+        public Quaternion Rotation
         {
             get { return rotation; }
             set { MarkDirty(); rotation = value; }
         }
 
-        float rotation = 0;
+        Quaternion rotation = Quaternion.Identity;
 
 
         /// <summary>
-        /// Gets or sets entity rotation on the X axis
-        /// </summary>
-        public float RotationX
-        {
-            get { return rotationX; }
-            set { MarkDirty(); rotationX = value; }
-        }
-
-        float rotationX = 0;
-
-
-        /// <summary>
-        /// Gets or sets entity rotation on the Y axis
-        /// </summary>
-        public float RotationY
-        {
-            get { return rotationY; }
-            set { MarkDirty(); rotationY = value; }
-        }
-
-        float rotationY = 0;
-
-
-        /// <summary>
-        /// Gets or set entity scale
+        /// Gets or sets entity scale
         /// </summary>
         public Vector3 Scale
         {
             get { return scale; }
             set { MarkDirty(); scale = value; }
         }
-        
+
         Vector3 scale = Vector3.One;
 
 
         /// <summary>
-        /// Gets or sets Whether this entity has been selected
+        /// Gets or sets the bias of model transform
         /// </summary>
-        public bool Selected
+        public Matrix TransformBias
         {
-            get { return selected; }
-            set { selected = value; if (selected == value) OnSelectStateChanged(); }
+            get { return transformBias; }
+            set { MarkDirty(); transformBias = value; }
         }
 
-        bool selected;
-
+        Matrix transformBias = Matrix.Identity;
 
         /// <summary>
         /// Gets model transform
@@ -312,12 +600,8 @@ namespace Isles.Engine
                 if (isTransformDirty)
                 {
                     transform = // Build transform from SRT values
-                                // Bug: Something's wrong with Matrix.CreateFromYawPitchRoll
                         Matrix.CreateScale(scale) *
-                        //Matrix.CreateFromYawPitchRoll(rotationY, rotationX, rotation) *
-                        Matrix.CreateRotationX(rotationX) *
-                        Matrix.CreateRotationY(rotationY) *
-                        Matrix.CreateRotationZ(rotation) *
+                        Matrix.CreateFromQuaternion(rotation) *
                         Matrix.CreateTranslation(Position);
 
                     isTransformDirty = false;
@@ -327,7 +611,7 @@ namespace Isles.Engine
             }
         }
 
-        Matrix transform;
+        Matrix transform = Matrix.Identity;
 
 
         /// <summary>
@@ -358,54 +642,52 @@ namespace Isles.Engine
         /// </summary>
         public override BoundingBox BoundingBox
         {
-            get { return model != null ? model.BoundingBox : new BoundingBox(); }
+            get
+            {
+                if (model == null)
+                    return new BoundingBox();
+
+                if (isDirty)
+                    model.Transform = transformBias * Transform;
+
+                return model.BoundingBox;
+            }
         }
-
-        /// <summary>
-        /// Gets or sets the dirty bounding box
-        /// </summary>
-        public override BoundingBox DirtyBoundingBox
-        {
-            get { return dirtyBoundingBox; }
-            set { dirtyBoundingBox = value; }
-        }
-
-        BoundingBox dirtyBoundingBox = new BoundingBox();
-
 
         /// <summary>
         /// Gets the size of the entity
         /// </summary>
         public virtual Vector3 Size
         {
-            get { return model.BoundingBox.Max - model.BoundingBox.Min; }
+            get { return BoundingBox.Max - BoundingBox.Min; }
         }
-
-
-        /// <summary>
-        /// Gets or sets whether this entity has been highlighted. E.g. Mouse over
-        /// </summary>
-        public bool Highlighted
-        {
-            get { return highlighted; }
-            set { highlighted = value; if (highlighted == value) OnHighlightStateChanged(); }
-        }
-
-
-        bool highlighted;
-
-
+        
         /// <summary>
         /// Gets entity outline
         /// </summary>
         public Outline Outline
         {
-            get { return outline; }
+            get
+            {
+                if (isDirty)
+                    UpdateOutline(outline);
+
+                return outline; 
+            }
         }
 
-        Outline outline = Outline.Empty;
+        /// <summary>
+        /// Used by derived classes to setup their outline.
+        /// By default, the outline of an entity is a circle.
+        /// </summary>
+        protected virtual void UpdateOutline(Outline outline)
+        {
+            // Radius of the outline should not be changed
+            outline.SetCircle(new Vector2(Position.X, Position.Y), outline.Radius);
+        }
 
-        
+        Outline outline = new Outline();
+
         /// <summary>
         /// Gets or sets whether this world object is active
         /// </summary>
@@ -424,15 +706,13 @@ namespace Isles.Engine
 
 
         /// <summary>
-        /// Forces needed to drag this entity
+        /// Gets whether the entity is interactive. you can make an entity
+        /// interactive by calling GameWorld.Activate();
         /// </summary>
-        protected float dragForce = 100;
-
-        /// <summary>
-        /// A list of spells owned by this entity
-        /// </summary>
-        protected List<Spell> spells = new List<Spell>();
-        
+        public virtual bool IsInteractive
+        {
+            get { return true; }
+        }
         #endregion
 
         #region Methods
@@ -442,8 +722,7 @@ namespace Isles.Engine
         public Entity(GameWorld world)
             : base(world)
         {
-            // Entities are active by default
-            world.Activate(this);
+
         }
         
         public Entity(GameWorld world, GameModel model)
@@ -451,129 +730,113 @@ namespace Isles.Engine
         {
             // Note assign to the upper case Model
             Model = model;
-
-            // Entities are active by default
-            world.Activate(this);
         }
 
-        /// <summary>
-        /// Serialized attributes: Description, Model, Transform, Scale
-        /// </summary>
-        /// <param name="xml"></param>
-        public override void Serialize(XmlElement xml)
-        {
-            base.Serialize(xml);
-
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Deserialized attributes: Description, Model, Position, Scale,
-        /// Rotation, RotationX, RotationY
-        /// </summary>
-        /// <param name="xml"></param>
         public override void Deserialize(XmlElement xml)
         {
             base.Deserialize(xml);
 
-            string value = "";
+            // Make entity fall on the ground
+            Fall();
 
-            // Get entity description
-            if (xml.HasAttribute("Description"))
-                description = xml.GetAttribute("Description");
+            string value = "";
 
             // Treat game model as level content
             if ((value = xml.GetAttribute("Model")) != "")
-                Model = new GameModel(world.LevelContent.Load<Model>(value));
+                Model = new GameModel(World.Content.Load<Model>(value));
             
-            // Get entity rotation & scale
-            if ((value = xml.GetAttribute("Rotation")) != "")
-                Rotation = MathHelper.ToRadians(float.Parse(value));
+            Vector3 scaleBias = Vector3.One;
+            Vector3 translation = Vector3.Zero;
+            float rotationX = 0, rotationY = 0, rotationZ = 0;
+
+            // Get entity transform bias
+            if ((value = xml.GetAttribute("RotationXBias")) != "")
+                rotationX = MathHelper.ToRadians(float.Parse(value));
+
+            if ((value = xml.GetAttribute("RotationYBias")) != "")
+                rotationY = MathHelper.ToRadians(float.Parse(value));
+
+            if ((value = xml.GetAttribute("RotationZBias")) != "")
+                rotationZ = MathHelper.ToRadians(float.Parse(value));
+
+            if ((value = xml.GetAttribute("ScaleBias")) != "")
+                scaleBias = Helper.StringToVector3(value);
+
+            if ((value = xml.GetAttribute("PositionBias")) != "")
+                translation = Helper.StringToVector3(value);
+
+            if (scaleBias != Vector3.One || rotationX != 0 || rotationY != 0 || rotationZ != 0 ||
+                translation != Vector3.Zero)
+            {
+                transformBias = Matrix.CreateScale(scaleBias) *
+                                Matrix.CreateRotationX(rotationX) *
+                                Matrix.CreateRotationY(rotationY) *
+                                Matrix.CreateRotationZ(rotationZ) *
+                                Matrix.CreateTranslation(translation);
+
+                // Update model transform
+                model.Transform = transformBias;
+
+                // Center game model
+                Vector3 center = (model.BoundingBox.Max + model.BoundingBox.Min) / 2;
+                transformBias.M41 -= center.X;
+                transformBias.M42 -= center.Y;
+                transformBias.M43 -= model.BoundingBox.Min.Z;
+                transformBias.M43 -= 0.2f;  // A little offset under the ground
+            }
+
+            // Get entity transform
+            rotationX = rotationY = rotationZ = 0;
 
             if ((value = xml.GetAttribute("RotationX")) != "")
-                RotationX = MathHelper.ToRadians(float.Parse(value));
+                rotationX = MathHelper.ToRadians(float.Parse(value));
 
             if ((value = xml.GetAttribute("RotationY")) != "")
-                RotationY = MathHelper.ToRadians(float.Parse(value));
+                rotationY = MathHelper.ToRadians(float.Parse(value));
+
+            if ((value = xml.GetAttribute("RotationZ")) != "")
+                rotationZ = MathHelper.ToRadians(float.Parse(value));
+
+            if (rotationX != 0 || rotationX != 0 || rotationZ != 0)
+            {
+                Rotation = Quaternion.CreateFromRotationMatrix(
+                                    Matrix.CreateRotationX(rotationX) *
+                                    Matrix.CreateRotationY(rotationY) *
+                                    Matrix.CreateRotationZ(rotationZ));
+            }
+
+            if ((value = xml.GetAttribute("Rotation")) != "")
+                Rotation = Helper.StringToQuaternion(value);
 
             if ((value = xml.GetAttribute("Scale")) != "")
                 Scale = Helper.StringToVector3(value);
 
-            // Get entity spells
-            XmlNodeList spellNodes = xml.SelectNodes("Spell");
-            foreach (XmlNode node in spellNodes)
-            {
-                XmlElement element = node as XmlElement;
-
-                if (element != null && 
-                   (value = element.GetAttribute("Class")) != "")
-                {
-                    spells.Add(Spell.Create(value, world));
-                }
-            }
+            // Deserialize is probably always called during initialization,
+            // so calculate outline radius at this time.
+            outline.SetCircle(Vector2.Zero, (Size.X + Size.Y) / 4);
+            UpdateOutline(outline);
         }
-
-
-        /// <summary>
-        /// Get entity spells
-        /// </summary>
-        public virtual IEnumerable<Spell> Spells
+        
+        public override void Serialize(XmlElement xml)
         {
-            get { return spells; }
-        }
+            base.Serialize(xml);
 
-
-        /// <summary>
-        /// Transform a point from world space to local space
-        /// NOTE: This implementation does not consider z value
-        /// </summary>
-        /// <param name="p"></param>
-        /// <returns></returns>
-        public Vector3 WorldToLocal(Vector3 p)
-        {
-            Vector2 v, pos;
-
-            v.X = p.X;
-            v.Y = p.Y;
-
-            pos.X = Position.X;
-            pos.Y = Position.Y;
-
-            return new Vector3(
-                Math2D.WorldToLocal(v, pos, rotation), p.Z);
-        }
-
-        /// <summary>
-        /// Transform a point from local space to world space
-        /// NOTE: This implementation does not consider z value
-        /// </summary>
-        /// <param name="p"></param>
-        /// <returns></returns>
-        public Vector3 LocalToWorld(Vector3 p)
-        {
-            Vector2 v, pos;
-
-            v.X = p.X;
-            v.Y = p.Y;
-
-            pos.X = Position.X;
-            pos.Y = Position.Y;
-
-            return new Vector3(
-                Math2D.LocalToWorld(v, pos, rotation), p.Z);
+            if (scale != Vector3.One)
+                xml.SetAttribute("Scale", Helper.Vector3Tostring(scale));
+            if (rotation != Quaternion.Identity)
+                xml.SetAttribute("Rotation", Helper.QuaternionTostring(rotation));
         }
 
         /// <summary>
         /// Test to see if this entity is visible from a given view and projection
         /// </summary>
         /// <returns></returns>
-        public virtual bool VisibilityTest(Matrix viewProjection)
+        public virtual bool IsVisible(Matrix viewProjection)
         {
             // Transform position to projection space
-            //Vector3 p = Vector3.Transform(position, viewProjection);
-            //BoundingFrustum f = new BoundingFrustum(viewProjection);
+            BoundingFrustum f = new BoundingFrustum(viewProjection);
 
-            //if (f.Contains(position) == ContainmentType.Contains)
+            if (f.Intersects(BoundingBox))
             {
                 // Distance to the eye
                 if (Vector3.Subtract(
@@ -587,73 +850,70 @@ namespace Isles.Engine
             return false;
         }
 
-        /// <summary>
-        /// Gets the spells of the entity
-        /// </summary>
-        /// <returns></returns>
-        public virtual IEnumerable<Spell> GetSpells()
-        {
-            return null;
-        }
-
-        /// <summary>
-        /// Called when the entity highlighted state changed
-        /// </summary>
-        protected virtual void OnHighlightStateChanged() { }
-
-        /// <summary>
-        /// Called when the entity selected state changed
-        /// </summary>
-        protected virtual void OnSelectStateChanged() { }
-
-        /// <summary>
-        /// Draw the entity status when selected
-        /// </summary>
-        /// <returns>The rectangle drawed</returns>
-        public virtual Rectangle DrawStatus(Rectangle region)
-        {
-            Text.DrawString(Name, 15, new Vector2((float)region.X, (float)region.Y), Color.Orange);
-            return region;
-        }
-
         public override void Update(GameTime gameTime)
         {
+            // Update current state
+            if (state != null)
+            {
+                StateResult result = state.Update(gameTime);
+
+                if (result == StateResult.Completed ||
+                    result == StateResult.Failed)
+                {
+                    State = null;
+                }
+            }
+
             if (isDirty)
             {
                 // Update model transform, this will update the bounding box
-                model.Transform = Transform;
+                model.Transform = transformBias * Transform;
 
-                // By default, the outline of an entity is a circle
-                outline.SetCircle(
-                    new Vector2(Position.X, Position.Y),
-                    (Size.X + Size.Y) / 2);
+                // Update outline
+                UpdateOutline(outline);
             }
 
             if (model != null)
                 model.Update(gameTime);
+
+            withinViewFrustum = IsVisible(BaseGame.Singleton.ViewProjection);
         }
 
         public override void Draw(GameTime gameTime)
         {
-            if (model != null && VisibilityTest(BaseGame.Singleton.ViewProjection))
+            if (visible)
             {
-                model.Draw(gameTime);
+                // Draw current state
+                if (state != null)
+                    state.Draw(gameTime);
 
-                /*
-                int bone = model.GetBone("R_Thumb2");
-                
-                if (bone >= 0)
+                if (model != null && withinViewFrustum)
                 {
-                    Matrix mx = model.GetBoneTransform(bone);
-
-                    Vector3 v = BaseGame.Singleton.GraphicsDevice.Viewport.Project(
-                        mx.Translation, BaseGame.Singleton.Projection,
-                        BaseGame.Singleton.View, Matrix.Identity);
-
-                    Text.DrawString("Hehe, Im here", 16, new Vector2(v.X, v.Y), Color.White);
+                    //model.Tint = highlighted ? new Vector4(0, 0, 0, 1) : Vector4.One;
+                    model.Draw(gameTime);
                 }
-                 */
             }
+        }
+
+        public override void DrawShadowMap(GameTime gameTime, ShadowEffect shadow)
+        {
+            if (visible && model != null && IsVisible(shadow.ViewProjection))
+                model.DrawShadowMap(gameTime, shadow);
+        }
+
+        public override void DrawReflection(GameTime gameTime, Matrix view, Matrix projection)
+        {
+            if (visible && model != null && IsVisible(view * projection))
+                model.Draw(gameTime);
+        }
+
+        public override EventResult HandleEvent(EventType type, object sender, object tag)
+        {
+            if (state != null &&
+                state.HandleEvent(type, sender, tag) == EventResult.Handled)
+                return EventResult.Handled;
+
+            return base.HandleEvent(type, sender, tag);
         }
 
         /// <summary>
@@ -664,7 +924,7 @@ namespace Isles.Engine
         public virtual bool Intersects(Vector3 point)
         {
             // Performs an axis aligned bounding box intersection test
-            return BoundingBox.Contains(point) == ContainmentType.Contains;
+            return visible && BoundingBox.Contains(point) == ContainmentType.Contains;
         }
 
         /// <summary>
@@ -675,324 +935,18 @@ namespace Isles.Engine
         public virtual float? Intersects(Ray ray)
         {
             // Performs an axis aligned bounding box intersection test
-            return ray.Intersects(model.BoundingBox);
+            return visible ? model.Intersects(ray) : null;
         }
-        
-        #region Drag & Drop
-        /// <summary>
-        /// Called when the user decided to drag this entity (button just pressed)
-        /// </summary>
-        /// <returns>
-        /// Whether this entity shall be dragged (or receive Dragging/EndDrag events)
-        /// </returns>
-        public virtual bool BeginDrag(Hand hand) { return true; }
 
         /// <summary>
-        /// Called when the user is dragging the entity
+        /// Tests whether the object intersects the specified frustum.
         /// </summary>
-        public virtual void Dragging(Hand hand) { }
-
-        /// <summary>
-        /// Called when the user decided to drag this entity (button just released)
-        /// </summary>
-        public virtual void EndDrag(Hand hand)
+        public virtual bool Intersects(BoundingFrustum frustum)
         {
-            // Pick up then entity only when the hand has enough power
-            if (hand.Power >= dragForce)
-                hand.Drag(this);
+            return visible && frustum.Contains(Position) == ContainmentType.Contains;
         }
-
-        /// <summary>
-        /// Called when this entity is being carried by a hand
-        /// </summary>
-        public virtual void Follow(Hand hand)
-        {
-            Position = hand.Position;
-        }
-
-        protected Point mouseBeginDropPosition;
-        protected float mouseBeginDropRotation;
-
-        /// <summary>
-        /// Called when the user decided to drop this entity (button just pressed)
-        /// </summary>
-        /// <param name="entity">
-        /// The target entity to be drop to (can be null).
-        /// </param>
-        /// <returns>
-        /// OLD: Whether the hand should drag the target entity or not.
-        /// If the return value is true, the target entity will receive BeginDrap event,
-        /// and this entity will not receive Dropping/EndDrop event.
-        /// 
-        /// NEW: Whether this entity would like to continue receive Dropping/EndDrop events
-        /// </returns>
-        /// <remarks>
-        /// Place the entity on the ground plus rotating it by default
-        /// </remarks>
-        public virtual bool BeginDrop(Hand hand, Entity entity, bool leftButton)
-        {
-            // Otherwise, place it on the ground
-            mouseBeginDropRotation = Rotation;
-            mouseBeginDropPosition = Input.MousePosition;
-            mouseBeginDropPosition.Y -= 10;
-            return true; 
-        }
-
-        /// <summary>
-        /// Called when the user is dropping the entity
-        /// </summary>
-        public virtual void Dropping(Hand hand, Entity entity, bool leftButton)
-        {
-            Rotation = mouseBeginDropRotation + MathHelper.PiOver2 + (float)Math.Atan2(
-                -(double)(Input.MousePosition.Y - mouseBeginDropPosition.Y),
-                 (double)(Input.MousePosition.X - mouseBeginDropPosition.X));
-        }
-
-        /// <summary>
-        /// Called when the user decided to drop this entity (button just released)
-        /// </summary>
-        /// <param name="entity">
-        /// The target entity to be drop to (can be null).
-        /// </param>
-        /// <returns>
-        /// Whether the hand should drop this entity
-        /// </returns>
-        public virtual bool EndDrop(Hand hand, Entity entity, bool leftButton)
-        {
-            //if (!Place(world.Landscape))
-            //{
-            //    world.Destroy(this);
-            //}
-            return true;
-        }
-        #endregion
         #endregion
     }
 
-    #endregion
-    
-    #region BaseAgent
-    /// <summary>
-    /// Base class for all game agents
-    /// </summary>
-    public class BaseAgent : Entity
-    {
-        #region Field
-
-        /// <summary>
-        /// Agent state machine
-        /// </summary>
-        public StateMachine<BaseAgent> StateMachine
-        {
-            get { return stateMachine; }
-        }
-
-        protected StateMachine<BaseAgent> stateMachine;
-
-        /// <summary>
-        /// Map from animation type to model clip name
-        /// </summary>
-        protected IDictionary<string, string> clipMap = new Dictionary<string, string>();
-
-        /// <summary>
-        /// Gets or sets max health of the agent
-        /// </summary>
-        public virtual float MaxHealth
-        {
-            get { return maxHealth; }
-
-            set
-            {
-                maxHealth = (value > 0 ? value : 0);
-                if (health > 0)
-                    health = maxHealth;
-            }
-        }
-
-        float maxHealth = 100;
-
-        /// <summary>
-        /// Gets or sets the health of the building
-        /// </summary>
-        public virtual float Health
-        {
-            get { return health; }
-
-            set
-            {
-                if (value < 0)
-                    health = 0;
-                else if (value > maxHealth)
-                    health = maxHealth;
-                else
-                    health = value;
-            }
-        }
-
-        float health = 100;
-
-        #endregion
-
-        #region Methods
-        
-        public BaseAgent(GameWorld world)
-            : base(world)
-        {
-            stateMachine = new StateMachine<BaseAgent>(this);
-        }
-
-        /// <summary>
-        /// Play the animation of a given type.
-        /// </summary>
-        /// <param name="type">
-        /// Example types: Idle, Walk, Run, Attack...
-        /// </param>
-        /// <remarks>
-        /// This method differs from Model.PlayAnimation in that type is fixed 
-        /// and used all over the game.
-        /// E.g., a animation of type "Walk" may have the name "Take 001" in the model.
-        /// </remarks>
-        public void PlayAnimation(string type)
-        {
-            string clip;
-
-            if (clipMap.TryGetValue(type, out clip))
-            {
-                Model.PlayAnimation(clip);
-            }
-        }
-
-        /// <summary>
-        /// Deserialized attributes: Health, MaxHealth, ClipWalk, ClipRun
-        /// </summary>
-        /// <param name="xml"></param>
-        public override void Deserialize(XmlElement xml)
-        {
-            if (xml.HasAttribute("ClipWalk"))
-                clipMap.Add("Walk", xml.GetAttribute("ClipWalk"));
-
-            if (xml.HasAttribute("ClipRun"))
-                clipMap.Add("Run", xml.GetAttribute("ClipRun"));
-
-            float.TryParse(xml.GetAttribute("Health"), out health);
-            float.TryParse(xml.GetAttribute("MaxHealth"), out maxHealth);
-
-            if (health > maxHealth)
-            {
-                if (maxHealth >= 0)
-                    health = maxHealth;
-                else
-                    maxHealth = health;
-            }
-
-            base.Deserialize(xml);
-        }
-
-        /// <summary>
-        /// Called when the agent is dragged by the hand
-        /// </summary>
-        public override bool BeginDrag(Hand hand)
-        {
-            // Agents can't be dragged
-            return false;
-        }
-
-        /// <summary>
-        /// Called when the agent is dropped by the hand
-        /// </summary>
-        public override bool BeginDrop(Hand hand, Entity entity, bool leftButton)
-        {
-            // Agents can't be dropped
-            return false;
-        }
-        
-        /// <summary>
-        /// Move the agent to the specific location
-        /// </summary>
-        public bool MoveTo(Vector3 location)
-        {
-            // Change agent to move state
-            stateMachine.ChangeState(new StateMove(world, location));
-            return true;
-        }
-
-        /// <summary>
-        /// Move the agent towards the specific entity
-        /// </summary>
-        public bool MoveTo(Entity target)
-        {
-
-            return true;
-        }
-
-        /// <summary>
-        /// Attack the specific entity
-        /// </summary>
-        public bool Attack(Entity target)
-        {
-            // StateSequential<T> may came to help here.
-            // For the attack state, it contains two sequential states:
-            // E.g., StateMoveToTarget, StateAttackTarget.
-            // StateSequential will execute StateAttackTarget immediately
-            // StateMoveToTarget has finished (near enough to the target)
-            //
-            // Example code:
-            //
-            //      StateSequential<BaseAgent> sequential = new StateSequential<BaseAgent>();
-            //      sequential.Add(new StateMoveToTarget());
-            //      sequential.Add(new StateAttackTarget());
-            //      stateMachine.ChangeState(sequential);
-
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Move and attack the agent the specific location
-        /// </summary>
-        public bool AttackTo(Vector3 location)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Update the agent. If the agent is selected, handle mouse events.
-        /// </summary>
-        public override void Update(GameTime gameTime)
-        {
-            // Move the agent
-            if (Selected && Input.MouseRightButtonJustPressed)
-            {
-                Input.SuppressMouseEvent();
-
-                Entity picked = world.Pick();
-
-                if (picked != null)
-                {
-                    MoveTo(picked);
-                }
-                else
-                {
-                    Vector3? location = world.Landscape.Pick();
-
-                    if (location.HasValue)
-                        MoveTo(location.Value);
-                }
-            }
-
-            // Update state machine
-            stateMachine.Update(gameTime);
-
-            base.Update(gameTime);
-        }
-
-        public override void Draw(GameTime gameTime)
-        {
-            // Draw state machine
-            stateMachine.Draw(gameTime);
-
-            base.Draw(gameTime);
-        }
-        #endregion
-    }
     #endregion
 }

@@ -2,28 +2,25 @@
 <Landscape>
 	<Width>2048</Width>
 	<Depth>2048</Depth>
-	<Height>500</Height>
-	<BaseHeight>-156</BaseHeight>
-	<Heightmap>Testheightmap.bmp</Heightmap>
+	<Height>80</Height>
+	<BaseHeight>-43.3</BaseHeight>
+	<Heightmap>isles.bmp</Heightmap>
 	<WaterTexture>water.png</WaterTexture>
   <WaterBumpTexture>water_normalmap.jpg</WaterBumpTexture>
   <EarthRadius>65000</EarthRadius>
 	<SkyBox>testsky2.dds</SkyBox>
 	<LayerCollection>
 		<Layer>
-			<ColorTexture>test.bmp</ColorTexture>
-			<AlphaTexture>LandscapeDetail.tga</AlphaTexture>
-			<NormalTexture>LandscapeDetail.tga</NormalTexture>
+			<ColorTexture>shadi.png</ColorTexture>
+			<AlphaTexture>white.bmp</AlphaTexture>
 		</Layer>
+    <Layer>
+      <ColorTexture>caodi.png</ColorTexture>
+      <AlphaTexture>2.bmp</AlphaTexture>
+    </Layer>
+    <Layer>
+      <ColorTexture>daolu.png</ColorTexture>
+      <AlphaTexture>3.bmp</AlphaTexture>
+    </Layer>
 	</LayerCollection>
-	<VegetationCollection>
-		<Vegetation>
-			<Width>16</Width>
-			<Height>16</Height>
-			<WindAmount>1</WindAmount>
-			<MaxCountPerGrid>2</MaxCountPerGrid>
-			<Texture>Grass1.bmp</Texture>
-			<Distribution>GrassDistribution.bmp</Distribution>
-		</Vegetation>
-	</VegetationCollection>
 </Landscape>

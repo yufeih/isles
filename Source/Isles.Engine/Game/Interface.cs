@@ -19,7 +19,7 @@ namespace Isles.Engine
     /// <summary>
     /// Represents a game screen
     /// </summary>
-    public interface IScreen : IDisposable
+    public interface IScreen : IDisposable, IEventListener
     {
         /// <summary>
         /// Called when this screen is activated
@@ -61,39 +61,6 @@ namespace Isles.Engine
         void UnloadContent();
     }
     #endregion
-
-    #region ILoading
-    /// <summary>
-    /// Interface for tracking loading progress
-    /// </summary>
-    public interface ILoading
-    {
-        /// <summary>
-        /// Gets or sets current message
-        /// </summary>
-        string Message { get; }
-
-        /// <summary>
-        /// Gets current progress.
-        /// </summary>
-        float Progress { get; }
-
-        void Refresh(float newProgress);
-
-        /// <summary>
-        /// Refresh the loading screen with the new progress and message
-        /// </summary>
-        /// <param name="progress"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
-        void Refresh(float newProgress, string newMessage);
-
-        /// <summary>
-        /// Begins a new loading procedure
-        /// </summary>
-        void Reset();
-    }
-    #endregion
     
     #region IWorldObject
     /// <summary>
@@ -104,9 +71,14 @@ namespace Isles.Engine
     public interface IWorldObject
     {
         /// <summary>
+        /// Gets the name of the world object
+        /// </summary>
+        string Name { get; }
+
+        /// <summary>
         /// Gets the position of the scene object
         /// </summary>
-        Vector3 Position { get; }
+        Vector3 Position { get; set; }
 
         /// <summary>
         /// Gets the axis-aligned bounding box of the scene object
@@ -114,9 +86,9 @@ namespace Isles.Engine
         BoundingBox BoundingBox { get; }
 
         /// <summary>
-        /// Gets or sets whether the dirty bounding box
+        /// Gets or sets scene manager data
         /// </summary>
-        BoundingBox DirtyBoundingBox { get; set; }
+        object SceneManagerTag { get; set; }
 
         /// <summary>
         /// By marking the IsDirty property of a scene object, the scene
@@ -153,6 +125,16 @@ namespace Isles.Engine
         /// </summary>
         /// <param name="gameTime"></param>
         void Draw(GameTime gameTime);
+
+        /// <summary>
+        /// Draw the scene object to a shadow map
+        /// </summary>
+        void DrawShadowMap(GameTime gameTime, ShadowEffect shadow);
+
+        /// <summary>
+        /// Draw the scene object to a reflection map
+        /// </summary>
+        void DrawReflection(GameTime gameTime, Matrix view, Matrix projection);
 
         /// <summary>
         /// Write the scene object to an XML element
@@ -244,79 +226,12 @@ namespace Isles.Engine
         /// <summary>
         /// Gets all world objects that are near the point (Not always intersects).
         /// </summary>
-        IEnumerable<IWorldObject> GetNearbyObjects(Vector3 position);
-
-        /// <summary>
-        /// Gets all world objects that are near a bounding box volume
-        /// </summary>
-        IEnumerable<IWorldObject> GetNearbyObjects(BoundingBox volume);
+        IEnumerable<IWorldObject> GetNearbyObjects(Vector3 position, float radius);
 
         /// <summary>
         /// Gets a world object from its name
         /// </summary>
         IWorldObject ObjectFromName(string name);
-    }
-    #endregion
-
-    #region IGameUI
-    /// <summary>
-    /// Describe the type of a game message
-    /// </summary>
-    public enum MessageType
-    {
-        Message, Warning, Error, Congratulation
-    }
-
-    /// <summary>
-    /// In game user interface
-    /// </summary>
-    public interface IGameUI
-    {
-        /// <summary>
-        /// Called when an entity is selected. Game UI should refresh
-        /// itself to match the new entities, e.g., status and spells.
-        /// </summary>
-        void Select(Entity entity);
-
-        /// <summary>
-        /// Called when multiple entities are selected.
-        /// </summary>
-        void SelectMultiple(IEnumerable<Entity> entities);
-
-        /// <summary>
-        /// Popup a message
-        /// </summary>
-        void ShowMessage(MessageType type, string message, Vector2 position, Color color);
-    }
-    #endregion
-
-    #region ILevel
-    /// <summary>
-    /// Interface for a game level
-    /// </summary>
-    public interface ILevel
-    {
-        /// <summary>
-        /// Load a game level
-        /// </summary>
-        void Load(GameWorld world, ILoading progress);
-
-        /// <summary>
-        /// Unload a game level
-        /// </summary>
-        void Unload();
-
-        /// <summary>
-        /// Update level stuff
-        /// </summary>
-        /// <param name="gameTime"></param>
-        void Update(GameTime gameTime);
-
-        /// <summary>
-        /// Draw level stuff
-        /// </summary>
-        /// <param name="gameTime"></param>
-        void Draw(GameTime gameTime);
     }
     #endregion
 
@@ -339,9 +254,9 @@ namespace Isles.Engine
         float GetHeight(float x, float y);
 
         /// <summary>
-        /// Gets the height of a grid. 
+        /// Gets the normal of a point on the landscape
         /// </summary>
-        float GetGridHeight(int x, int y);
+        Vector3 GetNormal(float x, float y);
 
         /// <summary>
         /// Gets the number of grids
@@ -349,22 +264,9 @@ namespace Isles.Engine
         Point GridCount { get; }
 
         /// <summary>
-        /// Gets the size of single grid
+        /// Gets whether the point is walkable (E.g., above water)
         /// </summary>
-        Vector2 GridSize { get; }
-
-        /// <summary>
-        /// Gets the position of a grid
-        /// </summary>
-        Vector2 GridToPosition(int x, int y);
-
-        /// <summary>
-        /// Gets the grid occupying the point
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
-        Point PositionToGrid(float x, float y);
+        bool IsPointOccluded(float x, float y);
 
         /// <summary>
         /// Performs a ray landscape intersection test, the intersection point
@@ -372,22 +274,7 @@ namespace Isles.Engine
         /// </summary>
         /// <param name="ray"></param>
         /// <returns></returns>
-        Vector3? Intersects(Ray ray);
-
-        /// <summary>
-        /// Update the landscape
-        /// </summary>
-        void Update(GameTime gameTime);
-
-        /// <summary>
-        /// Draw the landscape
-        /// </summary
-        void Draw(GameTime gameTime);
-
-        /// <summary>
-        /// Draw the given texture onto the landscape
-        /// </summary>
-        void DrawSurface(Texture2D texture, Vector2 position, Vector2 size);
+        Nullable<Vector3> Intersects(Ray ray);
     }
     #endregion
 }

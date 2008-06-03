@@ -24,47 +24,28 @@ namespace Isles.Engine
         /// Directory for game assets
         /// </summary>
         public string ContentDirectory = "Content";
+        public string ArchiveFile = "Content.ixa";
 
         /// <summary>
         /// Default game font
         /// </summary>
         public string DefaultFont = "Fonts/Default";
+        public string Graphics2DEffect = "Effects/Graphics2D";
         public string PlayerName = "Unnamed";
         public bool EnableScreenshot = true;
         public bool EnableProfile = true;
         public bool IsMouseVisible = false;
         public bool IsFixedTimeStep = true;
-        public Camera CameraSettings;
-
-        [Serializable()]
-        public class Camera
-        {
-            public float FieldOfView = MathHelper.PiOver4;
-            public float FarPlane = 10000;
-            public float NearPlane = 1;
-
-            public float MinHeightAboveGround = 10.0f;
-            public float NavigationAreaSize = 10;
-            public float WheelFactor = 0.1f;
-            public float ScrollHeightFactor = 1.25f;
-            public float InitialHeight = 100.0f;
-            public float RotationFactorX = MathHelper.PiOver2 / 300;
-            public float RotationFactorY = MathHelper.PiOver2 / 150;
-
-            public float BaseSpeed = 0.15f;
-            public float Radius = 200.0f;
-            public float Roll = MathHelper.PiOver4;
-            public float Pitch = -MathHelper.PiOver4;
-
-            public float MinRoll = MathHelper.ToRadians(10);
-            public float MaxRoll = MathHelper.ToRadians(80);
-
-            public float MinRadius = 10.0F;
-            public float MaxRadius = 1500.0f;
-
-            public float InitialXPosition = 0;
-            public float InitialYPosition = 0;
-        }
+        public bool ClipCursor = false;
+        public bool EnableSound = true;
+        public bool ShowPathGraph = false;
+        public bool RevealMap = false;
+        public int MaxPathSearchStepsPerUpdate = 2000;
+        public bool DirectEnter = false;
+        public bool TraceUnits = false;
+        public bool Cheat = false;
+        public double GameSpeed = 1;
+        public GameCameraSettings CameraSettings;
         #endregion
 
         #region Graphics Settings
@@ -74,8 +55,14 @@ namespace Isles.Engine
         public bool Fullscreen = false;
         public bool NormalMappedTerrain = false;
         public bool RealisticWater = false;
+        public bool ReflectionEnabled = false;
+        public bool ShadowEnabled = true;
+        public bool ShowLandscape = true;
+        public bool ShowWater = true;
+        public bool ShowObjectReflection = true;
         public BloomEffect BloomSettings;
         public float ViewDistanceSquared = 800;
+        public string ModelEffect = "Effects/Model";
 
         // We want to trace frame performance, so turn off V'Sync
 #if DEBUG

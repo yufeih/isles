@@ -18,6 +18,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Storage;
 using Isles.Graphics;
+using Cursor = System.Windows.Forms.Cursor;
+using Control = System.Windows.Forms.Control;
 #endregion
 
 namespace Isles.Engine
@@ -25,13 +27,23 @@ namespace Isles.Engine
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class BaseGame : Microsoft.Xna.Framework.Game
+    public class BaseGame : Game, IEventListener
     {
         #region Variables
+        /// <summary>
+        /// Windows cursor
+        /// </summary>
+        Cursor cursor;
+
         /// <summary>
         /// XNA graphics device manager
         /// </summary>
         GraphicsDeviceManager graphics;
+
+        /// <summary>
+        /// ZipContent manager
+        /// </summary>
+        ZipContentManager content;
 
         /// <summary>
         /// Background color used to clear the scene
@@ -115,6 +127,16 @@ namespace Isles.Engine
         PointSpriteManager pointSprite;
 
         /// <summary>
+        /// Game model manager
+        /// </summary>
+        ModelManager modelManager;
+
+        /// <summary>
+        /// Game 2D graphics
+        /// </summary>
+        Graphics2D graphics2D;
+
+        /// <summary>
         /// Store game time in this frame
         /// </summary>
         GameTime currentGameTime;
@@ -123,13 +145,68 @@ namespace Isles.Engine
         /// GameSound
         /// </summary>
         AudioManager sound;
+
+        /// <summary>
+        /// Game input
+        /// </summary>
+        Input input;
+
+        /// <summary>
+        /// Shadow mapping effect
+        /// </summary>
+        ShadowEffect shadow;
+
+        /// <summary>
+        /// Post-screen bloom effect
+        /// </summary>
+        BloomEffect bloom;
+
+        /// <summary>
+        /// Whether the game is paused
+        /// </summary>
+        bool paused = false;
+
+        /// <summary>
+        /// Gets or sets game speed
+        /// </summary>
+        double gameSpeed = 1;
         #endregion
 
         #region Properties
         /// <summary>
+        /// Gets or sets windows cursor
+        /// </summary>
+        public Cursor Cursor
+        {
+            get { return cursor; }
+            set
+            {
+                Control control = Control.FromHandle(Window.Handle);
+                control.Cursor = cursor;
+                cursor = value; 
+            }
+        }
+
+        /// <summary>
+        /// Gets content manager
+        /// </summary>
+        public ZipContentManager ZipContent
+        {
+            get { return content; }
+        }
+
+        /// <summary>
+        /// Gets game input
+        /// </summary>
+        public Input Input
+        {
+            get { return input; }
+        }
+
+        /// <summary>
         /// Gets game sound
         /// </summary>
-        public AudioManager Sound
+        public AudioManager Audio
         {
             get { return sound; }
         }
@@ -140,6 +217,14 @@ namespace Isles.Engine
         public Profiler Profiler
         {
             get { return profiler; }
+        }
+
+        /// <summary>
+        /// Gets game screenshot capturer
+        /// </summary>
+        public ScreenshotCapturer ScreenshotCapturer
+        {
+            get { return screenshotCapturer; }
         }
 
         /// <summary>
@@ -303,6 +388,22 @@ namespace Isles.Engine
         }
 
         /// <summary>
+        /// Gets game model manager
+        /// </summary>
+        public ModelManager ModelManager
+        {
+            get { return modelManager; }
+        }
+
+        /// <summary>
+        /// Gets game 2D graphics
+        /// </summary>
+        public Graphics2D Graphics2D
+        {
+            get { return graphics2D; }
+        }
+
+        /// <summary>
         /// Gets all game screens
         /// </summary>
         public Dictionary<string, IScreen> Screens
@@ -316,6 +417,41 @@ namespace Isles.Engine
         public GameTime CurrentGameTime
         {
             get { return currentGameTime; }
+        }
+
+        /// <summary>
+        /// Gets game shadow effect
+        /// </summary>
+        public ShadowEffect Shadow
+        {
+            get { return shadow; }
+        }
+
+        /// <summary>
+        /// Gets game bloom effect
+        /// </summary>
+        public BloomEffect Bloom
+        {
+            get { return bloom; }
+        }
+
+        /// <summary>
+        /// Gets whether the game is been paused
+        /// </summary>
+        /// TODO: Fixe issues caused by pausing. (E.g., Timer)
+        public bool Paused
+        {
+            get { return paused; }
+            set { paused = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets game speed
+        /// </summary>
+        public double GameSpeed
+        {
+            get { return gameSpeed; }
+            set { gameSpeed = value; }
         }
         #endregion
 
@@ -408,21 +544,28 @@ namespace Isles.Engine
         {
             singleton = this;
 
+            Assembly assembly = Assembly.GetCallingAssembly();
+
             // Initialize log
             Log.Initialize();
             Log.NewLine();
             Log.NewLine();
-            Log.Write("Isles", false); // FIXME: + a version
+            Log.Write("Isles", false);
             Log.Write("Date: " + DateTime.Now, false);
+            Log.Write("Full Name: " + assembly.FullName, false);
+            Log.Write("CLR Runtime Version: " + assembly.ImageRuntimeVersion, false);
             Log.NewLine();
 
             // Initialize settings
             if (settings == null)
                 settings = Settings.CreateDefaultSettings(null);
             this.settings = settings;
+            gameSpeed = settings.GameSpeed;
 
+            content = new ZipContentManager(Services, settings.ArchiveFile, settings.ContentDirectory);
             Content.RootDirectory = settings.ContentDirectory;
-            Log.Write("Content Direction:" + settings.ContentDirectory +"...");
+            Log.Write("Archive File:" + settings.ArchiveFile + "...");
+            Log.Write("Content Directory:" + settings.ContentDirectory +"...");
 
             graphics = new GraphicsDeviceManager(this);
 
@@ -430,16 +573,16 @@ namespace Isles.Engine
             graphics.PreferredBackBufferWidth   = settings.ScreenWidth;
             graphics.PreferredBackBufferHeight  = settings.ScreenHeight;
             graphics.SynchronizeWithVerticalRetrace = settings.VSync;
-            graphics.MinimumPixelShaderProfile  = ShaderProfile.PS_1_4;
-            graphics.MinimumVertexShaderProfile = ShaderProfile.VS_1_1;
+            graphics.MinimumPixelShaderProfile  = ShaderProfile.PS_2_0;
+            graphics.MinimumVertexShaderProfile = ShaderProfile.VS_2_0;
 
             // Show cursor
             IsMouseVisible = settings.IsMouseVisible;
 //#if DEBUG
             // Use variant time step to trace frame performance
-            //IsFixedTimeStep = false;
+            //IsFixedTimeStep = true;
             IsFixedTimeStep = settings.IsFixedTimeStep;
-            //TargetElapsedTime = new TimeSpan(2000000);
+            //TargetElapsedTime = new TimeSpan(5000000);
 //#endif
         }
 
@@ -472,8 +615,15 @@ namespace Isles.Engine
             graphics_DeviceReset(null, EventArgs.Empty);
 
             // Initialize sound
-            Components.Add(sound = new AudioManager(this));
-            Log.Write("Sound Initialized...");
+            input = new Input();
+            input.Register(this, 0);
+            Log.Write("Input Initialized...");
+
+            if (settings.EnableSound)
+            {
+                Components.Add(sound = new AudioManager(this, ZipContent));
+                Log.Write("Sound Initialized...");
+            }
 
             if (settings.EnableScreenshot)
             {
@@ -490,7 +640,7 @@ namespace Isles.Engine
             if (settings.BloomSettings != null &&
                 settings.BloomSettings.Enabled)
             {
-                BloomComponent bloom = new BloomComponent(this);
+                bloom = new BloomEffect(this, content);
                 bloom.Settings = new BloomSettings(
                     settings.BloomSettings.Type,
                     settings.BloomSettings.Threshold,
@@ -504,6 +654,35 @@ namespace Isles.Engine
                 Log.Write("Bloom Effect Initialized...");
             }
 
+            ParticleSystem.LoadContent(this);
+            Log.Write("Particle System Initialized...");
+
+            // Initialize text
+            graphics2D = new Graphics2D(this);
+            Log.Write("2D Graphics Initialized...");
+
+            billboard = new BillboardManager(this);
+            Log.Write("Billboard Initialized...");
+
+            if (settings.ShadowEnabled)
+            {
+                shadow = new ShadowEffect(this);
+                Log.Write("Shadow Mapping Effect Initialized...");
+            }
+
+            //trailEffect = new TrailEffectManager();
+            //Log.Write("Trail Effect Initialized...");
+
+            pointSprite = new PointSpriteManager(this);
+            Log.Write("PointSprite Initialized...");
+
+            // Notify all screens to load contents
+            foreach (KeyValuePair<string, IScreen> screen in screens)
+                screen.Value.LoadContent();
+
+            modelManager = new ModelManager();
+            Log.Write("Model Manager Initialized...");
+
             base.Initialize();
         }
 
@@ -511,7 +690,7 @@ namespace Isles.Engine
         {
             screenWidth = GraphicsDevice.Viewport.Width;
             screenHeight = GraphicsDevice.Viewport.Height;
-
+            
             Log.Write("Device Reset <" + screenWidth + ", " + screenHeight + ">...");
 
             // Re-Set device
@@ -524,6 +703,9 @@ namespace Isles.Engine
             // Set 128 and greate alpha compare for Model.Render
             GraphicsDevice.RenderState.ReferenceAlpha = 128;
             GraphicsDevice.RenderState.AlphaFunction = CompareFunction.Greater;
+            // Set alpha blending operations
+            GraphicsDevice.RenderState.AlphaSourceBlend = Blend.SourceAlpha;
+            GraphicsDevice.RenderState.AlphaDestinationBlend = Blend.InverseSourceAlpha;
         }
 
         /// <summary>
@@ -534,20 +716,6 @@ namespace Isles.Engine
         /// <param name="loadAllContent">Which type of content to load.</param>
         protected override void LoadContent()
         {
-            // Initialize text
-            Text.Initialize(this);
-            Log.Write("Text Initialized...");
-
-            billboard = new BillboardManager(this);
-            Log.Write("Billboard Initialized...");
-
-            pointSprite = new PointSpriteManager(this);
-            Log.Write("PointSprite Initialized...");
-
-            // Notify all screens to load contents
-            foreach (KeyValuePair<string, IScreen> screen in screens)
-                screen.Value.LoadContent();
-
             base.LoadContent();
         }
         
@@ -560,11 +728,11 @@ namespace Isles.Engine
         /// <param name="unloadAllContent">Which type of content to unload.</param>
         protected override void UnloadContent()
         {
-            // TODO: Unload any non ContentManager content here
-
             // Notify all screens to unload contents
             foreach (KeyValuePair<string, IScreen> screen in screens)
                 screen.Value.UnloadContent();
+
+            //Content.Unload();
 
             base.UnloadContent();
         }
@@ -580,15 +748,24 @@ namespace Isles.Engine
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-                this.Exit();
+            // Adjust speed
+            gameTime = AdjustGameSpeed(gameTime);
 
             // Store game time
             currentGameTime = gameTime;
 
             // Update input
-            Input.Update();
+            input.Update(gameTime);
+
+            // Do not update other stuff when the game is paused
+            if (paused)
+                return;
+            
+            // Update events
+            Event.Update(gameTime);
+
+            // Update timer
+            Timer.Update(gameTime);
 
             if (camera != null)
             {
@@ -612,16 +789,34 @@ namespace Isles.Engine
             if (currentScreen != null)
                 currentScreen.Update(gameTime);
 
-            // For Debugging
-            if (Input.KeyboardSpaceJustPressed)
+            // Update particle system
+            ParticleSystem.UpdateAll(gameTime);
+
+            // Clip cursor
+            if (settings.ClipCursor && IsActive)
             {
-                if (GraphicsDevice.RenderState.FillMode == FillMode.WireFrame)
-                    GraphicsDevice.RenderState.FillMode = FillMode.Solid;
-                else
-                    GraphicsDevice.RenderState.FillMode = FillMode.WireFrame;
+                Cursor.Clip = new System.Drawing.Rectangle(
+                    Window.ClientBounds.X, Window.ClientBounds.Y,
+                    Window.ClientBounds.Width, Window.ClientBounds.Height);
             }
 
+            // Tell me why I have to set this every frame...
+            Cursor = cursor;
+
             base.Update(gameTime);
+        }
+
+        private GameTime AdjustGameSpeed(GameTime gameTime)
+        {
+            if (gameSpeed != 1)
+            {
+                // Note we only update game time
+                gameTime = new GameTime(
+                    gameTime.TotalRealTime, gameTime.ElapsedRealTime,
+                    new TimeSpan((long)(gameTime.TotalGameTime.Ticks * gameSpeed)),
+                    new TimeSpan((long)(gameTime.ElapsedGameTime.Ticks * gameSpeed)));
+            }
+            return gameTime;
         }
 
         private void UpdateFrustum()
@@ -719,6 +914,21 @@ namespace Isles.Engine
         }
 
         /// <summary>
+        /// Project a point in 3D world space to 2D screen space
+        /// </summary>
+        public Point Project(Vector3 position)
+        {
+            Vector4 hPosition = Vector4.Transform(position, viewProjection);
+            hPosition.X /= hPosition.W;
+            hPosition.Y /= hPosition.W;
+
+            Point screenPosition;
+            screenPosition.X = (int)(0.5f * (hPosition.X + 1) * screenWidth);
+            screenPosition.Y = (int)(0.5f * (-hPosition.Y + 1) * screenHeight);
+            return screenPosition;
+        }
+
+        /// <summary>
         /// Update view/projection matrices
         /// </summary>
         void UpdateMatrices()
@@ -740,9 +950,9 @@ namespace Isles.Engine
                 eye.Y = viewInverse.M42;
                 eye.Z = viewInverse.M43;
 
-                facing.X = view.M13;
-                facing.Y = view.M23;
-                facing.Z = view.M33;
+                facing.X = -view.M13;
+                facing.Y = -view.M23;
+                facing.Z = -view.M33;
             }
         }
 
@@ -761,7 +971,12 @@ namespace Isles.Engine
             {
                 initialized = true;
                 FirstTimeInitialize();
+
+                // Delay one frame
+                return;
             }
+
+            gameTime = AdjustGameSpeed(gameTime);
 
             graphics.GraphicsDevice.Clear(backgroundColor);
 
@@ -769,21 +984,52 @@ namespace Isles.Engine
             if (currentScreen != null)
                 currentScreen.Draw(gameTime);
 
+            if (modelManager != null)
+                modelManager.Present(gameTime);
+
             if (billboard != null)
                 billboard.Present(gameTime);
 
+            ParticleSystem.Present(gameTime);
+            
             if (pointSprite != null)
                 pointSprite.Present(gameTime);
 
-            Text.Present();
+
+
+            Graphics2D.Present();
 
             base.Draw(gameTime);
 
             // Take screen shot
             if (screenshotCapturer != null && screenshotCapturer.ShouldCapture)
                 screenshotCapturer.TakeScreenshot();
+
+            GraphicsDevice.Vertices[0].SetSource(null, 0, 0);
+            GraphicsDevice.Indices = null;
+
+            base.Draw(gameTime);
         }
 
+        #endregion
+
+        #region Handle Event
+        public EventResult HandleEvent(EventType type, object sender, object tag)
+        {
+            // Take screenshot
+            if (type == EventType.KeyDown && (tag as Keys?).Value == Keys.PrintScreen)
+                screenshotCapturer.ShouldCapture = true;
+
+            if (currentScreen != null &&
+                currentScreen.HandleEvent(type, sender, tag) == EventResult.Handled)
+                return EventResult.Handled;
+
+            if (camera != null &&
+                camera.HandleEvent(type, sender, tag) == EventResult.Handled)
+                return EventResult.Handled;
+
+            return EventResult.Unhandled;
+        }
         #endregion
 
         #region Dispose
@@ -797,6 +1043,9 @@ namespace Isles.Engine
 
                 if (billboard != null)
                     billboard.Dispose();
+
+                if (shadow != null)
+                    shadow.Dispose();
 
                 // Notify all screens to unload contents
                 foreach (KeyValuePair<string, IScreen> screen in screens)

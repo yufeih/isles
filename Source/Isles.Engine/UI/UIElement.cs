@@ -12,14 +12,15 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Isles.Engine;
+using Isles.Graphics;
 
 namespace Isles.UI
 {
     #region IUIElement
     /// <summary>
-    /// Interface for implementing a every UI element
+    /// Interface for implementing UI element
     /// </summary>
-    public interface IUIElement : IDisposable
+    public interface IUIElement : IDisposable, IEventListener
     {
         /// <summary>
         /// Gets the reference area of an UI element.
@@ -50,6 +51,16 @@ namespace Isles.UI
         bool Enabled { get; set; }
 
         /// <summary>
+        /// Gets or sets UI element anchor
+        /// </summary>
+        Anchor Anchor { get; set; }
+
+        /// <summary>
+        /// Gets or sets UI element scale mode
+        /// </summary>
+        ScaleMode ScaleMode { get; set; }
+
+        /// <summary>
         /// Update UI element
         /// </summary>
         /// <param name="gameTime"></param>
@@ -64,6 +75,18 @@ namespace Isles.UI
     #endregion
 
     #region Enumeration types
+
+    // The middle control panel should use ScaleMode.Stretch 
+    // & Anchor.BottomLeft.
+    // Other control panels and Menu panels use ScaleMode.ScaleY 
+    // including little map. Their anchor mode is trivial.
+    // All buttons and progress bars use ScaleMode.ScaleY &
+    // Anchor.TopLeft.
+    // 
+    // Exceptions : The Anchor Mode of the UIElements in the 
+    // middle control panel may be a little more complex.
+    // 
+
     /// <summary>
     /// Enumeration type used to set the location of an UI element
     /// </summary>
@@ -72,7 +95,8 @@ namespace Isles.UI
         TopLeft,
         TopRight,
         BottomLeft,
-        BottomRight
+        BottomRight,
+        Center
     }
 
     /// <summary>
@@ -92,6 +116,7 @@ namespace Isles.UI
 
         /// <summary>
         /// Size changes based on height, but width/height is fixed
+        /// This scale mode is supposed to be used for most UIElement
         /// </summary>
         ScaleY,
         
@@ -100,62 +125,58 @@ namespace Isles.UI
         /// </summary>
         Stretch
     }
-
-    /// <summary>
-    /// UI element state
-    /// </summary>
-    public enum UIState
-    {
-        Normal, Hover, Press,
-    }
     #endregion
 
     #region UIElement
     /// <summary>
     /// Basic UI element
     /// </summary>
-    public class UIElement : IUIElement
+    public abstract class UIElement : IUIElement
     {
         #region Fields
-        protected Rectangle area;
-        protected IUIElement parent;
-        protected Anchor anchor = Anchor.TopLeft;
-        protected ScaleMode scaleMode = ScaleMode.ScaleY;
-        protected UIState state = UIState.Normal;
-        protected bool visible = true;
-        protected bool enabled = true;
-
         /// <summary>
-        /// Texture used to draw the button
+        /// Gets or sets UIElement area
         /// </summary>
-        protected Texture2D texture;
-
-        /// <summary>
-        /// Button hot region
-        /// </summary>
-        protected Rectangle destinationRectangle;
-
-        /// <summary>
-        /// Button hot region
-        /// </summary>
-        protected Rectangle sourceRectangle;
-
-        /// <summary>
-        /// Gets or sets button area
-        /// </summary>
-        public Rectangle Area
+        virtual public Rectangle Area
         {
             get { return area; }
-            set { area = value; }
+            set { area = value; IsDirty = true; }
         }
+
+        Rectangle area;
+
 
         /// <summary>
         /// Gets button destination rectangle
         /// </summary>
-        public Rectangle DestinationRectangle
+        virtual public Rectangle DestinationRectangle
         {
-            get { return destinationRectangle; }
+            get
+            {
+                if (IsDirty)
+                {
+                    IsDirty = false;
+                    ResetDestinationRectangle();
+                }
+
+                return destinationRectangle;
+            }
         }
+
+        virtual public void ResetDestinationRectangle()
+        {
+            destinationRectangle = GetRelativeRectangle(area);
+        }
+
+        public Graphics2D Graphics2D = BaseGame.Singleton.Graphics2D;
+        
+        /// <summary>
+        /// Whether destination rectangle is dirty
+        /// </summary>
+        public bool IsDirty = true;
+
+        Rectangle destinationRectangle;
+
 
         /// <summary>
         /// Gets or sets button source rectangle
@@ -166,14 +187,21 @@ namespace Isles.UI
             set { sourceRectangle = value; }
         }
 
+        Rectangle sourceRectangle;
+
+
         /// <summary>
         /// Gets or sets UI element visibility
         /// </summary>
         public bool Visible
         {
             get { return visible; }
-            set { visible = value; }
+            set { visible = value; OnVisibleChanged(); }
         }
+
+        bool visible = true;
+
+        protected virtual void OnVisibleChanged() { }
 
         /// <summary>
         /// Gets or sets whether an UI element is enabled
@@ -184,18 +212,10 @@ namespace Isles.UI
             set { enabled = value; OnEnableStateChanged(); }
         }
 
-        protected virtual void OnEnableStateChanged()
-        {
+        bool enabled = true;
 
-        }
+        protected virtual void OnEnableStateChanged() { }
 
-        /// <summary>
-        /// Gets current UI state
-        /// </summary>
-        public UIState State
-        {
-            get { return state; }
-        }
 
         /// <summary>
         /// Gets or sets the texture used to draw the button
@@ -206,14 +226,18 @@ namespace Isles.UI
             set { texture = value; }
         }
 
+        Texture2D texture;
+
+
         /// <summary>
         /// Gets or sets UI element x position
         /// </summary>
         public int X
         {
             get { return area.X; }
-            set { area.X = value; }
+            set { area.X = value; IsDirty = true; }
         }
+
 
         /// <summary>
         /// Gets or sets UI element x position
@@ -221,8 +245,9 @@ namespace Isles.UI
         public int Y
         {
             get { return area.Y; }
-            set { area.Y = value; }
+            set { area.Y = value; IsDirty = true; }
         }
+
 
         /// <summary>
         /// Gets or sets the anchor mode of the UI element
@@ -230,8 +255,11 @@ namespace Isles.UI
         public Anchor Anchor
         {
             get { return anchor; }
-            set { anchor = value; }
+            set { anchor = value; IsDirty = true; }
         }
+
+        Anchor anchor = Anchor.TopLeft;
+
 
         /// <summary>
         /// Gets or sets the scale mode of the UI element
@@ -239,8 +267,11 @@ namespace Isles.UI
         public ScaleMode ScaleMode
         {
             get { return scaleMode; }
-            set { scaleMode = value; }
+            set { scaleMode = value; IsDirty = true; }
         }
+
+        ScaleMode scaleMode = ScaleMode.ScaleY;
+
 
         /// <summary>
         /// Gets or sets the parent of this UI element
@@ -248,8 +279,11 @@ namespace Isles.UI
         public IUIElement Parent
         {
             get { return parent; }
-            set { parent = value; }
+            set { parent = value; IsDirty = true; }
         }
+
+        IUIElement parent;
+
 
         /// <summary>
         /// Gets or sets a tag
@@ -258,9 +292,7 @@ namespace Isles.UI
         #endregion
 
         #region Methods
-        public UIElement()
-        {
-        }
+        public UIElement() { }
 
         /// <summary>
         /// Create the UI element 
@@ -268,28 +300,25 @@ namespace Isles.UI
         /// <param name="area"></param>
         public UIElement(Rectangle area)
         {
-            this.area = area;
-
-            this.destinationRectangle = GetRelativeRectangle(area);
+            Area = area;
         }
 
         /// <summary>
         /// Update UI element
         /// </summary>
         /// <param name="gameTime"></param>
-        public virtual void Update(GameTime gameTime)
-        {
-            //this.destinationRectangle = GetRelativeRectangle(area);
-        }
+        public abstract void Update(GameTime gameTime);
 
         /// <summary>
         /// Draw UI element
         /// </summary>
         /// <param name="gameTime"></param>
-        public virtual void Draw(GameTime gameTime, SpriteBatch sprite)
-        {
-            this.destinationRectangle = GetRelativeRectangle(area);
-        }
+        public abstract void Draw(GameTime gameTime, SpriteBatch sprite);
+
+        /// <summary>
+        /// Handle input events
+        /// </summary>
+        public abstract EventResult HandleEvent(EventType type, object sender, object tag);
 
         /// <summary>
         /// Dispose
@@ -304,11 +333,10 @@ namespace Isles.UI
         /// Dispose
         /// </summary>
         /// <param name="disposing">Disposing</param>
-        protected virtual void Dispose(bool disposing)
-        {
-        }
+        protected virtual void Dispose(bool disposing) { }
         #endregion
 
+        #region GetRelativeRectangle
         /// <summary>
         /// Gets the relative rectangle based on current anchor,
         /// scale mode and parent reference rectangle.
@@ -317,388 +345,123 @@ namespace Isles.UI
         /// <return>Rectangle in current resolution</return>
         public Rectangle GetRelativeRectangle(Rectangle rectangle)
         {
-            return UIDisplay.GetRelativeRectangle(rectangle, parent, scaleMode, anchor);
+            return GetRelativeRectangle(rectangle, parent, scaleMode, anchor);
         }
-    }
-    #endregion
 
-    #region Panel
-    public class Panel : UIElement
-    {
-        /// <summary>
-        /// All UI elements in this panel
-        /// </summary>
-        protected BroadcastList<IUIElement, List<IUIElement>> elements = new
-                  BroadcastList<IUIElement, List<IUIElement>>();
-
-        public Panel()
-        {
-        }
 
         /// <summary>
-        /// Create a panel
+        /// Gets the relative rectangle based on current anchor,
+        /// scale mode and parent reference rectangle.
         /// </summary>
-        /// <param name="area"></param>
-        public Panel(Rectangle area) : base(area)
+        /// <param name="rectangle">Rectangle in standard resolution</param>
+        /// <return>Rectangle in current resolution</return>
+        public static Rectangle GetRelativeRectangle(
+            Rectangle rectangle, IUIElement parent, ScaleMode scaleMode, Anchor anchor)
         {
-        }
+            if (parent == null)
+                return rectangle;
 
-        /// <summary>
-        /// Adds an UI element to the panel
-        /// </summary>
-        /// <param name="element"></param>
-        public virtual void Add(IUIElement element)
-        {
-            element.Parent = this;
-            elements.Add(element);
-        }
+            Rectangle relativeRectangle;
 
-        /// <summary>
-        /// Removes an UI elment from the panel
-        /// </summary>
-        /// <param name="element"></param>
-        public virtual void Remove(IUIElement element)
-        {
-            element.Parent = null;
-            elements.Remove(element);
-        }
+            double heightScale, widthScale;
 
-        public virtual void Clear()
-        {
-            foreach (IUIElement element in elements)
-                element.Parent = null;
-
-            elements.Clear();
-        }
-
-        protected override void OnEnableStateChanged()
-        {
-            foreach (IUIElement element in elements)
-                element.Enabled = this.enabled;
-        }
-
-        /// <summary>
-        /// Update all UI elements
-        /// </summary>
-        /// <param name="gameTime"></param>
-        public override void Update(GameTime gameTime)
-        {
-            elements.Update();
-
-            if (!visible)
-                return;
-            
-            base.Update(gameTime);
-
-            foreach (IUIElement element in elements)
-                element.Update(gameTime);
-        }
-
-        /// <summary>
-        /// Draw all UI elements
-        /// </summary>
-        /// <param name="gameTime"></param>
-        public override void Draw(GameTime gameTime, SpriteBatch sprite)
-        {
-            if (!visible)
-                return;
-
-            base.Draw(gameTime, sprite);
-
-            if (texture != null)
-                sprite.Draw(texture, destinationRectangle, sourceRectangle, Color.White);
-
-            foreach (IUIElement element in elements)
-                if (element.Visible)
-                    element.Draw(gameTime, sprite);
-        }
-    }
-    #endregion
-
-    #region Scroll Panel
-    /// <summary>
-    /// Game scroll panel
-    /// </summary>
-    public class ScrollPanel : Panel
-    {
-        /// <summary>
-        /// Index of the left most UIElement shown currently
-        /// </summary>
-        int current;
-
-        /// <summary>
-        /// Max number of UIElement visible
-        /// </summary>
-        int max;
-
-        int buttonWidth, scrollButtonWidth, buttonHeight;
-
-        public Button Left;
-        public Button Right;
-
-        public ScrollPanel(Rectangle area, int buttonWidth, int scrollButtonWidth)
-            : base(area)
-        {
-            this.buttonWidth = buttonWidth;
-            this.buttonHeight = destinationRectangle.Height;
-            this.scrollButtonWidth = scrollButtonWidth;
-
-            current = 0;
-
-            Left = new Button(new Rectangle(
-                0, 0, scrollButtonWidth, buttonHeight));
-
-            Right = new Button(new Rectangle(
-                scrollButtonWidth, 0, scrollButtonWidth, buttonHeight));
-            
-            Left.Parent = Right.Parent = this;
-            Left.Enabled = Right.Enabled = false;
-            Left.Anchor = Right.Anchor = Anchor.BottomLeft;
-            Left.ScaleMode = Right.ScaleMode = ScaleMode.ScaleY;
-
-            Left.Click += new EventHandler(LeftScroll_Click);
-            Right.Click += new EventHandler(RightScroll_Click);
-        }
-
-        void RightScroll_Click(object sender, EventArgs e)
-        {
-            if (enabled)
+            // scale
+            if (scaleMode == ScaleMode.Stretch)
             {
-                if (current < elements.Count - max)
-                {
-                    current++;
-                    Left.Enabled = true;
-
-                    if (current == elements.Count - max)
-                        Right.Enabled = false;
-                }
+                widthScale = (double)parent.DestinationRectangle.Width / parent.Area.Width;
+                relativeRectangle.Width = rectangle.Width *
+                    parent.DestinationRectangle.Width / parent.Area.Width;
+                heightScale = (double)parent.DestinationRectangle.Height / parent.Area.Height;
+                relativeRectangle.Height = rectangle.Height *
+                    parent.DestinationRectangle.Height / parent.Area.Height;
             }
-        }
-
-        void LeftScroll_Click(object sender, EventArgs e)
-        {
-            if (enabled)
+            else if (scaleMode == ScaleMode.ScaleY)
             {
-                if (current > 0)
-                {
-                    current--;
-                    Right.Enabled = true;
-
-                    if (current == 0)
-                        Left.Enabled = false;
-                }
+                widthScale = (double)parent.DestinationRectangle.Height / parent.Area.Height;
+                relativeRectangle.Width = rectangle.Width *
+                    parent.DestinationRectangle.Height / parent.Area.Height;
+                heightScale = (double)parent.DestinationRectangle.Height / parent.Area.Height;
+                relativeRectangle.Height = rectangle.Height *
+                    parent.DestinationRectangle.Height / parent.Area.Height;
             }
-        }
-
-        public override void Add(IUIElement element)
-        {
-            UIElement e = element as UIElement;
-
-            // Scroll panel works only with UIElement
-            if (e == null)
-                throw new ArgumentException();
-
-            // Reset element area
-            Rectangle rect = new Rectangle(
-                scrollButtonWidth + (elements.Count - current) * buttonWidth,
-                0, buttonWidth, buttonHeight);
-
-            e.Area = rect;
-            e.Anchor = Anchor.BottomLeft;
-            e.ScaleMode = ScaleMode.ScaleY;
-
-            if (elements.Count < current + max)
-                Right.Enabled = false;
+            else if (scaleMode == ScaleMode.ScaleX)
+            {
+                heightScale = widthScale = (double)parent.DestinationRectangle.Width / parent.Area.Width;
+                relativeRectangle.Width = rectangle.Width *
+                    parent.DestinationRectangle.Width / parent.Area.Width;
+                relativeRectangle.Height = rectangle.Height *
+                    parent.DestinationRectangle.Width / parent.Area.Width;
+            }
             else
-                Right.Enabled = true;
-
-            rect.X += buttonWidth;
-            rect.Width = scrollButtonWidth;
-
-            Right.Area = rect;
-
-            base.Add(element);
-        }
-
-        public override void Remove(IUIElement element)
-        {
-            base.Remove(element);
-
-            throw new NotImplementedException();
-        }
-
-        public override void Clear()
-        {
-            current = 0;
-            max = (destinationRectangle.Width - scrollButtonWidth * 2) / buttonWidth;
-
-            Left.Enabled = Right.Enabled = false;
-
-            Right.Area = new Rectangle(
-                scrollButtonWidth, 0, scrollButtonWidth, buttonHeight);
-
-            base.Clear();
-        }
-
-        public override void Update(GameTime gameTime)
-        {
-            if (!visible)
-                return;
-
-            Left.Update(gameTime);
-            Right.Update(gameTime);
-
-            base.Update(gameTime);
-        }
-
-        public override void Draw(GameTime gameTime, SpriteBatch sprite)
-        {
-            if (!visible)
-                return;
-
-            Rectangle rect;
-
-            rect.X = scrollButtonWidth;
-            rect.Y = 0;
-            rect.Width = buttonWidth;
-            rect.Height = buttonHeight;
-
-            int n = current + max - 1;
-            if (n > elements.Count)
-                n = elements.Count;
-
-            for (int i = 0; i < elements.Count; i++)
             {
-                if (i >= current && i < n)
+                heightScale = widthScale = 1;
+                relativeRectangle.Width = rectangle.Width;
+                relativeRectangle.Height = rectangle.Height;
+            }
+
+
+            // anchor
+
+            if (anchor == Anchor.TopLeft || anchor == Anchor.BottomLeft)
+            {
+                relativeRectangle.X = (int)(parent.DestinationRectangle.Left +
+                    rectangle.Left * widthScale);
+            }
+            else
+            {
+                relativeRectangle.X = (int)(parent.DestinationRectangle.Right +
+                    (rectangle.Right - parent.Area.Width) *
+                        widthScale - relativeRectangle.Width);
+            }
+
+            if (anchor == Anchor.TopLeft || anchor == Anchor.TopRight)
+            {
+                relativeRectangle.Y = (int)(parent.DestinationRectangle.Top +
+                    rectangle.Top * heightScale);
+            }
+            else
+            {
+                relativeRectangle.Y = (int)(parent.DestinationRectangle.Bottom +
+                    (rectangle.Bottom - parent.Area.Height) *
+                        heightScale -
+                            relativeRectangle.Height);
+            }
+
+            if (anchor == Anchor.Center)
+            {
+                if (scaleMode == ScaleMode.Stretch)
                 {
-                    // Reset element area
-                    elements.Elements[i].Visible = true;
-                    elements.Elements[i].Area = rect;
-                    rect.X += buttonWidth;
+                    widthScale = (double)parent.DestinationRectangle.Width / rectangle.Width;
+                    heightScale = (double)parent.DestinationRectangle.Height / rectangle.Height;
+                }
+                //else
+                //{
+                //    widthScale = (double)parent.DestinationRectangle.Width / parent.Area.Width;
+                //    heightScale = (double)parent.DestinationRectangle.Height / parent.Area.Height;
+                //}
+                if (heightScale > widthScale)
+                {
+                    relativeRectangle.Width = (int)(widthScale * rectangle.Width);
+                    relativeRectangle.Height = (int)(widthScale * rectangle.Height);
+
+                    relativeRectangle.X = (int)((parent.DestinationRectangle.Left + parent.DestinationRectangle.Right
+                                            - rectangle.Width * widthScale) / 2);
+                    relativeRectangle.Y = (int)((parent.DestinationRectangle.Top + parent.DestinationRectangle.Bottom
+                                            - rectangle.Height * widthScale) / 2); 
                 }
                 else
                 {
-                    elements.Elements[i].Visible = false;
+                    relativeRectangle.Width = (int)(heightScale * rectangle.Width);
+                    relativeRectangle.Height = (int)(heightScale * rectangle.Height);
+                    relativeRectangle.X = (int)((parent.DestinationRectangle.Left + parent.DestinationRectangle.Right
+                                            - rectangle.Width * heightScale) / 2);
+                    relativeRectangle.Y = (int)((parent.DestinationRectangle.Top + parent.DestinationRectangle.Bottom
+                                            - rectangle.Height * heightScale) / 2); 
                 }
             }
+            
 
-            rect.Width /= 2;
-            Right.Area = rect;
-
-            Left.Draw(gameTime, sprite);
-            Right.Draw(gameTime, sprite);
-
-            base.Draw(gameTime, sprite);
-        }
-    }
-    #endregion
-
-    #region Button
-    public class Button : UIElement
-    {
-        #region Fields
-        /// <summary>
-        /// Button hot key
-        /// </summary>
-        protected Keys hotKey;
-
-        /// <summary>
-        /// Gets or sets button hot key
-        /// </summary>
-        public Keys HotKey
-        {
-            get { return hotKey; }
-            set { hotKey = value; }
-        }
-
-        /// <summary>
-        /// Button click event
-        /// </summary>
-        public event EventHandler Click;
-
-        #endregion
-
-        #region Methods
-        public Button()
-        {
-        }
-
-        public Button(Rectangle destRect)
-            : base(destRect)
-        {
-        }
-
-        public Button(Texture2D texture,
-            Rectangle destRect, Rectangle srcRect, Keys hotKey)
-            : base(destRect)
-        {
-            this.texture = texture;
-            this.destinationRectangle = destRect;
-            this.sourceRectangle = srcRect;
-            this.hotKey = hotKey;
-        }
-
-        public override void Update(GameTime gameTime)
-        {
-            if (!visible)
-                return;
-
-            base.Update(gameTime);
-
-            state = Input.MouseInBox(destinationRectangle) ? UIState.Hover : UIState.Normal;
-
-            if (enabled &&
-               ((state == UIState.Hover && Input.MouseLeftButtonJustPressed) ||
-                Input.KeyboardKeyJustPressed(hotKey)))
-            {
-                // Suppress mouse and keyboard events,
-                // No one else will receive those events in this frame
-                Input.SuppressMouseEvent();
-                Input.SuppressKeyboardEvent();
-
-                state = UIState.Press;
-                if (Click != null)
-                    Click(this, null);
-            }
-        }
-
-        /// <summary>
-        /// Draw UI element
-        /// </summary>
-        /// <param name="gameTime"></param>
-        public override void Draw(GameTime gameTime, SpriteBatch sprite)
-        {
-            base.Draw(gameTime, sprite);
-
-            if (texture != null && visible)
-            {
-                Color color = Color.White;
-
-                if (state == UIState.Normal)
-                    color = Color.White;
-                else
-                    color = Color.Yellow;
-
-                if (!enabled)
-                    color = Color.Gray;
-
-                sprite.Draw(texture, destinationRectangle, sourceRectangle, color);
-            }
-        }
-
-        /// <summary>
-        /// Dispose
-        /// </summary>
-        /// <param name="disposing">Disposing</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (texture != null)
-                    texture.Dispose();
-            }
-
-            base.Dispose(disposing);
+            return relativeRectangle;
         }
         #endregion
     }

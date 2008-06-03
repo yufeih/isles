@@ -9,7 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Isles.AI
+namespace Isles.Engine
 {
     #region PriorityQueue
     /// <summary>
@@ -76,6 +76,14 @@ namespace Isles.AI
         public PriorityQueue(int capacity)
         {
             data = new T[(capacity + 2) & 0xFFFFFE];
+        }
+
+        /// <summary>
+        /// Gets each entry through index
+        /// </summary>
+        public T this[int index]
+        {
+            get { return data[index]; }
         }
 
         /// <summary>
@@ -303,19 +311,7 @@ namespace Isles.AI
             costs = new float[capacity];
             index = new int[capacity];
 
-            Reset();
-        }
-
-        /// <summary>
-        /// Reset the priority queue
-        /// </summary>
-        public void Reset()
-        {
-            for (int i = 0; i < costs.Length; i++)
-            {
-                costs[i] = 0;
-                index[i] = -1;
-            }
+            Clear();
         }
 
         /// <summary>
@@ -323,6 +319,12 @@ namespace Isles.AI
         /// </summary>
         public void Clear()
         {
+            for (int i = 0; i < costs.Length; i++)
+            {
+                costs[i] = 0;
+                index[i] = -1;
+            }
+
             count = 0;
         }
 

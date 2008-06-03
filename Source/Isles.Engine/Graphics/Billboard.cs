@@ -42,47 +42,146 @@ namespace Isles.Graphics
         DepthBufferEnable = (1 << 4),
     }
 
+    public enum AnchorType
+    {
+        /// <summary>
+        /// Position anchor on top
+        /// </summary>
+        Top = 0,
+
+        /// <summary>
+        /// Position anchor on Center
+        /// </summary>
+        Center = 1,
+
+        /// <summary>
+        /// Position anchor on bottom
+        /// </summary>
+        Bottom = 2
+
+    }
+
     /// <summary>
     /// A billboard definition
     /// </summary>
-    public struct Billboard
+    public class Billboard
     {
+
         /// <summary>
         /// Texture used to draw the billboard
         /// TODO: Implement animated texture
         /// </summary>
-        public Texture2D Texture;
+        public String TextureName
+        {
+            get
+            {
+                return this.textureName;
+            }
+            set
+            {
+                texture = BaseGame.Singleton.ZipContent.Load<Texture2D>(value);
+                textureName = value;
+            }
+        }
+
+        public Texture2D Texture
+        {
+            get
+            {
+                return this.texture;
+            }
+            set
+            {
+                this.texture = value;
+            }
+        }
+        private String textureName;
+        private Texture2D texture;
 
         /// <summary>
         /// Position of the billboard. Bottom center in the texture.
         /// </summary>
-        public Vector3 Position;
+        private Vector3 position;
+        public Vector3 Position
+        {
+            get
+            {
+                return this.position;
+            }
+
+            set
+            {
+                this.position = value;
+            }
+        }
+        
 
         /// <summary>
         /// Type of the billboard
         /// </summary>
-        public BillboardType Type;
+        public BillboardType Type
+        {
+            get
+            {
+                return this.type;
+            }
+            set
+            {
+                this.type = value;
+            }
+        }
+        private BillboardType type;
+
+        /// <summary>
+        /// Type of position anchor
+        /// </summary>
+        public AnchorType AchorType
+        {
+            get
+            {
+                return this.achorType;
+            }
+            set
+            {
+                this.achorType = value;
+            }
+        }
+        private AnchorType achorType;
+        
 
         /// <summary>
         /// Normalized vector around which the billboard is rotating
         /// </summary>
         public Vector3 Normal;
+       
 
         /// <summary>
         /// Size of the billboard
         /// </summary>
         public Vector2 Size;
+        
 
         /// <summary>
         /// Source rectangle (min, max). Measured in float [0 ~ 1]
         /// </summary>
         public Vector4 SourceRectangle;
+        
 
         /// <summary>
         /// Default source rectangle
         /// </summary>
         public static readonly Vector4 DefaultSourceRectangle = new Vector4(0, 0, 1, 1);
         public static readonly Vector4 DefaultSourceRectangleXInversed = new Vector4(1, 0, 0, 1);
+
+        public Billboard()
+        {
+            this.achorType = AnchorType.Center;
+        }
+
+        public void Draw()
+        {
+            BaseGame.Singleton.Billboard.Draw(this);
+        }
     }
     #endregion
 
@@ -92,6 +191,22 @@ namespace Isles.Graphics
     /// </summary>
     public class BillboardManager : IDisposable
     {
+        private static Vector3 GetCenterPosition(Billboard billboard)
+        {
+            if(billboard.AchorType == AnchorType.Top)
+            {
+                return billboard.Position - new Vector3(0, 0, billboard.Size.Y / 2);
+            }
+            else if (billboard.AchorType == AnchorType.Bottom)
+            {
+                return billboard.Position + new Vector3(0, 0, billboard.Size.Y / 2);
+            }
+            else
+            {
+                return billboard.Position;
+            }
+        }
+
         /// <summary>
         /// Max number of quads that can be rendered in one draw call
         /// </summary>
@@ -151,7 +266,7 @@ namespace Isles.Graphics
             this.game = game;
 
             // Initialize billboard effect
-            effect = game.Content.Load<Effect>("Effects/Billboard");
+            effect = game.ZipContent.Load<Effect>("Effects/Billboard");
 
             techniqueVegetation = effect.Techniques["Vegetation"];
             techniqueNormal = effect.Techniques["Normal"];
@@ -169,10 +284,11 @@ namespace Isles.Graphics
         /// <summary>
         /// Draw a billboard
         /// </summary>
-        public void Draw(Texture2D texture, Vector3 position, Vector2 size)
+        public void Draw(Texture2D texture, Vector3 position, Vector2 size, AnchorType achorType)
         {
-            Billboard billboard;
+            Billboard billboard = new Billboard();
 
+            billboard.AchorType = achorType;
             billboard.Texture = texture;
             billboard.Position = position;
             billboard.Normal = Vector3.UnitZ;
@@ -184,10 +300,11 @@ namespace Isles.Graphics
         }
 
         public void Draw(Texture2D texture, Vector3 position,
-            Vector2 size, Vector3 normal, Vector4 sourceRectangle)
+            Vector2 size, Vector3 normal, Vector4 sourceRectangle, AnchorType achorType)
         {
-            Billboard billboard;
+            Billboard billboard = new Billboard() ;
 
+            billboard.AchorType = achorType;
             billboard.Texture = texture;
             billboard.Position = position;
             billboard.Normal = normal;
@@ -341,7 +458,7 @@ namespace Isles.Graphics
 
             for (int i = 0; i < 4; i++)
             {
-                vertices[baseVertex + i].Position = billboard.Position;
+                vertices[baseVertex + i].Position = GetCenterPosition(billboard);
                 vertices[baseVertex + i].Normal = billboard.Normal;
             }
 

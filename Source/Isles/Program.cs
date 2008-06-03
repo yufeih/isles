@@ -5,19 +5,25 @@
 //-----------------------------------------------------------------------------
 
 using System;
+using System.IO;
+using System.Text;
+using System.Reflection;
+using System.Xml.Serialization;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework;
 using Isles.Engine;
+using Isles.UI;
 
 namespace Isles
 {
-    static class Program
+    public static class Program
     {
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-        static void Main(string[] args)
+        [STAThread()]
+        public static void Main(string[] args)
         {
 #if !DEBUG
             try
@@ -25,12 +31,12 @@ namespace Isles
 #endif
 
             using (BaseGame game = new GameIsles())
-            {
+            {                
                 game.Run();
 
                 // Sucessfully exit the game
                 Log.NewLine();
-                Log.Write("Program terminated. Overall FPS: " + game.Profiler.OverallFPS);
+                Log.Write("Program Terminated. Overall FPS: " + game.Profiler.OverallFPS);
             }
 #if !DEBUG
             }

@@ -10,13 +10,13 @@ using System.Text;
 using Isles.Graphics;
 using Microsoft.Xna.Framework;
 
-namespace Isles.AI
+namespace Isles.Engine
 {
     #region GraphEdge & IGraph
     /// <summary>
     /// Interface for a graph edge
     /// </summary>
-    public class GraphEdge
+    public struct GraphEdge
     {
         /// <summary>
         /// Gets an index representing where the edge is from
@@ -48,9 +48,7 @@ namespace Isles.AI
     /// <summary>
     /// Interface for a directed graph
     /// </summary>
-    /// <typeparam name="TNode"></typeparam>
-    /// <typeparam name="TEdge"></typeparam>
-    public interface IGraph<TEdge> where TEdge : GraphEdge
+    public interface IGraph
     {
         /// <summary>
         /// Gets the total number of nodes in the graph
@@ -60,7 +58,7 @@ namespace Isles.AI
         /// <summary>
         /// Gets all the out-going edges of a given node
         /// </summary>
-        IEnumerable<TEdge> GetEdges(int nodeIndex);
+        IEnumerable<GraphEdge> GetEdges(int nodeIndex);
 
         /// <summary>
         /// Gets the heuristic value between two nodes used in A* algorithm
@@ -76,8 +74,7 @@ namespace Isles.AI
     /// <summary>
     /// Sparse graph using adjacency list representation
     /// </summary>
-    public class SparseGraph<TNode, TEdge>
-                    : IGraph<TEdge> where TEdge : GraphEdge
+    public class SparseGraph<TNode> : IGraph
     {
         #region Fields
         /// <summary>
@@ -88,7 +85,7 @@ namespace Isles.AI
         /// <summary>
         /// Graph edge adjacency list
         /// </summary>
-        List<LinkedList<TEdge>> edges;
+        List<LinkedList<GraphEdge>> edges;
         #endregion
 
         #region IGraph
@@ -132,7 +129,7 @@ namespace Isles.AI
         /// <summary>
         /// Gets all the out-going edges of a given node
         /// </summary>
-        public IEnumerable<TEdge> GetEdges(int nodeIndex)
+        public IEnumerable<GraphEdge> GetEdges(int nodeIndex)
         {
             return edges[nodeIndex];
         }
@@ -145,7 +142,7 @@ namespace Isles.AI
         public SparseGraph()
         {
             nodes = new List<TNode>();
-            edges = new List<LinkedList<TEdge>>();
+            edges = new List<LinkedList<GraphEdge>>();
         }
 
         /// <summary>
@@ -156,11 +153,11 @@ namespace Isles.AI
         public SparseGraph(int nodeCount)
         {
             nodes = new List<TNode>(nodeCount);
-            edges = new List<LinkedList<TEdge>>(nodeCount);
+            edges = new List<LinkedList<GraphEdge>>(nodeCount);
 
             for (int i = 0; i < nodeCount; i++)
             {
-                edges[i] = new LinkedList<TEdge>();
+                edges[i] = new LinkedList<GraphEdge>();
             }
         }
 
@@ -172,7 +169,7 @@ namespace Isles.AI
         public int AddNode(TNode node)
         {
             nodes.Add(node);
-            edges.Add(new LinkedList<TEdge>());
+            edges.Add(new LinkedList<GraphEdge>());
 
             return nodes.Count - 1;
         }
@@ -181,7 +178,7 @@ namespace Isles.AI
         /// Adds a new edge to the graph
         /// </summary>
         /// <param name="edge"></param>
-        public void AddEdge(TEdge edge)
+        public void AddEdge(GraphEdge edge)
         {
             // Validate edge nodes
             if (edge.From < 0 || edge.From >= nodes.Count ||
@@ -210,211 +207,37 @@ namespace Isles.AI
             throw new NotImplementedException();
         }
         #endregion
-    }
-    #endregion
 
-    #region LandscapeGraph
-    /// <summary>
-    /// Graph used for Isles landscape
-    /// </summary>
-    public class LandscapeGraph : IGraph<GraphEdge>
-    {
+        #region Test
         /// <summary>
-        /// Reference to a landscape
+        /// Test cases for graph
         /// </summary>
-        Landscape landscape;
-
-        /// <summary>
-        /// How height values affects costs
-        /// </summary>
-        float heightCostFactor;
-
-        /// <summary>
-        /// How distance on XY plane affects costs
-        /// </summary>
-        float distanceCostFactor;
-
-        /// <summary>
-        /// Construct a landscape graph
-        /// </summary>
-        /// <param name="landscape"></param>
-        public LandscapeGraph(Landscape landscape)
+        public static void Test()
         {
-            this.landscape = landscape;
+            SparseGraph<int> graph = new SparseGraph<int>();
+            GraphSearchAStar search = new GraphSearchAStar();
 
-            // HACK! HACK! Assume landscape is a square
-            this.heightCostFactor = 1;
-            this.distanceCostFactor = landscape.Size.X / landscape.GridCount.X;
+            graph.AddNode(0);
+            graph.AddNode(1);
+            graph.AddNode(2);
+            graph.AddNode(3);
+            graph.AddNode(4);
+
+            graph.AddEdge(new GraphEdge(0, 1, 198));
+            graph.AddEdge(new GraphEdge(1, 0, 198));
+            graph.AddEdge(new GraphEdge(1, 2, 220));
+            graph.AddEdge(new GraphEdge(0, 4, 190));
+            graph.AddEdge(new GraphEdge(4, 1, 265));
+            graph.AddEdge(new GraphEdge(0, 3, 280));
+            graph.AddEdge(new GraphEdge(4, 3, 149));
+            graph.AddEdge(new GraphEdge(3, 2, 181));
+
+            search.Search(graph, 0, 2);
+
+            List<int> path = new List<int>();
+            path.AddRange(search.Path);
         }
-
-        /// <summary>
-        /// Gets the heuristic value between two nodes
-        /// </summary>
-        /// <param name="currentIndex">Index to the current node</param>
-        /// <param name="endIndex">Index to the end/target node</param>
-        /// <returns>A heuristic value between the two nodes</returns>
-        public float GetHeuristicValue(int currentIndex, int endIndex)
-        {
-            Point grid;
-            Vector2 current, end;
-
-            grid = IndexToGrid(currentIndex);
-            current = landscape.GridToPosition(grid.X, grid.Y);
-            grid = IndexToGrid(endIndex);
-            end = landscape.GridToPosition(grid.X, grid.Y);
-
-            // Return direct distance
-            return Vector2.Distance(current, end);
-        }
-
-        /// <summary>
-        /// Landscape graph is an undirected graph
-        /// </summary>
-        public bool Directed
-        {
-            get { return false; }
-        }
-
-        /// <summary>
-        /// Gets the total number of nodes in the graph
-        /// </summary>
-        public int NodeCount
-        {
-            get
-            {
-                // Every landscape grid is considered to be a graph node
-                return landscape.GridCount.X * landscape.GridCount.Y;
-            }
-        }
-
-        /// <summary>
-        /// Gets all nodes
-        /// </summary>
-        public IEnumerable<Landscape.Grid> Nodes
-        {
-            get
-            {
-                // Enumerate on all landscape grids
-                for (int y = 0; y < landscape.GridCount.Y; y++)
-                    for (int x = 0; x < landscape.GridCount.X; x++)
-                        yield return landscape.Data[x, y];
-            }
-        }
-
-        /// <summary>
-        /// Gets a graph node from a given index
-        /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        public Landscape.Grid GetNode(int index)
-        {
-            return landscape.Data[index / landscape.GridCount.X,
-                                  index % landscape.GridCount.X];
-        }
-
-        /// <summary>
-        /// Converts an 2D grid to 1D index 
-        /// </summary>
-        public Point IndexToGrid(int index)
-        {
-            return new Point(
-                index / landscape.GridCount.X,
-                index % landscape.GridCount.X);
-        }
-
-        /// <summary>
-        /// Converts an 2D grid to 1D index 
-        /// </summary>
-        public int GridToIndex(int x, int y)
-        {
-            return y * landscape.GridCount.X + x;
-        }
-
-        /// <summary>
-        /// Gets the cost of a landscape grid
-        /// </summary>
-        public float EdgeCost(int x1, int y1, int x2, int y2)
-        {
-            // Approximation
-            return distanceCostFactor + Math.Abs(
-                landscape.GetGridHeight(x1, y1) -
-                landscape.GetGridHeight(x2, y2)) * heightCostFactor;
-        }
-
-        /// <summary>
-        /// Gets whether a landscape grid can be walked through
-        /// </summary>
-        public bool IsWalkableGrid(int x, int y)
-        {
-            return true;
-            //return
-            //    landscape.Data[x, y].Owners.Count == 0 &&
-            //    landscape.Data[x, y].Type == LandscapeType.Ground;
-        }
-
-        /// <summary>
-        /// Gets all the out-going edges of a given node
-        /// </summary>
-        public IEnumerable<GraphEdge> GetEdges(int nodeIndex)
-        {
-            const float Sqrt2 = 1.414213562f;
-
-            // Our agents are walking at 8 directions,
-            // so a node has 8 out-going edges at most.
-
-            int x = nodeIndex % landscape.GridCount.X;
-            int y = nodeIndex / landscape.GridCount.X;
-
-            // 3 nodes on the left
-            if (x > 0)
-            {
-                if (IsWalkableGrid(x - 1, y))
-                    yield return new GraphEdge(
-                        nodeIndex, GridToIndex(x - 1, y),
-                        EdgeCost(x, y, x - 1, y));
-
-                if (y > 0 && IsWalkableGrid(x - 1, y - 1))
-                    yield return new GraphEdge(
-                        nodeIndex, GridToIndex(x - 1, y - 1),
-                        EdgeCost(x, y, x - 1, y - 1) * Sqrt2);
-
-                if (y < landscape.GridCount.Y - 1 && IsWalkableGrid(x - 1, y + 1))
-                    yield return new GraphEdge(
-                        nodeIndex, GridToIndex(x - 1, y + 1),
-                        EdgeCost(x, y, x - 1, y + 1) * Sqrt2);
-            }
-
-            // 3 nodes on the right
-            if (x < landscape.GridCount.X - 1)
-            {
-                if (IsWalkableGrid(x + 1, y))
-                    yield return new GraphEdge(
-                        nodeIndex, GridToIndex(x + 1, y),
-                        EdgeCost(x, y, x + 1, y));
-
-                if (y > 0 && IsWalkableGrid(x + 1, y - 1))
-                    yield return new GraphEdge(
-                        nodeIndex, GridToIndex(x + 1, y - 1),
-                        EdgeCost(x, y, x + 1, y - 1) * Sqrt2);
-
-                if (y < landscape.GridCount.Y - 1 && IsWalkableGrid(x + 1, y + 1))
-                    yield return new GraphEdge(
-                        nodeIndex, GridToIndex(x + 1, y + 1),
-                        EdgeCost(x, y, x + 1, y + 1) * Sqrt2);
-            }
-
-            // Upper node
-            if (y > 0 && IsWalkableGrid(x, y - 1))
-                yield return new GraphEdge(
-                    nodeIndex, GridToIndex(x, y - 1),
-                    EdgeCost(x, y, x, y - 1));
-
-            // Lower node
-            if (y < landscape.GridCount.Y - 1 && IsWalkableGrid(x, y + 1))
-                yield return new GraphEdge(
-                    nodeIndex, GridToIndex(x, y + 1),
-                    EdgeCost(x, y, x, y + 1));
-        }
+        #endregion
     }
     #endregion
 
@@ -422,7 +245,7 @@ namespace Isles.AI
     /// <summary>
     /// Interface for graph search algorithm
     /// </summary>
-    public interface IGraphSearch<TEdge> where TEdge : GraphEdge
+    public interface IGraphSearch
     {
         /// <summary>
         /// Perform a graph search on a graph, find a best path from start to end.
@@ -431,7 +254,7 @@ namespace Isles.AI
         /// <param name="start"></param>
         /// <param name="end"></param>
         /// <returns>Whether a path has been found</returns>
-        bool Search(IGraph<TEdge> graph, int start, int end);
+        bool Search(IGraph graph, int start, int end);
 
         /// <summary>
         /// Perform a graph search on a graph, find a best path from start to end.
@@ -439,6 +262,8 @@ namespace Isles.AI
         /// the maximum number of graph nodes traversed in each call is specified by
         /// the steps parameter. The algorithm aims at decomposing the time consuming
         /// graph search algorithm into several steps in order to average the time cost.
+        /// When the search is incomplete, if a different graph, start or end point is
+        /// specified, a new search will be triggered.
         /// </summary>
         /// <param name="start"></param>
         /// <param name="end"></param>
@@ -452,7 +277,7 @@ namespace Isles.AI
         /// True or false indicates whether a path has been found
         /// Null if the search isn't complete.
         /// </returns>
-        bool? Search(IGraph<TEdge> graph, int start, int end, int steps, out int stepsUsed);
+        bool? Search(IGraph graph, int start, int end, int steps, out int stepsUsed);
 
         /// <summary>
         /// Gets the path from search result. The path is an array of index
@@ -466,7 +291,7 @@ namespace Isles.AI
     /// <summary>
     /// Performs an A* graph search on a given graph
     /// </summary>
-    public class GraphSearchAStar<TEdge> : IGraphSearch<TEdge> where TEdge : GraphEdge
+    public class GraphSearchAStar : IGraphSearch
     {
         /// <summary>
         /// Whether a search has finished
@@ -477,6 +302,11 @@ namespace Isles.AI
         /// Start, end node of the search
         /// </summary>
         int start, end;
+
+        /// <summary>
+        /// The graph we're currently searching
+        /// </summary>
+        IGraph graph;
 
         /// <summary>
         /// A list holding the path information.
@@ -528,6 +358,10 @@ namespace Isles.AI
                 path = new int[length];
                 costs = new float[length];
                 queue = new IndexedPriorityQueue(length);
+
+                // Reset path to -1
+                for (int i = 0; i < length; i++)
+                    path[i] = -1;
             }
 
             // Clear costs (path don't need to be cleared)
@@ -537,7 +371,7 @@ namespace Isles.AI
             }
 
             // Reset the queue
-            queue.Reset();
+            queue.Clear();
         }
 
         /// <summary>
@@ -547,7 +381,7 @@ namespace Isles.AI
         /// <param name="start"></param>
         /// <param name="end"></param>
         /// <returns>Whether a path has been found</returns>
-        public bool Search(IGraph<TEdge> graph, int start, int end)
+        public bool Search(IGraph graph, int start, int end)
         {
             int steps;
             // Simple call our step search using infinite steps
@@ -568,13 +402,15 @@ namespace Isles.AI
         /// True or false indicates whether a path has been found
         /// Null if the search isn't complete.
         /// </returns>
-        public bool? Search(IGraph<TEdge> graph, int start, int end, int steps, out int stepCount)
+        public bool? Search(IGraph graph, int start, int end, int steps, out int stepCount)
         {
             int nodeCount = graph.NodeCount;
 
             // Start a new search
-            if (finished)
+            if (finished || this.start != start || this.end != end || this.graph != graph)
             {
+                this.finished = false;
+                this.graph = graph;
                 this.start = start;
                 this.end = end;
 
@@ -590,11 +426,6 @@ namespace Isles.AI
 
                 // Add the start node on the queue
                 queue.Add(start, 0);
-            }    
-            // Continue the old search. start/end node must not change!!
-            else if (this.start != start || this.end != end)
-            {
-                throw new ArgumentException();
             }
 
             // Step count
@@ -649,7 +480,10 @@ namespace Isles.AI
                 // If we have processed enough nodes but still failed to reach the target,
                 // pause the search and return null.
                 if (++stepCount >= steps)
+                {
+                    finished = false;
                     return null;
+                }
             }
 
             // Finish the search
@@ -659,7 +493,7 @@ namespace Isles.AI
 
         /// <summary>
         /// Gets the path from search result. The path is an array of index
-        /// to all the graph nodes on the path from start to end.
+        /// to all the graph nodes on the path FROM END TO START!!!.
         /// The path is only valid after search is called and completed.
         /// </summary>
         public IEnumerable<int> Path
@@ -667,47 +501,16 @@ namespace Isles.AI
             get
             {
                 int i = end;
-                while (i >= 0)
+                while (i != start && i >= 0)
                 {
                     yield return i;
 
                     i = path[i];
                 }
+
+                // Do not forget to return start
+                yield return start;
             }
-        }
-    }
-    #endregion
-
-    #region GraphTest
-    public static class GraphTest
-    {
-        /// <summary>
-        /// Test cases for graph
-        /// </summary>
-        public static void Test()
-        {
-            SparseGraph<int, GraphEdge> graph = new SparseGraph<int, GraphEdge>();
-            GraphSearchAStar<GraphEdge> search = new GraphSearchAStar<GraphEdge>();
-
-            graph.AddNode(0);
-            graph.AddNode(1);
-            graph.AddNode(2);
-            graph.AddNode(3);
-            graph.AddNode(4);
-
-            graph.AddEdge(new GraphEdge(0, 1, 198));
-            graph.AddEdge(new GraphEdge(1, 0, 198));
-            graph.AddEdge(new GraphEdge(1, 2, 220));
-            graph.AddEdge(new GraphEdge(0, 4, 190));
-            graph.AddEdge(new GraphEdge(4, 1, 265));
-            graph.AddEdge(new GraphEdge(0, 3, 280));
-            graph.AddEdge(new GraphEdge(4, 3, 149));
-            graph.AddEdge(new GraphEdge(3, 2, 181));
-
-            search.Search(graph, 0, 2);
-
-            List<int> path = new List<int>();
-            path.AddRange(search.Path);
         }
     }
     #endregion

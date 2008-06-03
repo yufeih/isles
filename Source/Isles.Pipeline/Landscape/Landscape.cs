@@ -206,8 +206,12 @@ namespace Isles.Pipeline
                     (new ExternalReference<TextureContent>(Path.Combine(directory, alphaTexture)), null);
 
                 // Build normal texture
-                normalTextureContent = context.BuildAsset<TextureContent, TextureContent>
-                    (new ExternalReference<TextureContent>(Path.Combine(directory, normalTexture)), null);
+                string normalTextureFile = Path.Combine(directory, normalTexture);
+                if (File.Exists(normalTextureFile))
+                {
+                    normalTextureContent = context.BuildAsset<TextureContent, TextureContent>
+                        (new ExternalReference<TextureContent>(Path.Combine(directory, normalTexture)), null);
+                }
 
                 // Process alpha texture to get patches that this layer will finally render to
                 Texture2DContent visibility = (Texture2DContent)
@@ -287,6 +291,7 @@ namespace Isles.Pipeline
             heightData = new float[heightFieldWidth, heightFieldHeight];
             for (int y = 0; y < heightFieldHeight; y++)
                 for (int x = 0; x < heightFieldWidth; x++)
+                    // Negate Y value
                     heightData[x, y] = baseHeight + height * heightfield.GetPixel(x, y);
 
             #endregion

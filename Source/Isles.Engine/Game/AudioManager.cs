@@ -8,6 +8,7 @@
 #endregion
 
 #region Using Statements
+using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -35,13 +36,27 @@ namespace Isles.Engine
     public class AudioManager : Microsoft.Xna.Framework.GameComponent
     {
         #region Fields
-
+        ZipContentManager content;
 
         // XACT objects.
         AudioEngine audioEngine;
         WaveBank waveBank;
         SoundBank soundBank;
 
+        public AudioEngine Audio
+        {
+            get { return audioEngine; }
+        }
+
+        public WaveBank Wave
+        {
+            get { return waveBank; }
+        }
+
+        public SoundBank Sound
+        {
+            get { return soundBank; }
+        }
 
         // The listener describes the ear which is hearing 3D sounds.
         // This is usually set to match the camera.
@@ -70,9 +85,13 @@ namespace Isles.Engine
         #endregion
 
 
-        public AudioManager(Game game)
+        public AudioManager(Game game, ZipContentManager content)
             : base(game)
-        { }
+        {
+            if (content == null)
+                throw new ArgumentException();
+            this.content = content;
+        }
 
 
         /// <summary>
@@ -80,9 +99,9 @@ namespace Isles.Engine
         /// </summary>
         public override void Initialize()
         {
-            audioEngine = new AudioEngine("Content/Sounds/Isles.xgs");
-            waveBank = new WaveBank(audioEngine, "Content/Sounds/Isles.xwb");
-            soundBank = new SoundBank(audioEngine, "Content/Sounds/Isles.xsb");
+            audioEngine = content.LoadAudioEngine("Content/Audios/Isles.xgs");
+            waveBank = content.LoadWaveBank(audioEngine, "Content/Audios/Isles.xwb");
+            soundBank = content.LoadSoundBank(audioEngine, "Content/Audios/Isles.xsb");
 
             base.Initialize();
         }
@@ -126,7 +145,7 @@ namespace Isles.Engine
             {
                 Cue3D cue3D = activeCues[index];
 
-                if (cue3D.Cue.IsStopped)
+                if (!cue3D.Cue.IsDisposed && cue3D.Cue.IsStopped)
                 {
                     // If the cue has stopped playing, dispose it.
                     cue3D.Cue.Dispose();
@@ -147,7 +166,20 @@ namespace Isles.Engine
             }
 
             // Update the XACT engine.
-            audioEngine.Update();
+            // Some bugs with the audio engine. Sometimes it causes the game to stuck :(
+            //audioEngine.Update();
+
+            // Update background musc
+            if (backgroundMusic != null && (delayBeforePlaying || backgroundMusic.IsStopped))
+            {
+                delayedLoopTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                if (delayedLoopTimer >= delayedLoopSeconds)
+                {
+                    delayBeforePlaying = false;
+                    PlayBackground(backgroundMusicName, delayedLoopSeconds);
+                    delayedLoopTimer = 0;
+                }
+            }
 
             base.Update(gameTime);
         }
@@ -171,6 +203,9 @@ namespace Isles.Engine
         /// </summary>
         public Cue Play(string cueName, IAudioEmitter emitter)
         {
+            if (emitter == null)
+                return Play(cueName);
+
             Cue3D cue3D;
 
             if (cuePool.Count > 0)
@@ -199,18 +234,60 @@ namespace Isles.Engine
             return cue3D.Cue;
         }
 
+        /// <summary>
+        /// Play a background music
+        /// </summary>
+        public Cue PlayBackground(string cueName, float delayedLoopSeconds)
+        {
+            return PlayBackground(cueName, delayedLoopSeconds, false);
+        }
+
+        public Cue PlayBackground(string cueName, float delayedLoopSeconds, bool delayBeforePlaying)
+        {
+            this.delayBeforePlaying = delayBeforePlaying;
+            this.delayedLoopSeconds = delayedLoopSeconds;
+
+            Cue cue = soundBank.GetCue(cueName);
+
+            if (backgroundMusic != null && !backgroundMusicName.Equals(cueName))
+                backgroundMusic.Stop(AudioStopOptions.AsAuthored);
+
+            if (!delayBeforePlaying)
+            {
+                if (!backgroundMusicName.Equals(cueName))
+                {
+                    cue.Play();
+                }
+                else if (!backgroundMusic.IsPlaying)
+                {
+                    cue.Play();
+                }
+            }
+
+            backgroundMusicName = cueName;
+            return backgroundMusic = cue;
+        }
+
+        float delayedLoopTimer;
+        float delayedLoopSeconds;
+        Cue backgroundMusic;
+        string backgroundMusicName = "";
+        bool delayBeforePlaying;
 
         /// <summary>
         /// Updates the position and velocity settings of a 3D cue.
         /// </summary>
         private void Apply3D(Cue3D cue3D)
         {
-            emitter.Position = cue3D.Emitter.Position;
-            emitter.Forward = cue3D.Emitter.Forward;
-            emitter.Up = cue3D.Emitter.Up;
-            emitter.Velocity = cue3D.Emitter.Velocity;
-            
-            cue3D.Cue.Apply3D(listener, emitter);
+            if (!cue3D.Cue.IsDisposed)
+            {
+                emitter.Position = cue3D.Emitter.Position;
+                emitter.Forward = cue3D.Emitter.Forward;
+                emitter.Up = cue3D.Emitter.Up;
+                emitter.Velocity = cue3D.Emitter.Velocity;
+
+                cue3D.Cue.Apply3D(listener, emitter);
+            }
         }
 
 

@@ -15,31 +15,14 @@ using System.Threading;
 
 namespace Isles.Engine
 {
-    /// <summary>
-    /// Input helper class, captures all the mouse, keyboard and XBox 360
-    /// controller input and provides some nice helper methods and properties.
-    /// Will also keep track of the last frame states for comparison if
-    /// a button was just pressed this frame, but not already in the last frame.
-    /// 
-    /// Originally grabbed from Racing game
-    /// We need an advanced input system !!! our game and UI need it !!!
-    /// </summary>
-    public static class Input
+    public class Input
     {
-        #region Variables
-#if !XBOX360
+        #region Field
         /// <summary>
         /// Mouse state, set every frame in the Update method.
         /// </summary>
-        private static MouseState mouseState, mouseStateLastFrame;
-#endif
-
-        /// <summary>
-        /// Was a mouse detected? Returns true if the user moves the mouse.
-        /// On the Xbox 360 there will be no mouse movement and theirfore we
-        /// know that we don't have to display the mouse.
-        /// </summary>
-        private static bool mouseDetected = false;
+        MouseState mouseState =
+            Microsoft.Xna.Framework.Input.Mouse.GetState(), mouseStateLastFrame;
 
         /// <summary>
         /// Keyboard state, set every frame in the Update method.
@@ -51,292 +34,45 @@ namespace Isles.Engine
         /// information, section Input). We store our own array of keys from
         /// the last frame for comparing stuff.
         /// </summary>
-        private static KeyboardState keyboardState =
+        KeyboardState keyboardState = 
             Microsoft.Xna.Framework.Input.Keyboard.GetState();
 
         /// <summary>
         /// Keys pressed last frame, for comparison if a key was just pressed.
         /// </summary>
-        private static List<Keys> keysPressedLastFrame = new List<Keys>();
-
-        /// <summary>
-        /// GamePad state, set every frame in the Update method.
-        /// </summary>
-        private static GamePadState gamePadState, gamePadStateLastFrame;
+        List<Keys> keysPressedLastFrame = new List<Keys>();
 
         /// <summary>
         /// Mouse wheel delta this frame. XNA does report only the total
         /// scroll value, but we usually need the current delta!
         /// </summary>
         /// <returns>0</returns>
-        private static int mouseWheelDelta = 0;
-#if !XBOX360
-        private static int mouseWheelValue = 0;
-#endif
-
-        /// <summary>
-        /// Start dragging pos, will be set when we just pressed the left
-        /// mouse button. Used for the MouseDraggingAmount property.
-        /// </summary>
-        private static Point startDraggingPos;
-        
-        /// <summary>
-        /// When the mouse events are suppressed, all MouseButtonJustPressed
-        /// Property will return false. This is useful when handling UI events.
-        /// </summary>
-        private static bool mouseEventSuppressed = false;
-        #endregion
-
-        #region Mouse Properties
-        /// <summary>
-        /// Was a mouse detected? Returns true if the user moves the mouse.
-        /// On the Xbox 360 there will be no mouse movement and theirfore we
-        /// know that we don't have to display the mouse.
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool MouseDetected
-        {
-            get
-            {
-                return mouseDetected;
-            }
-        }
+        int mouseWheelDelta = 0;
+        int mouseWheelValue = 0;
 
         /// <summary>
         /// Mouse position
         /// </summary>
-        /// <returns>Point</returns>
-        public static Point MousePosition
+        public Point MousePosition
         {
-            get
-            {
-#if !XBOX360
-                return new Point(mouseState.X, mouseState.Y);
-#else
-                return Point.Zero;
-#endif
-            }
+            get { return new Point(mouseState.X, mouseState.Y); }
         }
 
         /// <summary>
-        /// X and y movements of the mouse this frame
+        /// Gets current mouse state
         /// </summary>
-#if !XBOX360
-        private static float mouseXMovement, mouseYMovement;
-        private static float lastMouseXMovement, lastMouseYMovement;
-#endif
-
-        /// <summary>
-        /// Mouse x movement
-        /// </summary>
-        /// <returns>Float</returns>
-        public static float MouseXMovement
+        public MouseState Mouse
         {
-            get
-            {
-#if !XBOX360
-                return mouseXMovement;
-#else
-                return 0;
-#endif
-            }
-        }
-
-        /// <summary>
-        /// Mouse y movement
-        /// </summary>
-        /// <returns>Float</returns>
-        public static float MouseYMovement
-        {
-            get
-            {
-#if !XBOX360
-                return mouseYMovement;
-#else
-                    return 0;
-#endif
-            }
-        }
-
-        /// <summary>
-        /// Mouse has moved in either the X or Y direction
-        /// </summary>
-        /// <returns>Boolean</returns>
-        public static bool HasMouseMoved
-        {
-            get
-            {
-#if !XBOX360
-                //TODO: Introduce a mouse movement threshold constant
-                if (MouseXMovement > 1 || MouseYMovement > 1)
-                    return true;
-#endif
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Mouse left button pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool MouseLeftButtonPressed
-        {
-            get
-            {
-#if !XBOX360
-                return mouseState.LeftButton == ButtonState.Pressed;
-#else
-                return false;
-#endif
-            }
-        }
-
-        /// <summary>
-        /// Mouse right button pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool MouseRightButtonPressed
-        {
-            get
-            {
-#if !XBOX360
-                return mouseState.RightButton == ButtonState.Pressed;
-#else
-                return false;
-#endif
-            }
-        }
-
-        /// <summary>
-        /// Mouse middle button pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool MouseMiddleButtonPressed
-        {
-            get
-            {
-#if !XBOX360
-                return mouseState.MiddleButton == ButtonState.Pressed;
-#else
-                return false;
-#endif
-            }
-        }
-
-        public static bool MouseLeftButtonJustReleased
-        {
-            get
-            {
-                return !mouseEventSuppressed &&
-                        mouseState.LeftButton == ButtonState.Released &&
-                        mouseStateLastFrame.LeftButton == ButtonState.Pressed;
-            }
-        }
-
-        public static bool MouseRightButtonJustReleased
-        {
-            get
-            {
-                return !mouseEventSuppressed &&
-                        mouseState.RightButton == ButtonState.Released &&
-                        mouseStateLastFrame.RightButton == ButtonState.Pressed;
-            }
-        }
-
-        public static bool MouseMiddleButtonJustReleased
-        {
-            get
-            {
-                return !mouseEventSuppressed &&
-                        mouseState.MiddleButton == ButtonState.Released &&
-                        mouseStateLastFrame.MiddleButton == ButtonState.Pressed;
-            }
-        }
-
-        /// <summary>
-        /// Mouse left button just pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool MouseLeftButtonJustPressed
-        {
-            get
-            {
-#if !XBOX360
-                return !mouseEventSuppressed &&
-                        mouseState.LeftButton == ButtonState.Pressed &&
-                        mouseStateLastFrame.LeftButton == ButtonState.Released;
-#else
-                return false;
-#endif
-            }
-        }
-
-        /// <summary>
-        /// Mouse right button just pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage(
-            "Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
-            Justification = "Makes this class reuseable.")]
-        public static bool MouseRightButtonJustPressed
-        {
-            get
-            {
-#if !XBOX360
-                return !mouseEventSuppressed &&
-                        mouseState.RightButton == ButtonState.Pressed &&
-                        mouseStateLastFrame.RightButton == ButtonState.Released;
-#else
-                return false;
-#endif
-            }
-        }
-
-        public static bool MouseMiddleButtonJustPressed
-        {
-            get
-            {
-                return !mouseEventSuppressed &&
-                        mouseState.MiddleButton == ButtonState.Pressed &&
-                        mouseStateLastFrame.MiddleButton == ButtonState.Released;
-            }
-        }
-
-        /// <summary>
-        /// Mouse dragging amount
-        /// </summary>
-        /// <returns>Point</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage(
-            "Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
-            Justification = "Makes this class reuseable.")]
-        public static Point MouseDraggingAmount
-        {
-            get
-            {
-                return new Point(
-                    startDraggingPos.X - MousePosition.X,
-                    startDraggingPos.Y - MousePosition.Y);
-            }
-        }
-
-        /// <summary>
-        /// Reset mouse dragging amount
-        /// </summary>
-        public static void ResetMouseDraggingAmount()
-        {
-            startDraggingPos = MousePosition;
+            get { return mouseState; }
         }
 
         /// <summary>
         /// Mouse wheel delta
         /// </summary>
         /// <returns>Int</returns>
-        public static int MouseWheelDelta
+        public int MouseWheelDelta
         {
-            get
-            {
-                return mouseWheelDelta;
-            }
+            get { return mouseWheelDelta; }
         }
 
         /// <summary>
@@ -344,56 +80,49 @@ namespace Isles.Engine
         /// </summary>
         /// <param name="rect">Rectangle</param>
         /// <returns>Bool</returns>
-        public static bool MouseInBox(Rectangle rect)
+        public bool MouseInBox(Rectangle rect)
         {
-#if !XBOX360
-            bool ret = mouseState.X >= rect.X &&
-                       mouseState.Y >= rect.Y &&
-                       mouseState.X < rect.Right &&
-                       mouseState.Y < rect.Bottom;
-            //bool lastRet = mouseStateLastFrame.X >= rect.X &&
-            //               mouseStateLastFrame.Y >= rect.Y &&
-            //               mouseStateLastFrame.X < rect.Right &&
-            //               mouseStateLastFrame.Y < rect.Bottom;
-            return ret;
-#else
-            return false;
-#endif
+            return mouseState.X >= rect.X &&
+                   mouseState.Y >= rect.Y &&
+                   mouseState.X < rect.Right &&
+                   mouseState.Y < rect.Bottom;
         }
 
-        /// <summary>
-        /// Mouse in box relative
-        /// </summary>
-        /// <param name="rect">Rectangle</param>
-        /// <returns>Bool</returns>
-        public static bool MouseInBoxRelative(Rectangle rect)
-        {
-            throw new NotImplementedException();
-            /*
-            float widthFactor = BaseGame.Width / 1024.0f;
-            float heightFactor = BaseGame.Height / 640.0f;
-            return MouseInBox(new Rectangle(
-                (int)Math.Round(rect.X * widthFactor),
-                (int)Math.Round(rect.Y * heightFactor),
-                (int)Math.Round(rect.Right * widthFactor),
-                (int)Math.Round(rect.Bottom * heightFactor)));
-             * */
-        }
-        #endregion
-
-        #region Keyboard Properties
         /// <summary>
         /// Keyboard
         /// </summary>
         /// <returns>Keyboard state</returns>
-        public static KeyboardState Keyboard
+        public KeyboardState Keyboard
         {
-            get
-            {
-                return keyboardState;
-            }
+            get { return keyboardState; }
         }
 
+        /// <summary>
+        /// Gets whether left ALT or right ALT key is pressed
+        /// </summary>
+        public bool IsAltPressed
+        {
+            get { return keyboardState.IsKeyDown(Keys.LeftAlt) || keyboardState.IsKeyDown(Keys.RightAlt); }
+        }
+
+        /// <summary>
+        /// Gets whether left shift or right shift key is pressed
+        /// </summary>
+        public bool IsShiftPressed
+        {
+            get { return keyboardState.IsKeyDown(Keys.LeftShift) || keyboardState.IsKeyDown(Keys.RightShift); }
+        }
+
+        /// <summary>
+        /// Gets whether left ctrl or right ctrl key is pressed
+        /// </summary>
+        public bool IsCtrlPressed
+        {
+            get { return keyboardState.IsKeyDown(Keys.LeftControl) || keyboardState.IsKeyDown(Keys.RightControl); }
+        }
+        #endregion
+
+        #region Method
         public static bool IsSpecialKey(Keys key)
         {
             // All keys except A-Z, 0-9 and `-\[];',./= (and space) are special keys.
@@ -497,7 +226,7 @@ namespace Isles.Engine
         /// for an input text. Only used to enter the player name in the game.
         /// </summary>
         /// <param name="inputText">Input text</param>
-        public static void HandleKeyboardInput(ref string inputText)
+        public void HandleKeyboardInput(ref string inputText)
         {
             // Is a shift key pressed (we have to check both, left and right)
             bool isShiftPressed =
@@ -527,493 +256,247 @@ namespace Isles.Engine
                 }
         }
 
-        /// <summary>
-        /// Keyboard key just pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool KeyboardKeyJustPressed(Keys key)
+        struct Entry
         {
-            return keyboardState.IsKeyDown(key) &&
-                keysPressedLastFrame.Contains(key) == false;
+            public float Order;
+            public IEventListener Handler;
+
+            public Entry(IEventListener handler, float order)
+            {
+                Order = order;
+                Handler = handler;
+            }
+        }
+
+        LinkedList<Entry> handlers = new LinkedList<Entry>();
+
+        /// <summary>
+        /// Registers a new input event handler
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <param name="order">
+        /// Handlers with lower order will be notified first
+        /// </param>
+        public void Register(IEventListener handler, float order)
+        {
+            if (null == handler)
+                throw new ArgumentNullException();
+
+            // Check if this handler already exists in the list
+            LinkedListNode<Entry> p = handlers.First;
+
+            while (p != null)
+            {
+                if (p.Value.Handler == handler)
+                {
+                    Log.Write("Warning: Duplicate Input Handler.");
+                    return;
+                }
+
+                p = p.Next;
+            }
+
+            // Add to the list
+            p = handlers.First;
+
+            while (p != null)
+            {
+                if (p.Value.Order > order)
+                {
+                    handlers.AddBefore(p, new Entry(handler, order));
+                    return;
+                }
+
+                p = p.Next;
+            }
+
+            handlers.AddLast(new Entry(handler, order));
         }
 
         /// <summary>
-        /// Keyboard space just pressed
+        /// Removes an input event handler
         /// </summary>
-        /// <returns>Bool</returns>
-        public static bool KeyboardSpaceJustPressed
+        /// <param name="handler"></param>
+        public void Unregister(IEventListener handler)
         {
-            get
+            if (null == handler)
+                throw new ArgumentNullException();
+
+            LinkedListNode<Entry> p = handlers.First;
+
+            while (p != null)
             {
-                return keyboardState.IsKeyDown(Keys.Space) &&
-                    keysPressedLastFrame.Contains(Keys.Space) == false;
+                if (p.Value.Handler == handler)
+                {
+                    handlers.Remove(p);
+                    break;
+                }
+
+                p = p.Next;
             }
         }
 
         /// <summary>
-        /// Keyboard F1 just pressed
+        /// Clear all handler registries
         /// </summary>
-        /// <returns>Bool</returns>
-        public static bool KeyboardF1JustPressed
+        public void Clear()
         {
-            get
-            {
-                return keyboardState.IsKeyDown(Keys.F1) &&
-                    keysPressedLastFrame.Contains(Keys.F1) == false;
-            }
+            handlers.Clear();
+        }
+
+        IEventListener captured;
+
+        /// <summary>
+        /// Capture input event. All input events will always (only) be 
+        /// sent to the specified handler.
+        /// </summary>
+        public void Capture(IEventListener handler)
+        {
+            if (captured != null)
+                throw new InvalidOperationException();
+
+            captured = handler;
         }
 
         /// <summary>
-        /// Keyboard escape just pressed
+        /// Release the capture of input events
         /// </summary>
-        /// <returns>Bool</returns>
-        public static bool KeyboardEscapeJustPressed
+        public void Uncapture()
         {
-            get
-            {
-                return keyboardState.IsKeyDown(Keys.Escape) &&
-                    keysPressedLastFrame.Contains(Keys.Escape) == false;
-            }
+            captured = null;
         }
 
-        /// <summary>
-        /// Keyboard left just pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool KeyboardLeftJustPressed
-        {
-            get
-            {
-                return keyboardState.IsKeyDown(Keys.Left) &&
-                    keysPressedLastFrame.Contains(Keys.Left) == false;
-            }
-        }
-
-        /// <summary>
-        /// Keyboard right just pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool KeyboardRightJustPressed
-        {
-            get
-            {
-                return keyboardState.IsKeyDown(Keys.Right) &&
-                    keysPressedLastFrame.Contains(Keys.Right) == false;
-            }
-        }
-
-        /// <summary>
-        /// Keyboard up just pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool KeyboardUpJustPressed
-        {
-            get
-            {
-                return keyboardState.IsKeyDown(Keys.Up) &&
-                    keysPressedLastFrame.Contains(Keys.Up) == false;
-            }
-        }
-
-        /// <summary>
-        /// Keyboard down just pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool KeyboardDownJustPressed
-        {
-            get
-            {
-                return keyboardState.IsKeyDown(Keys.Down) &&
-                    keysPressedLastFrame.Contains(Keys.Down) == false;
-            }
-        }
-
-        /// <summary>
-        /// Keyboard left pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool KeyboardLeftPressed
-        {
-            get
-            {
-                return keyboardState.IsKeyDown(Keys.Left);
-            }
-        }
-
-        /// <summary>
-        /// Keyboard right pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool KeyboardRightPressed
-        {
-            get
-            {
-                return keyboardState.IsKeyDown(Keys.Right);
-            }
-        }
-
-        /// <summary>
-        /// Keyboard up pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool KeyboardUpPressed
-        {
-            get
-            {
-                return keyboardState.IsKeyDown(Keys.Up);
-            }
-        }
-
-        /// <summary>
-        /// Keyboard down pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool KeyboardDownPressed
-        {
-            get
-            {
-                return keyboardState.IsKeyDown(Keys.Down);
-            }
-        }
-        #endregion
-
-        #region GamePad Properties
-        /// <summary>
-        /// Game pad
-        /// </summary>
-        /// <returns>Game pad state</returns>
-        public static GamePadState GamePad
-        {
-            get
-            {
-                return gamePadState;
-            }
-        }
-
-        /// <summary>
-        /// Is game pad connected
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool IsGamePadConnected
-        {
-            get
-            {
-                return gamePadState.IsConnected;
-            }
-        }
-
-        /// <summary>
-        /// Game pad start pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool GamePadStartPressed
-        {
-            get
-            {
-                return gamePadState.Buttons.Start == ButtonState.Pressed;
-            }
-        }
-
-        /// <summary>
-        /// Game pad a pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool GamePadAPressed
-        {
-            get
-            {
-                return gamePadState.Buttons.A == ButtonState.Pressed;
-            }
-        }
-
-        /// <summary>
-        /// Game pad b pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool GamePadBPressed
-        {
-            get
-            {
-                return gamePadState.Buttons.B == ButtonState.Pressed;
-            }
-        }
-
-        /// <summary>
-        /// Game pad x pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool GamePadXPressed
-        {
-            get
-            {
-                return gamePadState.Buttons.X == ButtonState.Pressed;
-            }
-        }
-
-        /// <summary>
-        /// Game pad y pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool GamePadYPressed
-        {
-            get
-            {
-                return gamePadState.Buttons.Y == ButtonState.Pressed;
-            }
-        }
-
-        /// <summary>
-        /// Game pad left pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool GamePadLeftPressed
-        {
-            get
-            {
-                return gamePadState.DPad.Left == ButtonState.Pressed ||
-                    gamePadState.ThumbSticks.Left.X < -0.75f;
-            }
-        }
-
-        /// <summary>
-        /// Game pad right pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool GamePadRightPressed
-        {
-            get
-            {
-                return gamePadState.DPad.Right == ButtonState.Pressed ||
-                    gamePadState.ThumbSticks.Left.X > 0.75f;
-            }
-        }
-
-        /// <summary>
-        /// Game pad left just pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool GamePadLeftJustPressed
-        {
-            get
-            {
-                return (gamePadState.DPad.Left == ButtonState.Pressed &&
-                    gamePadStateLastFrame.DPad.Left == ButtonState.Released) ||
-                    (gamePadState.ThumbSticks.Left.X < -0.75f &&
-                    gamePadStateLastFrame.ThumbSticks.Left.X > -0.75f);
-            }
-        }
-
-        /// <summary>
-        /// Game pad right just pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool GamePadRightJustPressed
-        {
-            get
-            {
-                return (gamePadState.DPad.Right == ButtonState.Pressed &&
-                    gamePadStateLastFrame.DPad.Right == ButtonState.Released) ||
-                    (gamePadState.ThumbSticks.Left.X > 0.75f &&
-                    gamePadStateLastFrame.ThumbSticks.Left.X < 0.75f);
-            }
-        }
-
-        /// <summary>
-        /// Game pad up just pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool GamePadUpJustPressed
-        {
-            get
-            {
-                return (gamePadState.DPad.Up == ButtonState.Pressed &&
-                    gamePadStateLastFrame.DPad.Up == ButtonState.Released) ||
-                    (gamePadState.ThumbSticks.Left.Y > 0.75f &&
-                    gamePadStateLastFrame.ThumbSticks.Left.Y < 0.75f);
-            }
-        }
-
-        /// <summary>
-        /// Game pad down just pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool GamePadDownJustPressed
-        {
-            get
-            {
-                return (gamePadState.DPad.Down == ButtonState.Pressed &&
-                    gamePadStateLastFrame.DPad.Down == ButtonState.Released) ||
-                    (gamePadState.ThumbSticks.Left.Y < -0.75f &&
-                    gamePadStateLastFrame.ThumbSticks.Left.Y > -0.75f);
-            }
-        }
-
-        /// <summary>
-        /// Game pad up pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool GamePadUpPressed
-        {
-            get
-            {
-                return gamePadState.DPad.Up == ButtonState.Pressed ||
-                    gamePadState.ThumbSticks.Left.Y > 0.75f;
-            }
-        }
-
-        /// <summary>
-        /// Game pad down pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool GamePadDownPressed
-        {
-            get
-            {
-                return gamePadState.DPad.Down == ButtonState.Pressed ||
-                    gamePadState.ThumbSticks.Left.Y < -0.75f;
-            }
-        }
-
-        /// <summary>
-        /// Game pad a just pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool GamePadAJustPressed
-        {
-            get
-            {
-                return gamePadState.Buttons.A == ButtonState.Pressed &&
-                    gamePadStateLastFrame.Buttons.A == ButtonState.Released;
-            }
-        }
-
-        /// <summary>
-        /// Game pad b just pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool GamePadBJustPressed
-        {
-            get
-            {
-                return gamePadState.Buttons.B == ButtonState.Pressed &&
-                    gamePadStateLastFrame.Buttons.B == ButtonState.Released;
-            }
-        }
-
-        /// <summary>
-        /// Game pad x just pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage(
-            "Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
-            Justification = "Makes this class reuseable.")]
-        public static bool GamePadXJustPressed
-        {
-            get
-            {
-                return gamePadState.Buttons.X == ButtonState.Pressed &&
-                    gamePadStateLastFrame.Buttons.X == ButtonState.Released;
-            }
-        }
-
-        /// <summary>
-        /// Game pad y just pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool GamePadYJustPressed
-        {
-            get
-            {
-                return gamePadState.Buttons.Y == ButtonState.Pressed &&
-                    gamePadStateLastFrame.Buttons.Y == ButtonState.Released;
-            }
-        }
-
-        /// <summary>
-        /// Game pad back just pressed
-        /// </summary>
-        /// <returns>Bool</returns>
-        public static bool GamePadBackJustPressed
-        {
-            get
-            {
-                return gamePadState.Buttons.Back == ButtonState.Pressed &&
-                    gamePadStateLastFrame.Buttons.Back == ButtonState.Released;
-            }
-        }
         #endregion
 
         #region Update
         /// <summary>
+        /// Time interval for double click, measured in seconds
+        /// </summary>
+        public const float DoubleClickInterval = 0.25f;
+
+        /// <summary>
+        /// Flag for simulating double click
+        /// </summary>
+        int doubleClickFlag = 0;
+        double doubleClickTime = 0;
+
+        /// <summary>
         /// Update, called from BaseGame.Update().
         /// Will catch all new states for keyboard, mouse and the gamepad.
         /// </summary>
-        internal static void Update()
+        public void Update(GameTime gameTime)
         {
-            // Release suppress
-            mouseEventSuppressed = false;
-#if XBOX360
-            // No mouse support on the XBox360 yet :(
-            mouseDetected = false;
-#else
             // Handle mouse input variables
             mouseStateLastFrame = mouseState;
             mouseState = Microsoft.Xna.Framework.Input.Mouse.GetState();
 
-            // Update mouseXMovement and mouseYMovement
-            lastMouseXMovement += mouseState.X - mouseStateLastFrame.X;
-            lastMouseYMovement += mouseState.Y - mouseStateLastFrame.Y;
-            mouseXMovement = lastMouseXMovement / 2.0f;
-            mouseYMovement = lastMouseYMovement / 2.0f;
-            lastMouseXMovement -= lastMouseXMovement / 2.0f;
-            lastMouseYMovement -= lastMouseYMovement / 2.0f;
-
-            if (MouseLeftButtonPressed == false)
-                startDraggingPos = MousePosition;
             mouseWheelDelta = mouseState.ScrollWheelValue - mouseWheelValue;
             mouseWheelValue = mouseState.ScrollWheelValue;
-
-            // Check if mouse was moved this frame if it is not detected yet.
-            // This allows us to ignore the mouse even when it is captured
-            // on a windows machine if just the gamepad or keyboard is used.
-            if (mouseDetected == false)// &&
-                //always returns false: Microsoft.Xna.Framework.Input.Mouse.IsCaptured)
-                mouseDetected = mouseState.X != mouseStateLastFrame.X ||
-                    mouseState.Y != mouseStateLastFrame.Y ||
-                    mouseState.LeftButton != mouseStateLastFrame.LeftButton;
-#endif
-
+                        
             // Handle keyboard input
             keysPressedLastFrame = new List<Keys>(keyboardState.GetPressedKeys());
             keyboardState = Microsoft.Xna.Framework.Input.Keyboard.GetState();
 
-            // And finally catch the XBox Controller input (only use 1 player here)
-            gamePadStateLastFrame = gamePadState;
-            gamePadState =
-                Microsoft.Xna.Framework.Input.GamePad.GetState(PlayerIndex.One);
+            // Mouse wheel event
+            if (mouseWheelDelta != 0)
+                TriggerEvent(EventType.Wheel, null);
+
+            // Mouse Left Button Events
+            if (mouseState.LeftButton == ButtonState.Pressed &&
+                mouseStateLastFrame.LeftButton == ButtonState.Released)
+            {
+                if (doubleClickFlag == 0)
+                {
+                    doubleClickFlag = 1;
+                    doubleClickTime = gameTime.TotalGameTime.TotalSeconds;
+                    TriggerEvent(EventType.LeftButtonDown, null);
+                }
+                else if (doubleClickFlag == 1)
+                {
+                    if ((gameTime.TotalGameTime.TotalSeconds - doubleClickTime) < DoubleClickInterval)
+                    {
+                        doubleClickFlag = 0;
+                        TriggerEvent(EventType.DoubleClick, null);
+                    }
+                    else
+                    {
+                        doubleClickTime = gameTime.TotalGameTime.TotalSeconds;
+                        TriggerEvent(EventType.LeftButtonDown, null);
+                    }
+                }
+            }
+            else if (mouseState.LeftButton == ButtonState.Released &&
+                     mouseStateLastFrame.LeftButton == ButtonState.Pressed)
+            {
+                TriggerEvent(EventType.LeftButtonUp, null);
+            }
+
+            // Mouse Right Button Events
+            if (mouseState.RightButton == ButtonState.Pressed &&
+                mouseStateLastFrame.RightButton == ButtonState.Released)
+            {
+                TriggerEvent(EventType.RightButtonDown, null);
+            }
+            else if (mouseState.RightButton == ButtonState.Released &&
+                     mouseStateLastFrame.RightButton == ButtonState.Pressed)
+            {
+                TriggerEvent(EventType.RightButtonUp, null);
+            }
+
+            // Mouse Middle Button Events
+            if (mouseState.MiddleButton == ButtonState.Pressed &&
+                mouseStateLastFrame.MiddleButton == ButtonState.Released)
+            {
+                TriggerEvent(EventType.MiddleButtonDown, null);
+            }
+            else if (mouseState.MiddleButton == ButtonState.Released &&
+                     mouseStateLastFrame.MiddleButton == ButtonState.Pressed)
+            {
+                TriggerEvent(EventType.MiddleButtonUp, null);
+            }
+
+            // Key down events
+            foreach (Keys key in keyboardState.GetPressedKeys())
+            {
+                if (!keysPressedLastFrame.Contains(key))
+                    TriggerEvent(EventType.KeyDown, key);
+            }
+
+            // Key up events
+            foreach (Keys key in keysPressedLastFrame)
+            {
+                bool found = false;
+                foreach (Keys keyCurrent in keyboardState.GetPressedKeys())
+                    if (keyCurrent == key)
+                    {
+                        found = true;
+                        break;
+                    }
+
+                if (!found)
+                    TriggerEvent(EventType.KeyUp, key);
+            }
         }
-        #endregion
 
-        #region Methods
-
-        /// <summary>
-        /// Suppress keyboard just pressed event for one frame
-        /// </summary>
-        public static void SuppressKeyboardEvent()
+        void TriggerEvent(EventType type, Keys? key)
         {
-            // This is a little tricky
-            keysPressedLastFrame.Clear();
-        }
+            // If we're captured, only send the event to
+            // the hooker.
+            if (captured != null)
+            {
+                captured.HandleEvent(type, this, key);
+                return;
+            }
 
-        /// <summary>
-        /// Suppress keyboard just pressed event for one frame
-        /// </summary>
-        public static void SuppressMouseEvent()
-        {
-            // This is also very tricky
-            mouseEventSuppressed = true;
+            // Otherwise pump down through all handlers.
+            // Stop when the event is handled.
+            foreach (Entry entry in handlers)
+            {
+                if (entry.Handler.HandleEvent(type, this, key) == 
+                    EventResult.Handled)
+                    break;
+            }
         }
-
         #endregion
     }
 }

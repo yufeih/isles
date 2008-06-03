@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Isles.Engine;
@@ -17,7 +18,7 @@ namespace Isles.UI
     /// <summary>
     /// Manages all UI elements
     /// </summary>
-    public class UIDisplay : IUIElement
+    public sealed class UIDisplay : IUIElement
     {
         /// <summary>
         /// Standard screen width and height, all UI elements
@@ -30,7 +31,7 @@ namespace Isles.UI
         /// <summary>
         /// UI content manager
         /// </summary>
-        ContentManager content;
+        BaseGame game;
 
         /// <summary>
         /// Sprite batch used to draw all UI elements
@@ -55,7 +56,8 @@ namespace Isles.UI
         /// <summary>
         /// UI Elements
         /// </summary>
-        List<IUIElement> elements = new List<IUIElement>();
+        BroadcastList<IUIElement, List<IUIElement>> elements = new
+                  BroadcastList<IUIElement, List<IUIElement>>();
 
         /// <summary>
         /// Visible
@@ -127,6 +129,23 @@ namespace Isles.UI
             // Can't set the parent of a display
             set { }
         }
+        /// <summary>
+        /// Gets or sets UI element anchor
+        /// </summary>
+        public Anchor Anchor
+        {
+            get { return Anchor.TopLeft; }
+            set { }
+        }
+
+        /// <summary>
+        /// Gets or sets UI element scale mode
+        /// </summary>
+        public ScaleMode ScaleMode
+        {
+            get { return ScaleMode.Fixed; }
+            set { }
+        }
 
         /// <summary>
         /// Gets or sets UI element visibility
@@ -148,24 +167,11 @@ namespace Isles.UI
         #endregion
 
         #region Methods
-        public UIDisplay(Game game)
-            : this(game, "Fonts/Default")
+        public UIDisplay(BaseGame game)
         {
-        }
+            this.game = game;
 
-        /// <summary>
-        /// Create an UI display
-        /// </summary>
-        /// <param name="game"></param>
-        public UIDisplay(Game game, string defaultFont)
-        {
-            content = game.Content;
-            sprite = new SpriteBatch(game.GraphicsDevice);
-            effect = new BasicEffect(game.GraphicsDevice, null);
-            font = content.Load<SpriteFont>(defaultFont);
-
-            GraphicsDevice_DeviceReset(game.GraphicsDevice, null);
-            game.GraphicsDevice.DeviceReset += new EventHandler(GraphicsDevice_DeviceReset);
+            LoadContent();
         }
 
         void GraphicsDevice_DeviceReset(object sender, EventArgs e)
@@ -175,6 +181,16 @@ namespace Isles.UI
             area.X = area.Y = 0;
             area.Width = device.Viewport.Width;
             area.Height = device.Viewport.Height;
+        }
+
+        public void LoadContent()
+        {
+            sprite = new SpriteBatch(game.GraphicsDevice);
+            effect = new BasicEffect(game.GraphicsDevice, null);
+            font = game.ZipContent.Load<SpriteFont>("Fonts/Default");
+
+            GraphicsDevice_DeviceReset(game.GraphicsDevice, null);
+            game.GraphicsDevice.DeviceReset += new EventHandler(GraphicsDevice_DeviceReset);
         }
 
         /// <summary>
@@ -208,6 +224,12 @@ namespace Isles.UI
             elements.Clear();
         }
 
+        public IEnumerable<IUIElement> Elements
+        {
+            get { return elements; }
+        }
+
+
         /// <summary>
         /// Update all UI elements
         /// </summary>
@@ -239,7 +261,7 @@ namespace Isles.UI
             if (!visible)
                 return;
 
-            sprite.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Immediate, SaveStateMode.SaveState);
+            sprite.Begin();
 
             foreach (IUIElement element in elements)
                 if (element.Visible)
@@ -247,79 +269,18 @@ namespace Isles.UI
 
             sprite.End();
         }
-        #endregion
-
-        #region GetRelativeRectangle
+        
         /// <summary>
-        /// Gets the relative rectangle based on current anchor,
-        /// scale mode and parent reference rectangle.
+        /// Handle UI input
         /// </summary>
-        /// <param name="rectangle">Rectangle in standard resolution</param>
-        /// <return>Rectangle in current resolution</return>
-        public static Rectangle GetRelativeRectangle(
-            Rectangle rectangle, IUIElement parent, ScaleMode scaleMode, Anchor anchor)
+        public EventResult HandleEvent(EventType type, object sender, object tag)
         {
-            if (parent == null)
-                return rectangle;
+            for(int i = elements.Count -1 ; i >= 0; i--)
+                if (elements.Elements[i].Enabled &&
+                    elements.Elements[i].HandleEvent(type, sender, tag) == EventResult.Handled)
+                    return EventResult.Handled;
 
-            Rectangle relativeRectangle;
-
-            // scale
-            if (scaleMode == ScaleMode.Stretch)
-            {
-                relativeRectangle.Width = rectangle.Width *
-                    parent.DestinationRectangle.Width / parent.Area.Width;
-                relativeRectangle.Height = rectangle.Height *
-                    parent.DestinationRectangle.Height / parent.Area.Height;
-            }
-            else if (scaleMode == ScaleMode.ScaleY)
-            {
-                relativeRectangle.Width = rectangle.Width *
-                    parent.DestinationRectangle.Height / parent.Area.Height;
-                relativeRectangle.Height = rectangle.Height *
-                    parent.DestinationRectangle.Height / parent.Area.Height;
-            }
-            else if (scaleMode == ScaleMode.ScaleX)
-            {
-                relativeRectangle.Width = rectangle.Width *
-                    parent.DestinationRectangle.Width / parent.Area.Width;
-                relativeRectangle.Height = rectangle.Height *
-                    parent.DestinationRectangle.Width / parent.Area.Width;
-            }
-            else
-            {
-                relativeRectangle.Width = rectangle.Width;
-                relativeRectangle.Height = rectangle.Height;
-            }
-
-            // anchor
-            if (anchor == Anchor.TopLeft || anchor == Anchor.BottomLeft)
-            {
-                relativeRectangle.X = parent.DestinationRectangle.Left +
-                    rectangle.Left * relativeRectangle.Width / rectangle.Width;
-            }
-            else
-            {
-                relativeRectangle.X = parent.DestinationRectangle.Right +
-                    (rectangle.Right - parent.Area.Width) *
-                        relativeRectangle.Width / rectangle.Width -
-                            relativeRectangle.Width;
-            }
-
-            if (anchor == Anchor.TopLeft || anchor == Anchor.TopRight)
-            {
-                relativeRectangle.Y = parent.Area.Top +
-                    rectangle.Top * relativeRectangle.Height / rectangle.Height;
-            }
-            else
-            {
-                relativeRectangle.Y = parent.DestinationRectangle.Bottom +
-                    (rectangle.Bottom - parent.Area.Height) *
-                        relativeRectangle.Height / rectangle.Height -
-                            relativeRectangle.Height;
-            }
-
-            return relativeRectangle;
+            return EventResult.Unhandled;
         }
         #endregion
 
@@ -330,29 +291,18 @@ namespace Isles.UI
         /// </summary>
         public void Dispose()
         {
-            Dispose(true);
+            if (sprite != null)
+                sprite.Dispose();
+
+            if (effect != null)
+                effect.Dispose();
+
+            foreach (IUIElement element in elements)
+                element.Dispose();
+            this.Clear();
+
             GC.SuppressFinalize(this);
         }
-
-        /// <summary>
-        /// Dispose
-        /// </summary>
-        /// <param name="disposing">Disposing</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (sprite != null)
-                    sprite.Dispose();
-
-                if (effect != null)
-                    effect.Dispose();
-
-                foreach (IUIElement element in elements)
-                    element.Dispose();
-            }
-        }
-
         #endregion
     }
 }

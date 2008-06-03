@@ -84,7 +84,7 @@ namespace Isles.Graphics
             this.game = game;
 
             // Initialize pointSprite effect
-            effect = game.Content.Load<Effect>("Effects/PointSprite");
+            effect = game.ZipContent.Load<Effect>("Effects/PointSprite");
 
             // Create vertices
             vertices = new DynamicVertexBuffer(game.GraphicsDevice,
