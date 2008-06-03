@@ -37,7 +37,7 @@
   <DirectEnter>false</DirectEnter>
   <TraceUnits>false</TraceUnits>
   <Cheat>false</Cheat>
-  <RevealMap>true</RevealMap>
+  <RevealMap>false</RevealMap>
   <GameSpeed>1</GameSpeed>
 
   <!--Camera settings-->

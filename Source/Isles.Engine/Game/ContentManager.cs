@@ -178,6 +178,9 @@ namespace Isles.Engine
             }
             catch (Exception e) { e.ToString(); }
 
+            if (zipFile == null)
+                throw new FileNotFoundException("File not found: " + filename);
+
             filename = filename.Replace("\\", "/");
 
             if (!caseSensitive)

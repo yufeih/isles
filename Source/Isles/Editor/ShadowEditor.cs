@@ -30,19 +30,19 @@ namespace Isles.Editor
 
         private void trackBar1_Scroll(object sender, EventArgs e)
         {
-            world.Distance = (float)trackBar1.Value;
+            //world.Distance = (float)trackBar1.Value;
             label1.Text = "Distance " + trackBar1.Value;
         }
 
         private void trackBar2_Scroll(object sender, EventArgs e)
         {
-            world.Near = (float)trackBar2.Value;
+            //world.Near = (float)trackBar2.Value;
             label2.Text = "Near " + trackBar2.Value;
         }
 
         private void trackBar3_Scroll(object sender, EventArgs e)
         {
-            world.Far = (float)trackBar3.Value;
+            //world.Far = (float)trackBar3.Value;
             label3.Text = "Far " + trackBar3.Value;
         }
     }

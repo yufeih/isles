@@ -267,7 +267,7 @@ namespace Isles
                 if (Model != null)
                     Model.Glow = highlighted ? Vector4.One : Vector4.Zero;
 
-                if (highlighted && owner != null)
+                if (highlighted && owner != null && ShouldDrawModel)
                 {
                     if (tip == null)
                         tip = CreateTipBox();

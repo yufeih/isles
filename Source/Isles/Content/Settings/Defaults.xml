@@ -8,7 +8,7 @@
 
     <Tree
         Name="Tree" Lumber="100" Model="models/alphapalm" RotationXBias="90" ScaleBias="2.75, 2.75, 2.75"/>
-
+    
     <BoxOfPandora
         Name="Box of Pandora" Description="This magic box is a gift from pandora.
 Upon opened, it will either give you good fortune or create deadly damage.

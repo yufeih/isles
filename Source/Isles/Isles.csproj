@@ -159,7 +159,9 @@
     <Content Include="Game.ico" />
     <Content Include="gamethumbnail.ico" />
     <Content Include="GameThumbnail.png" />
-    <Content Include="Settings.xml" />
+    <Content Include="Settings.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <NestedContentProject Include="Content\Content.contentproj">
