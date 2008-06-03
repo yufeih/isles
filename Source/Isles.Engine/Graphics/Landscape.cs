@@ -15,103 +15,20 @@ using Isles.Engine;
 
 namespace Isles.Graphics
 {
+    #region Landscape
     /// <summary>
-    /// Manipulate terrain, patches for landscape visualization.
-    /// Uses Geometry Mipmapping to generate continously level of detailed terrain.
-    /// Uses multi-pass technology to render different terrain layers (textures)
+    /// Landscape without terrain
     /// </summary>
-    public partial class Landscape : IDisposable, ILandscape
+    public abstract class Landscape : BaseLandscape
     {
-        #region Field
-        /// <summary>
-        /// Base game
-        /// </summary>
-        BaseGame game;
-
-
-        /// <summary>
-        /// Graphics device
-        /// </summary>
-        GraphicsDevice graphics;
-
-
-        /// <summary>
-        /// Gets terrain size (x, y, z)
-        /// </summary>
-        public Vector3 Size
-        {
-            get { return size; }
-        }
-    
-        Vector3 size;
-
-
-        /// <summary>
-        /// Gets the heightfield data of the landscape
-        /// </summary>
-        public float[,] HeightField
-        {
-            get { return heightField; }
-        }
-
-        float[,] heightField;
-
-
-        /// <summary>
-        /// Gets the normal field of the landscape
-        /// </summary>
-        public Vector3[,] NormalField
-        {
-            get { return normalField; }
-        }
-
-        Vector3[,] normalField;
-
-        /// <summary>
-        /// Gets the number of patches on the x axis
-        /// </summary>
-        public int PatchCountOnXAxis
-        {
-            get { return xPatchCount; }
-        }
-
-        /// <summary>
-        /// Gets the terrain bounding box
-        /// </summary>
-        public BoundingBox TerrainBoundingBox
-        {
-            get { return terrainBoundingBox; }
-        }
-
-        /// <summary>
-        /// Gets the number of patches on the y axis
-        /// </summary>
-        public int PatchCountOnYAxis
-        {
-            get { return yPatchCount; }
-        }
-
-        #endregion
-        
         #region Methods
-
-        public Landscape()
-        {
-        }
-
         /// <summary>
         /// Initialize landscape from XNB file
         /// </summary>
         /// <param name="input"></param>
-        public Landscape(ContentReader input)
+        public override void ReadContent(ContentReader input)
         {
-            // Size info
-            size.X = input.ReadSingle();
-            size.Y = input.ReadSingle();
-            size.Z = input.ReadSingle();
-
-            // Initialize terrain
-            ReadTerrainContent(input);
+ 	        base.ReadContent(input);
 
             // Initialize Water
             ReadWaterContent(input);
@@ -132,777 +49,875 @@ namespace Isles.Graphics
         /// <summary>
         /// Call this everytime a landscape is loaded
         /// </summary>
-        protected void Initialize(BaseGame game)
+        public override void Initialize(BaseGame game)
         {
-            this.game = game;
-            this.graphics = game.GraphicsDevice;
-            this.surfaceEffect = new BasicEffect(graphics, null);
-            this.surfaceDeclaraction = new VertexDeclaration(
-                graphics, VertexPositionTexture.VertexElements);
+            base.Initialize(game);
 
             InitializeWater();
             InitializeSky();
-            InitializeTerrain();
-            InitializeGrid();
+
+            surfaceEffect = game.ZipContent.Load<Effect>("Effects/Surface");
+            surfaceDeclaration = new VertexDeclaration(game.GraphicsDevice,
+                                     VertexPositionColorTexture.VertexElements);
+            surfaceVertexBuffer = new DynamicVertexBuffer(game.GraphicsDevice,
+                typeof(VertexPositionTexture), MaxSurfaceVertices, BufferUsage.WriteOnly);
+            surfaceIndexBuffer = new DynamicIndexBuffer(game.GraphicsDevice,
+                typeof(ushort), MaxSurfaceIndices, BufferUsage.WriteOnly);
         }
-
-        public void Unload()
-        {
-            UnloadManualContent();
-        }
-
-        /// <summary>
-        /// Transform from heightfield grid to real world position
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
-        public Vector2 GridToPosition(int x, int y)
-        {
-            return new Vector2(
-                x * size.X / (gridCountOnXAxis - 1),
-                y * size.Y / (gridCountOnYAxis - 1) );
-        }
-
-        public Point PositionToGrid(float x, float y)
-        {
-            return new Point(
-                (int)(x * (gridCountOnXAxis - 1) / size.X),
-                (int)(y * (gridCountOnYAxis - 1) / size.Y) );
-        }
-
-        /// <summary>
-        /// Gets the landscape size.Z of a given point on the heightfield
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
-        public float GetGridHeight(int x, int y)
-        {
-            return heightField[x, y];
-        }
-
-        /// <summary>
-        /// Gets the landscape size.Z of any given point
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
-        public float GetHeight(float x, float y)
-        {            
-            // Grabbed and modified from racing game
-            // We don't want to cause any exception here
-            if (x < 0)
-                x = 0;
-            else if (x >= size.X)
-                x = size.X - 1;  // x can't be heightfieldWidth-1
-                                // or there'll be an out of range
-            if (y < 0)          // exception. So is y.
-                y = 0;
-            else if (y >= size.Y)
-                y = size.Y - 1;
-
-            // Rescale to our heightfield dimensions
-            x *= (gridCountOnXAxis - 1) / size.X;
-            y *= (gridCountOnYAxis - 1) / size.Y;
-
-            // Get the position ON the current tile (0.0-1.0)!!!
-            float
-                fX = x - ((float)((int)x)),
-                fY = y - ((float)((int)y));
-
-            // Interpolate the current position
-            int ix2 = (int)x;
-            int iy2 = (int)y;
-
-            int ix1 = ix2 + 1;
-            int iy1 = iy2 + 1;
-
-            if (fX + fY > 1) // opt. version
-            {
-                // we are on triangle 1 !!
-                //  0____1
-                //   \   |
-                //    \  |
-                //     \ |
-                //      \|
-                //  2    3
-                return
-                    heightField[ix1, iy1] + // 1
-                    (1.0f - fX) * (heightField[ix2, iy1] - heightField[ix1, iy1]) + // 0
-                    (1.0f - fY) * (heightField[ix1, iy2] - heightField[ix1, iy1]); // 3
-            }
-            // we are on triangle 1 !!
-            //  0     1
-            //  |\  
-            //  | \ 
-            //  |  \ 
-            //  |   \
-            //  |    \
-            //  2_____3
-            return
-                heightField[ix2, iy2] + // 2
-                fX * (heightField[ix1, iy2] - heightField[ix2, iy2]) +    // 3
-                fY * (heightField[ix2, iy1] - heightField[ix2, iy2]); // 0
-        }
-
-        /// <summary>
-        /// Gets the normal of a grid
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
-        public Vector3 GetNormal(int x, int y)
-        {
-            return normalField[x, y];
-        }
-
-        /// <summary>
-        /// Gets the normal of the terrain from a world position
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
-        public Vector3 GetNormal(float x, float y)
-        {
-            Point grid = PositionToGrid(x, y);
-            return normalField[grid.X, grid.Y];
-        }
-
-        /// <summary>
-        /// Gets a terrain vertex at a given position
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
-        public TerrainVertex GetTerrainVertex(int x, int y)
-        {
-            return terrainVertices[x, y];
-        }
-
-        /// <summary>
-        /// Gets a given patch
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
-        public Patch GetPatch(int x, int y)
-        {
-            return patches[y * xPatchCount + x];
-        }
-
-        /// <summary>
-        /// Cached pick position. Remember to set it to null each frame.
-        /// </summary>
-        Vector3? picked = null;
-
-        /// <summary>
-        /// Gets the current point of the terrain picked by the cursor
-        /// </summary>
-        public Vector3? Pick()
-        {
-            if (picked != null)
-                return picked;
-
-            return Intersects(game.PickRay);
-        }
-        
-        /// <summary>
-        /// Checks whether a ray intersects the terrain mesh
-        /// </summary>
-        /// <remarks>
-        /// This algorithm has some bugs right now... :(
-        /// </remarks>
-        /// <param name="ray"></param>
-        /// <returns>Intersection point or null if there's no intersection</returns>
-        Nullable<Vector3> Intersects(Ray ray, ref List<VertexPositionColor> track)
-        {
-            // Get two vertices to draw a line through the
-            // heightfield.
-            //
-            // 1. Project the ray to XY plane
-            // 2. Compute the 2 intersections of the ray and
-            //    terrain bounding box (Projected)
-            // 3. Find the 2 points to draw
-            int i = 0;
-            Vector3[] points = new Vector3[2];
-
-            // Line equation: y = k * (x - x0) + y0
-            float k = ray.Direction.Y / ray.Direction.X;
-            float invK = ray.Direction.X / ray.Direction.Y;
-            float r = ray.Position.Y - ray.Position.X * k;
-            if (r >= 0 && r <= size.Y)
-            {
-                points[i++] = new Vector3(0, r,
-                    ray.Position.Z - ray.Position.X *
-                    ray.Direction.Z / ray.Direction.X);
-            }
-            r = ray.Position.Y + (size.X - ray.Position.X) * k;
-            if (r >= 0 && r <= size.Y)
-            {
-                points[i++] = new Vector3(size.X, r,
-                    ray.Position.Z + (size.X - ray.Position.X) *
-                    ray.Direction.Z / ray.Direction.X);
-            }
-            if (i < 2)
-            {
-                r = ray.Position.X - ray.Position.Y * invK;
-                if (r >= 0 && r <= size.X)
-                    points[i++] = new Vector3(r, 0,
-                        ray.Position.Z - ray.Position.Y *
-                        ray.Direction.Z / ray.Direction.Y);
-            }
-            if (i < 2)
-            {
-                r = ray.Position.X + (size.Y - ray.Position.Y) * invK;
-                if (r >= 0 && r <= size.X)
-                    points[i++] = new Vector3(r, size.Y,
-                        ray.Position.Z + (size.Y - ray.Position.Y) *
-                        ray.Direction.Z / ray.Direction.Y);
-            }
-            if (i < 2)
-                return null;
-
-            // When ray position is inside the box, it should be one
-            // of the starting point
-            bool inside = ray.Position.X > 0 && ray.Position.X < size.X &&
-                          ray.Position.Y > 0 && ray.Position.Y < size.Y;
-
-            Vector3 v1 = Vector3.Zero, v2 = Vector3.Zero;
-            // Sort the 2 points to make the line follow the direction
-            if (ray.Direction.X > 0) 
-            {
-                if (points[0].X < points[1].X)
-                {
-                    v2 = points[1];
-                    v1 = inside ? ray.Position : points[0];
-                }
-                else
-                {
-                    v2 = points[0];
-                    v1 = inside ? ray.Position : points[1];
-                }
-            }
-            else if (ray.Direction.X < 0)
-            {
-                if (points[0].X > points[1].X)
-                {
-                    v2 = points[1];
-                    v1 = inside ? ray.Position : points[0];
-                }
-                else
-                {
-                    v2 = points[0];
-                    v1 = inside ? ray.Position : points[1];
-                }
-            }
-
-
-            //Log.NewLine();
-            //Log.Write("v1: " + v1, false);
-            //Log.Write("v2: " + v2, false);
-
-            // FIXME: If direction.x equals 0, this algorithm fails.
-            //        These 2 cases are Really Really Really unusual,
-            //        but we have to add them any way :(
-
-            // Perform a Bresenham line drawing algorithm on
-            // the heightfield so that only the points on the
-            // heightfield is tested. Interpolation is avoided.
-
-            Point p1 = PositionToGrid(v1.X, v1.Y);
-            Point p2 = PositionToGrid(v2.X, v2.Y);
-
-            bool invert = false;
-            int x = p1.X;
-            int y = p1.Y;
-            int sx = p2.X - p1.X;
-            int sy = p2.Y - p1.Y;
-            int dx = Math.Abs(sx);
-            int dy = Math.Abs(sy);
-
-            sx = (sx != 0) ? (sx > 0 ? 1 : -1) : 0;
-            sy = (sy != 0) ? (sy > 0 ? 1 : -1) : 0;
-
-            if (dy > dx)
-            {
-                // Swap dx, dy
-                int t = dx;
-                dx = dy;
-                dy = t;
-                invert = true;
-            }
-
-            // Init error term
-            int e = (dy << 1) - dx;
-
-            int n = dx;
-            dx = dx * 2;
-            dy = dy * 2;
-
-            // Compute z and dz
-            float z = v1.Z, dz;
-            //float dz = ray.Direction.Z *
-            //    (invert ? size.X / (heightfieldWidth - 1) :
-            //              size.Y / (heightfieldHeight - 1)) /
-            //    (new Vector2(ray.Direction.X, ray.Direction.Y).Length());
-            if (invert)
-            {
-                Vector2 v = Vector2.Normalize(new Vector2(ray.Direction.X, ray.Direction.Z));
-                v /= v.X;
-                dz = v.Y * size.X / (gridCountOnXAxis - 1) / v.X;
-            }
-            else
-            {
-                Vector2 v = Vector2.Normalize(new Vector2(ray.Direction.Y, ray.Direction.Z));
-                v /= v.X;
-                dz = v.Y * size.Y / (gridCountOnYAxis - 1) / v.X;
-            }
-            
-            // Start drawing pixels
-            for (i = 0; i < n; ++i)
-            {
-                // Don't test bounding vertices to ease the generation
-                // of precise intersection point :)
-                if (x > 0 && x < gridCountOnXAxis - 1 &&
-                    y > 0 && y < gridCountOnYAxis - 1)
-                {
-                    track.Add(new VertexPositionColor(new Vector3(
-                        GridToPosition(x, y), heightField[x, y]), Color.White));
-                    //Log.Write("x: " + x + "\ty: " + y + "\tz: " + z + "\theight: " + heightfield[x, y], false);
-
-                    // Test a pixel
-                    if (heightField[x, y] >= z)
-                    {
-                        // Find the first intersection, we
-                        // need a precise value of the position
-                        Vector3[] v = new Vector3[4];
-
-                        Point min = new Point();
-                        Point max = new Point();
-
-                        int[] xDirection = new int[] { -1, 0, -1, 0 };
-                        int[] yDirection = new int[] { -1, -1, 0, 0 };
-
-                        Point grid;
-                        Vector3 ret;
-                        for (int m = 0; m < 4; m++)
-                        {
-                            min.X = x + xDirection[m];
-                            min.Y = y + yDirection[m];
-                            max.X = min.X + 1;
-                            max.Y = min.Y + 1;
-
-                            v[0] = new Vector3(
-                                GridToPosition(min.X, min.Y), heightField[min.X, min.Y]);
-                            v[1] = new Vector3(
-                                GridToPosition(max.X, min.Y), heightField[max.X, min.Y]);
-                            v[2] = new Vector3(
-                                GridToPosition(min.X, max.Y), heightField[min.X, max.Y]);
-                            v[3] = new Vector3(
-                                GridToPosition(max.X, max.Y), heightField[max.X, max.Y]);
-
-                            // Test the first triangles
-                            Plane plane = new Plane(v[0], v[1], v[3]);
-                            Nullable<float> result = ray.Intersects(plane);
-                            if (result != null)
-                            {
-                                ret = ray.Position + result.Value * ray.Direction;
-                                grid = PositionToGrid(ret.X, ret.Y);
-
-                                //Log.Write("Intersection: " + grid + "min: " + min + "max: " + max, false);
-
-                                if (grid.X == min.X || grid.Y == min.Y)
-                                    return ret;
-                            }
-
-                            // Test the second triangle
-                            plane = new Plane(v[0], v[3], v[2]);
-                            result = ray.Intersects(plane);
-                            if (result != null)
-                            {
-                                ret = ray.Position + result.Value * ray.Direction;
-                                grid = PositionToGrid(ret.X, ret.Y);
-
-                                if (grid.X == min.X || grid.Y == min.Y)
-                                    return ret;
-                            }
-                        }
-
-                        // Any way, return an approximate value
-                        //Log.Write(ray.ToString());
-                        return new Vector3(GridToPosition(x, y), heightField[x, y]);
-                    }
-                }
-
-                while (e > 0)
-                {
-                    if (invert)
-                        x = x + sx;
-                    else
-                        y = y + sy;
-
-                    e = e - dx;
-                }
-
-                if (invert)
-                    y = y + sy;
-                else
-                    x = x + sx;
-
-                e = e + dy;
-                z += dz;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Checks whether a ray intersects the terrain mesh
-        /// </summary>
-        /// <param name="ray"></param>
-        /// <returns>Intersection point or null if there's no intersection</returns>
-        public Nullable<Vector3> Intersects(Ray ray)
-        {
-            // Normalize ray direction
-            ray.Direction.Normalize();
-
-            // Get two vertices to draw a line through the
-            // heightfield.
-            //
-            // 1. Project the ray to XY plane
-            // 2. Compute the 2 intersections of the ray and
-            //    terrain bounding box (Projected)
-            // 3. Find the 2 points to draw
-            int i = 0;
-            Vector3[] points = new Vector3[2];
-
-            // Line equation: y = k * (x - x0) + y0
-            float k = ray.Direction.Y / ray.Direction.X;
-            float invK = ray.Direction.X / ray.Direction.Y;
-            float r = ray.Position.Y - ray.Position.X * k;
-            if (r >= 0 && r <= size.Y)
-            {
-                points[i++] = new Vector3(0, r,
-                    ray.Position.Z - ray.Position.X *
-                    ray.Direction.Z / ray.Direction.X);
-            }
-            r = ray.Position.Y + (size.X - ray.Position.X) * k;
-            if (r >= 0 && r <= size.Y)
-            {
-                points[i++] = new Vector3(size.X, r,
-                    ray.Position.Z + (size.X - ray.Position.X) *
-                    ray.Direction.Z / ray.Direction.X);
-            }
-            if (i < 2)
-            {
-                r = ray.Position.X - ray.Position.Y * invK;
-                if (r >= 0 && r <= size.X)
-                    points[i++] = new Vector3(r, 0,
-                        ray.Position.Z - ray.Position.Y *
-                        ray.Direction.Z / ray.Direction.Y);
-            }
-            if (i < 2)
-            {
-                r = ray.Position.X + (size.Y - ray.Position.Y) * invK;
-                if (r >= 0 && r <= size.X)
-                    points[i++] = new Vector3(r, size.Y,
-                        ray.Position.Z + (size.Y - ray.Position.Y) *
-                        ray.Direction.Z / ray.Direction.Y);
-            }
-            if (i < 2)
-                return null;
-
-            // When ray position is inside the box, it should be one
-            // of the starting point
-            bool inside = ray.Position.X > 0 && ray.Position.X < size.X &&
-                          ray.Position.Y > 0 && ray.Position.Y < size.Y;
-
-            Vector3 v1 = Vector3.Zero, v2 = Vector3.Zero;
-            // Sort the 2 points to make the line follow the direction
-            if (ray.Direction.X > 0)
-            {
-                if (points[0].X < points[1].X)
-                {
-                    v2 = points[1];
-                    v1 = inside ? ray.Position : points[0];
-                }
-                else
-                {
-                    v2 = points[0];
-                    v1 = inside ? ray.Position : points[1];
-                }
-            }
-            else if (ray.Direction.X < 0)
-            {
-                if (points[0].X > points[1].X)
-                {
-                    v2 = points[1];
-                    v1 = inside ? ray.Position : points[0];
-                }
-                else
-                {
-                    v2 = points[0];
-                    v1 = inside ? ray.Position : points[1];
-                }
-            }
-
-            // Trace steps along your line and determine the size.Z at each point,
-            // for each sample point look up the size.Z of the terrain and determine
-            // if the point on the line is above or below the terrain. Once you have
-            // determined the two sampling points that are above and below the terrain
-            // you can refine using binary searching.
-            const float SamplePrecision = 5.0f;
-            const int RefineSteps = 5;
-
-            float length = Vector3.Subtract(v2, v1).Length();
-            float current = 0;
-
-            Vector3[] point = new Vector3[2];
-            Vector3 step = ray.Direction * SamplePrecision;
-            point[0] = v1;
-
-            while (current < length)
-            {
-                if (GetHeight(point[0].X, point[0].Y) >= point[0].Z)
-                    break;
-
-                point[0] += step;
-                current += SamplePrecision;
-            }
-
-            if (current > 0 && current < length)
-            {
-                // Perform binary search
-
-                Vector3 p = point[0];
-                point[1] = point[0] - step;
-
-                for (i = 0; i < RefineSteps; i++)
-                {
-                    p = (point[0] + point[1]) * 0.5f;
-
-                    if (GetHeight(p.X, p.Y) >= p.Z)
-                        point[0] = p;
-                    else
-                        point[1] = p;
-                }
-
-                return p;
-            }
-
-            return null;
-        } 
-
-        #endregion
-
-        #region Update
-
-        /// <summary>
-        /// Update landscape every frame
-        /// </summary>
-        /// <param name="gameTime"></param>
-        public void Update(GameTime gameTime)
-        {
-            // Set picked to null
-            picked = null;
-
-            // Get current view frustum from camera
-            BoundingFrustum viewFrustum = game.ViewFrustum;
-
-            bool visible;
-            bool LODChanged = false;
-            bool visibleAreaChanged = false;
-            bool visibleAreaEnlarged = false;
-
-            Vector3 eye = Vector3.Transform(Vector3.Zero, game.ViewInverse);
-
-            for (int i = 0; i < patches.Count; i++)
-            {
-                // Perform a bounding box test on each terrain patch
-                visible = viewFrustum.Intersects(patches[i].BoundingBox);
-                if (visible != patches[i].Visible)
-                {
-                    if (visible)
-                        visibleAreaEnlarged = true;
-                    visibleAreaChanged = true;
-                    patches[i].Visible = visible;
-                }
-            
-                // Update patch LOD if patch visibility has changed
-                if (patches[i].UpdateLOD(eye))
-                    LODChanged = true;
-            }
-
-            // No need to update anything if visibility hasn't changed.
-            // (That means terrain LOD hasn't changed too)
-            if (!visibleAreaChanged && !LODChanged)
-                return;
-            
-            // If patch LOD hasn't changed and the visible area
-            // isn't enlarged, we only need to update index buffers :)
-            if (LODChanged || visibleAreaEnlarged)
-                UpdateTerrainVertexBuffer();
-            UpdateTerrainIndexBufferSet();
-        }
-
-        uint[] workingIndices;
-        TerrainVertex[] workingVertices;
-
-        uint terrainVertexCount;
-        uint[] terrainIndexCount;
-
-        private void UpdateTerrainVertexBuffer()
-        {
-            if (workingVertices == null)
-            {
-                workingVertices = new TerrainVertex[
-                    6 * xPatchCount * yPatchCount *
-                    Patch.MaxPatchResolution * Patch.MaxPatchResolution];
-            }
-
-            terrainVertexCount = 0;
-            for (int i = 0; i < patches.Count; i++)
-            {
-                if (patches[i].Visible)
-                { 
-                    // Update patch starting vertex
-                    patches[i].StartingVertex = terrainVertexCount;
-                    terrainVertexCount += patches[i].
-                        FillVertices(ref workingVertices, terrainVertexCount);
-                }
-            }
-
-            if (terrainVertexCount > 0)
-                terrainVertexBuffer.SetData<TerrainVertex>(
-                    workingVertices, 0, (int)terrainVertexCount);
-        }
-
-        private void UpdateTerrainIndexBufferSet()
-        {
-            if (workingIndices == null)
-            {
-                workingIndices = new uint[
-                    6 * xPatchCount * yPatchCount *
-                    Patch.MaxPatchResolution * Patch.MaxPatchResolution];
-                terrainIndexCount = new uint[patchGroups.Length];
-            }
-
-            for (int i = 0; i < patchGroups.Length; i++)
-            {
-                terrainIndexCount[i] = 0;
-                foreach (int index in patchGroups[i])
-                {
-                    if (patches[index].Visible)
-                        terrainIndexCount[i] += patches[index].
-                            FillIndices(ref workingIndices, terrainIndexCount[i]);
-                }
-
-                if (terrainIndexCount[i] > 0)
-                    terrainIndexBufferSet[i].SetData<uint>(
-                        workingIndices, 0, (int)terrainIndexCount[i]);
-            }
-        }
-
         #endregion
 
         #region Draw
 
         /// <summary>
+        /// Draw the terrain for water reflection and refraction
+        /// </summary>
+        /// <param name="upper">Only draw upper part or underwater part</param>
+        public abstract void DrawTerrain(Matrix view, Matrix projection, bool upper);
+        public abstract void DrawTerrain(GameTime gameTime, ShadowEffect shadowEffect);
+
+        /// <summary>
         /// Draw landscape
         /// </summary>
         /// <param name="gameTime"></param>
-        public void Draw(GameTime gameTime)
+        public override void Draw(GameTime gameTime)
         {
             DrawSky(gameTime, game.View, game.Projection);
             DrawWater(gameTime);
-            DrawTerrain(Matrix.Identity, null);
+            DrawTerrain(gameTime, null);
 
             // FIXME but this grass is soo ugly...
-            DrawVegetation(gameTime);
-            DrawGridStates();
-        }
-
-        private void DrawGridStates()
-        {
-            float offset = 0;
-            for (int y = 0; y < gridCountOnYAxis; y++)
-                for (int x = 0; x < gridCountOnXAxis; x++)
-                {
-                    if (Data[x, y].Owners != null &&
-                        Data[x, y].Owners.Count >= 0)
-                    {
-
-                        foreach (Entity e in Data[x, y].Owners)
-                        {
-                            //Vector2 v = GridToPosition(x, y);
-                            //Vector3 pos = graphics.Viewport.Project(
-                            //    new Vector3(v.X, v.Y, GetHeight(x, y)),
-                            //    game.Projection, game.View, Matrix.Identity);
-
-                            //pos.Y += (offset += 10);
-
-                            Text.DrawString(
-                                e.Name, 14,
-                                new Vector2(0, 20 + (offset += 10)),
-                                Color.White);
-                        }
-                    }
-                }
-        }
-
-        public void Draw(GameTime gameTime, Matrix lightViewProjection, Texture shadowMap)
-        {
-            graphics.RenderState.CullMode = CullMode.CullClockwiseFace;
-
-            DrawSky(gameTime, game.View, game.Projection);
-            DrawWater(gameTime);
-            DrawTerrain(lightViewProjection, shadowMap);
             //DrawVegetation(gameTime);
+            //DrawGridStates();
+        }
 
+        struct TexturedSurface
+        {
+            public Texture2D Texture;
+            public Vector3 Position;
+            public Color Color;
+            public float Width;
+            public float Height;
+        }
+
+        const int MaxSurfaceVertices = 512;
+        const int MaxSurfaceIndices = 768;
+
+        Effect surfaceEffect;
+        DynamicVertexBuffer surfaceVertexBuffer;
+        DynamicIndexBuffer surfaceIndexBuffer;
+        VertexDeclaration surfaceDeclaration;
+        List<ushort> surfaceIndices = new List<ushort>();
+        List<VertexPositionColorTexture> surfaceVertices = new List<VertexPositionColorTexture>();
+        LinkedList<TexturedSurface> texturedSurfaces = new LinkedList<TexturedSurface>();
+
+        /// <summary>
+        /// Draw a textured surface on top of the landscape. (But below all world objects).
+        /// </summary>
+        public void DrawSurface(Texture2D texture, Vector3 position, float width, float height, Color color)
+        {
+            if (texture == null)
+                throw new ArgumentNullException();
+
+            TexturedSurface surface;
+            surface.Color = color;
+            surface.Texture = texture;
+            surface.Position = position;
+            
+            // Plus a little offset
+            surface.Position.Z = GetHeight(position.X, position.Y) + 6; 
+            
+            // Divided by 2 so we don't have to do this during presentation
+            surface.Width = width / 2;  
+            surface.Height = height / 2;
+
+            // Add a new textured surface to the list.
+            // Sort the entries by texture.
+            LinkedListNode<TexturedSurface> p = texturedSurfaces.First;
+
+            while (p != null)
+            {
+                if (p.Value.Texture != texture)
+                    break;
+
+                p = p.Next;
+            }
+
+            if (p == null)
+                texturedSurfaces.AddFirst(surface);
+            else
+                texturedSurfaces.AddBefore(p, surface);
+        }
+
+        public void PresentSurface(GameTime gameTime)
+        {
+            if (texturedSurfaces.Count <= 0)
+                return;
+
+            graphics.VertexDeclaration = surfaceDeclaration;
+
+            game.GraphicsDevice.RenderState.AlphaBlendEnable = true;
+            game.GraphicsDevice.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
+
+            surfaceEffect.Parameters["WorldViewProjection"].SetValue(game.ViewProjection);
+
+            surfaceEffect.Begin();
+            foreach (EffectPass pass in surfaceEffect.CurrentTechnique.Passes)
+            {
+                pass.Begin();
+
+                LinkedListNode<TexturedSurface> start = texturedSurfaces.First;
+                LinkedListNode<TexturedSurface> end = texturedSurfaces.First;
+                Texture2D texture = start.Value.Texture;
+
+                while (end != null)
+                {
+                    if (end.Value.Texture != texture && start != end)
+                    {
+                        PresentSurface(start, end);
+
+                        start = end;
+                        texture = end.Value.Texture;
+                    }
+
+                    end = end.Next;
+                }
+
+                PresentSurface(start, end);
+
+                pass.End();
+            }
+            surfaceEffect.End();
+
+            texturedSurfaces.Clear();
+        }
+
+        void PresentSurface(LinkedListNode<TexturedSurface> start,
+                            LinkedListNode<TexturedSurface> end)
+        {
+            Texture2D texture = start.Value.Texture;
+            VertexPositionColorTexture vertex;
+
+            #region BuildVertices
+            surfaceIndices.Clear();
+            surfaceVertices.Clear();
+
+            while (start != end)
+            {
+                // Quad indices
+                surfaceIndices.Add((ushort)(surfaceVertices.Count + 0));
+                surfaceIndices.Add((ushort)(surfaceVertices.Count + 1));
+                surfaceIndices.Add((ushort)(surfaceVertices.Count + 3));
+                surfaceIndices.Add((ushort)(surfaceVertices.Count + 3));
+                surfaceIndices.Add((ushort)(surfaceVertices.Count + 1));
+                surfaceIndices.Add((ushort)(surfaceVertices.Count + 2));
+
+                // Create 4 quad vertices
+                vertex.Color = start.Value.Color;
+                vertex.Position = start.Value.Position;
+                vertex.Position.X -= start.Value.Width;
+                vertex.Position.Y += start.Value.Height;
+                vertex.TextureCoordinate.X = 0.02f;
+                vertex.TextureCoordinate.Y = 0.98f;
+                surfaceVertices.Add(vertex);
+
+                vertex.Position = start.Value.Position;
+                vertex.Position.X += start.Value.Width;
+                vertex.Position.Y += start.Value.Height;
+                vertex.TextureCoordinate.X = 0.98f;
+                vertex.TextureCoordinate.Y = 0.98f;
+                surfaceVertices.Add(vertex);
+
+                vertex.Position = start.Value.Position;
+                vertex.Position.X += start.Value.Width;
+                vertex.Position.Y -= start.Value.Height;
+                vertex.TextureCoordinate.X = 0.98f;
+                vertex.TextureCoordinate.Y = 0.02f;
+                surfaceVertices.Add(vertex);
+
+                vertex.Position = start.Value.Position;
+                vertex.Position.X -= start.Value.Width;
+                vertex.Position.Y -= start.Value.Height;
+                vertex.TextureCoordinate.X = 0.02f;
+                vertex.TextureCoordinate.Y = 0.02f;
+                surfaceVertices.Add(vertex);
+
+                start = start.Next;
+            }
+            #endregion
+
+            // Draw user primitives
+            surfaceEffect.Parameters["BasicTexture"].SetValue(texture);
+
+            surfaceIndexBuffer.SetData<ushort>(surfaceIndices.ToArray());
+            surfaceVertexBuffer.SetData<VertexPositionColorTexture>(surfaceVertices.ToArray());
+
+            game.GraphicsDevice.Indices = surfaceIndexBuffer;
+            game.GraphicsDevice.Vertices[0].SetSource(surfaceVertexBuffer, 0,
+                                                      VertexPositionColorTexture.SizeInBytes);
+            game.GraphicsDevice.DrawIndexedPrimitives(
+                PrimitiveType.TriangleList, 0, 0, surfaceVertices.Count, 0, surfaceIndices.Count / 3);
+        }
+
+        #endregion
+
+        #region Sky
+
+        TextureCube skyTexture;
+        Effect skyEffect;
+        Model skyModel;
+
+        void ReadSkyContent(ContentReader input)
+        {
+            skyEffect = input.ContentManager.Load<Effect>("Effects/Sky");
+            skyModel = input.ContentManager.Load<Model>("Models/Cube");
+            skyTexture = input.ReadExternalReference<TextureCube>();
+        }
+
+        void InitializeSky()
+        {
+        }
+
+        public void DrawSky(GameTime gameTime)
+        {
+            DrawSky(gameTime, game.View, game.Projection);
+        }
+
+        void DrawSky(GameTime gameTime, Matrix view, Matrix projection)
+        {
+            // We have to retrieve the new graphics device every frame,
+            // since graphics device will be changed when resetting.
+            graphics = game.GraphicsDevice;
+
+            // Don't use or write to the z buffer
+            graphics.RenderState.DepthBufferEnable = false;
+            graphics.RenderState.DepthBufferWriteEnable = false;
+            graphics.RenderState.CullMode = CullMode.None;
+
+            // Also don't use any kind of blending.
+            graphics.RenderState.AlphaBlendEnable = false;
+
+            skyEffect.Parameters["View"].SetValue(view);
+            skyEffect.Parameters["Projection"].SetValue(projection);
+            skyEffect.Parameters["CubeTexture"].SetValue(skyTexture);
+
+            // Override model's effect and render
+            skyModel.Meshes[0].MeshParts[0].Effect = skyEffect;
+            skyModel.Meshes[0].Draw();
+
+            // Reset previous render states
             graphics.RenderState.DepthBufferEnable = true;
             graphics.RenderState.DepthBufferWriteEnable = true;
-            graphics.RenderState.CullMode = CullMode.None;
-            graphics.RenderState.AlphaBlendEnable = false;
         }
+
+        /// <summary>
+        /// Dispose
+        /// </summary>
+        void DisposeSky()
+        {
+            if (skyTexture != null)
+                skyTexture.Dispose();
+            if (skyEffect != null)
+                skyEffect.Dispose();
+        }
+
+        #endregion
+
+        #region Vegetation
+
+        float grassViewDistanceSquared = 400000;
+        List<Billboard> vegetations = new List<Billboard>(512);
+
+        void ReadVegetationContent(ContentReader input)
+        {
+            int count = input.ReadInt32();
+
+            Vector2 position;
+            Billboard billboard = new Billboard();
+            Texture2D texture;
+            for (int i = 0; i < count; i++)
+            {
+                texture = input.ReadExternalReference<Texture2D>();
+
+                int n = input.ReadInt32();
+
+                for (int k = 0; k < n; k++)
+                {
+                    billboard.Texture = texture;
+                    position = input.ReadVector2();
+                    billboard.Position = new Vector3(position, GetHeight(position.X, position.Y));
+                    billboard.Size = input.ReadVector2();
+                    billboard.Normal = Vector3.UnitZ;
+                    billboard.Type = BillboardType.NormalOriented;
+                    billboard.SourceRectangle = Billboard.DefaultSourceRectangle;
+
+                    vegetations.Add(billboard);
+                }
+            }
+        }
+
+        void InitializeVegetation()
+        {
+
+        }
+
+        void DrawVegetation(GameTime gameTime)
+        {
+            foreach (Billboard billboard in vegetations)
+            {
+                if (grassViewDistanceSquared >=
+                    Vector3.DistanceSquared(billboard.Position, game.Eye))
+                {
+                    game.Billboard.Draw(billboard);
+                }
+            }
+        }
+
+        #endregion
+
+        #region Water
+
+        bool IsSpheralWaterSurface = false;
+
+        /// <summary>
+        /// Gets or sets the fog texture used to draw the landscape
+        /// </summary>
+        public Texture2D FogTexture
+        {
+            get { return fogTexture; }
+            set { fogTexture = value; }
+        }
+
+        Texture2D fogTexture;
+
+        /// <summary>
+        /// The water is part of a spherical surface to make it look vast.
+        /// But during rendering, e.g., for computing reflection and refraction,
+        /// the water is treated as a flat plane with the height of zero.
+        /// This value determines the shape of the surface
+        /// </summary>
+        float earthRadius;
+
+        /// <summary>
+        /// A static texture applied to the water surface
+        /// </summary>
+        Texture waterTexture;
+
+        /// <summary>
+        /// This texture is used as a bump map to simulate water
+        /// </summary>
+        Texture waterDstortion;
+
+        /// <summary>
+        /// Render target used to draw the reflection & refraction texture
+        /// </summary>
+        RenderTarget2D reflectionRenderTarget;
+
+        /// <summary>
+        /// Depth stencil buffer used when drawing reflection and refraction
+        /// </summary>
+        DepthStencilBuffer waterDepthStencil;
+
+        /// <summary>
+        /// This texture is generated each frame for water reflection color sampling
+        /// </summary>
+        Texture2D waterReflection;
+
+        /// <summary>
+        /// See Effects/Water.fx
+        /// </summary>
+        Effect waterEffect;
+
+        /// <summary>
+        /// Water mesh
+        /// </summary>
+        int waterVertexCount;
+        int waterPrimitiveCount;
+
+        VertexBuffer waterVertices;
+        IndexBuffer waterIndices;
+
+        VertexDeclaration waterVertexDeclaration;
+
+        public Effect WaterEffect
+        {
+            get { return waterEffect; }
+            set { waterEffect = value; }
+        }
+
+        void ReadWaterContent(ContentReader input)
+        {
+            earthRadius = input.ReadSingle();
+            waterTexture = input.ReadExternalReference<Texture>();
+            waterDstortion = input.ReadExternalReference<Texture>();
+            waterEffect = input.ContentManager.Load<Effect>("Effects/Water");
+        }
+
+        void InitializeWater()
+        {
+            // Reflection & Refraction textures
+            reflectionRenderTarget = new RenderTarget2D(
+                graphics, 1024, 1024, 0, SurfaceFormat.Color, RenderTargetUsage.DiscardContents);
+
+            waterDepthStencil = new DepthStencilBuffer(
+                graphics, 1024, 1024, graphics.DepthStencilBuffer.Format);
+
+            // Initialize water mesh
+            waterVertexDeclaration = new VertexDeclaration(
+                graphics, VertexPositionTexture.VertexElements);
+
+            // Create vb / ib
+            const int CellCount = 16;
+            const int TextureRepeat = 32;
+
+            waterVertexCount = (CellCount + 1) * (CellCount + 1);
+            waterPrimitiveCount = CellCount * CellCount * 2;
+            VertexPositionTexture[] vertexData = new VertexPositionTexture[waterVertexCount];
+
+            // Water height is zero at the 4 corners of the terrain quad
+            float highest = earthRadius - (float)Math.Sqrt(
+                earthRadius * earthRadius - Size.X * Size.X / 4);
+
+            float waterSize = Math.Max(Size.X, Size.Y) * 2;
+            float cellSize = waterSize / CellCount;
+
+            int i = 0;
+            float len = 0;
+            Vector2 pos;
+            Vector2 center = new Vector2(Size.X / 2, Size.Y / 2);
+
+            for (int y = 0; y <= CellCount; y++)
+                for (int x = 0; x <= CellCount; x++)
+                {
+                    pos.X = (Size.X - waterSize) / 2 + cellSize * x;
+                    pos.Y = (Size.Y - waterSize) / 2 + cellSize * y;
+
+                    len = Vector2.Subtract(pos, center).Length();
+
+                    vertexData[i].Position.X = pos.X;
+                    vertexData[i].Position.Y = pos.Y;
+
+                    // Make the water a sphere surface
+                    if (IsSpheralWaterSurface)
+                        vertexData[i].Position.Z = highest - earthRadius +
+                            (float)Math.Sqrt(earthRadius * earthRadius - len * len);
+                    else
+                        vertexData[i].Position.Z = 0;
+
+                    vertexData[i].TextureCoordinate.X = 1.0f * x * TextureRepeat / CellCount;
+                    vertexData[i].TextureCoordinate.Y = 1.0f * y * TextureRepeat / CellCount;
+
+                    i++;
+                }
+
+            short[] indexData = new short[waterPrimitiveCount * 3];
+
+            i = 0;
+            for (int y = 0; y < CellCount; y++)
+                for (int x = 0; x < CellCount; x++)
+                {
+                    indexData[i++] = (short)((CellCount + 1) * (y + 1) + x);     // 0
+                    indexData[i++] = (short)((CellCount + 1) * y + x + 1);       // 2
+                    indexData[i++] = (short)((CellCount + 1) * (y + 1) + x + 1); // 1
+                    indexData[i++] = (short)((CellCount + 1) * (y + 1) + x);     // 0
+                    indexData[i++] = (short)((CellCount + 1) * y + x);           // 3
+                    indexData[i++] = (short)((CellCount + 1) * y + x + 1);       // 2
+                }
+
+
+            waterVertices = new VertexBuffer(
+                graphics, typeof(VertexPositionTexture), waterVertexCount, BufferUsage.WriteOnly);
+
+            waterVertices.SetData<VertexPositionTexture>(vertexData);
+
+            waterIndices = new IndexBuffer(
+                graphics, typeof(short), waterPrimitiveCount * 3, BufferUsage.WriteOnly);
+
+            waterIndices.SetData<short>(indexData);
+        }
+
+        public event DrawDelegate DrawWaterReflection;
+        public delegate void DrawDelegate(GameTime gameTime, Matrix view, Matrix projection);
 
         /// <summary>
         /// Draw landscape into an environment map.
         /// Call this before anything is drawed.
         /// </summary>
         /// <param name="gameTime"></param>
-        public void PreDraw(GameTime gameTime)
+        public void UpdateWaterReflectionAndRefraction(GameTime gameTime)
         {
-            UpdateWaterReflectionAndRefraction(gameTime);
+            if (!game.Settings.RealisticWater)
+                return;
+
+            DepthStencilBuffer prevDepth = graphics.DepthStencilBuffer;
+            graphics.DepthStencilBuffer = waterDepthStencil;
+            graphics.SetRenderTarget(0, reflectionRenderTarget);
+
+            graphics.Clear(Color.Black);
+
+            // Create a reflection view matrix
+            Matrix viewReflect = Matrix.Multiply(
+                Matrix.CreateReflection(new Plane(Vector3.UnitZ, 0)), game.View);
+
+            DrawSky(gameTime, viewReflect, game.Projection);
+
+            if (game.Settings.ShowLandscape)
+                DrawTerrain(viewReflect, game.Projection, true);
+
+            // Draw other reflections
+            if (game.Settings.ReflectionEnabled)
+                DrawWaterReflection(gameTime, viewReflect, game.Projection);
+
+            // Present the model manager to draw those models
+            game.ModelManager.Present(gameTime, viewReflect, game.Projection);
+
+            // Draw refraction onto the reflection texture
+            if (game.Settings.ShowLandscape)
+                DrawTerrain(game.View, game.Projection, false);
+
+            graphics.SetRenderTarget(0, null);
+            graphics.DepthStencilBuffer = prevDepth;
+
+            // Retrieve refraction texture
+            waterReflection = reflectionRenderTarget.GetTexture();
+
+            graphics.RenderState.AlphaBlendEnable = false;
         }
 
-        #endregion
+        public void DrawWater(GameTime gameTime)
+        {
+            // Draw water mesh
+            graphics.Indices = waterIndices;
+            graphics.VertexDeclaration = waterVertexDeclaration;
+            graphics.Vertices[0].SetSource(waterVertices, 0, VertexPositionTexture.SizeInBytes);
 
-        #region Dispose
+            if (FogTexture != null)
+                WaterEffect.Parameters["FogTexture"].SetValue(FogTexture);
+
+            if (game.Settings.RealisticWater)
+            {
+                WaterEffect.CurrentTechnique = WaterEffect.Techniques["Realisic"];
+                WaterEffect.Parameters["ReflectionTexture"].SetValue(waterReflection);
+            }
+            else
+            {
+                WaterEffect.CurrentTechnique = WaterEffect.Techniques["Default"];
+                waterEffect.Parameters["ColorTexture"].SetValue(waterTexture);
+            }
+
+            waterEffect.Parameters["DistortionTexture"].SetValue(waterDstortion);
+            WaterEffect.Parameters["ViewInverse"].SetValue(game.ViewInverse);
+            waterEffect.Parameters["WorldViewProj"].SetValue(game.ViewProjection);
+            WaterEffect.Parameters["WorldView"].SetValue(game.View);
+            waterEffect.Parameters["DisplacementScroll"].SetValue(MoveInCircle(gameTime, 0.01f));
+
+            waterEffect.Begin();
+            foreach (EffectPass pass in waterEffect.CurrentTechnique.Passes)
+            {
+                pass.Begin();
+                graphics.DrawIndexedPrimitives(
+                    PrimitiveType.TriangleList, 0, 0, waterVertexCount, 0, waterPrimitiveCount);
+                pass.End();
+            }
+            waterEffect.End();
+
+            graphics.RenderState.DepthBufferWriteEnable = true;
+        }
 
         /// <summary>
-        /// Dispose
+        /// Helper for moving a value around in a circle.
         /// </summary>
-        public void Dispose()
+        static Vector2 MoveInCircle(GameTime gameTime, float speed)
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            double time = gameTime.TotalGameTime.TotalSeconds * speed;
+
+            float x = (float)Math.Cos(time);
+            float y = (float)Math.Sin(time);
+
+            return new Vector2(x, y);
         }
 
         /// <summary>
         /// Dispose
         /// </summary>
         /// <param name="disposing">Disposing</param>
-        protected virtual void Dispose(bool disposing)
+        void DisposeWater()
         {
-            if (disposing)
-            {
-                DisposeSky();
-                DisposeWater();
-                DisposeTerrain();
-            }
+            if (waterVertices != null)
+                waterVertices.Dispose();
+            if (waterIndices != null)
+                waterIndices.Dispose();
         }
 
         #endregion
     }
+    #endregion
+    
+    #region FogMask
+    /// <summary>
+    /// Game fog of war
+    /// </summary>
+    public class FogMask
+    {
+        #region Field
+        const int Size = 128;
+
+        /// <summary>
+        /// Gets the default glow texture for each unit
+        /// </summary>
+        public static Texture2D Glow
+        {
+            get
+            {
+                if (glow == null || glow.IsDisposed)
+                    glow = BaseGame.Singleton.ZipContent.Load<Texture2D>("Textures/Glow");
+                return glow;
+            }
+        }
+
+        static Texture2D glow;
+
+        /// <summary>
+        /// Gets the width of the mask
+        /// </summary>
+        public float Width
+        {
+            get { return width; }
+        }
+
+        float width;
+
+        /// <summary>
+        /// Gets the height of the mask
+        /// </summary>
+        public float Height
+        {
+            get { return height; }
+        }
+
+        float height;
+
+        /// <summary>
+        /// Objects are invisible when the intensity is below this value
+        /// </summary>
+        public const float VisibleIntensity = 0.5f;
+
+        /// <summary>
+        /// Common stuff
+        /// </summary>
+        GraphicsDevice graphics;
+        SpriteBatch sprite;
+        Rectangle textureRectangle;
+
+        /// <summary>
+        /// Gets the result mask texture (Fog of war)
+        /// </summary>
+        public Texture2D Mask
+        {
+            get { return mask; }
+        }
+
+        public Texture2D Discovered
+        {
+            get { return discovered; }
+        }
+
+        public Texture2D Current
+        {
+            get { return current; }
+        }
+
+        /// <summary>
+        /// Textures & render targets
+        /// </summary>
+        Texture2D mask;
+        Texture2D discovered;
+        Texture2D current;
+
+        RenderTarget2D discoveredCanvas;
+        RenderTarget2D currentCanvas;
+        RenderTarget2D maskCanvas;
+
+        DepthStencilBuffer depthBuffer;
+
+        /// <summary>
+        /// Fog intensities
+        /// </summary>
+        bool[] visibility;
+
+        /// <summary>
+        /// Visible areas
+        /// </summary>
+        struct Entry
+        {
+            public float Radius;
+            public Vector2 Position;
+        }
+
+        List<Entry> visibleAreas = new List<Entry>();
+        #endregion
+
+        #region Method
+        /// <summary>
+        /// Creates a new fog of war mask
+        /// </summary>
+        public FogMask(GraphicsDevice graphics, float width, float height)
+        {
+            if (graphics == null || width <= 0 || height <= 0)
+                throw new ArgumentException();
+
+            this.width = width;
+            this.height = height;
+            this.graphics = graphics;
+            this.sprite = new SpriteBatch(graphics);
+            this.visibility = new bool[Size * Size];
+            this.textureRectangle = new Rectangle(0, 0, Size, Size);
+            this.depthBuffer = new DepthStencilBuffer(graphics, Size, Size, graphics.DepthStencilBuffer.Format);
+            this.discoveredCanvas = new RenderTarget2D(graphics, Size, Size, 0, SurfaceFormat.Color);
+            this.currentCanvas = new RenderTarget2D(graphics, Size, Size, 0, SurfaceFormat.Color);
+            this.maskCanvas = new RenderTarget2D(graphics, Size, Size, 0, SurfaceFormat.Color, RenderTargetUsage.PreserveContents);
+        }
+
+        /// <summary>
+        /// Gets the whether the specified point is in the fog of war
+        /// </summary>
+        public bool Contains(float x, float y)
+        {
+            if (x <= 0 || y <= 0 || x >= width || y >= height)
+                return true;
+
+            return !visibility[Size * (int)(Size * y / height) + (int)(Size * x / width)];
+        }
+
+        /// <summary>
+        /// Call this each frame to mark an area as visible
+        /// </summary>
+        /// <remarks>
+        /// TODO: Custom glow texture
+        /// </remarks>
+        public void DrawVisibleArea(float radius, float x, float y)
+        {
+            Entry entry;
+
+            entry.Radius = radius;
+            entry.Position.X = x;
+            entry.Position.Y = y;
+
+            visibleAreas.Add(entry);
+        }
+
+        /// <summary>
+        /// Call this to refresh the fog of war texture
+        /// </summary>
+        public void Refresh(GameTime gameTime)
+        {
+            if (mask != null && visibleAreas.Count <= 0)
+                return;
+
+            DepthStencilBuffer prevDepth = graphics.DepthStencilBuffer;
+
+            graphics.DepthStencilBuffer = depthBuffer;
+
+
+            // Draw current glows
+            graphics.SetRenderTarget(0, currentCanvas);
+            graphics.Clear(Color.Black);
+
+            // Draw glows
+            sprite.Begin(SpriteBlendMode.Additive);
+
+            Rectangle destination;
+            foreach (Entry entry in visibleAreas)
+            {
+                destination.X = (int)(Size * (entry.Position.X - entry.Radius) / width);
+                destination.Y = (int)(Size * (entry.Position.Y - entry.Radius) / height);
+                destination.Width = (int)(Size * entry.Radius * 2 / width);
+                destination.Height = (int)(Size * entry.Radius * 2 / height);
+
+                // Draw the glow texture
+                sprite.Draw(Glow, destination, Color.White);
+            }
+
+            sprite.End();
+
+
+            // Draw discovered area texture without clearing it
+            graphics.SetRenderTarget(0, discoveredCanvas);
+            graphics.Clear(Color.Black);
+
+            // Retrieve current glow texture
+            current = currentCanvas.GetTexture();
+
+            sprite.Begin(SpriteBlendMode.Additive);
+            if (discovered != null)
+                sprite.Draw(discovered, textureRectangle, Color.White);
+            sprite.Draw(current, textureRectangle, Color.White);
+            sprite.End();
+
+
+            // Draw final mask texture
+            graphics.SetRenderTarget(0, maskCanvas);
+            graphics.Clear(Color.Black);
+
+            // Retrieve discovered area
+            discovered = discoveredCanvas.GetTexture();
+
+            sprite.Begin(SpriteBlendMode.Additive);
+            sprite.Draw(discovered, textureRectangle, new Color(128, 128, 128, 128));
+            sprite.Draw(current, textureRectangle, Color.White);
+            sprite.End();
+
+
+            // Restore states
+            graphics.SetRenderTarget(0, null);
+            graphics.DepthStencilBuffer = prevDepth;
+
+            // Retrieve final mask texture
+            mask = maskCanvas.GetTexture();
+
+            // Update intensity map
+            //mask.GetData<float>(intensity);
+
+            // Manually update intensity map
+            UpdateIntensity();
+
+            // Clear visible areas
+            visibleAreas.Clear();
+        }
+
+        private void UpdateIntensity()
+        {
+            for (int i = 0; i < visibility.Length; i++)
+                visibility[i] = false;
+
+            float CellWidth = width / Size;
+            float CellHeight = height / Size;
+
+            foreach (Entry entry in visibleAreas)
+            {
+                int minX = (int)(Size * (entry.Position.X - entry.Radius) / width);
+                int minY = (int)(Size * (entry.Position.Y - entry.Radius) / height);
+                int maxX = (int)(Size * (entry.Position.X + entry.Radius) / width) + 1;
+                int maxY = (int)(Size * (entry.Position.Y + entry.Radius) / height) + 1;
+
+                if (minX < 0) minX = 0;
+                if (minY < 0) minY = 0;
+                if (maxX >= Size) maxX = Size - 1;
+                if (maxY >= Size) maxY = Size - 1;
+
+                for (int y = minY; y <= maxY; y++)
+                    for (int x = minX; x <= maxX; x++)
+                    {
+                        Vector2 v;
+
+                        v.X = x * CellWidth + CellWidth / 2 - entry.Position.X;
+                        v.Y = y * CellHeight + CellHeight / 2 - entry.Position.Y;
+
+                        if (v.LengthSquared() <= entry.Radius * entry.Radius)
+                            visibility[y * Size + x] = true;
+                    }
+            }
+        }
+        #endregion
+    }
+    #endregion
 }

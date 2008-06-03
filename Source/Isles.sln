@@ -17,6 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Document", "Document", "{49
 		Document\License.txt = Document\License.txt
 		Document\Readme - Game.txt = Document\Readme - Game.txt
 		Document\Readme - Source.txt = Document\Readme - Source.txt
+		Document\TODO.txt = Document\TODO.txt
 	EndProjectSection
 EndProject
 Global
@@ -25,23 +26,23 @@ Global
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs06.codeplex.com/
 		SccLocalPath0 = .
-		SccProjectUniqueName1 = Isles.Engine\\Content\\Content.contentproj
-		SccProjectTopLevelParentUniqueName1 = Isles.Engine\\Isles.Engine.csproj
-		SccProjectName1 = Isles.Engine/Content
-		SccLocalPath1 = Isles.Engine\\Content
-		SccProjectUniqueName2 = Isles.Engine\\Isles.Engine.csproj
-		SccProjectName2 = Isles.Engine
-		SccLocalPath2 = Isles.Engine
-		SccProjectUniqueName3 = Isles.Pipeline\\Isles.Pipeline.csproj
-		SccProjectName3 = Isles.Pipeline
-		SccLocalPath3 = Isles.Pipeline
+		SccProjectUniqueName1 = Isles\\Isles.csproj
+		SccProjectName1 = Isles
+		SccLocalPath1 = Isles
+		SccProjectUniqueName2 = Isles.Pipeline\\Isles.Pipeline.csproj
+		SccProjectName2 = Isles.Pipeline
+		SccLocalPath2 = Isles.Pipeline
+		SccProjectUniqueName3 = Isles.Engine\\Isles.Engine.csproj
+		SccProjectName3 = Isles.Engine
+		SccLocalPath3 = Isles.Engine
 		SccProjectUniqueName4 = Isles\\Content\\Content.contentproj
 		SccProjectTopLevelParentUniqueName4 = Isles\\Isles.csproj
 		SccProjectName4 = Isles/Content
 		SccLocalPath4 = Isles\\Content
-		SccProjectUniqueName5 = Isles\\Isles.csproj
-		SccProjectName5 = Isles
-		SccLocalPath5 = Isles
+		SccProjectUniqueName5 = Isles.Engine\\Content\\Content.contentproj
+		SccProjectTopLevelParentUniqueName5 = Isles.Engine\\Isles.Engine.csproj
+		SccProjectName5 = Isles.Engine/Content
+		SccLocalPath5 = Isles.Engine\\Content
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
