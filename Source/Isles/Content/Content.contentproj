@@ -130,157 +130,16 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Textures\fire.png">
-      <Name>fire</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Textures\smoke.png">
-      <Name>smoke</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Textures\smoke2.png">
-      <Name>smoke2</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="UI\MainEntry.png">
-      <Name>MainEntry</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="UI\LoadingDisplay.png">
-      <Name>LoadingDisplay</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="UI\ProgressBar.png">
-      <Name>ProgressBar</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Models\Buildings\Goldmine.X">
-      <Name>Goldmine</Name>
-      <Importer>XImporter</Importer>
-      <Processor>GameModelProcessor</Processor>
-      <ProcessorParameters_GenerateTangentFrames>True</ProcessorParameters_GenerateTangentFrames>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="UI\Panels.png">
-      <Name>Panels</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="UI\Buttons.png">
-      <Name>Buttons</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="UI\Focus\1.png">
-      <Name>1</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="UI\Focus\2.png">
-      <Name>2</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="UI\Focus\3.png">
-      <Name>3</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="UI\Focus\4.png">
-      <Name>4</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="UI\Focus\5.png">
-      <Name>5</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="UI\Focus\6.png">
-      <Name>6</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="UI\Focus\7.png">
-      <Name>7</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="UI\Focus\8.png">
-      <Name>8</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Textures\Failure.png">
-      <Name>Failure</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Textures\Victory.png">
-      <Name>Victory</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Settings\Defaults.xml">
-      <Name>Defaults</Name>
-      <Importer>XmlImporter</Importer>
-      <Processor>PassThroughProcessor</Processor>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <Compile Include="Textures\Glow.dds">
-      <Name>Glow</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Models\AlphaPalm.X">
       <Name>AlphaPalm</Name>
       <Importer>XImporter</Importer>
       <Processor>GameModelProcessor</Processor>
     </Compile>
-    <Compile Include="UI\TipBox.png">
-      <Name>TipBox</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Credits.txt">
+    <Compile Include="Credits.txt">
       <Name>Credits</Name>
-      <Importer>XmlImporter</Importer>
-      <Processor>PassThroughProcessor</Processor>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
+    </Compile>
     <None Include="Models\Palm.tga">
       <Name>Palm</Name>
       <Importer>TextureImporter</Importer>
@@ -291,274 +150,103 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Textures\SelectionArea.png">
-      <Name>SelectionArea</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Textures\SelectionAreaLarge.png">
-      <Name>SelectionAreaLarge</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Models\Buildings\barracks.X">
-      <Name>barracks</Name>
-      <Importer>XImporter</Importer>
-      <Processor>GameModelProcessor</Processor>
-    </Compile>
-    <None Include="Settings\ParticleSettings.xml">
-      <Name>ParticleSettings</Name>
-      <Importer>XmlImporter</Importer>
-      <Processor>PassThroughProcessor</Processor>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Models\Buildings\tietu_bingying.bmp">
-      <Name>tietu_bingying</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-    <Compile Include="Models\Buildings\townhall.X">
-      <Name>townhall</Name>
-      <Importer>XImporter</Importer>
-      <Processor>GameModelProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Models\Buildings\altar.X">
-      <Name>altar</Name>
-      <Importer>XImporter</Importer>
-      <Processor>GameModelProcessor</Processor>
-    </Compile>
-    <Compile Include="Models\Buildings\farm.X">
-      <Name>farm</Name>
-      <Importer>XImporter</Importer>
-      <Processor>GameModelProcessor</Processor>
-    </Compile>
-    <None Include="Models\Buildings\tietu_dating.bmp">
-      <Name>tietu_dating</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-    <Compile Include="Models\Buildings\tower.X">
-      <Name>tower</Name>
-      <Importer>XImporter</Importer>
-      <Processor>GameModelProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Models\Buildings\tietu_fangyu1.bmp">
-      <Name>tietu_fangyu1</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-    <None Include="Models\Buildings\tietu_fangyu2.bmp">
-      <Name>tietu_fangyu2</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-    <None Include="Models\Buildings\tietu_fangyu3.bmp">
-      <Name>tietu_fangyu3</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-    <None Include="Models\Buildings\tietu_fangyu4.bmp">
-      <Name>tietu_fangyu4</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-    <None Include="Models\Buildings\tietu_jinkuang.bmp">
-      <Name>tietu_jinkuang</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-    <None Include="Models\Buildings\tietu_jitan.bmp">
-      <Name>tietu_jitan</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-    <None Include="Models\Buildings\tietu_minfang.bmp">
-      <Name>tietu_minfang</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="UI\Snapshots.png">
-      <Name>Snapshots</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Readme.txt">
+    <Compile Include="Readme.txt">
       <Name>Readme</Name>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Settings\Bloom.xml">
+    <Compile Include="Settings\Bloom.xml">
       <Name>Bloom</Name>
       <Importer>XmlImporter</Importer>
       <Processor>PassThroughProcessor</Processor>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Models\Buildings\Lumbermill.X">
-      <Name>Lumbermill</Name>
-      <Importer>XImporter</Importer>
-      <Processor>GameModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Settings\Defaults.xml">
+      <Name>Defaults</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>PassThroughProcessor</Processor>
+    </Compile>
+    <Compile Include="Settings\ParticleSettings.xml">
+      <Name>ParticleSettings</Name>
+      <Importer>XmlImporter</Importer>
+      <Processor>PassThroughProcessor</Processor>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Models\Buildings\tietu_famuchang.bmp">
-      <Name>tietu_famuchang</Name>
+    <Compile Include="Models\1.jpg">
+      <Name>1</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
-    </None>
-    <None Include="Models\Buildings\tietu_famuchang2.bmp">
-      <Name>tietu_famuchang2</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-    <Compile Include="Models\shield.X">
-      <Name>shield</Name>
-      <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
     </Compile>
-    <Compile Include="Models\spear.X">
-      <Name>spear</Name>
-      <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Models\weapon.JPG">
-      <Name>weapon</Name>
+    <Compile Include="Models\2.jpg">
+      <Name>2</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Models\box.X">
+    </Compile>
+    <Compile Include="Models\3.jpg">
+      <Name>3</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\5.jpg">
+      <Name>5</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\6.jpg">
+      <Name>6</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\box.png">
       <Name>box</Name>
-      <Importer>XImporter</Importer>
-      <Processor>GameModelProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="UI\ReadmeButtons.png">
-      <Name>ReadmeButtons</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="UI\LeftMask.png">
-      <Name>LeftMask</Name>
+    <Compile Include="Models\gold.bmp">
+      <Name>gold</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="UI\RightMask.png">
-      <Name>RightMask</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Models\rally.X">
-      <Name>rally</Name>
-      <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Models\hammer.X">
+    <Compile Include="Models\hammer.png">
       <Name>hammer</Name>
-      <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="Models\warhammer.X">
-      <Name>warhammer</Name>
-      <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
+    <Compile Include="Models\rally.png">
+      <Name>rally</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="Models\wood.X">
-      <Name>wood</Name>
-      <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
+    <Compile Include="Models\shield.png">
+      <Name>shield</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Models\toetu_ mutou.bmp">
+    <Compile Include="Models\spear.png">
+      <Name>spear</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\stone.jpg">
+      <Name>stone</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\toetu_ mutou.bmp">
       <Name>toetu_ mutou</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Models\rally.png">
-      <Name>rally</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Models\gold.X">
-      <Name>gold</Name>
-      <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
     </Compile>
-    <Compile Include="Textures\Effect\blooddagak.PNG">
-      <Name>blooddagak</Name>
+    <Compile Include="Models\warhammer.png">
+      <Name>warhammer</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="Textures\Effect\frostvapors.PNG">
-      <Name>frostvapors</Name>
+    <Compile Include="Models\weapon.JPG">
+      <Name>weapon</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="Textures\Effect\greenmist.PNG">
-      <Name>greenmist</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Textures\Effect\illusion01.PNG">
-      <Name>illusion01</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Textures\Effect\light.png">
-      <Name>light</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Textures\Effect\spark.PNG">
-      <Name>spark</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <None Include="Models\hammer.png">
-      <Name>hammer</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Models\gold.bmp">
-      <Name>gold</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\cube.x">
@@ -566,67 +254,6 @@
       <Importer>XImporter</Importer>
       <Processor>ModelProcessor</Processor>
     </Compile>
-    <None Include="Models\box.png">
-      <Name>box</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-    <Compile Include="Models\stone.FBX">
-      <Name>stone</Name>
-      <Importer>FbxImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Models\stone.jpg">
-      <Name>stone</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Models\ruined.FBX">
-      <Name>ruined</Name>
-      <Importer>FbxImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-    </Compile>
-    <None Include="Models\shield.png">
-      <Name>shield</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-    <None Include="Models\warhammer.png">
-      <Name>warhammer</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-    <None Include="Models\spear.png">
-      <Name>spear</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Models\2.jpg">
-      <Name>2</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-    <None Include="Models\3.jpg">
-      <Name>3</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-    <None Include="Models\5.jpg">
-      <Name>5</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
-    <None Include="Models\6.jpg">
-      <Name>6</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audios\Isles.xap">
@@ -1164,11 +791,306 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-    <None Include="Models\1.jpg">
+    <Compile Include="Models\box.X">
+      <Name>box</Name>
+      <Importer>XImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\Buildings\altar.X">
+      <Name>altar</Name>
+      <Importer>XImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\Buildings\barracks.X">
+      <Name>barracks</Name>
+      <Importer>XImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\Buildings\farm.X">
+      <Name>farm</Name>
+      <Importer>XImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\Buildings\Goldmine.X">
+      <Name>Goldmine</Name>
+      <Importer>XImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\Buildings\Lumbermill.X">
+      <Name>Lumbermill</Name>
+      <Importer>XImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\Buildings\tower.X">
+      <Name>tower</Name>
+      <Importer>XImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\Buildings\townhall.X">
+      <Name>townhall</Name>
+      <Importer>XImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\Buildings\tietu_bingying.bmp">
+      <Name>tietu_bingying</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\Buildings\tietu_dating.bmp">
+      <Name>tietu_dating</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\Buildings\tietu_famuchang.bmp">
+      <Name>tietu_famuchang</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\Buildings\tietu_famuchang2.bmp">
+      <Name>tietu_famuchang2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\Buildings\tietu_fangyu1.bmp">
+      <Name>tietu_fangyu1</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\Buildings\tietu_fangyu2.bmp">
+      <Name>tietu_fangyu2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\Buildings\tietu_fangyu3.bmp">
+      <Name>tietu_fangyu3</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\Buildings\tietu_fangyu4.bmp">
+      <Name>tietu_fangyu4</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\Buildings\tietu_jinkuang.bmp">
+      <Name>tietu_jinkuang</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\Buildings\tietu_jitan.bmp">
+      <Name>tietu_jitan</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\Buildings\tietu_minfang.bmp">
+      <Name>tietu_minfang</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\gold.X">
+      <Name>gold</Name>
+      <Importer>XImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\hammer.X">
+      <Name>hammer</Name>
+      <Importer>XImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\rally.X">
+      <Name>rally</Name>
+      <Importer>XImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\ruined.FBX">
+      <Name>ruined</Name>
+      <Importer>FbxImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\shield.X">
+      <Name>shield</Name>
+      <Importer>XImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\spear.X">
+      <Name>spear</Name>
+      <Importer>XImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\stone.FBX">
+      <Name>stone</Name>
+      <Importer>FbxImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\warhammer.X">
+      <Name>warhammer</Name>
+      <Importer>XImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\wood.X">
+      <Name>wood</Name>
+      <Importer>XImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Effect\blooddagak.PNG">
+      <Name>blooddagak</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Effect\frostvapors.PNG">
+      <Name>frostvapors</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Effect\greenmist.PNG">
+      <Name>greenmist</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Effect\illusion01.PNG">
+      <Name>illusion01</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Effect\light.png">
+      <Name>light</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Effect\spark.PNG">
+      <Name>spark</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Failure.png">
+      <Name>Failure</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\fire.png">
+      <Name>fire</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Glow.dds">
+      <Name>Glow</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\SelectionArea.png">
+      <Name>SelectionArea</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\SelectionAreaLarge.png">
+      <Name>SelectionAreaLarge</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\smoke.png">
+      <Name>smoke</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\smoke2.png">
+      <Name>smoke2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Victory.png">
+      <Name>Victory</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="UI\Buttons.png">
+      <Name>Buttons</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="UI\Focus\1.png">
       <Name>1</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
-    </None>
+    </Compile>
+    <Compile Include="UI\Focus\2.png">
+      <Name>2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="UI\Focus\3.png">
+      <Name>3</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="UI\Focus\4.png">
+      <Name>4</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="UI\Focus\5.png">
+      <Name>5</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="UI\Focus\6.png">
+      <Name>6</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="UI\Focus\7.png">
+      <Name>7</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="UI\Focus\8.png">
+      <Name>8</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="UI\LeftMask.png">
+      <Name>LeftMask</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="UI\LoadingDisplay.png">
+      <Name>LoadingDisplay</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="UI\MainEntry.png">
+      <Name>MainEntry</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="UI\Panels.png">
+      <Name>Panels</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="UI\ProgressBar.png">
+      <Name>ProgressBar</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="UI\ReadmeButtons.png">
+      <Name>ReadmeButtons</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="UI\RightMask.png">
+      <Name>RightMask</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="UI\Snapshots.png">
+      <Name>Snapshots</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="UI\TipBox.png">
+      <Name>TipBox</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\v2.0\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
