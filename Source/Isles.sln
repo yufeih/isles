@@ -1,6 +1,12 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Document", "Document", "{4929D1D5-DC02-4C45-B94B-39870D742108}"
+	ProjectSection(SolutionItems) = preProject
+		Document\Changelog.txt = Document\Changelog.txt
+		Document\License.txt = Document\License.txt
+	EndProjectSection
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isles", "Isles\Isles.csproj", "{23F408E0-D6E0-41C6-94C7-C64A7CB373A3}"
 	ProjectSection(ProjectDependencies) = postProject
 		{BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27} = {BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27}
@@ -10,40 +16,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isles.Pipeline", "Isles.Pip
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isles.Engine", "Isles.Engine\Isles.Engine.csproj", "{BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Document", "Document", "{4929D1D5-DC02-4C45-B94B-39870D742108}"
-	ProjectSection(SolutionItems) = preProject
-		Document\Changelog.txt = Document\Changelog.txt
-		Document\Design Summary.txt = Document\Design Summary.txt
-		Document\License.txt = Document\License.txt
-		Document\Readme - Game.txt = Document\Readme - Game.txt
-		Document\Readme - Source.txt = Document\Readme - Source.txt
-		Document\TODO.txt = Document\TODO.txt
-	EndProjectSection
-EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 6
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://tfs06.codeplex.com/
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = Isles\\Isles.csproj
-		SccProjectName1 = Isles
-		SccLocalPath1 = Isles
-		SccProjectUniqueName2 = Isles.Pipeline\\Isles.Pipeline.csproj
-		SccProjectName2 = Isles.Pipeline
-		SccLocalPath2 = Isles.Pipeline
-		SccProjectUniqueName3 = Isles.Engine\\Isles.Engine.csproj
-		SccProjectName3 = Isles.Engine
-		SccLocalPath3 = Isles.Engine
-		SccProjectUniqueName4 = Isles\\Content\\Content.contentproj
-		SccProjectTopLevelParentUniqueName4 = Isles\\Isles.csproj
-		SccProjectName4 = Isles/Content
-		SccLocalPath4 = Isles\\Content
-		SccProjectUniqueName5 = Isles.Engine\\Content\\Content.contentproj
-		SccProjectTopLevelParentUniqueName5 = Isles.Engine\\Isles.Engine.csproj
-		SccProjectName5 = Isles.Engine/Content
-		SccLocalPath5 = Isles.Engine\\Content
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
 		Debug|Xbox 360 = Debug|Xbox 360
@@ -82,5 +55,28 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 6
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs06.codeplex.com/
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = Isles\\Isles.csproj
+		SccProjectName1 = Isles
+		SccLocalPath1 = Isles
+		SccProjectUniqueName2 = Isles.Pipeline\\Isles.Pipeline.csproj
+		SccProjectName2 = Isles.Pipeline
+		SccLocalPath2 = Isles.Pipeline
+		SccProjectUniqueName3 = Isles.Engine\\Isles.Engine.csproj
+		SccProjectName3 = Isles.Engine
+		SccLocalPath3 = Isles.Engine
+		SccProjectUniqueName4 = Isles\\Content\\Content.contentproj
+		SccProjectTopLevelParentUniqueName4 = Isles\\Isles.csproj
+		SccProjectName4 = Isles/Content
+		SccLocalPath4 = Isles\\Content
+		SccProjectUniqueName5 = Isles.Engine\\Content\\Content.contentproj
+		SccProjectTopLevelParentUniqueName5 = Isles.Engine\\Isles.Engine.csproj
+		SccProjectName5 = Isles.Engine/Content
+		SccLocalPath5 = Isles.Engine\\Content
 	EndGlobalSection
 EndGlobal
