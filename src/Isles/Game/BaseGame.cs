@@ -3,7 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
+using System.Text.Json;
 using Isles.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -184,7 +186,7 @@ viewProjectionInverse;
         public Vector3 Facing => facing;
 
         /// <summary>
-        /// Gets or sets Game settings.
+        /// Gets or sets Game Settings.
         /// </summary>
         public Settings Settings { get; set; }
 
@@ -342,11 +344,6 @@ viewProjectionInverse;
         }
 
         public BaseGame()
-            : this(Settings.CreateDefaultSettings(null))
-        {
-        }
-
-        public BaseGame(Settings settings)
         {
             Singleton = this;
 
@@ -362,36 +359,30 @@ viewProjectionInverse;
             Log.Write("CLR Runtime Version: " + assembly.ImageRuntimeVersion, false);
             Log.NewLine();
 
-            // Initialize settings
-            if (settings == null)
-            {
-                settings = Settings.CreateDefaultSettings(null);
-            }
+            Settings = JsonSerializer.Deserialize<Settings>(File.ReadAllText("data/settings/settings.json"));
+            GameSpeed = Settings.GameSpeed;
 
-            Settings = settings;
-            GameSpeed = settings.GameSpeed;
-
-            ZipContent = new ZipContentManager(Services, settings.ArchiveFile, settings.ContentDirectory);
-            Content.RootDirectory = settings.ContentDirectory;
-            Log.Write("Archive File:" + settings.ArchiveFile + "...");
-            Log.Write("Content Directory:" + settings.ContentDirectory + "...");
+            ZipContent = new ZipContentManager(Services, Settings.ArchiveFile, Settings.ContentDirectory);
+            Content.RootDirectory = Settings.ContentDirectory;
+            Log.Write("Archive File:" + Settings.ArchiveFile + "...");
+            Log.Write("Content Directory:" + Settings.ContentDirectory + "...");
 
             Graphics = new GraphicsDeviceManager(this)
             {
-                IsFullScreen = settings.Fullscreen,
-                PreferredBackBufferWidth = settings.ScreenWidth,
-                PreferredBackBufferHeight = settings.ScreenHeight,
-                SynchronizeWithVerticalRetrace = settings.VSync,
+                IsFullScreen = Settings.Fullscreen,
+                PreferredBackBufferWidth = Settings.ScreenWidth,
+                PreferredBackBufferHeight = Settings.ScreenHeight,
+                SynchronizeWithVerticalRetrace = Settings.VSync,
                 MinimumPixelShaderProfile = ShaderProfile.PS_2_0,
                 MinimumVertexShaderProfile = ShaderProfile.VS_2_0,
             };
 
             // Show cursor
-            IsMouseVisible = settings.IsMouseVisible;
+            IsMouseVisible = Settings.IsMouseVisible;
             // #if DEBUG
             // Use variant time step to trace frame performance
             // IsFixedTimeStep = true;
-            IsFixedTimeStep = settings.IsFixedTimeStep;
+            IsFixedTimeStep = Settings.IsFixedTimeStep;
             // TargetElapsedTime = new TimeSpan(5000000);
             // #endif
         }

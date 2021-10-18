@@ -1,96 +1,57 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.IO;
-using System.Xml.Serialization;
-
 namespace Isles.Engine
 {
-    /// <summary>
-    /// Game settings.
-    /// </summary>
-    [Serializable]
     public class Settings
     {
-        /// <summary>
-        /// Directory for game assets.
-        /// </summary>
-        public string ContentDirectory = "Content";
-        public string ArchiveFile = "Content.ixa";
+        public string ContentDirectory { get; set; } = "Content";
+        public string ArchiveFile { get; set; } = "Content.ixa";
 
-        /// <summary>
-        /// Default game font.
-        /// </summary>
-        public string DefaultFont = "Fonts/Default";
-        public string Graphics2DEffect = "Effects/Graphics2D";
-        public string PlayerName = "Unnamed";
-        public bool EnableScreenshot = true;
-        public bool EnableProfile = true;
-        public bool IsMouseVisible;
-        public bool IsFixedTimeStep = true;
-        public bool ClipCursor;
-        public bool EnableSound = true;
-        public bool ShowPathGraph;
-        public bool RevealMap;
-        public int MaxPathSearchStepsPerUpdate = 2000;
-        public bool DirectEnter;
-        public bool TraceUnits;
-        public bool Cheat;
-        public double GameSpeed = 1;
-        public GameCameraSettings CameraSettings;
+        public string DefaultFont { get; set; } = "Fonts/Default";
+        public string Graphics2DEffect { get; set; } = "Effects/Graphics2D";
+        public string PlayerName { get; set; } = "Unnamed";
+        public bool EnableScreenshot { get; set; } = true;
+        public bool EnableProfile { get; set; } = true;
+        public bool IsMouseVisible { get; set; }
+        public bool IsFixedTimeStep { get; set; } = true;
+        public bool ClipCursor { get; set; }
+        public bool EnableSound { get; set; } = true;
+        public bool ShowPathGraph { get; set; }
+        public bool RevealMap { get; set; }
+        public int MaxPathSearchStepsPerUpdate { get; set; } = 2000;
+        public bool DirectEnter { get; set; }
+        public bool TraceUnits { get; set; }
+        public bool Cheat { get; set; }
+        public double GameSpeed { get; set; } = 1;
+        public GameCameraSettings CameraSettings { get; set; } = new();
 
-        public int ScreenWidth = 960;
-        public int ScreenHeight = 600;
-        public bool Fullscreen;
-        public bool NormalMappedTerrain;
-        public bool RealisticWater;
-        public bool ReflectionEnabled;
-        public bool ShadowEnabled = true;
-        public bool ShowLandscape = true;
-        public bool ShowWater = true;
-        public bool ShowObjectReflection = true;
-        public BloomEffect BloomSettings;
-        public float ViewDistanceSquared = 800;
-        public string ModelEffect = "Effects/Model";
+        public int ScreenWidth { get; set; } = 960;
+        public int ScreenHeight { get; set; } = 600;
+        public bool Fullscreen { get; set; }
+        public bool NormalMappedTerrain { get; set; }
+        public bool RealisticWater { get; set; }
+        public bool ReflectionEnabled { get; set; }
+        public bool ShadowEnabled { get; set; } = true;
+        public bool ShowLandscape { get; set; } = true;
+        public bool ShowWater { get; set; } = true;
+        public bool ShowObjectReflection { get; set; } = true;
+        public BloomEffect BloomSettings { get; set; } = new();
+        public float ViewDistanceSquared { get; set; } = 800;
+        public string ModelEffect { get; set; } = "Effects/Model";
 
-        // We want to trace frame performance, so turn off V'Sync
-#if DEBUG
-        public bool VSync;
-#else
-        public bool VSync = false;
-#endif
+        public bool VSync { get; set; }
 
-        [Serializable]
         public class BloomEffect
         {
-            public bool Enabled;
-            public string Type = "Saturated";
-            public float Threshold = 0.25f;
-            public float Blur = 2;
-            public float BloomIntensity = 1;
-            public float BaseIntensity = 1;
-            public float BloomSaturation = 2;
-            public float BaseSaturation;
-        }
-
-        /// <summary>
-        /// Create default game settings.
-        /// </summary>
-        /// <param name="fromFile"></param>
-        public static Settings CreateDefaultSettings(Stream stream)
-        {
-            var settings = new Settings();
-
-            return stream == null ? settings : (Settings)new XmlSerializer(typeof(Settings)).Deserialize(stream);
-        }
-
-        /// <summary>
-        /// Save settings.
-        /// </summary>
-        public void Save(Stream stream)
-        {
-            new XmlSerializer(typeof(Settings)).Serialize(stream, this);
+            public bool Enabled { get; set; }
+            public string Type { get; set; } = "Saturated";
+            public float Threshold { get; set; } = 0.25f;
+            public float Blur { get; set; } = 2;
+            public float BloomIntensity { get; set; } = 1;
+            public float BaseIntensity { get; set; } = 1;
+            public float BloomSaturation { get; set; } = 2;
+            public float BaseSaturation { get; set; }
         }
     }
 }

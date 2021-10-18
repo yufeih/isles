@@ -19,13 +19,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Settings.xml" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\data\cursors\**" LinkBase="data\cursors" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\data\settings\**" LinkBase="data\settings" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\xnb\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Isles.Pipeline\Isles.Pipeline.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="5.0.2" />
   </ItemGroup>
 
 </Project>

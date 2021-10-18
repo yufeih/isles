@@ -97,51 +97,50 @@ namespace Isles.Engine
     /// <summary>
     /// Settings for game camera.
     /// </summary>
-    [Serializable]
     public class GameCameraSettings
     {
         /// <summary>
         /// Minmun camera height above ground.
         /// </summary>
-        public float MinHeightAboveGround = 10.0f;
+        public float MinHeightAboveGround { get; set; } = 10.0f;
 
         /// <summary>
         /// Max camera arcball radius.
         /// </summary>
-        public float MaxRadius = 1000.0f;
+        public float MaxRadius { get; set; } = 1000.0f;
 
         /// <summary>
         /// Default camera arcball radius.
         /// </summary>
-        public float DefaultRadius = 100.0f;
+        public float DefaultRadius { get; set; } = 100.0f;
 
         /// <summary>
         /// Size of the hot area at the borders of the screen that
         /// scroll the position of the camera, in pixels.
         /// </summary>
-        public float ScrollAreaSize = 10;
+        public float ScrollAreaSize { get; set; } = 10;
 
         /// <summary>
         /// Global camera sensitivity scaler.
         /// </summary>
-        public float Sensitivity = 1.0f;
+        public float Sensitivity { get; set; } = 1.0f;
 
         /// <summary>
         /// Controls how mouse wheel value affects view distance.
         /// </summary>
-        public float WheelFactor = 0.1f;
+        public float WheelFactor { get; set; } = 0.1f;
 
         /// <summary>
         /// Controls the global smoothness of camera transitions.
         /// </summary>
-        public float Smoothness = 1.0f;
+        public float Smoothness { get; set; } = 1.0f;
 
         /// <summary>
         /// Scrolling speed of the camera. It's faster to scroll
         /// when the camera gets higher (Depends on arcball radius).
         /// </summary>
-        public float MinSpeed = 0.2f;
-        public float MaxSpeed = 1.0f;
+        public float MinSpeed { get; set; } = 0.2f;
+        public float MaxSpeed { get; set; } = 1.0f;
     }
 
     /// <summary>

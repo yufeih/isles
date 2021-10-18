@@ -13,20 +13,10 @@ namespace Isles
     /// </summary>
     public class GameIsles : BaseGame
     {
-        private const string ConfigFile = "Settings.xml";
-
         /// <summary>
         /// Gets game screen.
         /// </summary>
         public GameScreen GameScreen { get; private set; }
-
-        /// <summary>
-        /// Gets settins stream.
-        /// </summary>
-        private static Stream SettingsStream => File.Exists(ConfigFile) ? new FileStream(ConfigFile, FileMode.Open) : null;
-
-        public GameIsles()
-            : base(Settings.CreateDefaultSettings(SettingsStream)) { }
 
         private TitleScreen titleScreen;
 
