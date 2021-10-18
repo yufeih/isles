@@ -17,11 +17,6 @@ namespace Isles
         [STAThread()]
         public static void Main(string[] args)
         {
-#if !DEBUG
-            try
-            {
-#endif
-
             using (BaseGame game = new GameIsles())
             {                
                 game.Run();
@@ -30,16 +25,6 @@ namespace Isles
                 Log.NewLine();
                 Log.Write("Program Terminated. Overall FPS: " + game.Profiler.OverallFPS);
             }
-#if !DEBUG
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("Error: " + e.Message + "\n\nSee log file for error detailes.", "Isles");
-                Log.Write(e.Source + " - " + e.Message);
-                Log.NewLine();
-                Log.Write(e.StackTrace, false);
-            }   
-#endif
         }
     }
 }
