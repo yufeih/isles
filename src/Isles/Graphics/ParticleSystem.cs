@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -15,7 +15,7 @@ using Isles.Engine;
 
 namespace Isles.Graphics
 {
-    #region ParticleSettings
+
     /// <summary>
     /// Settings class describes all the tweakable options used
     /// to control the appearance of a particle system.
@@ -25,10 +25,10 @@ namespace Isles.Graphics
     /// ParticleSettings    -   Description of a single particle
     /// ParticleEmitter     -   Add new particles of any particle system
     /// ParticleEffect      -   Base class for all particle system effects
-    /// 
+    ///
     /// ParticleEffect : IWorldObject
     /// world.Create("Fireball");
-    /// 
+    ///
     /// new ParticleSystem(new ParticleSettings());
     /// </example>
     [Serializable()]
@@ -56,7 +56,7 @@ namespace Isles.Graphics
         public float Duration = 1;
 
         /// <summary>
-        /// If greater than zero, some particles will last a shorter time than others. 
+        /// If greater than zero, some particles will last a shorter time than others.
         /// </summary>
         public float DurationRandomness;
 
@@ -141,15 +141,12 @@ namespace Isles.Graphics
         public Blend SourceBlend = Blend.SourceAlpha;
         public Blend DestinationBlend = Blend.InverseSourceAlpha;
     }
-    #endregion
 
-    #region ParticleSystem
     /// <summary>
     /// The main component in charge of displaying particles.
     /// </summary>
     public class ParticleSystem
     {
-        #region Fields
 
         public string ParticleName
         {
@@ -213,7 +210,7 @@ namespace Isles.Graphics
         //
         //      0
         //      1 - first active particle
-        //      2 
+        //      2
         //      3 - first free particle
         //
         // In this case, particles 1 and 2 are active, while 3 and 4 are free.
@@ -221,7 +218,7 @@ namespace Isles.Graphics
         //
         //      0
         //      1 - first free particle
-        //      2 
+        //      2
         //      3 - first active particle
         //
         // Here, 3 and 0 are active, while 1 and 2 are free.
@@ -285,9 +282,6 @@ namespace Isles.Graphics
         // Shared random number generator.
         private static readonly Random random = new();
 
-        #endregion
-
-        #region Static Stuff
         private static BaseGame baseGame;
         private static List<ParticleSettings> ParticleSettings = new();
         private static readonly List<ParticleSystem> ParticleSystems = new();
@@ -361,9 +355,6 @@ namespace Isles.Graphics
                 ps.Update(gameTime);
             }
         }
-        #endregion
-
-        #region Initialization
 
         private ParticleSystem(Game game, ParticleSettings settings)
         {
@@ -464,10 +455,6 @@ namespace Isles.Graphics
             var techniqueName = (settings.MinRotateSpeed == 0) && (settings.MaxRotateSpeed == 0) ? "NonRotatingParticles" : "RotatingParticles";
             particleEffect.CurrentTechnique = particleEffect.Techniques[techniqueName];
         }
-
-        #endregion
-
-        #region Update and Draw
 
         private bool presented;
 
@@ -723,10 +710,6 @@ namespace Isles.Graphics
             renderState.DepthBias = 0;
         }
 
-        #endregion
-
-        #region Public Methods
-
         private Matrix view, projection;
 
         public void SetCamera(Matrix view, Matrix projection)
@@ -789,26 +772,23 @@ namespace Isles.Graphics
             firstFreeParticle = nextFreeParticle;
         }
 
-        #endregion
     }
-    #endregion
 
-    #region ParticleEmitter
     /// <summary>
     /// Helper for objects that want to leave particles behind them as they
     /// move around the world. This emitter implementation solves two related
     /// problems:
-    /// 
+    ///
     /// If an object wants to create particles very slowly, less than once per
     /// frame, it can be a pain to keep track of which updates ought to create
     /// a new particle versus which should not.
-    /// 
+    ///
     /// If an object is moving quickly and is creating many particles per frame,
     /// it will look ugly if these particles are all bunched up together. Much
     /// better if they can be spread out along a line between where the object
     /// is now and where it was on the previous frame. This is particularly
     /// important for leaving trails behind fast moving objects such as rockets.
-    /// 
+    ///
     /// This emitter class keeps track of a moving object, remembering its
     /// previous position so it can calculate the velocity of the object. It
     /// works out the perfect locations for creating particles at any frequency
@@ -817,7 +797,6 @@ namespace Isles.Graphics
     /// </summary>
     public class ParticleEmitter
     {
-        #region Fields
 
         private readonly ParticleSystem particleSystem;
         private float timeBetweenParticles;
@@ -840,7 +819,6 @@ namespace Isles.Graphics
             get => 1.0f / timeBetweenParticles;
             set => timeBetweenParticles = 1.0f / value;
         }
-        #endregion
 
         /// <summary>
         /// Constructs a new particle emitter object.
@@ -924,9 +902,7 @@ namespace Isles.Graphics
             previousPosition = newPosition;
         }
     }
-    #endregion
 
-    #region ParticleVertex
     /// <summary>
     /// Custom vertex structure for drawing point sprite particles.
     /// </summary>
@@ -967,9 +943,7 @@ namespace Isles.Graphics
         // Describe the size of this vertex structure.
         public const int SizeInBytes = 32;
     }
-    #endregion
 
-    #region Projectile
     /// <summary>
     /// This class demonstrates how to combine several different particle systems
     /// to build up a more sophisticated composite effect. It implements a rocket
@@ -979,7 +953,6 @@ namespace Isles.Graphics
     /// </summary>
     public class Projectile
     {
-        #region Constants
 
         private const float trailParticlesPerSecond = 200;
         private const int numExplosionParticles = 30;
@@ -989,10 +962,6 @@ namespace Isles.Graphics
         private const float verticalVelocityRange = 40;
         private const float gravity = 15;
 
-        #endregion
-
-        #region Fields
-
         private readonly ParticleSystem explosionParticles;
         private readonly ParticleSystem explosionSmokeParticles;
         private readonly ParticleEmitter trailEmitter;
@@ -1000,8 +969,6 @@ namespace Isles.Graphics
         private Vector3 velocity;
         private float age;
         private static readonly Random random = new();
-
-        #endregion
 
         /// <summary>
         /// Constructs a new projectile.
@@ -1061,5 +1028,5 @@ namespace Isles.Graphics
             return true;
         }
     }
-    #endregion
+
 }

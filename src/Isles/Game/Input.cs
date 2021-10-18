@@ -1,21 +1,19 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
-#region Using directives
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-#endregion
 
 namespace Isles.Engine
 {
     public class Input
     {
-        #region Field
+
         /// <summary>
         /// Mouse state, set every frame in the Update method.
         /// </summary>
@@ -90,9 +88,7 @@ namespace Isles.Engine
         /// Gets whether left ctrl or right ctrl key is pressed
         /// </summary>
         public bool IsCtrlPressed => keyboardState.IsKeyDown(Keys.LeftControl) || keyboardState.IsKeyDown(Keys.RightControl);
-        #endregion
 
-        #region Method
         public static bool IsSpecialKey(Keys key)
         {
             // All keys except A-Z, 0-9 and `-\[];',./= (and space) are special keys.
@@ -362,7 +358,7 @@ namespace Isles.Engine
         private IEventListener captured;
 
         /// <summary>
-        /// Capture input event. All input events will always (only) be 
+        /// Capture input event. All input events will always (only) be
         /// sent to the specified handler.
         /// </summary>
         public void Capture(IEventListener handler)
@@ -383,9 +379,6 @@ namespace Isles.Engine
             captured = null;
         }
 
-        #endregion
-
-        #region Update
         /// <summary>
         /// Time interval for double click, measured in seconds
         /// </summary>
@@ -524,6 +517,6 @@ namespace Isles.Engine
                 }
             }
         }
-        #endregion
+
     }
 }

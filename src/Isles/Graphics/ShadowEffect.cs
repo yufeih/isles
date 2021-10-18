@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -16,23 +16,22 @@ namespace Isles.Graphics
     /// </summary>
     /// <example>
     /// Here is a code snippet demonstrating how to make use of this class:
-    /// 
+    ///
     /// // Initialization
     /// ShadowEffect shadow = new ShadowEffect(game);
-    /// 
+    ///
     /// // Draw
     /// if (shadow.Begin())
     /// {
     ///     // Draw all shadow casters using shadow map generation effect
     ///     shadow.End();
-    ///     
+    ///
     ///     // Draw all shadow receivers using the shadow map generated in
     ///     // the previous step.
     /// }
     /// </example>
     public class ShadowEffect : IDisposable
     {
-        #region Variables & Properties
 
         public const int ShadowMapSize = 1024;
         private readonly BaseGame game;
@@ -82,10 +81,6 @@ namespace Isles.Graphics
         }
 
         private BoundingSphere targetBounds = new(Vector3.Zero, 100);
-
-        #endregion
-
-        #region Methods
 
         public ShadowEffect(BaseGame game)
         {
@@ -179,10 +174,6 @@ namespace Isles.Graphics
             return null;
         }
 
-        #endregion
-
-        #region Dispose
-
         /// <summary>
         /// Dispose
         /// </summary>
@@ -222,6 +213,5 @@ namespace Isles.Graphics
             }
         }
 
-        #endregion
     }
 }

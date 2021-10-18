@@ -1,22 +1,19 @@
-#region File Description
+
 //-----------------------------------------------------------------------------
 // BloomComponent.cs
 //
 // Microsoft XNA Community Game Platform
 // Copyright (C) Microsoft Corporation. All rights reserved.
 //-----------------------------------------------------------------------------
-#endregion
 
-#region Using Statements
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-#endregion
 
 namespace Isles.Graphics
 {
-    #region BloomSettings
+
     /// <summary>
     /// Class holds all the settings used to tweak the bloom effect.
     /// Code grabbed from XNA creators club samples :)
@@ -24,7 +21,6 @@ namespace Isles.Graphics
     [Serializable()]
     public class BloomSettings
     {
-        #region Fields
 
         // Name of a preset bloom setting, for display to the user.
         public string Name;
@@ -48,8 +44,6 @@ namespace Isles.Graphics
         // unchanged, while higher values increase the saturation level.
         public float BloomSaturation;
         public float BaseSaturation;
-
-        #endregion
 
         public BloomSettings()
         {
@@ -100,12 +94,9 @@ namespace Isles.Graphics
             new BloomSettings("Subtle",      0.5f,   2,   1,     1,    1,       1),
         };
     }
-    #endregion
 
-    #region BloomEffect
     public class BloomEffect : DrawableGameComponent
     {
-        #region Fields
 
         private readonly ContentManager content;
         private SpriteBatch spriteBatch;
@@ -131,10 +122,6 @@ namespace Isles.Graphics
         }
 
         public IntermediateBuffer ShowBuffer { get; set; } = IntermediateBuffer.FinalResult;
-
-        #endregion
-
-        #region Initialization
 
         public BloomEffect(Game game, ContentManager content)
             : base(game)
@@ -192,10 +179,6 @@ namespace Isles.Graphics
             renderTarget1.Dispose();
             renderTarget2.Dispose();
         }
-
-        #endregion
-
-        #region Draw
 
         /// <summary>
         /// This is where it all happens. Grabs a scene that has already been rendered,
@@ -381,7 +364,6 @@ namespace Isles.Graphics
                            Math.Exp(-(n * n) / (2 * theta * theta)));
         }
 
-        #endregion
     }
-    #endregion
+
 }

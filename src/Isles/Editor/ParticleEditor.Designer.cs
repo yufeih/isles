@@ -20,7 +20,7 @@ namespace Isles.Editor
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
+
 
         /// <summary>
         /// Required method for Designer support - do not modify
@@ -98,9 +98,9 @@ namespace Isles.Editor
             ((System.ComponentModel.ISupportInitialize)(this.trackBarDurationRandomness)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarDuration)).BeginInit();
             this.SuspendLayout();
-            // 
+            //
             // groupBox1
-            // 
+            //
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
@@ -156,9 +156,9 @@ namespace Isles.Editor
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Particle Parameters";
-            // 
+            //
             // comboBoxTexture
-            // 
+            //
             this.comboBoxTexture.FormattingEnabled = true;
             this.comboBoxTexture.Location = new System.Drawing.Point(437, 45);
             this.comboBoxTexture.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -166,9 +166,9 @@ namespace Isles.Editor
             this.comboBoxTexture.Size = new System.Drawing.Size(181, 20);
             this.comboBoxTexture.TabIndex = 48;
             this.comboBoxTexture.SelectedIndexChanged += new System.EventHandler(this.comboBoxTexture_SelectedIndexChanged);
-            // 
+            //
             // trackBarEmission
-            // 
+            //
             this.trackBarEmission.Location = new System.Drawing.Point(438, 266);
             this.trackBarEmission.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.trackBarEmission.Maximum = 100;
@@ -177,18 +177,18 @@ namespace Isles.Editor
             this.trackBarEmission.TabIndex = 47;
             this.trackBarEmission.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trackBarEmission.Scroll += new System.EventHandler(this.trackBarEmission_Scroll);
-            // 
+            //
             // label21
-            // 
+            //
             this.label21.AutoSize = true;
             this.label21.Location = new System.Drawing.Point(436, 249);
             this.label21.Name = "label21";
             this.label21.Size = new System.Drawing.Size(107, 12);
             this.label21.TabIndex = 46;
             this.label21.Text = "Particle Emission";
-            // 
+            //
             // buttonMinColor
-            // 
+            //
             this.buttonMinColor.Location = new System.Drawing.Point(554, 115);
             this.buttonMinColor.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buttonMinColor.Name = "buttonMinColor";
@@ -197,9 +197,9 @@ namespace Isles.Editor
             this.buttonMinColor.Text = "Set";
             this.buttonMinColor.UseVisualStyleBackColor = true;
             this.buttonMinColor.Click += new System.EventHandler(this.buttonMinColor_Click);
-            // 
+            //
             // buttonMaxColor
-            // 
+            //
             this.buttonMaxColor.Location = new System.Drawing.Point(554, 91);
             this.buttonMaxColor.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buttonMaxColor.Name = "buttonMaxColor";
@@ -208,9 +208,9 @@ namespace Isles.Editor
             this.buttonMaxColor.Text = "Set";
             this.buttonMaxColor.UseVisualStyleBackColor = true;
             this.buttonMaxColor.Click += new System.EventHandler(this.buttonMaxColor_Click);
-            // 
+            //
             // buttonSave
-            // 
+            //
             this.buttonSave.Location = new System.Drawing.Point(554, 338);
             this.buttonSave.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buttonSave.Name = "buttonSave";
@@ -219,9 +219,9 @@ namespace Isles.Editor
             this.buttonSave.Text = "Save";
             this.buttonSave.UseVisualStyleBackColor = true;
             this.buttonSave.Click += new System.EventHandler(this.buttonSave_Click);
-            // 
+            //
             // buttonLoad
-            // 
+            //
             this.buttonLoad.Location = new System.Drawing.Point(485, 338);
             this.buttonLoad.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buttonLoad.Name = "buttonLoad";
@@ -229,9 +229,9 @@ namespace Isles.Editor
             this.buttonLoad.TabIndex = 42;
             this.buttonLoad.Text = "Load";
             this.buttonLoad.UseVisualStyleBackColor = true;
-            // 
+            //
             // comboBoxDestBlend
-            // 
+            //
             this.comboBoxDestBlend.FormattingEnabled = true;
             this.comboBoxDestBlend.Items.AddRange(new object[] {
             "Zero",
@@ -255,9 +255,9 @@ namespace Isles.Editor
             this.comboBoxDestBlend.Size = new System.Drawing.Size(181, 20);
             this.comboBoxDestBlend.TabIndex = 41;
             this.comboBoxDestBlend.SelectedIndexChanged += new System.EventHandler(this.comboBoxDestBlend_SelectedIndexChanged);
-            // 
+            //
             // comboBoxSourceBlend
-            // 
+            //
             this.comboBoxSourceBlend.FormattingEnabled = true;
             this.comboBoxSourceBlend.Items.AddRange(new object[] {
             "Zero",
@@ -281,54 +281,54 @@ namespace Isles.Editor
             this.comboBoxSourceBlend.Size = new System.Drawing.Size(181, 20);
             this.comboBoxSourceBlend.TabIndex = 40;
             this.comboBoxSourceBlend.SelectedIndexChanged += new System.EventHandler(this.comboBoxSourceBlend_SelectedIndexChanged);
-            // 
+            //
             // label20
-            // 
+            //
             this.label20.AutoSize = true;
             this.label20.Location = new System.Drawing.Point(435, 186);
             this.label20.Name = "label20";
             this.label20.Size = new System.Drawing.Size(107, 12);
             this.label20.TabIndex = 39;
             this.label20.Text = "Destination Blend";
-            // 
+            //
             // label19
-            // 
+            //
             this.label19.AutoSize = true;
             this.label19.Location = new System.Drawing.Point(435, 149);
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(77, 12);
             this.label19.TabIndex = 38;
             this.label19.Text = "Source Blend";
-            // 
+            //
             // label18
-            // 
+            //
             this.label18.AutoSize = true;
             this.label18.Location = new System.Drawing.Point(436, 121);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(59, 12);
             this.label18.TabIndex = 37;
             this.label18.Text = "Min Color";
-            // 
+            //
             // label17
-            // 
+            //
             this.label17.AutoSize = true;
             this.label17.Location = new System.Drawing.Point(436, 99);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(59, 12);
             this.label17.TabIndex = 36;
             this.label17.Text = "Max Color";
-            // 
+            //
             // label15
-            // 
+            //
             this.label15.AutoSize = true;
             this.label15.Location = new System.Drawing.Point(5, 345);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(77, 12);
             this.label15.TabIndex = 35;
             this.label15.Text = "Min End Size";
-            // 
+            //
             // trackBarMinEndSize
-            // 
+            //
             this.trackBarMinEndSize.Location = new System.Drawing.Point(190, 345);
             this.trackBarMinEndSize.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.trackBarMinEndSize.Maximum = 100;
@@ -337,18 +337,18 @@ namespace Isles.Editor
             this.trackBarMinEndSize.TabIndex = 34;
             this.trackBarMinEndSize.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trackBarMinEndSize.Scroll += new System.EventHandler(this.trackBarMinEndSize_Scroll);
-            // 
+            //
             // label16
-            // 
+            //
             this.label16.AutoSize = true;
             this.label16.Location = new System.Drawing.Point(5, 323);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(77, 12);
             this.label16.TabIndex = 33;
             this.label16.Text = "Max End Size";
-            // 
+            //
             // trackBarMaxEndSize
-            // 
+            //
             this.trackBarMaxEndSize.Location = new System.Drawing.Point(190, 323);
             this.trackBarMaxEndSize.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.trackBarMaxEndSize.Maximum = 100;
@@ -357,18 +357,18 @@ namespace Isles.Editor
             this.trackBarMaxEndSize.TabIndex = 32;
             this.trackBarMaxEndSize.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trackBarMaxEndSize.Scroll += new System.EventHandler(this.trackBarMaxEndSize_Scroll);
-            // 
+            //
             // label13
-            // 
+            //
             this.label13.AutoSize = true;
             this.label13.Location = new System.Drawing.Point(5, 301);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(89, 12);
             this.label13.TabIndex = 31;
             this.label13.Text = "Min Start Size";
-            // 
+            //
             // trackBarMinStartSize
-            // 
+            //
             this.trackBarMinStartSize.Location = new System.Drawing.Point(190, 301);
             this.trackBarMinStartSize.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.trackBarMinStartSize.Maximum = 100;
@@ -377,18 +377,18 @@ namespace Isles.Editor
             this.trackBarMinStartSize.TabIndex = 30;
             this.trackBarMinStartSize.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trackBarMinStartSize.Scroll += new System.EventHandler(this.trackBarMinStartSize_Scroll);
-            // 
+            //
             // label14
-            // 
+            //
             this.label14.AutoSize = true;
             this.label14.Location = new System.Drawing.Point(5, 280);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(89, 12);
             this.label14.TabIndex = 29;
             this.label14.Text = "Max Start Size";
-            // 
+            //
             // trackBarMaxStartSize
-            // 
+            //
             this.trackBarMaxStartSize.Location = new System.Drawing.Point(190, 280);
             this.trackBarMaxStartSize.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.trackBarMaxStartSize.Maximum = 100;
@@ -397,18 +397,18 @@ namespace Isles.Editor
             this.trackBarMaxStartSize.TabIndex = 28;
             this.trackBarMaxStartSize.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trackBarMaxStartSize.Scroll += new System.EventHandler(this.trackBarMaxStartSize_Scroll);
-            // 
+            //
             // label11
-            // 
+            //
             this.label11.AutoSize = true;
             this.label11.Location = new System.Drawing.Point(5, 257);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(101, 12);
             this.label11.TabIndex = 27;
             this.label11.Text = "Min Rotate Speed";
-            // 
+            //
             // trackBarMinRotationSpeed
-            // 
+            //
             this.trackBarMinRotationSpeed.Location = new System.Drawing.Point(190, 257);
             this.trackBarMinRotationSpeed.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.trackBarMinRotationSpeed.Maximum = 400;
@@ -418,18 +418,18 @@ namespace Isles.Editor
             this.trackBarMinRotationSpeed.TabIndex = 26;
             this.trackBarMinRotationSpeed.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trackBarMinRotationSpeed.Scroll += new System.EventHandler(this.trackBarMinRotationSpeed_Scroll);
-            // 
+            //
             // label12
-            // 
+            //
             this.label12.AutoSize = true;
             this.label12.Location = new System.Drawing.Point(5, 235);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(101, 12);
             this.label12.TabIndex = 25;
             this.label12.Text = "Max Rotate Speed";
-            // 
+            //
             // trackBarMaxRotationSpeed
-            // 
+            //
             this.trackBarMaxRotationSpeed.Location = new System.Drawing.Point(190, 235);
             this.trackBarMaxRotationSpeed.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.trackBarMaxRotationSpeed.Maximum = 400;
@@ -439,18 +439,18 @@ namespace Isles.Editor
             this.trackBarMaxRotationSpeed.TabIndex = 24;
             this.trackBarMaxRotationSpeed.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trackBarMaxRotationSpeed.Scroll += new System.EventHandler(this.trackBarMaxRotationSpeed_Scroll);
-            // 
+            //
             // label9
-            // 
+            //
             this.label9.AutoSize = true;
             this.label9.Location = new System.Drawing.Point(5, 193);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(77, 12);
             this.label9.TabIndex = 23;
             this.label9.Text = "End Velocity";
-            // 
+            //
             // trackBarGravity
-            // 
+            //
             this.trackBarGravity.Location = new System.Drawing.Point(190, 212);
             this.trackBarGravity.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.trackBarGravity.Maximum = 100;
@@ -460,18 +460,18 @@ namespace Isles.Editor
             this.trackBarGravity.TabIndex = 22;
             this.trackBarGravity.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trackBarGravity.Scroll += new System.EventHandler(this.trackBarGravity_Scroll);
-            // 
+            //
             // label10
-            // 
+            //
             this.label10.AutoSize = true;
             this.label10.Location = new System.Drawing.Point(5, 213);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(47, 12);
             this.label10.TabIndex = 21;
             this.label10.Text = "Gravity";
-            // 
+            //
             // trackBarEndVelocity
-            // 
+            //
             this.trackBarEndVelocity.Location = new System.Drawing.Point(190, 190);
             this.trackBarEndVelocity.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.trackBarEndVelocity.Maximum = 100;
@@ -480,18 +480,18 @@ namespace Isles.Editor
             this.trackBarEndVelocity.TabIndex = 20;
             this.trackBarEndVelocity.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trackBarEndVelocity.Scroll += new System.EventHandler(this.trackBarEndVelocity_Scroll);
-            // 
+            //
             // label8
-            // 
+            //
             this.label8.AutoSize = true;
             this.label8.Location = new System.Drawing.Point(5, 169);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(131, 12);
             this.label8.TabIndex = 19;
             this.label8.Text = "Min Vertical Velocity";
-            // 
+            //
             // trackBarMinVVelocity
-            // 
+            //
             this.trackBarMinVVelocity.Location = new System.Drawing.Point(190, 168);
             this.trackBarMinVVelocity.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.trackBarMinVVelocity.Maximum = 100;
@@ -501,18 +501,18 @@ namespace Isles.Editor
             this.trackBarMinVVelocity.TabIndex = 18;
             this.trackBarMinVVelocity.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trackBarMinVVelocity.Scroll += new System.EventHandler(this.trackBarMinVVelocity_Scroll);
-            // 
+            //
             // label7
-            // 
+            //
             this.label7.AutoSize = true;
             this.label7.Location = new System.Drawing.Point(5, 147);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(131, 12);
             this.label7.TabIndex = 17;
             this.label7.Text = "Max Vertical Velocity";
-            // 
+            //
             // trackBarMaxVVelocity
-            // 
+            //
             this.trackBarMaxVVelocity.Location = new System.Drawing.Point(190, 145);
             this.trackBarMaxVVelocity.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.trackBarMaxVVelocity.Maximum = 100;
@@ -522,18 +522,18 @@ namespace Isles.Editor
             this.trackBarMaxVVelocity.TabIndex = 16;
             this.trackBarMaxVVelocity.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trackBarMaxVVelocity.Scroll += new System.EventHandler(this.trackBarMaxVVelocity_Scroll);
-            // 
+            //
             // label6
-            // 
+            //
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(5, 127);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(143, 12);
             this.label6.TabIndex = 15;
             this.label6.Text = "Min Horizontal Velocity";
-            // 
+            //
             // trackBarMinHVelocity
-            // 
+            //
             this.trackBarMinHVelocity.Location = new System.Drawing.Point(190, 121);
             this.trackBarMinHVelocity.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.trackBarMinHVelocity.Maximum = 100;
@@ -542,18 +542,18 @@ namespace Isles.Editor
             this.trackBarMinHVelocity.TabIndex = 14;
             this.trackBarMinHVelocity.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trackBarMinHVelocity.Scroll += new System.EventHandler(this.trackBarMinHVelocity_Scroll);
-            // 
+            //
             // label5
-            // 
+            //
             this.label5.AutoSize = true;
             this.label5.Location = new System.Drawing.Point(5, 100);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(143, 12);
             this.label5.TabIndex = 13;
             this.label5.Text = "Max Horizontal Velocity";
-            // 
+            //
             // trackBarMaxHVelocity
-            // 
+            //
             this.trackBarMaxHVelocity.Location = new System.Drawing.Point(190, 97);
             this.trackBarMaxHVelocity.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.trackBarMaxHVelocity.Maximum = 100;
@@ -562,9 +562,9 @@ namespace Isles.Editor
             this.trackBarMaxHVelocity.TabIndex = 12;
             this.trackBarMaxHVelocity.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trackBarMaxHVelocity.Scroll += new System.EventHandler(this.trackBarMaxHVelocity_Scroll);
-            // 
+            //
             // trackBarSensitivity
-            // 
+            //
             this.trackBarSensitivity.Location = new System.Drawing.Point(190, 74);
             this.trackBarSensitivity.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.trackBarSensitivity.Maximum = 100;
@@ -573,9 +573,9 @@ namespace Isles.Editor
             this.trackBarSensitivity.TabIndex = 11;
             this.trackBarSensitivity.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trackBarSensitivity.Scroll += new System.EventHandler(this.trackBarSensitivity_Scroll);
-            // 
+            //
             // trackBarDurationRandomness
-            // 
+            //
             this.trackBarDurationRandomness.Location = new System.Drawing.Point(190, 45);
             this.trackBarDurationRandomness.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.trackBarDurationRandomness.Maximum = 100;
@@ -584,9 +584,9 @@ namespace Isles.Editor
             this.trackBarDurationRandomness.TabIndex = 10;
             this.trackBarDurationRandomness.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trackBarDurationRandomness.Scroll += new System.EventHandler(this.trackBarDurationRandomness_Scroll);
-            // 
+            //
             // trackBarDuration
-            // 
+            //
             this.trackBarDuration.Location = new System.Drawing.Point(190, 21);
             this.trackBarDuration.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.trackBarDuration.Maximum = 100;
@@ -595,89 +595,89 @@ namespace Isles.Editor
             this.trackBarDuration.TabIndex = 9;
             this.trackBarDuration.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trackBarDuration.Scroll += new System.EventHandler(this.trackBarDuration_Scroll);
-            // 
+            //
             // label4
-            // 
+            //
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(5, 76);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(173, 12);
             this.label4.TabIndex = 8;
             this.label4.Text = "Emitter Velocity Sensitivity";
-            // 
+            //
             // label3
-            // 
+            //
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(5, 46);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(173, 12);
             this.label3.TabIndex = 6;
             this.label3.Text = "Particle Duration Randomness";
-            // 
+            //
             // label2
-            // 
+            //
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(5, 21);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(107, 12);
             this.label2.TabIndex = 4;
             this.label2.Text = "Particle Duration";
-            // 
+            //
             // labelTexture
-            // 
+            //
             this.labelTexture.AutoSize = true;
             this.labelTexture.Location = new System.Drawing.Point(435, 21);
             this.labelTexture.Name = "labelTexture";
             this.labelTexture.Size = new System.Drawing.Size(47, 12);
             this.labelTexture.TabIndex = 0;
             this.labelTexture.Text = "Texture";
-            // 
+            //
             // openFileDialog
-            // 
+            //
             this.openFileDialog.FileName = "openFileDialog1";
-            // 
+            //
             // saveFileDialog
-            // 
+            //
             this.saveFileDialog.Filter = "Xml File|*.xml";
-            // 
+            //
             // cmbParticle
-            // 
+            //
             this.cmbParticle.FormattingEnabled = true;
             this.cmbParticle.Location = new System.Drawing.Point(65, 5);
             this.cmbParticle.Name = "cmbParticle";
             this.cmbParticle.Size = new System.Drawing.Size(121, 20);
             this.cmbParticle.TabIndex = 1;
             this.cmbParticle.SelectedIndexChanged += new System.EventHandler(this.cmbParticle_SelectedIndexChanged);
-            // 
+            //
             // label1
-            // 
+            //
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(11, 8);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(53, 12);
             this.label1.TabIndex = 2;
             this.label1.Text = "Particle";
-            // 
+            //
             // label22
-            // 
+            //
             this.label22.AutoSize = true;
             this.label22.Location = new System.Drawing.Point(196, 8);
             this.label22.Name = "label22";
             this.label22.Size = new System.Drawing.Size(47, 12);
             this.label22.TabIndex = 3;
             this.label22.Text = "Emitter";
-            // 
+            //
             // cmbEmitter
-            // 
+            //
             this.cmbEmitter.FormattingEnabled = true;
             this.cmbEmitter.Location = new System.Drawing.Point(249, 5);
             this.cmbEmitter.Name = "cmbEmitter";
             this.cmbEmitter.Size = new System.Drawing.Size(125, 20);
             this.cmbEmitter.TabIndex = 4;
             this.cmbEmitter.SelectedIndexChanged += new System.EventHandler(this.cmbEmitter_SelectedIndexChanged);
-            // 
+            //
             // ParticleEditor
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(646, 433);
@@ -712,7 +712,7 @@ namespace Isles.Editor
 
         }
 
-        #endregion
+
 
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label labelTexture;

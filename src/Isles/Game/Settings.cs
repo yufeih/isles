@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -16,7 +16,7 @@ namespace Isles.Engine
     [Serializable()]
     public class Settings
     {
-        #region General Settings
+
         /// <summary>
         /// Directory for game assets
         /// </summary>
@@ -43,9 +43,6 @@ namespace Isles.Engine
         public bool Cheat;
         public double GameSpeed = 1;
         public GameCameraSettings CameraSettings;
-        #endregion
-
-        #region Graphics Settings
 
         public int ScreenWidth = 960;
         public int ScreenHeight = 600;
@@ -82,9 +79,6 @@ namespace Isles.Engine
 
         }
 
-        #endregion
-
-        #region Method
         /// <summary>
         /// Create default game settings
         /// </summary>
@@ -104,6 +98,6 @@ namespace Isles.Engine
         {
             new XmlSerializer(typeof(Settings)).Serialize(stream, this);
         }
-        #endregion
+
     }
 }

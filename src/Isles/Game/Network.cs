@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -12,14 +12,13 @@ using Isles.Engine;
 
 namespace Isles
 {
-    #region GameServer
+
     public class GameServer
     {
-        #region Singleton
+
         public static GameServer Singleton => singleton;
 
         private static GameServer singleton;
-        #endregion
 
         private readonly Dictionary<ushort, IGameObject> idToObject = new();
         private readonly Dictionary<IGameObject, ushort> objectToID = new();
@@ -249,11 +248,11 @@ namespace Isles
                     // Serialize into our memory stream
                     pair.Value.Serialize(stream);
 
-                    // Dispatch the serialized data                    
+                    // Dispatch the serialized data
                     Dispatch(pair.Key, stream.GetBuffer(), 0, (int)stream.Position);
                 }
             }
         }
     }
-    #endregion
+
 }

@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -12,7 +12,7 @@ namespace Isles.Graphics
 {
     public class TiledLandscape : Landscape
     {
-        #region Field
+
         /// <summary>
         /// The effect used to draw the terrain
         /// </summary>
@@ -37,9 +37,7 @@ namespace Isles.Graphics
         /// Stuff for drawing primitives
         /// </summary>
         private int vertexCount, primitiveCount;
-        #endregion
 
-        #region Initialization
         public override void Initialize(BaseGame game)
         {
             base.Initialize(game);
@@ -136,9 +134,7 @@ namespace Isles.Graphics
                 }
             }
         }
-        #endregion
 
-        #region Draw
         public override void DrawTerrain(Matrix view, Matrix projection, bool upper)
         {
             EffectTechnique technique = upper ?
@@ -246,9 +242,7 @@ namespace Isles.Graphics
             }
             terrainEffect.End();
         }
-        #endregion
 
-        #region TerrainVertex
         public struct TerrainVertex
         {
             /// <summary>
@@ -306,6 +300,6 @@ namespace Isles.Graphics
                 }
             }
         }
-        #endregion
+
     }
 }

@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -15,10 +15,10 @@ using Isles.Engine;
 
 namespace Isles
 {
-    #region GameRecorder
+
     public class GameRecorder
     {
-        #region Keyframe
+
         public struct Keyframe
         {
             public float Time;
@@ -27,7 +27,6 @@ namespace Isles
 
             public static readonly int SizeInBytes = Marshal.SizeOf(typeof(Keyframe));
         }
-        #endregion
 
         /// <summary>
         /// Constants
@@ -131,19 +130,16 @@ namespace Isles
             }
         }
     }
-    #endregion
 
-    #region GameReplay
     public class GameReplay
     {
-        #region Keyframe
+
         public struct Keyframe
         {
             public float Time;
             public ushort ID;
             public byte[] Bytes;
         }
-        #endregion
 
         private int currentFrame;
         private readonly BaseGame game;
@@ -330,5 +326,5 @@ namespace Isles
             }
         }
     }
-    #endregion
+
 }

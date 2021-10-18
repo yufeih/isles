@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -20,7 +20,7 @@ namespace Isles.Engine
     /// </summary>
     public class GameWorld : ISceneManager
     {
-        #region Field
+
         /// <summary>
         /// Version of the game world
         /// </summary>
@@ -80,9 +80,7 @@ namespace Isles.Engine
 
         public string Name;
         public string Description;
-        #endregion
 
-        #region Methods
         public GameWorld()
         {
             Content = Game.ZipContent;
@@ -263,9 +261,9 @@ namespace Isles.Engine
         {
             // This is a little tricky, I never want to look into it again...
             //
-            // These values are found out through experiments, 
+            // These values are found out through experiments,
             // they might be the most suitable values for our scene.
-            // 
+            //
             // { Distance, Near, Far }
             // { 245.0f, 50, 500 }
             // { 734.0f, 300, 1022 }
@@ -516,7 +514,7 @@ namespace Isles.Engine
         /// This dictionary holds all the info to create a world object of a given type.
         /// For a given type of object, the create funtion calls its corresponding Creator,
         /// which is responsible for performing the actual creation stuff.
-        /// 
+        ///
         /// I haven't figure out a better way to do this.
         /// If you know how, let me know it ASAP :)
         /// </summary>
@@ -615,9 +613,7 @@ namespace Isles.Engine
 
             return worldObject;
         }
-        #endregion
 
-        #region Pick
         /// <summary>
         /// Entity picked this frame
         /// </summary>
@@ -740,9 +736,7 @@ namespace Isles.Engine
 
             return null;
         }
-        #endregion
 
-        #region ISceneManager Members
         private int ObjectCounter;
 
         /// <summary>
@@ -1008,10 +1002,6 @@ namespace Isles.Engine
             return nameToWorldObject.TryGetValue(name, out IWorldObject o) ? o : null;
         }
 
-        #endregion
-
-        #region Grid
-
         /// <summary>
         /// The data to hold on each grid
         /// </summary>
@@ -1153,12 +1143,9 @@ namespace Isles.Engine
                 }
             }
         }
-        #endregion
-
-        #region GridEnumerator
 
         /// <summary>
-        /// Enumerate all the grid points that falls inside a 
+        /// Enumerate all the grid points that falls inside a
         /// rectangle on the XY plane.
         /// </summary>
         private class GridEnumerator : IEnumerable<Point>
@@ -1220,7 +1207,7 @@ namespace Isles.Engine
                 this.landscape = landscape;
 
                 // This is not an fast algorithm, but at least it works :)
-                // 
+                //
                 // 1. Project the rectangle to XY plane and get its
                 //    Axis Aligned Bouding Box.
                 //
@@ -1336,6 +1323,5 @@ namespace Isles.Engine
             }
         }
 
-        #endregion
     }
 }

@@ -1,14 +1,12 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
-#region Using directives
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-#endregion
 
 namespace Isles.Engine
 {
@@ -63,7 +61,7 @@ namespace Isles.Engine
     /// Interface for any event receiver.
     /// Finally I decided to use the interface style event handling
     /// system instead of the native c# event. Because using c# event,
-    /// you can't specify the order of listeners, nor are you able to 
+    /// you can't specify the order of listeners, nor are you able to
     /// Capture/Uncapture mouse event (Useful to garuentee a MouseUp
     /// event after MouseDown occurs).
     /// </summary>

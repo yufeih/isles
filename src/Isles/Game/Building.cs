@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -15,13 +15,13 @@ using Isles.Engine;
 
 namespace Isles
 {
-    #region Building
+
     /// <summary>
     /// Respresents a building in the game
     /// </summary>
     public class Building : GameObject, IPlaceable
     {
-        #region Building State & Flag
+
         /// <summary>
         /// State of the building
         /// </summary>
@@ -33,9 +33,7 @@ namespace Isles
             Constructing,
             Destroyed,
         }
-        #endregion
 
-        #region Fields
         /// <summary>
         /// Gets the building state
         /// </summary>
@@ -148,9 +146,7 @@ namespace Isles
         /// </summary>
         private EffectHalo halo;
         private string haloParticle;
-        #endregion
 
-        #region Methods
         /// <summary>
         /// Create a new building
         /// </summary>
@@ -505,9 +501,7 @@ namespace Isles
                 Audios.Play("Rally");
             }
         }
-        #endregion
 
-        #region Update & Draw
         protected override void DrawStatus()
         {
             if (state == BuildingState.Constructing)
@@ -755,9 +749,6 @@ namespace Isles
 
         }
 
-        #endregion
-
-        #region IPlaceable Members
         public bool BeginPlace()
         {
             if (Owner != null)
@@ -939,12 +930,9 @@ namespace Isles
             Owner.Gold += Gold;
             Owner.Lumber += Lumber;
         }
-        #endregion
+
     }
 
-    #endregion
-
-    #region Tower
     public class Tower : Building
     {
         private readonly SpellCombat combat;
@@ -1022,9 +1010,7 @@ namespace Isles
             }
         }
     }
-    #endregion
 
-    #region Lumbermill
     public class Lumbermill : Building
     {
         public Lumbermill(GameWorld world, string classID)
@@ -1091,5 +1077,5 @@ namespace Isles
 
         private List<Tree> affectedTrees;
     }
-    #endregion
+
 }

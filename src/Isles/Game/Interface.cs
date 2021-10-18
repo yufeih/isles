@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -12,7 +12,7 @@ using Isles.Graphics;
 
 namespace Isles.Engine
 {
-    #region IScreen
+
     /// <summary>
     /// Represents a game screen
     /// </summary>
@@ -57,9 +57,7 @@ namespace Isles.Engine
         /// <param name="unloadAllContent">Which type of content to unload.</param>
         void UnloadContent();
     }
-    #endregion
 
-    #region IWorldObject
     /// <summary>
     /// Interface for a class of object that can be load from a file
     /// and drawed on the scene.
@@ -145,9 +143,7 @@ namespace Isles.Engine
         /// <param name="reader"></param>
         void Deserialize(XmlElement xml);
     }
-    #endregion
 
-    #region ISceneManager
     /// <summary>
     /// Interface to manage IWorldObject instances
     /// </summary>
@@ -230,9 +226,7 @@ namespace Isles.Engine
         /// </summary>
         IWorldObject ObjectFromName(string name);
     }
-    #endregion
 
-    #region ILandscape
     /// <summary>
     /// Interface for a landscape.
     /// The landscape lays on the XY plane, Z value is used to represent the height.
@@ -273,5 +267,5 @@ namespace Isles.Engine
         /// <returns></returns>
         Vector3? Intersects(Ray ray);
     }
-    #endregion
+
 }

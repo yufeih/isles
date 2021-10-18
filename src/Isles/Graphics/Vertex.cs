@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -10,7 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Graphics
 {
-    #region VertexTangent
+
     /// <summary>
     /// Tangent vertex format for shader vertex format used all over the place.
     /// It contains: Position, Normal vector, texture coords, tangent vector.
@@ -19,7 +19,6 @@ namespace Isles.Graphics
     {
         // Grabbed from racing game :)
 
-        #region Variables
         /// <summary>
         /// Position
         /// </summary>
@@ -53,9 +52,7 @@ namespace Isles.Graphics
         /// </summary>
         /// <returns>Float</returns>
         public float V => TextureCoordinate.Y;
-        #endregion
 
-        #region Constructor
         /// <summary>
         /// Create tangent vertex
         /// </summary>
@@ -94,9 +91,7 @@ namespace Isles.Graphics
             Normal = setNormal;
             Tangent = setTangent;
         }
-        #endregion
 
-        #region Generate vertex declaration
         /// <summary>
         /// Vertex elements for Mesh.Clone
         /// </summary>
@@ -125,9 +120,7 @@ namespace Isles.Graphics
                 };
             return decl;
         }
-        #endregion
 
-        #region Is declaration tangent vertex declaration
         /// <summary>
         /// Returns true if declaration is tangent vertex declaration.
         /// </summary>
@@ -143,18 +136,16 @@ namespace Isles.Graphics
                 declaration[2].VertexElementUsage == VertexElementUsage.Normal &&
                 declaration[3].VertexElementUsage == VertexElementUsage.Tangent;
         }
-        #endregion
-    }
-    #endregion
 
-    #region VertexPositionNormalDuoTexture
+    }
+
     /// <summary>
     /// Vertex format for shader vertex format used all over the place.
     /// It contains: Position, Normal vector, 2 texture coords
     /// </summary>
     public struct VertexPositionNormalDuoTexture
     {
-        #region Variables
+
         /// <summary>
         /// Position
         /// </summary>
@@ -176,9 +167,7 @@ namespace Isles.Graphics
         /// Stride size, in XNA called SizeInBytes. I'm just conforming with that.
         /// </summary>
         public static int SizeInBytes => 4 * (3 + 4 + 3);
-        #endregion
 
-        #region Constructor
         /// <summary>
         /// Create tangent vertex
         /// </summary>
@@ -197,9 +186,7 @@ namespace Isles.Graphics
             TextureCoordinate1 = uv1;
             Normal = normal;
         }
-        #endregion
 
-        #region Generate vertex declaration
         /// <summary>
         /// Vertex elements for Mesh.Clone
         /// </summary>
@@ -228,7 +215,7 @@ namespace Isles.Graphics
                 };
             return decl;
         }
-        #endregion
+
     }
-    #endregion
+
 }

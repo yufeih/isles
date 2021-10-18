@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -12,7 +12,7 @@ using Isles.Engine;
 
 namespace Isles.Graphics
 {
-    #region Material
+
     /// <summary>
     /// Material for every game model.
     /// </summary>
@@ -141,11 +141,11 @@ namespace Isles.Graphics
 
         /// <summary>
         /// Trick: Enable AlphaTest for trees
-        /// 
+        ///
         /// Opaque:
         /// Default -   Tint
         /// Tree    -   AlphaTestEnabled
-        /// 
+        ///
         /// Transparent:
         /// Default Transparent
         /// Tree Transparent
@@ -212,12 +212,10 @@ namespace Isles.Graphics
             return ModelManager.ModelEffect == null ? throw new InvalidOperationException() : ModelManager.ModelEffect.Techniques[techniqueName];
         }
     }
-    #endregion
 
-    #region ModelManager
     /// <summary>
     /// Class for managing model rendering
-    /// 
+    ///
     /// Transparency -> Technique -> Texture -> Color & Transform
     /// </summary>
     public class ModelManager
@@ -755,5 +753,5 @@ namespace Isles.Graphics
             game.GraphicsDevice.RenderState.AlphaBlendEnable = false;
         }
     }
-    #endregion
+
 }

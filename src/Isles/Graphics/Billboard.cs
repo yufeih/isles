@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -12,7 +12,7 @@ using Isles.Engine;
 
 namespace Isles.Graphics
 {
-    #region Billboard
+
     /// <summary>
     /// Type of a billboard
     /// </summary>
@@ -149,9 +149,7 @@ namespace Isles.Graphics
             BaseGame.Singleton.Billboard.Draw(this);
         }
     }
-    #endregion
 
-    #region BillboardManager
     /// <summary>
     /// Manager class for billboard
     /// </summary>
@@ -174,7 +172,6 @@ namespace Isles.Graphics
         /// </summary>
         public const int ChunkSize = 1024;
 
-        #region Fields
         /// <summary>
         /// Billboard effect
         /// </summary>
@@ -217,9 +214,7 @@ namespace Isles.Graphics
         /// Graphics device
         /// </summary>
         private readonly BaseGame game;
-        #endregion
 
-        #region Methods
         /// <summary>
         /// Create a billboard manager
         /// </summary>
@@ -242,7 +237,6 @@ namespace Isles.Graphics
                 typeof(short), ChunkSize * 6, BufferUsage.WriteOnly);
         }
 
-        #region Draw
         /// <summary>
         /// Draw a billboard
         /// </summary>
@@ -312,7 +306,7 @@ namespace Isles.Graphics
             effect.CurrentTechnique = effect.Techniques[0];
 
             // It's not fast to sort all billboards using texture and distance,
-            // we just check if texture is changed. So always draw a bounch of 
+            // we just check if texture is changed. So always draw a bounch of
             // billboards using the same texture.
             //
             // Divide all billboards into small chunks. A chunk ends when the chunk
@@ -487,11 +481,6 @@ namespace Isles.Graphics
             baseVertex += 4;
             baseIndex += 6;
         }
-        #endregion
-
-        #endregion
-
-        #region Dispose
 
         /// <summary>
         /// Dispose
@@ -527,7 +516,6 @@ namespace Isles.Graphics
             }
         }
 
-        #endregion
     }
-    #endregion
+
 }

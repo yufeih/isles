@@ -35,7 +35,7 @@ using Microsoft.Xna.Framework.Audio;
 
 namespace Isles.Engine
 {
-    #region ZipContentManager
+
     /// <summary>
     /// A content manager used to read files stored inside of a .zip file.
     /// </summary>
@@ -440,9 +440,7 @@ namespace Isles.Engine
             return cursor;
         }
     }
-    #endregion
 
-    #region ZipEntry
     public class ZipEntry
     {
 
@@ -454,8 +452,8 @@ namespace Isles.Engine
         private DateTime _LastModified;
         public DateTime LastModified => _LastModified;
 
-        // when this is set, we trim the volume (eg C:\) off any fully-qualified pathname, 
-        // before writing the ZipEntry into the ZipFile. 
+        // when this is set, we trim the volume (eg C:\) off any fully-qualified pathname,
+        // before writing the ZipEntry into the ZipFile.
         private bool _TrimVolumeFromFullyQualifiedPaths = true;  // by default, trim them.
         public bool TrimVolumeFromFullyQualifiedPaths
         {
@@ -552,8 +550,8 @@ namespace Isles.Engine
             ze._LastModDateTime = block[i++] + block[i++] * 256 + block[i++] * 256 * 256 + block[i++] * 256 * 256 * 256;
 
             // the PKZIP spec says that if bit 3 is set (0x0008), then the CRC, Compressed size, and uncompressed size
-            // come directly after the file data.  The only way to find it is to scan the zip archive for the signature of 
-            // the Data Descriptor, and presume that that signature does not appear in the (compressed) data of the compressed file.  
+            // come directly after the file data.  The only way to find it is to scan the zip archive for the signature of
+            // the Data Descriptor, and presume that that signature does not appear in the (compressed) data of the compressed file.
 
             if ((ze._BitField & 0x0008) != 0x0008)
             {
@@ -659,8 +657,8 @@ namespace Isles.Engine
 
                 _LastModified = System.IO.File.GetLastWriteTime(filename)
             };
-            // adjust the time if the .NET BCL thinks it is in DST.  
-            // see the note elsewhere in this file for more info. 
+            // adjust the time if the .NET BCL thinks it is in DST.
+            // see the note elsewhere in this file for more info.
             if (entry._LastModified.IsDaylightSavingTime())
             {
                 DateTime AdjustedTime = entry._LastModified - new TimeSpan(1, 0, 0);
@@ -701,7 +699,7 @@ namespace Isles.Engine
                 memstream, System.IO.Compression.CompressionMode.Decompress);
         }
 
-        // pass in either basedir or s, but not both. 
+        // pass in either basedir or s, but not both.
         // In other words, you can extract to a stream or to a directory, but not both!
         private void Extract(string basedir, Stream s)
         {
@@ -822,7 +820,7 @@ namespace Isles.Engine
                     }
                     finally
                     {
-                        // we only close the output stream if we opened it. 
+                        // we only close the output stream if we opened it.
                         if ((output != null) && (TargetFile != null))
                         {
                             output.Close();
@@ -835,8 +833,8 @@ namespace Isles.Engine
                         // We may have to adjust the last modified time to compensate
                         // for differences in how the .NET Base Class Library deals
                         // with daylight saving time (DST) versus how the Windows
-                        // filesystem deals with daylight saving time. See 
-                        // http://blogs.msdn.com/oldnewthing/archive/2003/10/24/55413.aspx for some context. 
+                        // filesystem deals with daylight saving time. See
+                        // http://blogs.msdn.com/oldnewthing/archive/2003/10/24/55413.aspx for some context.
 
                         // in a nutshell: Daylight savings time rules change regularly.  In
                         // 2007, for example, the inception week of DST changed.  In 1977,
@@ -892,7 +890,7 @@ namespace Isles.Engine
                 }
                 finally
                 {
-                    // we only close the output stream if we opened it. 
+                    // we only close the output stream if we opened it.
                     // we cannot use using() here because in some cases we do not want to Dispose the stream!
                     if ((input != null) && (input != memstream))
                     {
@@ -937,12 +935,12 @@ namespace Isles.Engine
             bytes[i++] = 0;
 
             // internal file attrs
-            // TODO: figure out what is required here. 
+            // TODO: figure out what is required here.
             bytes[i++] = 1;
             bytes[i++] = 0;
 
             // external file attrs
-            // TODO: figure out what is required here. 
+            // TODO: figure out what is required here.
             bytes[i++] = 0x20;
             bytes[i++] = 0;
             bytes[i++] = 0xb6;
@@ -958,7 +956,7 @@ namespace Isles.Engine
             {
                 System.Console.WriteLine("\ninserting filename into CDS: (length= {0})", Header.Length - 30);
             }
-            // actual filename (starts at offset 34 in header) 
+            // actual filename (starts at offset 34 in header)
             for (j = 0; j < Header.Length - 30; j++)
             {
                 bytes[i + j] = Header[30 + j];
@@ -1135,7 +1133,7 @@ namespace Isles.Engine
             // write the header:
             WriteHeader(s, bytes);
 
-            // write the actual file data: 
+            // write the actual file data:
             _UnderlyingMemoryStream.Position = 0;
 
             if (_Debug)
@@ -1175,9 +1173,7 @@ namespace Isles.Engine
             _UnderlyingMemoryStream = null;
         }
     }
-    #endregion
 
-    #region ZipDirEntry
     public class ZipDirEntry
     {
 
@@ -1285,18 +1281,16 @@ namespace Isles.Engine
             return (signature != ZipDirEntrySignature);
         }
     }
-    #endregion
 
-    #region ZipFile
     public class ZipFile : IEnumerable<ZipEntry>,
       IDisposable
     {
         private string _name;
         public string Name => _name;
 
-        // when this is set, we trim the volume (eg C:) off any fully-qualified pathname, 
-        // before writing the ZipEntry into the ZipFile. 
-        // We default this to true.  This allows Windows Explorer to read the zip archives properly. 
+        // when this is set, we trim the volume (eg C:) off any fully-qualified pathname,
+        // before writing the ZipEntry into the ZipFile.
+        // We default this to true.  This allows Windows Explorer to read the zip archives properly.
         private bool _TrimVolumeFromFullyQualifiedPaths = true;
         public bool TrimVolumeFromFullyQualifiedPaths
         {
@@ -1329,8 +1323,6 @@ namespace Isles.Engine
         }
 
         private ZipFile() { }
-
-        #region For Writing Zip Files
 
         public ZipFile(string NewZipFileName)
         {
@@ -1457,7 +1449,7 @@ namespace Isles.Engine
             bytes[i++] = (byte)((SizeOfCentralDirectory & 0x00FF0000) >> 16);
             bytes[i++] = (byte)((SizeOfCentralDirectory & 0xFF000000) >> 24);
 
-            // offset of the start of the central directory 
+            // offset of the start of the central directory
             var StartOffset = (int)StartOfCentralDirectory;  // cast down from Long
             bytes[i++] = (byte)(StartOffset & 0x000000FF);
             bytes[i++] = (byte)((StartOffset & 0x0000FF00) >> 8);
@@ -1471,12 +1463,8 @@ namespace Isles.Engine
             WriteStream.Write(bytes, 0, i);
         }
 
-        #endregion
-
-        #region For Reading Zip Files
-
         /// <summary>
-        /// This will throw if the zipfile does not exist. 
+        /// This will throw if the zipfile does not exist.
         /// </summary>
         public static ZipFile Read(string zipfilename)
         {
@@ -1484,7 +1472,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// This will throw if the zipfile does not exist. 
+        /// This will throw if the zipfile does not exist.
         /// </summary>
         public static ZipFile Read(string zipfilename, bool TurnOnDebug)
         {
@@ -1592,8 +1580,6 @@ namespace Isles.Engine
             }
         }
 
-        #endregion
-
         // the destructor
         ~ZipFile()
         {
@@ -1642,9 +1628,7 @@ namespace Isles.Engine
         private List<ZipEntry> _entries;
         private List<ZipDirEntry> _direntries;
     }
-    #endregion
 
-    #region CRC32
     /// <summary>
     /// Calculates a 32bit Cyclic Redundancy Checksum (CRC) using the
     /// same polynomial used by Zip.
@@ -1745,9 +1729,7 @@ namespace Isles.Engine
             }
         }
     }
-    #endregion
 
-    #region Shared
     internal class Shared
     {
         protected internal static string StringFromBuffer(byte[] buf, int start, int maxlength)
@@ -1828,7 +1810,7 @@ namespace Isles.Engine
 
             // subtract 4 for the signature.
             var bytesRead = (s.Position - startingPosition) - 4;
-            // number of bytes read, should be the same as compressed size of file            
+            // number of bytes read, should be the same as compressed size of file
             return bytesRead;
         }
         protected internal static DateTime PackedToDateTime(int packedDateTime)
@@ -1867,5 +1849,5 @@ namespace Isles.Engine
             return (int)(((uint)(packedDate << 16)) | packedTime);
         }
     }
-    #endregion
+
 }

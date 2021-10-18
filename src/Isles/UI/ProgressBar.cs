@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -12,10 +12,8 @@ namespace Isles.UI
 {
     public class ProgressBar : UIElement
     {
-        #region Fields
 
         //About time control
-
 
         public bool HighLightOn = true;
 
@@ -109,8 +107,6 @@ namespace Isles.UI
             }
         }
 
-        #endregion
-
         /// <summary>
         /// Set the progress
         /// </summary>
@@ -141,15 +137,15 @@ namespace Isles.UI
             }
             /*
             // Draw the rolling highlight
-            int highLightFront = (int)((gameTime.TotalGameTime.TotalSeconds - StartingTime) 
+            int highLightFront = (int)((gameTime.TotalGameTime.TotalSeconds - StartingTime)
                                 % HightLightCycle * HighLightRollingSpeed);
 
             if ( FillingRectangle.Width > HighLightLength)
             {
                 if ( highLightFront - HighLightLength > FillingRectangle.Right)
                 {
-                    // Hight is not in the drawing region 
-                    // So, do nothing 
+                    // Hight is not in the drawing region
+                    // So, do nothing
                 }
                 else if(highLightFront > FillingRectangle.Right)
                 {

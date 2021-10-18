@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -12,7 +12,7 @@ using Isles.UI;
 
 namespace Isles
 {
-    #region TipBox
+
     public class TipBox : Panel
     {
         private static readonly Texture2D white = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/Panels");
@@ -156,5 +156,5 @@ namespace Isles
             }
         }
     }
-    #endregion
+
 }

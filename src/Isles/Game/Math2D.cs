@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -9,15 +9,15 @@ using Microsoft.Xna.Framework;
 
 namespace Isles.Engine
 {
-    #region Math2D
+
     /// <summary>
     /// Helper class for 2D math and geometries
-    /// 
+    ///
     /// Thanks for the code from Mat Buckland (fup@ai-junkie.com)
     /// </summary>
     public static class Math2D
     {
-        #region 2D Geometry
+
         /// <summary>
         /// Default epsilion used all over Math2D
         /// </summary>
@@ -80,7 +80,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// given a plane and a ray this function determins how far along the ray 
+        /// given a plane and a ray this function determins how far along the ray
         /// an interestion occurs. Returns null if the ray is parallel
         /// </summary>
         public static float? RayPlaneIntersects(
@@ -151,7 +151,7 @@ namespace Isles.Engine
 
         /// <summary>
         /// Given a point P and a circle of radius R centered at C this function
-        /// determines the two points on the circle that intersect with the 
+        /// determines the two points on the circle that intersect with the
         /// tangents from P to the circle. Returns false if P is within the circle.
         /// thanks to Dave Eberly for this one.
         /// </summary>
@@ -307,7 +307,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Given 2 lines in 2D space AB, CD this returns true if an 
+        /// Given 2 lines in 2D space AB, CD this returns true if an
         /// intersection occurs.
         /// </summary>
         public static bool LineSegmentIntersects(
@@ -338,7 +338,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Given 2 lines in 2D space AB, CD this returns true if an 
+        /// Given 2 lines in 2D space AB, CD this returns true if an
         /// intersection occurs and sets dist to the distance the intersection
         /// occurs along AB. Also sets the 2d vector point to the point of
         /// intersection
@@ -371,7 +371,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Given 2 lines in 2D space AB, CD this returns true if an 
+        /// Given 2 lines in 2D space AB, CD this returns true if an
         /// intersection occurs and sets dist to the distance the intersection
         /// occurs along AB. Also sets the 2d vector point to the point of
         /// intersection
@@ -472,7 +472,7 @@ namespace Isles.Engine
         /// <summary>
         /// Given two circles this function calculates the intersection points
         /// of any overlap. This function assumes that the two circles overlaps.
-        /// 
+        ///
         /// see http://astronomy.swin.edu.au/~pbourke/geometry/2circle/
         /// </summary>
         /// <returns></returns>
@@ -487,9 +487,9 @@ namespace Isles.Engine
             var a = (r1 - r2 + (d * d)) / (2 * d);
             _ = (r2 - r1 + (d * d)) / (2 * d);
 
-            //MAYBE A TEST FOR EXACT OVERLAP? 
+            //MAYBE A TEST FOR EXACT OVERLAP?
 
-            //calculate the point P2 which is the center of the line which 
+            //calculate the point P2 which is the center of the line which
             //connects the intersection points
             double p2X, p2Y;
 
@@ -542,9 +542,9 @@ namespace Isles.Engine
 
         /// <summary>
         /// Given a line segment AB and a circle position and radius, this function
-        /// determines if there is an intersection and stores the position of the 
+        /// determines if there is an intersection and stores the position of the
         /// closest intersection in the reference IntersectionPoint.
-        /// 
+        ///
         /// returns null if no intersection point is found
         /// </summary>
         /// <returns></returns>
@@ -566,7 +566,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Tests to see if a rectangle contains a point. 
+        /// Tests to see if a rectangle contains a point.
         /// v1 and v2 are in local space relative to position and rotation
         /// </summary>
         /// <returns></returns>
@@ -730,9 +730,7 @@ namespace Isles.Engine
                 ? ContainmentType.Intersects
                 : ContainmentType.Disjoint;
         }
-        #endregion
 
-        #region Test
         /// <summary>
         /// Test cases for Math2D class, too few of them
         /// </summary>
@@ -748,11 +746,9 @@ namespace Isles.Engine
                                         min, max, Vector2.Zero, 0) != ContainmentType.Disjoint);
             }
         }
-        #endregion
-    }
-    #endregion
 
-    #region Outline
+    }
+
     /// <summary>
     /// Types of outline
     /// </summary>
@@ -1041,5 +1037,5 @@ namespace Isles.Engine
                 : ContainmentType.Disjoint;
         }
     }
-    #endregion
+
 }

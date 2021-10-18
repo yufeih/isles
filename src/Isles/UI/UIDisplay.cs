@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -24,7 +24,6 @@ namespace Isles.UI
         public const int ReferenceScreenWidth = 800;
         public const int ReferenceScreenHeight = 600;
 
-        #region Variables
         /// <summary>
         /// UI content manager
         /// </summary>
@@ -71,9 +70,7 @@ namespace Isles.UI
         /// </summary>
         private readonly Rectangle referenceArea =
             new(0, 0, ReferenceScreenWidth, ReferenceScreenHeight);
-        #endregion
 
-        #region Properties
         /// <summary>
         /// Gets or sets the sprite batch used to draw all UI elements
         /// </summary>
@@ -161,9 +158,7 @@ namespace Isles.UI
             get => enabled;
             set => enabled = value;
         }
-        #endregion
 
-        #region Methods
         public UIDisplay(BaseGame game)
         {
             this.game = game;
@@ -291,9 +286,6 @@ namespace Isles.UI
 
             return EventResult.Unhandled;
         }
-        #endregion
-
-        #region Dispose
 
         /// <summary>
         /// Dispose
@@ -319,6 +311,6 @@ namespace Isles.UI
 
             GC.SuppressFinalize(this);
         }
-        #endregion
+
     }
 }

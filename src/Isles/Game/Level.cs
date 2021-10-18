@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -13,7 +13,7 @@ using Isles.Graphics;
 
 namespace Isles
 {
-    #region Level
+
     public class Level : IEventListener
     {
         private RuinedLand ruinedLand;
@@ -162,9 +162,7 @@ namespace Isles
             return EventResult.Unhandled;
         }
     }
-    #endregion
 
-    #region Skirmish
     /// <summary>
     /// Respresents a level in the game
     /// </summary>
@@ -366,5 +364,5 @@ namespace Isles
             return true;
         }
     }
-    #endregion
+
 }

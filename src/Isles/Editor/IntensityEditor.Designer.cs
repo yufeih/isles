@@ -20,7 +20,7 @@
             base.Dispose(disposing);
         }
 
-        #region Windows 窗体设计器生成的代码
+
 
         /// <summary>
         /// 设计器支持所需的方法 - 不要
@@ -31,9 +31,9 @@
             this.trackBar1 = new System.Windows.Forms.TrackBar();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.SuspendLayout();
-            // 
+            //
             // trackBar1
-            // 
+            //
             this.trackBar1.Location = new System.Drawing.Point(-4, 1);
             this.trackBar1.Maximum = 1000;
             this.trackBar1.Name = "trackBar1";
@@ -41,9 +41,9 @@
             this.trackBar1.TabIndex = 0;
             this.trackBar1.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trackBar1.Scroll += new System.EventHandler(this.TrackBar_Scroll);
-            // 
+            //
             // IntensityEditor
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(575, 42);
@@ -57,7 +57,7 @@
 
         }
 
-        #endregion
+
 
         private System.Windows.Forms.TrackBar trackBar1;
     }

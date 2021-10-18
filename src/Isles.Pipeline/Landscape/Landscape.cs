@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ namespace Isles.Pipeline
     [Serializable()]
     public partial class Landscape
     {
-        #region Fields
+
         private string heightmap;
         private string waterTexture;
         private string waterBumpTexture;
@@ -44,9 +44,7 @@ namespace Isles.Pipeline
         [NonSerialized()]
         public string SourceFilename;
         private string directory;
-        #endregion
 
-        #region Properties
         public string Heightmap
         {
             get { return heightmap; }
@@ -121,9 +119,7 @@ namespace Isles.Pipeline
             get { return BaseHeight; }
             set { baseHeight = value; }
         }
-        #endregion
 
-        #region Layer
         /// <summary>
         /// Represent a texture layer in the terrain
         /// </summary>
@@ -140,12 +136,10 @@ namespace Isles.Pipeline
 
             public int PatchGroup;
             public bool[] TargetPatches;
-            
+
             public Layer()
             {
             }
-
-            #region Properties
 
             /// <summary>
             /// Effect technqiue
@@ -155,7 +149,7 @@ namespace Isles.Pipeline
                 get { return technique; }
                 set { technique = value; }
             }
-            
+
             /// <summary>
             /// Color texture
             /// </summary>
@@ -183,10 +177,6 @@ namespace Isles.Pipeline
                 set { normalTexture = value; }
             }
 
-            #endregion
-
-            #region Methods
-
             public void Process(ContentProcessorContext context,
                 string directory, int xPatchCount, int yPatchCount)
             {
@@ -211,7 +201,7 @@ namespace Isles.Pipeline
                     context.BuildAndLoadAsset<TextureContent, TextureContent>
                         (new ExternalReference<TextureContent>(Path.Combine(directory, alphaTexture)),
                         "TextureProcessor");
-                
+
                 // Convert to pixel bitmap, but we only care about alpha channel
                 visibility.ConvertBitmapType(typeof(PixelBitmapContent<Color>));
                 PixelBitmapContent<Color> pixmap = (PixelBitmapContent<Color>)visibility.Mipmaps[0];
@@ -252,28 +242,22 @@ namespace Isles.Pipeline
                 output.WriteExternalReference<TextureContent>(normalTextureContent);
             }
 
-            #endregion
         }
-        #endregion
-
-        #region Process
 
         public Landscape()
         {
         }
-        
+
         public void Process(ContentProcessorContext context)
         {
             directory = Path.GetDirectoryName(SourceFilename);
-
-            #region Heightmap
 
             // Heightmap
             Texture2DContent map = (Texture2DContent)
                 context.BuildAndLoadAsset<TextureContent, TextureContent>(
                 new ExternalReference<TextureContent>(Path.Combine(directory, heightmap)),
                 "TextureProcessor");
- 
+
             map.ConvertBitmapType(typeof(PixelBitmapContent<float>));
             PixelBitmapContent<float> heightfield = (PixelBitmapContent<float>)map.Mipmaps[0];
 
@@ -298,11 +282,7 @@ namespace Isles.Pipeline
                 }
             }
 
-            #endregion
-
             CalculateNormalsAndTangents();
-
-            #region Patch
 
             // Number of patches
             xPatchCount = heightfield.Width / 16;
@@ -344,10 +324,6 @@ namespace Isles.Pipeline
                         ((x + 1) * width / xPatchCount, (y + 1) * depth / yPatchCount, max));
                 }
             }
-
-            #endregion
-
-            #region Layers & Patch groups
 
             foreach (Layer layer in layers)
             {
@@ -426,8 +402,6 @@ namespace Isles.Pipeline
                 }
             }
 
-            #endregion
-
             // Water
             waterColorTexture = context.BuildAsset<TextureContent, TextureContent>(
                 new ExternalReference<TextureContent>(
@@ -445,10 +419,6 @@ namespace Isles.Pipeline
             // Vegetations
             ProcessVegetation(context);
         }
-
-        #endregion
-
-        #region Write
 
         public void Write(ContentWriter output)
         {
@@ -521,10 +491,6 @@ namespace Isles.Pipeline
             WriteVegetation(output);
         }
 
-        #endregion
-
-        #region Terrain Normal & Tangent Data Generation
-
         private Vector3 CalcLandscapePos(int x, int y)
         {
             // Make sure we stay on the valid map data
@@ -544,8 +510,7 @@ namespace Isles.Pipeline
             // Code grabbed from racing game :)
             normalData = new Vector3[heightFieldWidth, heightFieldHeight];
             tangentData = new Vector3[heightFieldWidth, heightFieldHeight];
-            
-            #region Build tangent vertices
+
             // Build our tangent vertices
             for (int x = 0; x < heightFieldWidth; x++)
             {
@@ -574,9 +539,7 @@ namespace Isles.Pipeline
                     tangentData[x, y] = Vector3.Normalize(edge1);
                 }
             }
-            #endregion
 
-            #region Smooth normals
             // Smooth all normals, first copy them over, then smooth everything
             Vector3[,] normalsForSmoothing = new Vector3[heightFieldWidth, heightFieldHeight];
             for (int x = 0; x < heightFieldWidth; x++)
@@ -609,9 +572,8 @@ namespace Isles.Pipeline
                     tangentData[x, y] = Vector3.Cross(helperVector, normalData[x, y]);
                 }
             }
-            #endregion
+
         }
 
-        #endregion
     }
 }

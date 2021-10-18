@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -14,13 +14,13 @@ using Isles.Engine;
 
 namespace Isles
 {
-    #region Charactor
+
     /// <summary>
     /// Base class for all game charactors
     /// </summary>
     public class Charactor : GameObject, IMovable
     {
-        #region Field
+
         public EffectGlow Glow;
         public bool ShowGlow;
         public bool IsHero;
@@ -114,9 +114,7 @@ namespace Isles
         public virtual string RunAnimation => "Run";
 
         public virtual string AttackAnimation => "Attack";
-        #endregion
 
-        #region Method
         public Charactor(GameWorld world) : base(world)
         {
             VisibleInFogOfWar = false;
@@ -488,7 +486,7 @@ namespace Isles
                 // Update moving
                 elapsedAnimationTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-                // Adjust the animation 
+                // Adjust the animation
                 var moved = !(Math2D.FloatEquals(Position.X, positionLastFrame.X) &&
                                Math2D.FloatEquals(Position.Y, positionLastFrame.Y));
 
@@ -541,11 +539,9 @@ namespace Isles
                 AttackTarget.Health -= ComputeHit(this, AttackTarget);
             }
         }
-        #endregion
-    }
-    #endregion
 
-    #region Worker
+    }
+
     public class Worker : Charactor
     {
         public int LumberCarried;
@@ -715,9 +711,7 @@ namespace Isles
             }
         }
     }
-    #endregion
 
-    #region Hunter
     public class Hunter : Charactor
     {
         private bool weaponVisible = true;
@@ -819,9 +813,7 @@ namespace Isles
             }
         }
     }
-    #endregion
 
-    #region FireSorceress
     public class FireSorceress : Charactor
     {
         private int rightHand;
@@ -928,9 +920,7 @@ namespace Isles
             }
         }
     }
-    #endregion
 
-    #region Hellfire
     public class Hellfire : Charactor
     {
         public Hellfire(GameWorld world, string classID)
@@ -938,5 +928,5 @@ namespace Isles
 
         public override string AttackAnimation => Helper.Random.Next(2) == 0 ? "Attack" : "Attack_2";
     }
-    #endregion
+
 }

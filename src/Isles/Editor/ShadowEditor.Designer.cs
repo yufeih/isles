@@ -20,7 +20,7 @@ namespace Isles.Editor
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
+
 
         /// <summary>
         /// Required method for Designer support - do not modify
@@ -40,9 +40,9 @@ namespace Isles.Editor
             ((System.ComponentModel.ISupportInitialize)(this.trackBar2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.SuspendLayout();
-            // 
+            //
             // groupBox1
-            // 
+            //
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.label1);
@@ -55,36 +55,36 @@ namespace Isles.Editor
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Projection";
-            // 
+            //
             // label3
-            // 
+            //
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(20, 130);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(26, 17);
             this.label3.TabIndex = 11;
             this.label3.Text = "Far";
-            // 
+            //
             // label2
-            // 
+            //
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(20, 79);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(37, 17);
             this.label2.TabIndex = 10;
             this.label2.Text = "Near";
-            // 
+            //
             // label1
-            // 
+            //
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(20, 28);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(57, 17);
             this.label1.TabIndex = 9;
             this.label1.Text = "Distance";
-            // 
+            //
             // trackBar3
-            // 
+            //
             this.trackBar3.Location = new System.Drawing.Point(107, 130);
             this.trackBar3.Maximum = 2000;
             this.trackBar3.Minimum = 400;
@@ -94,9 +94,9 @@ namespace Isles.Editor
             this.trackBar3.TickFrequency = 50;
             this.trackBar3.Value = 500;
             this.trackBar3.Scroll += new System.EventHandler(trackBar3_Scroll);
-            // 
+            //
             // trackBar2
-            // 
+            //
             this.trackBar2.Location = new System.Drawing.Point(107, 79);
             this.trackBar2.Maximum = 1000;
             this.trackBar2.Minimum = 1;
@@ -106,9 +106,9 @@ namespace Isles.Editor
             this.trackBar2.TickFrequency = 5;
             this.trackBar2.Value = 10;
             this.trackBar2.Scroll += new System.EventHandler(trackBar2_Scroll);
-            // 
+            //
             // trackBar1
-            // 
+            //
             this.trackBar1.Location = new System.Drawing.Point(107, 28);
             this.trackBar1.Maximum = 1000;
             this.trackBar1.Minimum = 100;
@@ -118,9 +118,9 @@ namespace Isles.Editor
             this.trackBar1.TickFrequency = 20;
             this.trackBar1.Value = 200;
             this.trackBar1.Scroll += new System.EventHandler(trackBar1_Scroll);
-            // 
+            //
             // Editor
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(456, 203);
@@ -136,7 +136,7 @@ namespace Isles.Editor
 
         }
 
-        #endregion
+
 
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label label3;

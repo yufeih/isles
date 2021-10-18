@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -13,8 +13,7 @@ using Isles.Engine;
 
 namespace Isles
 {
-    #region Player
-    #region Enums & PlayerInfo
+
     public enum PlayerType
     {
         Dummy, Local, Computer, Remote
@@ -39,14 +38,13 @@ namespace Isles
         public Vector2 SpawnPoint;
         public PlayerType Type;
     }
-    #endregion
 
     /// <summary>
     /// Represent either human player, computer oppnent
     /// </summary>
     public abstract class Player : IEventListener
     {
-        #region Static stuff
+
         public static List<Player> AllPlayers = new();
         public static LocalPlayer LocalPlayer;
 
@@ -96,9 +94,7 @@ namespace Isles
         {
             return CharactorRegistry.Contains(type);
         }
-        #endregion
 
-        #region Properties
         /// <summary>
         /// Gets or sets the name of the player
         /// </summary>
@@ -261,9 +257,7 @@ namespace Isles
                 return MathHelper.Clamp(value * 0.1f, 0, 1);
             }
         }
-        #endregion
 
-        #region Object Management
         /// <summary>
         /// Stores whether a technique is available. Instead of storing a
         /// bool value, we stores a reference counter. E.g., if we have
@@ -523,9 +517,7 @@ namespace Isles
         public string TowerName => Race == Race.Islander ? "Tower" : "SteamCannon";
 
         public string HeroName => Race == Race.Islander ? "FireSorceress" : "Steambot";
-        #endregion
 
-        #region Relations
         /// <summary>
         /// Gets the relationship with the target player
         /// </summary>
@@ -536,9 +528,7 @@ namespace Isles
                                                              PlayerRelation.Opponent;
             // return PlayerRelation.Opponent;
         }
-        #endregion
 
-        #region Methods
         public abstract void Update(GameTime gameTime);
 
         public virtual void Draw(GameTime gameTime) { }
@@ -682,11 +672,9 @@ namespace Isles
         }
 
         public abstract void Start(GameWorld world);
-        #endregion
-    }
-    #endregion
 
-    #region DummyPlayer
+    }
+
     /// <summary>
     /// Dummy player will do nothing
     /// </summary>
@@ -695,15 +683,13 @@ namespace Isles
         public override void Update(GameTime gameTime) { }
         public override void Start(GameWorld world) { }
     }
-    #endregion
 
-    #region LocalPlayer
     /// <summary>
     /// The human player on the local machine
     /// </summary>
     public class LocalPlayer : Player
     {
-        #region Fields
+
         /// <summary>
         /// Standard stuff
         /// </summary>
@@ -751,9 +737,7 @@ namespace Isles
         /// </summary>
         private readonly List<GameObject> attackers = new();
         private readonly List<double> attackTimer = new();
-        #endregion
 
-        #region Methods
         public override void Start(GameWorld world)
         {
             this.world = world ?? throw new ArgumentNullException();
@@ -1098,9 +1082,7 @@ namespace Isles
                 }
             }
         }
-        #endregion
 
-        #region Update, Draw & Event
         public override void Update(GameTime gameTime)
         {
             // Update spells
@@ -1725,11 +1707,9 @@ namespace Isles
                 }
             }
         }
-        #endregion
-    }
-    #endregion
 
-    #region ComputerPlayer
+    }
+
     public class ComputerPlayer : Player
     {
         public GameWorld World;
@@ -2026,8 +2006,5 @@ namespace Isles
 #endif
         }
     }
-    #endregion
 
-    #region RemotePlayer
-    #endregion
 }

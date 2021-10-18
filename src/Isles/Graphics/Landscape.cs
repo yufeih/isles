@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -13,13 +13,13 @@ using Isles.Engine;
 
 namespace Isles.Graphics
 {
-    #region Landscape
+
     /// <summary>
     /// Landscape without terrain
     /// </summary>
     public abstract class Landscape : BaseLandscape
     {
-        #region Methods
+
         /// <summary>
         /// Initialize landscape from XNB file
         /// </summary>
@@ -62,9 +62,6 @@ namespace Isles.Graphics
             surfaceIndexBuffer = new DynamicIndexBuffer(game.GraphicsDevice,
                 typeof(ushort), MaxSurfaceIndices, BufferUsage.WriteOnly);
         }
-        #endregion
-
-        #region Draw
 
         /// <summary>
         /// Draw the terrain for water reflection and refraction
@@ -199,7 +196,6 @@ namespace Isles.Graphics
             Texture2D texture = start.Value.Texture;
             VertexPositionColorTexture vertex;
 
-            #region BuildVertices
             surfaceIndices.Clear();
             surfaceVertices.Clear();
 
@@ -245,7 +241,6 @@ namespace Isles.Graphics
 
                 start = start.Next;
             }
-            #endregion
 
             // Draw user primitives
             surfaceEffect.Parameters["BasicTexture"].SetValue(texture);
@@ -259,10 +254,6 @@ namespace Isles.Graphics
             game.GraphicsDevice.DrawIndexedPrimitives(
                 PrimitiveType.TriangleList, 0, 0, surfaceVertices.Count, 0, surfaceIndices.Count / 3);
         }
-
-        #endregion
-
-        #region Sky
 
         private TextureCube skyTexture;
         private Effect skyEffect;
@@ -327,10 +318,6 @@ namespace Isles.Graphics
             }
         }
 
-        #endregion
-
-        #region Vegetation
-
         private readonly float grassViewDistanceSquared = 400000;
         private readonly List<Billboard> vegetations = new(512);
 
@@ -378,10 +365,6 @@ namespace Isles.Graphics
                 }
             }
         }
-
-        #endregion
-
-        #region Water
 
         /// <summary>
         /// Gets or sets the fog texture used to draw the landscape
@@ -651,17 +634,14 @@ namespace Isles.Graphics
             }
         }
 
-        #endregion
     }
-    #endregion
 
-    #region FogMask
     /// <summary>
     /// Game fog of war
     /// </summary>
     public class FogMask
     {
-        #region Field
+
         private const int Size = 128;
 
         /// <summary>
@@ -734,9 +714,7 @@ namespace Isles.Graphics
         }
 
         private readonly List<Entry> visibleAreas = new();
-        #endregion
 
-        #region Method
         /// <summary>
         /// Creates a new fog of war mask
         /// </summary>
@@ -918,7 +896,7 @@ namespace Isles.Graphics
                 }
             }
         }
-        #endregion
+
     }
-    #endregion
+
 }

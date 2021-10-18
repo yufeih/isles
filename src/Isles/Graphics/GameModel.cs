@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -14,10 +14,10 @@ using Isles.Engine;
 
 namespace Isles.Graphics
 {
-    #region GameModel
+
     public class GameModel
     {
-        #region Fields
+
         /// <summary>
         /// Current game
         /// </summary>
@@ -270,9 +270,7 @@ namespace Isles.Graphics
         /// </summary>
         private List<ModelManager.Renderable> renderables = new();
         private List<ModelManager.Renderable> shadowMapRenderables = new();
-        #endregion
 
-        #region Methods
         public GameModel()
         {
             game = BaseGame.Singleton;
@@ -576,9 +574,6 @@ namespace Isles.Graphics
             return dist;
         }
 
-        #endregion Method
-
-        #region Animation
         /// <summary>
         /// Gets the default (first) animation clip of this game model
         /// </summary>
@@ -756,9 +751,7 @@ namespace Isles.Graphics
                 blending = false;
             }
         }
-        #endregion
 
-        #region Update & Draw
         public virtual void Update(GameTime gameTime)
         {
             if (!IsAnimated)
@@ -942,9 +935,7 @@ namespace Isles.Graphics
                 }
             }
         }
-        #endregion
 
-        #region BoundingBox
         /// <summary>
         /// Compute bounding box for the specified xna model.
         /// </summary>
@@ -1062,18 +1053,15 @@ namespace Isles.Graphics
 
             return new BoundingBox(min, max);
         }
-        #endregion
-    }
-    #endregion
 
-    #region AnimationPlayer
+    }
+
     /// <summary>
     /// The animation player is in charge of decoding bone position
     /// matrices from an animation clip.
     /// </summary>
     public class AnimationPlayer
     {
-        #region Fields
 
         private readonly Model model;
         private TimeSpan currentTimeValue;
@@ -1090,8 +1078,6 @@ namespace Isles.Graphics
         public IEnumerable<KeyValuePair<TimeSpan, EventHandler>> Triggers;
         public EventHandler Complete;
         public bool Loop;
-
-        #endregion
 
         /// <summary>
         /// Constructs a new animation player.
@@ -1313,9 +1299,7 @@ namespace Isles.Graphics
         /// </summary>
         public TimeSpan CurrentTime => currentTimeValue;
     }
-    #endregion
 
-    #region TypeReaders
     /// <summary>
     /// Loads SkinningData objects from compiled XNB format.
     /// </summary>
@@ -1368,5 +1352,5 @@ namespace Isles.Graphics
             return new Keyframe(bone, time, transform);
         }
     }
-    #endregion
+
 }

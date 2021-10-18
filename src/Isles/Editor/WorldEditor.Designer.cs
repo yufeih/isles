@@ -20,7 +20,7 @@ namespace Isles.Editor
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
+
 
         /// <summary>
         /// Required method for Designer support - do not modify
@@ -41,27 +41,27 @@ namespace Isles.Editor
             this.buttonSavePath = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarPathBrushSize)).BeginInit();
             this.SuspendLayout();
-            // 
+            //
             // label1
-            // 
+            //
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(12, 9);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(133, 17);
             this.label1.TabIndex = 0;
             this.label1.Text = "Create a new object...";
-            // 
+            //
             // objectList
-            // 
+            //
             this.objectList.FormattingEnabled = true;
             this.objectList.ItemHeight = 17;
             this.objectList.Location = new System.Drawing.Point(12, 46);
             this.objectList.Name = "objectList";
             this.objectList.Size = new System.Drawing.Size(274, 395);
             this.objectList.TabIndex = 1;
-            // 
+            //
             // buttonDelete
-            // 
+            //
             this.buttonDelete.Location = new System.Drawing.Point(292, 77);
             this.buttonDelete.Name = "buttonDelete";
             this.buttonDelete.Size = new System.Drawing.Size(108, 25);
@@ -69,9 +69,9 @@ namespace Isles.Editor
             this.buttonDelete.Text = "Delete";
             this.buttonDelete.UseVisualStyleBackColor = true;
             this.buttonDelete.Click += new System.EventHandler(this.buttonDelete_Click);
-            // 
+            //
             // buttonCreate
-            // 
+            //
             this.buttonCreate.Location = new System.Drawing.Point(292, 46);
             this.buttonCreate.Name = "buttonCreate";
             this.buttonCreate.Size = new System.Drawing.Size(108, 25);
@@ -79,9 +79,9 @@ namespace Isles.Editor
             this.buttonCreate.Text = "Create";
             this.buttonCreate.UseVisualStyleBackColor = true;
             this.buttonCreate.Click += new System.EventHandler(this.buttonCreate_Click);
-            // 
+            //
             // buttonSave
-            // 
+            //
             this.buttonSave.Location = new System.Drawing.Point(292, 385);
             this.buttonSave.Name = "buttonSave";
             this.buttonSave.Size = new System.Drawing.Size(108, 25);
@@ -89,9 +89,9 @@ namespace Isles.Editor
             this.buttonSave.Text = "Save";
             this.buttonSave.UseVisualStyleBackColor = true;
             this.buttonSave.Click += new System.EventHandler(this.buttonSave_Click);
-            // 
+            //
             // buttonLoad
-            // 
+            //
             this.buttonLoad.Location = new System.Drawing.Point(292, 416);
             this.buttonLoad.Name = "buttonLoad";
             this.buttonLoad.Size = new System.Drawing.Size(108, 25);
@@ -99,17 +99,17 @@ namespace Isles.Editor
             this.buttonLoad.Text = "Load";
             this.buttonLoad.UseVisualStyleBackColor = true;
             this.buttonLoad.Click += new System.EventHandler(this.buttonLoad_Click);
-            // 
+            //
             // openFileDialog
-            // 
+            //
             this.openFileDialog.Filter = "Xml files|*.xml|All files|*.*";
-            // 
+            //
             // saveFileDialog
-            // 
+            //
             this.saveFileDialog.Filter = "Xml files|*.xml|All files|*.*";
-            // 
+            //
             // buttonDrawPath
-            // 
+            //
             this.buttonDrawPath.Location = new System.Drawing.Point(290, 254);
             this.buttonDrawPath.Name = "buttonDrawPath";
             this.buttonDrawPath.Size = new System.Drawing.Size(108, 25);
@@ -117,9 +117,9 @@ namespace Isles.Editor
             this.buttonDrawPath.Text = "DrawPath";
             this.buttonDrawPath.UseVisualStyleBackColor = true;
             this.buttonDrawPath.Click += new System.EventHandler(this.buttonDrawPath_Click);
-            // 
+            //
             // trackBarPathBrushSize
-            // 
+            //
             this.trackBarPathBrushSize.Location = new System.Drawing.Point(294, 203);
             this.trackBarPathBrushSize.Minimum = 1;
             this.trackBarPathBrushSize.Name = "trackBarPathBrushSize";
@@ -127,9 +127,9 @@ namespace Isles.Editor
             this.trackBarPathBrushSize.TabIndex = 7;
             this.trackBarPathBrushSize.Value = 1;
             this.trackBarPathBrushSize.Scroll += new System.EventHandler(this.trackBarPathBrushSize_Scroll);
-            // 
+            //
             // buttonSavePath
-            // 
+            //
             this.buttonSavePath.Location = new System.Drawing.Point(290, 285);
             this.buttonSavePath.Name = "buttonSavePath";
             this.buttonSavePath.Size = new System.Drawing.Size(108, 25);
@@ -137,9 +137,9 @@ namespace Isles.Editor
             this.buttonSavePath.Text = "SavePath";
             this.buttonSavePath.UseVisualStyleBackColor = true;
             this.buttonSavePath.Click += new System.EventHandler(this.buttonSavePath_Click);
-            // 
+            //
             // WorldEditor
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(410, 450);
@@ -160,7 +160,7 @@ namespace Isles.Editor
 
         }
 
-        #endregion
+
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ListBox objectList;

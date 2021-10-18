@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -17,14 +17,14 @@ using Isles.UI;
 
 namespace Isles
 {
-    #region IGameObject
+
     /// <summary>
     /// Game replay and network game uses this interface
     /// </summary>
     public interface IGameObject
     {
         /// <summary>
-        /// Serialize any change of this recordable 
+        /// Serialize any change of this recordable
         /// </summary>
         void Serialize(Stream output);
 
@@ -33,9 +33,7 @@ namespace Isles
         /// </summary>
         void Deserialize(Stream input);
     }
-    #endregion
 
-    #region GameObject
     /// <summary>
     /// Base class for all game objects.
     /// Incoorperating game logic specific members.
@@ -1021,9 +1019,7 @@ namespace Isles
         /// </summary>
         public virtual void TriggerAttack(Entity target) { }
     }
-    #endregion
 
-    #region Tree
     public class Tree : GameObject
     {
         /// <summary>
@@ -1214,9 +1210,7 @@ namespace Isles
             base.Update(gameTime);
         }
     }
-    #endregion
 
-    #region Goldmine
     public class Goldmine : GameObject
     {
         /// <summary>
@@ -1354,9 +1348,7 @@ namespace Isles
             outline.SetRectangle(-obstructorSize, obstructorSize, position, RotationZ);
         }
     }
-    #endregion
 
-    #region BoxOfPandora
     public class BoxOfPandora : GameObject
     {
         public BoxOfPandora(GameWorld world)
@@ -1431,9 +1423,7 @@ namespace Isles
             base.Update(gameTime);
         }
     }
-    #endregion
 
-    #region RuinedLand
     public class RuinedLand
     {
         private const int TextureSize = 128;
@@ -1741,9 +1731,7 @@ namespace Isles
             }
         }
     }
-    #endregion
 
-    #region Missile
     public interface IProjectile
     {
         event EventHandler Hit;
@@ -1872,9 +1860,7 @@ namespace Isles
             }
         }
     }
-    #endregion
 
-    #region Decoration
     public class Decoration : Entity
     {
         public Decoration(GameWorld world)
@@ -1897,5 +1883,5 @@ namespace Isles
             }
         }
     }
-    #endregion
+
 }

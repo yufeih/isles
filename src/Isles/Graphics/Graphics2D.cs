@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -366,7 +366,6 @@ namespace Isles.Graphics
             primitiveVertexCount = 0;
         }
 
-        #region String Formatting
         /// <summary>
         /// Each charactor has a different with and height. But sadly SpriteFont
         /// hides all those charactor map and cropping stuff inside, making it
@@ -544,7 +543,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Used to Iterate each word in the text. 
+        /// Used to Iterate each word in the text.
         /// This class is designed to help to implement FormatString.
         /// A word here is defined as a sequence of characters without '\n' and ' '
         /// or with only the last being '\n' or ' '.
@@ -604,6 +603,6 @@ namespace Isles.Graphics
             /// </summary>
             public int CurrentIndex { get; set; }
         }
-        #endregion
+
     }
 }

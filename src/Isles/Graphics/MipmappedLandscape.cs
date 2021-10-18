@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -14,7 +14,6 @@ namespace Isles.Graphics
 {
     public class MipmappedLandscape : Landscape
     {
-        #region Draw Surface
 
         /// <summary>
         /// Effect for drawing surface
@@ -127,10 +126,6 @@ namespace Isles.Graphics
             graphics.SamplerStates[0].AddressV = TextureAddressMode.Wrap;
         }
 
-        #endregion
-
-        #region Fields
-
         /// <summary>
         /// Effect used to render the terrain
         /// </summary>
@@ -161,9 +156,7 @@ namespace Isles.Graphics
         /// Gets or sets the error ratio when computing terrain LOD
         /// </summary>
         public float TerrainErrorRatio { get; set; } = 0.0012f;
-        #endregion
 
-        #region Methods
         /// <summary>
         /// This drawing method is used for generating water reflection
         /// </summary>
@@ -214,7 +207,7 @@ namespace Isles.Graphics
                 return;
             }
 
-            // This code would go between a device 
+            // This code would go between a device
             // BeginScene-EndScene block.
             graphics.Vertices[0].SetSource(
                 terrainVertexBuffer, 0, TerrainVertex.SizeInBytes);
@@ -463,10 +456,6 @@ namespace Isles.Graphics
             }
         }
 
-        #endregion
-
-        #region Update
-
         /// <summary>
         /// Update landscape every frame
         /// </summary>
@@ -523,10 +512,6 @@ namespace Isles.Graphics
 
             UpdateTerrainIndexBufferSet();
         }
-
-        #endregion
-
-        #region Device Lost & Reset
 
         /// <summary>
         /// Call this when device is reset
@@ -588,9 +573,7 @@ namespace Isles.Graphics
         {
             UnloadManualContent();
         }
-        #endregion
 
-        #region Terrain vertex
         /// <summary>
         /// Tangent vertex format for shader vertex format used all over the place.
         /// It contains: Position, Normal vector, texture coords, tangent vector.
@@ -599,7 +582,6 @@ namespace Isles.Graphics
         {
             // Grabbed from racing game :)
 
-            #region Variables
             /// <summary>
             /// Position
             /// </summary>
@@ -633,9 +615,7 @@ namespace Isles.Graphics
             /// </summary>
             /// <returns>Float</returns>
             public float V => TextureCoordinate.Y;
-            #endregion
 
-            #region Constructor
             /// <summary>
             /// Create tangent vertex
             /// </summary>
@@ -674,9 +654,7 @@ namespace Isles.Graphics
                 Normal = setNormal;
                 Tangent = setTangent;
             }
-            #endregion
 
-            #region Generate vertex declaration
             /// <summary>
             /// Vertex elements for Mesh.Clone
             /// </summary>
@@ -705,9 +683,7 @@ namespace Isles.Graphics
                 };
                 return decl;
             }
-            #endregion
 
-            #region Is declaration tangent vertex declaration
             /// <summary>
             /// Returns true if declaration is tangent vertex declaration.
             /// </summary>
@@ -723,8 +699,8 @@ namespace Isles.Graphics
                     declaration[2].VertexElementUsage == VertexElementUsage.Normal &&
                     declaration[3].VertexElementUsage == VertexElementUsage.Tangent;
             }
-            #endregion
+
         }
-        #endregion
+
     }
 }

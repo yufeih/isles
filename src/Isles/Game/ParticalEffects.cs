@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles
 {
-    #region ParticleEffect
+
     /// <summary>
     /// Base class for all particle system effect
     /// </summary>
@@ -21,9 +21,7 @@ namespace Isles
         public override void Update(GameTime gameTime) { }
         public override void Draw(GameTime gameTime) { }
     }
-    #endregion
 
-    #region Arrow
     public enum ArrowState
     {
         Waiting = 0,
@@ -34,7 +32,6 @@ namespace Isles
 
     public class Arrow : BaseEntity
     {
-        #region variable
 
         private Vector3 destination;
 
@@ -53,10 +50,6 @@ namespace Isles
         private ArrowState state;
 
         private float fadingAge;
-
-        #endregion
-
-        #region property
 
         /// <summary>
         /// The target the arrow aims
@@ -92,12 +85,6 @@ namespace Isles
 
         public Vector3 Accerlation => acceleration;
 
-        #endregion
-
-        #region method
-
-        #region Initialization
-
         public Arrow(GameWorld world)
             : base(world)
         {
@@ -126,10 +113,6 @@ namespace Isles
             maxSpeed = 0.08f;
             state = ArrowState.Waiting;
         }
-
-        #endregion
-
-        #region Update and Draw
 
         public override void Update(GameTime gameTime)
         {
@@ -200,13 +183,8 @@ namespace Isles
             GameServer.Singleton.Destroy(this);
         }
 
-        #endregion
-
-        #endregion
     }
-    #endregion
 
-    #region AreaEmitter
     /// <summary>
     /// Generate particles randomly within the specified area
     /// </summary>
@@ -265,9 +243,7 @@ namespace Isles
             Update(gameTime, position, Vector3.Zero, true);
         }
     }
-    #endregion
 
-    #region CircularEmitter
     public class CircularEmitter : ParticleEmitter
     {
         /// <summary>
@@ -323,9 +299,7 @@ namespace Isles
             Update(gameTime);
         }
     }
-    #endregion
 
-    #region ProjectileEmitter
     public class ProjectileEmitter : ParticleEmitter, IProjectile
     {
         private Vector3 position;
@@ -407,9 +381,7 @@ namespace Isles
             base.Update(gameTime, position, Vector3.Zero, true);
         }
     }
-    #endregion
 
-    #region EffectTest
     public class EffectTest : ParticleEffect
     {
         private readonly ProjectileEmitter emitter;
@@ -435,9 +407,7 @@ namespace Isles
             emitter.Update(gameTime);
         }
     }
-    #endregion
 
-    #region EffectConstruct
     public class EffectConstruct : ParticleEffect
     {
         private readonly AreaEmitter emitter;
@@ -463,9 +433,7 @@ namespace Isles
             emitter.Update(gameTime);
         }
     }
-    #endregion
 
-    #region EffectFire
     public class EffectFire : ParticleEffect
     {
         private readonly ParticleSystem fire;
@@ -500,9 +468,7 @@ namespace Isles
             smokeEmitter.Update(gameTime, Position + Vector3.UnitZ * 4, Vector3.Zero, true);
         }
     }
-    #endregion
 
-    #region EffectFireball
     public class EffectFireball : ParticleEffect
     {
         private readonly ParticleSystem fire;
@@ -547,9 +513,7 @@ namespace Isles
             fireEmitter.Update(gameTime);
         }
     }
-    #endregion
 
-    #region EffectExplosion
     public class EffectExplosion : ParticleEffect
     {
         private readonly ParticleSystem fire;
@@ -611,9 +575,7 @@ namespace Isles
             //smokeEmitter.Update(gameTime, Position + Vector3.UnitZ * 4, Vector3.Zero);
         }
     }
-    #endregion
 
-    #region EffectStar
     public class EffectStar : ParticleEffect
     {
         private readonly GameObject target;
@@ -655,9 +617,7 @@ namespace Isles
             emitter.Update(gameTime, Position);
         }
     }
-    #endregion
 
-    #region EffectGlow
     public class EffectGlow : ParticleEffect
     {
         private readonly GameObject target;
@@ -700,9 +660,7 @@ namespace Isles
             emitter.Update(gameTime, Position, Vector3.Zero, true);
         }
     }
-    #endregion
 
-    #region EffectPunishOfNature
     public class EffectPunishOfNature : ParticleEffect
     {
         private const float DropSpeed = 50;
@@ -780,9 +738,7 @@ namespace Isles
             }
         }
     }
-    #endregion
 
-    #region EffectHalo
     public class EffectHalo : ParticleEffect
     {
         private float angle;
@@ -821,9 +777,7 @@ namespace Isles
             emitter.Update(gameTime, spawn);
         }
     }
-    #endregion
 
-    #region EffectSpawn
     public class EffectSpawn : ParticleEffect
     {
         private float angle;
@@ -880,5 +834,5 @@ namespace Isles
             }
         }
     }
-    #endregion
+
 }

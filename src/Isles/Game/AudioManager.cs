@@ -1,18 +1,15 @@
-#region File Description
+
 //-----------------------------------------------------------------------------
 // AudioManager.cs
 //
 // Microsoft XNA Community Game Platform
 // Copyright (C) Microsoft Corporation. All rights reserved.
 //-----------------------------------------------------------------------------
-#endregion
 
-#region Using Statements
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
-#endregion
 
 namespace Isles.Engine
 {
@@ -35,7 +32,7 @@ namespace Isles.Engine
     /// </summary>
     public class AudioManager : GameComponent
     {
-        #region Fields
+
         private readonly ZipContentManager content;
 
         public AudioEngine Audio { get; private set; }
@@ -58,8 +55,6 @@ namespace Isles.Engine
         // Otherwise we would have to allocate new instances each time
         // a sound was played, which would create unnecessary garbage.
         private readonly Stack<Cue3D> cuePool = new();
-
-        #endregion
 
         public AudioManager(Game game, ZipContentManager content)
             : base(game)

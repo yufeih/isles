@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -13,7 +13,7 @@ using Isles.Graphics;
 
 namespace Isles.Engine
 {
-    #region IState
+
     public enum StateResult
     {
         Active, Inactive, Completed, Failed,
@@ -37,9 +37,6 @@ namespace Isles.Engine
         void Draw(GameTime gameTime);
     }
 
-    #endregion
-
-    #region General Purpose States
     /// <summary>
     /// Base state
     /// </summary>
@@ -240,15 +237,12 @@ namespace Isles.Engine
             return SubStates.First != null ? SubStates.First.Value.HandleEvent(type, sender, tag) : EventResult.Unhandled;
         }
     }
-    #endregion
 
-    #region BaseEntity
     /// <summary>
     /// Base world object
     /// </summary>
     public abstract class BaseEntity : IWorldObject, IAudioEmitter, IEventListener
     {
-        #region Field
 
         public static int EntityCount;
 
@@ -332,8 +326,6 @@ namespace Isles.Engine
             get => false;
             set => throw new Exception("Base entity is inactive by default");
         }
-
-        #endregion
 
         /// <summary>
         /// Constructor
@@ -432,9 +424,7 @@ namespace Isles.Engine
             return EventResult.Unhandled;
         }
     }
-    #endregion
 
-    #region Entity
     /// <summary>
     /// Base class for all pickable game entities
     /// </summary>
@@ -445,7 +435,6 @@ namespace Isles.Engine
         /// </summary>
         public const float MaxHeight = 1000.0f;
 
-        #region Field
         /// <summary>
         /// Gets or sets the state of the agent
         /// </summary>
@@ -676,9 +665,7 @@ namespace Isles.Engine
         /// interactive by calling GameWorld.Activate();
         /// </summary>
         public virtual bool IsInteractive => true;
-        #endregion
 
-        #region Methods
         /// <summary>
         /// Constructor
         /// </summary>
@@ -942,8 +929,7 @@ namespace Isles.Engine
         {
             return Visible && frustum.Contains(Position) == ContainmentType.Contains;
         }
-        #endregion
+
     }
 
-    #endregion
 }

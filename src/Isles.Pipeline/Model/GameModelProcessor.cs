@@ -1,13 +1,11 @@
-#region File Description
+
 //-----------------------------------------------------------------------------
 // SkinnedModelProcessor.cs
 //
 // Microsoft XNA Community Game Platform
 // Copyright (C) Microsoft Corporation. All rights reserved.
 //-----------------------------------------------------------------------------
-#endregion
 
-#region Using Statements
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -17,11 +15,10 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
-#endregion
 
 namespace Isles.Pipeline
 {
-    #region GameModelProcessor
+
     /// <summary>
     /// Custom processor extends the builtin framework ModelProcessor class,
     /// adding animation support.
@@ -33,7 +30,6 @@ namespace Isles.Pipeline
         // in a single pass. If you change this, update SkinnedModel.fx to match.
         private const int MaxBones = 59;
 
-    
         /// <summary>
         /// The main Process method converts an intermediate format content pipeline
         /// NodeContent tree to a ModelContent object with embedded animation data.
@@ -224,7 +220,7 @@ namespace Isles.Pipeline
                 {
                     for (int k = 2; k < 6; k++)
                     {
-                        info.Set( info.Box.Min + 
+                        info.Set( info.Box.Min +
                                   new Vector3(position.X * (2 * i + 1), position.Y * (2 * j + 1), position.Z * (2 * k + 1)));
                     }
                 }
@@ -499,9 +495,6 @@ namespace Isles.Pipeline
         }
     }
 
-    #endregion
-
-    #region Space Partition
     public class ModelSpacePartitionInformation
     {
         public BoundingBox Box;
@@ -690,7 +683,7 @@ namespace Isles.Pipeline
                 {
                     rtv.Max.X = (rtv.Max.X + rtv.Min.X) / 2;
                 }
-                
+
                 if(y)
                 {
                     rtv.Min.Y = (rtv.Max.Y + rtv.Min.Y) / 2;
@@ -714,9 +707,7 @@ namespace Isles.Pipeline
         }
 
     }
-    #endregion
 
-    #region NormalMapTextureProcessor
     /// <summary>
     /// The NormalMapTextureProcessor takes in an encoded normal map, and outputs
     /// a texture in the NormalizedByte4 format.  Every pixel in the source texture
@@ -726,7 +717,7 @@ namespace Isles.Pipeline
     internal class NormalMapTextureProcessor : ContentProcessor<TextureContent, TextureContent>
     {
         /// <summary>
-        /// Process converts the encoded normals to the NormalizedByte4 format and 
+        /// Process converts the encoded normals to the NormalizedByte4 format and
         /// generates mipmaps.
         /// </summary>
         /// <param name="input"></param>
@@ -735,7 +726,7 @@ namespace Isles.Pipeline
         public override TextureContent Process(TextureContent input,
             ContentProcessorContext context)
         {
-            // convert to vector4 format, so that we know what kind of data we're 
+            // convert to vector4 format, so that we know what kind of data we're
             // working with.
             input.ConvertBitmapType(typeof(PixelBitmapContent<Vector4>));
 
@@ -759,7 +750,7 @@ namespace Isles.Pipeline
                 }
             }
 
-            // now that the conversion to -1 to 1 ranges is finished, convert to the 
+            // now that the conversion to -1 to 1 ranges is finished, convert to the
             // runtime-ready format NormalizedByte4.
             // EDUCATIONAL: it is possible to perform the conversion to NormalizedByte4
             // in the inner loop above by copying to a new TextureContent.  For
@@ -770,9 +761,7 @@ namespace Isles.Pipeline
             return input;
         }
     }
-    #endregion
 
-    #region AnimationClip
     /// <summary>
     /// An animation clip is the runtime equivalent of the
     /// Microsoft.Xna.Framework.Content.Pipeline.Graphics.AnimationContent type.
@@ -810,21 +799,16 @@ namespace Isles.Pipeline
 
         private IList<Keyframe> keyframesValue;
     }
-    #endregion
 
-    #region Keyframe
     /// <summary>
     /// Describes the position of a single bone at a single point in time.
     /// </summary>
     public class Keyframe
     {
-        #region Fields
 
         private int boneValue;
         private TimeSpan timeValue;
         private Matrix transformValue;
-
-        #endregion
 
         /// <summary>
         /// Constructs a new keyframe object.
@@ -860,22 +844,18 @@ namespace Isles.Pipeline
             get { return transformValue; }
         }
     }
-    #endregion
 
-    #region SkinningData
     /// <summary>
     /// Combines all the data needed to render and animate a skinned object.
     /// This is typically stored in the Tag property of the Model being animated.
     /// </summary>
     public class SkinningData
     {
-        #region Fields
 
         private IList<Matrix> bindPoseValue;
         private IList<Matrix> inverseBindPoseValue;
         private IList<int> skeletonHierarchyValue;
         private IList<string> boneNameValue;
-        #endregion
 
         /// <summary>
         /// Constructs a new skinning data object.
@@ -922,9 +902,7 @@ namespace Isles.Pipeline
             get { return boneNameValue; }
         }
     }
-    #endregion
 
-    #region TypeWriters
     /// <summary>
     /// Writes ModelAnimation objects into compiled XNB format.
     /// </summary>
@@ -984,5 +962,5 @@ namespace Isles.Pipeline
                    "Isles, Version=1.0.0.0, Culture=neutral";
         }
     }
-    #endregion
+
 }

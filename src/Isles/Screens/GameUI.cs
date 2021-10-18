@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -14,7 +14,7 @@ using Isles.Engine;
 using Isles.UI;
 namespace Isles
 {
-    #region Enums
+
     public enum MessageType
     {
         None, Warning, Hint, Unavailable
@@ -29,17 +29,13 @@ namespace Isles
     {
         Untextured, Textured
     }
-    #endregion
 
-    #region ISelectable
     public interface ISelectable : IEventListener
     {
         bool Highlighted { get; set; }
         bool Selected { get; set; }
     }
-    #endregion
 
-    #region GameUI
     /// <summary>
     /// This is the in-game UI
     /// </summary>
@@ -50,7 +46,7 @@ namespace Isles
     /// </remarks>
     public class GameUI : IEventListener
     {
-        #region Fields
+
         public const int ButtonWidth = 80;
         public const int ButtonHeight = 40;
         public const int ScrollButtonWidth = 40;
@@ -68,11 +64,7 @@ namespace Isles
         private readonly List<SpellButton> profileButtons = new();
         private int profileNextX = ProfileBaseX;
 
-        #region Singleton
         public static GameUI Singleton { get; private set; }
-        #endregion
-
-        #region Panels
 
         private UI.Panel snapShot, profilePanel;
 
@@ -92,8 +84,6 @@ namespace Isles
         public UI.Panel TipBoxContainer { get; private set; }
 
         public MiniMap Minimap { get; private set; }
-
-        #endregion
 
         private Texture2D dialogTexture, panelsTexture;
 
@@ -153,9 +143,6 @@ namespace Isles
         private double startTime;
         private Effect disappearEffect;
 
-        #endregion
-
-        #region Methods
         /// <summary>
         /// Creates a new game user interface
         /// </summary>
@@ -341,7 +328,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Remove a UI element 
+        /// Remove a UI element
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
@@ -371,7 +358,6 @@ namespace Isles
 
         }
 
-        #region Messages
         /// <summary>
         /// Present Messages in the message queue
         /// </summary>
@@ -463,8 +449,6 @@ namespace Isles
             }
         }
 
-        #region Fields for Game Messages
-
         // Message Queues
         private readonly Queue<GameMessage> BubbleUpMessageQueue = new();
         private readonly Queue<GameMessage> FlyAwayMessageQueue = new();
@@ -505,8 +489,6 @@ namespace Isles
         // Time when the last push happened
         private double lastPushTime;
 
-        #endregion
-
         /// <summary>
         ///  Represent a message in the game
         /// </summary>
@@ -536,7 +518,6 @@ namespace Isles
             }
         }
 
-        #region Present Wherever Messages
         /// <summary>
         /// Present messages that may appear anywhere
         /// </summary>
@@ -603,7 +584,7 @@ namespace Isles
         /// <param name="gameTime"></param>
         private void PresentFlyAwayMessage(GameTime gameTime)
         {
-            // ! Time not finished 
+            // ! Time not finished
             while (FlyAwayMessageQueue.Count != 0 && gameTime.TotalGameTime.TotalSeconds > FlyAwayMessageQueue.Peek().PushTime)
             {
                 FlyAwayMessageQueue.Dequeue();
@@ -626,8 +607,6 @@ namespace Isles
                 game.Graphics2D.DrawShadowedString(message.Message, NoneStyleMessageFontSize, new Vector2(game.Project(message.Position).X, game.Project(message.Position).Y), message.Color, Color.Black);
             }
         }
-
-        #endregion
 
         /// <summary>
         /// Present all kinds of messages
@@ -676,8 +655,6 @@ namespace Isles
             lastPushTime = BaseGame.Singleton.CurrentGameTime.TotalGameTime.TotalSeconds;
             messageQueue.Enqueue(new GameMessage(message, type, color, lastPushTime));
         }
-
-        #endregion
 
         public void SetCursorFocus(Vector3 position, Color color)
         {
@@ -1095,9 +1072,7 @@ namespace Isles
         {
             return ControlPanel.ActualEffectiveRegion.Contains(p) || ResourcePanel.ActualEffectiveRegion.Contains(p);
         }
-        #endregion
 
-        #region HandleEvent
         public EventResult HandleEvent(EventType type, object sender, object tag)
         {
 
@@ -1106,11 +1081,9 @@ namespace Isles
                 ? EventResult.Handled
                 : EventResult.Unhandled;
         }
-        #endregion
-    }
-    #endregion
 
-    #region Cursors
+    }
+
     public static class Cursors
     {
         public static Cursor StoredCursor;
@@ -1324,5 +1297,5 @@ namespace Isles
         private static Cursor move;
         private static Cursor rotate;
     }
-    #endregion
+
 }

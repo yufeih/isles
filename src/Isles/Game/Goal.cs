@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@ using Isles.Engine;
 
 namespace Isles
 {
-    #region Goal
+
     public abstract class Goal : BaseState
     {
         public float ArbitrateInterval = 2;
@@ -35,9 +35,7 @@ namespace Isles
             return StateResult.Active;
         }
     }
-    #endregion
 
-    #region GoalDevelop
     public class GoalDevelop : Goal
     {
         private readonly GameWorld world;
@@ -275,9 +273,7 @@ namespace Isles
             }
         }
     }
-    #endregion
 
-    #region GoalAttack
     public class GoalAttack : Goal
     {
         private readonly GameWorld world;
@@ -427,9 +423,7 @@ namespace Isles
                    target.Position : new Vector3(enermy.SpawnPoint, 0);
         }
     }
-    #endregion
 
-    #region GoalDefend
     public class GoalDefend : Goal
     {
         private readonly GameWorld world;
@@ -511,5 +505,5 @@ namespace Isles
             return attacker != null ? (Vector3?)attacker.Position : null;
         }
     }
-    #endregion
+
 }

@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ namespace Isles
     /// </summary>
     public class GameScreen : IScreen, IEventListener
     {
-        #region Field
+
         private const string ReplayDirectory = "Replays";
         private const string DefaultReplayName = "LastReplay";
         private const string ReplayExtension = "ixr";
@@ -97,9 +97,7 @@ namespace Isles
         /// Gets game server interface
         /// </summary>
         public GameServer Server { get; private set; }
-        #endregion
 
-        #region Initialization
         /// <summary>
         /// Creates a new game screen.
         /// NOTE: You can only create a game screen after graphics device
@@ -362,9 +360,7 @@ namespace Isles
         /// </summary>
         /// <param name="unloadAllContent">Which type of content to unload.</param>
         public void UnloadContent() { }
-        #endregion
 
-        #region Methods
         /// <summary>
         /// Called when this screen is activated
         /// </summary>
@@ -475,9 +471,6 @@ namespace Isles
             Game.IsMouseVisible = false;
         }
 
-        #endregion
-
-        #region Update and Draw
         /// <summary>
         /// Handle game updates
         /// </summary>
@@ -766,9 +759,7 @@ namespace Isles
         }
 
         public static string DefaultReplayFilename => ReplayDirectory + "/" + DefaultReplayName + "." + ReplayExtension;
-        #endregion
 
-        #region Dispose
         /// <summary>
         /// Dispose
         /// </summary>
@@ -789,6 +780,6 @@ namespace Isles
 
             }
         }
-        #endregion
+
     }
 }

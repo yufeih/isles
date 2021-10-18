@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -12,7 +12,7 @@ using Isles.Engine;
 
 namespace Isles.Graphics
 {
-    #region PointSprite
+
     /// <summary>
     /// A pointSprite definition
     /// </summary>
@@ -33,9 +33,7 @@ namespace Isles.Graphics
         /// </summary>
         public float Size;
     }
-    #endregion
 
-    #region PointSpriteManager
     /// <summary>
     /// Manager class for pointSprite
     /// </summary>
@@ -46,7 +44,6 @@ namespace Isles.Graphics
         /// </summary>
         public const int ChunkSize = 1024;
 
-        #region Fields
         /// <summary>
         /// PointSprite effect
         /// </summary>
@@ -71,9 +68,7 @@ namespace Isles.Graphics
         /// Graphics device
         /// </summary>
         private readonly BaseGame game;
-        #endregion
 
-        #region Methods
         /// <summary>
         /// Create a pointSprite manager
         /// </summary>
@@ -89,7 +84,6 @@ namespace Isles.Graphics
                 typeof(VertexPositionTexture), ChunkSize, BufferUsage.WriteOnly);
         }
 
-        #region Draw
         /// <summary>
         /// Draw a pointSprite
         /// </summary>
@@ -202,11 +196,6 @@ namespace Isles.Graphics
             // Clear internal list after drawing
             pointSprites.Clear();
         }
-        #endregion
-
-        #endregion
-
-        #region Dispose
 
         /// <summary>
         /// Dispose
@@ -237,7 +226,6 @@ namespace Isles.Graphics
             }
         }
 
-        #endregion
     }
-    #endregion
+
 }

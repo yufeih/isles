@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -13,10 +13,10 @@ using Isles.Engine;
 
 namespace Isles.UI
 {
-    #region Button
+
     public class Button : UIElement
     {
-        #region Fields
+
         /// <summary>
         /// Gets or sets button hot key
         /// </summary>
@@ -110,9 +110,7 @@ namespace Isles.UI
         /// A fake button handles no messages
         /// </summary>
         public bool IgnoreMessage { get; set; }
-        #endregion
 
-        #region Methods
         public Button()
         {
         }
@@ -292,11 +290,9 @@ namespace Isles.UI
 
             base.Dispose(disposing);
         }
-        #endregion
-    }
-    #endregion
 
-    #region TextButton
+    }
+
     public class TextButton : Button
     {
         private readonly TextField textField;
@@ -313,7 +309,7 @@ namespace Isles.UI
         private Color normalColor;
 
         /// <summary>
-        /// Gets or sets the color of the text in 
+        /// Gets or sets the color of the text in
         /// normal state
         /// </summary>
         public Color NormalColor
@@ -410,6 +406,6 @@ namespace Isles.UI
             }
         }
     }
-    #endregion
+
 }
 

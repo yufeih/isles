@@ -1,19 +1,17 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
-#region Using Statements
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
-#endregion
 
 namespace Isles.Engine
 {
-    #region ICamera && Camera
+
     /// <summary>
     /// Interface for game camera
     /// </summary>
@@ -99,9 +97,7 @@ namespace Isles.Engine
             return EventResult.Unhandled;
         }
     }
-    #endregion
 
-    #region GameCamera
     /// <summary>
     /// Settings for game camera
     /// </summary>
@@ -628,6 +624,6 @@ namespace Isles.Engine
             return EventResult.Unhandled;
         }
     }
-    #endregion
+
 }
 

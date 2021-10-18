@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace Isles.Engine
 {
-    #region GraphEdge & IGraph
+
     /// <summary>
     /// Interface for a graph edge
     /// </summary>
@@ -64,15 +64,13 @@ namespace Isles.Engine
         /// <returns>A heuristic value between the two nodes</returns>
         float GetHeuristicValue(int currentIndex, int endIndex);
     }
-    #endregion
 
-    #region SparseGraph
     /// <summary>
     /// Sparse graph using adjacency list representation
     /// </summary>
     public class SparseGraph<TNode> : IGraph
     {
-        #region Fields
+
         /// <summary>
         /// All graph nodes
         /// </summary>
@@ -82,9 +80,7 @@ namespace Isles.Engine
         /// Graph edge adjacency list
         /// </summary>
         private readonly List<LinkedList<GraphEdge>> edges;
-        #endregion
 
-        #region IGraph
         /// <summary>
         /// Gets the total number of nodes in the graph
         /// </summary>
@@ -123,9 +119,7 @@ namespace Isles.Engine
         {
             return edges[nodeIndex];
         }
-        #endregion
 
-        #region Construction
         /// <summary>
         /// Creates new directed sparse graph
         /// </summary>
@@ -196,9 +190,7 @@ namespace Isles.Engine
         {
             throw new NotImplementedException();
         }
-        #endregion
 
-        #region Test
         /// <summary>
         /// Test cases for graph
         /// </summary>
@@ -227,11 +219,9 @@ namespace Isles.Engine
             var path = new List<int>();
             path.AddRange(search.Path);
         }
-        #endregion
-    }
-    #endregion
 
-    #region GraphSearch
+    }
+
     /// <summary>
     /// Interface for graph search algorithm
     /// </summary>
@@ -431,7 +421,7 @@ namespace Isles.Engine
                 // Otherwise test all node adjacent to this one
                 foreach (GraphEdge edge in graph.GetEdges(top))
                 {
-                    // Calculate the heuristic cost from this node to the target (H)                       
+                    // Calculate the heuristic cost from this node to the target (H)
                     var HCost = graph.GetHeuristicValue(edge.To, end);
 
                     // Calculate the 'real' cost to this node from the source (G)
@@ -496,5 +486,5 @@ namespace Isles.Engine
             }
         }
     }
-    #endregion
+
 }

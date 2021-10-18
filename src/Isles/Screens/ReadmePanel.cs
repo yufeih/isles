@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -71,7 +71,6 @@ namespace Isles.Screens
             var okButtonArea = new Rectangle(area.Width * 3 / 7, area.Height * 6 / 7,
                                                     area.Width / 7, area.Width / 21);
 
-            #region deleted
             //previousPage = new MenuButton(  BaseGame.Singleton.Content.Load<Texture2D>("UI/ReadmeButtons"),
             //                                 preButtonArea, new Rectangle(0, 123, 390, 123),Keys.P, null);
             //previousPage.Hightlighted = new Rectangle(390, 123, 390, 123);
@@ -86,7 +85,6 @@ namespace Isles.Screens
             //                                 okButtonArea, new Rectangle(0, 0, 390, 123), Keys.X, null);
             //ok.Hightlighted = new Rectangle(390, 0, 390, 123);
             //ok.Pressed = new Rectangle(780, 0, 390, 123);
-            #endregion
 
             previousPage = new TextButton("Previous", 21f / 23, Color.Gold, preButtonArea);
             nextPage = new TextButton("Next", 21f / 23, Color.Gold, nextButtonArea);

@@ -1,10 +1,9 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
-#region Using Statements
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -12,7 +11,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
-#endregion
 
 namespace Isles.Pipeline
 {
@@ -28,7 +26,6 @@ namespace Isles.Pipeline
         private List<Vector2>[] grassPosition;
         private ExternalReference<TextureContent>[] grassTexture;
 
-        #region Vegetation
         /// <summary>
         /// Represents a vegetation layer in the terrain
         /// </summary>
@@ -42,9 +39,7 @@ namespace Isles.Pipeline
             public int WindAmount;
             public int MaxCountPerGrid;
         }
-        #endregion
 
-        #region Process
         private void ProcessVegetation(ContentProcessorContext context)
         {
             grassSize = new List<Vector2>[vegetations.Count];
@@ -98,9 +93,7 @@ namespace Isles.Pipeline
                         directory, vegetations[i].Texture)), "TextureProcessor");
             }
         }
-        #endregion
 
-        #region Write
         private void WriteVegetation(ContentWriter output)
         {
             output.Write(vegetations.Count);
@@ -117,6 +110,6 @@ namespace Isles.Pipeline
                 }
             }
         }
-        #endregion
+
     }
 }

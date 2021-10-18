@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -12,7 +12,7 @@ using Isles.Graphics;
 
 namespace Isles.UI
 {
-    #region IUIElement
+
     /// <summary>
     /// Interface for implementing UI element
     /// </summary>
@@ -68,20 +68,17 @@ namespace Isles.UI
         /// <param name="gameTime"></param>
         void Draw(GameTime gameTime, SpriteBatch sprite);
     }
-    #endregion
 
-    #region Enumeration types
-
-    // The middle control panel should use ScaleMode.Stretch 
+    // The middle control panel should use ScaleMode.Stretch
     // & Anchor.BottomLeft.
-    // Other control panels and Menu panels use ScaleMode.ScaleY 
+    // Other control panels and Menu panels use ScaleMode.ScaleY
     // including little map. Their anchor mode is trivial.
     // All buttons and progress bars use ScaleMode.ScaleY &
     // Anchor.TopLeft.
-    // 
-    // Exceptions : The Anchor Mode of the UIElements in the 
+    //
+    // Exceptions : The Anchor Mode of the UIElements in the
     // middle control panel may be a little more complex.
-    // 
+    //
 
     /// <summary>
     /// Enumeration type used to set the location of an UI element
@@ -117,19 +114,17 @@ namespace Isles.UI
         ScaleY,
 
         /// <summary>
-        /// Width and height all changes 
+        /// Width and height all changes
         /// </summary>
         Stretch
     }
-    #endregion
 
-    #region UIElement
     /// <summary>
     /// Basic UI element
     /// </summary>
     public abstract class UIElement : IUIElement
     {
-        #region Fields
+
         /// <summary>
         /// Gets or sets UIElement area
         /// </summary>
@@ -306,13 +301,11 @@ namespace Isles.UI
         /// Gets or sets a tag
         /// </summary>
         public object Tag;
-        #endregion
 
-        #region Methods
         public UIElement() { }
 
         /// <summary>
-        /// Create the UI element 
+        /// Create the UI element
         /// </summary>
         /// <param name="area"></param>
         public UIElement(Rectangle area)
@@ -351,9 +344,7 @@ namespace Isles.UI
         /// </summary>
         /// <param name="disposing">Disposing</param>
         protected virtual void Dispose(bool disposing) { }
-        #endregion
 
-        #region GetRelativeRectangle
         /// <summary>
         /// Gets the relative rectangle based on current anchor,
         /// scale mode and parent reference rectangle.
@@ -469,7 +460,7 @@ namespace Isles.UI
 
             return relativeRectangle;
         }
-        #endregion
+
     }
-    #endregion
+
 }

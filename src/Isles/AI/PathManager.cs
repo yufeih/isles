@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -23,7 +23,6 @@ namespace Isles.Engine
     //
     //-------------------------------------------------------------------------
 
-    #region Path
     /// <summary>
     /// Represents a sequence of nodes to follow
     /// </summary>
@@ -55,9 +54,6 @@ namespace Isles.Engine
         }
     }
 
-    #endregion
-
-    #region PathBrush
     /// <summary>
     /// A brush describing the shape of the obstacle
     /// </summary>
@@ -216,9 +212,7 @@ namespace Isles.Engine
             }
         }
     }
-    #endregion
 
-    #region PathGraph
     /// <summary>
     /// Graph representing the path graph of Isles landscape
     /// </summary>
@@ -677,16 +671,14 @@ namespace Isles.Engine
             return CalculateCost(currentIndex, endIndex);
         }
     }
-    #endregion
 
-    #region PathManager
     /// <summary>
     /// Path manager to provide path finding service
     /// for all game agents.
     /// </summary>
     public class PathManager
     {
-        #region Field
+
         /// <summary>
         /// Resolution for small graph
         /// </summary>
@@ -772,9 +764,7 @@ namespace Isles.Engine
         /// The query current active
         /// </summary>
         private PathQuery currentQuery;
-        #endregion
 
-        #region PathQuery
         /// <summary>
         /// Internal representation for a given path query
         /// </summary>
@@ -833,9 +823,7 @@ namespace Isles.Engine
                 Boundary = boundary;
             }
         }
-        #endregion
 
-        #region Tag
         /// <summary>
         /// Info attached to each dynamic obstacle
         /// </summary>
@@ -851,9 +839,7 @@ namespace Isles.Engine
             /// </summary>
             public Vector3 Position = Vector3.Zero;
         }
-        #endregion
 
-        #region Obstacle & Enumeration
         /// <summary>
         /// Create a circular path brush
         /// </summary>
@@ -1099,9 +1085,7 @@ namespace Isles.Engine
                 }
             }
         }
-        #endregion
 
-        #region Method
         /// <summary>
         /// Create a new path manager on a given landscape
         /// </summary>
@@ -1356,7 +1340,7 @@ namespace Isles.Engine
             }
 
             Unmark(agent);
-            
+
             // look up its adjancent grids
             foreach (Point p in EnumerateGridsInnerOut(x, y, 512))
             {
@@ -1373,7 +1357,7 @@ namespace Isles.Engine
                 }
             }
 
-            // No grid found, just return null 
+            // No grid found, just return null
             Mark(agent);
 
             return position;
@@ -1547,7 +1531,7 @@ namespace Isles.Engine
 
         /// <summary>
         /// Query a path asychroniously from start node to end node.
-        /// 
+        ///
         /// FIXME: Can we change the structure of the graph when the search is still
         ///        been carry on? We are not perform searching using multi-threading,
         ///        but we limit the maximum search steps each frame, and the priority
@@ -1623,9 +1607,7 @@ namespace Isles.Engine
                 }
             }
         }
-        #endregion
 
-        #region Update
         /// <summary>
         /// Update path manager
         /// </summary>
@@ -1945,7 +1927,7 @@ namespace Isles.Engine
                 p = p.Next;
             }
         }
-        #endregion
+
     }
-    #endregion
+
 }

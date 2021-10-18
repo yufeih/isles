@@ -7,11 +7,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Graphics
 {
-    #region TrailEffect
 
     public class TrailEffect
     {
-        #region variables
+
         /// <summary>
         /// The queue
         /// </summary>
@@ -43,12 +42,12 @@ namespace Isles.Graphics
         private Vector3 lastPosition;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private float halfWidth;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private bool animationStarted;
 
@@ -62,10 +61,6 @@ namespace Isles.Graphics
         /// </summary>
         private Matrix projection;
 
-        #endregion
-
-        #region property
-
         /// <summary>
         /// The poisiton here means the leading position of the trail
         /// </summary>
@@ -76,12 +71,12 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public VertexPositionTexture LeadVertex1 => leadVertex1;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public VertexPositionTexture LeadVertex2 => leadVertex2;
 
@@ -115,10 +110,6 @@ namespace Isles.Graphics
         /// Gets or sets the alpha property of trail
         /// </summary>
         public float Alpha { get; set; } = 1;
-
-        #endregion
-
-        #region method
 
         public TrailEffect()
         {
@@ -193,29 +184,23 @@ namespace Isles.Graphics
             }
         }
 
-        #endregion
     }
-
-    #endregion
-
-    #region TrailEffectManager
 
     public class TrailEffectManager
     {
         //-----TrailEffectOutline----
-        //1-We'll keep a path of the 
-        //arrow going as a queue of a 
+        //1-We'll keep a path of the
+        //arrow going as a queue of a
         //fix length
-        //2- The new key point was 
-        //determined by current position 
-        //and last position the last 
+        //2- The new key point was
+        //determined by current position
+        //and last position the last
         //position will be update with a
         //span of time
         //
         //
         //
         //---------------------------
-        #region variable
 
         private readonly List<TrailEffect> trailList;
 
@@ -255,18 +240,10 @@ namespace Isles.Graphics
         private BasicEffect effect;
         private readonly int chunckSize = 100;
 
-        #endregion
-
-        #region property
-
         /// <summary>
         /// Time span to update the blocks
         /// </summary>
         public float UpdateSpan { get; set; }
-
-        #endregion
-
-        #region method
 
         /// <summary>
         /// Construction method
@@ -290,7 +267,6 @@ namespace Isles.Graphics
             effect = new BasicEffect(device, null);
         }
 
-        #region update & draw
         public void Update(GameTime gameTime)
         {
         }
@@ -370,9 +346,7 @@ namespace Isles.Graphics
                 vertexList[2 + i] = tempList[vertexCount - i - 1];
             }
         }
-        #endregion
 
-        #endregion
     }
-    #endregion
+
 }

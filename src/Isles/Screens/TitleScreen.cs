@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -14,13 +14,13 @@ using Isles.UI;
 
 namespace Isles
 {
-    #region TitleScreen
+
     /// <summary>
     /// Screen that shows the Title
     /// </summary>
     public class TitleScreen : IScreen
     {
-        // The screen that will be loaded when 
+        // The screen that will be loaded when
         // new game button is pressed
         private readonly GameScreen gameScreen;
 
@@ -33,7 +33,7 @@ namespace Isles
         // Texture used for disappearing effect
         private Texture2D titleDisplayShotTexture;
 
-        // Texture for transition to loading 
+        // Texture for transition to loading
         private readonly Texture2D loadingDisplayTexture;
 
         // Disappear effect
@@ -52,7 +52,7 @@ namespace Isles
         /// <summary>
         /// Use the double variable to describe the expected position
         /// of the high light panel.
-        /// In this way, it can be guaranteed that highLight.X will 
+        /// In this way, it can be guaranteed that highLight.X will
         /// finally miss its destination no more than 1 pixel.
         /// </summary>
 
@@ -64,7 +64,7 @@ namespace Isles
         private readonly double creditRollingTime = 10;
         private readonly int creditStringLength = 400;
 
-        // Buttons in array arranged in the following order: 
+        // Buttons in array arranged in the following order:
         //      1. Campaign
         //      2. Skirmish
         //      3. Options
@@ -76,8 +76,6 @@ namespace Isles
         // this screen
         private readonly UIDisplay ui;
 
-        #region constant values
-
         private const int buttonSourceWidth = 199;
         private const int buttonSourceHeight = 38;
         private const int buttonDestinationWidth = 100;
@@ -85,8 +83,6 @@ namespace Isles
         private readonly int buttonBias = 150;
         private const int hightLightDestinationHeight = 25;
         private const int hightLightButtonBaseY = 230;
-
-        #endregion
 
         private readonly Panel highLight;
         private readonly Panel loadingPanel;
@@ -454,7 +450,7 @@ namespace Isles
             //ui.Sprite.Begin();
 
             //ui.Sprite.Draw(buttonsTexture, new Rectangle((int)highLightPosition, 508,
-            //                buttonDestinationWidth, hightLightDestinationHeight), 
+            //                buttonDestinationWidth, hightLightDestinationHeight),
             //                new Rectangle(0, 5 * buttonSourceHeight, buttonSourceWidth, 66), Color.White);
             //ui.Sprite.End();
 
@@ -528,9 +524,7 @@ namespace Isles
 
         }
     }
-    #endregion
 
-    #region MenuButton
     public class MenuButton : Button
     {
         // The name of the menu button
@@ -598,14 +592,5 @@ namespace Isles
             }
         }
     }
-    #endregion
 
-    #region LANGameDialog
-    #endregion
-
-    #region CreateGameDialog
-    #endregion
-
-    #region LobbyDialog
-    #endregion
 }

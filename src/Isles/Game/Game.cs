@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@ using Isles.Engine;
 
 namespace Isles
 {
-    #region GameIsles
+
     /// <summary>
     /// Game Isles
     /// </summary>
@@ -192,9 +192,7 @@ namespace Isles
             Spell.RegisterCreator("SummonHellfire", delegate (GameWorld world) { return new SpellSummon(world, "Hellfire"); });
         }
     }
-    #endregion
 
-    #region Audios
     public static class Audios
     {
         public enum Channel
@@ -276,7 +274,7 @@ namespace Isles
                         unit = null;
                     }
 
-                    //unitTimer = 0;                        
+                    //unitTimer = 0;
                     unit = Audio.Play(name, emitter);
                 }
                 else if (channel == Channel.Interface &&
@@ -374,5 +372,5 @@ namespace Isles
             }
         }
     }
-    #endregion
+
 }

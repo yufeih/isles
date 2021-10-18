@@ -1,10 +1,9 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
-#region Using Statements
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -14,7 +13,6 @@ using Microsoft.Xna.Framework.Input;
 using Isles.Graphics;
 using Cursor = System.Windows.Forms.Cursor;
 using Control = System.Windows.Forms.Control;
-#endregion
 
 namespace Isles.Engine
 {
@@ -23,7 +21,7 @@ namespace Isles.Engine
     /// </summary>
     public class BaseGame : Game, IEventListener
     {
-        #region Variables
+
         /// <summary>
         /// Windows cursor
         /// </summary>
@@ -59,9 +57,7 @@ namespace Isles.Engine
         /// Facing direction of this frame
         /// </summary>
         private Vector3 facing;
-        #endregion
 
-        #region Properties
         /// <summary>
         /// Gets or sets windows cursor
         /// </summary>
@@ -242,9 +238,6 @@ namespace Isles.Engine
         /// Gets or sets game speed
         /// </summary>
         public double GameSpeed { get; set; } = 1;
-        #endregion
-
-        #region Methods
 
         /// <summary>
         /// Starts a game screen and run
@@ -327,9 +320,6 @@ namespace Isles.Engine
             }
         }
 
-        #endregion
-
-        #region Initialization
         public BaseGame()
             : this(Settings.CreateDefaultSettings(null))
         {
@@ -537,9 +527,6 @@ namespace Isles.Engine
             base.UnloadContent();
         }
 
-        #endregion
-
-        #region Update
         private bool initialized;
         /// <summary>
         /// Allows the game to run logic such as updating the world,
@@ -760,10 +747,6 @@ namespace Isles.Engine
             }
         }
 
-        #endregion
-
-        #region Draw
-
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>
@@ -823,9 +806,6 @@ namespace Isles.Engine
             base.Draw(gameTime);
         }
 
-        #endregion
-
-        #region Handle Event
         public EventResult HandleEvent(EventType type, object sender, object tag)
         {
             // Take screenshot
@@ -845,9 +825,6 @@ namespace Isles.Engine
                 ? EventResult.Handled
                 : EventResult.Unhandled;
         }
-        #endregion
-
-        #region Dispose
 
         protected override void Dispose(bool disposing)
         {
@@ -878,6 +855,5 @@ namespace Isles.Engine
             base.Dispose(disposing);
         }
 
-        #endregion
     }
 }

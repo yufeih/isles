@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 namespace Isles.Engine
 {
-    #region PriorityQueue
+
     /// <summary>
     /// Use min heap to implement a priority queue
     /// </summary>
@@ -223,9 +223,7 @@ namespace Isles.Engine
             return data.GetEnumerator();
         }
     }
-    #endregion
 
-    #region IndexedPriorityQueue
     /// <summary>
     /// Use min heap to implement a priority queue.
     /// Used to implement Dijkstra's algorithm.
@@ -440,5 +438,5 @@ namespace Isles.Engine
             index[k] = i;
         }
     }
-    #endregion
+
 }

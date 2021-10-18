@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -14,7 +14,7 @@ using Isles.Engine;
 
 namespace Isles.UI
 {
-    #region Panel
+
     /// <summary>
     /// Basic Panel
     /// </summary>
@@ -185,9 +185,7 @@ namespace Isles.UI
             return EventResult.Unhandled;
         }
     }
-    #endregion
 
-    #region ScrollPanel
     /// <summary>
     /// Game scroll panel
     /// </summary>
@@ -369,9 +367,7 @@ namespace Isles.UI
             base.Draw(gameTime, sprite);
         }
     }
-    #endregion
 
-    #region TextField
     public class TextField : Panel
     {
         private string text;
@@ -582,9 +578,7 @@ namespace Isles.UI
             base.Draw(gameTime, sprite);
         }
     }
-    #endregion
 
-    #region TextBox
     public class TextBox : TextField
     {
         public int MaxCharactors
@@ -655,5 +649,5 @@ namespace Isles.UI
             return EventResult.Unhandled;
         }
     }
-    #endregion
+
 }

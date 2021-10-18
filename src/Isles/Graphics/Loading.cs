@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@ using Isles.UI;
 
 namespace Isles.Graphics
 {
-    #region ILoading
+
     /// <summary>
     /// Interface for tracking loading progress
     /// </summary>
@@ -42,9 +42,7 @@ namespace Isles.Graphics
         /// </summary>
         void Reset();
     }
-    #endregion
 
-    #region Loading
     /// <summary>
     /// Used to presents loading progress
     /// </summary>
@@ -206,5 +204,5 @@ namespace Isles.Graphics
 
         public Texture2D LoadingFinished;
     }
-    #endregion
+
 }

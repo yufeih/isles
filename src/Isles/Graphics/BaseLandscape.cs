@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -13,7 +13,7 @@ using Isles.Engine;
 
 namespace Isles.Graphics
 {
-    #region LandscapeReader
+
     public class LandscapeReader : ContentTypeReader<BaseLandscape>
     {
         /// <summary>
@@ -30,12 +30,10 @@ namespace Isles.Graphics
             return landscape;
         }
     }
-    #endregion
 
-    #region BaseLandscape
     public abstract class BaseLandscape : ILandscape
     {
-        #region Layer
+
         /// <summary>
         /// Represents a texture layer on the terrain
         /// </summary>
@@ -123,15 +121,12 @@ namespace Isles.Graphics
                 }
             }
         }
-        #endregion
 
-        #region Patch
         /// <summary>
         /// Represents the smallest unit of the terrain
         /// </summary>
         public class Patch
         {
-            #region Misc
 
             private BoundingBox boundingBox;
             private readonly BaseLandscape landscape;
@@ -232,10 +227,6 @@ namespace Isles.Graphics
             /// Gets patch bounding box
             /// </summary>
             public BoundingBox BoundingBox => boundingBox;
-
-            #endregion
-
-            #region Fill Patch Vertices and Indices
 
             public delegate Vector3 GetVertexPosition(int x, int y);
             public delegate void SetVertexPosition(uint index, Vector3 position);
@@ -343,10 +334,6 @@ namespace Isles.Graphics
 
                 return (uint)MagicIndices[LevelOfDetail].Length;
             }
-
-            #endregion
-
-            #region Magic Data :)
 
             /// <summary>
             /// At maximun resolution, a patch has 16 * 16 grids
@@ -526,11 +513,8 @@ namespace Isles.Graphics
             private static readonly int[] MagicBase = new int[] { 1, 2, 4, 8, 16 };
             private static readonly int[] MagicLength = new int[] { 16, 8, 4, 2, 1 };
 
-            #endregion
         }
-        #endregion
 
-        #region Field
         /// <summary>
         /// Base game
         /// </summary>
@@ -604,9 +588,6 @@ namespace Isles.Graphics
         /// Gets the height of grid
         /// </summary>
         public int GridCountOnYAxis { get; private set; }
-        #endregion
-
-        #region Method
 
         public virtual void ReadContent(ContentReader input)
         {
@@ -805,9 +786,9 @@ namespace Isles.Graphics
             }
             // we are on triangle 1 !!
             //  0     1
-            //  |\  
-            //  | \ 
-            //  |  \ 
+            //  |\
+            //  | \
+            //  |  \
             //  |   \
             //  |    \
             //  2_____3
@@ -1310,10 +1291,6 @@ namespace Isles.Graphics
             return null;
         }
 
-        #endregion
-
-        #region Update & Draw
-
         /// <summary>
         /// Update landscape every frame
         /// </summary>
@@ -1325,7 +1302,7 @@ namespace Isles.Graphics
         }
 
         public abstract void Draw(GameTime gameTime);
-        #endregion
+
     }
-    #endregion
+
 }

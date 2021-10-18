@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -10,9 +10,7 @@ using Microsoft.Xna.Framework;
 
 namespace Isles.Engine
 {
-    #region Movement
 
-    #region Interfaces
     /// <summary>
     /// Interface for the set of movement states to interact with
     /// moving entities.
@@ -49,9 +47,7 @@ namespace Isles.Engine
         /// </summary>
         object MovementTag { get; set; }
     }
-    #endregion
 
-    #region StateMoveToTarget
     /// <summary>
     /// Move the entity to a target moving entity
     /// </summary>
@@ -170,9 +166,7 @@ namespace Isles.Engine
             return StateResult.Active;
         }
     }
-    #endregion
 
-    #region StateMoveToPosition
     public class StateMoveToPosition : BaseState
     {
         private readonly IMovable owner;
@@ -311,9 +305,7 @@ namespace Isles.Engine
             return StateResult.Active;
         }
     }
-    #endregion
 
-    #region StateMoveToPositionPrecise
     public class StateMoveToPositionPrecise : BaseState
     {
         private readonly IMovable owner;
@@ -499,9 +491,7 @@ namespace Isles.Engine
             return EventResult.Unhandled;
         }
     }
-    #endregion
 
-    #region StateSeekToPosition
     public class StateSeekToPosition : BaseState
     {
         public float WaitTime;
@@ -601,7 +591,5 @@ namespace Isles.Engine
             return State;
         }
     }
-    #endregion
 
-    #endregion
 }

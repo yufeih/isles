@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@ using Isles.Graphics;
 
 namespace Isles
 {
-    #region Icon
+
     /// <summary>
     /// A rectangle on a texture.
     /// Currently all icons are placed in the same texture for simplicity.
@@ -99,16 +99,14 @@ namespace Isles
             return new Icon(texture, new Rectangle(x * w, y * h, w, h));
         }
     }
-    #endregion
 
-    #region Spell
     /// <summary>
     /// Base class for all game spells.
     /// A new spell instance is created whenever a spell is been casted
     /// </summary>
     public abstract class Spell : IEventListener
     {
-        #region Static Stuff
+
         /// <summary>
         /// Delegation used to create a spell
         /// </summary>
@@ -181,7 +179,6 @@ namespace Isles
         public static Spell CurrentSpell => currentSpell;
 
         private static Spell currentSpell;
-        #endregion
 
         protected GameWorld world;
 
@@ -506,12 +503,10 @@ namespace Isles
             throw new InvalidOperationException();
         }
     }
-    #endregion
 
-    #region SpellButton
     public class SpellButton : Button
     {
-        #region Fields
+
         /// <summary>
         /// Gets or sets the number in the top left corner
         /// </summary>
@@ -546,9 +541,7 @@ namespace Isles
             get => autoCast;
             set => autoCast = value;
         }
-        #endregion
 
-        #region Draw Fade
         /// <summary>
         /// The fade mask is divided into 5 parts to draw
         /// </summary>
@@ -659,7 +652,6 @@ namespace Isles
                 return;
             }
         }
-        #endregion
 
         /// <summary>
         /// Draw
@@ -684,9 +676,7 @@ namespace Isles
             }
         }
     }
-    #endregion
 
-    #region SpellTraining
     public class SpellTraining : Spell
     {
         /// <summary>
@@ -952,9 +942,7 @@ namespace Isles
             }
         }
     }
-    #endregion
 
-    #region SpellUpgrades
     public class SpellUpgrade : SpellTraining
     {
         public SpellUpgrade(GameWorld world, string type)
@@ -1049,9 +1037,7 @@ namespace Isles
             }
         }
     }
-    #endregion
 
-    #region SpellConstruct
     /// <summary>
     /// An interface for the construct spell to interact with other entities.
     /// A placeable must also be a derived class of Entity
@@ -1338,9 +1324,7 @@ namespace Isles
             return EventResult.Unhandled;
         }
     }
-    #endregion
 
-    #region SpellAttack
     public class SpellAttack : Spell
     {
         /// <summary>
@@ -1446,9 +1430,7 @@ namespace Isles
             return EventResult.Unhandled;
         }
     }
-    #endregion
 
-    #region SpellMove
     public class SpellMove : Spell
     {
         public SpellMove(GameWorld world)
@@ -1534,9 +1516,7 @@ namespace Isles
             return EventResult.Unhandled;
         }
     }
-    #endregion
 
-    #region SpellCombat
     /// <summary>
     /// Any spell againest units or buildings should derive from
     /// SpellCombat and use StateAttack to trigger the event.
@@ -1623,9 +1603,7 @@ namespace Isles
             }
         }
     }
-    #endregion
 
-    #region SpellSummon
     public class SpellSummon : Spell
     {
         private readonly string type;
@@ -1689,9 +1667,7 @@ namespace Isles
             base.Cast();
         }
     }
-    #endregion
 
-    #region SpellDrawPathOccluder
     public class SpellDrawPathOcculder : Spell
     {
         private bool? drawing;
@@ -1825,9 +1801,7 @@ namespace Isles
             }
         }
     }
-    #endregion
 
-    #region SpellPunishOfNature
     public class SpellPunishOfNature : Spell
     {
         private const float Duration = 60;
@@ -1907,9 +1881,7 @@ namespace Isles
             base.Update(gameTime);
         }
     }
-    #endregion
 
-    #region Fireball
     /// <summary>
     /// Fireball entity
     /// </summary>
@@ -1917,7 +1889,7 @@ namespace Isles
     {
         /// <summary>
         /// Gets or sets the velocity of the fireball
-        /// </summary>        
+        /// </summary>
         public override Vector3 Velocity => velocity;
 
         private Vector3 velocity;
@@ -2052,5 +2024,5 @@ namespace Isles
             billboard.Draw();
         }
     }
-    #endregion
+
 }

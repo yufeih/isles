@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -13,7 +13,7 @@ using Isles.Engine;
 
 namespace Isles
 {
-    #region StateHarvestGold
+
     public class StateHarvestGold : BaseState
     {
         /// <summary>
@@ -330,9 +330,7 @@ namespace Isles
             return minGoldmine;
         }
     }
-    #endregion
 
-    #region StateHarvestLumber
     public class StateHarvestLumber : BaseState
     {
         /// <summary>
@@ -701,9 +699,7 @@ namespace Isles
             return minTree;
         }
     }
-    #endregion
 
-    #region StateConstruct
     public class StateConstruct : BaseState
     {
         /// <summary>
@@ -828,9 +824,7 @@ namespace Isles
             return building == null || building.State != Building.BuildingState.Constructing;
         }
     }
-    #endregion
 
-    #region StateRepair
     public class StateRepair : BaseState
     {
         /// <summary>
@@ -957,9 +951,7 @@ namespace Isles
                                        building.Health == building.MaximumHealth);
         }
     }
-    #endregion
 
-    #region StateCharactorIdle
     public class StateCharactorIdle : BaseState
     {
         private double arbitrateTimer;
@@ -1004,9 +996,7 @@ namespace Isles
             return StateResult.Active;
         }
     }
-    #endregion
 
-    #region StateCharactorDie
     public class StateCharactorDie : BaseState
     {
         private bool sink;
@@ -1064,9 +1054,7 @@ namespace Isles
             return StateResult.Active;
         }
     }
-    #endregion
 
-    #region StateAttack
     public class StateAttack : BaseState
     {
         /// <summary>
@@ -1308,5 +1296,5 @@ namespace Isles
             return minTarget;
         }
     }
-    #endregion
+
 }

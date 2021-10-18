@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -13,13 +13,13 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Engine
 {
-    #region Helper
+
     /// <summary>
     /// A simple helper class
     /// </summary>
     public static class Helper
     {
-        #region String parser
+
         public static Color StringToColor(string value)
         {
             var split = value.Split(new char[] { ',' }, 3);
@@ -91,9 +91,7 @@ namespace Isles.Engine
                     float.Parse(split[3]))
                 : Quaternion.Identity;
         }
-        #endregion
 
-        #region ToString
         public static string ColorToString(Color c)
         {
             return c.R + ", " + c.G + ", " + c.B;
@@ -122,9 +120,7 @@ namespace Isles.Engine
         {
             return q.X + ", " + q.Y + ", " + q.Z + ", " + q.W;
         }
-        #endregion
 
-        #region Misc
         private static readonly Random random = new();
 
         /// <summary>
@@ -224,11 +220,9 @@ namespace Isles.Engine
 
             return true;
         }
-        #endregion
-    }
-    #endregion
 
-    #region BroadcastList
+    }
+
     /// <summary>
     /// A list, allow safe deletion of objects
     /// </summary>
@@ -305,9 +299,8 @@ namespace Isles.Engine
         }
     }
 
-    #region Obsolute
 #if SOMETHINGSWRONGWITHTHIS
-    public class BroadcastList<TValue, TList> 
+    public class BroadcastList<TValue, TList>
         : IEnumerable<TValue>, ICollection<TValue> where TList : ICollection<TValue>, new()
     {
         bool clear;
@@ -388,10 +381,7 @@ namespace Isles.Engine
         }
     }
 #endif
-    #endregion
-    #endregion
 
-    #region Property
 #if MAYBEWEDONOTNEETTHIS
     /// <summary>
     /// A set of property to describe an object
@@ -528,7 +518,7 @@ namespace Isles.Engine
             xml = element;
         }
 
-    #region IProperty<string> Members
+
         public string Name
         {
             get { return xml.Name; }
@@ -638,8 +628,8 @@ namespace Isles.Engine
         {
             throw new Exception("The method or operation is not implemented.");
         }
-    #endregion
+
     }
 #endif
-    #endregion
+
 }

@@ -1,20 +1,18 @@
 //-----------------------------------------------------------------------------
 //  Isles v1.0
-//  
+//
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
-#region Using directives
 using System;
 using System.IO;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-#endregion
 
 namespace Isles.Engine
 {
-    #region Log
+
     /// <summary>
     /// Log will create automatically a log file and write
     /// log/error/debug info for simple runtime error checking, very useful
@@ -24,12 +22,12 @@ namespace Isles.Engine
     ///
     /// Note: I don't use this class anymore for big projects, but its small
     /// and handy for smaller projects and nice to log non-debugable stuff.
-    /// 
+    ///
     /// Orignally grabbed from Racing game
     /// </summary>
     public static class Log
     {
-        #region Variables
+
         /// <summary>
         /// Writer
         /// </summary>
@@ -39,9 +37,7 @@ namespace Isles.Engine
         /// Log filename
         /// </summary>
         private const string LogFilename = "Log.txt";
-        #endregion
 
-        #region Static constructor to create log file
         /// <summary>
         /// Static constructor
         /// </summary>
@@ -87,9 +83,7 @@ namespace Isles.Engine
                 // createable (e.g. on a CD-Rom) it doesn't matter.
             }
         }
-        #endregion
 
-        #region Write log entry
         static public void NewLine()
         {
             writer.WriteLine("", false);
@@ -149,11 +143,9 @@ namespace Isles.Engine
                 // createable (e.g. on a CD-Rom) it doesn't matter.
             }
         }
-        #endregion
-    }
-    #endregion
 
-    #region Timer
+    }
+
     public static class Timer
     {
         private static readonly List<IEventListener> handlers = new();
@@ -217,9 +209,7 @@ namespace Isles.Engine
             }
         }
     }
-    #endregion
 
-    #region Profiler
     /// <summary>
     /// Frame rate profiler
     /// </summary>
@@ -330,9 +320,7 @@ namespace Isles.Engine
             game.Graphics2D.DrawString("FPS: " + fpsInterpolated, 16f / 23, new Vector2(0, 0), Color.White);
         }
     }
-    #endregion
 
-    #region ScreenshotCapturer
     /// <summary>
     /// Screenshot capturer grabbed from Racing game
     /// </summary>
@@ -340,7 +328,6 @@ namespace Isles.Engine
     {
         private const string ScreenshotsDirectory = "Screenshots";
 
-        #region Variables
         /// <summary>
         /// Internal screenshot number (will increase by one each screenshot)
         /// </summary>
@@ -383,19 +370,14 @@ namespace Isles.Engine
         }
 
         private ResolveTexture2D screenshot;
-        #endregion
 
-        #region Constructor
         public ScreenshotCapturer(BaseGame setGame)
             : base(setGame)
         {
             game = setGame;
             screenshotNum = GetCurrentScreenshotNum();
         }
-        #endregion
 
-        #region Make screenshot
-        #region Screenshot name builder
         /// <summary>
         /// Screenshot name builder
         /// </summary>
@@ -407,9 +389,7 @@ namespace Isles.Engine
                 game.Window.Title + " Screenshot " +
                 num.ToString("0000") + ".jpg";
         }
-        #endregion
 
-        #region Get current screenshot num
         /// <summary>
         /// Get current screenshot num
         /// </summary>
@@ -473,7 +453,6 @@ namespace Isles.Engine
 
             return i * 1000 + j * 100 + k * 10 + l;
         }
-        #endregion
 
         private IEventListener photographer;
 
@@ -548,9 +527,7 @@ namespace Isles.Engine
                 shouldCapture = false;
             }
         }
-        #endregion
 
-        #region Update
         /// <summary>
         /// Allows the game component to update itself.
         /// </summary>
@@ -571,11 +548,9 @@ namespace Isles.Engine
 
             base.Update(gameTime);
         }
-        #endregion
-    }
-    #endregion 
 
-    #region PathGraphVisualizer
+    }
+
     public class PathGraphVisualizer : DrawableGameComponent
     {
         private readonly BaseGame game;
@@ -668,5 +643,5 @@ namespace Isles.Engine
             }
         }
     }
-    #endregion
+
 }
