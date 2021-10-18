@@ -63,7 +63,6 @@ namespace Isles.UI
             set => hightLightLength = value;
         }
 
-
         // About Textures: 5 in total including the Frame of the bar
 
         private Rectangle sourceRectangleLeftEnd;

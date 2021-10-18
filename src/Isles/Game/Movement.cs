@@ -385,8 +385,10 @@ namespace Isles.Engine
             //else
             {
                 // Seek to destination before the path is found
-                seek = new StateSeekToPosition(destination, owner, pathManager);
-                seek.WaitTime = 0.1f * retryCounter;
+                seek = new StateSeekToPosition(destination, owner, pathManager)
+                {
+                    WaitTime = 0.1f * retryCounter
+                };
             }
 
             includeDynamic = true;
@@ -437,8 +439,10 @@ namespace Isles.Engine
                 {
                     currentEdge = currentEdge.Next;
 
-                    seek = new StateSeekToPosition(currentEdge.Value.Position, owner, pathManager);
-                    seek.WaitTime = 0.1f * retryCounter;
+                    seek = new StateSeekToPosition(currentEdge.Value.Position, owner, pathManager)
+                    {
+                        WaitTime = 0.1f * retryCounter
+                    };
 
                     return State = StateResult.Active;
                 }
@@ -465,8 +469,10 @@ namespace Isles.Engine
 
                 currentEdge = path.Edges.First;
 
-                seek = new StateSeekToPosition(currentEdge.Value.Position, owner, pathManager);
-                seek.WaitTime = 0.1f * retryCounter;
+                seek = new StateSeekToPosition(currentEdge.Value.Position, owner, pathManager)
+                {
+                    WaitTime = 0.1f * retryCounter
+                };
 
                 //LinkedListNode<PathEdge> edge = path.Edges.First;
                 //while (edge != null && edge.Next != null)

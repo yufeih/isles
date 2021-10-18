@@ -114,19 +114,23 @@ namespace Isles
             ui.Anchor = Anchor.TopLeft;
 
             var height = loadingDisplayTexture.Height * ui.Area.Width / loadingDisplayTexture.Width;
-            loadingPanel = new Panel(new Rectangle(0, (int)((ui.Area.Height - height) / 2), ui.Area.Width, height));
-            loadingPanel.Texture = loadingDisplayTexture;
-            loadingPanel.SourceRectangle = new Rectangle(0, 0, loadingDisplayTexture.Width, loadingDisplayTexture.Height);
-            loadingPanel.ScaleMode = ScaleMode.Stretch;
-            loadingPanel.Anchor = Anchor.Center;
+            loadingPanel = new Panel(new Rectangle(0, (int)((ui.Area.Height - height) / 2), ui.Area.Width, height))
+            {
+                Texture = loadingDisplayTexture,
+                SourceRectangle = new Rectangle(0, 0, loadingDisplayTexture.Width, loadingDisplayTexture.Height),
+                ScaleMode = ScaleMode.Stretch,
+                Anchor = Anchor.Center
+            };
             ui.Add(loadingPanel);
 
             // Set the panel
-            titlePanel = new Panel(new Rectangle(0, (int)((ui.Area.Height - height) / 2), ui.Area.Width, height));
-            titlePanel.Texture = titleTexture;
-            titlePanel.SourceRectangle = new Rectangle(0, 0, titleTexture.Width, titleTexture.Height);
-            titlePanel.ScaleMode = ScaleMode.Stretch;
-            titlePanel.Anchor = Anchor.Center;
+            titlePanel = new Panel(new Rectangle(0, (int)((ui.Area.Height - height) / 2), ui.Area.Width, height))
+            {
+                Texture = titleTexture,
+                SourceRectangle = new Rectangle(0, 0, titleTexture.Width, titleTexture.Height),
+                ScaleMode = ScaleMode.Stretch,
+                Anchor = Anchor.Center
+            };
             ui.Add(titlePanel);
 
             // Test textbox
@@ -140,7 +144,7 @@ namespace Isles
             using (Stream creditText = BaseGame.Singleton.ZipContent.GetFileStream("Content/Credits.txt"))
             {
                 var sr = new StreamReader(creditText);
-                String textSegment = null;
+                string textSegment = null;
                 while (null != (textSegment = sr.ReadLine()))
                 {
                     if (textSegment.Length == 0)
@@ -172,8 +176,10 @@ namespace Isles
             creditRollingTime = creditStringLength * 0.015;
 
             // I'll just hard code the size :(
-            leftMaskPanel = new Panel(Rectangle.Empty);
-            leftMaskPanel.Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/LeftMask");
+            leftMaskPanel = new Panel(Rectangle.Empty)
+            {
+                Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/LeftMask")
+            };
             leftMaskPanel.SourceRectangle = new Rectangle(0, 0, leftMaskPanel.Texture.Width, leftMaskPanel.Texture.Height);
             leftMaskPanel.ScaleMode = ScaleMode.Fixed;
             leftMaskPanel.Anchor = Anchor.TopLeft;
@@ -181,8 +187,10 @@ namespace Isles
             leftMaskPanel.EffectiveRegion = Rectangle.Empty;
             ui.Add(leftMaskPanel);
 
-            rightMaskPanel = new Panel(Rectangle.Empty);
-            rightMaskPanel.Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/RightMask");
+            rightMaskPanel = new Panel(Rectangle.Empty)
+            {
+                Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/RightMask")
+            };
             rightMaskPanel.SourceRectangle = new Rectangle(0, 0, rightMaskPanel.Texture.Width, rightMaskPanel.Texture.Height);
             rightMaskPanel.ScaleMode = ScaleMode.Fixed;
             rightMaskPanel.Anchor = Anchor.TopLeft;
@@ -195,20 +203,23 @@ namespace Isles
             //highLight = new Panel(new Rectangle
             //            (150, 507, buttonDestinationWidth, hightLightDestinationHeight));
             highLight = new Panel(new Rectangle
-                       (buttonBias, buttonY, buttonDestinationWidth, hightLightDestinationHeight));
-            highLight.Texture = buttonsTexture;
-            highLight.SourceRectangle = new Rectangle(0, 5 * buttonSourceHeight, buttonSourceWidth, 66);
-            highLight.Anchor = Anchor.TopLeft;
-            highLight.ScaleMode = ScaleMode.ScaleY;
-
+                       (buttonBias, buttonY, buttonDestinationWidth, hightLightDestinationHeight))
+            {
+                Texture = buttonsTexture,
+                SourceRectangle = new Rectangle(0, 5 * buttonSourceHeight, buttonSourceWidth, 66),
+                Anchor = Anchor.TopLeft,
+                ScaleMode = ScaleMode.ScaleY
+            };
 
             // Set buttons
             for (var i = 0; i < 5; i++)
             {
                 buttons[i] = new MenuButton(buttonsTexture,
                              new Rectangle(buttonBias * i + buttonBias * 4 / 5, buttonY, buttonDestinationWidth, buttonDestinationHeight),
-                             new Rectangle(0, i * 32, buttonSourceWidth, buttonSourceHeight), Keys.F1 + i, null);
-                buttons[i].Texture = buttonsTexture;
+                             new Rectangle(0, i * 32, buttonSourceWidth, buttonSourceHeight), Keys.F1 + i, null)
+                {
+                    Texture = buttonsTexture
+                };
                 buttons[i].Disabled = buttons[i].SourceRectangle
                     = new Rectangle(0, i * buttonSourceHeight, buttonSourceWidth, buttonSourceHeight);
                 buttons[i].Pressed = buttons[i].Hovered
@@ -216,7 +227,7 @@ namespace Isles
                 buttons[i].Anchor = Anchor.TopLeft;
                 buttons[i].ScaleMode = ScaleMode.ScaleY;
                 buttons[i].Index = i;
-                buttons[i].Enter += delegate (Object o, EventArgs e) { HighLightMoveTo((o as MenuButton).Index); };
+                buttons[i].Enter += delegate (object o, EventArgs e) { HighLightMoveTo((o as MenuButton).Index); };
                 titlePanel.Add(buttons[i]);
             }
 
@@ -548,7 +559,7 @@ namespace Isles
         /// Construct a new menu button
         /// </summary>
         public MenuButton(Texture2D texture,
-            Rectangle area, Rectangle srcRectangle, Keys hotKey, String name)
+            Rectangle area, Rectangle srcRectangle, Keys hotKey, string name)
             : base(texture, area, srcRectangle, hotKey)
         {
             Name = name;

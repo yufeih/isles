@@ -339,7 +339,7 @@ namespace Isles.Graphics
 #if SHORTINDEX
         UInt16[] workingIndices;
 #else
-        private UInt32[] workingIndices;
+        private uint[] workingIndices;
 #endif
 
         private TerrainVertex[] workingVertices;
@@ -405,7 +405,7 @@ namespace Isles.Graphics
                     6 * PatchCountOnXAxis * PatchCountOnYAxis *
                     Patch.MaxPatchResolution * Patch.MaxPatchResolution];
 #else
-                workingIndices = new UInt32[
+                workingIndices = new uint[
                     6 * PatchCountOnXAxis * PatchCountOnYAxis *
                     Patch.MaxPatchResolution * Patch.MaxPatchResolution];
 #endif
@@ -564,7 +564,7 @@ namespace Isles.Graphics
                     graphics,typeof(UInt16), elementCount,BufferUsage.WriteOnly));
 #else
                 terrainIndexBufferSet.Add(new IndexBuffer(
-                    graphics, typeof(UInt32), elementCount, BufferUsage.WriteOnly));
+                    graphics, typeof(uint), elementCount, BufferUsage.WriteOnly));
 #endif
             }
 

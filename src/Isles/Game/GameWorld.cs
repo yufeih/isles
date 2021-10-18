@@ -39,47 +39,36 @@ namespace Isles.Engine
         /// <summary>
         /// Gets main game instance
         /// </summary>
-        public BaseGame Game => game;
-
-        private readonly BaseGame game = BaseGame.Singleton;
+        public BaseGame Game { get; } = BaseGame.Singleton;
 
         /// <summary>
         /// Landscape of the game world
         /// </summary>
-        public Landscape Landscape => landscape;
+        public Landscape Landscape { get; private set; }
 
-        private Landscape landscape;
         private string landscapeFilename;
 
         /// <summary>
         /// Gets the path manager of the game world
         /// </summary>
-        public PathManager PathManager => pathManager;
-
-        private PathManager pathManager;
+        public PathManager PathManager { get; private set; }
 
         /// <summary>
         /// Game content manager.
         /// Assets loaded using this content manager will not be unloaded
         /// until the termination of the application.
         /// </summary>
-        public ContentManager Content => content;
-
-        private readonly ContentManager content;
+        public ContentManager Content { get; }
 
         /// <summary>
         /// Gets game the fog of war
         /// </summary>
-        public FogMask FogOfWar => fogOfWar;
-
-        private FogMask fogOfWar;
+        public FogMask FogOfWar { get; private set; }
 
         /// <summary>
         /// Gets or sets whether fog of war is enable
         /// </summary>
-        public bool EnableFogOfWar => enableFogOfWar;
-
-        private readonly bool enableFogOfWar = true;
+        public bool EnableFogOfWar { get; } = true;
 
         /// <summary>
         /// Gets the smoothed target position
@@ -96,7 +85,7 @@ namespace Isles.Engine
         #region Methods
         public GameWorld()
         {
-            content = game.ZipContent;
+            Content = Game.ZipContent;
         }
 
         /// <summary>
@@ -120,7 +109,7 @@ namespace Isles.Engine
             worldObjects.Update();
 
             // Update landscape
-            landscape.Update(gameTime);
+            Landscape.Update(gameTime);
 
             // Smooth target position
             SmoothTargetPosition();
@@ -132,13 +121,13 @@ namespace Isles.Engine
             }
 
             // Refresh fog of war
-            if (enableFogOfWar && fogOfWar != null)
+            if (EnableFogOfWar && FogOfWar != null)
             {
-                fogOfWar.Refresh(gameTime);
+                FogOfWar.Refresh(gameTime);
             }
 
             // Update path manager
-            pathManager.Update();
+            PathManager.Update();
 
             // Update scene manager internal structure
             UpdateSceneManager();
@@ -146,11 +135,11 @@ namespace Isles.Engine
 
         private void SmoothTargetPosition()
         {
-            Vector3? hitPoint = landscape.Pick();
+            Vector3? hitPoint = Landscape.Pick();
             if (isTargetPositionOnLandscape = hitPoint.HasValue)
             {
                 targetPosition += (hitPoint.Value - targetPosition) * 0.5f;
-                var height = landscape.GetHeight(targetPosition.X, targetPosition.Y);
+                var height = Landscape.GetHeight(targetPosition.X, targetPosition.Y);
                 if (height > targetPosition.Z)
                 {
                     targetPosition.Z = height;
@@ -166,33 +155,33 @@ namespace Isles.Engine
         {
             Texture2D shadowMap = null;
 
-            if (game.Settings.ShowWater)
+            if (Game.Settings.ShowWater)
             {
                 // Pre-render our landscape, update landscape
                 // reflection and refraction texture.
-                landscape.UpdateWaterReflectionAndRefraction(gameTime);
+                Landscape.UpdateWaterReflectionAndRefraction(gameTime);
             }
 
             // Generate shadow map
-            if (game.Settings.ShowLandscape &&
-                game.Shadow != null && game.Shadow.Begin())
+            if (Game.Settings.ShowLandscape &&
+                Game.Shadow != null && Game.Shadow.Begin())
             {
                 // Calculate shadow view projection matrix
-                CalculateShadowMatrix(game.Shadow);
+                CalculateShadowMatrix(Game.Shadow);
 
                 // Draw shadow casters. Currently we only draw all world object
                 foreach (IWorldObject o in worldObjects)
                 {
-                    o.DrawShadowMap(gameTime, game.Shadow);
+                    o.DrawShadowMap(gameTime, Game.Shadow);
                 }
 
-                game.ModelManager.Present(gameTime, game.Shadow);
+                Game.ModelManager.Present(gameTime, Game.Shadow);
 
                 // Resolve shadow map
-                shadowMap = game.Shadow.End();
+                shadowMap = Game.Shadow.End();
             }
 
-            landscape.DrawSky(gameTime);
+            Landscape.DrawSky(gameTime);
 
             // Draw world objects before landscape
             foreach (IWorldObject o in worldObjects)
@@ -201,49 +190,49 @@ namespace Isles.Engine
             }
 
             // Draw water before terrain when realistic rendering is turned off
-            if (game.Settings.ShowWater && !game.Settings.RealisticWater)
+            if (Game.Settings.ShowWater && !Game.Settings.RealisticWater)
             {
-                landscape.DrawWater(gameTime);
+                Landscape.DrawWater(gameTime);
             }
 
-            if (game.Settings.ShowLandscape)
+            if (Game.Settings.ShowLandscape)
             {
                 // Draw shadow receivers with the shadow map
                 if (shadowMap != null)
                 {
                     // Only the landscape receives the shadows
-                    landscape.DrawTerrain(gameTime, game.Shadow);
+                    Landscape.DrawTerrain(gameTime, Game.Shadow);
                 }
                 else
                 {
-                    landscape.DrawTerrain(gameTime, null);
+                    Landscape.DrawTerrain(gameTime, null);
                 }
             }
 
             // Draw water after terrain when realistic rendering is turned on
-            if (game.Settings.ShowWater && game.Settings.RealisticWater)
+            if (Game.Settings.ShowWater && Game.Settings.RealisticWater)
             {
-                landscape.DrawWater(gameTime);
+                Landscape.DrawWater(gameTime);
             }
 
             // Present surface
-            landscape.PresentSurface(gameTime);
+            Landscape.PresentSurface(gameTime);
 
             // FIXME: There are some weired things when models are drawed after
             // drawing the terrain... Annoying...
-            game.ModelManager.Present(gameTime, game.View, game.Projection, null, true, false);
+            Game.ModelManager.Present(gameTime, Game.View, Game.Projection, null, true, false);
 
             // TODO: Draw particles with ZEnable = true, ZWriteEnable = false
             ParticleSystem.Present(gameTime);
 
-            game.ModelManager.Present(gameTime, game.View, game.Projection, null, false, true);
+            Game.ModelManager.Present(gameTime, Game.View, Game.Projection, null, false, true);
 
             // Present surface that are on top of everything :)
-            game.GraphicsDevice.RenderState.DepthBufferFunction = CompareFunction.Always;
-            landscape.PresentSurface(gameTime);
-            game.GraphicsDevice.RenderState.DepthBufferFunction = CompareFunction.LessEqual;
+            Game.GraphicsDevice.RenderState.DepthBufferFunction = CompareFunction.Always;
+            Landscape.PresentSurface(gameTime);
+            Game.GraphicsDevice.RenderState.DepthBufferFunction = CompareFunction.LessEqual;
 
-            if (game.Settings.ShowPathGraph)
+            if (Game.Settings.ShowPathGraph)
             {
                 DrawPathGraph();
             }
@@ -284,13 +273,13 @@ namespace Isles.Engine
             //
             // Adjust light view and projection matrix based on current
             // camera position.
-            var eyeDistance = -game.Eye.Z / game.Facing.Z;
-            Vector3 target = game.Eye + game.Facing * eyeDistance;
+            var eyeDistance = -Game.Eye.Z / Game.Facing.Z;
+            Vector3 target = Game.Eye + Game.Facing * eyeDistance;
 
             // Make it closer to the eye
             const float ClosenessToEye = 0.1f;
-            target.X = game.Eye.X * ClosenessToEye + target.X * (1 - ClosenessToEye);
-            target.Y = game.Eye.Y * ClosenessToEye + target.Y * (1 - ClosenessToEye);
+            target.X = Game.Eye.X * ClosenessToEye + target.X * (1 - ClosenessToEye);
+            target.Y = Game.Eye.Y * ClosenessToEye + target.Y * (1 - ClosenessToEye);
 
             // Compute shadow area size based on eye distance
             const float MinDistance = 250.0f;
@@ -327,7 +316,7 @@ namespace Isles.Engine
 
         private void DrawPathGraph()
         {
-            PathGraph graph = pathManager.Graph;
+            PathGraph graph = PathManager.Graph;
 
             for (var y = 0; y < graph.EntryHeight; y++)
             {
@@ -337,25 +326,24 @@ namespace Isles.Engine
                     {
                         Vector2 p = graph.IndexToPosition(y * graph.EntryWidth + x);
 
-                        if (landscape.GetHeight(p.X, p.Y) <= 0)
+                        if (Landscape.GetHeight(p.X, p.Y) <= 0)
                         {
                             continue;
                         }
 
-                        Vector3 v = game.GraphicsDevice.Viewport.Project(
+                        Vector3 v = Game.GraphicsDevice.Viewport.Project(
                                                              new Vector3(p.X, p.Y,
-                                                             landscape.GetHeight(p.X, p.Y)),
-                                                             game.Projection,
-                                                             game.View,
+                                                             Landscape.GetHeight(p.X, p.Y)),
+                                                             Game.Projection,
+                                                             Game.View,
                                                              Matrix.Identity);
 
-                        game.Graphics2D.DrawString("*",
+                        Game.Graphics2D.DrawString("*",
                                                    15f / 23, new Vector2(v.X, v.Y), Color.White);
                     }
                 }
             }
         }
-
 
         /// <summary>
         /// Load the game world from a file
@@ -385,18 +373,18 @@ namespace Isles.Engine
                 throw new Exception("World does not have a landscape");
             }
 
-            landscape = content.Load<Landscape>(landscapeFilename);
-            landscape.DrawWaterReflection += new Landscape.DrawDelegate(DrawWaterReflection);
+            Landscape = Content.Load<Landscape>(landscapeFilename);
+            Landscape.DrawWaterReflection += new Landscape.DrawDelegate(DrawWaterReflection);
             InitializeGrid();
 
             // Initialize fog of war
-            fogOfWar = new FogMask(game.GraphicsDevice, landscape.Size.X, landscape.Size.Y);
+            FogOfWar = new FogMask(Game.GraphicsDevice, Landscape.Size.X, Landscape.Size.Y);
             Log.Write("Fog of War Initialized...");
 
             context.Refresh(5);
 
             // Create a path manager for the landscape
-            pathManager = new PathManager(landscape, ReadOccluders(node));
+            PathManager = new PathManager(Landscape, ReadOccluders(node));
 
             // Name & description
             Name = node.GetAttribute("Name");
@@ -674,7 +662,7 @@ namespace Isles.Engine
             const float PickPrecision = 5.0f;
 
             // This is the bounding box for all game entities
-            BoundingBox boundingBox = landscape.TerrainBoundingBox;
+            BoundingBox boundingBox = Landscape.TerrainBoundingBox;
             boundingBox.Max.Z += Entity.MaxHeight;
 
             // Nothing will be picked if the ray doesn't even intersects
@@ -697,10 +685,10 @@ namespace Isles.Engine
                 boundingBox.Contains(sampler) == ContainmentType.Contains)
             {
                 // Project to XY plane and get which grid we're in
-                Point grid = landscape.PositionToGrid(sampler.X, sampler.Y);
+                Point grid = Landscape.PositionToGrid(sampler.X, sampler.Y);
 
                 // If we hit the ground, nothing is picked
-                if (landscape.HeightField[grid.X, grid.Y] > sampler.Z)
+                if (Landscape.HeightField[grid.X, grid.Y] > sampler.Z)
                 {
                     return null;
                 }
@@ -763,7 +751,6 @@ namespace Isles.Engine
         public void Add(IWorldObject worldObject)
         {
             worldObjects.Add(worldObject);
-
 
             if (worldObject is Entity entity)
             {
@@ -838,7 +825,6 @@ namespace Isles.Engine
 
             worldObject.IsActive = true;
 
-
             if (worldObject.SceneManagerTag is not List<Point> grids)
             {
                 grids = new List<Point>();
@@ -876,7 +862,6 @@ namespace Isles.Engine
             }
 
             worldObject.IsActive = false;
-
 
             if (worldObject.SceneManagerTag is not List<Point> grids)
             {
@@ -933,7 +918,7 @@ namespace Isles.Engine
 
         public IEnumerable<IWorldObject> ObjectsFromPoint(Vector3 point)
         {
-            Point grid = landscape.PositionToGrid(point.X, point.Y);
+            Point grid = Landscape.PositionToGrid(point.X, point.Y);
 
             foreach (IWorldObject o in Data[grid.X, grid.Y].Owners)
             {
@@ -951,8 +936,8 @@ namespace Isles.Engine
 
         public IEnumerable<IWorldObject> ObjectsFromRegion(BoundingBox boundingBox)
         {
-            Point min = landscape.PositionToGrid(boundingBox.Min.X, boundingBox.Min.Y);
-            Point max = landscape.PositionToGrid(boundingBox.Max.X, boundingBox.Max.Y);
+            Point min = Landscape.PositionToGrid(boundingBox.Min.X, boundingBox.Min.Y);
+            Point max = Landscape.PositionToGrid(boundingBox.Max.X, boundingBox.Max.Y);
 
             System.Diagnostics.Debug.Assert(min.X <= max.X);
             System.Diagnostics.Debug.Assert(min.Y <= max.Y);
@@ -1044,38 +1029,28 @@ namespace Isles.Engine
         public Grid[,] Data;
 
         /// <summary>
-        /// Describes the size of heightfield
-        /// </summary>
-        private int gridCountOnXAxis, gridCountOnYAxis;
-
-        /// <summary>
-        /// Describes the size of heightfield
-        /// </summary>
-        private float gridSizeOnXAxis, gridSizeOnYAxis;
-
-        /// <summary>
         /// Gets the width of grid
         /// </summary>
-        public int GridCountOnXAxis => gridCountOnXAxis;
+        public int GridCountOnXAxis { get; private set; }
 
         /// <summary>
         /// Gets the height of grid
         /// </summary>
-        public int GridCountOnYAxis => gridCountOnYAxis;
+        public int GridCountOnYAxis { get; private set; }
 
         /// <summary>
         /// Gets the size.X of grid
         /// </summary>
-        public float GridSizeOnXAxis => gridSizeOnXAxis;
+        public float GridSizeOnXAxis { get; private set; }
 
         /// <summary>
         /// Gets the height of grid
         /// </summary>
-        public float GridSizeOnYAxis => gridSizeOnYAxis;
+        public float GridSizeOnYAxis { get; private set; }
 
-        public Vector2 GridSize => new(gridSizeOnXAxis, gridSizeOnYAxis);
+        public Vector2 GridSize => new(GridSizeOnXAxis, GridSizeOnYAxis);
 
-        public Point GridCount => new(gridCountOnXAxis, gridCountOnYAxis);
+        public Point GridCount => new(GridCountOnXAxis, GridCountOnYAxis);
 
         /// <summary>
         /// Checks if a grid is within the boundery of the terrain
@@ -1084,8 +1059,8 @@ namespace Isles.Engine
         /// <returns></returns>
         public bool IsValidGrid(Point grid)
         {
-            return grid.X >= 0 && grid.X < gridCountOnXAxis &&
-                   grid.Y >= 0 && grid.Y < gridCountOnYAxis;
+            return grid.X >= 0 && grid.X < GridCountOnXAxis &&
+                   grid.Y >= 0 && grid.Y < GridCountOnYAxis;
         }
 
         /// <summary>
@@ -1093,18 +1068,18 @@ namespace Isles.Engine
         /// </summary>
         private void InitializeGrid()
         {
-            gridCountOnXAxis = landscape.GridCountOnXAxis;
-            gridCountOnYAxis = landscape.GridCountOnYAxis;
+            GridCountOnXAxis = Landscape.GridCountOnXAxis;
+            GridCountOnYAxis = Landscape.GridCountOnYAxis;
 
-            Data = new Grid[gridCountOnXAxis, gridCountOnYAxis];
+            Data = new Grid[GridCountOnXAxis, GridCountOnYAxis];
 
-            gridSizeOnXAxis = landscape.Size.X / gridCountOnXAxis;
-            gridSizeOnYAxis = landscape.Size.Y / gridCountOnYAxis;
+            GridSizeOnXAxis = Landscape.Size.X / GridCountOnXAxis;
+            GridSizeOnYAxis = Landscape.Size.Y / GridCountOnYAxis;
 
             // Initialize landscape type
-            for (var x = 0; x < gridCountOnXAxis; x++)
+            for (var x = 0; x < GridCountOnXAxis; x++)
             {
-                for (var y = 0; y < gridCountOnYAxis; y++)
+                for (var y = 0; y < GridCountOnYAxis; y++)
                 {
                     Data[x, y].Owners = new List<IWorldObject>(2);
                 }
@@ -1113,8 +1088,8 @@ namespace Isles.Engine
 
         public IEnumerable<Point> EnumerateGrid(Vector3 position, Vector3 size)
         {
-            Point min = landscape.PositionToGrid(position.X - size.X / 2, position.Y - size.Y / 2);
-            Point max = landscape.PositionToGrid(position.X + size.X / 2, position.Y + size.Y / 2);
+            Point min = Landscape.PositionToGrid(position.X - size.X / 2, position.Y - size.Y / 2);
+            Point max = Landscape.PositionToGrid(position.X + size.X / 2, position.Y + size.Y / 2);
 
             if (min.X < 0)
             {
@@ -1126,14 +1101,14 @@ namespace Isles.Engine
                 min.Y = 0;
             }
 
-            if (max.X >= gridCountOnXAxis)
+            if (max.X >= GridCountOnXAxis)
             {
-                max.X = gridCountOnXAxis - 1;
+                max.X = GridCountOnXAxis - 1;
             }
 
-            if (max.Y >= gridCountOnYAxis)
+            if (max.Y >= GridCountOnYAxis)
             {
-                max.Y = gridCountOnYAxis - 1;
+                max.Y = GridCountOnYAxis - 1;
             }
 
             for (var y = min.Y; y <= max.Y; y++)
@@ -1147,8 +1122,8 @@ namespace Isles.Engine
 
         public IEnumerable<Point> EnumerateGrid(BoundingBox boundingBox)
         {
-            Point min = landscape.PositionToGrid(boundingBox.Min.X, boundingBox.Min.Y);
-            Point max = landscape.PositionToGrid(boundingBox.Max.X, boundingBox.Max.Y);
+            Point min = Landscape.PositionToGrid(boundingBox.Min.X, boundingBox.Min.Y);
+            Point max = Landscape.PositionToGrid(boundingBox.Max.X, boundingBox.Max.Y);
 
             if (min.X < 0)
             {
@@ -1160,14 +1135,14 @@ namespace Isles.Engine
                 min.Y = 0;
             }
 
-            if (max.X >= gridCountOnXAxis)
+            if (max.X >= GridCountOnXAxis)
             {
-                max.X = gridCountOnXAxis - 1;
+                max.X = GridCountOnXAxis - 1;
             }
 
-            if (max.Y >= gridCountOnYAxis)
+            if (max.Y >= GridCountOnYAxis)
             {
-                max.Y = gridCountOnYAxis - 1;
+                max.Y = GridCountOnYAxis - 1;
             }
 
             for (var y = min.Y; y <= max.Y; y++)

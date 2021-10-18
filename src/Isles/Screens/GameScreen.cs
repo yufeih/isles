@@ -37,17 +37,15 @@ namespace Isles
         /// <summary>
         /// Game screen UI
         /// </summary>
-        public GameUI UI => ui;
+        public GameUI UI { get; private set; }
 
-        private GameUI ui;
         private TipBox pausePanel;
 
         /// <summary>
         /// Gets basic game instance
         /// </summary>
-        public BaseGame Game => game;
+        public BaseGame Game { get; }
 
-        private readonly BaseGame game;
         private bool paused;
         private IEventListener activeObject;
 
@@ -55,22 +53,20 @@ namespace Isles
         {
             this.activeObject = activeObject;
             paused = true;
-            (game.Camera as GameCamera).Freezed = true;
+            (Game.Camera as GameCamera).Freezed = true;
         }
 
         public void Resume()
         {
             paused = false;
             activeObject = null;
-            (game.Camera as GameCamera).Freezed = false;
+            (Game.Camera as GameCamera).Freezed = false;
         }
 
         /// <summary>
         /// Gets game world
         /// </summary>
-        public GameWorld World => world;
-
-        private GameWorld world;
+        public GameWorld World { get; private set; }
 
         /// <summary>
         /// The read me panel
@@ -80,13 +76,7 @@ namespace Isles
         /// <summary>
         /// Gets or sets game level
         /// </summary>
-        public Level Level
-        {
-            get => level;
-            set => level = value;
-        }
-
-        private Level level;
+        public Level Level { get; set; }
 
         /// <summary>
         /// Level filename
@@ -96,23 +86,17 @@ namespace Isles
         /// <summary>
         /// Gets game recorder
         /// </summary>
-        public GameRecorder Recorder => recorder;
-
-        private GameRecorder recorder;
+        public GameRecorder Recorder { get; private set; }
 
         /// <summary>
         /// Gets game replay
         /// </summary>
-        public GameReplay Replay => replay;
-
-        private GameReplay replay;
+        public GameReplay Replay { get; private set; }
 
         /// <summary>
         /// Gets game server interface
         /// </summary>
-        public GameServer Server => server;
-
-        private GameServer server;
+        public GameServer Server { get; private set; }
         #endregion
 
         #region Initialization
@@ -123,8 +107,8 @@ namespace Isles
         /// </summary>
         public GameScreen()
         {
-            game = BaseGame.Singleton;
-            graphics = game.Graphics;
+            Game = BaseGame.Singleton;
+            graphics = Game.Graphics;
 
             if (graphics == null)
             {
@@ -137,7 +121,7 @@ namespace Isles
         /// </summary>
         public void StartEditor(System.Windows.Forms.Form editorForm)
         {
-            GameWindow Window = game.Window;
+            GameWindow Window = Game.Window;
             editorForm.Show(System.Windows.Forms.Control.FromHandle(Window.Handle));
             editorForm.Location = new System.Drawing.Point(
                 Window.ClientBounds.X + Window.ClientBounds.Width / 2,
@@ -153,11 +137,11 @@ namespace Isles
             // Create a replay for test purpose
             using (Stream stream = new FileStream(DefaultReplayFilename, FileMode.Open))
             {
-                replay = new GameReplay(game);
-                replay.Load(stream);
+                Replay = new GameReplay(Game);
+                Replay.Load(stream);
             }
 
-            LoadWorld(replay.WorldFilename, null);
+            LoadWorld(Replay.WorldFilename, null);
         }
 
         /// <summary>
@@ -182,19 +166,19 @@ namespace Isles
             }
 
             this.levelFilename = levelFilename ?? throw new ArgumentNullException();
-            this.level = level;
+            Level = level;
 
             // Reset game recorder
-            recorder = new GameRecorder();
+            Recorder = new GameRecorder();
 
             // Load game world
-            using (Stream levelFile = game.ZipContent.GetFileStream(levelFilename))
+            using (Stream levelFile = Game.ZipContent.GetFileStream(levelFilename))
             {
                 // Hide cursor
-                game.IsMouseVisible = false;
+                Game.IsMouseVisible = false;
 
                 // Reset loading context
-                ILoading loadContext = new Loading(graphics.GraphicsDevice, game.Graphics2D);
+                ILoading loadContext = new Loading(graphics.GraphicsDevice, Game.Graphics2D);
 
                 loadContext.Refresh(0, "Loading...");
 
@@ -211,11 +195,11 @@ namespace Isles
                 }
 
                 // Load game world
-                world = new GameWorld();
-                world.Load(doc.DocumentElement, loadContext);
+                World = new GameWorld();
+                World.Load(doc.DocumentElement, loadContext);
 
                 // Set world
-                server = new GameServer(world, recorder);
+                Server = new GameServer(World, Recorder);
 
                 loadContext.Refresh(100);
 
@@ -228,7 +212,7 @@ namespace Isles
                 // Start level
                 if (level != null)
                 {
-                    level.Start(world);
+                    level.Start(World);
                 }
 
                 // Load complete
@@ -236,7 +220,7 @@ namespace Isles
 
                 // Restore cursor
                 BaseGame.Singleton.Cursor = Cursors.Default;
-                game.IsMouseVisible = true;
+                Game.IsMouseVisible = true;
 
                 Event.SendMessage(EventType.Unknown, this, this, 1, 0.2f);
             }
@@ -244,14 +228,16 @@ namespace Isles
 
         private void ResetUI(ILoading loadContext)
         {
-            ui = new GameUI(game, (loadContext as Loading).LoadingFinished, world);
+            UI = new GameUI(Game, (loadContext as Loading).LoadingFinished, World);
 
             using (Stream readmeText = BaseGame.Singleton.ZipContent.GetFileStream("Content/Readme.txt"))
             {
                 readme = new ReadmePanel(readmeText,
-                                        new Rectangle(65, 70, 530, 460));
-                readme.ScaleMode = ScaleMode.ScaleY;
-                readme.Anchor = Anchor.Center;
+                                        new Rectangle(65, 70, 530, 460))
+                {
+                    ScaleMode = ScaleMode.ScaleY,
+                    Anchor = Anchor.Center
+                };
                 readme.OK.Click += delegate (object o, EventArgs e)
                 {
                     readme.Visible = false;
@@ -259,26 +245,26 @@ namespace Isles
                     Resume();
                 };
                 readme.Visible = false;
-                ui.Display.Add(readme);
+                UI.Display.Add(readme);
             }
 
-            pausePanel = new TipBox(new Rectangle(game.ScreenWidth * 3 / 10, game.ScreenHeight * 3 / 8,
-                                                  game.ScreenWidth * 2 / 5, game.ScreenHeight / 5));
+            pausePanel = new TipBox(new Rectangle(Game.ScreenWidth * 3 / 10, Game.ScreenHeight * 3 / 8,
+                                                  Game.ScreenWidth * 2 / 5, Game.ScreenHeight / 5));
 
             var quitOrNotText = new TextField("Are your sure you want to quit?", 20f / 23, Color.White,
-                                            new Rectangle(0, 0, game.ScreenWidth * 2 / 5, game.ScreenHeight / 8));
+                                            new Rectangle(0, 0, Game.ScreenWidth * 2 / 5, Game.ScreenHeight / 8));
 
             var ok = new TextButton("OK", 20f / 23, Color.Gold,
-                                            new Rectangle(game.ScreenWidth * 2 / 35,
-                                                          game.ScreenHeight / 8,
-                                                          game.ScreenWidth / 7,
-                                                          game.ScreenHeight * 2 / 35));
+                                            new Rectangle(Game.ScreenWidth * 2 / 35,
+                                                          Game.ScreenHeight / 8,
+                                                          Game.ScreenWidth / 7,
+                                                          Game.ScreenHeight * 2 / 35));
 
             var cancel = new TextButton("Cancel", 20f / 23, Color.Gold,
-                                            new Rectangle(game.ScreenWidth / 5,
-                                                          game.ScreenHeight / 8,
-                                                          game.ScreenWidth / 7,
-                                                          game.ScreenHeight * 2 / 35));
+                                            new Rectangle(Game.ScreenWidth / 5,
+                                                          Game.ScreenHeight / 8,
+                                                          Game.ScreenWidth / 7,
+                                                          Game.ScreenHeight * 2 / 35));
             ok.HotKey = Keys.Space;
             ok.Click += delegate (object o, EventArgs e)
             {
@@ -301,59 +287,61 @@ namespace Isles
             pausePanel.Add(cancel);
             pausePanel.Add(quitOrNotText);
             pausePanel.Visible = false;
-            ui.Display.Add(pausePanel);
+            UI.Display.Add(pausePanel);
         }
 
         private bool scrollingCamera;
 
         private void ResetCamera()
         {
-            var camera = new GameCamera(game.Settings.CameraSettings, world);
+            var camera = new GameCamera(Game.Settings.CameraSettings, World);
             camera.FlyTo(new Vector3(Player.LocalPlayer.SpawnPoint, 0), true);
-            game.Camera = camera;
+            Game.Camera = camera;
 
             camera.BeginMove += new EventHandler(delegate (object sender, EventArgs e)
             {
-                Cursors.StoredCursor = game.Cursor;
-                game.Cursor = Cursors.Move;
+                Cursors.StoredCursor = Game.Cursor;
+                Game.Cursor = Cursors.Move;
                 scrollingCamera = true;
             });
             camera.EndMove += new EventHandler(delegate (object sender, EventArgs e)
             {
                 scrollingCamera = false;
-                game.Cursor = Cursors.StoredCursor;
+                Game.Cursor = Cursors.StoredCursor;
             });
             camera.BeginRotate += new EventHandler(delegate (object sender, EventArgs e)
             {
-                Cursors.StoredCursor = game.Cursor;
-                game.Cursor = Cursors.Rotate;
+                Cursors.StoredCursor = Game.Cursor;
+                Game.Cursor = Cursors.Rotate;
             });
             camera.EndRotate += new EventHandler(delegate (object sender, EventArgs e)
             {
-                game.Cursor = Cursors.StoredCursor;
+                Game.Cursor = Cursors.StoredCursor;
             });
         }
 
         private IEnumerable<PlayerInfo> CreateTestPlayerInfo()
         {
-            var info1 = new PlayerInfo();
-
-            info1.Name = game.Settings.PlayerName;
-            info1.Race = (Race.Islander);
-            info1.Team = 1;
-            info1.TeamColor = Color.Wheat;
-            info1.Type = PlayerType.Local;
+            var info1 = new PlayerInfo
+            {
+                Name = Game.Settings.PlayerName,
+                Race = (Race.Islander),
+                Team = 1,
+                TeamColor = Color.Wheat,
+                Type = PlayerType.Local
+            };
 
             yield return info1;
 
-            var info2 = new PlayerInfo();
-
-            info2.Name = "Computer";
-            info2.Race = (Race.Islander);
-            info2.Team = 2;
-            info2.TeamColor = Color.Green;
-            info2.Type = PlayerType.Computer;
-            info2.SpawnPoint = Vector2.Zero;
+            var info2 = new PlayerInfo
+            {
+                Name = "Computer",
+                Race = (Race.Islander),
+                Team = 2,
+                TeamColor = Color.Green,
+                Type = PlayerType.Computer,
+                SpawnPoint = Vector2.Zero
+            };
 
             yield return info2;
         }
@@ -407,15 +395,15 @@ namespace Isles
             {
                 if (victoryTexture == null)
                 {
-                    victoryTexture = game.ZipContent.Load<Texture2D>("Textures/Victory");
+                    victoryTexture = Game.ZipContent.Load<Texture2D>("Textures/Victory");
                 }
 
                 // Load bloom
-                if (game.Bloom != null)
+                if (Game.Bloom != null)
                 {
                     targetSettings = LoadBloomSettings("Victory");
                     bloomLerpElapsedTime = 0;
-                    defaultSettings = game.Bloom.Settings;
+                    defaultSettings = Game.Bloom.Settings;
                 }
 
                 Audios.PlayMusic("Win", false, 0, 0);
@@ -429,14 +417,14 @@ namespace Isles
             {
                 if (failureTexture == null)
                 {
-                    failureTexture = game.ZipContent.Load<Texture2D>("Textures/Failure");
+                    failureTexture = Game.ZipContent.Load<Texture2D>("Textures/Failure");
                 }
 
-                if (game.Bloom != null)
+                if (Game.Bloom != null)
                 {
                     targetSettings = LoadBloomSettings("Failed");
                     bloomLerpElapsedTime = 0;
-                    defaultSettings = game.Bloom.Settings;
+                    defaultSettings = Game.Bloom.Settings;
                 }
 
                 Audios.PlayMusic("Lose", false, 0, 0);
@@ -446,7 +434,7 @@ namespace Isles
 
         private BloomSettings LoadBloomSettings(string type)
         {
-            using (Stream stream = game.ZipContent.GetFileStream("Content/Settings/Bloom.xml"))
+            using (Stream stream = Game.ZipContent.GetFileStream("Content/Settings/Bloom.xml"))
             {
                 var settings = (List<BloomSettings>)
                     new XmlSerializer(typeof(List<BloomSettings>)).Deserialize(stream);
@@ -465,11 +453,11 @@ namespace Isles
 
         private void EnterPostScreen(Texture2D texture)
         {
-            postScreenRectangle.Width = (int)(game.ScreenWidth * 0.8f);
+            postScreenRectangle.Width = (int)(Game.ScreenWidth * 0.8f);
             postScreenRectangle.Height = (int)(1.0f * postScreenRectangle.Width /
                                                texture.Width * texture.Height);
-            postScreenRectangle.X = (game.ScreenWidth - postScreenRectangle.Width) / 2;
-            postScreenRectangle.Y = (game.ScreenHeight - postScreenRectangle.Height) / 2;
+            postScreenRectangle.X = (Game.ScreenWidth - postScreenRectangle.Width) / 2;
+            postScreenRectangle.Y = (Game.ScreenHeight - postScreenRectangle.Height) / 2;
 
             Vector3? position = null;
             if (Building.LastDestroyedBuilding != null)
@@ -477,14 +465,14 @@ namespace Isles
                 position = Building.LastDestroyedBuilding.Position;
             }
 
-            if (game.Camera is GameCamera)
+            if (Game.Camera is GameCamera)
             {
-                (game.Camera as GameCamera).Orbit(position, 0.00008f, 150, MathHelper.ToRadians(40));
+                (Game.Camera as GameCamera).Orbit(position, 0.00008f, 150, MathHelper.ToRadians(40));
             }
 
-            game.Input.Uncapture();
+            Game.Input.Uncapture();
             postScreen = true;
-            game.IsMouseVisible = false;
+            Game.IsMouseVisible = false;
         }
 
         #endregion
@@ -501,16 +489,16 @@ namespace Isles
             {
                 readme.Update(gameTime);
                 pausePanel.Update(gameTime);
-                game.Cursor = Cursors.Default;
+                Game.Cursor = Cursors.Default;
                 return;
             }
 
             UpdateCursorArrows();
 
             // Update UI first
-            if (ui != null)
+            if (UI != null)
             {
-                ui.Update(gameTime);
+                UI.Update(gameTime);
             }
 
             // Update players
@@ -523,9 +511,9 @@ namespace Isles
             }
 
             // Update world
-            if (world != null)
+            if (World != null)
             {
-                world.Update(gameTime);
+                World.Update(gameTime);
             }
 
             // Update spells
@@ -534,20 +522,20 @@ namespace Isles
                 Spell.CurrentSpell.UpdateCast(gameTime);
             }
 
-            if (level != null)
+            if (Level != null)
             {
-                level.Update(gameTime);
+                Level.Update(gameTime);
             }
 
-            if (replay != null)
+            if (Replay != null)
             {
-                replay.Update(gameTime);
+                Replay.Update(gameTime);
             }
 
             // Update game server
-            if (server != null)
+            if (Server != null)
             {
-                server.Update(gameTime);
+                Server.Update(gameTime);
             }
         }
 
@@ -555,24 +543,24 @@ namespace Isles
         {
             if (scrollingCamera)
             {
-                Point mouse = game.Input.MousePosition;
-                var border = (int)(game.Settings.CameraSettings.ScrollAreaSize);
+                Point mouse = Game.Input.MousePosition;
+                var border = (int)(Game.Settings.CameraSettings.ScrollAreaSize);
 
                 if (mouse.Y <= border)
                 {
-                    game.Cursor = Cursors.Top;
+                    Game.Cursor = Cursors.Top;
                 }
-                else if (mouse.Y >= game.ScreenHeight - border)
+                else if (mouse.Y >= Game.ScreenHeight - border)
                 {
-                    game.Cursor = Cursors.Bottom;
+                    Game.Cursor = Cursors.Bottom;
                 }
                 else if (mouse.X <= border)
                 {
-                    game.Cursor = Cursors.Left;
+                    Game.Cursor = Cursors.Left;
                 }
-                else if (mouse.X >= game.ScreenWidth - border)
+                else if (mouse.X >= Game.ScreenWidth - border)
                 {
-                    game.Cursor = Cursors.Right;
+                    Game.Cursor = Cursors.Right;
                 }
             }
         }
@@ -584,15 +572,15 @@ namespace Isles
         public void Draw(GameTime gameTime)
         {
             // Draw level info
-            if (level != null)
+            if (Level != null)
             {
-                level.Draw(gameTime);
+                Level.Draw(gameTime);
             }
 
             // Draw game world
-            if (world != null)
+            if (World != null)
             {
-                world.Draw(gameTime);
+                World.Draw(gameTime);
             }
 
             // Draw player info
@@ -611,22 +599,22 @@ namespace Isles
             }
 
             // Force everything to be presented before UI is rendered
-            game.ModelManager.Present(gameTime);
-            game.Billboard.Present(gameTime);
-            game.Graphics2D.Present();
-            game.PointSprite.Present(gameTime);
+            Game.ModelManager.Present(gameTime);
+            Game.Billboard.Present(gameTime);
+            Game.Graphics2D.Present();
+            Game.PointSprite.Present(gameTime);
             ParticleSystem.Present(gameTime);
 
             if (postScreen)
             {
                 // Draw post screen texture
-                game.Graphics2D.Sprite.Begin();
-                game.Graphics2D.Sprite.Draw(victoryTexture != null ? victoryTexture : failureTexture,
+                Game.Graphics2D.Sprite.Begin();
+                Game.Graphics2D.Sprite.Draw(victoryTexture != null ? victoryTexture : failureTexture,
                                             postScreenRectangle, Color.White);
-                game.Graphics2D.Sprite.End();
+                Game.Graphics2D.Sprite.End();
 
                 // Lerp bloom settings
-                if (game.Bloom != null && targetSettings != null)
+                if (Game.Bloom != null && targetSettings != null)
                 {
                     const float BloomLerpTime = 3;
 
@@ -634,19 +622,19 @@ namespace Isles
 
                     if (bloomLerpElapsedTime < BloomLerpTime)
                     {
-                        game.Bloom.Settings = BloomSettings.Lerp(defaultSettings, targetSettings,
+                        Game.Bloom.Settings = BloomSettings.Lerp(defaultSettings, targetSettings,
                             bloomLerpElapsedTime / BloomLerpTime);
                     }
                     else
                     {
-                        game.Bloom.Settings = targetSettings;
+                        Game.Bloom.Settings = targetSettings;
                     }
                 }
             }
             // Draw UI at last
-            else if (ui != null)
+            else if (UI != null)
             {
-                ui.Draw(gameTime);
+                UI.Draw(gameTime);
             }
         }
 
@@ -689,8 +677,8 @@ namespace Isles
             }
 
             // Let UI handle event first
-            if (ui != null &&
-                ui.HandleEvent(type, sender, tag) == EventResult.Handled)
+            if (UI != null &&
+                UI.HandleEvent(type, sender, tag) == EventResult.Handled)
             {
                 return EventResult.Handled;
             }
@@ -736,14 +724,14 @@ namespace Isles
                 failureTexture = null;
             }
 
-            if (defaultSettings != null && game.Bloom != null)
+            if (defaultSettings != null && Game.Bloom != null)
             {
-                game.Bloom.Settings = defaultSettings;
+                Game.Bloom.Settings = defaultSettings;
             }
 
-            game.IsMouseVisible = true;
+            Game.IsMouseVisible = true;
             postScreen = false;
-            game.StartScreen(new TitleScreen(this));
+            Game.StartScreen(new TitleScreen(this));
 
             // Save replay
             SaveReplay(DefaultReplayName);
@@ -753,7 +741,7 @@ namespace Isles
         {
             try
             {
-                if (recorder != null)
+                if (Recorder != null)
                 {
                     // Make sure replays directory exists
                     if (Directory.Exists(ReplayDirectory) == false)
@@ -764,9 +752,9 @@ namespace Isles
                     using (Stream replay = new FileStream(
                         ReplayDirectory + "/" + name + "." + ReplayExtension, FileMode.Create))
                     {
-                        using (Stream world = game.ZipContent.GetFileStream(levelFilename))
+                        using (Stream world = Game.ZipContent.GetFileStream(levelFilename))
                         {
-                            recorder.Save(replay, levelFilename, world);
+                            Recorder.Save(replay, levelFilename, world);
                         }
                     }
                 }

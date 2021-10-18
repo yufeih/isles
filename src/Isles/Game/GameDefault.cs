@@ -269,7 +269,6 @@ namespace Isles
                 return;
             }
 
-
             // Get default XML node describing the object type
             if (WorldObjectDefaults.TryGetValue(type, out XmlElement value))
             {

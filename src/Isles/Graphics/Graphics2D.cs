@@ -389,7 +389,7 @@ namespace Isles.Graphics
         /// FormatString("ABCD", 20): "AB\nCD"
         /// FormatString("What is your name?", 100): "What is \nyour name?"
         /// </example>
-        public static string FormatString(String text, float width, float fontSize, SpriteFont font)
+        public static string FormatString(string text, float width, float fontSize, SpriteFont font)
         {
             width /= fontSize;
 
@@ -467,7 +467,7 @@ namespace Isles.Graphics
         /// FormatString("ABCDEFGH", 40, 50)    : "ABCD\nEFGH"
         /// FormatString("ABCDEFGHIJ", 40, 50)  : "ABCD\nE..."
         /// </example>
-        public static string FormatString(String text, float width, float height, float fontSize, SpriteFont font)
+        public static string FormatString(string text, float width, float height, float fontSize, SpriteFont font)
         {
 
             width /= fontSize;
@@ -622,7 +622,6 @@ namespace Isles.Graphics
                 get => currentIndex;
                 set => currentIndex = value;
             }
-
         }
         #endregion
     }

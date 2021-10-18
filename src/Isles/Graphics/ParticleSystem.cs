@@ -151,13 +151,13 @@ namespace Isles.Graphics
     {
         #region Fields
 
-        public String ParticleName
+        public string ParticleName
         {
             get => name;
             set => name = value;
         }
 
-        private String name;
+        private string name;
 
         // Settings class controls the appearance and animation of this particle system.
         private ParticleSettings settings;
@@ -337,7 +337,6 @@ namespace Isles.Graphics
 
             return null;
         }
-
 
         /// <summary>
         /// Flush all the particle system effects onto the screen

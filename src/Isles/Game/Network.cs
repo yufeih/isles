@@ -27,8 +27,8 @@ namespace Isles
         /// <summary>
         /// Make sure every game object has a unique ID
         /// </summary>
-        private UInt16 currentValidID = MinID;
-        private const UInt16 MinID = 128;
+        private ushort currentValidID = MinID;
+        private const ushort MinID = 128;
 
         /// <summary>
         /// Record all game object changes

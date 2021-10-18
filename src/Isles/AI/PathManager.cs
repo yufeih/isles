@@ -961,10 +961,11 @@ namespace Isles.Engine
             dynamicObstacles.Add(obstacle);
 
             // Store marked grids in the tag of the obstacle
-            var tag = new Tag();
-
-            tag.Position = obstacle.Position;
-            tag.Marks = new List<Point>();
+            var tag = new Tag
+            {
+                Position = obstacle.Position,
+                Marks = new List<Point>()
+            };
             tag.Marks.AddRange(graph.EnumerateGridsInBrush(new Vector2(obstacle.Position.X,
                                                                        obstacle.Position.Y),
                                                                        obstacle.Brush));
@@ -1206,7 +1207,6 @@ namespace Isles.Engine
             }
         }
 
-
         /// <summary>
         /// Gets the unobstructed grid that are nearest to the specified point.
         /// </summary>
@@ -1288,7 +1288,6 @@ namespace Isles.Engine
             {
                 lastPositionValue = lastPosition.Value;
             }
-
 
             Vector2 newDirection, newTarget, lastDirection, originalDirection, prep;
             float distance = 0;

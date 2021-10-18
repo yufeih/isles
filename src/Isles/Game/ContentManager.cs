@@ -466,25 +466,25 @@ namespace Isles.Engine
         private string _FileName;
         public string FileName => _FileName;
 
-        private Int16 _VersionNeeded;
-        public Int16 VersionNeeded => _VersionNeeded;
+        private short _VersionNeeded;
+        public short VersionNeeded => _VersionNeeded;
 
-        private Int16 _BitField;
-        public Int16 BitField => _BitField;
+        private short _BitField;
+        public short BitField => _BitField;
 
-        private Int16 _CompressionMethod;
-        public Int16 CompressionMethod => _CompressionMethod;
+        private short _CompressionMethod;
+        public short CompressionMethod => _CompressionMethod;
 
-        private Int32 _CompressedSize;
-        public Int32 CompressedSize => _CompressedSize;
+        private int _CompressedSize;
+        public int CompressedSize => _CompressedSize;
 
-        private Int32 _UncompressedSize;
-        public Int32 UncompressedSize => _UncompressedSize;
+        private int _UncompressedSize;
+        public int UncompressedSize => _UncompressedSize;
 
-        public Double CompressionRatio => 100 * (1.0 - (1.0 * CompressedSize) / (1.0 * UncompressedSize));
+        public double CompressionRatio => 100 * (1.0 - (1.0 * CompressedSize) / (1.0 * UncompressedSize));
 
-        private Int32 _LastModDateTime;
-        private Int32 _Crc32;
+        private int _LastModDateTime;
+        private int _Crc32;
         private byte[] _Extra;
 
         private byte[] __filedata;
@@ -628,8 +628,10 @@ namespace Isles.Engine
 
         public static ZipEntry Read(Stream s, bool TurnOnDebug)
         {
-            var entry = new ZipEntry();
-            entry._Debug = TurnOnDebug;
+            var entry = new ZipEntry
+            {
+                _Debug = TurnOnDebug
+            };
             if (!ReadHeader(s, entry))
             {
                 return null;
@@ -649,12 +651,14 @@ namespace Isles.Engine
             return entry;
         }
 
-        internal static ZipEntry Create(String filename)
+        internal static ZipEntry Create(string filename)
         {
-            var entry = new ZipEntry();
-            entry._FileName = filename;
+            var entry = new ZipEntry
+            {
+                _FileName = filename,
 
-            entry._LastModified = System.IO.File.GetLastWriteTime(filename);
+                _LastModified = System.IO.File.GetLastWriteTime(filename)
+            };
             // adjust the time if the .NET BCL thinks it is in DST.  
             // see the note elsewhere in this file for more info. 
             if (entry._LastModified.IsDaylightSavingTime())
@@ -892,7 +896,6 @@ namespace Isles.Engine
                         }
 #endif
                     }
-
                 }
                 finally
                 {
@@ -993,17 +996,17 @@ namespace Isles.Engine
             bytes[i++] = (byte)((ZipEntrySignature & 0xFF000000) >> 24);
 
             // version needed
-            Int16 FixedVersionNeeded = 0x14; // from examining existing zip files
+            short FixedVersionNeeded = 0x14; // from examining existing zip files
             bytes[i++] = (byte)(FixedVersionNeeded & 0x00FF);
             bytes[i++] = (byte)((FixedVersionNeeded & 0xFF00) >> 8);
 
             // bitfield
-            Int16 BitField = 0x00; // from examining existing zip files
+            short BitField = 0x00; // from examining existing zip files
             bytes[i++] = (byte)(BitField & 0x00FF);
             bytes[i++] = (byte)((BitField & 0xFF00) >> 8);
 
             // compression method
-            Int16 CompressionMethod = 0x08; // 0x08 = Deflate
+            short CompressionMethod = 0x08; // 0x08 = Deflate
             bytes[i++] = (byte)(CompressionMethod & 0x00FF);
             bytes[i++] = (byte)((CompressionMethod & 0xFF00) >> 8);
 
@@ -1015,7 +1018,7 @@ namespace Isles.Engine
 
             // CRC32 (Int32)
             var crc32 = new CRC32();
-            UInt32 crc = 0;
+            uint crc = 0;
             using (Stream input = System.IO.File.OpenRead(FileName))
             {
                 crc = crc32.GetCrc32AndCopy(input, CompressedStream);
@@ -1028,8 +1031,8 @@ namespace Isles.Engine
             bytes[i++] = (byte)((crc & 0xFF000000) >> 24);
 
             // CompressedSize (Int32)
-            var isz = (Int32)_UnderlyingMemoryStream.Length;
-            var sz = (UInt32)isz;
+            var isz = (int)_UnderlyingMemoryStream.Length;
+            var sz = (uint)isz;
             bytes[i++] = (byte)(sz & 0x000000FF);
             bytes[i++] = (byte)((sz & 0x0000FF00) >> 8);
             bytes[i++] = (byte)((sz & 0x00FF0000) >> 16);
@@ -1047,7 +1050,7 @@ namespace Isles.Engine
             bytes[i++] = (byte)((crc32.TotalBytesRead & 0xFF000000) >> 24);
 
             // filename length (Int16)
-            var length = (Int16)FileName.Length;
+            var length = (short)FileName.Length;
             // see note below about TrimVolumeFromFullyQualifiedPaths.
             if ((TrimVolumeFromFullyQualifiedPaths) && (FileName[1] == ':') && (FileName[2] == '\\'))
             {
@@ -1058,7 +1061,7 @@ namespace Isles.Engine
             bytes[i++] = (byte)((length & 0xFF00) >> 8);
 
             // extra field length (short)
-            Int16 ExtraFieldLength = 0x00;
+            short ExtraFieldLength = 0x00;
             bytes[i++] = (byte)(ExtraFieldLength & 0x00FF);
             bytes[i++] = (byte)((ExtraFieldLength & 0xFF00) >> 8);
 
@@ -1187,8 +1190,6 @@ namespace Isles.Engine
 
         internal const int ZipDirEntrySignature = 0x02014b50;
 
-        private bool _Debug;
-
         private ZipDirEntry() { }
 
         private DateTime _LastModified;
@@ -1200,27 +1201,25 @@ namespace Isles.Engine
         private string _Comment;
         public string Comment => _Comment;
 
-        private Int16 _VersionMadeBy;
-        public Int16 VersionMadeBy => _VersionMadeBy;
+        private short _VersionMadeBy;
+        public short VersionMadeBy => _VersionMadeBy;
 
-        private Int16 _VersionNeeded;
-        public Int16 VersionNeeded => _VersionNeeded;
+        private short _VersionNeeded;
+        public short VersionNeeded => _VersionNeeded;
 
-        private Int16 _CompressionMethod;
-        public Int16 CompressionMethod => _CompressionMethod;
+        private short _CompressionMethod;
+        public short CompressionMethod => _CompressionMethod;
 
-        private Int32 _CompressedSize;
-        public Int32 CompressedSize => _CompressedSize;
+        private int _CompressedSize;
+        public int CompressedSize => _CompressedSize;
 
-        private Int32 _UncompressedSize;
-        public Int32 UncompressedSize => _UncompressedSize;
+        private int _UncompressedSize;
+        public int UncompressedSize => _UncompressedSize;
 
-        public Double CompressionRatio => 100 * (1.0 - (1.0 * CompressedSize) / (1.0 * UncompressedSize));
+        public double CompressionRatio => 100 * (1.0 - (1.0 * CompressedSize) / (1.0 * UncompressedSize));
 
-        private Int16 _BitField;
-        private Int32 _LastModDateTime;
+        private int _LastModDateTime;
 
-        private Int32 _Crc32;
         private byte[] _Extra;
 
         internal ZipDirEntry(ZipEntry ze) { }
@@ -1254,17 +1253,15 @@ namespace Isles.Engine
             }
 
             var i = 0;
-            var zde = new ZipDirEntry();
-
-            zde._Debug = TurnOnDebug;
-            zde._VersionMadeBy = (short)(block[i++] + block[i++] * 256);
-            zde._VersionNeeded = (short)(block[i++] + block[i++] * 256);
-            zde._BitField = (short)(block[i++] + block[i++] * 256);
-            zde._CompressionMethod = (short)(block[i++] + block[i++] * 256);
-            zde._LastModDateTime = block[i++] + block[i++] * 256 + block[i++] * 256 * 256 + block[i++] * 256 * 256 * 256;
-            zde._Crc32 = block[i++] + block[i++] * 256 + block[i++] * 256 * 256 + block[i++] * 256 * 256 * 256;
-            zde._CompressedSize = block[i++] + block[i++] * 256 + block[i++] * 256 * 256 + block[i++] * 256 * 256 * 256;
-            zde._UncompressedSize = block[i++] + block[i++] * 256 + block[i++] * 256 * 256 + block[i++] * 256 * 256 * 256;
+            var zde = new ZipDirEntry
+            {
+                _VersionMadeBy = (short)(block[i++] + block[i++] * 256),
+                _VersionNeeded = (short)(block[i++] + block[i++] * 256),
+                _CompressionMethod = (short)(block[i++] + block[i++] * 256),
+                _LastModDateTime = block[i++] + block[i++] * 256 + block[i++] * 256 * 256 + block[i++] * 256 * 256 * 256,
+                _CompressedSize = block[i++] + block[i++] * 256 + block[i++] * 256 * 256 + block[i++] * 256 * 256 * 256,
+                _UncompressedSize = block[i++] + block[i++] * 256 + block[i++] * 256 * 256 + block[i++] * 256 * 256 * 256
+            };
 
             zde._LastModified = Shared.PackedToDateTime(zde._LastModDateTime);
 
@@ -1294,7 +1291,6 @@ namespace Isles.Engine
         {
             return (signature != ZipDirEntrySignature);
         }
-
     }
     #endregion
 
@@ -1349,7 +1345,7 @@ namespace Isles.Engine
             _name = NewZipFileName;
             if (System.IO.File.Exists(_name))
             {
-                throw new Exception(String.Format("That file ({0}) already exists.", NewZipFileName));
+                throw new Exception(string.Format("That file ({0}) already exists.", NewZipFileName));
             }
 
             _entries = new List<ZipEntry>();
@@ -1372,7 +1368,7 @@ namespace Isles.Engine
             }
             else
             {
-                throw new Exception(String.Format("That file or directory ({0}) does not exist!", FileOrDirectoryName));
+                throw new Exception(string.Format("That file or directory ({0}) does not exist!", FileOrDirectoryName));
             }
         }
 
@@ -1439,7 +1435,7 @@ namespace Isles.Engine
             var bytes = new byte[1024];
             var i = 0;
             // signature
-            UInt32 EndOfCentralDirectorySignature = 0x06054b50;
+            uint EndOfCentralDirectorySignature = 0x06054b50;
             bytes[i++] = (byte)(EndOfCentralDirectorySignature & 0x000000FF);
             bytes[i++] = (byte)((EndOfCentralDirectorySignature & 0x0000FF00) >> 8);
             bytes[i++] = (byte)((EndOfCentralDirectorySignature & 0x00FF0000) >> 16);
@@ -1462,14 +1458,14 @@ namespace Isles.Engine
             bytes[i++] = (byte)((_entries.Count & 0xFF00) >> 8);
 
             // size of the central directory
-            var SizeOfCentralDirectory = (Int32)(EndOfCentralDirectory - StartOfCentralDirectory);
+            var SizeOfCentralDirectory = (int)(EndOfCentralDirectory - StartOfCentralDirectory);
             bytes[i++] = (byte)(SizeOfCentralDirectory & 0x000000FF);
             bytes[i++] = (byte)((SizeOfCentralDirectory & 0x0000FF00) >> 8);
             bytes[i++] = (byte)((SizeOfCentralDirectory & 0x00FF0000) >> 16);
             bytes[i++] = (byte)((SizeOfCentralDirectory & 0xFF000000) >> 24);
 
             // offset of the start of the central directory 
-            var StartOffset = (Int32)StartOfCentralDirectory;  // cast down from Long
+            var StartOffset = (int)StartOfCentralDirectory;  // cast down from Long
             bytes[i++] = (byte)(StartOffset & 0x000000FF);
             bytes[i++] = (byte)((StartOffset & 0x0000FF00) >> 8);
             bytes[i++] = (byte)((StartOffset & 0x00FF0000) >> 16);
@@ -1500,10 +1496,12 @@ namespace Isles.Engine
         public static ZipFile Read(string zipfilename, bool TurnOnDebug)
         {
 
-            var zf = new ZipFile();
-            zf._Debug = TurnOnDebug;
-            zf._name = zipfilename;
-            zf._entries = new List<ZipEntry>();
+            var zf = new ZipFile
+            {
+                _Debug = TurnOnDebug,
+                _name = zipfilename,
+                _entries = new List<ZipEntry>()
+            };
             ZipEntry e;
             while ((e = ZipEntry.Read(zf.ReadStream, zf._Debug)) != null)
             {
@@ -1559,7 +1557,7 @@ namespace Isles.Engine
                 {
                     System.Console.WriteLine("\n{1,-22} {2,-6} {3,4}   {4,-8}  {0}",
                                  "Name", "Modified", "Size", "Ratio", "Packed");
-                    System.Console.WriteLine(new System.String('-', 72));
+                    System.Console.WriteLine(new string('-', 72));
                     header = false;
                 }
                 if (WantVerbose)
@@ -1586,7 +1584,7 @@ namespace Isles.Engine
             this[filename].Extract(s);
         }
 
-        public ZipEntry this[String filename]
+        public ZipEntry this[string filename]
         {
             get
             {
@@ -1660,18 +1658,18 @@ namespace Isles.Engine
     /// </summary>
     public class CRC32
     {
-        private readonly UInt32[] crc32Table;
+        private readonly uint[] crc32Table;
         private const int BUFFER_SIZE = 8192;
 
-        private Int32 _TotalBytesRead;
-        public Int32 TotalBytesRead => _TotalBytesRead;
+        private int _TotalBytesRead;
+        public int TotalBytesRead => _TotalBytesRead;
 
         /// <summary>
         /// Returns the CRC32 for the specified stream.
         /// </summary>
         /// <param name="input">The stream over which to calculate the CRC32</param>
         /// <returns>the CRC32 calculation</returns>
-        public UInt32 GetCrc32(Stream input)
+        public uint GetCrc32(Stream input)
         {
             return GetCrc32AndCopy(input, null);
         }
@@ -1682,11 +1680,11 @@ namespace Isles.Engine
         /// <param name="input">The stream over which to calculate the CRC32</param>
         /// <param name="output">The stream into which to deflate the input</param>
         /// <returns>the CRC32 calculation</returns>
-        public UInt32 GetCrc32AndCopy(Stream input, Stream output)
+        public uint GetCrc32AndCopy(Stream input, Stream output)
         {
             unchecked
             {
-                UInt32 crc32Result;
+                uint crc32Result;
                 crc32Result = 0xFFFFFFFF;
                 var buffer = new byte[BUFFER_SIZE];
                 var readSize = BUFFER_SIZE;
@@ -1730,11 +1728,11 @@ namespace Isles.Engine
                 // This is the official polynomial used by CRC32 in PKZip.
                 // Often the polynomial is shown reversed as 0x04C11DB7.
                 var dwPolynomial = 0xEDB88320;
-                UInt32 i, j;
+                uint i, j;
 
-                crc32Table = new UInt32[256];
+                crc32Table = new uint[256];
 
-                UInt32 dwCrc;
+                uint dwCrc;
                 for (i = 0; i < 256; i++)
                 {
                     dwCrc = i;
@@ -1767,7 +1765,7 @@ namespace Isles.Engine
             {
                 c[i] = (char)buf[i]; // System.BitConverter.ToChar(buf, start+i*2);
             }
-            var s = new System.String(c, 0, i);
+            var s = new string(c, 0, i);
             return s;
         }
 
@@ -1840,10 +1838,10 @@ namespace Isles.Engine
             // number of bytes read, should be the same as compressed size of file            
             return bytesRead;
         }
-        protected internal static DateTime PackedToDateTime(Int32 packedDateTime)
+        protected internal static DateTime PackedToDateTime(int packedDateTime)
         {
-            var packedTime = (Int16)(packedDateTime & 0x0000ffff);
-            var packedDate = (Int16)((packedDateTime & 0xffff0000) >> 16);
+            var packedTime = (short)(packedDateTime & 0x0000ffff);
+            var packedDate = (short)((packedDateTime & 0xffff0000) >> 16);
 
             var year = 1980 + ((packedDate & 0xFE00) >> 9);
             var month = (packedDate & 0x01E0) >> 5;
@@ -1869,11 +1867,11 @@ namespace Isles.Engine
             return d;
         }
 
-        protected internal static Int32 DateTimeToPacked(DateTime time)
+        protected internal static int DateTimeToPacked(DateTime time)
         {
-            var packedDate = (UInt16)((time.Day & 0x0000001F) | ((time.Month << 5) & 0x000001E0) | (((time.Year - 1980) << 9) & 0x0000FE00));
-            var packedTime = (UInt16)((time.Second & 0x0000001F) | ((time.Minute << 5) & 0x000007E0) | ((time.Hour << 11) & 0x0000F800));
-            return (Int32)(((UInt32)(packedDate << 16)) | packedTime);
+            var packedDate = (ushort)((time.Day & 0x0000001F) | ((time.Month << 5) & 0x000001E0) | (((time.Year - 1980) << 9) & 0x0000FE00));
+            var packedTime = (ushort)((time.Second & 0x0000001F) | ((time.Minute << 5) & 0x000007E0) | ((time.Hour << 11) & 0x0000F800));
+            return (int)(((uint)(packedDate << 16)) | packedTime);
         }
     }
     #endregion

@@ -60,45 +60,38 @@ namespace Isles
         public const int ProfileWidth = 40;
         public const int ProfileSpace = 4;
         private readonly BaseGame game;
-        private UIDisplay ui;
         private readonly IUIElement[,] elements = new IUIElement[3, 5];
         private readonly GameWorld world;
 
-        public UIDisplay Display => ui;
+        public UIDisplay Display { get; private set; }
 
         private readonly List<SpellButton> profileButtons = new();
         private int profileNextX = ProfileBaseX;
 
         #region Singleton
-        public static GameUI Singleton => singleton;
-
-        private static GameUI singleton;
+        public static GameUI Singleton { get; private set; }
         #endregion
 
         #region Panels
 
-        private UI.Panel controlPanel, snapShot, tipBoxContainer, profilePanel;
+        private UI.Panel snapShot, profilePanel;
 
         /// <summary>
         /// Gets the control panel in the game
         /// </summary>
-        public UI.Panel ControlPanel => controlPanel;
-
-        private UI.Panel resourcePanel;
+        public UI.Panel ControlPanel { get; private set; }
 
         /// <summary>
         /// Gets the resource panel
         /// </summary>
-        public UI.Panel ResourcePanel => resourcePanel;
+        public UI.Panel ResourcePanel { get; private set; }
 
         /// <summary>
         /// Gets the tip box container
         /// </summary>
-        public UI.Panel TipBoxContainer => tipBoxContainer;
+        public UI.Panel TipBoxContainer { get; private set; }
 
-        private MiniMap minimap;
-
-        public MiniMap Minimap => minimap;
+        public MiniMap Minimap { get; private set; }
 
         #endregion
 
@@ -169,7 +162,7 @@ namespace Isles
         public GameUI(BaseGame game, Texture2D loadingFinished, GameWorld world)
         {
             // Setup singleton
-            singleton = this;
+            Singleton = this;
 
             this.game = game;
             this.world = world;
@@ -181,7 +174,7 @@ namespace Isles
         public void LoadContent()
         {
             // Create a new UI display
-            ui = new UIDisplay(BaseGame.Singleton);
+            Display = new UIDisplay(BaseGame.Singleton);
 
             // Load UI textures
             borderFadeout = game.ZipContent.Load<Texture2D>("Textures/Fadeout");
@@ -190,7 +183,6 @@ namespace Isles
             panelsTexture = game.ZipContent.Load<Texture2D>("UI/Panels");
             dialogTexture = game.ZipContent.Load<Texture2D>("UI/Tipbox");
 
-
             for (var i = 0; i < focusAnimation.Length; i++)
             {
                 focusAnimation[i] = game.ZipContent.Load<Texture2D>("UI/Focus/" + (i + 1));
@@ -198,70 +190,84 @@ namespace Isles
 
             Rectangle relativeRect = UIElement.GetRelativeRectangle(new Rectangle
                                             ((int)(StartLineForMessage.X), (int)(StartLineForMessage.Y), 0, 0),
-                                            ui, ScaleMode.ScaleX, Anchor.TopLeft);
-            tipBoxContainer = new UI.Panel(ui.Area);
-            tipBoxContainer.ScaleMode = ScaleMode.Stretch;
-            tipBoxContainer.EffectiveRegion = Rectangle.Empty;
+                                            Display, ScaleMode.ScaleX, Anchor.TopLeft);
+            TipBoxContainer = new UI.Panel(Display.Area)
+            {
+                ScaleMode = ScaleMode.Stretch,
+                EffectiveRegion = Rectangle.Empty
+            };
 
-            profilePanel = new UI.Panel(ui.Area);
-            profilePanel.ScaleMode = ScaleMode.Stretch;
-            profilePanel.EffectiveRegion = Rectangle.Empty;
+            profilePanel = new UI.Panel(Display.Area)
+            {
+                ScaleMode = ScaleMode.Stretch,
+                EffectiveRegion = Rectangle.Empty
+            };
 
             RelativeMessageStartLine.X = relativeRect.X;
             RelativeMessageStartLine.Y = relativeRect.Y;
-            RelativeMessageStep.Y = StepForOneMessage.Y * ui.Area.Height / ui.DestinationRectangle.Height;
+            RelativeMessageStep.Y = StepForOneMessage.Y * Display.Area.Height / Display.DestinationRectangle.Height;
             RelativeMessageStep.X = 0;
 
-            controlPanel = new UI.Panel(ControlPanelDestinationRectangle);
-            controlPanel.Anchor = Anchor.BottomLeft;
-            controlPanel.SourceRectangle = ControlPanelSourceRectangle;
-            controlPanel.Texture = panelsTexture;
-            controlPanel.EffectiveRegion = ControlPanelEffectiveRegion;
+            ControlPanel = new UI.Panel(ControlPanelDestinationRectangle)
+            {
+                Anchor = Anchor.BottomLeft,
+                SourceRectangle = ControlPanelSourceRectangle,
+                Texture = panelsTexture,
+                EffectiveRegion = ControlPanelEffectiveRegion
+            };
 
-            snapShot = new UI.Panel(SnapshotDestinationRectangle);
-            snapShot.Anchor = Anchor.BottomLeft;
-            snapShot.EffectiveRegion = Rectangle.Empty;
+            snapShot = new UI.Panel(SnapshotDestinationRectangle)
+            {
+                Anchor = Anchor.BottomLeft,
+                EffectiveRegion = Rectangle.Empty
+            };
 
-            snapShotName = new TextField("Name", 17f / 23, Color.Gold, SnapShotNameDestination, Color.Black);//NameDestination);
-            snapShotName.Centered = true;
+            snapShotName = new TextField("Name", 17f / 23, Color.Gold, SnapShotNameDestination, Color.Black)
+            {
+                Centered = true
+            };//NameDestination);
 
             snapShot.Add(snapShotName);
 
-            controlPanel.Add(snapShot);
+            ControlPanel.Add(snapShot);
 
-            resourcePanel = new UI.Panel(ResourcePanelDestinationRectangle);
-            resourcePanel.Anchor = Anchor.TopRight;
-            resourcePanel.SourceRectangle = ResourcePanelSourceRectangle;
-            resourcePanel.Texture = panelsTexture;
+            ResourcePanel = new UI.Panel(ResourcePanelDestinationRectangle)
+            {
+                Anchor = Anchor.TopRight,
+                SourceRectangle = ResourcePanelSourceRectangle,
+                Texture = panelsTexture
+            };
 
             Color color = Color.White;
-            resourcePanel.Add(lumberTextField = new TextField(Player.LocalPlayer.Lumber.ToString(),
+            ResourcePanel.Add(lumberTextField = new TextField(Player.LocalPlayer.Lumber.ToString(),
                                 17f / 23, color, new Rectangle(72, 2, 150, 20)));
-            resourcePanel.Add(goldTextField = new TextField(Player.LocalPlayer.Gold.ToString(),
+            ResourcePanel.Add(goldTextField = new TextField(Player.LocalPlayer.Gold.ToString(),
                                 17f / 23, color, new Rectangle(128, 2, 150, 20)));
             if (Player.LocalPlayer.Food > Player.LocalPlayer.FoodCapacity)
             {
                 color = Color.Red;
             }
 
-            resourcePanel.Add(foodTextField = new TextField(Player.LocalPlayer.Food.ToString()
+            ResourcePanel.Add(foodTextField = new TextField(Player.LocalPlayer.Food.ToString()
                                 + "/" + Player.LocalPlayer.FoodCapacity,
                                 17f / 23, color, new Rectangle(184, 2, 150, 20)));
 
-            minimap = new MiniMap(game, world);
-            minimap.Texture = panelsTexture;
-            minimap.SourceRectangle = MapSourceRectangle;
-            minimap.GoldMinePointerTexture = panelsTexture;
-            minimap.GoldMineSourceRectangle = GoldMineSourceRectangle;
-            minimap.Area = MapDestinationRectangle;
-            minimap.ScaleMode = ScaleMode.ScaleY;
-            minimap.Anchor = Anchor.BottomRight;
+            Minimap = new MiniMap(game, world)
+            {
+                Texture = panelsTexture,
+                SourceRectangle = MapSourceRectangle,
+                GoldMinePointerTexture = panelsTexture,
+                GoldMineSourceRectangle = GoldMineSourceRectangle,
+                Area = MapDestinationRectangle,
+                ScaleMode = ScaleMode.ScaleY,
+                Anchor = Anchor.BottomRight
+            };
 
-            ui.Add(profilePanel);
-            ui.Add(controlPanel);
-            ui.Add(resourcePanel);
-            controlPanel.Add(minimap);
-            ui.Add(tipBoxContainer);
+            Display.Add(profilePanel);
+            Display.Add(ControlPanel);
+            Display.Add(ResourcePanel);
+            ControlPanel.Add(Minimap);
+            Display.Add(TipBoxContainer);
             randomOffset = Vector2.Normalize(new Vector2((float)rand.NextDouble(), (float)rand.NextDouble()));
 
             // Init rendering of fog of war
@@ -298,7 +304,7 @@ namespace Isles
             }
             if (elements[y, x] != null)
             {
-                controlPanel.Remove(elements[y, x]);
+                ControlPanel.Remove(elements[y, x]);
             }
 
             // Remove old one
@@ -325,10 +331,10 @@ namespace Isles
                 element.ScaleMode = ScaleMode.ScaleX;
 
                 // Add it to the ui
-                controlPanel.Add(element);
+                ControlPanel.Add(element);
             }
 
-            tipBoxContainer.Clear();
+            TipBoxContainer.Clear();
 
             // Store it in the array
             elements[y, x] = element;
@@ -346,7 +352,7 @@ namespace Isles
                 return;
             }
 
-            controlPanel.Remove(elements[x, y]);
+            ControlPanel.Remove(elements[x, y]);
         }
 
         /// <summary>
@@ -358,10 +364,10 @@ namespace Isles
             {
                 if (e != null)
                 {
-                    controlPanel.Remove(e);
+                    ControlPanel.Remove(e);
                 }
             }
-            tipBoxContainer.Clear();
+            TipBoxContainer.Clear();
 
         }
 
@@ -588,7 +594,6 @@ namespace Isles
                                 new Vector2(0, (float)(BubbleUpSustainingHeight * (passedTime / BubbleUpSustainingPeriodLength)));
                     game.Graphics2D.DrawShadowedString(message.Message, BubbleUpMessageFontSize, position, message.Color, Color.Black);
                 }
-
             }
         }
 
@@ -770,7 +775,7 @@ namespace Isles
                 //        playerName.Text = player.CurrentGroup[0].Owner.Name;
                 //}
             }
-            ui.Update(gameTime);
+            Display.Update(gameTime);
 
             Player currentPlayer = Player.LocalPlayer;
 
@@ -823,8 +828,8 @@ namespace Isles
             game.Graphics2D.Present();
 
             // Draw screen border fadeout
-            ui.Sprite.Begin();
-            ui.Sprite.Draw(borderFadeout,
+            Display.Sprite.Begin();
+            Display.Sprite.Draw(borderFadeout,
                 new Rectangle(0, 0, game.ScreenWidth, game.ScreenHeight), Color.White);
 
 #if DEBUG
@@ -832,23 +837,23 @@ namespace Isles
                                     15f / 23, new Vector2(10, 30), Color.White);
 #endif
 
-            ui.Sprite.End();
+            Display.Sprite.End();
 
             var currentProfileIndex = Player.LocalPlayer.CurrentGroupIndex;
 
-            ui.Draw(gameTime);
+            Display.Draw(gameTime);
 
             DrawFogOfWar();
 
             // Draw statistics
             Rectangle dest = UIElement.GetRelativeRectangle(
-                ResourcePanelDestinationRectangle, ui, ScaleMode.ScaleX, Anchor.TopRight);
+                ResourcePanelDestinationRectangle, Display, ScaleMode.ScaleX, Anchor.TopRight);
             float y = dest.Y + dest.Height / 2 - 10;
 
             Rectangle status = UIElement.GetRelativeRectangle(
-                StatusDestination, ui, ScaleMode.ScaleX, Anchor.BottomLeft);
+                StatusDestination, Display, ScaleMode.ScaleX, Anchor.BottomLeft);
 
-            ui.Sprite.Begin();
+            Display.Sprite.Begin();
 
             Player player = Player.LocalPlayer;
 
@@ -862,12 +867,12 @@ namespace Isles
 #endif
 
             // Draw environment indicator
-            ui.Sprite.Draw(panelsTexture,
-                UIElement.GetRelativeRectangle(EnvironmentIndicatorDestination, ui,
+            Display.Sprite.Draw(panelsTexture,
+                UIElement.GetRelativeRectangle(EnvironmentIndicatorDestination, Display,
                                                ScaleMode.ScaleY, Anchor.TopRight),
                 EnvironmentIndicatorSource, GameObject.ColorFromPercentage(1 - player.EnvironmentLevel));
 
-            DrawCursorFocus(gameTime, ui.Sprite);
+            DrawCursorFocus(gameTime, Display.Sprite);
 
             //if (world.FogOfWar != null)
             //{
@@ -876,7 +881,7 @@ namespace Isles
             //    ui.Sprite.Draw(world.FogOfWar.Mask, new Rectangle(0, 360, 128, 128), Color.White);
             //}
 
-            ui.Sprite.End();
+            Display.Sprite.End();
 
             game.Graphics2D.Present();
 
@@ -916,7 +921,7 @@ namespace Isles
             if (world.FogOfWar.Mask != null)
             {
                 // Setup vertices
-                Rectangle destination = minimap.ActualArea;
+                Rectangle destination = Minimap.ActualArea;
 
                 fogOfWarVertices[0].Position = game.Graphics2D.ScreenToEffect(destination.Left, destination.Bottom);
                 fogOfWarVertices[1].Position = game.Graphics2D.ScreenToEffect(destination.Left, destination.Top);
@@ -1047,7 +1052,7 @@ namespace Isles
             }
 
             // Draw the background image.
-            SpriteBatch spriteBatch = ui.Sprite;
+            SpriteBatch spriteBatch = Display.Sprite;
 
             // Begin the sprite batch.
             spriteBatch.Begin(SpriteBlendMode.AlphaBlend,
@@ -1075,7 +1080,7 @@ namespace Isles
             // Draw the sprite, passing the fade amount as the
             // alpha of the SpriteBatch.Draw color parameter.
             var fade = (byte)Pulsate(gameTime);
-            spriteBatch.Draw(LoadingDisplayFinished, ui.DestinationRectangle,
+            spriteBatch.Draw(LoadingDisplayFinished, Display.DestinationRectangle,
                                 new Rectangle(0, 0, LoadingDisplayFinished.Width, LoadingDisplayFinished.Height),
                              //MoveInCircle(gameTime, LoadingDisplayFinished, 1),
                              new Color(255, 255, 255, (byte)(255 - fade)));
@@ -1092,7 +1097,7 @@ namespace Isles
         /// </summary>
         public bool Overlaps(Point p)
         {
-            return controlPanel.ActualEffectiveRegion.Contains(p) || resourcePanel.ActualEffectiveRegion.Contains(p);
+            return ControlPanel.ActualEffectiveRegion.Contains(p) || ResourcePanel.ActualEffectiveRegion.Contains(p);
         }
         #endregion
 
@@ -1100,8 +1105,8 @@ namespace Isles
         public EventResult HandleEvent(EventType type, object sender, object tag)
         {
 
-            return ui != null &&
-                ui.HandleEvent(type, sender, tag) == EventResult.Handled
+            return Display != null &&
+                Display.HandleEvent(type, sender, tag) == EventResult.Handled
                 ? EventResult.Handled
                 : EventResult.Unhandled;
         }

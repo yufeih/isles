@@ -33,7 +33,7 @@ namespace Isles.Engine
 
         public static Vector2 StringToVector2(string value)
         {
-            var split = value.Split(new Char[] { ',' }, 2);
+            var split = value.Split(new char[] { ',' }, 2);
 
             return split.Length >= 2
                 ? new Vector2(
@@ -44,7 +44,7 @@ namespace Isles.Engine
 
         public static Vector3 StringToVector3(string value)
         {
-            var split = value.Split(new Char[] { ',' }, 3);
+            var split = value.Split(new char[] { ',' }, 3);
 
             return split.Length >= 3
                 ? new Vector3(
@@ -56,7 +56,7 @@ namespace Isles.Engine
 
         public static Matrix StringToMatrix(string value)
         {
-            var split = value.Split(new Char[] { ',' }, 16);
+            var split = value.Split(new char[] { ',' }, 16);
 
             return split.Length >= 16
                 ? new Matrix(
@@ -81,7 +81,7 @@ namespace Isles.Engine
 
         public static Quaternion StringToQuaternion(string value)
         {
-            var split = value.Split(new Char[] { ',' }, 4);
+            var split = value.Split(new char[] { ',' }, 4);
 
             return split.Length >= 3
                 ? new Quaternion(
@@ -170,7 +170,7 @@ namespace Isles.Engine
         /// <summary>
         /// Convert an object to a byte array
         /// </summary>
-        public static byte[] ObjectToByteArray(Object obj)
+        public static byte[] ObjectToByteArray(object obj)
         {
             if (obj == null)
             {
@@ -189,7 +189,7 @@ namespace Isles.Engine
         /// <summary>
         /// Convert a byte array to an Object
         /// </summary>
-        public static Object ByteArrayToObject(byte[] rawData, Type type)
+        public static object ByteArrayToObject(byte[] rawData, Type type)
         {
             var rawSize = Marshal.SizeOf(type);
             if (rawSize > rawData.Length)

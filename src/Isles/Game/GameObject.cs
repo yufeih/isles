@@ -119,7 +119,6 @@ namespace Isles
             set => tip = value;
         }
 
-
         /// <summary>
         /// Gets or sets the view distance of this game object
         /// </summary>
@@ -501,13 +500,15 @@ namespace Isles
                 iconIndex = int.Parse(xml.GetAttribute("Icon"));
                 icon = Icon.FromTiledTexture(iconIndex);
 
-                profileButton = new SpellButton();
-                profileButton.Texture = icon.Texture;
-                profileButton.SourceRectangle = icon.Region;
-                profileButton.Hovered = Icon.RectangeFromIndex(iconIndex + 1);
-                profileButton.Pressed = Icon.RectangeFromIndex(iconIndex + 2);
-                profileButton.Anchor = Anchor.BottomLeft;
-                profileButton.ScaleMode = ScaleMode.ScaleY;
+                profileButton = new SpellButton
+                {
+                    Texture = icon.Texture,
+                    SourceRectangle = icon.Region,
+                    Hovered = Icon.RectangeFromIndex(iconIndex + 1),
+                    Pressed = Icon.RectangeFromIndex(iconIndex + 2),
+                    Anchor = Anchor.BottomLeft,
+                    ScaleMode = ScaleMode.ScaleY
+                };
 
                 profileButton.Click += new EventHandler(delegate (object sender, EventArgs e)
                 {
@@ -619,7 +620,7 @@ namespace Isles
 
         public override bool Intersects(BoundingFrustum frustum)
         {
-            return IsAlive ? base.Intersects(frustum) : false;
+            return IsAlive && base.Intersects(frustum);
         }
 
         /// <summary>
@@ -830,13 +831,17 @@ namespace Isles
         {
             TextField content = null;
             var title = new TextField(Name, 16f / 23, Color.Gold,
-                                            new Rectangle(0, 6, 150, 20));
-            title.Centered = true;
+                                            new Rectangle(0, 6, 150, 20))
+            {
+                Centered = true
+            };
             if (Owner.Name != null && Owner.Name != "")
             {
                 content = new TextField(Owner.Name, 15f / 23, Color.White,
-                                        new Rectangle(0, 25, 150, 20));
-                content.Centered = true;
+                                        new Rectangle(0, 25, 150, 20))
+                {
+                    Centered = true
+                };
             }
             var tip = new TipBox(150, title.RealHeight +
                                         (content != null ? content.RealHeight : 0) + 20);
@@ -1117,7 +1122,7 @@ namespace Isles
 
         public override bool Intersects(BoundingFrustum frustum)
         {
-            return Pickable ? base.Intersects(frustum) : false;
+            return Pickable && base.Intersects(frustum);
         }
 
         public void Hit(IWorldObject hitter)
@@ -1469,9 +1474,8 @@ namespace Isles
         /// </summary>
         public bool Contains(float x, float y)
         {
-            return x <= 0 || y <= 0 || x >= width || y >= height
-                ? false
-                : overlapped[TextureSize * (int)(TextureSize * y / height) + (int)(TextureSize * x / width)];
+            return x > 0 && y > 0 && x < width && y < height
+&& overlapped[TextureSize * (int)(TextureSize * y / height) + (int)(TextureSize * x / width)];
         }
 
         /// <summary>
@@ -1561,9 +1565,11 @@ namespace Isles
             if (layer == null || !world.Landscape.Layers.Contains(layer))
             {
                 // Create a new layer on the landscape
-                layer = new BaseLandscape.Layer();
-                layer.ColorTexture = ruinedTexture;
-                layer.AlphaTexture = finalTexture;
+                layer = new BaseLandscape.Layer
+                {
+                    ColorTexture = ruinedTexture,
+                    AlphaTexture = finalTexture
+                };
                 world.Landscape.Layers.Add(layer);
             }
 

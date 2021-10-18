@@ -69,7 +69,7 @@ namespace Isles.Graphics
         /// Texture used to draw the billboard
         /// TODO: Implement animated texture
         /// </summary>
-        public String TextureName
+        public string TextureName
         {
             get => textureName;
             set
@@ -84,7 +84,7 @@ namespace Isles.Graphics
             get => texture;
             set => texture = value;
         }
-        private String textureName;
+        private string textureName;
         private Texture2D texture;
 
         /// <summary>
@@ -97,7 +97,6 @@ namespace Isles.Graphics
 
             set => position = value;
         }
-
 
         /// <summary>
         /// Type of the billboard
@@ -119,24 +118,20 @@ namespace Isles.Graphics
         }
         private AnchorType achorType;
 
-
         /// <summary>
         /// Normalized vector around which the billboard is rotating
         /// </summary>
         public Vector3 Normal;
-
 
         /// <summary>
         /// Size of the billboard
         /// </summary>
         public Vector2 Size;
 
-
         /// <summary>
         /// Source rectangle (min, max). Measured in float [0 ~ 1]
         /// </summary>
         public Vector4 SourceRectangle;
-
 
         /// <summary>
         /// Default source rectangle
@@ -216,7 +211,7 @@ namespace Isles.Graphics
         /// <summary>
         /// Index buffer used to generate indices
         /// </summary>
-        private Int16[] workingIndices = new short[ChunkSize * 6];
+        private short[] workingIndices = new short[ChunkSize * 6];
 
         /// <summary>
         /// Graphics device
@@ -244,7 +239,7 @@ namespace Isles.Graphics
                 typeof(VertexPositionNormalDuoTexture), ChunkSize * 4, BufferUsage.WriteOnly);
 
             indices = new DynamicIndexBuffer(game.GraphicsDevice,
-                typeof(Int16), ChunkSize * 6, BufferUsage.WriteOnly);
+                typeof(short), ChunkSize * 6, BufferUsage.WriteOnly);
         }
 
         #region Draw
@@ -253,15 +248,16 @@ namespace Isles.Graphics
         /// </summary>
         public void Draw(Texture2D texture, Vector3 position, Vector2 size, AnchorType achorType)
         {
-            var billboard = new Billboard();
-
-            billboard.AchorType = achorType;
-            billboard.Texture = texture;
-            billboard.Position = position;
-            billboard.Normal = Vector3.UnitZ;
-            billboard.Size = size;
-            billboard.Type = BillboardType.CenterOriented;
-            billboard.SourceRectangle = Billboard.DefaultSourceRectangle;
+            var billboard = new Billboard
+            {
+                AchorType = achorType,
+                Texture = texture,
+                Position = position,
+                Normal = Vector3.UnitZ,
+                Size = size,
+                Type = BillboardType.CenterOriented,
+                SourceRectangle = Billboard.DefaultSourceRectangle
+            };
 
             Draw(billboard);
         }
@@ -269,15 +265,16 @@ namespace Isles.Graphics
         public void Draw(Texture2D texture, Vector3 position,
             Vector2 size, Vector3 normal, Vector4 sourceRectangle, AnchorType achorType)
         {
-            var billboard = new Billboard();
-
-            billboard.AchorType = achorType;
-            billboard.Texture = texture;
-            billboard.Position = position;
-            billboard.Normal = normal;
-            billboard.Size = size;
-            billboard.SourceRectangle = sourceRectangle;
-            billboard.Type = BillboardType.NormalOriented;
+            var billboard = new Billboard
+            {
+                AchorType = achorType,
+                Texture = texture,
+                Position = position,
+                Normal = normal,
+                Size = size,
+                SourceRectangle = sourceRectangle,
+                Type = BillboardType.NormalOriented
+            };
 
             Draw(billboard);
         }
@@ -425,7 +422,7 @@ namespace Isles.Graphics
 
         private static void CreateQuad(Billboard billboard,
             ref VertexPositionNormalDuoTexture[] vertices, ref int baseVertex,
-            ref Int16[] indices, ref int baseIndex)
+            ref short[] indices, ref int baseIndex)
         {
             // Quad:
             //

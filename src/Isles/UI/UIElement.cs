@@ -477,7 +477,6 @@ namespace Isles.UI
                 }
             }
 
-
             return relativeRectangle;
         }
         #endregion

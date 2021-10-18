@@ -89,9 +89,10 @@ namespace Isles.Editor
         private void button4_Click(object sender, EventArgs e)
         {
             Building townHall = GetTestTarget();
-            var fire = new EffectFire(world);
-
-            fire.Position = townHall.TopCenter;
+            var fire = new EffectFire(world)
+            {
+                Position = townHall.TopCenter
+            };
 
             Edit(fire);
 

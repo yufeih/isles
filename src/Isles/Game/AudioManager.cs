@@ -110,7 +110,6 @@ namespace Isles.Engine
             }
         }
 
-
         /// <summary>
         /// Updates the state of the 3D audio system.
         /// </summary>

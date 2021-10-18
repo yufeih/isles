@@ -102,10 +102,12 @@ namespace Isles
             : base(world)
         {
             RestoreDefault();
-            trail = new TrailEffect();
-            trail.Length = 5;
-            trail.Width = 2;
-            trail.Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("Textures/ray2");
+            trail = new TrailEffect
+            {
+                Length = 5,
+                Width = 2,
+                Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("Textures/ray2")
+            };
 
         }
 

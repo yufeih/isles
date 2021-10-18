@@ -276,7 +276,6 @@ namespace Isles.Engine
 
         private Vector3 position;
 
-
         /// <summary>
         /// Gets or sets which way the entity is facing.
         /// Used for 3D sound.
@@ -333,7 +332,6 @@ namespace Isles.Engine
         }
 
         private string name;
-
 
         /// <summary>
         /// Gets or sets the class ID of this world object

@@ -119,7 +119,6 @@ namespace Isles.Screens
                     Add(t);
                     t.ResetDestinationRectangle();
                 }
-
             };
 
             nextPage.Click += delegate (object o, EventArgs e)
@@ -162,7 +161,7 @@ namespace Isles.Screens
             var ex = new IOException("The readme text is not well-formated.");
             using (var sr = new StreamReader(readmeText))
             {
-                String line;
+                string line;
                 while (null != (line = sr.ReadLine()))
                 {
                     line.Trim();
@@ -174,7 +173,7 @@ namespace Isles.Screens
                     if (line.StartsWith("$FontSize$"))
                     {
                         line = line.Substring(10);
-                        fontSize = Int32.Parse(line);
+                        fontSize = int.Parse(line);
                     }
                     else if (line.StartsWith("$Color$"))
                     {
@@ -214,10 +213,12 @@ namespace Isles.Screens
                             currentContent = null;
                         }
                         currentContent = null;
-                        currentTitle = new TextField(line.Substring(7), fontSize / 23f, color, titleArea);
-                        currentTitle.Anchor = Anchor.TopLeft;
-                        currentTitle.ScaleMode = ScaleMode.ScaleX;
-                        currentTitle.Centered = true;
+                        currentTitle = new TextField(line.Substring(7), fontSize / 23f, color, titleArea)
+                        {
+                            Anchor = Anchor.TopLeft,
+                            ScaleMode = ScaleMode.ScaleX,
+                            Centered = true
+                        };
                         title = true;
                         heightOffset = 0;
                     }
@@ -231,9 +232,11 @@ namespace Isles.Screens
                         var tempContentRect = new Rectangle(contentArea.X, contentArea.Y + heightOffset,
                                                                     contentArea.Width, contentArea.Height);
 
-                        currentContent = new TextField(line.Substring(9), fontSize / 23f, color, tempContentRect);
-                        currentContent.Anchor = Anchor.TopLeft;
-                        currentContent.ScaleMode = ScaleMode.ScaleX;
+                        currentContent = new TextField(line.Substring(9), fontSize / 23f, color, tempContentRect)
+                        {
+                            Anchor = Anchor.TopLeft,
+                            ScaleMode = ScaleMode.ScaleX
+                        };
                         title = false;
                     }
                     else if (title)
@@ -244,7 +247,6 @@ namespace Isles.Screens
                     {
                         currentContent.Text += "\n" + line;
                     }
-
                 }
             }
             titles.Add(currentTitle);

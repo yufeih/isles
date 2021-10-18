@@ -258,7 +258,6 @@ namespace Isles
                 spell.Enable = true;
             }
 
-
             if (Owner is LocalPlayer local &&
                 local.CurrentGroup != null && local.CurrentGroup.Contains(this))
             {

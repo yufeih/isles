@@ -39,13 +39,6 @@ namespace Isles.Engine
         /// Keys pressed last frame, for comparison if a key was just pressed.
         /// </summary>
         private List<Keys> keysPressedLastFrame = new();
-
-        /// <summary>
-        /// Mouse wheel delta this frame. XNA does report only the total
-        /// scroll value, but we usually need the current delta!
-        /// </summary>
-        /// <returns>0</returns>
-        private int mouseWheelDelta;
         private int mouseWheelValue;
 
         /// <summary>
@@ -62,7 +55,7 @@ namespace Isles.Engine
         /// Mouse wheel delta
         /// </summary>
         /// <returns>Int</returns>
-        public int MouseWheelDelta => mouseWheelDelta;
+        public int MouseWheelDelta { get; private set; }
 
         /// <summary>
         /// Mouse in box
@@ -421,7 +414,7 @@ namespace Isles.Engine
             mouseStateLastFrame = mouseState;
             mouseState = Microsoft.Xna.Framework.Input.Mouse.GetState();
 
-            mouseWheelDelta = mouseState.ScrollWheelValue - mouseWheelValue;
+            MouseWheelDelta = mouseState.ScrollWheelValue - mouseWheelValue;
             mouseWheelValue = mouseState.ScrollWheelValue;
 
             // Handle keyboard input
@@ -429,7 +422,7 @@ namespace Isles.Engine
             keyboardState = Microsoft.Xna.Framework.Input.Keyboard.GetState();
 
             // Mouse wheel event
-            if (mouseWheelDelta != 0)
+            if (MouseWheelDelta != 0)
             {
                 TriggerEvent(EventType.Wheel, null);
             }

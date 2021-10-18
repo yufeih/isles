@@ -73,14 +73,15 @@ namespace Isles.Graphics
 
         public static BloomSettings Lerp(BloomSettings settings1, BloomSettings settings2, float amount)
         {
-            var settings = new BloomSettings();
-
-            settings.BaseIntensity = MathHelper.Lerp(settings1.BaseIntensity, settings2.BaseIntensity, amount);
-            settings.BaseSaturation = MathHelper.Lerp(settings1.BaseSaturation, settings2.BaseSaturation, amount);
-            settings.BloomIntensity = MathHelper.Lerp(settings1.BloomIntensity, settings2.BloomIntensity, amount);
-            settings.BloomSaturation = MathHelper.Lerp(settings1.BloomSaturation, settings2.BloomSaturation, amount);
-            settings.BloomThreshold = MathHelper.Lerp(settings1.BloomThreshold, settings2.BloomThreshold, amount);
-            settings.BlurAmount = MathHelper.Lerp(settings1.BlurAmount, settings2.BlurAmount, amount);
+            var settings = new BloomSettings
+            {
+                BaseIntensity = MathHelper.Lerp(settings1.BaseIntensity, settings2.BaseIntensity, amount),
+                BaseSaturation = MathHelper.Lerp(settings1.BaseSaturation, settings2.BaseSaturation, amount),
+                BloomIntensity = MathHelper.Lerp(settings1.BloomIntensity, settings2.BloomIntensity, amount),
+                BloomSaturation = MathHelper.Lerp(settings1.BloomSaturation, settings2.BloomSaturation, amount),
+                BloomThreshold = MathHelper.Lerp(settings1.BloomThreshold, settings2.BloomThreshold, amount),
+                BlurAmount = MathHelper.Lerp(settings1.BlurAmount, settings2.BlurAmount, amount)
+            };
 
             return settings;
         }

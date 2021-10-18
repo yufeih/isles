@@ -312,7 +312,7 @@ namespace Isles.Graphics
             trailList = new List<TrailEffect>();
             vertexDeclaration = new VertexDeclaration(device, VertexPositionTexture.VertexElements);
             vertexBuffer = new DynamicVertexBuffer(device, typeof(VertexPositionTexture), (chunckSize + 1) * 2, BufferUsage.WriteOnly);
-            indexBuffer = new DynamicIndexBuffer(device, typeof(Int16), (chunckSize + 1) * 2, BufferUsage.WriteOnly);
+            indexBuffer = new DynamicIndexBuffer(device, typeof(short), (chunckSize + 1) * 2, BufferUsage.WriteOnly);
             vertexList = new VertexPositionTexture[(chunckSize + 1) * 2];
 
             LoadContent();
@@ -403,7 +403,6 @@ namespace Isles.Graphics
             {
                 vertexList[2 + i] = tempList[vertexCount - i - 1];
             }
-
         }
         #endregion
 

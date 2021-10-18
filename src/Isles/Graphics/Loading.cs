@@ -128,31 +128,37 @@ namespace Isles.Graphics
             graphics2D = gfx2D;
             this.graphics = graphics;
             uiDisplay = new UIDisplay(BaseGame.Singleton);
-            progressBar = new ProgressBar();
-            progressBar.Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/ProgressBar");
-            progressBar.SourceRectangleLeftEnd = new Rectangle(0, 0, 64, 63);
-            progressBar.SourceRectangleHightLight = new Rectangle(0, 126, 85, 63);
-            progressBar.SourceRectangleRightEnd = new Rectangle(165, 0, 64, 63);
-            progressBar.SourceRectangleFiller = new Rectangle(80, 0, 40, 63);
-            progressBar.StartingTime = BaseGame.Singleton.CurrentGameTime.TotalGameTime.TotalSeconds;
-            progressBar.HighLightRollingSpeed = 180;
-            progressBar.HighLightLength = 50;
-            progressBar.Area = new Rectangle(181, 269, 435, 6);//new Rectangle(181, 323, 435, 7);
-            progressBar.Anchor = Anchor.TopLeft;
-            progressBar.ScaleMode = ScaleMode.Stretch;
+            progressBar = new ProgressBar
+            {
+                Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/ProgressBar"),
+                SourceRectangleLeftEnd = new Rectangle(0, 0, 64, 63),
+                SourceRectangleHightLight = new Rectangle(0, 126, 85, 63),
+                SourceRectangleRightEnd = new Rectangle(165, 0, 64, 63),
+                SourceRectangleFiller = new Rectangle(80, 0, 40, 63),
+                StartingTime = BaseGame.Singleton.CurrentGameTime.TotalGameTime.TotalSeconds,
+                HighLightRollingSpeed = 180,
+                HighLightLength = 50,
+                Area = new Rectangle(181, 269, 435, 6),//new Rectangle(181, 323, 435, 7);
+                Anchor = Anchor.TopLeft,
+                ScaleMode = ScaleMode.Stretch
+            };
 
             var height = 875.0 * uiDisplay.Area.Width / 1400;
 
             var backgroundPanel = new Panel(new Rectangle(0, (int)((uiDisplay.Area.Height - height) / 2),
-                                    uiDisplay.Area.Width, (int)height));
-            backgroundPanel.Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/LoadingDisplay");
+                                    uiDisplay.Area.Width, (int)height))
+            {
+                Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/LoadingDisplay")
+            };
             backgroundPanel.SourceRectangle = new Rectangle(0, 0, backgroundPanel.Texture.Width, backgroundPanel.Texture.Height);
             backgroundPanel.Anchor = Anchor.Center;
             backgroundPanel.ScaleMode = ScaleMode.Stretch;
 
             var panel = new Panel(new Rectangle(0, (int)((uiDisplay.Area.Height - height) / 2),
-                                    uiDisplay.Area.Width, (int)height));
-            panel.Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/LoadingDisplay");
+                                    uiDisplay.Area.Width, (int)height))
+            {
+                Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/LoadingDisplay")
+            };
             panel.SourceRectangle = new Rectangle(0, 0, panel.Texture.Width, panel.Texture.Height);
             panel.Anchor = Anchor.Center;
             panel.ScaleMode = ScaleMode.Stretch;

@@ -747,8 +747,8 @@ namespace Isles.Graphics
                 throw new ArgumentException();
             }
 
-            this.Width = width;
-            this.Height = height;
+            Width = width;
+            Height = height;
             this.graphics = graphics;
             sprite = new SpriteBatch(graphics);
             visibility = new bool[Size * Size];
@@ -764,7 +764,7 @@ namespace Isles.Graphics
         /// </summary>
         public bool Contains(float x, float y)
         {
-            return x <= 0 || y <= 0 || x >= Width || y >= Height ? true : !visibility[Size * (int)(Size * y / Height) + (int)(Size * x / Width)];
+            return x <= 0 || y <= 0 || x >= Width || y >= Height || !visibility[Size * (int)(Size * y / Height) + (int)(Size * x / Width)];
         }
 
         /// <summary>

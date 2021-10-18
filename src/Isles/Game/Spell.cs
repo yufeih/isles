@@ -365,13 +365,15 @@ namespace Isles
             }
 
             var baseIcon = Icon.IndexFromRectangle(Icon.Region);
-            spellButton = new SpellButton();
-            spellButton.Texture = Icon.Texture == null ? Icon.DefaultTexture : Icon.Texture;
-            spellButton.SourceRectangle = Icon.Region;
-            spellButton.Pressed = Icon.RectangeFromIndex(baseIcon + 1);
-            spellButton.Hovered = Icon.RectangeFromIndex(baseIcon + 2);
-            spellButton.HotKey = Hotkey;
-            spellButton.Tag = this;
+            spellButton = new SpellButton
+            {
+                Texture = Icon.Texture == null ? Icon.DefaultTexture : Icon.Texture,
+                SourceRectangle = Icon.Region,
+                Pressed = Icon.RectangeFromIndex(baseIcon + 1),
+                Hovered = Icon.RectangeFromIndex(baseIcon + 2),
+                HotKey = Hotkey,
+                Tag = this
+            };
 
             spellButton.Click += new EventHandler(delegate (object sender, EventArgs e)
             {
@@ -2036,11 +2038,12 @@ namespace Isles
 
             // It's not accurate to use point sprite to draw the fireball,
             // so use center oriented billboard instead.
-            var billboard = new Billboard();
-
-            billboard.Texture = texture[(int)frame];
-            billboard.Normal = Vector3.Zero;
-            billboard.Position = Position;
+            var billboard = new Billboard
+            {
+                Texture = texture[(int)frame],
+                Normal = Vector3.Zero,
+                Position = Position
+            };
             billboard.Size.X = billboard.Size.Y = explode ? 64 : 128;
             billboard.SourceRectangle = Billboard.DefaultSourceRectangle;
             billboard.Type = BillboardType.CenterOriented;

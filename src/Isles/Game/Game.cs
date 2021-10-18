@@ -129,7 +129,6 @@ namespace Isles
             Player.RegisterBuilding("Barracks");
             Player.RegisterBuilding("Altar");
 
-
             // Islander units
             GameWorld.RegisterCreator("Follower", delegate (GameWorld world) { return new Worker(world, "Follower"); });
             GameWorld.RegisterCreator("Militia", delegate (GameWorld world) { return new Charactor(world, "Militia"); });
@@ -148,7 +147,6 @@ namespace Isles
             Player.RegisterCharactor("Hunter");
             Player.RegisterCharactor("FireSorceress");
             Player.RegisterCharactor("Hellfire");
-
 
             // Steamer architectures
             GameWorld.RegisterCreator("SteamFort", delegate (GameWorld world) { return new Building(world, "SteamFort"); });

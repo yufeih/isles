@@ -1210,8 +1210,10 @@ namespace Isles
                 if (moveToTarget == null)
                 {
                     moveToTarget = new StateMoveToTarget(owner, target,
-                                                         owner.Priority, world.PathManager);
-                    moveToTarget.FollowDistance = 0;
+                                                         owner.Priority, world.PathManager)
+                    {
+                        FollowDistance = 0
+                    };
                 }
 
                 // Update move

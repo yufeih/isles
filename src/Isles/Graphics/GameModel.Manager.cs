@@ -34,7 +34,6 @@ namespace Isles.Graphics
 
         private bool isDirty = true;
 
-
         /// <summary>
         /// The effect technique for the material
         /// </summary>
@@ -64,7 +63,6 @@ namespace Isles.Graphics
         }
 
         private Texture2D texture;
-
 
         /// <summary>
         /// Model normal texture

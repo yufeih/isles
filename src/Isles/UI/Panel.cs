@@ -184,7 +184,6 @@ namespace Isles.UI
 
             return EventResult.Unhandled;
         }
-
     }
     #endregion
 
@@ -382,12 +381,12 @@ namespace Isles.UI
     #region TextField
     public class TextField : Panel
     {
-        private String text;
+        private string text;
 
         /// <summary>
         /// Gets or sets the text to be displayed
         /// </summary>
-        public String Text
+        public string Text
         {
             get => text;
             set
@@ -412,12 +411,12 @@ namespace Isles.UI
             }
         }
 
-        private String formatedText;
+        private string formatedText;
 
         /// <summary>
         /// Gets the formatted text
         /// </summary>
-        public String FormatedText => formatedText;
+        public string FormatedText => formatedText;
 
         /// <summary>
         /// Color of the text
@@ -487,7 +486,7 @@ namespace Isles.UI
         /// </summary>
         /// <param name="text"></param>
         /// <param name="area"></param>
-        public TextField(String text, float fontSize, Color color, Rectangle area)
+        public TextField(string text, float fontSize, Color color, Rectangle area)
             : base(area)
         {
             this.color = color;
@@ -501,7 +500,7 @@ namespace Isles.UI
         /// </summary>
         /// <param name="text"></param>
         /// <param name="area"></param>
-        public TextField(String text, float fontSize, Color color, Rectangle area, Color shadowColor)
+        public TextField(string text, float fontSize, Color color, Rectangle area, Color shadowColor)
             : base(area)
         {
             shadowed = true;
@@ -520,7 +519,7 @@ namespace Isles.UI
             return EventResult.Unhandled;
         }
 
-        private String[] lines;
+        private string[] lines;
 
         public override Rectangle DestinationRectangle
         {

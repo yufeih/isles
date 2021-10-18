@@ -126,7 +126,6 @@ namespace Isles
             GoldMineList.Remove(key);
         }
 
-
         /// <summary>
         /// Gets the corresponding position in the real world.
         /// </summary>
@@ -137,9 +136,11 @@ namespace Isles
 
             if (ActualArea.Contains(mapPoint))
             {
-                var rtv = new Vector3();
-                rtv.X = world.Landscape.Size.X * (mapPoint.X - ActualArea.X) / ActualArea.Width;
-                rtv.Y = world.Landscape.Size.Y * (ActualArea.Bottom - mapPoint.Y) / ActualArea.Height;
+                var rtv = new Vector3
+                {
+                    X = world.Landscape.Size.X * (mapPoint.X - ActualArea.X) / ActualArea.Width,
+                    Y = world.Landscape.Size.Y * (ActualArea.Bottom - mapPoint.Y) / ActualArea.Height
+                };
                 rtv.Z = world.Landscape.GetHeight(rtv.X, rtv.Y);
                 return rtv;
             }
@@ -149,9 +150,11 @@ namespace Isles
 
         private Vector3 MapPointToWorldPositionNegativeAllowed(Point mapPoint)
         {
-            var rtv = new Vector3();
-            rtv.X = world.Landscape.Size.X * (mapPoint.X - ActualArea.X) / ActualArea.Width;
-            rtv.Y = world.Landscape.Size.Y * (ActualArea.Bottom - mapPoint.Y) / ActualArea.Height;
+            var rtv = new Vector3
+            {
+                X = world.Landscape.Size.X * (mapPoint.X - ActualArea.X) / ActualArea.Width,
+                Y = world.Landscape.Size.Y * (ActualArea.Bottom - mapPoint.Y) / ActualArea.Height
+            };
             rtv.Z = world.Landscape.GetHeight(rtv.X, rtv.Y);
             return rtv;
         }
@@ -166,9 +169,11 @@ namespace Isles
             if (position.X >= 0 && position.X <= world.Landscape.Size.X &&
                 position.Y >= 0 && position.Y <= world.Landscape.Size.Y)
             {
-                var mp = new Point();
-                mp.X = (int)(position.X / world.Landscape.Size.X * ActualArea.Width + ActualArea.X);
-                mp.Y = (int)((1 - position.Y / world.Landscape.Size.Y) * ActualArea.Height + ActualArea.Y);
+                var mp = new Point
+                {
+                    X = (int)(position.X / world.Landscape.Size.X * ActualArea.Width + ActualArea.X),
+                    Y = (int)((1 - position.Y / world.Landscape.Size.Y) * ActualArea.Height + ActualArea.Y)
+                };
                 return mp;
             }
 
@@ -177,9 +182,11 @@ namespace Isles
 
         private Point WorldPositionToMapPointNegativeAllowed(Vector3 position)
         {
-            var mp = new Point();
-            mp.X = (int)(position.X / world.Landscape.Size.X * ActualArea.Width + ActualArea.X);
-            mp.Y = (int)((1 - position.Y / world.Landscape.Size.Y) * ActualArea.Height + ActualArea.Y);
+            var mp = new Point
+            {
+                X = (int)(position.X / world.Landscape.Size.X * ActualArea.Width + ActualArea.X),
+                Y = (int)((1 - position.Y / world.Landscape.Size.Y) * ActualArea.Height + ActualArea.Y)
+            };
             return mp;
         }
 

@@ -26,9 +26,10 @@ namespace Isles
 
             foreach (XmlElement child in childNodes)
             {
-                var info = new PlayerInfo();
-
-                info.Name = child.GetAttribute("Name");
+                var info = new PlayerInfo
+                {
+                    Name = child.GetAttribute("Name")
+                };
                 if (child.HasAttribute("Team"))
                 {
                     info.Team = int.Parse(child.GetAttribute("Team"));

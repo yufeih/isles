@@ -87,7 +87,6 @@ namespace Isles
 
                 ignoreDynamicObstacles = value;
             }
-
         }
 
         private bool ignoreDynamicObstacles;
@@ -305,8 +304,7 @@ namespace Isles
         /// </summary>
         public virtual bool TargetReached(Entity entity)
         {
-            return entity == null ? false :
-                   entity.Outline.DistanceTo(new Vector2(Position.X, Position.Y)) < Outline.Radius;
+            return entity != null && entity.Outline.DistanceTo(new Vector2(Position.X, Position.Y)) < Outline.Radius;
         }
 
         /// <summary>

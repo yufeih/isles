@@ -61,8 +61,10 @@ namespace Isles.Editor
             if (objectList.SelectedItem is string type)
             {
                 Spell.EndSpell();
-                var construct = new SpellConstruct(screen.World, type);
-                construct.AutoReactivate = true;
+                var construct = new SpellConstruct(screen.World, type)
+                {
+                    AutoReactivate = true
+                };
                 Spell.Cast(construct);
             }
         }

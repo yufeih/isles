@@ -72,7 +72,6 @@ namespace Isles.Graphics
 
             indexBuffer.SetData(indices);
 
-
             // Initialize vertices
             var vertexBufferElementCount = (Patch.MaxPatchResolution + 1) *
                                            (Patch.MaxPatchResolution + 1);

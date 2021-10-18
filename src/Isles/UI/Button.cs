@@ -310,7 +310,7 @@ namespace Isles.UI
         /// <summary>
         /// Gets or sets the text for the button
         /// </summary>
-        public String Text
+        public string Text
         {
             get => textField.Text;
             set => textField.Text = value;
@@ -352,12 +352,11 @@ namespace Isles.UI
             set => pressDownColor = value;
         }
 
-
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="text"></param>
-        public TextButton(String text, float fontSize, Color normalColor, Rectangle area)
+        public TextButton(string text, float fontSize, Color normalColor, Rectangle area)
         {
             Area = area;
             textField = new TextField(text, fontSize, normalColor,

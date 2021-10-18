@@ -159,7 +159,6 @@ namespace Isles
                 X = Mouse.GetState().X - DestinationRectangle.Width;
             }
         }
-
     }
     #endregion
 }

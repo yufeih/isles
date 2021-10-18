@@ -167,7 +167,7 @@ namespace Isles.Graphics
 #if SHORTINDEX
             public UInt16 StartingVertex = 0;
 #else
-            public UInt32 StartingVertex;
+            public uint StartingVertex;
 #endif
 
             private static int i;
@@ -356,24 +356,24 @@ namespace Isles.Graphics
             /// </summary>
             /// <param name="indices"></param>
             /// <returns>Number of indices added to the list</returns>
-            public UInt16 FillIndices16(ref UInt16[] indices, uint baseIndex)
+            public ushort FillIndices16(ref ushort[] indices, uint baseIndex)
             {
                 for (var i = 0; i < MagicIndices[lod].Length; i++)
                 {
-                    indices[baseIndex++] = (UInt16)(MagicIndices[lod][i] + StartingVertex);
+                    indices[baseIndex++] = (ushort)(MagicIndices[lod][i] + StartingVertex);
                 }
 
-                return (UInt16)MagicIndices[lod].Length;
+                return (ushort)MagicIndices[lod].Length;
             }
 
-            public UInt32 FillIndices32(ref UInt32[] indices, uint baseIndex)
+            public uint FillIndices32(ref uint[] indices, uint baseIndex)
             {
                 for (var i = 0; i < MagicIndices[lod].Length; i++)
                 {
-                    indices[baseIndex++] = (UInt32)(MagicIndices[lod][i] + StartingVertex);
+                    indices[baseIndex++] = (uint)(MagicIndices[lod][i] + StartingVertex);
                 }
 
-                return (UInt32)MagicIndices[lod].Length;
+                return (uint)MagicIndices[lod].Length;
             }
 
             #endregion
@@ -423,12 +423,12 @@ namespace Isles.Graphics
             };
 
             // Indices
-            private static readonly UInt32[] Indices0 = new UInt32[] { 0, 1, 3, 0, 3, 2 };
-            private static readonly UInt32[] Indices1 = new UInt32[]
+            private static readonly uint[] Indices0 = new uint[] { 0, 1, 3, 0, 3, 2 };
+            private static readonly uint[] Indices1 = new uint[]
             {
                 0, 1, 4, 0, 4, 3, 1, 2, 5, 1, 5, 4, 3, 4, 7, 3, 7, 6, 4, 5, 8, 4, 8, 7
             };
-            private static readonly UInt32[] Indices2 = new UInt32[]
+            private static readonly uint[] Indices2 = new uint[]
             {
                 0, 1, 6, 0, 6, 5, 1, 2, 7, 1, 7, 6, 2, 3, 8, 2, 8, 7, 3, 4, 9, 3, 9, 8, 5, 6, 11
                 , 5, 11, 10, 6, 7, 12, 6, 12, 11, 7, 8, 13, 7, 13, 12, 8, 9, 14, 8, 14, 13, 10,
@@ -436,7 +436,7 @@ namespace Isles.Graphics
                 13, 19, 18, 15, 16, 21, 15, 21, 20, 16, 17, 22, 16, 22, 21, 17, 18, 23, 17, 23,
                 22, 18, 19, 24, 18, 24, 23
             };
-            private static readonly UInt32[] Indices3 = new UInt32[]
+            private static readonly uint[] Indices3 = new uint[]
             {
                 0, 1, 10, 0, 10, 9, 1, 2, 11, 1, 11, 10, 2, 3, 12, 2, 12, 11, 3, 4, 13, 3, 13,
                 12, 4, 5, 14, 4, 14, 13, 5, 6, 15, 5, 15, 14, 6, 7, 16, 6, 16, 15, 7, 8, 17, 7,
@@ -458,7 +458,7 @@ namespace Isles.Graphics
                 73, 65, 66, 75, 65, 75, 74, 66, 67, 76, 66, 76, 75, 67, 68, 77, 67, 77, 76, 68,
                 69, 78, 68, 78, 77, 69, 70, 79, 69, 79, 78, 70, 71, 80, 70, 80, 79
             };
-            private static readonly UInt32[] Indices4 = new UInt32[]
+            private static readonly uint[] Indices4 = new uint[]
             {
                 0, 1, 18, 0, 18, 17, 1, 2, 19, 1, 19, 18, 2, 3, 20, 2, 20, 19, 3, 4, 21, 3, 21,
                 20, 4, 5, 22, 4, 22, 21, 5, 6, 23, 5, 23, 22, 6, 7, 24, 6, 24, 23, 7, 8, 25, 7,
@@ -554,7 +554,7 @@ namespace Isles.Graphics
 
             // Vertices & Indices
             private static readonly uint[][] MagicVertices = new uint[][] { Vertices0, Vertices1, Vertices2, Vertices3, Vertices4 };
-            private static readonly UInt32[][] MagicIndices = new UInt32[][] { Indices0, Indices1, Indices2, Indices3, Indices4 };
+            private static readonly uint[][] MagicIndices = new uint[][] { Indices0, Indices1, Indices2, Indices3, Indices4 };
             private static readonly int[] MagicBase = new int[] { 1, 2, 4, 8, 16 };
             private static readonly int[] MagicLength = new int[] { 16, 8, 4, 2, 1 };
 

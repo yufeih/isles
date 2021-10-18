@@ -308,31 +308,32 @@ namespace Isles.Graphics
         /// </summary>
         public GameModel ShadowCopy()
         {
-            var copy = new GameModel();
-
-            copy.animationClips = animationClips;
-            copy.AnimationSpeed = AnimationSpeed;
-            copy.animationState = animationState;
-            copy.blendDuration = blendDuration;
-            copy.blending = blending;
-            copy.blendStart = blendStart;
-            copy.boundingBox = boundingBox;
-            copy.currentClip = currentClip;
-            copy.currentPlayer = currentPlayer;
-            copy.game = game;
-            copy.glow = glow;
-            copy.isBoundingBoxDirty = isBoundingBoxDirty;
-            copy.materials = materials;
-            copy.meshParts = meshParts;
-            copy.model = model;
-            copy.orientedBoundingBox = orientedBoundingBox;
-            copy.players = players;
-            copy.renderables = renderables;
-            copy.shadowMapRenderables = shadowMapRenderables;
-            copy.skin = skin;
-            copy.spacePartitionInfo = spacePartitionInfo;
-            copy.tint = tint;
-            copy.transform = transform;
+            var copy = new GameModel
+            {
+                animationClips = animationClips,
+                AnimationSpeed = AnimationSpeed,
+                animationState = animationState,
+                blendDuration = blendDuration,
+                blending = blending,
+                blendStart = blendStart,
+                boundingBox = boundingBox,
+                currentClip = currentClip,
+                currentPlayer = currentPlayer,
+                game = game,
+                glow = glow,
+                isBoundingBoxDirty = isBoundingBoxDirty,
+                materials = materials,
+                meshParts = meshParts,
+                model = model,
+                orientedBoundingBox = orientedBoundingBox,
+                players = players,
+                renderables = renderables,
+                shadowMapRenderables = shadowMapRenderables,
+                skin = skin,
+                spacePartitionInfo = spacePartitionInfo,
+                tint = tint,
+                transform = transform
+            };
 
             if (skinTransforms != null)
             {
@@ -376,10 +377,12 @@ namespace Isles.Graphics
 
                     dictionary.TryGetValue("SpacePartition", out value);
 
-                    spacePartitionInfo = new ModelSpacePartitionInformation();
-                    spacePartitionInfo.BitMap = value as bool[];
+                    spacePartitionInfo = new ModelSpacePartitionInformation
+                    {
+                        BitMap = value as bool[],
 
-                    spacePartitionInfo.Box = OBBFromModel(model);
+                        Box = OBBFromModel(model)
+                    };
                 }
 
                 if (animationClips != null)
@@ -423,10 +426,12 @@ namespace Isles.Graphics
                         // TODO: What if the effect cannot be casted to BasicEffect?
                         var effect = part.Effect as BasicEffect;
 
-                        var material = new Material(effect);
+                        var material = new Material(effect)
+                        {
 
-                        // Read normal texture from mesh part tag
-                        material.NormalTexture = part.Tag as Texture2D;
+                            // Read normal texture from mesh part tag
+                            NormalTexture = part.Tag as Texture2D
+                        };
 
                         materials.Add(material);
 
