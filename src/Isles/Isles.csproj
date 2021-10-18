@@ -19,8 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\..\data\cursors\**" LinkBase="data\cursors" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="..\..\data\settings\**" LinkBase="data\settings" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\data\**" LinkBase="data" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\xnb\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 

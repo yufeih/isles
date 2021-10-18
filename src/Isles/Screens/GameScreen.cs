@@ -161,8 +161,6 @@ namespace Isles
             // Reset game recorder
             Recorder = new GameRecorder();
 
-            // Load game world
-            using Stream levelFile = Game.ZipContent.GetFileStream(levelFilename);
             // Hide cursor
             Game.IsMouseVisible = false;
 
@@ -176,7 +174,7 @@ namespace Isles
 
             // Read XML scene content
             var doc = new XmlDocument();
-            doc.Load(levelFile);
+            doc.Load($"data/levels/{levelFilename}");
 
             if (level != null)
             {

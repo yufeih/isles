@@ -32,26 +32,7 @@ namespace Isles
             AddScreen("GameScreen", GameScreen = new GameScreen());
             AddScreen("TitleScreen", titleScreen = new TitleScreen(GameScreen));
 
-            // Start new level
-            // using (Stream stream = new FileStream("Content/Levels/World.xml", FileMode.Open))
-            // {
-            //    gameScreen.StartLevel(stream);
-            // }
-
-            // StartScreen(gameScreen);
-            if (Settings.DirectEnter)
-            {
-                GameScreen.StartLevel("Content/Levels/World.xml");
-
-                StartScreen(GameScreen);
-            }
-            else
-            {
-                StartScreen(titleScreen);
-            }
-
-            // Start game screen
-            // StartScreen(new TestScreen());
+            StartScreen(titleScreen);
 
             // Handle editors
             // StartEditor(new ShadowEditor(gameScreen.World));

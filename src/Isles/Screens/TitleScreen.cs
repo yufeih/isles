@@ -283,7 +283,7 @@ namespace Isles
         private void StartLoadingCampaign()
         {
             ui.Dispose();
-            gameScreen.StartLevel("Content/Levels/World.xml");
+            gameScreen.StartLevel("World.xml");
             BaseGame.Singleton.StartScreen(gameScreen);
         }
 

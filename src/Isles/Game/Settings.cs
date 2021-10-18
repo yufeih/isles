@@ -20,7 +20,6 @@ namespace Isles.Engine
         public bool ShowPathGraph { get; set; }
         public bool RevealMap { get; set; }
         public int MaxPathSearchStepsPerUpdate { get; set; } = 2000;
-        public bool DirectEnter { get; set; }
         public bool TraceUnits { get; set; }
         public bool Cheat { get; set; }
         public double GameSpeed { get; set; } = 1;
