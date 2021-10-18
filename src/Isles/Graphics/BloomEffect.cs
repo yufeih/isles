@@ -117,13 +117,7 @@ namespace Isles.Graphics
         private RenderTarget2D renderTarget2;
 
         // Choose what display settings the bloom should use.
-        public BloomSettings Settings
-        {
-            get => settings;
-            set => settings = value;
-        }
-
-        private BloomSettings settings = BloomSettings.PresetSettings[0];
+        public BloomSettings Settings { get; set; } = BloomSettings.PresetSettings[0];
 
         // Optionally displays one of the intermediate buffers used
         // by the bloom postprocess, so you can see exactly what is
@@ -136,13 +130,7 @@ namespace Isles.Graphics
             FinalResult,
         }
 
-        public IntermediateBuffer ShowBuffer
-        {
-            get => showBuffer;
-            set => showBuffer = value;
-        }
-
-        private IntermediateBuffer showBuffer = IntermediateBuffer.FinalResult;
+        public IntermediateBuffer ShowBuffer { get; set; } = IntermediateBuffer.FinalResult;
 
         #endregion
 
@@ -297,7 +285,7 @@ namespace Isles.Graphics
             // has selected one of the show intermediate buffer options, we still
             // draw the quad to make sure the image will end up on the screen,
             // but might need to skip applying the custom pixel shader.
-            if (showBuffer >= currentBuffer)
+            if (ShowBuffer >= currentBuffer)
             {
                 effect.Begin();
                 effect.CurrentTechnique.Passes[0].Begin();
@@ -308,7 +296,7 @@ namespace Isles.Graphics
             spriteBatch.End();
 
             // End the custom effect.
-            if (showBuffer >= currentBuffer)
+            if (ShowBuffer >= currentBuffer)
             {
                 effect.CurrentTechnique.Passes[0].End();
                 effect.End();

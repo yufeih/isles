@@ -183,13 +183,9 @@ namespace Isles.Engine
                 {
                     break;
                 }
-                else if (x == n)   /* No right subtree */
-                {
-                    min = x;
-                }
                 else
                 {
-                    min = (E[x].CompareTo(E[x + 1]) < 0) ? x : x + 1;
+                    min = x == n ? x : (E[x].CompareTo(E[x + 1]) < 0) ? x : x + 1;
                 }
 
                 if (E[min].CompareTo(k) < 0)
@@ -421,13 +417,9 @@ namespace Isles.Engine
                 {
                     break;
                 }
-                else if (x == n)   /* No right subtree */
-                {
-                    min = x;
-                }
                 else
                 {
-                    min = (costs[x] < costs[x + 1]) ? x : x + 1;
+                    min = x == n ? x : (costs[x] < costs[x + 1]) ? x : x + 1;
                 }
 
                 if (costs[min] < cost)

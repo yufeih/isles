@@ -153,17 +153,7 @@ namespace Isles
                         continue;
                     }
 
-                    Color color;
-
-                    if (textSegment.EndsWith(":"))
-                    {
-                        color = Color.Yellow;
-                    }
-                    else
-                    {
-                        color = Color.White;
-                    }
-
+                    Color color = textSegment.EndsWith(":") ? Color.Yellow : Color.White;
                     var width = (int)(BaseGame.Singleton.Graphics2D.Font.MeasureString(textSegment).X * CreditFontSize);
 
                     creditSegment = new TextField(textSegment, CreditFontSize, color,

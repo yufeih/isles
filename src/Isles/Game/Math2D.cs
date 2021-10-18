@@ -946,13 +946,9 @@ namespace Isles.Engine
             {
                 outlineRet = new Outline(t.position, t.radius * n);
             }
-            else if (t.Type == OutlineType.Rectangle)
-            {
-                outlineRet = new Outline(t.min * n, t.max * n, t.position, t.rotation);
-            }
             else
             {
-                outlineRet = null;
+                outlineRet = t.Type == OutlineType.Rectangle ? new Outline(t.min * n, t.max * n, t.position, t.rotation) : null;
             }
 
             return outlineRet;

@@ -524,23 +524,9 @@ namespace Isles.Engine
 
             int xGrid, yGrid;
 
-            if (brush.SizeX % 2 == 0)
-            {
-                xGrid = (int)Math.Round(x / cellSize) - brush.SizeX / 2;
-            }
-            else
-            {
-                xGrid = (int)(x / cellSize) - brush.SizeX / 2;
-            }
+            xGrid = brush.SizeX % 2 == 0 ? (int)Math.Round(x / cellSize) - brush.SizeX / 2 : (int)(x / cellSize) - brush.SizeX / 2;
 
-            if (brush.SizeY % 2 == 0)
-            {
-                yGrid = (int)Math.Round(y / cellSize) - brush.SizeY / 2;
-            }
-            else
-            {
-                yGrid = (int)(y / cellSize) - brush.SizeY / 2;
-            }
+            yGrid = brush.SizeY % 2 == 0 ? (int)Math.Round(y / cellSize) - brush.SizeY / 2 : (int)(y / cellSize) - brush.SizeY / 2;
 
             return new Point(xGrid, yGrid);
         }
@@ -616,18 +602,10 @@ namespace Isles.Engine
         /// </summary>
         public bool IsGridObstructed(int x, int y, bool includeDynamic)
         {
-            bool withinBounds;
-
-            if (boundary == null)
-            {
-                withinBounds = (x >= 0 && x < entryWidth && y >= 0 && y < entryHeight);
-            }
-            else
-            {
-                withinBounds = (x >= boundary.Value.X && x < boundary.Value.Right &&
-                                y >= boundary.Value.Y && y < boundary.Value.Bottom);
-            }
-
+            var withinBounds = boundary == null
+                ? x >= 0 && x < entryWidth && y >= 0 && y < entryHeight
+                : x >= boundary.Value.X && x < boundary.Value.Right &&
+                                y >= boundary.Value.Y && y < boundary.Value.Bottom;
             if (!withinBounds)
             {
                 return true;
@@ -1257,14 +1235,7 @@ namespace Isles.Engine
                 lastPosition = null;
             }
 
-            if (start.HasValue)
-            {
-                startValue = start.Value;
-            }
-            else
-            {
-                startValue = Vector2.Zero;
-            }
+            startValue = start.HasValue ? start.Value : Vector2.Zero;
 
             if (target == startValue)
             {
@@ -1333,14 +1304,9 @@ namespace Isles.Engine
                 }
                 else
                 {
-                    if (Vector2.Dot(lastDirection, prep) > 0)
-                    {
-                        newDirection = Math2D.LocalToWorld(originalDirection, Vector2.Zero, -angle);
-                    }
-                    else
-                    {
-                        newDirection = Math2D.LocalToWorld(originalDirection, Vector2.Zero, angle);
-                    }
+                    newDirection = Vector2.Dot(lastDirection, prep) > 0
+                        ? Math2D.LocalToWorld(originalDirection, Vector2.Zero, -angle)
+                        : Math2D.LocalToWorld(originalDirection, Vector2.Zero, angle);
                 }
                 newDirection.Normalize();
                 newDirection *= distance;

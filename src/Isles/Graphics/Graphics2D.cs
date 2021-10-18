@@ -37,9 +37,6 @@ namespace Isles.Graphics
         }
 
         private readonly BaseGame game;
-        private readonly Effect effect;
-        private readonly SpriteFont font;
-        private readonly SpriteBatch sprite;
         private readonly BasicEffect basicEffect;
         private readonly List<StringValue> strings = new();
         private readonly VertexPositionColor[] lines = new VertexPositionColor[MaxLineCount];
@@ -54,17 +51,17 @@ namespace Isles.Graphics
         /// <summary>
         /// Gets graphics 2D effect
         /// </summary>
-        public Effect Effect => effect;
+        public Effect Effect { get; }
 
         /// <summary>
         /// Get sprite font
         /// </summary>
-        public SpriteFont Font => font;
+        public SpriteFont Font { get; }
 
         /// <summary>
         /// Gets or Sets sprite batch used to drawing the text
         /// </summary>
-        public SpriteBatch Sprite => sprite;
+        public SpriteBatch Sprite { get; }
 
         /// <summary>
         /// Initialize text system
@@ -73,9 +70,9 @@ namespace Isles.Graphics
         public Graphics2D(BaseGame setGame)
         {
             game = setGame;
-            font = game.ZipContent.Load<SpriteFont>(game.Settings.DefaultFont);
-            effect = game.ZipContent.Load<Effect>(game.Settings.Graphics2DEffect);
-            sprite = new SpriteBatch(game.GraphicsDevice);
+            Font = game.ZipContent.Load<SpriteFont>(game.Settings.DefaultFont);
+            Effect = game.ZipContent.Load<Effect>(game.Settings.Graphics2DEffect);
+            Sprite = new SpriteBatch(game.GraphicsDevice);
             basicEffect = new BasicEffect(game.GraphicsDevice, null);
             vertices = new DynamicVertexBuffer(
                 game.GraphicsDevice, typeof(VertexPositionColor), MaxPrimitiveVertexCount, BufferUsage.WriteOnly);
@@ -284,15 +281,15 @@ namespace Isles.Graphics
                 return;
             }
 
-            sprite.Begin();
+            Sprite.Begin();
             foreach (StringValue value in strings)
             {
-                sprite.DrawString(
-                    font, value.Text, value.Position, value.Color, 0,
+                Sprite.DrawString(
+                    Font, value.Text, value.Position, value.Color, 0,
                     Vector2.Zero, value.Size, SpriteEffects.None, 0);
             }
 
-            sprite.End();
+            Sprite.End();
 
             // Clear all string in this frame
             strings.Clear();
@@ -317,16 +314,16 @@ namespace Isles.Graphics
             game.GraphicsDevice.Vertices[0].SetSource(
                 vertices, 0, VertexPositionColor.SizeInBytes);
 
-            effect.CurrentTechnique = effect.Techniques["Graphics2D"];
-            effect.Begin();
-            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+            Effect.CurrentTechnique = Effect.Techniques["Graphics2D"];
+            Effect.Begin();
+            foreach (EffectPass pass in Effect.CurrentTechnique.Passes)
             {
                 pass.Begin();
                 game.GraphicsDevice.DrawPrimitives(
                     PrimitiveType.LineList, 0, lineCount / 2);
                 pass.End();
             }
-            effect.End();
+            Effect.End();
 
             // Clear all lines in this frame
             lineCount = 0;
@@ -353,16 +350,16 @@ namespace Isles.Graphics
                 vertices, 0, VertexPositionColor.SizeInBytes);
             game.GraphicsDevice.Indices = indices;
 
-            effect.CurrentTechnique = effect.Techniques["Graphics2D"];
-            effect.Begin();
-            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+            Effect.CurrentTechnique = Effect.Techniques["Graphics2D"];
+            Effect.Begin();
+            foreach (EffectPass pass in Effect.CurrentTechnique.Passes)
             {
                 pass.Begin();
                 game.GraphicsDevice.DrawIndexedPrimitives(
                     PrimitiveType.TriangleList, 0, 0, primitiveVertexCount, 0, primitiveIndexCount / 3);
                 pass.End();
             }
-            effect.End();
+            Effect.End();
 
             // Clear all primitives after drawing them
             primitiveIndexCount = 0;
@@ -561,18 +558,13 @@ namespace Isles.Graphics
             private readonly string text;
 
             /// <summary>
-            /// Identify the index of the first char of the next word
-            /// </summary>
-            private int currentIndex;
-
-            /// <summary>
             /// Constructor
             /// </summary>
             /// <param name="text">initialize the text</param>
             public WordIterator(string text)
             {
                 this.text = text;
-                currentIndex = 0;
+                CurrentIndex = 0;
             }
 
             /// <summary>
@@ -583,26 +575,19 @@ namespace Isles.Graphics
             {
                 int i;
                 string rtvStr;
-                if (currentIndex >= text.Length)
+                if (CurrentIndex >= text.Length)
                 {
                     return null;
                 }
-                for (i = currentIndex; i < text.Length; i++)
+                for (i = CurrentIndex; i < text.Length; i++)
                 {
                     if (text[i] == ' ' || text[i] == '\n')
                     {
                         break;
                     }
                 }
-                if (i == text.Length)
-                {
-                    rtvStr = text.Substring(currentIndex);
-                }
-                else
-                {
-                    rtvStr = text.Substring(currentIndex, i - currentIndex + 1);
-                }
-                currentIndex = i + 1;
+                rtvStr = i == text.Length ? text.Substring(CurrentIndex) : text.Substring(CurrentIndex, i - CurrentIndex + 1);
+                CurrentIndex = i + 1;
                 return rtvStr;
             }
 
@@ -611,17 +596,13 @@ namespace Isles.Graphics
             /// </summary>
             public void Reset()
             {
-                currentIndex = 0;
+                CurrentIndex = 0;
             }
 
             /// <summary>
             /// Get or set the currentIndex
             /// </summary>
-            public int CurrentIndex
-            {
-                get => currentIndex;
-                set => currentIndex = value;
-            }
+            public int CurrentIndex { get; set; }
         }
         #endregion
     }

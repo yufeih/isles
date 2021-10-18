@@ -419,30 +419,20 @@ namespace Isles.UI
 
             // anchor
 
-            if (anchor == Anchor.TopLeft || anchor == Anchor.BottomLeft)
-            {
-                relativeRectangle.X = (int)(parent.DestinationRectangle.Left +
-                    rectangle.Left * widthScale);
-            }
-            else
-            {
-                relativeRectangle.X = (int)(parent.DestinationRectangle.Right +
+            relativeRectangle.X = anchor == Anchor.TopLeft || anchor == Anchor.BottomLeft
+                ? (int)(parent.DestinationRectangle.Left +
+                    rectangle.Left * widthScale)
+                : (int)(parent.DestinationRectangle.Right +
                     (rectangle.Right - parent.Area.Width) *
                         widthScale - relativeRectangle.Width);
-            }
 
-            if (anchor == Anchor.TopLeft || anchor == Anchor.TopRight)
-            {
-                relativeRectangle.Y = (int)(parent.DestinationRectangle.Top +
-                    rectangle.Top * heightScale);
-            }
-            else
-            {
-                relativeRectangle.Y = (int)(parent.DestinationRectangle.Bottom +
+            relativeRectangle.Y = anchor == Anchor.TopLeft || anchor == Anchor.TopRight
+                ? (int)(parent.DestinationRectangle.Top +
+                    rectangle.Top * heightScale)
+                : (int)(parent.DestinationRectangle.Bottom +
                     (rectangle.Bottom - parent.Area.Height) *
                         heightScale -
                             relativeRectangle.Height);
-            }
 
             if (anchor == Anchor.Center)
             {

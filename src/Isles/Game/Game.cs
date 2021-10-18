@@ -20,14 +20,9 @@ namespace Isles
         private const string ConfigFile = "Settings.xml";
 
         /// <summary>
-        /// Game screen
-        /// </summary>
-        private GameScreen gameScreen;
-
-        /// <summary>
         /// Gets game screen
         /// </summary>
-        public GameScreen GameScreen => gameScreen;
+        public GameScreen GameScreen { get; private set; }
 
         /// <summary>
         /// Gets settins stream
@@ -48,8 +43,8 @@ namespace Isles
             Register();
 
             // Register screens
-            AddScreen("GameScreen", gameScreen = new GameScreen());
-            AddScreen("TitleScreen", titleScreen = new TitleScreen(gameScreen));
+            AddScreen("GameScreen", GameScreen = new GameScreen());
+            AddScreen("TitleScreen", titleScreen = new TitleScreen(GameScreen));
 
             // Start new level
             //using (Stream stream = new FileStream("Content/Levels/World.xml", FileMode.Open))
@@ -60,9 +55,9 @@ namespace Isles
             //StartScreen(gameScreen);
             if (Settings.DirectEnter)
             {
-                gameScreen.StartLevel("Content/Levels/World.xml");
+                GameScreen.StartLevel("Content/Levels/World.xml");
 
-                StartScreen(gameScreen);
+                StartScreen(GameScreen);
             }
             else
             {

@@ -189,14 +189,7 @@ namespace Isles.Screens
                         var r = byte.Parse(colorElements[0]);
                         var g = byte.Parse(colorElements[1]);
                         var b = byte.Parse(colorElements[2]);
-                        if (colorElements.Length == 3)
-                        {
-                            color = new Color(r, g, b);
-                        }
-                        else
-                        {
-                            color = new Color(r, g, b, byte.Parse(colorElements[3]));
-                        }
+                        color = colorElements.Length == 3 ? new Color(r, g, b) : new Color(r, g, b, byte.Parse(colorElements[3]));
                     }
                     else if (line.StartsWith("$Title$"))
                     {

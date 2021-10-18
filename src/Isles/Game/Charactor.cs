@@ -900,14 +900,7 @@ namespace Isles
         {
             Vector3 spawn = Vector3.Zero;
 
-            if (rightHand >= 0)
-            {
-                spawn = Model.GetBoneTransform(rightHand).Translation;
-            }
-            else
-            {
-                spawn = TopCenter - Vector3.UnitZ * 5;
-            }
+            spawn = rightHand >= 0 ? Model.GetBoneTransform(rightHand).Translation : TopCenter - Vector3.UnitZ * 5;
 
             var fireball = new EffectFireball(
                 World, spawn, Vector3.UnitZ * 50, AttackTarget);

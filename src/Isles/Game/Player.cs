@@ -562,7 +562,7 @@ namespace Isles
             }
 
             // Compute the average position
-            start = start / count;
+            start /= count;
 
             return start;
         }
@@ -590,7 +590,7 @@ namespace Isles
             }
 
             // Compute the space between charactors
-            space = space * 2;
+            space *= 2;
 
             // Compute squard size
             var squardWidth = (int)Math.Sqrt(members.Count - 1) + 1;
@@ -1507,14 +1507,7 @@ namespace Isles
 #if DEBUG
             if (type == EventType.KeyDown && (tag as Keys?).Value == Keys.F11)
             {
-                if (game.GraphicsDevice.RenderState.FillMode == FillMode.WireFrame)
-                {
-                    game.GraphicsDevice.RenderState.FillMode = FillMode.Solid;
-                }
-                else
-                {
-                    game.GraphicsDevice.RenderState.FillMode = FillMode.WireFrame;
-                }
+                game.GraphicsDevice.RenderState.FillMode = game.GraphicsDevice.RenderState.FillMode == FillMode.WireFrame ? FillMode.Solid : FillMode.WireFrame;
 
                 return EventResult.Handled;
             }
@@ -1618,7 +1611,7 @@ namespace Isles
 
             var distance = center.Z / dot;
 
-            center = center + ray.Direction * distance;
+            center += ray.Direction * distance;
 
             return center;
         }
@@ -1885,17 +1878,9 @@ namespace Isles
         /// </summary>
         public void Construct(string type)
         {
-            Vector3 startPosition;
+            Vector3 startPosition = Townhall != null ? Townhall.Position : new Vector3(SpawnPoint, 0);
 
             // Townhall should be treated seperately
-            if (Townhall != null)
-            {
-                startPosition = Townhall.Position;
-            }
-            else
-            {
-                startPosition = new Vector3(SpawnPoint, 0);
-            }
 
             if (CheckDependency(type))
             {
@@ -1959,7 +1944,7 @@ namespace Isles
                         if (++counter > 2)
                         {
                             counter = 0;
-                            Radius = Radius + 20;
+                            Radius += 20;
                         }
                     }
 

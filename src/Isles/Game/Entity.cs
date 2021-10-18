@@ -255,9 +255,7 @@ namespace Isles.Engine
         /// <summary>
         /// Game world
         /// </summary>
-        public GameWorld World => world;
-
-        private readonly GameWorld world;
+        public GameWorld World { get; }
 
         /// <summary>
         /// Gets or sets the 3D position of the entity.
@@ -312,37 +310,19 @@ namespace Isles.Engine
         /// <summary>
         /// Gets or sets scene manager data
         /// </summary>
-        public object SceneManagerTag
-        {
-            get => sceneManagerTag;
-            set => sceneManagerTag = value;
-        }
-
-        private object sceneManagerTag;
+        public object SceneManagerTag { get; set; }
 
         public virtual BoundingBox BoundingBox => new();
 
         /// <summary>
         /// Gets or sets entity name
         /// </summary>
-        public string Name
-        {
-            get => name;
-            set => name = value;
-        }
-
-        private string name;
+        public string Name { get; set; }
 
         /// <summary>
         /// Gets or sets the class ID of this world object
         /// </summary>
-        public string ClassID
-        {
-            get => classID;
-            set => classID = value;
-        }
-
-        private string classID;
+        public string ClassID { get; set; }
 
         /// <summary>
         /// Gets or sets whether this world object is active
@@ -360,8 +340,8 @@ namespace Isles.Engine
         /// </summary>
         public BaseEntity(GameWorld world)
         {
-            this.world = world;
-            name = "Entity " + (EntityCount++);
+            World = world;
+            Name = "Entity " + (EntityCount++);
         }
 
         /// <summary>
@@ -419,7 +399,7 @@ namespace Isles.Engine
         /// <param name="writer"></param>
         public virtual void Serialize(XmlElement xml)
         {
-            xml.SetAttribute("Name", name);
+            xml.SetAttribute("Name", Name);
             xml.SetAttribute("Position", Helper.Vector3Tostring(position));
         }
 
@@ -434,7 +414,7 @@ namespace Isles.Engine
 
             if (xml.HasAttribute("Name"))
             {
-                name = xml.GetAttribute("Name");
+                Name = xml.GetAttribute("Name");
             }
 
             if ((value = xml.GetAttribute("Position")) != "")
@@ -512,20 +492,12 @@ namespace Isles.Engine
         /// <summary>
         /// Gets or sets whether this entity is visible
         /// </summary>
-        public bool Visible
-        {
-            get => visible;
-            set => visible = value;
-        }
-
-        private bool visible = true;
+        public bool Visible { get; set; } = true;
 
         /// <summary>
         /// Gets or sets whether the entity is within the view frustum
         /// </summary>
-        public bool WithinViewFrustum => withinViewFrustum;
-
-        private bool withinViewFrustum;
+        public bool WithinViewFrustum { get; private set; }
 
         /// <summary>
         /// Gets or sets entity position.
@@ -896,12 +868,12 @@ namespace Isles.Engine
                 model.Update(gameTime);
             }
 
-            withinViewFrustum = IsVisible(BaseGame.Singleton.ViewProjection);
+            WithinViewFrustum = IsVisible(BaseGame.Singleton.ViewProjection);
         }
 
         public override void Draw(GameTime gameTime)
         {
-            if (visible)
+            if (Visible)
             {
                 // Draw current state
                 if (state != null)
@@ -909,7 +881,7 @@ namespace Isles.Engine
                     state.Draw(gameTime);
                 }
 
-                if (model != null && withinViewFrustum)
+                if (model != null && WithinViewFrustum)
                 {
                     //model.Tint = highlighted ? new Vector4(0, 0, 0, 1) : Vector4.One;
                     model.Draw(gameTime);
@@ -919,7 +891,7 @@ namespace Isles.Engine
 
         public override void DrawShadowMap(GameTime gameTime, ShadowEffect shadow)
         {
-            if (visible && model != null && IsVisible(shadow.ViewProjection))
+            if (Visible && model != null && IsVisible(shadow.ViewProjection))
             {
                 model.DrawShadowMap(gameTime, shadow);
             }
@@ -927,7 +899,7 @@ namespace Isles.Engine
 
         public override void DrawReflection(GameTime gameTime, Matrix view, Matrix projection)
         {
-            if (visible && model != null && IsVisible(view * projection))
+            if (Visible && model != null && IsVisible(view * projection))
             {
                 model.Draw(gameTime);
             }
@@ -949,7 +921,7 @@ namespace Isles.Engine
         public virtual bool Intersects(Vector3 point)
         {
             // Performs an axis aligned bounding box intersection test
-            return visible && BoundingBox.Contains(point) == ContainmentType.Contains;
+            return Visible && BoundingBox.Contains(point) == ContainmentType.Contains;
         }
 
         /// <summary>
@@ -960,7 +932,7 @@ namespace Isles.Engine
         public virtual float? Intersects(Ray ray)
         {
             // Performs an axis aligned bounding box intersection test
-            return visible ? model.Intersects(ray) : null;
+            return Visible ? model.Intersects(ray) : null;
         }
 
         /// <summary>
@@ -968,7 +940,7 @@ namespace Isles.Engine
         /// </summary>
         public virtual bool Intersects(BoundingFrustum frustum)
         {
-            return visible && frustum.Contains(Position) == ContainmentType.Contains;
+            return Visible && frustum.Contains(Position) == ContainmentType.Contains;
         }
         #endregion
     }

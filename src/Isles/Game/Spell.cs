@@ -889,15 +889,10 @@ namespace Isles
                 // Update enable states
                 if (ownerBuilding != null)
                 {
-                    if (multipleBuildings)
-                    {
-                        Enable = ownerBuilding.CanTrain(type);
-                    }
-                    else
-                    {
-                        Enable = ownerBuilding.CanTrain(type) || !Ready ||
+                    Enable = multipleBuildings
+                        ? ownerBuilding.CanTrain(type)
+                        : ownerBuilding.CanTrain(type) || !Ready ||
                                  ownerBuilding.QueuedSpells.Contains(this);
-                    }
                 }
             }
 

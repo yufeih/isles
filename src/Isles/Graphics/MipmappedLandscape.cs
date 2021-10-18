@@ -160,13 +160,7 @@ namespace Isles.Graphics
         /// <summary>
         /// Gets or sets the error ratio when computing terrain LOD
         /// </summary>
-        public float TerrainErrorRatio
-        {
-            get => terrainErrorRatio;
-            set => terrainErrorRatio = value;
-        }
-
-        private float terrainErrorRatio = 0.0012f;
+        public float TerrainErrorRatio { get; set; } = 0.0012f;
         #endregion
 
         #region Methods
@@ -507,7 +501,7 @@ namespace Isles.Graphics
                 }
 
                 // Update patch LOD if patch visibility has changed
-                if (Patches[i].UpdateLOD(eye, terrainErrorRatio))
+                if (Patches[i].UpdateLOD(eye, TerrainErrorRatio))
                 {
                     LODChanged = true;
                 }

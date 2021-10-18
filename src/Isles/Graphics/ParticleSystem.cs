@@ -461,17 +461,7 @@ namespace Isles.Graphics
 
             // Choose the appropriate effect technique. If these particles will never
             // rotate, we can use a simpler pixel shader that requires less GPU power.
-            string techniqueName;
-
-            if ((settings.MinRotateSpeed == 0) && (settings.MaxRotateSpeed == 0))
-            {
-                techniqueName = "NonRotatingParticles";
-            }
-            else
-            {
-                techniqueName = "RotatingParticles";
-            }
-
+            var techniqueName = (settings.MinRotateSpeed == 0) && (settings.MaxRotateSpeed == 0) ? "NonRotatingParticles" : "RotatingParticles";
             particleEffect.CurrentTechnique = particleEffect.Techniques[techniqueName];
         }
 

@@ -620,15 +620,10 @@ namespace Isles
 
                     bloomLerpElapsedTime += (float)(gameTime.ElapsedGameTime.TotalSeconds);
 
-                    if (bloomLerpElapsedTime < BloomLerpTime)
-                    {
-                        Game.Bloom.Settings = BloomSettings.Lerp(defaultSettings, targetSettings,
-                            bloomLerpElapsedTime / BloomLerpTime);
-                    }
-                    else
-                    {
-                        Game.Bloom.Settings = targetSettings;
-                    }
+                    Game.Bloom.Settings = bloomLerpElapsedTime < BloomLerpTime
+                        ? BloomSettings.Lerp(defaultSettings, targetSettings,
+                            bloomLerpElapsedTime / BloomLerpTime)
+                        : targetSettings;
                 }
             }
             // Draw UI at last

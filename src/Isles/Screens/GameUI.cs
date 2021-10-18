@@ -737,13 +737,9 @@ namespace Isles
                     {
                         snapShotName.Color = Color.White;
                     }
-                    else if (player.CurrentGroup[0].Owner is LocalPlayer)
-                    {
-                        snapShotName.Color = Color.Yellow;
-                    }
                     else
                     {
-                        snapShotName.Color = Color.Red;
+                        snapShotName.Color = player.CurrentGroup[0].Owner is LocalPlayer ? Color.Yellow : Color.Red;
                     }
 
                     snapShotName.Text = player.CurrentGroup[0].Name;

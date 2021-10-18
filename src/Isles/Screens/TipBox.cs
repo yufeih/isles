@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 //  Isles v1.0
 //  
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
@@ -32,11 +32,7 @@ namespace Isles
 
         public bool Mask;
 
-        /// <summary>
-        /// Whather to track the cursor
-        /// </summary>
-        private readonly bool trackCursor;
-        public bool TrackCursor => trackCursor;
+        public bool TrackCursor { get; }
 
         /// <summary>
         /// Construct a fixed-location tipbox
@@ -44,7 +40,7 @@ namespace Isles
         public TipBox(Rectangle area)
             : base(area)
         {
-            trackCursor = false;
+            TrackCursor = false;
             ScaleMode = ScaleMode.Fixed;
 
         }
@@ -58,7 +54,7 @@ namespace Isles
         public TipBox(int width, int height)
             : base(Rectangle.Empty)
         {
-            trackCursor = true;
+            TrackCursor = true;
             ScaleMode = ScaleMode.Fixed;
             Area = new Rectangle(Mouse.GetState().X, Mouse.GetState().Y, width, height);
             setPositionToCursor();
@@ -133,7 +129,7 @@ namespace Isles
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            if (trackCursor)
+            if (TrackCursor)
             {
                 setPositionToCursor();
                 foreach (IUIElement element in elements)

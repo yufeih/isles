@@ -65,15 +65,10 @@ namespace Isles.Engine
                 }
                 // Associate writer with that, when writing to a new file,
                 // make sure UTF-8 sign is written, else don't write it again!
-                if (file.Length == 0)
-                {
-                    writer = new StreamWriter(file,
-                        System.Text.Encoding.UTF8);
-                }
-                else
-                {
-                    writer = new StreamWriter(file);
-                }
+                writer = file.Length == 0
+                    ? new StreamWriter(file,
+                        System.Text.Encoding.UTF8)
+                    : new StreamWriter(file);
 
                 // Go to end of file
                 writer.BaseStream.Seek(0, SeekOrigin.End);

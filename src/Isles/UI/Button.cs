@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 //  Isles v1.0
 //  
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
@@ -106,16 +106,10 @@ namespace Isles.UI
         /// </summary>
         public int Index;
 
-        private bool ignoreMessage;
-
         /// <summary>
         /// A fake button handles no messages
         /// </summary>
-        public bool IgnoreMessage
-        {
-            get => ignoreMessage;
-            set => ignoreMessage = value;
-        }
+        public bool IgnoreMessage { get; set; }
         #endregion
 
         #region Methods
@@ -225,7 +219,7 @@ namespace Isles.UI
 
         public override EventResult HandleEvent(EventType type, object sender, object tag)
         {
-            if (ignoreMessage)
+            if (IgnoreMessage)
             {
                 return EventResult.Unhandled;
             }

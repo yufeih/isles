@@ -43,16 +43,6 @@ namespace Isles.Graphics
         private Vector3 lastPosition;
 
         /// <summary>
-        /// Number of blocks
-        /// </summary>
-        private int length;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private Texture2D texture;
-
-        /// <summary>
         /// 
         /// </summary>
         private float halfWidth;
@@ -61,11 +51,6 @@ namespace Isles.Graphics
         /// 
         /// </summary>
         private bool animationStarted;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private float alpha = 1;
 
         /// <summary>
         /// ViewMatrix
@@ -112,17 +97,9 @@ namespace Isles.Graphics
         /// <summary>
         /// The number of blocks owned by the trail
         /// </summary>
-        public int Length
-        {
-            get => length;
-            set => length = value;
-        }
+        public int Length { get; set; }
 
-        public Texture2D Texture
-        {
-            get => texture;
-            set => texture = value;
-        }
+        public Texture2D Texture { get; set; }
 
         /// <summary>
         /// View Matrix
@@ -137,11 +114,7 @@ namespace Isles.Graphics
         /// <summary>
         /// Gets or sets the alpha property of trail
         /// </summary>
-        public float Alpha
-        {
-            get => alpha;
-            set => alpha = value;
-        }
+        public float Alpha { get; set; } = 1;
 
         #endregion
 
@@ -280,9 +253,6 @@ namespace Isles.Graphics
         /// effect
         /// </summary>
         private BasicEffect effect;
-
-        private float updateSpan;
-
         private readonly int chunckSize = 100;
 
         #endregion
@@ -292,11 +262,7 @@ namespace Isles.Graphics
         /// <summary>
         /// Time span to update the blocks
         /// </summary>
-        public float UpdateSpan
-        {
-            get => updateSpan;
-            set => updateSpan = value;
-        }
+        public float UpdateSpan { get; set; }
 
         #endregion
 
@@ -377,7 +343,7 @@ namespace Isles.Graphics
             {
                 var df = 1.0f / (trail.trailQueue.Count / 2);
                 float sumy = 0;
-                for (var i = 0; i < trail.trailQueue.Count + 2; i = i + 2)
+                for (var i = 0; i < trail.trailQueue.Count + 2; i += 2)
                 {
                     vertexList[i].TextureCoordinate.X = 0;
                     vertexList[i].TextureCoordinate.Y = sumy;

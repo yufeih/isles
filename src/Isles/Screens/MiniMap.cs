@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 //  Isles v1.0
 //  
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
@@ -19,8 +19,6 @@ namespace Isles
     {
         private readonly Rectangle FogOfWarSourceRectangle = new(500, 692, 429, 429);
         private readonly Dictionary<int, Vector3> GoldMineList = new();
-
-        private Texture2D goldMinePointer;
         private GameCamera camera;
         private readonly BaseGame game;
         private readonly GameWorld world;
@@ -89,11 +87,7 @@ namespace Isles
         /// <summary>
         /// Gets or sets texture for gold mine pointer
         /// </summary>
-        public Texture2D GoldMinePointerTexture
-        {
-            get => goldMinePointer;
-            set => goldMinePointer = value;
-        }
+        public Texture2D GoldMinePointerTexture { get; set; }
 
         /// <summary>
         /// Constructor

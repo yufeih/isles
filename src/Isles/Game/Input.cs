@@ -134,14 +134,7 @@ namespace Isles.Engine
             var keyNum = (int)key;
             if (keyNum >= (int)Keys.A && keyNum <= (int)Keys.Z)
             {
-                if (shiftPressed)
-                {
-                    ret = key.ToString()[0];
-                }
-                else
-                {
-                    ret = key.ToString().ToLower()[0];
-                }
+                ret = shiftPressed ? key.ToString()[0] : key.ToString().ToLower()[0];
             }
             else if (keyNum >= (int)Keys.D0 && keyNum <= (int)Keys.D9 &&
                 shiftPressed == false)

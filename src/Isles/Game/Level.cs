@@ -82,13 +82,9 @@ namespace Isles
                 {
                     player = new ComputerPlayer();
                 }
-                else if (playerInfoFromMap[i].Type == PlayerType.Dummy)
-                {
-                    player = new DummyPlayer();
-                }
                 else
                 {
-                    throw new NotImplementedException();
+                    player = playerInfoFromMap[i].Type == PlayerType.Dummy ? new DummyPlayer() : throw new NotImplementedException();
                 }
 
                 player.Name = playerInfoFromMap[i].Name;

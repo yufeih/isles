@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 //  Isles v1.0
 //  
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
@@ -16,52 +16,21 @@ namespace Isles.UI
 
         //About time control
 
-        private double hightLightCycle = 2.5;
 
         public bool HighLightOn = true;
 
-        public double HightLightCycle
-        {
-            get => hightLightCycle;
-            set => hightLightCycle = value;
-        }
+        public double HightLightCycle { get; set; } = 2.5;
 
-        private double staringTime;
-
-        public double StartingTime
-        {
-            get => staringTime;
-            set => staringTime = value;
-        }
-
-        private double highLightRollingSpeed;
+        public double StartingTime { get; set; }
 
         /// <summary>
         /// Pixels per second
         /// </summary>
-        public double HighLightRollingSpeed
-        {
-            get => highLightRollingSpeed;
-            set => highLightRollingSpeed = value;
-        }
+        public double HighLightRollingSpeed { get; set; }
 
-        // About length
+        public int EndLength { get; set; } = 14;
 
-        private int endLength = 14;
-
-        public int EndLength
-        {
-            get => endLength;
-            set => endLength = value;
-        }
-
-        private int hightLightLength = 20;
-
-        public int HighLightLength
-        {
-            get => hightLightLength;
-            set => hightLightLength = value;
-        }
+        public int HighLightLength { get; set; } = 20;
 
         // About Textures: 5 in total including the Frame of the bar
 

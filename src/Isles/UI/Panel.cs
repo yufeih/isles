@@ -282,14 +282,7 @@ namespace Isles.UI
             e.Anchor = Anchor.BottomLeft;
             e.ScaleMode = ScaleMode.ScaleY;
 
-            if (elements.Count < current + max)
-            {
-                Right.Enabled = false;
-            }
-            else
-            {
-                Right.Enabled = true;
-            }
+            Right.Enabled = elements.Count >= current + max;
 
             rect.X += buttonWidth;
             rect.Width = scrollButtonWidth;
@@ -621,7 +614,7 @@ namespace Isles.UI
 
             if (flash && Text.Length < maxCharactors)
             {
-                Text = Text + "_";
+                Text += "_";
                 base.Draw(gameTime, sprite);
                 Text = Text.Remove(Text.Length - 1);
             }

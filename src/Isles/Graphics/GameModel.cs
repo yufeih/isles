@@ -572,14 +572,7 @@ namespace Isles.Graphics
                     }
                 }
             }
-            if (minLength != float.PositiveInfinity)
-            {
-                dist = minLength;
-            }
-            else
-            {
-                dist = null;
-            }
+            dist = minLength != float.PositiveInfinity ? minLength : (float?)null;
             return dist;
         }
 
@@ -933,16 +926,9 @@ namespace Isles.Graphics
                 if (shadowMapRenderables[i] == null)
                 {
                     // First time initialize
-                    if (IsSkinned)
-                    {
-                        shadowMapRenderables[i] =
-                            game.ModelManager.GetRenderable(mesh, part, Material.ShadowMapSkinned);
-                    }
-                    else
-                    {
-                        shadowMapRenderables[i] =
-                            game.ModelManager.GetRenderable(mesh, part, Material.ShadowMap);
-                    }
+                    shadowMapRenderables[i] = IsSkinned
+                        ? game.ModelManager.GetRenderable(mesh, part, Material.ShadowMapSkinned)
+                        : game.ModelManager.GetRenderable(mesh, part, Material.ShadowMap);
                 }
 
                 // Add a new instance to the renderable

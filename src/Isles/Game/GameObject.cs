@@ -874,7 +874,7 @@ namespace Isles
             }
             else
             {
-                percentage = percentage * 2;
+                percentage *= 2;
                 v1 = Red;
                 v2 = Yellow;
             }

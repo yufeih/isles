@@ -60,22 +60,12 @@ namespace Isles.Graphics
         /// </summary>
         private readonly GraphicsDevice graphics;
         private readonly ProgressBar progressBar;
-
-        /// <summary>
-        /// Current progress
-        /// </summary>
-        private float progress;
         private readonly UIDisplay uiDisplay;
-
-        /// <summary>
-        /// Loading message
-        /// </summary>
-        private string message = "Loading...";
 
         /// <summary>
         /// Gets current progress.
         /// </summary>
-        public float Progress => progress;
+        public float Progress { get; private set; }
 
         /// <summary>
         /// Refresh the loading screen with the new progress
@@ -84,7 +74,7 @@ namespace Isles.Graphics
         /// <param name="newMessage"></param>
         public void Refresh(float newProgress)
         {
-            Refresh(newProgress, message);
+            Refresh(newProgress, Message);
         }
 
         /// <summary>
@@ -95,16 +85,16 @@ namespace Isles.Graphics
         /// <returns></returns>
         public void Refresh(float newProgress, string newMessage)
         {
-            message = newMessage;
-            progress = newProgress;
+            Message = newMessage;
+            Progress = newProgress;
             progressBar.SetProgress((int)newProgress);
-            if (progress < 0)
+            if (Progress < 0)
             {
-                progress = 0;
+                Progress = 0;
             }
-            else if (progress > 100)
+            else if (Progress > 100)
             {
-                progress = 100;
+                Progress = 100;
             }
 
             Draw();
@@ -113,11 +103,7 @@ namespace Isles.Graphics
         /// <summary>
         /// Gets or sets current message
         /// </summary>
-        public string Message
-        {
-            get => message;
-            set => message = value;
-        }
+        public string Message { get; set; } = "Loading...";
 
         /// <summary>
         /// Create a loading screen for a given graphics device
@@ -190,8 +176,8 @@ namespace Isles.Graphics
         /// </summary>
         public void Reset()
         {
-            progress = 0;
-            message = "Loading...";
+            Progress = 0;
+            Message = "Loading...";
         }
 
         /// <summary>

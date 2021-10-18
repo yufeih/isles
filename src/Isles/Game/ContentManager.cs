@@ -764,14 +764,7 @@ namespace Isles.Engine
                     Stream output = null;
                     try
                     {
-                        if (TargetFile != null)
-                        {
-                            output = new FileStream(TargetFile, System.IO.FileMode.CreateNew);
-                        }
-                        else
-                        {
-                            output = s;
-                        }
+                        output = TargetFile != null ? new FileStream(TargetFile, System.IO.FileMode.CreateNew) : s;
 
                         var bytes = new byte[4096];
                         int n;
