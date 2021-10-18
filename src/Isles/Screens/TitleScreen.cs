@@ -131,26 +131,22 @@ namespace Isles
             // credit = new TextField("R", 16, Color.White, new Rectangle(800, 470, 10000, 30));
             titlePanel.Add(credit);
             var offset = 0;
-            using (Stream creditText = BaseGame.Singleton.ZipContent.GetFileStream("Content/Credits.txt"))
+
+            foreach (var textSegment in File.ReadAllLines("data/credits.txt"))
             {
-                var sr = new StreamReader(creditText);
-                string textSegment = null;
-                while (null != (textSegment = sr.ReadLine()))
+                if (textSegment.Length == 0)
                 {
-                    if (textSegment.Length == 0)
-                    {
-                        offset += 30;
-                        continue;
-                    }
-
-                    Color color = textSegment.EndsWith(":") ? Color.Yellow : Color.White;
-                    var width = (int)(BaseGame.Singleton.Graphics2D.Font.MeasureString(textSegment).X * CreditFontSize);
-
-                    creditSegment = new TextField(textSegment, CreditFontSize, color,
-                                                    new Rectangle(offset, 0, width, 30), Color.Black);
-                    offset += width;
-                    credit.Add(creditSegment);
+                    offset += 30;
+                    continue;
                 }
+
+                Color color = textSegment.EndsWith(":") ? Color.Yellow : Color.White;
+                var width = (int)(BaseGame.Singleton.Graphics2D.Font.MeasureString(textSegment).X * CreditFontSize);
+
+                creditSegment = new TextField(textSegment, CreditFontSize, color,
+                                                new Rectangle(offset, 0, width, 30), Color.Black);
+                offset += width;
+                credit.Add(creditSegment);
             }
 
             creditStringLength = offset + 200;

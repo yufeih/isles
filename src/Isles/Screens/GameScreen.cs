@@ -188,23 +188,19 @@ namespace Isles
         {
             UI = new GameUI(Game, (loadContext as Loading).LoadingFinished, World);
 
-            using (Stream readmeText = BaseGame.Singleton.ZipContent.GetFileStream("Content/Readme.txt"))
+            readme = new ReadmePanel(new Rectangle(65, 70, 530, 460))
             {
-                readme = new ReadmePanel(readmeText,
-                                        new Rectangle(65, 70, 530, 460))
-                {
-                    ScaleMode = ScaleMode.ScaleY,
-                    Anchor = Anchor.Center,
-                };
-                readme.OK.Click += (o, e) =>
-                {
-                    readme.Visible = false;
-                    Audios.Play("OK");
-                    Resume();
-                };
+                ScaleMode = ScaleMode.ScaleY,
+                Anchor = Anchor.Center,
+            };
+            readme.OK.Click += (o, e) =>
+            {
                 readme.Visible = false;
-                UI.Display.Add(readme);
-            }
+                Audios.Play("OK");
+                Resume();
+            };
+            readme.Visible = false;
+            UI.Display.Add(readme);
 
             pausePanel = new TipBox(new Rectangle(Game.ScreenWidth * 3 / 10, Game.ScreenHeight * 3 / 8,
                                                   Game.ScreenWidth * 2 / 5, Game.ScreenHeight / 5));

@@ -145,22 +145,6 @@ namespace Isles.Graphics
             backgroundPanel.Add(progressBar);
             uiDisplay.Add(panel);
             uiDisplay.Draw(BaseGame.Singleton.CurrentGameTime);
-
-            // if (BaseGame.Singleton.Settings.DirectEnter)
-            // {
-            //    progressBar.SetProgress(100);
-            //    Draw();
-            // }
-            // else
-            // {
-            //    //progressBar.SetProgress(50);
-            //    for (int i = 0; i <= 100; i++)
-            //    {
-            //        System.Threading.Thread.Sleep(1);
-            //        progressBar.SetProgress(i);
-            //        Draw();
-            //    }
-            // }
         }
 
         /// <summary>
@@ -177,11 +161,6 @@ namespace Isles.Graphics
         /// </summary>
         protected virtual void Draw()
         {
-            // graphics2D.Sprite.Begin();
-            // graphics2D.Sprite.DrawString(
-            //    graphics2D.Font, message + " " + progress + "%",
-            //    Vector2.Zero, Color.Wheat);
-            // graphics2D.Sprite.End();
             graphics.Clear(Color.Black);
             uiDisplay.Draw(BaseGame.Singleton.CurrentGameTime);
             graphics.Present();

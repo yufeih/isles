@@ -57,7 +57,7 @@ namespace Isles.Screens
         /// </summary>
         /// <param name="pageTextures">Textures for pages.</param>
         /// <param name="area">area.</param>
-        public ReadmePanel(Stream readmeText, Rectangle area)
+        public ReadmePanel(Rectangle area)
             : base(area)
         {
             DialogCornerWidth = 6;
@@ -140,91 +140,86 @@ namespace Isles.Screens
             var titleArea = new Rectangle(area.Width / 20, area.Height / 20,
                                                 area.Width * 11 / 12, 30);
 
-            var ex = new IOException("The readme text is not well-formated.");
-            using (var sr = new StreamReader(readmeText))
+            foreach (var aLine in File.ReadAllLines("data/readme.txt"))
             {
-                string line;
-                while (null != (line = sr.ReadLine()))
+                var line = aLine.Trim();
+                if (line.Length == 0)
                 {
+                    continue;
+                }
+
+                if (line.StartsWith("$FontSize$"))
+                {
+                    line = line.Substring(10);
+                    fontSize = int.Parse(line);
+                }
+                else if (line.StartsWith("$Color$"))
+                {
+                    line = line.Substring(7);
                     line.Trim();
-                    if (line.Length == 0)
+                    var colorElements = line.Split(new char[] { '(', ')', ',' },
+                                                    StringSplitOptions.RemoveEmptyEntries);
+                    if (colorElements.Length != 3 && colorElements.Length != 4)
                     {
-                        continue;
+                        // Ill-formatted color tag, use white as defalut
+                        color = Color.White;
                     }
 
-                    if (line.StartsWith("$FontSize$"))
+                    var r = byte.Parse(colorElements[0]);
+                    var g = byte.Parse(colorElements[1]);
+                    var b = byte.Parse(colorElements[2]);
+                    color = colorElements.Length == 3 ? new Color(r, g, b) : new Color(r, g, b, byte.Parse(colorElements[3]));
+                }
+                else if (line.StartsWith("$Title$"))
+                {
+                    if (currentTitle != null)
                     {
-                        line = line.Substring(10);
-                        fontSize = int.Parse(line);
-                    }
-                    else if (line.StartsWith("$Color$"))
-                    {
-                        line = line.Substring(7);
-                        line.Trim();
-                        var colorElements = line.Split(new char[] { '(', ')', ',' },
-                                                        StringSplitOptions.RemoveEmptyEntries);
-                        if (colorElements.Length != 3 && colorElements.Length != 4)
-                        {
-                            // Ill-formatted color tag, use white as defalut
-                            color = Color.White;
-                        }
-
-                        var r = byte.Parse(colorElements[0]);
-                        var g = byte.Parse(colorElements[1]);
-                        var b = byte.Parse(colorElements[2]);
-                        color = colorElements.Length == 3 ? new Color(r, g, b) : new Color(r, g, b, byte.Parse(colorElements[3]));
-                    }
-                    else if (line.StartsWith("$Title$"))
-                    {
-                        if (currentTitle != null)
-                        {
-                            titles.Add(currentTitle);
-                            if (currentContent != null)
-                            {
-                                currentContentList.Add(currentContent);
-                            }
-
-                            contents.Add(currentContentList);
-                            currentContentList = new List<TextField>();
-                            currentContent = null;
-                        }
-
-                        currentContent = null;
-                        currentTitle = new TextField(line.Substring(7), fontSize / 23f, color, titleArea)
-                        {
-                            Anchor = Anchor.TopLeft,
-                            ScaleMode = ScaleMode.ScaleX,
-                            Centered = true,
-                        };
-                        title = true;
-                        heightOffset = 0;
-                    }
-                    else if (line.StartsWith("$Content$"))
-                    {
+                        titles.Add(currentTitle);
                         if (currentContent != null)
                         {
-                            heightOffset += currentContent.RealHeight + 10;
                             currentContentList.Add(currentContent);
                         }
 
-                        var tempContentRect = new Rectangle(contentArea.X, contentArea.Y + heightOffset,
-                                                                    contentArea.Width, contentArea.Height);
+                        contents.Add(currentContentList);
+                        currentContentList = new List<TextField>();
+                        currentContent = null;
+                    }
 
-                        currentContent = new TextField(line.Substring(9), fontSize / 23f, color, tempContentRect)
-                        {
-                            Anchor = Anchor.TopLeft,
-                            ScaleMode = ScaleMode.ScaleX,
-                        };
-                        title = false;
-                    }
-                    else if (title)
+                    currentContent = null;
+                    currentTitle = new TextField(line.Substring(7), fontSize / 23f, color, titleArea)
                     {
-                        currentTitle.Text += "\n" + line;
-                    }
-                    else
+                        Anchor = Anchor.TopLeft,
+                        ScaleMode = ScaleMode.ScaleX,
+                        Centered = true,
+                    };
+                    title = true;
+                    heightOffset = 0;
+                }
+                else if (line.StartsWith("$Content$"))
+                {
+                    if (currentContent != null)
                     {
-                        currentContent.Text += "\n" + line;
+                        heightOffset += currentContent.RealHeight + 10;
+                        currentContentList.Add(currentContent);
                     }
+
+                    var tempContentRect = new Rectangle(contentArea.X, contentArea.Y + heightOffset,
+                                                                contentArea.Width, contentArea.Height);
+
+                    currentContent = new TextField(line.Substring(9), fontSize / 23f, color, tempContentRect)
+                    {
+                        Anchor = Anchor.TopLeft,
+                        ScaleMode = ScaleMode.ScaleX,
+                    };
+                    title = false;
+                }
+                else if (title)
+                {
+                    currentTitle.Text += "\n" + line;
+                }
+                else
+                {
+                    currentContent.Text += "\n" + line;
                 }
             }
 
