@@ -1,4 +1,4 @@
-﻿// Copyright (c) Yufei Huang. All rights reserved.
+// Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -100,8 +100,11 @@ namespace Isles.UI
         /// <param name="element"></param>
         public virtual void Remove(IUIElement element)
         {
-            element.Parent = null;
-            elements.Remove(element);
+            if (element != null)
+            {
+                element.Parent = null;
+                elements.Remove(element);
+            }
         }
 
         public virtual void Clear()
