@@ -4,18 +4,10 @@
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
-using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Text;
-using System.Diagnostics;
 using System.Xml.Serialization;
-using System.Security.Permissions;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Content.Pipeline;
-using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 
 namespace Isles.Pipeline

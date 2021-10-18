@@ -7,10 +7,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Text;
 using System.Xml;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Isles.Engine;
 
 namespace Isles

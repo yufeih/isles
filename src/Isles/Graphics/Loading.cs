@@ -4,10 +4,6 @@
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Isles.Engine;

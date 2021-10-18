@@ -5,15 +5,8 @@
 //-----------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
-using Isles;
 using Isles.Engine;
-using Isles.Graphics;
 
 namespace Isles.Editor
 {

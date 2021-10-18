@@ -28,11 +28,8 @@
 
 using System;
 using System.IO;
-using System.IO.Compression;
 using System.Windows.Forms;
 using System.Collections.Generic;
-using System.Text;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Audio;
 

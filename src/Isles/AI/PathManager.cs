@@ -6,8 +6,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using Isles.Engine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 

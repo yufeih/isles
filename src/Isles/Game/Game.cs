@@ -4,19 +4,10 @@
 //  Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
-using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml;
-using System.Xml.Serialization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Isles.Editor;
 using Isles.Engine;
-using Isles.Graphics;
 
 
 namespace Isles

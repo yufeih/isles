@@ -5,15 +5,7 @@
 //-----------------------------------------------------------------------------
 
 using System;
-using System.IO;
-using System.Text;
-using System.Reflection;
-using System.Xml.Serialization;
-using System.Collections.Generic;
-using System.Windows.Forms;
-using Microsoft.Xna.Framework;
 using Isles.Engine;
-using Isles.UI;
 
 namespace Isles
 {

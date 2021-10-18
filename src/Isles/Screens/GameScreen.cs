@@ -9,14 +9,12 @@ using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Collections.Generic;
-using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using Isles.Engine;
 using Isles.Graphics;
 using Isles.UI;
-using Isles.Editor;
 using Isles.Screens;
 
 namespace Isles

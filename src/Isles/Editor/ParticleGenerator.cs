@@ -1,17 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Isles;
 using Isles.Engine;
-using Isles.Graphics;
-using Isles.UI;
 
 namespace Isles.Editor
 {

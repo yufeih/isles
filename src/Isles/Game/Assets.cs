@@ -8,11 +8,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 #endregion
 

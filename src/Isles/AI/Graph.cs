@@ -6,9 +6,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using Isles.Graphics;
-using Microsoft.Xna.Framework;
 
 namespace Isles.Engine
 {
