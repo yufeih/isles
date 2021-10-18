@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <Content Include="Settings.xml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\data\cursors\**" LinkBase="data\cursors" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\xnb\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 

@@ -1093,7 +1093,7 @@ namespace Isles
             {
                 if (menuDefaultCursor == null)
                 {
-                    menuDefaultCursor = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/NormalCursor.cur");
+                    menuDefaultCursor = LoadCursor("NormalCursor.cur");
                 }
 
                 return menuDefaultCursor;
@@ -1106,7 +1106,7 @@ namespace Isles
             {
                 if (menuHighlightCursor == null)
                 {
-                    menuHighlightCursor = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/LightedCursor.cur");
+                    menuHighlightCursor = LoadCursor("LightedCursor.cur");
                 }
 
                 return menuHighlightCursor;
@@ -1119,7 +1119,7 @@ namespace Isles
             {
                 if (defaultCursor == null)
                 {
-                    defaultCursor = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/default.ani");
+                    defaultCursor = LoadCursor("default.ani");
                 }
 
                 return defaultCursor;
@@ -1132,7 +1132,7 @@ namespace Isles
             {
                 if (attack == null)
                 {
-                    attack = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/attack.ani");
+                    attack = LoadCursor("attack.ani");
                 }
 
                 return attack;
@@ -1145,7 +1145,7 @@ namespace Isles
             {
                 if (gather == null)
                 {
-                    gather = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/gather.ani");
+                    gather = LoadCursor("gather.ani");
                 }
 
                 return gather;
@@ -1158,7 +1158,7 @@ namespace Isles
             {
                 if (targetRed == null)
                 {
-                    targetRed = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/target_red.ani");
+                    targetRed = LoadCursor("target_red.ani");
                 }
 
                 return targetRed;
@@ -1171,7 +1171,7 @@ namespace Isles
             {
                 if (targetGreen == null)
                 {
-                    targetGreen = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/target_green.ani");
+                    targetGreen = LoadCursor("target_green.ani");
                 }
 
                 return targetGreen;
@@ -1184,7 +1184,7 @@ namespace Isles
             {
                 if (targetNeutral == null)
                 {
-                    targetNeutral = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/target_neutral.ani");
+                    targetNeutral = LoadCursor("target_neutral.ani");
                 }
 
                 return targetNeutral;
@@ -1197,7 +1197,7 @@ namespace Isles
             {
                 if (targetDisable == null)
                 {
-                    targetDisable = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/target_disable.ani");
+                    targetDisable = LoadCursor("target_disable.ani");
                 }
 
                 return targetDisable;
@@ -1210,7 +1210,7 @@ namespace Isles
             {
                 if (top == null)
                 {
-                    top = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/screen_top.cur");
+                    top = LoadCursor("screen_top.cur");
                 }
 
                 return top;
@@ -1223,7 +1223,7 @@ namespace Isles
             {
                 if (bottom == null)
                 {
-                    bottom = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/screen_bottom.cur");
+                    bottom = LoadCursor("screen_bottom.cur");
                 }
 
                 return bottom;
@@ -1236,7 +1236,7 @@ namespace Isles
             {
                 if (left == null)
                 {
-                    left = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/screen_left.cur");
+                    left = LoadCursor("screen_left.cur");
                 }
 
                 return left;
@@ -1249,7 +1249,7 @@ namespace Isles
             {
                 if (right == null)
                 {
-                    right = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/screen_right.cur");
+                    right = LoadCursor("screen_right.cur");
                 }
 
                 return right;
@@ -1262,7 +1262,7 @@ namespace Isles
             {
                 if (move == null)
                 {
-                    move = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/screen_move.cur");
+                    move = LoadCursor("screen_move.cur");
                 }
 
                 return move;
@@ -1275,7 +1275,7 @@ namespace Isles
             {
                 if (rotate == null)
                 {
-                    rotate = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/screen_rotate.cur");
+                    rotate = LoadCursor("screen_rotate.cur");
                 }
 
                 return rotate;
@@ -1297,5 +1297,10 @@ namespace Isles
         private static Cursor right;
         private static Cursor move;
         private static Cursor rotate;
+
+        private static Cursor LoadCursor(string name)
+        {
+            return new(Win32.LoadCursorFromFile(System.IO.Path.Combine(AppContext.BaseDirectory, "data/cursors", name)));
+        }
     }
 }

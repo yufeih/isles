@@ -393,25 +393,6 @@ namespace Isles.Engine
             DeleteExtractedFile(filename);
             return bank;
         }
-
-        /// <summary>
-        /// This method loads a cursor (.cur or .ani) from a file.
-        /// .NET Cursor class does not directly support .ani cursors
-        /// so we have to call the native Win32 functions :(.
-        /// </summary>
-        public Cursor LoadCursor(string filename)
-        {
-            if (File.Exists(filename))
-            {
-                return new Cursor(Win32.LoadCursorFromFile(filename));
-            }
-
-            filename = filename.ToLower();
-            ExtractFile(filename);
-            var cursor = new Cursor(Win32.LoadCursorFromFile(filename));
-            DeleteExtractedFile(filename);
-            return cursor;
-        }
     }
 
     public class ZipEntry
