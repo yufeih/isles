@@ -168,12 +168,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <NestedContentProject Include="Content\Content.contentproj">
-      <Project>3ef57541-d5ed-4b48-a308-5ac5e48e3588</Project>
-      <Visible>False</Visible>
-    </NestedContentProject>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Isles.Pipeline\Isles.Pipeline.csproj">
       <Project>{77E31563-2EED-400D-8591-1ACED921E11F}</Project>
       <Name>Isles.Pipeline</Name>
