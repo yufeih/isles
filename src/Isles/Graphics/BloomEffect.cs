@@ -26,34 +26,28 @@ namespace Isles.Graphics
     {
         #region Fields
 
-
         // Name of a preset bloom setting, for display to the user.
         public string Name;
-
 
         // Controls how bright a pixel needs to be before it will bloom.
         // Zero makes everything bloom equally, while higher values select
         // only brighter colors. Somewhere between 0.25 and 0.5 is good.
         public float BloomThreshold;
 
-
         // Controls how much blurring is applied to the bloom image.
         // The typical range is from 1 up to 10 or so.
         public float BlurAmount;
-
 
         // Controls the amount of the bloom and base images that
         // will be mixed into the final scene. Range 0 to 1.
         public float BloomIntensity;
         public float BaseIntensity;
 
-
         // Independently control the color saturation of the bloom and
         // base images. Zero is totally desaturated, 1.0 leaves saturation
         // unchanged, while higher values increase the saturation level.
         public float BloomSaturation;
         public float BaseSaturation;
-
 
         #endregion
 
@@ -79,7 +73,7 @@ namespace Isles.Graphics
 
         public static BloomSettings Lerp(BloomSettings settings1, BloomSettings settings2, float amount)
         {
-            BloomSettings settings = new BloomSettings();
+            var settings = new BloomSettings();
 
             settings.BaseIntensity = MathHelper.Lerp(settings1.BaseIntensity, settings2.BaseIntensity, amount);
             settings.BaseSaturation = MathHelper.Lerp(settings1.BaseSaturation, settings2.BaseSaturation, amount);
@@ -112,28 +106,23 @@ namespace Isles.Graphics
     {
         #region Fields
 
-        ContentManager content;
-
-        SpriteBatch spriteBatch;
-
-        Effect bloomExtractEffect;
-        Effect bloomCombineEffect;
-        Effect gaussianBlurEffect;
-
-        ResolveTexture2D resolveTarget;
-        RenderTarget2D renderTarget1;
-        RenderTarget2D renderTarget2;
-
+        private readonly ContentManager content;
+        private SpriteBatch spriteBatch;
+        private Effect bloomExtractEffect;
+        private Effect bloomCombineEffect;
+        private Effect gaussianBlurEffect;
+        private ResolveTexture2D resolveTarget;
+        private RenderTarget2D renderTarget1;
+        private RenderTarget2D renderTarget2;
 
         // Choose what display settings the bloom should use.
         public BloomSettings Settings
         {
-            get { return settings; }
-            set { settings = value; }
+            get => settings;
+            set => settings = value;
         }
 
-        BloomSettings settings = BloomSettings.PresetSettings[0];
-
+        private BloomSettings settings = BloomSettings.PresetSettings[0];
 
         // Optionally displays one of the intermediate buffers used
         // by the bloom postprocess, so you can see exactly what is
@@ -148,27 +137,26 @@ namespace Isles.Graphics
 
         public IntermediateBuffer ShowBuffer
         {
-            get { return showBuffer; }
-            set { showBuffer = value; }
+            get => showBuffer;
+            set => showBuffer = value;
         }
 
-        IntermediateBuffer showBuffer = IntermediateBuffer.FinalResult;
-
+        private IntermediateBuffer showBuffer = IntermediateBuffer.FinalResult;
 
         #endregion
 
         #region Initialization
 
-
         public BloomEffect(Game game, ContentManager content)
             : base(game)
         {
             if (game == null)
+            {
                 throw new ArgumentNullException("game");
+            }
 
             this.content = content;
         }
-
 
         /// <summary>
         /// Load your graphics content.
@@ -181,12 +169,11 @@ namespace Isles.Graphics
             bloomCombineEffect = content.Load<Effect>("Effects/BloomCombine");
             gaussianBlurEffect = content.Load<Effect>("Effects/GaussianBlur");
 
-
             // Look up the resolution and format of our main backbuffer.
             PresentationParameters pp = GraphicsDevice.PresentationParameters;
 
-            int width = pp.BackBufferWidth;
-            int height = pp.BackBufferHeight;
+            var width = pp.BackBufferWidth;
+            var height = pp.BackBufferHeight;
 
             SurfaceFormat format = pp.BackBufferFormat;
 
@@ -207,7 +194,6 @@ namespace Isles.Graphics
                 format);
         }
 
-
         /// <summary>
         /// Unload your graphics content.
         /// </summary>
@@ -218,11 +204,9 @@ namespace Isles.Graphics
             renderTarget2.Dispose();
         }
 
-
         #endregion
 
         #region Draw
-
 
         /// <summary>
         /// This is where it all happens. Grabs a scene that has already been rendered,
@@ -281,12 +265,11 @@ namespace Isles.Graphics
                                IntermediateBuffer.FinalResult);
         }
 
-
         /// <summary>
         /// Helper for drawing a texture into a rendertarget, using
         /// a custom shader to apply postprocessing effects.
         /// </summary>
-        void DrawFullscreenQuad(Texture2D texture, RenderTarget2D renderTarget,
+        private void DrawFullscreenQuad(Texture2D texture, RenderTarget2D renderTarget,
                                 Effect effect, IntermediateBuffer currentBuffer)
         {
             GraphicsDevice.SetRenderTarget(0, renderTarget);
@@ -298,12 +281,11 @@ namespace Isles.Graphics
             GraphicsDevice.SetRenderTarget(0, null);
         }
 
-
         /// <summary>
         /// Helper for drawing a texture into the current rendertarget,
         /// using a custom shader to apply postprocessing effects.
         /// </summary>
-        void DrawFullscreenQuad(Texture2D texture, int width, int height,
+        private void DrawFullscreenQuad(Texture2D texture, int width, int height,
                                 Effect effect, IntermediateBuffer currentBuffer)
         {
             spriteBatch.Begin(SpriteBlendMode.None,
@@ -332,12 +314,11 @@ namespace Isles.Graphics
             }
         }
 
-
         /// <summary>
         /// Computes sample weightings and texture coordinate offsets
         /// for one pass of a separable gaussian blur filter.
         /// </summary>
-        void SetBlurEffectParameters(float dx, float dy)
+        private void SetBlurEffectParameters(float dx, float dy)
         {
             // Look up the sample weight and offset effect parameters.
             EffectParameter weightsParameter, offsetsParameter;
@@ -346,25 +327,25 @@ namespace Isles.Graphics
             offsetsParameter = gaussianBlurEffect.Parameters["SampleOffsets"];
 
             // Look up how many samples our gaussian blur effect supports.
-            int sampleCount = weightsParameter.Elements.Count;
+            var sampleCount = weightsParameter.Elements.Count;
 
             // Create temporary arrays for computing our filter settings.
-            float[] sampleWeights = new float[sampleCount];
-            Vector2[] sampleOffsets = new Vector2[sampleCount];
+            var sampleWeights = new float[sampleCount];
+            var sampleOffsets = new Vector2[sampleCount];
 
             // The first sample always has a zero offset.
             sampleWeights[0] = ComputeGaussian(0);
             sampleOffsets[0] = new Vector2(0);
 
             // Maintain a sum of all the weighting values.
-            float totalWeights = sampleWeights[0];
+            var totalWeights = sampleWeights[0];
 
             // Add pairs of additional sample taps, positioned
             // along a line in both directions from the center.
-            for (int i = 0; i < sampleCount / 2; i++)
+            for (var i = 0; i < sampleCount / 2; i++)
             {
                 // Store weights for the positive and negative taps.
-                float weight = ComputeGaussian(i + 1);
+                var weight = ComputeGaussian(i + 1);
 
                 sampleWeights[i * 2 + 1] = weight;
                 sampleWeights[i * 2 + 2] = weight;
@@ -379,7 +360,7 @@ namespace Isles.Graphics
                 // This allows us to step in units of two texels per sample, rather
                 // than just one at a time. The 1.5 offset kicks things off by
                 // positioning us nicely in between two texels.
-                float sampleOffset = i * 2 + 1.5f;
+                var sampleOffset = i * 2 + 1.5f;
 
                 Vector2 delta = new Vector2(dx, dy) * sampleOffset;
 
@@ -389,7 +370,7 @@ namespace Isles.Graphics
             }
 
             // Normalize the list of sample weightings, so they will always sum to one.
-            for (int i = 0; i < sampleWeights.Length; i++)
+            for (var i = 0; i < sampleWeights.Length; i++)
             {
                 sampleWeights[i] /= totalWeights;
             }
@@ -399,19 +380,17 @@ namespace Isles.Graphics
             offsetsParameter.SetValue(sampleOffsets);
         }
 
-
         /// <summary>
         /// Evaluates a single point on the gaussian falloff curve.
         /// Used for setting up the blur filter weightings.
         /// </summary>
-        float ComputeGaussian(float n)
+        private float ComputeGaussian(float n)
         {
-            float theta = Settings.BlurAmount;
+            var theta = Settings.BlurAmount;
 
             return (float)((1.0 / Math.Sqrt(2 * Math.PI * theta)) *
                            Math.Exp(-(n * n) / (2 * theta * theta)));
         }
-
 
         #endregion
     }

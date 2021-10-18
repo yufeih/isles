@@ -9,28 +9,24 @@ namespace Isles.Editor
 {
     public partial class ParticleEditor : Form
     {
-        ParticleEffect particleEffect;
+        private readonly ParticleEffect particleEffect;
 
         public ParticleEditor(ParticleEffect particleEffect)
         {
             InitializeComponent();
-
-            if (null == particleEffect)
-                throw new ArgumentNullException();
-
-            this.particleEffect = particleEffect;
+            this.particleEffect = particleEffect ?? throw new ArgumentNullException();
 
             InitializeSettings(particleEffect.Emission, particleEffect.Particle);
 
             InitializeTextures();
         }
 
-        const string TexturePath = "Content/Textures/Effect";
-        const string TextureLoadPath = "Textures/Effect/";
+        private const string TexturePath = "Content/Textures/Effect";
+        private const string TextureLoadPath = "Textures/Effect/";
 
         private void InitializeTextures()
         {
-            foreach (string file in Directory.GetFiles(TexturePath))
+            foreach (var file in Directory.GetFiles(TexturePath))
             {
                 comboBoxTexture.Items.Add(Path.GetFileNameWithoutExtension(file));
             }
@@ -183,7 +179,7 @@ namespace Isles.Editor
             if (colorDialog.ShowDialog() == DialogResult.OK)
             {
                 particleEffect.Particle.Settings.MaxColor =
-                    new Microsoft.Xna.Framework.Graphics.Color(
+                    new Color(
                     colorDialog.Color.R, colorDialog.Color.G, colorDialog.Color.B);
                 particleEffect.Particle.Refresh();
             }
@@ -194,7 +190,7 @@ namespace Isles.Editor
             if (colorDialog.ShowDialog() == DialogResult.OK)
             {
                 particleEffect.Particle.Settings.MinColor =
-                    new Microsoft.Xna.Framework.Graphics.Color(
+                    new Color(
                     colorDialog.Color.R, colorDialog.Color.G, colorDialog.Color.B);
                 particleEffect.Particle.Refresh();
             }

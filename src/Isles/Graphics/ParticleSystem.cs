@@ -39,18 +39,15 @@ namespace Isles.Graphics
         /// </summary>
         public string Name = null;
 
-
         /// <summary>
         /// Name of the texture used by this particle system.
         /// </summary>
         public string TextureName = null;
 
-
         /// <summary>
         /// Maximum number of particles that can be displayed at one time.
         /// </summary>
         public int MaxParticles = 100;
-
 
         /// <summary>
         /// How long these particles will last.
@@ -58,12 +55,10 @@ namespace Isles.Graphics
         /// </summary>
         public float Duration = 1;
 
-
         /// <summary>
         /// If greater than zero, some particles will last a shorter time than others. 
         /// </summary>
         public float DurationRandomness = 0;
-
 
         /// <summary>
         /// Controls how much particles are influenced by the velocity of the object
@@ -74,7 +69,6 @@ namespace Isles.Graphics
         /// </summary>
         public float EmitterVelocitySensitivity = 1;
 
-
         /// <summary>
         /// Range of values controlling how much X and Z axis velocity to give each
         /// particle. Values for individual particles are randomly chosen from somewhere
@@ -83,7 +77,6 @@ namespace Isles.Graphics
         public float MinHorizontalVelocity = 0;
         public float MaxHorizontalVelocity = 0;
 
-
         /// <summary>
         /// Range of values controlling how much Y axis velocity to give each particle.
         /// Values for individual particles are randomly chosen from somewhere between
@@ -91,7 +84,6 @@ namespace Isles.Graphics
         /// </summary>
         public float MinVerticalVelocity = 0;
         public float MaxVerticalVelocity = 0;
-
 
         /// <summary>
         /// Direction and strength of the gravity effect. Note that this can point in any
@@ -108,14 +100,12 @@ namespace Isles.Graphics
         /// </summary>
         public float EndVelocity = 1;
 
-
         /// <summary>
         /// Range of values controlling the particle color and alpha. Values for
         /// individual particles are randomly chosen from somewhere between these limits.
         /// </summary>
         public Color MinColor = Color.White;
         public Color MaxColor = Color.White;
-
 
         /// <summary>
         /// Range of values controlling how fast the particles rotate. Values for
@@ -129,7 +119,6 @@ namespace Isles.Graphics
         public float MinRotateSpeed = 0;
         public float MaxRotateSpeed = 0;
 
-
         /// <summary>
         /// Range of values controlling how big the particles are when first created.
         /// Values for individual particles are randomly chosen from somewhere between
@@ -138,7 +127,6 @@ namespace Isles.Graphics
         public float MinStartSize = 100;
         public float MaxStartSize = 100;
 
-
         /// <summary>
         /// Range of values controlling how big particles become at the end of their
         /// life. Values for individual particles are randomly chosen from somewhere
@@ -146,7 +134,6 @@ namespace Isles.Graphics
         /// </summary>
         public float MinEndSize = 100;
         public float MaxEndSize = 100;
-
 
         /// <summary>
         /// Alpha blending settings.
@@ -164,54 +151,53 @@ namespace Isles.Graphics
     {
         #region Fields
 
-
         public String ParticleName
         {
-            get { return name; }
-            set { name = value; }
+            get => name;
+            set => name = value;
         }
 
-        String name;
+        private String name;
 
         // Settings class controls the appearance and animation of this particle system.
-        ParticleSettings settings;
+        private ParticleSettings settings;
 
         /// <summary>
         /// Gets or sets the settings for this particle system
         /// </summary>
         public ParticleSettings Settings
         {
-            get { return settings; }
-            set { settings = value; Refresh(); }
+            get => settings;
+            set
+            {
+                settings = value;
+                Refresh();
+            }
         }
 
         // For accessing view projection matrix
-        Game game;
-        ContentManager content;
+        private readonly Game game;
+        private readonly ContentManager content;
 
         // Custom effect for drawing point sprite particles. This computes the particle
         // animation entirely in the vertex shader: no per-particle CPU work required!
-        Effect particleEffect;
+        private Effect particleEffect;
 
         // Shortcuts for accessing frequently changed effect parameters.
-        EffectParameter effectViewParameter;
-        EffectParameter effectProjectionParameter;
-        EffectParameter effectViewportHeightParameter;
-        EffectParameter effectTimeParameter;
-
+        private EffectParameter effectViewParameter;
+        private EffectParameter effectProjectionParameter;
+        private EffectParameter effectViewportHeightParameter;
+        private EffectParameter effectTimeParameter;
 
         // An array of particles, treated as a circular queue.
-        ParticleVertex[] particles;
-
+        private ParticleVertex[] particles;
 
         // A vertex buffer holding our particles. This contains the same data as
         // the particles array, but copied across to where the GPU can access it.
-        DynamicVertexBuffer vertexBuffer;
-
+        private DynamicVertexBuffer vertexBuffer;
 
         // Vertex declaration describes the format of our ParticleVertex structure.
-        VertexDeclaration vertexDeclaration;
-
+        private VertexDeclaration vertexDeclaration;
 
         // The particles array and vertex buffer are treated as a circular queue.
         // Initially, the entire contents of the array are free, because no particles
@@ -284,31 +270,27 @@ namespace Isles.Graphics
         // using them. These need to be kept around for a few more frames before they
         // can be reallocated.
 
-        int firstActiveParticle;
-        int firstNewParticle;
-        int firstFreeParticle;
-        int firstRetiredParticle;
-
+        private int firstActiveParticle;
+        private int firstNewParticle;
+        private int firstFreeParticle;
+        private int firstRetiredParticle;
 
         // Store the current time, in seconds.
-        float currentTime;
-
+        private float currentTime;
 
         // Count how many times Draw has been called. This is used to know
         // when it is safe to retire old particles back into the free list.
-        int drawCounter;
-
+        private int drawCounter;
 
         // Shared random number generator.
-        static Random random = new Random();
-
+        private static readonly Random random = new();
 
         #endregion
 
         #region Static Stuff
         private static BaseGame baseGame;
-        private static List<ParticleSettings> ParticleSettings = new List<ParticleSettings>();
-        private static List<ParticleSystem> ParticleSystems = new List<ParticleSystem>();
+        private static List<ParticleSettings> ParticleSettings = new();
+        private static readonly List<ParticleSystem> ParticleSystems = new();
 
         /// <summary>
         /// Initialize particle system
@@ -326,7 +308,9 @@ namespace Isles.Graphics
 
             // Create particle system
             foreach (ParticleSettings settings in ParticleSettings)
+            {
                 ParticleSystems.Add(new ParticleSystem(game, settings));
+            }
         }
 
         /// <summary>
@@ -342,7 +326,7 @@ namespace Isles.Graphics
         /// </summary>
         public static ParticleSystem Create(string type)
         {
-            for (int i = 0; i < ParticleSettings.Count; i++)
+            for (var i = 0; i < ParticleSettings.Count; i++)
             {
                 if (ParticleSettings[i].Name != null &&
                     ParticleSettings[i].Name.Equals(type))
@@ -387,7 +371,9 @@ namespace Isles.Graphics
             this.game = game;
 
             if (game is BaseGame)
-                this.content = (game as BaseGame).ZipContent;
+            {
+                content = (game as BaseGame).ZipContent;
+            }
 
             LoadParticleEffect();
 
@@ -405,7 +391,7 @@ namespace Isles.Graphics
                                                       ParticleVertex.VertexElements);
 
             // Create a dynamic vertex buffer.
-            int size = ParticleVertex.SizeInBytes * particles.Length;
+            var size = ParticleVertex.SizeInBytes * particles.Length;
 
             vertexBuffer = new DynamicVertexBuffer(game.GraphicsDevice, size,
                                                    BufferUsage.WriteOnly | BufferUsage.Points);
@@ -415,11 +401,10 @@ namespace Isles.Graphics
             vertexBuffer.SetData(particles);
         }
 
-
         /// <summary>
         /// Helper for loading and initializing the particle effect.
         /// </summary>
-        void LoadParticleEffect()
+        private void LoadParticleEffect()
         {
             Effect effect = content.Load<Effect>("Effects/ParticleEffect");
 
@@ -480,9 +465,13 @@ namespace Isles.Graphics
             string techniqueName;
 
             if ((settings.MinRotateSpeed == 0) && (settings.MaxRotateSpeed == 0))
+            {
                 techniqueName = "NonRotatingParticles";
+            }
             else
+            {
                 techniqueName = "RotatingParticles";
+            }
 
             particleEffect.CurrentTechnique = particleEffect.Techniques[techniqueName];
         }
@@ -491,7 +480,7 @@ namespace Isles.Graphics
 
         #region Update and Draw
 
-        bool presented;
+        private bool presented;
 
         /// <summary>
         /// Updates the particle system.
@@ -499,7 +488,9 @@ namespace Isles.Graphics
         public void Update(GameTime gameTime)
         {
             if (gameTime == null)
+            {
                 throw new ArgumentNullException("gameTime");
+            }
 
             currentTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -513,31 +504,36 @@ namespace Isles.Graphics
             // so we can reset it back to zero any time the active queue is empty.
 
             if (firstActiveParticle == firstFreeParticle)
+            {
                 currentTime = 0;
+            }
 
             if (firstRetiredParticle == firstActiveParticle)
+            {
                 drawCounter = 0;
+            }
 
             presented = false;
         }
-
 
         /// <summary>
         /// Helper for checking when active particles have reached the end of
         /// their life. It moves old particles from the active area of the queue
         /// to the retired section.
         /// </summary>
-        void RetireActiveParticles()
+        private void RetireActiveParticles()
         {
-            float particleDuration = (float)settings.Duration;
+            var particleDuration = (float)settings.Duration;
 
             while (firstActiveParticle != firstNewParticle)
             {
                 // Is this particle old enough to retire?
-                float particleAge = currentTime - particles[firstActiveParticle].Time;
+                var particleAge = currentTime - particles[firstActiveParticle].Time;
 
                 if (particleAge < particleDuration)
+                {
                     break;
+                }
 
                 // Remember the time at which we retired this particle.
                 particles[firstActiveParticle].Time = drawCounter;
@@ -546,35 +542,40 @@ namespace Isles.Graphics
                 firstActiveParticle++;
 
                 if (firstActiveParticle >= particles.Length)
+                {
                     firstActiveParticle = 0;
+                }
             }
         }
-
 
         /// <summary>
         /// Helper for checking when retired particles have been kept around long
         /// enough that we can be sure the GPU is no longer using them. It moves
         /// old particles from the retired area of the queue to the free section.
         /// </summary>
-        void FreeRetiredParticles()
+        private void FreeRetiredParticles()
         {
             while (firstRetiredParticle != firstActiveParticle)
             {
                 // Has this particle been unused long enough that
                 // the GPU is sure to be finished with it?
-                int age = drawCounter - (int)particles[firstRetiredParticle].Time;
+                var age = drawCounter - (int)particles[firstRetiredParticle].Time;
 
                 // The GPU is never supposed to get more than 2 frames behind the CPU.
                 // We add 1 to that, just to be safe in case of buggy drivers that
                 // might bend the rules and let the GPU get further behind.
                 if (age < 3)
+                {
                     break;
+                }
 
                 // Move the particle from the retired to the free queue.
                 firstRetiredParticle++;
 
                 if (firstRetiredParticle >= particles.Length)
+                {
                     firstRetiredParticle = 0;
+                }
             }
         }
 
@@ -583,8 +584,10 @@ namespace Isles.Graphics
         /// </summary>
         public void Draw(GameTime gameTime)
         {
-            if (presented) 
+            if (presented)
+            {
                 return;
+            }
 
             // Be sure update is always called before draw is called
             presented = true;
@@ -668,14 +671,13 @@ namespace Isles.Graphics
             drawCounter++;
         }
 
-
         /// <summary>
         /// Helper for uploading new particles from our managed
         /// array to the GPU vertex buffer.
         /// </summary>
-        void AddNewParticlesToVertexBuffer()
+        private void AddNewParticlesToVertexBuffer()
         {
-            int stride = ParticleVertex.SizeInBytes;
+            var stride = ParticleVertex.SizeInBytes;
 
             if (firstNewParticle < firstFreeParticle)
             {
@@ -704,11 +706,10 @@ namespace Isles.Graphics
             firstNewParticle = firstFreeParticle;
         }
 
-
         /// <summary>
         /// Helper for setting the renderstates used to draw particles.
         /// </summary>
-        void SetParticleRenderStates(RenderState renderState)
+        private void SetParticleRenderStates(RenderState renderState)
         {
             // Enable point sprites.
             renderState.PointSpriteEnable = true;
@@ -733,12 +734,11 @@ namespace Isles.Graphics
             renderState.DepthBias = 0;
         }
 
-
         #endregion
 
         #region Public Methods
 
-        Matrix view, projection;
+        private Matrix view, projection;
 
         public void SetCamera(Matrix view, Matrix projection)
         {
@@ -752,25 +752,29 @@ namespace Isles.Graphics
         public void AddParticle(Vector3 position, Vector3 velocity)
         {
             // Figure out where in the circular queue to allocate the new particle.
-            int nextFreeParticle = firstFreeParticle + 1;
+            var nextFreeParticle = firstFreeParticle + 1;
 
             if (nextFreeParticle >= particles.Length)
+            {
                 nextFreeParticle = 0;
+            }
 
             // If there are no free particles, we just have to give up.
             if (nextFreeParticle == firstRetiredParticle)
+            {
                 return;
+            }
 
             // Adjust the input velocity based on how much
             // this particle system wants to be affected by it.
             velocity *= settings.EmitterVelocitySensitivity;
 
             // Add in some random amount of horizontal velocity.
-            float horizontalVelocity = MathHelper.Lerp(settings.MinHorizontalVelocity,
+            var horizontalVelocity = MathHelper.Lerp(settings.MinHorizontalVelocity,
                                                        settings.MaxHorizontalVelocity,
                                                        (float)random.NextDouble());
 
-            double horizontalAngle = random.NextDouble() * MathHelper.TwoPi;
+            var horizontalAngle = random.NextDouble() * MathHelper.TwoPi;
 
             velocity.X += horizontalVelocity * (float)Math.Cos(horizontalAngle);
             velocity.Y += horizontalVelocity * (float)Math.Sin(horizontalAngle);
@@ -782,7 +786,7 @@ namespace Isles.Graphics
 
             // Choose four random control values. These will be used by the vertex
             // shader to give each particle a different size, rotation, and color.
-            Color randomValues = new Color((byte)random.Next(255),
+            var randomValues = new Color((byte)random.Next(255),
                                            (byte)random.Next(255),
                                            (byte)random.Next(255),
                                            (byte)random.Next(255));
@@ -795,7 +799,6 @@ namespace Isles.Graphics
 
             firstFreeParticle = nextFreeParticle;
         }
-
 
         #endregion
     }
@@ -827,29 +830,28 @@ namespace Isles.Graphics
     {
         #region Fields
 
-        ParticleSystem particleSystem;
-        float timeBetweenParticles;
-        Vector3 previousPosition;
-        float timeLeftOver;
+        private readonly ParticleSystem particleSystem;
+        private float timeBetweenParticles;
+        private Vector3 previousPosition;
+        private float timeLeftOver;
 
         public string EmitterName;
 
         public Vector3 PreviousPosition
         {
-            get { return previousPosition; }
-            set { previousPosition = value; }
+            get => previousPosition;
+            set => previousPosition = value;
         }
-        
+
         /// <summary>
         /// Gets or sets how many particles will be generated per second
         /// </summary>
         public float ParticlesPerSecond
         {
-            get { return 1.0f / timeBetweenParticles; }
-            set { timeBetweenParticles = 1.0f / value; }
+            get => 1.0f / timeBetweenParticles;
+            set => timeBetweenParticles = 1.0f / value;
         }
         #endregion
-
 
         /// <summary>
         /// Constructs a new particle emitter object.
@@ -884,10 +886,12 @@ namespace Isles.Graphics
         public void Update(GameTime gameTime, Vector3 newPosition, Vector3? newVelocity, bool lerpPosition)
         {
             if (gameTime == null)
+            {
                 throw new ArgumentNullException("gameTime");
+            }
 
             // Work out how much time has passed since the previous update.
-            float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            var elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             if (elapsedTime > 0)
             {
@@ -897,10 +901,10 @@ namespace Isles.Graphics
 
                 // If we had any time left over that we didn't use during the
                 // previous update, add that to the current elapsed time.
-                float timeToSpend = timeLeftOver + elapsedTime;
+                var timeToSpend = timeLeftOver + elapsedTime;
 
                 // Counter for looping over the time interval.
-                float currentTime = -timeLeftOver;
+                var currentTime = -timeLeftOver;
 
                 // Create particles as long as we have a big enough time interval.
                 while (timeToSpend > timeBetweenParticles)
@@ -915,7 +919,7 @@ namespace Isles.Graphics
                         // Work out the optimal position for this particle. This will produce
                         // evenly spaced particles regardless of the object speed, particle
                         // creation frequency, or game update rate.
-                        float mu = currentTime / elapsedTime;
+                        var mu = currentTime / elapsedTime;
 
                         position = Vector3.Lerp(previousPosition, newPosition, mu);
                     }
@@ -951,7 +955,6 @@ namespace Isles.Graphics
         // The time (in seconds) at which this particle was created.
         public float Time;
 
-
         // Describe the layout of this vertex structure.
         public static readonly VertexElement[] VertexElements =
         {
@@ -972,7 +975,6 @@ namespace Isles.Graphics
                                      VertexElementUsage.TextureCoordinate, 0),
         };
 
-
         // Describe the size of this vertex structure.
         public const int SizeInBytes = 32;
     }
@@ -990,30 +992,27 @@ namespace Isles.Graphics
     {
         #region Constants
 
-        const float trailParticlesPerSecond = 200;
-        const int numExplosionParticles = 30;
-        const int numExplosionSmokeParticles = 50;
-        const float projectileLifespan = 1.5f;
-        const float sidewaysVelocityRange = 60;
-        const float verticalVelocityRange = 40;
-        const float gravity = 15;
+        private const float trailParticlesPerSecond = 200;
+        private const int numExplosionParticles = 30;
+        private const int numExplosionSmokeParticles = 50;
+        private const float projectileLifespan = 1.5f;
+        private const float sidewaysVelocityRange = 60;
+        private const float verticalVelocityRange = 40;
+        private const float gravity = 15;
 
         #endregion
 
         #region Fields
 
-        ParticleSystem explosionParticles;
-        ParticleSystem explosionSmokeParticles;
-        ParticleEmitter trailEmitter;
-
-        Vector3 position;
-        Vector3 velocity;
-        float age;
-
-        static Random random = new Random();
+        private readonly ParticleSystem explosionParticles;
+        private readonly ParticleSystem explosionSmokeParticles;
+        private readonly ParticleEmitter trailEmitter;
+        private Vector3 position;
+        private Vector3 velocity;
+        private float age;
+        private static readonly Random random = new();
 
         #endregion
-
 
         /// <summary>
         /// Constructs a new projectile.
@@ -1037,13 +1036,12 @@ namespace Isles.Graphics
                                                trailParticlesPerSecond, position);
         }
 
-
         /// <summary>
         /// Updates the projectile.
         /// </summary>
         public bool Update(GameTime gameTime)
         {
-            float elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            var elapsedTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             // Simple projectile physics.
             position += velocity * elapsedTime;
@@ -1058,11 +1056,15 @@ namespace Isles.Graphics
             // by the speed and direction of the projectile which created it.
             if (age > projectileLifespan)
             {
-                for (int i = 0; i < numExplosionParticles; i++)
+                for (var i = 0; i < numExplosionParticles; i++)
+                {
                     explosionParticles.AddParticle(position, velocity);
+                }
 
-                for (int i = 0; i < numExplosionSmokeParticles; i++)
+                for (var i = 0; i < numExplosionSmokeParticles; i++)
+                {
                     explosionSmokeParticles.AddParticle(position, velocity);
+                }
 
                 return false;
             }

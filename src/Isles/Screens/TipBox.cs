@@ -10,41 +10,33 @@ using Microsoft.Xna.Framework.Graphics;
 using Isles.Engine;
 using Isles.UI;
 
-
 namespace Isles
 {
     #region TipBox
     public class TipBox : Panel
     {
-        static Texture2D white = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/Panels");
-
-        static readonly Rectangle DialogHigherHorizontalLine = new Rectangle(50, 0, 50, 50);
-        static readonly Rectangle DialogLowerHorizontalLine = new Rectangle(50, 380, 50, 50);
-        static readonly Rectangle DialogLeftVerticalLine = new Rectangle(0, 50, 50, 50);
-        static readonly Rectangle DialogRightVerticalLine = new Rectangle(408, 50, 50, 50);
-        static readonly Rectangle DialogLeftTopCorner = new Rectangle(0, 0, 50, 50);
-        static readonly Rectangle DialogRightTopCorner = new Rectangle(408, 0, 50, 50);
-        static readonly Rectangle DialogLeftBottomCorner = new Rectangle(0, 380, 50, 50);
-        static readonly Rectangle DialogRightBottomCorner = new Rectangle(408, 380, 50, 50);
-        static readonly Rectangle DialogContent = new Rectangle(50, 50, 50, 50);
-        static readonly Rectangle whiteTextureSource = new Rectangle(1000, 800, 1, 1);
-
-        static Texture2D DialogTexture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/TipBox");
-
+        private static readonly Texture2D white = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/Panels");
+        private static readonly Rectangle DialogHigherHorizontalLine = new(50, 0, 50, 50);
+        private static readonly Rectangle DialogLowerHorizontalLine = new(50, 380, 50, 50);
+        private static readonly Rectangle DialogLeftVerticalLine = new(0, 50, 50, 50);
+        private static readonly Rectangle DialogRightVerticalLine = new(408, 50, 50, 50);
+        private static readonly Rectangle DialogLeftTopCorner = new(0, 0, 50, 50);
+        private static readonly Rectangle DialogRightTopCorner = new(408, 0, 50, 50);
+        private static readonly Rectangle DialogLeftBottomCorner = new(0, 380, 50, 50);
+        private static readonly Rectangle DialogRightBottomCorner = new(408, 380, 50, 50);
+        private static readonly Rectangle DialogContent = new(50, 50, 50, 50);
+        private static readonly Rectangle whiteTextureSource = new(1000, 800, 1, 1);
+        private static readonly Texture2D DialogTexture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/TipBox");
 
         public int DialogCornerWidth = 6;
-
 
         public bool Mask = false;
 
         /// <summary>
         /// Whather to track the cursor
         /// </summary>
-        bool trackCursor = false;
-        public bool TrackCursor
-        {
-            get { return trackCursor; }
-        }
+        private readonly bool trackCursor = false;
+        public bool TrackCursor => trackCursor;
 
         /// <summary>
         /// Construct a fixed-location tipbox
@@ -53,7 +45,7 @@ namespace Isles
             : base(area)
         {
             trackCursor = false;
-            this.ScaleMode = ScaleMode.Fixed;
+            ScaleMode = ScaleMode.Fixed;
 
         }
 
@@ -67,7 +59,7 @@ namespace Isles
             : base(Rectangle.Empty)
         {
             trackCursor = true;
-            this.ScaleMode = ScaleMode.Fixed;
+            ScaleMode = ScaleMode.Fixed;
             Area = new Rectangle(Mouse.GetState().X, Mouse.GetState().Y, width, height);
             setPositionToCursor();
         }
@@ -78,8 +70,8 @@ namespace Isles
         public void DrawDialog(Rectangle rectangle, SpriteBatch sprite)
         {
             // Actual Width and Height for corner
-            int width = DialogCornerWidth;
-            int height = DialogCornerWidth;
+            var width = DialogCornerWidth;
+            var height = DialogCornerWidth;
             if (rectangle.Width < 2 * width)
             {
                 width = rectangle.Width / 2;
@@ -97,7 +89,6 @@ namespace Isles
 
             destRect.X = rectangle.Right - width;
             sprite.Draw(DialogTexture, destRect, DialogRightTopCorner, Color.White);
-
 
             destRect.Y = rectangle.Bottom - height;
             sprite.Draw(DialogTexture, destRect, DialogRightBottomCorner, Color.White);
@@ -128,7 +119,6 @@ namespace Isles
             sprite.Draw(DialogTexture, destRect, DialogContent, Color.White);
         }
 
-
         public override void Draw(GameTime gameTime, SpriteBatch sprite)
         {
             if (Mask)
@@ -136,7 +126,7 @@ namespace Isles
                 sprite.Draw(white, new Rectangle(0, 0, BaseGame.Singleton.ScreenWidth, BaseGame.Singleton.ScreenHeight),
                              whiteTextureSource, new Color(0, 0, 0, 180));
             }
-            DrawDialog(this.DestinationRectangle, sprite);
+            DrawDialog(DestinationRectangle, sprite);
             base.Draw(gameTime, sprite);
         }
 
@@ -149,22 +139,24 @@ namespace Isles
                 foreach (IUIElement element in elements)
                 {
                     if (element is UIElement)
+                    {
                         (element as UIElement).ResetDestinationRectangle();
+                    }
                 }
             }
         }
 
-        void setPositionToCursor()
+        private void setPositionToCursor()
         {
-            this.X = Mouse.GetState().X + 15;
-            this.Y = Mouse.GetState().Y - this.DestinationRectangle.Height;
-            if (this.Y < 0)
+            X = Mouse.GetState().X + 15;
+            Y = Mouse.GetState().Y - DestinationRectangle.Height;
+            if (Y < 0)
             {
-                this.Y = Mouse.GetState().Y;
+                Y = Mouse.GetState().Y;
             }
-            if (Mouse.GetState().X + 15 + this.DestinationRectangle.Width > BaseGame.Singleton.ScreenWidth)
+            if (Mouse.GetState().X + 15 + DestinationRectangle.Width > BaseGame.Singleton.ScreenWidth)
             {
-                this.X = Mouse.GetState().X - this.DestinationRectangle.Width;
+                X = Mouse.GetState().X - DestinationRectangle.Width;
             }
         }
 

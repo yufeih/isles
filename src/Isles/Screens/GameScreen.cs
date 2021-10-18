@@ -25,40 +25,31 @@ namespace Isles
     public class GameScreen : IScreen, IEventListener
     {
         #region Field
-        const string ReplayDirectory = "Replays";
-        const string DefaultReplayName = "LastReplay";
-        const string ReplayExtension = "ixr";
+        private const string ReplayDirectory = "Replays";
+        private const string DefaultReplayName = "LastReplay";
+        private const string ReplayExtension = "ixr";
 
         /// <summary>
         /// Graphcis device
         /// </summary>
-        GraphicsDeviceManager graphics;
+        private readonly GraphicsDeviceManager graphics;
 
         /// <summary>
         /// Game screen UI
         /// </summary>
-        public GameUI UI
-        {
-            get { return ui; }
-        }
+        public GameUI UI => ui;
 
-        GameUI ui;
-
-        TipBox pausePanel;
+        private GameUI ui;
+        private TipBox pausePanel;
 
         /// <summary>
         /// Gets basic game instance
         /// </summary>
-        public BaseGame Game
-        {
-            get { return game; }
-        }
+        public BaseGame Game => game;
 
-        BaseGame game;
-
-
-        bool paused = false;
-        IEventListener activeObject = null;
+        private readonly BaseGame game;
+        private bool paused = false;
+        private IEventListener activeObject = null;
 
         public void Pause(IEventListener activeObject)
         {
@@ -74,69 +65,54 @@ namespace Isles
             (game.Camera as GameCamera).Freezed = false;
         }
 
-
         /// <summary>
         /// Gets game world
         /// </summary>
-        public GameWorld World
-        {
-            get { return world; }
-        }
+        public GameWorld World => world;
 
-        GameWorld world;
+        private GameWorld world;
 
         /// <summary>
         /// The read me panel
         /// </summary>
-        ReadmePanel readme;
-
+        private ReadmePanel readme;
 
         /// <summary>
         /// Gets or sets game level
         /// </summary>
         public Level Level
         {
-            get { return level; }
-            set { level = value; }
+            get => level;
+            set => level = value;
         }
 
-        Level level;
-
+        private Level level;
 
         /// <summary>
         /// Level filename
         /// </summary>
-        string levelFilename;
+        private string levelFilename;
 
         /// <summary>
         /// Gets game recorder
         /// </summary>
-        public GameRecorder Recorder
-        {
-            get { return recorder; }
-        }
+        public GameRecorder Recorder => recorder;
 
-        GameRecorder recorder;
+        private GameRecorder recorder;
 
         /// <summary>
         /// Gets game replay
         /// </summary>
-        public GameReplay Replay
-        {
-            get { return replay; }
-        }
+        public GameReplay Replay => replay;
 
-        GameReplay replay;
+        private GameReplay replay;
 
         /// <summary>
         /// Gets game server interface
         /// </summary>
-        public GameServer Server
-        {
-            get { return server; }
-        }
+        public GameServer Server => server;
 
-        GameServer server;
+        private GameServer server;
         #endregion
 
         #region Initialization
@@ -151,7 +127,9 @@ namespace Isles
             graphics = game.Graphics;
 
             if (graphics == null)
+            {
                 throw new InvalidOperationException();
+            }
         }
 
         /// <summary>
@@ -196,14 +174,14 @@ namespace Isles
         /// </summary>
         private void LoadWorld(string levelFilename, Level level)
         {
-            if (levelFilename == null)
-                throw new ArgumentNullException();
 
             // Creates a default level if no input specified
             if (level == null)
+            {
                 level = new Level();
+            }
 
-            this.levelFilename = levelFilename;
+            this.levelFilename = levelFilename ?? throw new ArgumentNullException();
             this.level = level;
 
             // Reset game recorder
@@ -224,11 +202,13 @@ namespace Isles
                 Player.Reset();
 
                 // Read XML scene content
-                XmlDocument doc = new XmlDocument();
+                var doc = new XmlDocument();
                 doc.Load(levelFile);
 
                 if (level != null)
+                {
                     level.Load(doc.DocumentElement, loadContext);
+                }
 
                 // Load game world
                 world = new GameWorld();
@@ -247,7 +227,9 @@ namespace Isles
 
                 // Start level
                 if (level != null)
+                {
                     level.Start(world);
+                }
 
                 // Load complete
                 loadContext.Refresh(100);
@@ -283,16 +265,16 @@ namespace Isles
             pausePanel = new TipBox(new Rectangle(game.ScreenWidth * 3 / 10, game.ScreenHeight * 3 / 8,
                                                   game.ScreenWidth * 2 / 5, game.ScreenHeight / 5));
 
-            TextField quitOrNotText = new TextField("Are your sure you want to quit?", 20f / 23, Color.White,
+            var quitOrNotText = new TextField("Are your sure you want to quit?", 20f / 23, Color.White,
                                             new Rectangle(0, 0, game.ScreenWidth * 2 / 5, game.ScreenHeight / 8));
 
-            TextButton ok = new TextButton("OK", 20f / 23, Color.Gold,
+            var ok = new TextButton("OK", 20f / 23, Color.Gold,
                                             new Rectangle(game.ScreenWidth * 2 / 35,
                                                           game.ScreenHeight / 8,
                                                           game.ScreenWidth / 7,
                                                           game.ScreenHeight * 2 / 35));
 
-            TextButton cancel = new TextButton("Cancel", 20f / 23, Color.Gold,
+            var cancel = new TextButton("Cancel", 20f / 23, Color.Gold,
                                             new Rectangle(game.ScreenWidth / 5,
                                                           game.ScreenHeight / 8,
                                                           game.ScreenWidth / 7,
@@ -321,13 +303,12 @@ namespace Isles
             pausePanel.Visible = false;
             ui.Display.Add(pausePanel);
         }
-        
 
-        bool scrollingCamera = false;
+        private bool scrollingCamera = false;
 
         private void ResetCamera()
         {
-            GameCamera camera = new GameCamera(game.Settings.CameraSettings, world);
+            var camera = new GameCamera(game.Settings.CameraSettings, world);
             camera.FlyTo(new Vector3(Player.LocalPlayer.SpawnPoint, 0), true);
             game.Camera = camera;
 
@@ -355,7 +336,7 @@ namespace Isles
 
         private IEnumerable<PlayerInfo> CreateTestPlayerInfo()
         {
-            PlayerInfo info1 = new PlayerInfo();
+            var info1 = new PlayerInfo();
 
             info1.Name = game.Settings.PlayerName;
             info1.Race = (Race.Islander);
@@ -365,7 +346,7 @@ namespace Isles
 
             yield return info1;
 
-            PlayerInfo info2 = new PlayerInfo();
+            var info2 = new PlayerInfo();
 
             info2.Name = "Computer";
             info2.Race = (Race.Islander);
@@ -412,20 +393,22 @@ namespace Isles
 
         }
 
-        bool postScreen = false;
-        Texture2D victoryTexture;
-        Texture2D failureTexture;
-        Rectangle postScreenRectangle;
-        BloomSettings targetSettings;
-        BloomSettings defaultSettings;
-        float bloomLerpElapsedTime = 0;
+        private bool postScreen = false;
+        private Texture2D victoryTexture;
+        private Texture2D failureTexture;
+        private Rectangle postScreenRectangle;
+        private BloomSettings targetSettings;
+        private BloomSettings defaultSettings;
+        private float bloomLerpElapsedTime = 0;
 
         public void ShowVictory()
         {
             if (!postScreen)
             {
                 if (victoryTexture == null)
+                {
                     victoryTexture = game.ZipContent.Load<Texture2D>("Textures/Victory");
+                }
 
                 // Load bloom
                 if (game.Bloom != null)
@@ -445,7 +428,9 @@ namespace Isles
             if (!postScreen)
             {
                 if (failureTexture == null)
+                {
                     failureTexture = game.ZipContent.Load<Texture2D>("Textures/Failure");
+                }
 
                 if (game.Bloom != null)
                 {
@@ -463,12 +448,16 @@ namespace Isles
         {
             using (Stream stream = game.ZipContent.GetFileStream("Content/Settings/Bloom.xml"))
             {
-                List<BloomSettings> settings = (List<BloomSettings>)
+                var settings = (List<BloomSettings>)
                     new XmlSerializer(typeof(List<BloomSettings>)).Deserialize(stream);
 
                 foreach (BloomSettings bloom in settings)
+                {
                     if (bloom.Name.Equals(type))
+                    {
                         return bloom;
+                    }
+                }
             }
 
             return null;
@@ -484,10 +473,14 @@ namespace Isles
 
             Vector3? position = null;
             if (Building.LastDestroyedBuilding != null)
+            {
                 position = Building.LastDestroyedBuilding.Position;
+            }
 
             if (game.Camera is GameCamera)
+            {
                 (game.Camera as GameCamera).Orbit(position, 0.00008f, 150, MathHelper.ToRadians(40));
+            }
 
             game.Input.Uncapture();
             postScreen = true;
@@ -516,30 +509,46 @@ namespace Isles
 
             // Update UI first
             if (ui != null)
+            {
                 ui.Update(gameTime);
+            }
 
             // Update players
             foreach (Player player in Player.AllPlayers)
+            {
                 if (player != null)
+                {
                     player.Update(gameTime);
+                }
+            }
 
             // Update world
             if (world != null)
+            {
                 world.Update(gameTime);
-            
+            }
+
             // Update spells
             if (Spell.CurrentSpell != null)
+            {
                 Spell.CurrentSpell.UpdateCast(gameTime);
+            }
 
             if (level != null)
+            {
                 level.Update(gameTime);
+            }
 
             if (replay != null)
+            {
                 replay.Update(gameTime);
+            }
 
             // Update game server
             if (server != null)
+            {
                 server.Update(gameTime);
+            }
         }
 
         private void UpdateCursorArrows()
@@ -547,16 +556,24 @@ namespace Isles
             if (scrollingCamera)
             {
                 Point mouse = game.Input.MousePosition;
-                int border = (int)(game.Settings.CameraSettings.ScrollAreaSize);
+                var border = (int)(game.Settings.CameraSettings.ScrollAreaSize);
 
                 if (mouse.Y <= border)
+                {
                     game.Cursor = Cursors.Top;
+                }
                 else if (mouse.Y >= game.ScreenHeight - border)
+                {
                     game.Cursor = Cursors.Bottom;
+                }
                 else if (mouse.X <= border)
+                {
                     game.Cursor = Cursors.Left;
+                }
                 else if (mouse.X >= game.ScreenWidth - border)
+                {
                     game.Cursor = Cursors.Right;
+                }
             }
         }
 
@@ -568,20 +585,30 @@ namespace Isles
         {
             // Draw level info
             if (level != null)
+            {
                 level.Draw(gameTime);
+            }
 
             // Draw game world
             if (world != null)
+            {
                 world.Draw(gameTime);
+            }
 
             // Draw player info
             foreach (Player player in Player.AllPlayers)
+            {
                 if (player != null)
+                {
                     player.Draw(gameTime);
+                }
+            }
 
             // Draw spell
             if (Spell.CurrentSpell != null)
+            {
                 Spell.CurrentSpell.Draw(gameTime);
+            }
 
             // Force everything to be presented before UI is rendered
             game.ModelManager.Present(gameTime);
@@ -598,7 +625,6 @@ namespace Isles
                                             postScreenRectangle, Color.White);
                 game.Graphics2D.Sprite.End();
 
-
                 // Lerp bloom settings
                 if (game.Bloom != null && targetSettings != null)
                 {
@@ -607,10 +633,14 @@ namespace Isles
                     bloomLerpElapsedTime += (float)(gameTime.ElapsedGameTime.TotalSeconds);
 
                     if (bloomLerpElapsedTime < BloomLerpTime)
+                    {
                         game.Bloom.Settings = BloomSettings.Lerp(defaultSettings, targetSettings,
                             bloomLerpElapsedTime / BloomLerpTime);
+                    }
                     else
+                    {
                         game.Bloom.Settings = targetSettings;
+                    }
                 }
             }
             // Draw UI at last
@@ -619,7 +649,6 @@ namespace Isles
                 ui.Draw(gameTime);
             }
         }
-
 
         public EventResult HandleEvent(EventType type, object sender, object tag)
         {
@@ -633,7 +662,10 @@ namespace Isles
             if (paused)
             {
                 if (activeObject != null)
+                {
                     activeObject.HandleEvent(type, sender, tag);
+                }
+
                 return EventResult.Handled;
             }
             // Prevent any event if we've in the post screen state
@@ -652,21 +684,31 @@ namespace Isles
             // Let spell handle event
             if (Spell.CurrentSpell != null &&
                 Spell.CurrentSpell.HandleEvent(type, sender, tag) == EventResult.Handled)
+            {
                 return EventResult.Handled;
+            }
 
             // Let UI handle event first
             if (ui != null &&
                 ui.HandleEvent(type, sender, tag) == EventResult.Handled)
+            {
                 return EventResult.Handled;
+            }
             // Let player handle event
             foreach (Player player in Player.AllPlayers)
+            {
                 if (player.HandleEvent(type, sender, tag) == EventResult.Handled)
+                {
                     return EventResult.Handled;
+                }
+            }
 
             // Let level handle event
             if (Level != null &&
                 Level.HandleEvent(type, sender, tag) == EventResult.Handled)
+            {
                 return EventResult.Handled;
+            }
 
             if (type == EventType.KeyDown && tag is Keys? &&
                 ((tag as Keys?).Value == Keys.Escape))
@@ -695,12 +737,13 @@ namespace Isles
             }
 
             if (defaultSettings != null && game.Bloom != null)
+            {
                 game.Bloom.Settings = defaultSettings;
+            }
 
             game.IsMouseVisible = true;
             postScreen = false;
             game.StartScreen(new TitleScreen(this));
-
 
             // Save replay
             SaveReplay(DefaultReplayName);
@@ -714,7 +757,9 @@ namespace Isles
                 {
                     // Make sure replays directory exists
                     if (Directory.Exists(ReplayDirectory) == false)
+                    {
                         Directory.CreateDirectory(ReplayDirectory);
+                    }
 
                     using (Stream replay = new FileStream(
                         ReplayDirectory + "/" + name + "." + ReplayExtension, FileMode.Create))
@@ -737,13 +782,7 @@ namespace Isles
             return true;
         }
 
-        public static string DefaultReplayFilename
-        {
-            get
-            {
-                return ReplayDirectory + "/" + DefaultReplayName + "." + ReplayExtension;
-            }
-        }
+        public static string DefaultReplayFilename => ReplayDirectory + "/" + DefaultReplayName + "." + ReplayExtension;
         #endregion
 
         #region Dispose

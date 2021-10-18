@@ -50,7 +50,7 @@ namespace Isles.Engine
             try
             {
                 // Open file
-                FileStream file = new FileStream(
+                var file = new FileStream(
                     LogFilename, FileMode.OpenOrCreate,
                     FileAccess.Write, FileShare.ReadWrite);
 
@@ -66,10 +66,14 @@ namespace Isles.Engine
                 // Associate writer with that, when writing to a new file,
                 // make sure UTF-8 sign is written, else don't write it again!
                 if (file.Length == 0)
+                {
                     writer = new StreamWriter(file,
                         System.Text.Encoding.UTF8);
+                }
                 else
+                {
                     writer = new StreamWriter(file);
+                }
 
                 // Go to end of file
                 writer.BaseStream.Seek(0, SeekOrigin.End);
@@ -112,7 +116,9 @@ namespace Isles.Engine
         {
             // Can't continue without valid writer
             if (writer == null)
+            {
                 return;
+            }
 
             try
             {
@@ -155,9 +161,9 @@ namespace Isles.Engine
     #region Timer
     public static class Timer
     {
-        static List<IEventListener> handlers = new List<IEventListener>();
-        static List<float> intervals = new List<float>();
-        static List<float> times = new List<float>();
+        private static readonly List<IEventListener> handlers = new();
+        private static readonly List<float> intervals = new();
+        private static readonly List<float> times = new();
 
         /// <summary>
         /// Adds a new timer alert
@@ -166,7 +172,9 @@ namespace Isles.Engine
         public static void Add(IEventListener handler, float interval)
         {
             if (handler == null || interval <= 0)
+            {
                 throw new ArgumentException();
+            }
 
             if (handlers.Contains(handler))
             {
@@ -183,7 +191,7 @@ namespace Isles.Engine
         /// </summary>
         public static void Remove(IEventListener handler)
         {
-            int i = handlers.FindIndex(delegate(IEventListener item)
+            var i = handlers.FindIndex(delegate(IEventListener item)
             {
                 return item == handler;
             });
@@ -202,7 +210,7 @@ namespace Isles.Engine
         /// <param name="gameTime"></param>
         public static void Update(GameTime gameTime)
         {
-            for (int i = 0; i < handlers.Count; i++)
+            for (var i = 0; i < handlers.Count; i++)
             {
                 times[i] += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -222,7 +230,7 @@ namespace Isles.Engine
     /// </summary>
     public class Profiler : DrawableGameComponent
     {
-        private BaseGame game;
+        private readonly BaseGame game;
         private int updateCount = 0;
         private int currentFrame = 0;
         private int counter = 0;
@@ -239,26 +247,17 @@ namespace Isles.Engine
         /// <summary>
         /// Gets the total number of frames since profiler started
         /// </summary>
-        public int CurrentFrame
-        {
-            get { return currentFrame; }
-        }
+        public int CurrentFrame => currentFrame;
 
         /// <summary>
         /// Gets the average frame rate up until now
         /// </summary>
-        public float OverallFPS
-        {
-            get { return overallFps; }
-        }
+        public float OverallFPS => overallFps;
 
         /// <summary>
         /// Gets the current Frame Per Second for the game
         /// </summary>
-        public float FramesPerSecond
-        {
-            get { return fpsInterpolated; }
-        }
+        public float FramesPerSecond => fpsInterpolated;
 
         public Profiler()
             : base(null)
@@ -268,8 +267,8 @@ namespace Isles.Engine
         /// <summary>
         /// The main constructor for the class.
         /// </summary>
-        /// <param name="game">The <see cref="Microsoft.Xna.Framework.Game" /> instance for this <see cref="DrawableGameComponent"/> to use.</param>
-        /// <remarks>Sets the <see cref="_gameWindowTitle"/> data member to the value of <see cref="Microsoft.Xna.Framework.GameWindow.Title"/>.</remarks>
+        /// <param name="game">The <see cref="Game" /> instance for this <see cref="DrawableGameComponent"/> to use.</param>
+        /// <remarks>Sets the <see cref="_gameWindowTitle"/> data member to the value of <see cref="GameWindow.Title"/>.</remarks>
         public Profiler(BaseGame game)
             : base(game)
         {
@@ -295,13 +294,15 @@ namespace Isles.Engine
         {
             base.Update(gameTime);
 
-            if (!this.Enabled)
+            if (!Enabled)
+            {
                 return;
+            }
 
             counter++;
             currentFrame++;
 
-            float elapsed = (float)(gameTime.TotalRealTime.TotalMilliseconds - storedTime);
+            var elapsed = (float)(gameTime.TotalRealTime.TotalMilliseconds - storedTime);
 
             if (elapsed > UpdateFrequency)
             {
@@ -325,8 +326,10 @@ namespace Isles.Engine
         {
             base.Draw(gameTime);
 
-            if (!this.Visible || !this.Enabled)
+            if (!Visible || !Enabled)
+            {
                 return;
+            }
 
             // Try if we can do without saving state changes
             game.Graphics2D.DrawString("FPS: " + fpsInterpolated, 16f / 23, new Vector2(0, 0), Color.White);
@@ -340,27 +343,29 @@ namespace Isles.Engine
     /// </summary>
     public partial class ScreenshotCapturer : GameComponent
     {
-        const string ScreenshotsDirectory = "Screenshots";
+        private const string ScreenshotsDirectory = "Screenshots";
 
         #region Variables
         /// <summary>
         /// Internal screenshot number (will increase by one each screenshot)
         /// </summary>
         private int screenshotNum = 0;
+
         /// <summary>
         /// Link to BaseGame class instance. Also holds windows title,
         /// which is used instead of Application.ProgramName.
         /// </summary>
-        BaseGame game;
+        private readonly BaseGame game;
+
         /// <summary>
         /// If it's true, the game should call TakeScreenshot at the end of the frame
         /// </summary>
-        bool shouldCapture;
+        private bool shouldCapture;
 
         public bool ShouldCapture
         {
-            get { return shouldCapture; }
-            set { shouldCapture = value; }
+            get => shouldCapture;
+            set => shouldCapture = value;
         }
 
         public Texture2D Screenshot
@@ -382,7 +387,7 @@ namespace Isles.Engine
             }
         }
 
-        ResolveTexture2D screenshot;
+        private ResolveTexture2D screenshot;
         #endregion
 
         #region Constructor
@@ -426,7 +431,9 @@ namespace Isles.Engine
                 for (i = 1; i < 10; i++)
                 {
                     if (File.Exists(ScreenshotNameBuilder(i * 1000)) == false)
+                    {
                         break;
+                    }
                 }
 
                 // This i*1000 does not exist, continue scan next level
@@ -435,7 +442,9 @@ namespace Isles.Engine
                 for (j = 1; j < 10; j++)
                 {
                     if (File.Exists(ScreenshotNameBuilder(i * 1000 + j * 100)) == false)
+                    {
                         break;
+                    }
                 }
 
                 // This i*1000+j*100 does not exist, continue scan next level
@@ -445,7 +454,9 @@ namespace Isles.Engine
                 {
                     if (File.Exists(ScreenshotNameBuilder(
                             i * 1000 + j * 100 + k * 10)) == false)
+                    {
                         break;
+                    }
                 }
 
                 // This i*1000+j*100+k*10 does not exist, continue scan next level
@@ -455,7 +466,9 @@ namespace Isles.Engine
                 {
                     if (File.Exists(ScreenshotNameBuilder(
                             i * 1000 + j * 100 + k * 10 + l)) == false)
+                    {
                         break;
+                    }
                 }
 
                 // This i*1000+j*100+k*10+l does not exist, we have now last
@@ -467,7 +480,7 @@ namespace Isles.Engine
         }
         #endregion
 
-        IEventListener photographer;
+        private IEventListener photographer;
 
         /// <summary>
         /// Gets the screenshot for this frame.
@@ -499,9 +512,11 @@ namespace Isles.Engine
                     screenshotNum++;
                     // Make sure screenshots directory exists
                     if (Directory.Exists(ScreenshotsDirectory) == false)
+                    {
                         Directory.CreateDirectory(ScreenshotsDirectory);
+                    }
 
-                    using (ResolveTexture2D dstTexture = new ResolveTexture2D(
+                    using (var dstTexture = new ResolveTexture2D(
                         game.GraphicsDevice,
                         game.ScreenWidth, game.ScreenHeight, 1,
                         SurfaceFormat.Color))
@@ -518,7 +533,7 @@ namespace Isles.Engine
                 }
                 else
                 {
-                    ResolveTexture2D dstTexture = new ResolveTexture2D(
+                    var dstTexture = new ResolveTexture2D(
                         game.GraphicsDevice,
                         game.ScreenWidth, game.ScreenHeight, 1,
                         SurfaceFormat.Color);
@@ -568,25 +583,27 @@ namespace Isles.Engine
     #region PathGraphVisualizer
     public class PathGraphVisualizer : DrawableGameComponent
     {
-        BaseGame game;
-        PathGraph graph;
-        BasicEffect effect;
-        GraphicsDevice graphics;
-        VertexDeclaration declaraction;
-        List<int> indices = new List<int>();
-        List<VertexPositionColor> vertices = new List<VertexPositionColor>();
+        private readonly BaseGame game;
+        private readonly PathGraph graph;
+        private readonly BasicEffect effect;
+        private readonly GraphicsDevice graphics;
+        private readonly VertexDeclaration declaraction;
+        private readonly List<int> indices = new();
+        private readonly List<VertexPositionColor> vertices = new();
 
         public PathGraphVisualizer(BaseGame game, PathGraph graph)
             : base(game)
         {
             if (game.GraphicsDevice == null || graph == null)
+            {
                 throw new InvalidOperationException();
+            }
 
             this.game = game;
             this.graph = graph;
-            this.graphics = game.GraphicsDevice;
-            this.effect = new BasicEffect(graphics, null);
-            this.declaraction = new VertexDeclaration(graphics, VertexPositionColor.VertexElements);
+            graphics = game.GraphicsDevice;
+            effect = new BasicEffect(graphics, null);
+            declaraction = new VertexDeclaration(graphics, VertexPositionColor.VertexElements);
         }
 
         public override void Draw(GameTime gameTime)
@@ -603,7 +620,7 @@ namespace Isles.Engine
 
             BuildMesh();
 
-            graphics.DrawUserIndexedPrimitives<VertexPositionColor>(
+            graphics.DrawUserIndexedPrimitives(
                 PrimitiveType.TriangleList, vertices.ToArray(), 0, vertices.Count, indices.ToArray(), 0, indices.Count / 3);
 
             effect.CurrentTechnique.Passes[0].End();
@@ -620,8 +637,10 @@ namespace Isles.Engine
             Vector3 v;
             Color color = Color.RoyalBlue;
 
-            for (int y = 0; y < graph.EntryHeight; y++)
-                for (int x = 0; x < graph.EntryWidth; x++)
+            for (var y = 0; y < graph.EntryHeight; y++)
+            {
+                for (var x = 0; x < graph.EntryWidth; x++)
+                {
                     if (graph.IsGridObstructed(x, y, true))
                     {
                         Vector2 p = graph.GridToPosition(x, y);
@@ -631,7 +650,7 @@ namespace Isles.Engine
 
                         if (game.ViewFrustum.Contains(v) == ContainmentType.Contains)
                         {
-                            int bias = vertices.Count;
+                            var bias = vertices.Count;
 
                             vertices.Add(new VertexPositionColor(
                                 new Vector3(v.X - graph.HalfCellSize, v.Y - graph.HalfCellSize, v.Z), color));
@@ -650,6 +669,8 @@ namespace Isles.Engine
                             indices.Add(bias + 3);
                         }
                     }
+                }
+            }
         }
     }
     #endregion

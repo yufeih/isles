@@ -12,7 +12,6 @@ using Isles.Pipeline;
 using Isles.Graphics;
 using Isles.Engine;
 
-
 namespace Isles
 {
     #region Charactor
@@ -32,67 +31,46 @@ namespace Isles
         /// </summary>
         public virtual float Speed
         {
-            get { return speed; }
-            set { speed = value; }
+            get => speed;
+            set => speed = value;
         }
 
-        float speed;
+        private float speed;
 
         /// <summary>
         /// Used by the movement system
         /// </summary>
-        public object MovementTag
-        {
-            get { return pathManagerTag; }
-            set { pathManagerTag = value; }
-        }
-
-        object pathManagerTag;
-
+        public object MovementTag { get; set; }
 
         /// <summary>
         /// Gets or sets the radius of the charactor
         /// </summary>
-        public float PathObstructorRadius
-        {
-            get { return pathObstructorRadius; }
-            set { pathObstructorRadius = value; }
-        }
-
-        float pathObstructorRadius = 5;
-
+        public float PathObstructorRadius { get; set; } = 5;
 
         /// <summary>
         /// Gets or sets the facing of the charactor
         /// </summary>
         public Vector3 Facing
         {
-            get { return new Vector3((float)Math.Cos(rotation), (float)Math.Sin(rotation), 0); }
-            set { targetRotation = (float)(Math.Atan2(value.Y, value.X)); }
+            get => new Vector3((float)Math.Cos(rotation), (float)Math.Sin(rotation), 0);
+            set => targetRotation = (float)(Math.Atan2(value.Y, value.X));
         }
 
-        float rotation;
-        float targetRotation;
-
+        private float rotation;
+        private float targetRotation;
 
         /// <summary>
         /// Gets or sets the path brush of the charactor
         /// </summary>
-        public PathBrush Brush
-        {
-            get { return brush; }
-            set { brush = value; }
-        }
-
-        PathBrush brush;
+        public PathBrush Brush { get; set; }
 
         /// <summary>
         /// Whether dynamic obstacles (E.g. units) are ignored when moving
         /// </summary>
         public bool IgnoreDynamicObstacles
         {
-            get { return ignoreDynamicObstacles; }
-            
+            get => ignoreDynamicObstacles;
+
             set
             {
                 if (!value)
@@ -101,7 +79,7 @@ namespace Isles
                     Vector2 spawnPoint;
                     spawnPoint.X = Position.X;
                     spawnPoint.Y = Position.Y;
-                    spawnPoint = World.PathManager.FindValidPosition(spawnPoint, brush);
+                    spawnPoint = World.PathManager.FindValidPosition(spawnPoint, Brush);
                     Position = new Vector3(spawnPoint, 0);
                     World.PathManager.UpdateMovable(this);
                     Fall();
@@ -109,10 +87,10 @@ namespace Isles
 
                 ignoreDynamicObstacles = value;
             }
-        
+
         }
 
-        bool ignoreDynamicObstacles = false;
+        private bool ignoreDynamicObstacles = false;
 
         /// <summary>
         /// Gets or sets the combat spell for this charactor
@@ -127,25 +105,16 @@ namespace Isles
         /// <summary>
         /// Stores those commands that are queued
         /// </summary>
-        public Queue<IState> QueuedStates = new Queue<IState>();
+        public Queue<IState> QueuedStates = new();
 
         /// <summary>
         /// Animation names
         /// </summary>
-        public virtual string IdleAnimation
-        {
-            get { return "Idle"; }
-        }
+        public virtual string IdleAnimation => "Idle";
 
-        public virtual string RunAnimation
-        {
-            get { return "Run"; }
-        }
+        public virtual string RunAnimation => "Run";
 
-        public virtual string AttackAnimation
-        {
-            get { return "Attack"; }
-        }
+        public virtual string AttackAnimation => "Attack";
         #endregion
 
         #region Method
@@ -166,13 +135,19 @@ namespace Isles
             string value;
 
             if ((value = xml.GetAttribute("Speed")) != "")
+            {
                 speed = float.Parse(value);
+            }
 
             if ((value = xml.GetAttribute("ObstructorRadius")) != "")
-                pathObstructorRadius = float.Parse(value);
+            {
+                PathObstructorRadius = float.Parse(value);
+            }
 
             if ((value = xml.GetAttribute("IsHero")) != "")
+            {
                 IsHero = bool.Parse(value);
+            }
 
             int.TryParse(xml.GetAttribute("Food"), out Food);
         }
@@ -200,9 +175,13 @@ namespace Isles
         public override void PerformAction(Entity entity, bool queueAction)
         {
             if (entity is GameObject && IsOpponent(entity as GameObject))
+            {
                 AttackTo(entity as GameObject, queueAction);
+            }
             else if (entity != this)
+            {
                 MoveTo(entity, queueAction);
+            }
         }
 
         public void MoveTo(Vector3 position, bool queueAction)
@@ -210,14 +189,20 @@ namespace Isles
             if (IsAlive)
             {
                 if (Sound != null && Owner is LocalPlayer)
+                {
                     Audios.Play(Sound, Audios.Channel.Unit, this);
+                }
 
                 IState state = new StateMoveToPosition(new Vector2(position.X, position.Y), this, Priority, World.PathManager);
 
                 if (queueAction)
+                {
                     QueuedStates.Enqueue(state);
+                }
                 else
+                {
                     State = state;
+                }
             }
         }
 
@@ -226,14 +211,20 @@ namespace Isles
             if (IsAlive)
             {
                 if (Sound != null && Owner is LocalPlayer)
+                {
                     Audios.Play(Sound, Audios.Channel.Unit, this);
+                }
 
                 IState state = new StateMoveToTarget(this, target, Priority, World.PathManager);
 
                 if (queueAction)
+                {
                     QueuedStates.Enqueue(state);
+                }
                 else
+                {
                     State = state;
+                }
             }
         }
 
@@ -248,14 +239,20 @@ namespace Isles
                 }
 
                 if (Sound != null && Owner is LocalPlayer)
+                {
                     Audios.Play(Sound, Audios.Channel.Unit, this);
+                }
 
                 IState state = new StateAttack(World, this, position, Combat);
 
                 if (queueAction)
+                {
                     QueuedStates.Enqueue(state);
+                }
                 else
+                {
                     State = state;
+                }
             }
         }
 
@@ -270,14 +267,20 @@ namespace Isles
                 }
 
                 if (Sound != null && Owner is LocalPlayer)
+                {
                     Audios.Play(Sound, Audios.Channel.Unit, this);
+                }
 
                 IState state = new StateAttack(World, this, target, Combat);
 
                 if (queueAction)
+                {
                     QueuedStates.Enqueue(state);
+                }
                 else
+                {
                     State = state;
+                }
             }
         }
 
@@ -343,11 +346,11 @@ namespace Isles
             Combat = new SpellCombat(World, this);
 
             // Create a path brush
-            brush = World.PathManager.CreateBrush(pathObstructorRadius);
+            Brush = World.PathManager.CreateBrush(PathObstructorRadius);
 
             // Find a valid position
             Position = new Vector3(World.PathManager.FindValidPosition(
-                       new Vector2(Position.X, Position.Y), brush), 0);
+                       new Vector2(Position.X, Position.Y), Brush), 0);
 
             // Fall on the ground
             Fall();
@@ -356,7 +359,9 @@ namespace Isles
             World.PathManager.AddMovable(this);
 
             if (Model != null)
+            {
                 Model.Play(IdleAnimation);
+            }
 
             positionLastFrame = Position;
 
@@ -364,7 +369,9 @@ namespace Isles
 
             // Initialize idle state
             if (Idle == null)
+            {
                 Idle = new StateCharactorIdle(this);
+            }
 
             State = Idle;
 
@@ -382,7 +389,9 @@ namespace Isles
 
             // Play the horrible death sfx
             if (Helper.Random.Next(4) == 0 && Owner is LocalPlayer)
+            {
                 Audios.Play("Death", Audios.Channel.Interface, null);
+            }
 
             World.PathManager.RemoveMovable(this);
 
@@ -392,7 +401,9 @@ namespace Isles
         protected override bool OnStateChanged(IState newState, ref IState resultState) 
         {
             if (!IsAlive && !(newState is StateCharactorDie))
+            {
                 return false;
+            }
 
             // Handle queued states
             if (newState == null)
@@ -410,7 +421,9 @@ namespace Isles
         protected override void ShowSpells(GameUI ui)
         {
             if (Sound != null && Owner is LocalPlayer)
+            {
                 Audios.Play(Sound, Audios.Channel.Unit, this);
+            }
 
             base.ShowSpells(ui);
             
@@ -422,17 +435,20 @@ namespace Isles
         }
 
         // Variables to avoid animation jittering
-        const float MinAnimationDuraction = 0.2f;
-        float elapsedAnimationTime = 0;
-        Vector3 positionLastFrame;
-        bool moving = false;
+        private const float MinAnimationDuraction = 0.2f;
+        private float elapsedAnimationTime = 0;
+        private Vector3 positionLastFrame;
+        private bool moving = false;
 
         public override void Draw(GameTime gameTime)
         {
             if (ShowGlow && ShouldDrawModel)
             {
                 if (Glow == null)
+                {
                     Glow = new EffectGlow(World, this);
+                }
+
                 Glow.Update(gameTime);
                 ShowGlow = false;
             }
@@ -447,17 +463,26 @@ namespace Isles
                 // Adjust the facing of the charactor.
                 // Smooth entity rotation exponentially
                 const float PiPi = 2 * MathHelper.Pi;
-                float rotationOffset = targetRotation - rotation;
+                var rotationOffset = targetRotation - rotation;
 
                 while (rotationOffset > MathHelper.Pi)
+                {
                     rotationOffset -= PiPi;
+                }
+
                 while (rotationOffset < -MathHelper.Pi)
+                {
                     rotationOffset += PiPi;
+                }
 
                 if (Math.Abs(rotationOffset) > float.Epsilon)
                 {
-                    float smoother = (float)gameTime.ElapsedGameTime.TotalSeconds * 5;
-                    if (smoother > 1) smoother = 1;
+                    var smoother = (float)gameTime.ElapsedGameTime.TotalSeconds * 5;
+                    if (smoother > 1)
+                    {
+                        smoother = 1;
+                    }
+
                     rotation += rotationOffset * smoother;
                     Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, rotation);
                 }
@@ -466,7 +491,7 @@ namespace Isles
                 elapsedAnimationTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
                 // Adjust the animation 
-                bool moved = !(Math2D.FloatEquals(Position.X, positionLastFrame.X) &&
+                var moved = !(Math2D.FloatEquals(Position.X, positionLastFrame.X) &&
                                Math2D.FloatEquals(Position.Y, positionLastFrame.Y));
 
                 positionLastFrame = Position;
@@ -485,7 +510,9 @@ namespace Isles
                 }
 
                 if (Combat != null)
+                {
                     Combat.Update(gameTime);
+                }
             }
 
             base.Update(gameTime);
@@ -509,7 +536,9 @@ namespace Isles
             if (IsAlive && AttackTarget != null)
             {
                 if (SoundCombat != null)
+                {
                     Audios.Play(SoundCombat, this);
+                }
 
                 AttackTarget.Health -= ComputeHit(this, AttackTarget);
             }
@@ -525,33 +554,23 @@ namespace Isles
         public int GoldCarried = 0;
         public int LumberCapacity = 10;
         public int GoldCapacity = 10;
-
-        GameModel wood;
-        GameModel gold;
+        private GameModel wood;
+        private GameModel gold;
 
         public Worker(GameWorld world, string classID) : base(world, classID) { }
 
-        public override string RunAnimation
-        {
-            get { return LumberCarried > 0 ? "Carry" : "Run"; }
-        }
+        public override string RunAnimation => LumberCarried > 0 ? "Carry" : "Run";
 
         //public override string AttackAnimation
         //{
         //    get { return Helper.Random.Next(2) == 0 ? "Attack" : "Chop"; }
         //}
-        
+
         public override float Speed
         {
-            get
-            {
-                if (LumberCarried > 0 || GoldCarried > 0)
-                    return base.Speed * 0.75f;
+            get => LumberCarried > 0 || GoldCarried > 0 ? base.Speed * 0.75f : base.Speed;
 
-                return base.Speed;
-            }
-
-            set { base.Speed = value; }
+            set => base.Speed = value;
         }
 
         public override void OnCreate()
@@ -575,14 +594,20 @@ namespace Isles
         protected override void OnSelect(GameUI ui)
         {
             if (ui != null)
+            {
                 Tree.Pickable = true;
+            }
+
             base.OnSelect(ui);
         }
 
         protected override void OnDeselect(GameUI ui)
         {
             if (ui != null)
+            {
                 Tree.Pickable = false;
+            }
+
             base.OnDeselect(ui);
         }
 
@@ -593,14 +618,21 @@ namespace Isles
                 if (pair.Key == wood)
                 {
                     if (LumberCarried > 0)
+                    {
                         pair.Key.Draw(gameTime);
+                    }
                 }
                 else if (pair.Key == gold)
                 {
                     if (GoldCarried > 0)
+                    {
                         pair.Key.Draw(gameTime);
+                    }
                 }
-                else pair.Key.Draw(gameTime);
+                else
+                {
+                    pair.Key.Draw(gameTime);
+                }
             }
         }
 
@@ -611,29 +643,39 @@ namespace Isles
                 IState state = null;
 
                 if (Sound != null && Owner is LocalPlayer)
-                    Audios.Play(Sound, Audios.Channel.Unit, this); 
+                {
+                    Audios.Play(Sound, Audios.Channel.Unit, this);
+                }
 
                 // Harvest lumber
                 if (entity is Tree && (entity as Tree).IsAlive && (entity as Tree).Lumber > 0)
+                {
                     state = new StateHarvestLumber(World, this, entity as Tree);
+                }
                 // Harvest gold
                 else if (entity is Goldmine && (entity as Goldmine).Gold > 0)
+                {
                     state = new StateHarvestGold(World, this, entity as Goldmine);
+                }
                 // Action on buildings
                 else if (entity is Building)
                 {
-                    Building building = entity as Building;
+                    var building = entity as Building;
 
                     if (building != null && building.Owner == Owner)
                     {
                         // Help construct building
                         if (building.State == Building.BuildingState.Constructing)
+                        {
                             state = new StateConstruct(World, this, building);
+                        }
 
                         // Help repair building
                         else if (building.State == Building.BuildingState.Normal &&
                                  building.Health < building.MaximumHealth)
+                        {
                             state = new StateRepair(World, this, building);
+                        }
 
                         // Go on harvesting
                         else if (building.ClassID == Owner.TownhallName &&
@@ -642,9 +684,13 @@ namespace Isles
                             System.Diagnostics.Debug.Assert(LumberCarried * GoldCarried == 0);
 
                             if (LumberCarried != 0)
+                            {
                                 state = new StateHarvestLumber(World, this, building);
+                            }
                             else if (GoldCarried != 0)
+                            {
                                 state = new StateHarvestGold(World, this, building);
+                            }
                         }
                         else if (building.ClassID == Owner.LumbermillName &&
                                  building.State == Building.BuildingState.Normal)
@@ -656,12 +702,20 @@ namespace Isles
                 }
 
                 if (state != null)
+                {
                     if (queueAction)
+                    {
                         QueuedStates.Enqueue(state);
+                    }
                     else
+                    {
                         State = state;
+                    }
+                }
                 else
+                {
                     base.PerformAction(entity, queueAction);
+                }
             }
         }
     }
@@ -670,19 +724,16 @@ namespace Isles
     #region Hunter
     public class Hunter : Charactor
     {
-        bool weaponVisible = true;
-        GameModel weapon;
-        KeyValuePair<TimeSpan, EventHandler>[] trigger;
+        private bool weaponVisible = true;
+        private GameModel weapon;
+        private KeyValuePair<TimeSpan, EventHandler>[] trigger;
 
         public Hunter(GameWorld world, string type)
             : base(world, type)
         {
         }
 
-        public override string AttackAnimation
-        {
-            get { return Helper.Random.Next(2) == 0 ? "Attack" : "Attack_2"; }
-        }
+        public override string AttackAnimation => Helper.Random.Next(2) == 0 ? "Attack" : "Attack_2";
 
         public override void OnCreate()
         {
@@ -692,13 +743,17 @@ namespace Isles
             weapon = GetAttachment("Weapon");
 
             if (weapon == null)
+            {
                 throw new Exception("The input model do not have a weapon attached.");
+            }
 
             AnimationClip clip = Model.GetAnimationClip("Attack");
             if (clip == null)
+            {
                 throw new InvalidOperationException();
+            }
 
-            TimeSpan time = new TimeSpan((long)(clip.Duration.Ticks * 18.0f / 41));
+            var time = new TimeSpan((long)(clip.Duration.Ticks * 18.0f / 41));
             trigger = new KeyValuePair<TimeSpan, EventHandler>[]
             {
                 new KeyValuePair<TimeSpan, EventHandler>(time, Launch),
@@ -710,7 +765,9 @@ namespace Isles
             foreach (KeyValuePair<GameModel, int> pair in Attachment)
             {
                 if (pair.Key == weapon && weaponVisible || pair.Key != weapon)
+                {
                     pair.Key.Draw(gameTime);
+                }
             }
         }
 
@@ -731,14 +788,14 @@ namespace Isles
             }
         }
 
-        void OnComplete(object sender, EventArgs e)
+        private void OnComplete(object sender, EventArgs e)
         {
             weaponVisible = true;
         }
 
-        void Launch(object sender, EventArgs e)
+        private void Launch(object sender, EventArgs e)
         {
-            Missile missile = new Missile(World, weapon, AttackTarget);
+            var missile = new Missile(World, weapon, AttackTarget);
 
             missile.Hit += new EventHandler(Hit);
             World.Add(missile);
@@ -746,19 +803,23 @@ namespace Isles
             weaponVisible = false;
 
             if (ShouldDrawModel)
+            {
                 Audios.Play("HunterLaunch", this);
+            }
         }
 
-        void Hit(object sender, EventArgs e)
+        private void Hit(object sender, EventArgs e)
         {
-            IProjectile projectile = sender as IProjectile;
+            var projectile = sender as IProjectile;
 
             if (projectile != null && projectile.Target is GameObject)
             {
-                GameObject target = projectile.Target as GameObject;
+                var target = projectile.Target as GameObject;
 
                 if (target.ShouldDrawModel && target.IsAlive)
+                {
                     Audios.Play("HunterHit", target);
+                }
 
                 target.Health -= ComputeHit(this, target);
             }
@@ -769,16 +830,13 @@ namespace Isles
     #region FireSorceress
     public class FireSorceress : Charactor
     {
-        int rightHand;
-        KeyValuePair<TimeSpan, EventHandler>[] trigger;
+        private int rightHand;
+        private KeyValuePair<TimeSpan, EventHandler>[] trigger;
 
         public FireSorceress(GameWorld world, string classID)
             : base(world, classID) { }
 
-        public override string AttackAnimation
-        {
-            get { return Helper.Random.Next(2) == 0 ? "Attack" : "Attack_2"; }
-        }
+        public override string AttackAnimation => Helper.Random.Next(2) == 0 ? "Attack" : "Attack_2";
 
         public override void OnCreate()
         {
@@ -787,7 +845,9 @@ namespace Isles
             rightHand = Model.GetBone("Bip01_R_Hand");
 
             if (Owner != null && Owner.IsAvailable("PunishOfNatureUpgrade"))
+            {
                 AddSpell("PunishOfNature");
+            }
         }
 
         public override void TriggerAttack(Entity target)
@@ -824,9 +884,11 @@ namespace Isles
 
                     AnimationClip clip = Model.GetAnimationClip(AttackAnimation);
                     if (clip == null)
+                    {
                         throw new InvalidOperationException();
+                    }
 
-                    TimeSpan time = new TimeSpan((long)(clip.Duration.Ticks * 0.5f));
+                    var time = new TimeSpan((long)(clip.Duration.Ticks * 0.5f));
                     trigger = new KeyValuePair<TimeSpan, EventHandler>[]
                     {
                         new KeyValuePair<TimeSpan, EventHandler>(time, Launch),
@@ -840,34 +902,42 @@ namespace Isles
             }
         }
 
-        void Launch(object sender, EventArgs e)
+        private void Launch(object sender, EventArgs e)
         {
             Vector3 spawn = Vector3.Zero;
 
             if (rightHand >= 0)
+            {
                 spawn = Model.GetBoneTransform(rightHand).Translation;
+            }
             else
+            {
                 spawn = TopCenter - Vector3.UnitZ * 5;
+            }
 
-            EffectFireball fireball = new EffectFireball(
+            var fireball = new EffectFireball(
                 World, spawn, Vector3.UnitZ * 50, AttackTarget);
             fireball.Projectile.Hit += new EventHandler(Hit);
             World.Add(fireball);
 
             if (ShouldDrawModel)
+            {
                 Audios.Play("FireballCast", this);
+            }
         }
 
-        void Hit(object sender, EventArgs e)
+        private void Hit(object sender, EventArgs e)
         {
-            IProjectile projectile = sender as IProjectile;
+            var projectile = sender as IProjectile;
 
             if (projectile != null && projectile.Target is GameObject)
             {
-                GameObject target = projectile.Target as GameObject;
+                var target = projectile.Target as GameObject;
 
                 if (target.ShouldDrawModel)
+                {
                     Audios.Play("FireballHit", target);
+                }
 
                 target.Health -= ComputeHit(this, target);
             }
@@ -881,10 +951,7 @@ namespace Isles
         public Hellfire(GameWorld world, string classID)
             : base(world, classID) { }
 
-        public override string AttackAnimation
-        {
-            get { return Helper.Random.Next(2) == 0 ? "Attack" : "Attack_2"; }
-        }
+        public override string AttackAnimation => Helper.Random.Next(2) == 0 ? "Attack" : "Attack_2";
     }
     #endregion
 }

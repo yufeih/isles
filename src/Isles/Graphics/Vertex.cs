@@ -40,30 +40,19 @@ namespace Isles.Graphics
         /// <summary>
         /// Stride size, in XNA called SizeInBytes. I'm just conforming with that.
         /// </summary>
-        public static int SizeInBytes
-        {
-            // 4 bytes per float:
-            // 3 floats pos, 2 floats uv, 3 floats normal and 3 float tangent.
-            get { return 4 * (3 + 2 + 3 + 3); }
-        }
+        public static int SizeInBytes => 4 * (3 + 2 + 3 + 3);
 
         /// <summary>
         /// U texture coordinate
         /// </summary>
         /// <returns>Float</returns>
-        public float U
-        {
-            get { return TextureCoordinate.X; }
-        }
+        public float U => TextureCoordinate.X;
 
         /// <summary>
         /// V texture coordinate
         /// </summary>
         /// <returns>Float</returns>
-        public float V
-        {
-            get { return TextureCoordinate.Y; }
-        }
+        public float V => TextureCoordinate.Y;
         #endregion
 
         #region Constructor
@@ -119,7 +108,7 @@ namespace Isles.Graphics
         /// </summary>
         private static VertexElement[] GenerateVertexElements()
         {
-            VertexElement[] decl = new VertexElement[]
+            var decl = new VertexElement[]
                 {
                     // Construct new vertex declaration with tangent info
                     // First the normal stuff (we should already have that)
@@ -145,11 +134,9 @@ namespace Isles.Graphics
         public static bool IsTangentVertexDeclaration(
             VertexElement[] declaration)
         {
-            if (declaration == null)
-                throw new ArgumentNullException("declaration");
-
-            return
-                declaration.Length == 4 &&
+            return declaration == null
+                ? throw new ArgumentNullException("declaration")
+                : declaration.Length == 4 &&
                 declaration[0].VertexElementUsage == VertexElementUsage.Position &&
                 declaration[1].VertexElementUsage ==
                 VertexElementUsage.TextureCoordinate &&
@@ -188,12 +175,7 @@ namespace Isles.Graphics
         /// <summary>
         /// Stride size, in XNA called SizeInBytes. I'm just conforming with that.
         /// </summary>
-        public static int SizeInBytes
-        {
-            // 4 bytes per float:
-            // 3 floats pos, 4 floats uv, 3 floats normal.
-            get { return 4 * (3 + 4 + 3); }
-        }
+        public static int SizeInBytes => 4 * (3 + 4 + 3);
         #endregion
 
         #region Constructor
@@ -229,7 +211,7 @@ namespace Isles.Graphics
         /// </summary>
         private static VertexElement[] GenerateVertexElements()
         {
-            VertexElement[] decl = new VertexElement[]
+            var decl = new VertexElement[]
                 {
                     // Construct new vertex declaration with tangent info
                     // First the normal stuff (we should already have that)

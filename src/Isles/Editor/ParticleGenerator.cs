@@ -9,14 +9,8 @@ namespace Isles.Editor
     {
         public GameWorld World
         {
-            get
-            {
-                return this.world;
-            }
-            set
-            {
-                this.world = value;
-            }
+            get => world;
+            set => world = value;
         }
         private GameWorld world;
         public ParticleGenerator(GameWorld world)
@@ -40,9 +34,9 @@ namespace Isles.Editor
 
         public class TestTarget : BaseEntity
         {
-            IWorldObject center;
-            float radius = 75;
-            float angle = 0;
+            private readonly IWorldObject center;
+            private readonly float radius = 75;
+            private float angle = 0;
 
             public TestTarget(GameWorld world, IWorldObject center)
                 :base(world)
@@ -65,9 +59,9 @@ namespace Isles.Editor
         private void button1_Click(object sender, EventArgs e)
         {
             Building townHall = GetTestTarget();
-            TestTarget target = new TestTarget(world, townHall);
+            var target = new TestTarget(world, townHall);
 
-            EffectPunishOfNature fireball = new EffectPunishOfNature(world, townHall.Position);
+            var fireball = new EffectPunishOfNature(world, townHall.Position);
 
             //fireball.Projectile.Hit += new EventHandler(Projectile_Hit);
 
@@ -77,7 +71,7 @@ namespace Isles.Editor
             world.Add(fireball);
         }
 
-        void Projectile_Hit(object sender, EventArgs e)
+        private void Projectile_Hit(object sender, EventArgs e)
         {
             //world.Destroy(fireball);
         }
@@ -95,7 +89,7 @@ namespace Isles.Editor
         private void button4_Click(object sender, EventArgs e)
         {
             Building townHall = GetTestTarget();
-            EffectFire fire = new EffectFire(world);
+            var fire = new EffectFire(world);
 
             fire.Position = townHall.TopCenter;
 
@@ -107,9 +101,9 @@ namespace Isles.Editor
         private void button5_Click(object sender, EventArgs e)
         {
             Building townHall = GetTestTarget();
-            TestTarget target = new TestTarget(world, townHall);
+            var target = new TestTarget(world, townHall);
 
-            EffectTest test = new EffectTest(world, target, townHall.Position);
+            var test = new EffectTest(world, target, townHall.Position);
 
             Edit(test);
 
@@ -125,14 +119,14 @@ namespace Isles.Editor
         private void button7_Click(object sender, EventArgs e)
         {
             Building townHall = GetTestTarget();
-            EffectConstruct smoke = new EffectConstruct(
+            var smoke = new EffectConstruct(
                 world, townHall.Outline * 0.5f, townHall.Position.Z, townHall.Position.Z + 50);
 
             townHall.Model.Alpha = 0.3f;
 
             Edit(smoke);
 
-            this.world.Add(smoke);
+            world.Add(smoke);
         }
 
         private void button8_Click(object sender, EventArgs e)
@@ -175,7 +169,7 @@ namespace Isles.Editor
             //world.Add(star);   
 
             Building townHall = GetTestTarget();
-            EffectExplosion explosion = new EffectExplosion(world, (townHall.TopCenter + townHall.Position) / 2);
+            var explosion = new EffectExplosion(world, (townHall.TopCenter + townHall.Position) / 2);
 
             townHall.Model.Alpha = 0.5f;
 

@@ -6,7 +6,6 @@
 
 using Microsoft.Xna.Framework;
 
-
 namespace Isles.Graphics
 {
     /// <summary>
@@ -33,10 +32,10 @@ namespace Isles.Graphics
             Vector4 lightColor,
             Vector4 ambient)
         {
-            this.LightPosition = lightPosition;
-            this.LightDirection = lightDirection;
-            this.LightColor = lightColor;
-            this.AmbientColor = ambient;
+            LightPosition = lightPosition;
+            LightDirection = lightDirection;
+            LightColor = lightColor;
+            AmbientColor = ambient;
         }
 
         /// <summary>
@@ -47,7 +46,7 @@ namespace Isles.Graphics
         /// <param name="lerpAmount"></param>
         public static Atmosphere Blend(Atmosphere env1, Atmosphere env2, float lerpAmount)
         {
-            Atmosphere env = new Atmosphere();
+            var env = new Atmosphere();
 
             // Clamp lerp amount
             lerpAmount = MathHelper.Clamp(lerpAmount, 0.0f, 1.0f);
@@ -64,19 +63,10 @@ namespace Isles.Graphics
         /// <summary>
         /// Pre-defined environments
         /// </summary>
-        public static Atmosphere Day
-        {
-            get { return new Atmosphere(); }
-        }
+        public static Atmosphere Day => new Atmosphere();
 
-        public static Atmosphere Night
-        {
-            get { return new Atmosphere(); }
-        }
+        public static Atmosphere Night => new Atmosphere();
 
-        public static Atmosphere Storm
-        {
-            get { return new Atmosphere(); }
-        }
+        public static Atmosphere Storm => new Atmosphere();
     }
 }

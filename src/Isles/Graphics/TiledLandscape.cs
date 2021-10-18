@@ -16,27 +16,27 @@ namespace Isles.Graphics
         /// <summary>
         /// The effect used to draw the terrain
         /// </summary>
-        Effect terrainEffect;
+        private Effect terrainEffect;
 
         /// <summary>
         /// Index buffer for all patches
         /// </summary>
-        IndexBuffer indexBuffer;
+        private IndexBuffer indexBuffer;
 
         /// <summary>
         /// Vertex buffer for each individual patch
         /// </summary>
-        VertexBuffer[] vertexBuffers;
+        private VertexBuffer[] vertexBuffers;
 
         /// <summary>
         /// Vertex declaraction for terrain mesh
         /// </summary>
-        VertexDeclaration declaraction;
+        private VertexDeclaration declaraction;
 
         /// <summary>
         /// Stuff for drawing primitives
         /// </summary>
-        int vertexCount, primitiveCount;
+        private int vertexCount, primitiveCount;
         #endregion
 
         #region Initialization
@@ -52,7 +52,9 @@ namespace Isles.Graphics
 
             // Set patch LOD to highest
             foreach (Patch patch in Patches)
+            {
                 patch.LevelOfDetail = Patch.HighestLOD;
+            }
 
             // Initialize index buffer.
             // All patches use the same index buffer since tiled landscape
@@ -62,17 +64,17 @@ namespace Isles.Graphics
                                               Patch.MaxPatchResolution,
                                           BufferUsage.WriteOnly);
 
-            ushort[] indices = new ushort[6 * Patch.MaxPatchResolution *
+            var indices = new ushort[6 * Patch.MaxPatchResolution *
                                               Patch.MaxPatchResolution];
 
             // Fill index buffer and
             Patches[0].FillIndices16(ref indices, 0);
 
-            indexBuffer.SetData<ushort>(indices);
+            indexBuffer.SetData(indices);
             
 
             // Initialize vertices
-            int vertexBufferElementCount = (Patch.MaxPatchResolution + 1) *
+            var vertexBufferElementCount = (Patch.MaxPatchResolution + 1) *
                                            (Patch.MaxPatchResolution + 1);
 
             vertexCount = vertexBufferElementCount;
@@ -82,12 +84,13 @@ namespace Isles.Graphics
             vertexBuffers = new VertexBuffer[PatchCountOnXAxis * PatchCountOnYAxis];
 
             // Create an array to store the vertices
-            TerrainVertex[] vertices = new TerrainVertex[vertexBufferElementCount];
+            var vertices = new TerrainVertex[vertexBufferElementCount];
 
             // Initialize individual patch vertex buffer
-            int patchIndex = 0;
-            for (int yPatch = 0; yPatch < PatchCountOnYAxis; yPatch++)
-                for (int xPatch = 0; xPatch < PatchCountOnYAxis; xPatch++)
+            var patchIndex = 0;
+            for (var yPatch = 0; yPatch < PatchCountOnYAxis; yPatch++)
+            {
+                for (var xPatch = 0; xPatch < PatchCountOnYAxis; xPatch++)
                 {
                     // Fill patch vertices
                     Patches[patchIndex].FillVertices(0,
@@ -127,11 +130,12 @@ namespace Isles.Graphics
                                                                  vertexBufferElementCount,
                                                                  BufferUsage.WriteOnly);
                     // Set vertex buffer vertices
-                    vertexBuffers[patchIndex].SetData<TerrainVertex>(vertices);
+                    vertexBuffers[patchIndex].SetData(vertices);
 
                     // Next patch
                     patchIndex++;
                 }
+            }
         }
         #endregion
 
@@ -149,22 +153,27 @@ namespace Isles.Graphics
             DrawTerrain(gameTime, game.View, game.Projection, terrainEffect.Techniques["Default"]);
 
             if (shadowEffect != null)
+            {
                 DrawTerrainShadow(gameTime, shadowEffect);
+            }
         }
 
         /// <summary>
         /// Internal method to draw the terrain
         /// </summary>
-        void DrawTerrain(GameTime gameTime, Matrix view, Matrix projection, EffectTechnique technique)
+        private void DrawTerrain(GameTime gameTime, Matrix view, Matrix projection, EffectTechnique technique)
         {
             // Set parameters
             Matrix viewProjection = view * projection;
             if (FogTexture != null)
+            {
                 terrainEffect.Parameters["FogTexture"].SetValue(FogTexture);
+            }
+
             terrainEffect.Parameters["WorldView"].SetValue(view);
             terrainEffect.Parameters["WorldViewProjection"].SetValue(viewProjection);
             
-            BoundingFrustum viewFrustum = new BoundingFrustum(viewProjection);
+            var viewFrustum = new BoundingFrustum(viewProjection);
 
             // Set indices and vertices
             game.GraphicsDevice.Indices = indexBuffer;
@@ -179,7 +188,7 @@ namespace Isles.Graphics
                 pass.Begin();
 
                 // Draw each patch
-                for (int iPatch = 0; iPatch < Patches.Count; iPatch++)
+                for (var iPatch = 0; iPatch < Patches.Count; iPatch++)
                 {
                     Patches[iPatch].Visible = viewFrustum.Intersects(Patches[iPatch].BoundingBox);
                     if (Patches[iPatch].Visible)
@@ -208,7 +217,7 @@ namespace Isles.Graphics
             terrainEffect.End();
         }
 
-        void DrawTerrainShadow(GameTime gameTime, ShadowEffect shadowEffect)
+        private void DrawTerrainShadow(GameTime gameTime, ShadowEffect shadowEffect)
         {
             terrainEffect.Parameters["ShadowMap"].SetValue(shadowEffect.ShadowMap);
             terrainEffect.Parameters["LightViewProjection"].SetValue(shadowEffect.ViewProjection);
@@ -220,7 +229,7 @@ namespace Isles.Graphics
                 pass.Begin();
 
                 // Draw each patch
-                for (int iPatch = 0; iPatch < Patches.Count; iPatch++)
+                for (var iPatch = 0; iPatch < Patches.Count; iPatch++)
                 {
                     if (Patches[iPatch].Visible)
                     {
@@ -267,12 +276,7 @@ namespace Isles.Graphics
             /// <summary>
             /// Stride Size, in XNA called SizeInBytes. I'm just conforming with that.
             /// </summary>
-            public static int SizeInBytes
-            {
-                // 4 bytes per float:
-                // 3 floats pos, 4 floats uv, 3 floats normal and 3 float tangent.
-                get { return 4 * (3 + 4 + 3 + 3); }
-            }
+            public static int SizeInBytes => 4 * (3 + 4 + 3 + 3);
 
             /// <summary>
             /// Generate vertex declaration
@@ -281,7 +285,7 @@ namespace Isles.Graphics
             {
                 get
                 {
-                    VertexElement[] decl = new VertexElement[]
+                    var decl = new VertexElement[]
                     {
                         // Construct new vertex declaration with tangent info
                         // First the normal stuff (we should already have that)

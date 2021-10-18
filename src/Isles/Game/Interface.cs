@@ -271,7 +271,7 @@ namespace Isles.Engine
         /// </summary>
         /// <param name="ray"></param>
         /// <returns></returns>
-        Nullable<Vector3> Intersects(Ray ray);
+        Vector3? Intersects(Ray ray);
     }
     #endregion
 }

@@ -11,7 +11,6 @@ using Microsoft.Xna.Framework.Graphics;
 using MouseButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using Isles.Engine;
 
-
 namespace Isles.UI
 {
     #region Button
@@ -23,8 +22,8 @@ namespace Isles.UI
         /// </summary>
         public Keys HotKey
         {
-            get { return hotKey; }
-            set { hotKey = value; }
+            get => hotKey;
+            set => hotKey = value;
         }
 
         protected Keys hotKey;
@@ -49,8 +48,8 @@ namespace Isles.UI
         /// </summary>
         public Rectangle Pressed
         {
-            get { return pressed; }
-            set { pressed = value; }
+            get => pressed;
+            set => pressed = value;
         }
 
         private Rectangle disabled;
@@ -60,22 +59,22 @@ namespace Isles.UI
         /// </summary>
         public Rectangle Disabled
         {
-            get { return disabled; }
-            set { disabled = value; }
+            get => disabled;
+            set => disabled = value;
         }
 
-        Rectangle hovered;
+        private Rectangle hovered;
 
         /// <summary>
         /// Gets or sets the source rectangle for hovered button
         /// </summary>
         public Rectangle Hovered
         {
-            get { return hovered; }
-            set { hovered = value; }
+            get => hovered;
+            set => hovered = value;
         }
 
-        Input input = BaseGame.Singleton.Input;
+        private readonly Input input = BaseGame.Singleton.Input;
 
         /// <summary>
         /// Button click event
@@ -114,8 +113,8 @@ namespace Isles.UI
         /// </summary>
         public bool IgnoreMessage
         {
-            get { return ignoreMessage; }
-            set { ignoreMessage = value; }
+            get => ignoreMessage;
+            set => ignoreMessage = value;
         }
         #endregion
 
@@ -144,13 +143,14 @@ namespace Isles.UI
         /// <summary>
         /// For generating enter & leave events
         /// </summary>
-        bool cursorInButton = false;
+        private bool cursorInButton = false;
 
         protected override void OnVisibleChanged()
         {
             if (!Visible && input.MouseInBox(DestinationRectangle))
-                if (Leave != null)
-                    Leave(this, null);
+            {
+                Leave?.Invoke(this, null);
+            }
         }
 
         /// <summary>
@@ -160,22 +160,22 @@ namespace Isles.UI
         public override void Update(GameTime gameTime)
         {
             if (!Visible && !Enabled)
+            {
                 return;
+            }
 
-            bool overlaps = input.MouseInBox(DestinationRectangle);
+            var overlaps = input.MouseInBox(DestinationRectangle);
 
             // Trigger enter & leave events
             if (cursorInButton && !overlaps)
             {
                 cursorInButton = false;
-                if (Leave != null)
-                    Leave(this, null);
+                Leave?.Invoke(this, null);
             }
             else if (!cursorInButton && overlaps)
             {
                 cursorInButton = true;
-                if (Enter != null)
-                    Enter(this, null);
+                Enter?.Invoke(this, null);
             }
 
             // Update button state
@@ -221,17 +221,19 @@ namespace Isles.UI
         /// <summary>
         /// Whether this button overlaps the cursor when left button is down
         /// </summary>
-        bool clickThis = false;
+        private bool clickThis = false;
 
         public override EventResult HandleEvent(EventType type, object sender, object tag)
         {
             if (ignoreMessage)
+            {
                 return EventResult.Unhandled;
-            
+            }
+
             if (Enabled && Visible)
             {
-                Input input = sender as Input;
-                Keys? key = tag as Keys?;
+                var input = sender as Input;
+                var key = tag as Keys?;
 
                 // Handle left click
                 if (type == EventType.LeftButtonDown && input.MouseInBox(DestinationRectangle))
@@ -246,8 +248,8 @@ namespace Isles.UI
                 {
                     state = ButtonState.Normal;
                     clickThis = false;
-                    if (Click != null)
-                        Click(this, null);
+                    Click?.Invoke(this, null);
+
                     return EventResult.Handled;
                 }
 
@@ -263,16 +265,16 @@ namespace Isles.UI
                 {
                     state = ButtonState.Normal;
                     clickThis = false;
-                    if (RightClick != null)
-                        RightClick(this, null);
+                    RightClick?.Invoke(this, null);
+
                     return EventResult.Handled;
                 }
 
                 // Handle double click event
                 if (type == EventType.DoubleClick && input.MouseInBox(DestinationRectangle))
                 {
-                    if (DoubleClick != null)
-                        DoubleClick(this, null);
+                    DoubleClick?.Invoke(this, null);
+
                     return EventResult.Handled;
                 }
             }
@@ -289,7 +291,9 @@ namespace Isles.UI
             if (disposing)
             {
                 if (Texture != null)
+                {
                     Texture.Dispose();
+                }
             }
 
             base.Dispose(disposing);
@@ -301,16 +305,15 @@ namespace Isles.UI
     #region TextButton
     public class TextButton : Button
     {
-
-        TextField textField;
+        private readonly TextField textField;
 
         /// <summary>
         /// Gets or sets the text for the button
         /// </summary>
         public String Text
         {
-            get { return textField.Text; }
-            set { textField.Text = value; }
+            get => textField.Text;
+            set => textField.Text = value;
         }
 
         private Color normalColor;
@@ -321,13 +324,11 @@ namespace Isles.UI
         /// </summary>
         public Color NormalColor
         {
-            get { return normalColor; }
-            set { normalColor = value; }
+            get => normalColor;
+            set => normalColor = value;
         }
 
-
         private Color highlightColor;
-
 
         /// <summary>
         /// Gets or sets the color of the text in
@@ -335,10 +336,9 @@ namespace Isles.UI
         /// </summary>
         public Color HighlightColor
         {
-            get { return highlightColor; }
-            set { highlightColor = value; }
+            get => highlightColor;
+            set => highlightColor = value;
         }
-
 
         private Color pressDownColor;
 
@@ -348,10 +348,10 @@ namespace Isles.UI
         /// </summary>
         public Color PressDownColor
         {
-            get { return pressDownColor; }
-            set { pressDownColor = value; }
+            get => pressDownColor;
+            set => pressDownColor = value;
         }
-	
+
 
         /// <summary>
         /// Constructor
@@ -359,23 +359,23 @@ namespace Isles.UI
         /// <param name="text"></param>
         public TextButton(String text, float fontSize, Color normalColor, Rectangle area)
         {
-            this.Area = area;
-            this.textField = new TextField(text, fontSize, normalColor,
+            Area = area;
+            textField = new TextField(text, fontSize, normalColor,
                                  new Rectangle(0, 0, area.Width, area.Height));
             this.normalColor = normalColor;
-            Vector4 color = normalColor.ToVector4();
-            this.highlightColor = new Color(color + (Vector4.One - color) * 0.6f);
-            this.pressDownColor = normalColor;
-            this.textField.Parent = this;
-            this.textField.Centered = true;
+            var color = normalColor.ToVector4();
+            highlightColor = new Color(color + (Vector4.One - color) * 0.6f);
+            pressDownColor = normalColor;
+            textField.Parent = this;
+            textField.Centered = true;
         }
-
 
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
 
             if (Enabled)
+            {
                 switch (state)
                 {
                     case ButtonState.Normal:
@@ -388,8 +388,11 @@ namespace Isles.UI
                         textField.Color = pressDownColor;
                         break;
                 }
+            }
             else
-                this.textField.Color = new Color(normalColor.ToVector4() * 0.6f);
+            {
+                textField.Color = new Color(normalColor.ToVector4() * 0.6f);
+            }
         }
 
         /// <summary>
@@ -401,16 +404,16 @@ namespace Isles.UI
         {
             if (state == ButtonState.Press)
             {
-                this.textField.Y++;
-                this.textField.X++;
+                textField.Y++;
+                textField.X++;
             }
 
-            this.textField.Draw(gameTime, sprite);
+            textField.Draw(gameTime, sprite);
 
             if (state == ButtonState.Press)
             {
-                this.textField.Y--;
-                this.textField.X--;
+                textField.Y--;
+                textField.X--;
             }          
         }
     }

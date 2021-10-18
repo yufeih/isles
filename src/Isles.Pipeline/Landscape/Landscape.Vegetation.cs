@@ -23,11 +23,10 @@ namespace Isles.Pipeline
     /// </summary>
     public partial class Landscape
     {
-        Random random = new Random();
-
-        List<Vector2>[] grassSize;
-        List<Vector2>[] grassPosition;
-        ExternalReference<TextureContent>[] grassTexture;
+        private Random random = new Random();
+        private List<Vector2>[] grassSize;
+        private List<Vector2>[] grassPosition;
+        private ExternalReference<TextureContent>[] grassTexture;
 
         #region Vegetation
         /// <summary>
@@ -46,7 +45,7 @@ namespace Isles.Pipeline
         #endregion
 
         #region Process
-        void ProcessVegetation(ContentProcessorContext context)
+        private void ProcessVegetation(ContentProcessorContext context)
         {
             grassSize = new List<Vector2>[vegetations.Count];
             grassPosition = new List<Vector2>[vegetations.Count];
@@ -74,6 +73,7 @@ namespace Isles.Pipeline
                 int yCells = heightFieldHeight - 1;
 
                 for (int y = 0; y < yCells; y++)
+                {
                     for (int x = 0; x < xCells; x++)
                     {
                         int n = random.Next((int)(vegetations[i].MaxCountPerGrid *
@@ -90,6 +90,7 @@ namespace Isles.Pipeline
                                 vegetations[i].Height * (float)(0.5 + random.NextDouble())));
                         }
                     }
+                }
 
                 // Add texture
                 grassTexture[i] = context.BuildAsset<TextureContent, TextureContent>(
@@ -100,7 +101,7 @@ namespace Isles.Pipeline
         #endregion
 
         #region Write
-        void WriteVegetation(ContentWriter output)
+        private void WriteVegetation(ContentWriter output)
         {
             output.Write(vegetations.Count);
 

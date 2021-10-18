@@ -47,7 +47,7 @@ namespace Isles
     public abstract class Player : IEventListener
     {
         #region Static stuff
-        public static List<Player> AllPlayers = new List<Player>();
+        public static List<Player> AllPlayers = new();
         public static LocalPlayer LocalPlayer;
 
         /// <summary>
@@ -64,14 +64,15 @@ namespace Isles
             LocalPlayer = null;
         }
 
-
-        static List<string> BuildingRegistry = new List<string>();
-        static List<string> CharactorRegistry = new List<string>();
+        private static readonly List<string> BuildingRegistry = new();
+        private static readonly List<string> CharactorRegistry = new();
 
         public static void RegisterBuilding(string type)
         {
             if (!BuildingRegistry.Contains(type))
+            {
                 BuildingRegistry.Add(type);
+            }
 
             System.Diagnostics.Debug.Assert(!CharactorRegistry.Contains(type));
         }
@@ -79,7 +80,9 @@ namespace Isles
         public static void RegisterCharactor(string type)
         {
             if (!CharactorRegistry.Contains(type))
+            {
                 CharactorRegistry.Add(type);
+            }
 
             System.Diagnostics.Debug.Assert(!BuildingRegistry.Contains(type));
         }
@@ -126,61 +129,97 @@ namespace Isles
         /// </summary>
         public float Gold
         {
-            get { return gold; }
-            set { if (value < 0) value = 0; gold = value; }
+            get => gold;
+            set
+            {
+                if (value < 0)
+                {
+                    value = 0;
+                }
+
+                gold = value;
+            }
         }
 
-        float gold;
-
+        private float gold;
 
         /// <summary>
         /// Gets or sets how much lumber the player have
         /// </summary>
         public float Lumber
         {
-            get { return lumber; }
-            set { if (value < 0) value = 0; lumber = value; }
+            get => lumber;
+            set
+            {
+                if (value < 0)
+                {
+                    value = 0;
+                }
+
+                lumber = value;
+            }
         }
 
-        float lumber;
-
+        private float lumber;
 
         /// <summary>
         /// Gets or sets how much food the player have
         /// </summary>
         public float Food
         {
-            get { return food; }
-            set { if (value < 0) value = 0; food = value; }
+            get => food;
+            set
+            {
+                if (value < 0)
+                {
+                    value = 0;
+                }
+
+                food = value;
+            }
         }
 
-        float food;
+        private float food;
 
         public const float MaxFoodCapacity = 100;
-
 
         /// <summary>
         /// Gets or sets current food capacity of this player
         /// </summary>
         public float FoodCapacity
         {
-            get { return foodCapacity; }
-            set { if (value > MaxFoodCapacity) value = MaxFoodCapacity; foodCapacity = value; }
+            get => foodCapacity;
+            set
+            {
+                if (value > MaxFoodCapacity)
+                {
+                    value = MaxFoodCapacity;
+                }
+
+                foodCapacity = value;
+            }
         }
 
-        float foodCapacity;
-
+        private float foodCapacity;
 
         /// <summary>
         /// Gets or sets how many trees are cutted down by this player
         /// </summary>
         public int TreesCuttedDown
         {
-            get { return treesCuttedDown; }
-            set { if (value < 0) value = 0; treesCuttedDown = value; }
+            get => treesCuttedDown;
+            set
+            {
+                if (value < 0)
+                {
+                    value = 0;
+                }
+
+                treesCuttedDown = value;
+            }
         }
 
-        int treesCuttedDown = 0;
+        private int treesCuttedDown = 0;
 
         /// <summary>
         /// Gets or sets the attack point of this player
@@ -197,11 +236,19 @@ namespace Isles
         /// </summary>
         public float SmokeProduced
         {
-            get { return smokeProduced; }
-            set { if (value < 0) value = 0; smokeProduced = value; }
+            get => smokeProduced;
+            set
+            {
+                if (value < 0)
+                {
+                    value = 0;
+                }
+
+                smokeProduced = value;
+            }
         }
 
-        float smokeProduced = 0;
+        private float smokeProduced = 0;
 
         /// <summary>
         /// Gets the environment condition of the player
@@ -210,7 +257,7 @@ namespace Isles
         {
             get
             {
-                float value = smokeProduced + treesCuttedDown * 1.0f;
+                var value = smokeProduced + treesCuttedDown * 1.0f;
                 return MathHelper.Clamp(value * 0.1f, 0, 1);
             }
         }
@@ -227,46 +274,37 @@ namespace Isles
         /// Note that some dependencies are not enitities, e.g., techniques,
         /// so you cannot directly use the number of objects.
         /// </remarks>
-        Dictionary<string, int> availability = new Dictionary<string,int>();
+        private readonly Dictionary<string, int> availability = new();
 
         /// <summary>
         /// All objects owned by this player, grouped by type.
         /// </summary>
-        Dictionary<string, LinkedList<GameObject>> objects = new Dictionary<string, LinkedList<GameObject>>();
+        private readonly Dictionary<string, LinkedList<GameObject>> objects = new();
 
         /// <summary>
         /// A dictionary storing the number of objects that will be available in the near future
         /// </summary>
-        Dictionary<string, int> futureObjects = new Dictionary<string, int>();
+        private readonly Dictionary<string, int> futureObjects = new();
 
         /// <summary>
         /// Stores the relations between technqiues
         /// </summary>
-        List<KeyValuePair<string, string>> dependencies = new List<KeyValuePair<string,string>>();
+        private readonly List<KeyValuePair<string, string>> dependencies = new();
 
         /// <summary>
         /// Gets object dependency table
         /// </summary>
-        public List<KeyValuePair<string, string>> Dependencies
-        {
-            get { return dependencies; }
-        }
+        public List<KeyValuePair<string, string>> Dependencies => dependencies;
 
         /// <summary>
         /// Gets objects owned by this player
         /// </summary>
-        public Dictionary<string, LinkedList<GameObject>> Objects
-        {
-            get { return objects; }
-        }
+        public Dictionary<string, LinkedList<GameObject>> Objects => objects;
 
         /// <summary>
         /// Gets a dictionary storing the number of objects that will be available in the near future
         /// </summary>
-        public Dictionary<string, int> FutureObjects
-        {
-            get { return futureObjects; }
-        }
+        public Dictionary<string, int> FutureObjects => futureObjects;
 
         /// <summary>
         /// Gets all objects with the specified type
@@ -274,9 +312,7 @@ namespace Isles
         public LinkedList<GameObject> GetObjects(string type)
         {
             LinkedList<GameObject> value;
-            if (objects.TryGetValue(type, out value))
-                return value;
-            return null;
+            return objects.TryGetValue(type, out value) ? value : null;
         }
 
         /// <summary>
@@ -285,9 +321,14 @@ namespace Isles
         public void Add(GameObject entity)
         {
             if (!availability.ContainsKey(entity.ClassID))
+            {
                 availability.Add(entity.ClassID, 0);
+            }
+
             if (!objects.ContainsKey(entity.ClassID))
+            {
                 objects.Add(entity.ClassID, new LinkedList<GameObject>());
+            }
 
             availability[entity.ClassID]++;
             objects[entity.ClassID].AddFirst(entity);
@@ -313,7 +354,9 @@ namespace Isles
         public void MarkFutureObject(string type)
         {
             if (!futureObjects.ContainsKey(type))
+            {
                 futureObjects.Add(type, 0);
+            }
 
             futureObjects[type]++;
         }
@@ -344,14 +387,14 @@ namespace Isles
         /// </summary>
         public bool IsAvailable(string name)
         {
-            int value = 0;
+            var value = 0;
             availability.TryGetValue(name, out value);
             return value > 0;
         }
 
         public bool IsFutureAvailable(string name)
         {
-            int value = 0;
+            var value = 0;
             futureObjects.TryGetValue(name, out value);
             return value > 0;
         }
@@ -362,7 +405,9 @@ namespace Isles
         public void MarkAvailable(string name)
         {
             if (!availability.ContainsKey(name))
+            {
                 availability.Add(name, 0);
+            }
 
             availability[name]++;
         }
@@ -382,12 +427,16 @@ namespace Isles
         /// </summary>
         public bool CheckDependency(string name)
         {
-            bool available = true;
+            var available = true;
 
             // FIXME: What if the name is not in the list
-            for (int i = 0; i < dependencies.Count; i++)
+            for (var i = 0; i < dependencies.Count; i++)
+            {
                 if (dependencies[i].Key == name && !IsAvailable(dependencies[i].Value))
+                {
                     available = false;
+                }
+            }
 
             return available;
         }
@@ -405,12 +454,14 @@ namespace Isles
         /// </summary>
         public void RemoveDependency(string what, string dependsOnWhat)
         {
-            for (int i = 0; i < dependencies.Count; i++)
+            for (var i = 0; i < dependencies.Count; i++)
+            {
                 if (dependencies[i].Key == what && dependencies[i].Value == dependsOnWhat)
                 {
                     dependencies.RemoveAt(i);
                     break;
                 }
+            }
         }
 
         /// <summary>
@@ -420,8 +471,12 @@ namespace Isles
         public IEnumerable<GameObject> EnumerateObjects()
         {
             foreach (KeyValuePair<string, LinkedList<GameObject>> list in objects)
+            {
                 foreach (GameObject e in list.Value)
+                {
                     yield return e;
+                }
+            }
         }
 
         /// <summary>
@@ -434,7 +489,9 @@ namespace Isles
             if (objects.TryGetValue(type, out value))
             {
                 foreach (GameObject o in value)
+                {
                     yield return o;
+                }
             }
         }
 
@@ -445,17 +502,21 @@ namespace Isles
         public Entity FindNearestObject(Vector3 position, string type, Entity excluded)
         {
             if (type == null)
+            {
                 return null;
+            }
 
             Entity nearest = null;
-            float distanceSquared = float.MaxValue;
+            var distanceSquared = float.MaxValue;
 
             foreach (Entity e in EnumerateObjects(type))
             {
                 if (e == excluded)
+                {
                     continue;
+                }
 
-                float dist = Vector3.Subtract(e.Position, position).LengthSquared();
+                var dist = Vector3.Subtract(e.Position, position).LengthSquared();
 
                 if (dist < distanceSquared)
                 {
@@ -470,35 +531,17 @@ namespace Isles
         /// <summary>
         /// Names
         /// </summary>
-        public string TownhallName
-        {
-            get { return Race == Race.Islander ? "Townhall" : "SteamFort"; }
-        }
+        public string TownhallName => Race == Race.Islander ? "Townhall" : "SteamFort";
 
-        public string LumbermillName
-        {
-            get { return Race == Race.Islander ? "Lumbermill" : null; }
-        }
+        public string LumbermillName => Race == Race.Islander ? "Lumbermill" : null;
 
-        public string HouseName
-        {
-            get { return Race == Race.Islander ? "Farmhouse" : "Steamhouse"; }
-        }
+        public string HouseName => Race == Race.Islander ? "Farmhouse" : "Steamhouse";
 
-        public string WorkerName
-        {
-            get { return Race == Race.Islander ? "Follower" : "Miner"; }
-        }
+        public string WorkerName => Race == Race.Islander ? "Follower" : "Miner";
 
-        public string TowerName
-        {
-            get { return Race == Race.Islander ? "Tower" : "SteamCannon"; }
-        }
+        public string TowerName => Race == Race.Islander ? "Tower" : "SteamCannon";
 
-        public string HeroName
-        {
-            get { return Race == Race.Islander ? "FireSorceress" : "Steambot"; }
-        }
+        public string HeroName => Race == Race.Islander ? "FireSorceress" : "Steambot";
         #endregion
 
         #region Relations
@@ -526,7 +569,7 @@ namespace Isles
 
         public static Vector2 GetCenter(IEnumerable<GameObject> objects)
         {
-            int count = 0;
+            var count = 0;
             Vector2 start = Vector2.Zero;
 
             // Compute the center and space of the selected charactors
@@ -560,29 +603,31 @@ namespace Isles
             {
                 // Find the max radius
                 if (charactor.SelectionAreaRadius > space)
+                {
                     space = charactor.SelectionAreaRadius * 1.5f;
+                }
             }
 
             // Compute the space between charactors
             space = space * 2;
 
             // Compute squard size
-            int squardWidth = (int)Math.Sqrt(members.Count - 1) + 1;
-            int squardHeight = (members.Count - 1) / squardWidth + 1;
+            var squardWidth = (int)Math.Sqrt(members.Count - 1) + 1;
+            var squardHeight = (members.Count - 1) / squardWidth + 1;
 
             // Compute local to world transform
             Vector2 translation;
             translation.X = center.X;
             translation.Y = center.Y;
 
-            float rotation = -MathHelper.PiOver2 + (float)Math.Atan2(start.Y - center.Y,
+            var rotation = -MathHelper.PiOver2 + (float)Math.Atan2(start.Y - center.Y,
                                                                      start.X - center.X);
 
             // Transform charactor positions from world space to local space
             List<KeyValuePair<GameObject, Vector2>> startPositions;
             startPositions = new List<KeyValuePair<GameObject, Vector2>>(members.Count);
 
-            for (int i = 0; i < members.Count; i++)
+            for (var i = 0; i < members.Count; i++)
             {
                 startPositions.Add(new KeyValuePair<GameObject, Vector2>(members[i],
                                          Math2D.WorldToLocal(new Vector2(members[i].Position.X,
@@ -597,19 +642,19 @@ namespace Isles
                 return a.Value.Y.CompareTo(b.Value.Y);
             });
 
-
             int index = 0, begin = 0;
-            Comparer compare = new Comparer();
-            Vector2[] positions = new Vector2[members.Count];
-            List<GameObject> temp = new List<GameObject>(squardWidth);
+            var compare = new Comparer();
+            var positions = new Vector2[members.Count];
+            var temp = new List<GameObject>(squardWidth);
 
             List<KeyValuePair<GameObject, Vector2>> orders;
             orders = new List<KeyValuePair<GameObject, Vector2>>();
 
-            for (int y = 0; y < squardHeight; y++)
+            for (var y = 0; y < squardHeight; y++)
             {
                 // Compute end positions in world space
-                for (int x = 0; x < squardWidth; x++)
+                for (var x = 0; x < squardWidth; x++)
+                {
                     if (index < positions.Length)
                     {
                         positions[index].X = x * space - space * (squardWidth - 1) / 2;
@@ -619,14 +664,17 @@ namespace Isles
 
                         index++;
                     }
+                }
 
                 // Sort start position by X value
                 startPositions.Sort(begin, index - begin, compare);
 
                 // Associate positions with charactors
-                for (int i = begin; i < index; i++)
+                for (var i = begin; i < index; i++)
+                {
                     orders.Add(new KeyValuePair<GameObject, Vector2>(
                             startPositions[i].Key, positions[i]));
+                }
 
                 begin = index;
             }
@@ -641,7 +689,7 @@ namespace Isles
             return orders;
         }
 
-        class Comparer : IComparer<KeyValuePair<GameObject, Vector2>>
+        private class Comparer : IComparer<KeyValuePair<GameObject, Vector2>>
         {
             /// <summary>
             /// For CreateSquardPositions
@@ -678,70 +726,50 @@ namespace Isles
         /// <summary>
         /// Standard stuff
         /// </summary>
-        BaseGame game = BaseGame.Singleton;
-        GameCamera camera;
-        GameWorld world;
+        private readonly BaseGame game = BaseGame.Singleton;
+        private GameCamera camera;
+        private GameWorld world;
 
         /// <summary>
         /// Selected
         /// </summary>
-        public List<GameObject> Selected
-        {
-            get { return selected; }
-        }
+        public List<GameObject> Selected => selected;
 
-        public List<GameObject> CurrentGroup
-        {
-            get
-            {
-                if (groups.Count <= 0)
-                    return null;
-                return groups[currentGroup];
-            }
-        }
+        public List<GameObject> CurrentGroup => groups.Count <= 0 ? null : groups[currentGroup];
 
-        public List<List<GameObject>> Groups
-        {
-            get { return groups; }
-        }
+        public List<List<GameObject>> Groups => groups;
 
         /// <summary>
         /// Gets or sets the index of the current group
         /// </summary>
-        public int CurrentGroupIndex
-        {
-            get { return currentGroup; }
-        }
+        public int CurrentGroupIndex => currentGroup;
 
         /// <summary>
         /// 
         /// </summary>
-        bool selectionDirty = true;
+        private bool selectionDirty = true;
 
         public bool SelectionDirty
         {
-            get { return selectionDirty; }
-            set { selectionDirty = value; }
+            get => selectionDirty;
+            set => selectionDirty = value;
         }
 
-
-
-        List<GameObject> selected = new List<GameObject>();
-        List<List<GameObject>> groups = new List<List<GameObject>>();
-        List<GameObject> highlighted = new List<GameObject>();
-        List<GameObject>[] teams = new List<GameObject>[10];
-        int currentGroup = 0;
-
+        private readonly List<GameObject> selected = new();
+        private readonly List<List<GameObject>> groups = new();
+        private readonly List<GameObject> highlighted = new();
+        private readonly List<GameObject>[] teams = new List<GameObject>[10];
+        private int currentGroup = 0;
 
         /// <summary>
         /// Multiselecting
         /// </summary>
-        bool multiSelecting = false;
-        Rectangle multiSelectRectangle;
-        Point multiSelectStart;
-        bool keyDoublePressed = false;
-        double doubleClickTime;
-        bool traceCamera = false;
+        private bool multiSelecting = false;
+        private Rectangle multiSelectRectangle;
+        private Point multiSelectStart;
+        private bool keyDoublePressed = false;
+        private double doubleClickTime;
+        private bool traceCamera = false;
 
         /// <summary>
         /// Spells
@@ -749,37 +777,37 @@ namespace Isles
         public SpellAttack Attack;
         public SpellMove Move;
 
-
         /// <summary>
         /// List of attacker. We will draw a glow over them.
         /// </summary>
-        List<GameObject> attackers = new List<GameObject>();
-        List<double> attackTimer = new List<double>();
+        private readonly List<GameObject> attackers = new();
+        private readonly List<double> attackTimer = new();
         #endregion
 
         #region Methods
         public override void Start(GameWorld world)
         {
-            if (world == null)
-                throw new ArgumentNullException();
+            this.world = world ?? throw new ArgumentNullException();
+            camera = game.Camera as GameCamera;
+            Attack = new SpellAttack(world);
+            Move = new SpellMove(world);
 
-            this.world = world;
-            this.camera = game.Camera as GameCamera;
-            this.Attack = new SpellAttack(world);
-            this.Move = new SpellMove(world);
-
-            for (int i = 0; i < teams.Length; i++)
+            for (var i = 0; i < teams.Length; i++)
+            {
                 teams[i] = new List<GameObject>();
+            }
         }
 
         public void AddAttacker(GameObject attacker)
         {
-            for (int i = 0; i < attackers.Count; i++)
+            for (var i = 0; i < attackers.Count; i++)
+            {
                 if (attackers[i] == attacker)
                 {
                     attackTimer[i] = 0;
                     return;
                 }
+            }
 
             attackers.Add(attacker);
             attackTimer.Add(0);
@@ -788,8 +816,12 @@ namespace Isles
         public void Highlight(GameObject entity)
         {
             foreach (GameObject o in highlighted)
+            {
                 if (o.Highlighted)
+                {
                     o.Highlighted = false;
+                }
+            }
 
             highlighted.Clear();
 
@@ -803,11 +835,17 @@ namespace Isles
         public void HighlightMultiple(IEnumerable<GameObject> entities)
         {
             if (entities == null)
+            {
                 return;
+            }
 
             foreach (GameObject o in highlighted)
+            {
                 if (o.Highlighted)
+                {
                     o.Highlighted = false;
+                }
+            }
 
             highlighted.Clear();
 
@@ -835,7 +873,9 @@ namespace Isles
                     }
 
                     if (!entity.Selected)
+                    {
                         selected.Add(entity);
+                    }
 
                     entity.Selected = !entity.Selected;
                 }
@@ -843,8 +883,12 @@ namespace Isles
             else
             {
                 foreach (GameObject o in selected)
+                {
                     if (o.Selected)
+                    {
                         o.Selected = false;
+                    }
+                }
 
                 selected.Clear();
 
@@ -861,7 +905,9 @@ namespace Isles
         public void SelectMultiple(IEnumerable<GameObject> entities, bool shift)
         {
             if (entities == null)
+            {
                 return;
+            }
 
             if (shift)
             {
@@ -875,7 +921,9 @@ namespace Isles
                     }
 
                     if (!entity.Selected)
+                    {
                         selected.Add(entity);
+                    }
 
                     entity.Selected = !entity.Selected;
                 }
@@ -883,8 +931,12 @@ namespace Isles
             else
             {
                 foreach (GameObject o in selected)
+                {
                     if (o.Selected)
+                    {
                         o.Selected = false;
+                    }
+                }
 
                 selected.Clear();
 
@@ -898,15 +950,11 @@ namespace Isles
                 }
             }
 
-
             // Sorted selected by priority
             selected.Sort(delegate(GameObject x, GameObject y)
             {
-                int result = x.Priority.CompareTo(y.Priority);
-                if (result != 0)
-                    return result;
-
-                return string.Compare(x.ClassID, y.ClassID);
+                var result = x.Priority.CompareTo(y.Priority);
+                return result != 0 ? result : string.Compare(x.ClassID, y.ClassID);
             });
 
             OnSelectedChanged();
@@ -920,12 +968,14 @@ namespace Isles
             
             if (selected.Count != 0)
             {
-                String currentClassID = selected[0].ClassID;
-                List<GameObject> group = new List<GameObject>();
+                var currentClassID = selected[0].ClassID;
+                var group = new List<GameObject>();
                 foreach (GameObject o in selected)
                 {
                     if (currentClassID == o.ClassID)
+                    {
                         group.Add(o);
+                    }
                     else
                     {
                         groups.Add(group);
@@ -948,18 +998,20 @@ namespace Isles
         private IEnumerable<GameObject> ObjectsFromRectangle(Rectangle rectangle)
         {
             if (rectangle.Height == 0 || rectangle.Width == 0)
+            {
                 return null;
+            }
 
             // Select multiple objects
             Matrix rectProject;
             Matrix transform = Matrix.Identity;
 
-            float left = (float)(2 * rectangle.Left - game.ScreenWidth) / game.ScreenWidth;
-            float right = (float)(2 * rectangle.Right - game.ScreenWidth) / game.ScreenWidth;
-            float bottom = (float)(game.ScreenHeight - 2 * rectangle.Top) / game.ScreenHeight;
-            float top = (float)(game.ScreenHeight - 2 * rectangle.Bottom) / game.ScreenHeight;
+            var left = (float)(2 * rectangle.Left - game.ScreenWidth) / game.ScreenWidth;
+            var right = (float)(2 * rectangle.Right - game.ScreenWidth) / game.ScreenWidth;
+            var bottom = (float)(game.ScreenHeight - 2 * rectangle.Top) / game.ScreenHeight;
+            var top = (float)(game.ScreenHeight - 2 * rectangle.Bottom) / game.ScreenHeight;
 
-            Vector3 size = Vector3.Transform(new Vector3(1, 1, 0), game.ProjectionInverse);
+            var size = Vector3.Transform(new Vector3(1, 1, 0), game.ProjectionInverse);
 
             Matrix.CreatePerspectiveOffCenter(
                 left * size.X, right * size.X, bottom * size.Y, top * size.Y, 1.0f, 5000.0f, out rectProject);
@@ -971,8 +1023,12 @@ namespace Isles
         private IEnumerable<GameObject> SelectablesFromObjects(IEnumerable<IWorldObject> iEnumerable)
         {
             foreach (IWorldObject o in iEnumerable)
+            {
                 if (o is GameObject)
+                {
                     yield return o as GameObject;
+                }
+            }
         }
 
         /// <summary>
@@ -981,14 +1037,18 @@ namespace Isles
         private IEnumerable<GameObject> Filter(IEnumerable<GameObject> selectables)
         {
             if (selectables == null)
+            {
                 yield break;
+            }
 
-            List<GameObject> objects = new List<GameObject>(selectables);
+            var objects = new List<GameObject>(selectables);
 
             if (objects.Count <= 0)
+            {
                 yield break;
+            }
 
-            int type = -1;  // 0 for units, 1 for buildings, 2 for other player's object
+            var type = -1;  // 0 for units, 1 for buildings, 2 for other player's object
 
             foreach (GameObject o in selectables)
             {
@@ -1003,45 +1063,64 @@ namespace Isles
                     }
 
                     if (o is Building)
+                    {
                         type = 1;
+                    }
                 }
                 else if (type < 0)
+                {
                     type = 2;
+                }
             }
 
             // Units
             if (type == 0)
             {
                 foreach (GameObject o in selectables)
+                {
                     if (o is Charactor && o.Owner is LocalPlayer)
+                    {
                         yield return o;
+                    }
+                }
             }
             else if (type == 1)
             {
                 foreach (GameObject o in selectables)
+                {
                     if (o is Building && o.Owner is LocalPlayer)
+                    {
                         yield return o;
+                    }
+                }
             }
             else if (type == 2)
             {
                 foreach (GameObject o in selectables)
+                {
                     if (!(o.Owner is LocalPlayer))
                     {
                         yield return o;
                         break; // We can only select one other player's unit
                     }
+                }
             }
-            else throw new InvalidOperationException();
+            else
+            {
+                throw new InvalidOperationException();
+            }
         }
 
         private IEnumerable<GameObject> GetObjectsOfTheSameClass(GameObject gameObject)
         {
             if (gameObject == null)
+            {
                 throw new ArgumentNullException();
+            }
 
             foreach (Entity e in gameObject.Owner.EnumerateObjects(gameObject.ClassID))
             {
-                GameObject o = e as GameObject;
+                var o = e as GameObject;
 
                 if (o != null && o.Owner == gameObject.Owner &&
                     o.Visible && o.IsVisible(game.ViewProjection) &&
@@ -1058,10 +1137,14 @@ namespace Isles
         {
             // Update spells
             if (Attack != null)
+            {
                 Attack.Update(gameTime);
+            }
 
             if (Move != null)
+            {
                 Move.Update(gameTime);
+            }
 
             // Update multi-selecting rectangle
             if (multiSelecting)
@@ -1083,9 +1166,13 @@ namespace Isles
             else
             {
                 if (!GameUI.Singleton.Overlaps(game.Input.MousePosition))
+                {
                     Highlight(world.Pick() as GameObject);
+                }
                 else
+                {
                     Highlight(null);
+                }
             }
 
             // Remove dead members
@@ -1110,7 +1197,7 @@ namespace Isles
                 return false;
             });
 
-            for (int i = 0; i < teams.Length; i++)
+            for (var i = 0; i < teams.Length; i++)
             {
                 teams[i].RemoveAll(delegate(GameObject o)
                 {
@@ -1118,7 +1205,7 @@ namespace Isles
                 });
             }
 
-            bool hasRemoved = false;
+            var hasRemoved = false;
             foreach (List<GameObject> list in groups)
             {
                 list.RemoveAll(delegate(GameObject o)
@@ -1140,24 +1227,30 @@ namespace Isles
             }
 
             if (hasRemoved)
+            {
                 selectionDirty = true;
+            }
 
             // Camera tracing
             if (camera != null)
             {
                 // Stop tracing units if camera is interrupted by user
                 if (camera.MovedByUser)
+                {
                     traceCamera = false;
+                }
 
                 if (traceCamera)
+                {
                     camera.FlyTo(ProjectToScreenCenter(GetCenter(selected)), false);
+                }
             }
 
             // Update attacker
             const double DisappearTime = 4;
             const float RevealRadius = 40;
-            double elapsedTime = gameTime.ElapsedGameTime.TotalSeconds;
-            for (int i = 0; i < attackers.Count; i++)
+            var elapsedTime = gameTime.ElapsedGameTime.TotalSeconds;
+            for (var i = 0; i < attackers.Count; i++)
             {
                 if ((attackTimer[i] += elapsedTime) > DisappearTime)
                 {
@@ -1202,7 +1295,7 @@ namespace Isles
             {
                 // 0 1
                 // 2 3
-                Point[] corners = new Point[4];
+                var corners = new Point[4];
 
                 corners[0].X = corners[2].X = multiSelectRectangle.Left;
                 corners[1].X = corners[3].X = multiSelectRectangle.Right;
@@ -1222,16 +1315,23 @@ namespace Isles
         {
             // Pass on the message to the selected
             foreach (GameObject o in selected)
+            {
                 if (o.HandleEvent(type, sender, tag) == EventResult.Handled)
+                {
                     return EventResult.Handled;
+                }
+            }
 
-            Input input = sender as Input;
+            var input = sender as Input;
 
             if (type == EventType.KeyDown && tag is Keys? && (tag as Keys?).Value == Keys.Space)
             {
                 // Press space to back to spawnpoint
                 if (game.Camera is GameCamera)
-                   (game.Camera as GameCamera).FlyTo(new Vector3(SpawnPoint, 0), false);
+                {
+                    (game.Camera as GameCamera).FlyTo(new Vector3(SpawnPoint, 0), false);
+                }
+
                 return EventResult.Handled;
             }
 
@@ -1241,7 +1341,9 @@ namespace Isles
                 LinkedList<GameObject> hero = GetObjects(HeroName);
 
                 if (hero != null && hero.Count > 0)
+                {
                     Select(hero.First.Value, false);
+                }
 
                 return EventResult.Handled;
             }
@@ -1250,7 +1352,9 @@ namespace Isles
             if (type == EventType.LeftButtonDown && !multiSelecting)
             {
                 if (game.Camera is GameCamera)
-                   (game.Camera as GameCamera).Freezed = true;
+                {
+                    (game.Camera as GameCamera).Freezed = true;
+                }
 
                 input.Capture(this);
                 multiSelecting = true;
@@ -1262,17 +1366,21 @@ namespace Isles
             else if (type == EventType.LeftButtonUp && multiSelecting)
             {
                 if (game.Camera is GameCamera)
-                   (game.Camera as GameCamera).Freezed = false;
+                {
+                    (game.Camera as GameCamera).Freezed = false;
+                }
 
                 input.Uncapture();
                 multiSelecting = false;
-                bool shift = input.Keyboard.IsKeyDown(Keys.LeftShift) ||
+                var shift = input.Keyboard.IsKeyDown(Keys.LeftShift) ||
                              input.Keyboard.IsKeyDown(Keys.RightShift);
 
                 if (multiSelectRectangle.Width == 0 && multiSelectRectangle.Height == 0)
                 {
                     if (world.Pick() is GameObject)
+                    {
                         Select(world.Pick() as GameObject, shift);
+                    }
                 }
                 else
                 {
@@ -1284,10 +1392,12 @@ namespace Isles
             // Double click to select entities of the same type within the screen
             if (type == EventType.DoubleClick && world.Pick() is GameObject)
             {
-                GameObject o = world.Pick() as GameObject;
+                var o = world.Pick() as GameObject;
 
                 if (o.Owner is LocalPlayer)
+                {
                     SelectMultiple(GetObjectsOfTheSameClass(o), false);
+                }
 
                 return EventResult.Handled;
             }
@@ -1295,7 +1405,7 @@ namespace Isles
             // Handle teams
             if (type == EventType.KeyDown && tag is Keys?)
             {
-                int value = KeyToNumber((tag as Keys?).Value, false);
+                var value = KeyToNumber((tag as Keys?).Value, false);
                 if (value >= 0 && value < 10)
                 {
                     if (selected.Count > 0)
@@ -1306,15 +1416,19 @@ namespace Isles
                         {
                             object first = null;
                             if (teams[value].Count > 0)
+                            {
                                 first = teams[value][0];
+                            }
 
                             foreach (GameObject o in selected)
                             {
                                 if (teams[value].Contains(o) ||
                                     (first is Charactor && o is Building) ||
                                     (first is Building && o is Charactor))
+                                {
                                     continue;
-                                    
+                                }
+
                                 teams[value].Add(o);
                             }
                         }
@@ -1331,7 +1445,7 @@ namespace Isles
                     // Select a team
                     if (teams[value].Count > 0)
                     {
-                        double currentSeconds = game.CurrentGameTime.TotalGameTime.TotalSeconds;
+                        var currentSeconds = game.CurrentGameTime.TotalGameTime.TotalSeconds;
 
                         if (keyDoublePressed)
                         {
@@ -1339,8 +1453,10 @@ namespace Isles
                             {
                                 keyDoublePressed = false;
                                 if (game.Camera is GameCamera && teams[value].Count > 0)
-                                   (game.Camera as GameCamera).FlyTo(
+                                {
+                                    (game.Camera as GameCamera).FlyTo(
                                        ProjectToScreenCenter(GetTeamPosition(teams[value])), false);
+                                }
                             }
                             else
                             {
@@ -1375,7 +1491,7 @@ namespace Isles
                 Vector3? location = world.Landscape.Pick();
                 EventResult handled = EventResult.Unhandled;
 
-                bool queueAction = game.Input.Keyboard.IsKeyDown(Keys.LeftShift) ||
+                var queueAction = game.Input.Keyboard.IsKeyDown(Keys.LeftShift) ||
                                    game.Input.Keyboard.IsKeyDown(Keys.RightShift);
 
                 if (picked != null && world.FogOfWar != null &&
@@ -1388,14 +1504,20 @@ namespace Isles
                 {
                     // Move to target
                     if (picked is GameObject)
-                       (picked as GameObject).Flash();
+                    {
+                        (picked as GameObject).Flash();
+                    }
 
                     foreach (GameObject o in selected)
                     {
                         if (o != picked)
+                        {
                             o.PerformAction(picked, queueAction);
+                        }
                         else if (location.HasValue)
+                        {
                             o.PerformAction(location.Value, queueAction);
+                        }
                     }
 
                     return EventResult.Handled;
@@ -1408,7 +1530,9 @@ namespace Isles
                 }
 
                 if (handled == EventResult.Handled)
+                {
                     return EventResult.Handled;
+                }
             }
 
             // For Debugging
@@ -1416,15 +1540,21 @@ namespace Isles
             if (type == EventType.KeyDown && (tag as Keys?).Value == Keys.F11)
             {
                 if (game.GraphicsDevice.RenderState.FillMode == FillMode.WireFrame)
+                {
                     game.GraphicsDevice.RenderState.FillMode = FillMode.Solid;
+                }
                 else
+                {
                     game.GraphicsDevice.RenderState.FillMode = FillMode.WireFrame;
+                }
 
                 return EventResult.Handled;
             }
 
             if (type == EventType.KeyDown && (tag as Keys?).Value == Keys.F9)
+            {
                 game.Settings.ShowPathGraph = !game.Settings.ShowPathGraph;
+            }
 #endif
             return EventResult.Unhandled;
         }
@@ -1432,7 +1562,7 @@ namespace Isles
         private Vector2 GetTeamPosition(List<GameObject> list)
         {
             GameObject minObject = null;
-            float min = float.MaxValue;
+            var min = float.MaxValue;
 
             foreach (GameObject o in list)
             {
@@ -1443,15 +1573,12 @@ namespace Isles
                 }
             }
 
-            if (minObject != null)
-                return new Vector2(minObject.Position.X, minObject.Position.Y);
-
-            return Vector2.Zero;
+            return minObject != null ? new Vector2(minObject.Position.X, minObject.Position.Y) : Vector2.Zero;
         }
-        
+
         public void SelectGroup(GameObject o)
         {
-            for (int i = 0; i < groups.Count; i++)
+            for (var i = 0; i < groups.Count; i++)
             {
                 if (groups[i].Contains(o))
                 {
@@ -1463,7 +1590,7 @@ namespace Isles
 
         public void Focus(GameObject o)
         {
-            for (int i = 0; i < groups.Count; i++)
+            for (var i = 0; i < groups.Count; i++)
             {
                 if (groups[i].Contains(o))
                 {
@@ -1478,11 +1605,18 @@ namespace Isles
             if (newGroup >= 0 && newGroup < groups.Count)
             {
                 if (currentGroup >= 0 && currentGroup < groups.Count)
+                {
                     foreach (GameObject o in groups[currentGroup])
+                    {
                         o.Focused = false;
+                    }
+                }
+
                 currentGroup = newGroup;
                 foreach (GameObject o in groups[currentGroup])
+                {
                     o.Focused = true;
+                }
 
                 //if (groups[currentGroup].Count > 0 && groups[currentGroup][0] is Charactor &&
                 //    groups[currentGroup][0].Owner is LocalPlayer)
@@ -1507,12 +1641,14 @@ namespace Isles
 
             Ray ray = game.Unproject(game.ScreenWidth / 2, game.ScreenHeight / 2);
 
-            float dot = Vector3.Dot(-Vector3.UnitZ, ray.Direction);
+            var dot = Vector3.Dot(-Vector3.UnitZ, ray.Direction);
 
             if (dot == 0)
+            {
                 return center;
+            }
 
-            float distance = center.Z / dot;
+            var distance = center.Z / dot;
 
             center = center + ray.Direction * distance;
 
@@ -1521,15 +1657,12 @@ namespace Isles
 
         private int KeyToNumber(Keys key, bool numpad)
         {
-            if (numpad)
-                return (int)key - (int)Keys.NumPad0;
-            
-            return (int)key - (int)Keys.D0;
+            return numpad ? (int)key - (int)Keys.NumPad0 : (int)key - (int)Keys.D0;
         }
 
         public void PerformAction(Vector3 location)
         {
-            bool queueAction = game.Input.IsShiftPressed;
+            var queueAction = game.Input.IsShiftPressed;
 
             // Move to a location on the map
             if (selected.Count > 0 &&
@@ -1554,7 +1687,9 @@ namespace Isles
                 foreach (GameObject o in selected)
                 {
                     if (o.Owner is LocalPlayer)
+                    {
                         o.PerformAction(location, queueAction);
+                    }
                 }
             }
 
@@ -1644,7 +1779,7 @@ namespace Isles
         /// <summary>
         /// A dictionary storing each request and its priority
         /// </summary>
-        public Dictionary<string, float> Requests = new Dictionary<string, float>();
+        public Dictionary<string, float> Requests = new();
 
         /// <summary>
         /// Gets the first townhall
@@ -1657,14 +1792,16 @@ namespace Isles
                 {
                     LinkedList<GameObject> value;
                     if (Objects.TryGetValue(TownhallName, out value) && value.Count > 0)
+                    {
                         townhall = value.First.Value as Building;
+                    }
                 }
 
                 return townhall;
             }
         }
 
-        Building townhall;
+        private Building townhall;
 
         /// <summary>
         /// Gets the enermy of the player
@@ -1689,27 +1826,21 @@ namespace Isles
             }
         }
 
-        Player enermy;
+        private Player enermy;
 
         /// <summary>
         /// Gets the default rally point
         /// </summary>
-        public Vector3 DefaultRallyPoint
-        {
-            get { return defaultRallyPoint; }
-        }
+        public Vector3 DefaultRallyPoint => defaultRallyPoint;
 
-        Vector3 defaultRallyPoint;
+        private Vector3 defaultRallyPoint;
 
         /// <summary>
         /// Start running the computer player
         /// </summary>
         public override void Start(GameWorld world)
         {
-            if (world == null)
-                throw new ArgumentNullException();
-
-            this.World = world;
+            World = world ?? throw new ArgumentNullException();
 
             // Computer default rally point
             Vector2 toPlayer = Enermy.SpawnPoint - SpawnPoint;
@@ -1732,7 +1863,7 @@ namespace Isles
         /// </summary>
         public void Request(string type, int count, float scaler)
         {
-            int existingCount = 0;
+            var existingCount = 0;
             FutureObjects.TryGetValue(type, out existingCount);
 
             count -= existingCount;
@@ -1745,9 +1876,13 @@ namespace Isles
         public void Request(string type, float evaluation)
         {
             if (!Requests.ContainsKey(type))
+            {
                 Requests.Add(type, evaluation);
+            }
             else
+            {
                 Requests[type] = MathHelper.Lerp(Requests[type], evaluation, 0.5f);
+            }
 
             // Check dependencis
             //if (!CheckDependency(type))
@@ -1771,9 +1906,9 @@ namespace Isles
         /// </summary>
         public bool HasEnoughMoney(string type)
         {
-            float gold = GameDefault.Singleton.GetGold(type);
-            float lumber = GameDefault.Singleton.GetLumber(type);
-            float food = IsBuilding(type) ? 0 : GameDefault.Singleton.GetFood(type);
+            var gold = GameDefault.Singleton.GetGold(type);
+            var lumber = GameDefault.Singleton.GetLumber(type);
+            var food = IsBuilding(type) ? 0 : GameDefault.Singleton.GetFood(type);
 
             return gold <= Gold && lumber <= Lumber &&
                    (food == 0 || (food > 0 && food <= FoodCapacity - Food));
@@ -1788,32 +1923,44 @@ namespace Isles
 
             // Townhall should be treated seperately
             if (Townhall != null)
+            {
                 startPosition = Townhall.Position;
+            }
             else
+            {
                 startPosition = new Vector3(SpawnPoint, 0);
+            }
 
             if (CheckDependency(type))
             {
-                bool queue = false;
+                var queue = false;
                 Worker builder = null;
-                int minCost = int.MaxValue;
+                var minCost = int.MaxValue;
 
                 // Find a peon
                 foreach (GameObject o in EnumerateObjects(WorkerName))
                 {
-                    Worker p = o as Worker;
+                    var p = o as Worker;
 
                     if (p == null)
+                    {
                         continue;
+                    }
 
-                    int cost = 10;
+                    var cost = 10;
 
                     if (p.State is StateCharactorIdle)
+                    {
                         cost = 0;
+                    }
                     else if (p.State is StateHarvestLumber)
+                    {
                         cost = 1;
+                    }
                     else if (p.State is StateHarvestGold)
+                    {
                         cost = 2;
+                    }
 
                     if (cost < minCost)
                     {
@@ -1825,15 +1972,17 @@ namespace Isles
 
                 if (builder != null)
                 {
-                    Building building = World.Create(type) as Building;
+                    var building = World.Create(type) as Building;
 
                     if (building == null)
+                    {
                         throw new ArgumentException();
+                    }
 
                     // Find a place to build
                     float Radius = 80;
-                    bool valid = false;
-                    int counter = 0;
+                    var valid = false;
+                    var counter = 0;
 
                     while (!valid)
                     {
@@ -1872,11 +2021,11 @@ namespace Isles
         public void Train(string type)
         {
             Building building = null;
-            int minRequest = int.MaxValue;
+            var minRequest = int.MaxValue;
 
             foreach (GameObject o in EnumerateObjects())
             {
-                Building b = o as Building;
+                var b = o as Building;
 
                 if (b != null && b.CanTrain(type) && b.QueuedSpells.Count < minRequest)
                 {
@@ -1886,20 +2035,27 @@ namespace Isles
             }
 
             if (building != null)
+            {
                 building.TrainUnit(type);
+            }
         }
-
 
         public override void Update(GameTime gameTime)
         {
             if (Develop != null)
+            {
                 Develop.Update(gameTime);
+            }
 
             if (Attack != null)
+            {
                 Attack.Update(gameTime);
+            }
 
             if (Defend != null)
+            {
                 Defend.Update(gameTime);
+            }
 
 #if DEBUG
             if (World.Game.Input.Keyboard.IsKeyDown(Keys.F8))
@@ -1912,7 +2068,7 @@ namespace Isles
 
                 foreach (KeyValuePair<string, float> pair in Requests)
                 {
-                    int existing = 0;
+                    var existing = 0;
                     FutureObjects.TryGetValue(pair.Key, out existing);
 
                     World.Game.Graphics2D.DrawShadowedString(

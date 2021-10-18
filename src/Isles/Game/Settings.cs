@@ -92,12 +92,9 @@ namespace Isles.Engine
         /// <returns></returns>
         public static Settings CreateDefaultSettings(Stream stream)
         {
-            Settings settings = new Settings();
+            var settings = new Settings();
 
-            if (stream == null)
-                return settings;
-
-            return (Settings)new XmlSerializer(typeof(Settings)).Deserialize(stream);
+            return stream == null ? settings : (Settings)new XmlSerializer(typeof(Settings)).Deserialize(stream);
         }
 
         /// <summary>

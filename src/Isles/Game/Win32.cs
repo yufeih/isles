@@ -12,10 +12,10 @@ namespace Isles.Engine
     public sealed class Win32
     {
         // WM_NOTIFY notificaiton message header.
-        [System.Runtime.InteropServices.StructLayout(LayoutKind.Sequential)]
+        [StructLayout(LayoutKind.Sequential)]
         public class NMHDR
         {
-            private IntPtr hwndFrom;
+            private readonly IntPtr hwndFrom;
             public uint idFrom;
             public uint code;
         }
@@ -84,7 +84,7 @@ namespace Isles.Engine
         // high 16 bits of the value passed in.
         public static Point LParamToPoint(int lParam)
         {
-            uint ulParam = (uint)lParam;
+            var ulParam = (uint)lParam;
             return new Point(
                 (int)(ulParam & 0x0000ffff),
                 (int)((ulParam & 0xffff0000) >> 16));

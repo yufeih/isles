@@ -26,18 +26,14 @@ namespace Isles.UI
         /// </summary>
         /// FIXME: This is not a good design practise...
         protected BroadcastList<IUIElement, List<IUIElement>> elements = new
-                  BroadcastList<IUIElement, List<IUIElement>>();
-
+();
 
         /// <summary>
         /// Gets all ui elements contained in this panel
         /// </summary>
-        public IEnumerable<IUIElement> Elements
-        {
-            get { return elements; }
-        }
+        public IEnumerable<IUIElement> Elements => elements;
 
-        Rectangle effectiveRegion;
+        private Rectangle effectiveRegion;
 
         /// <summary>
         /// Gets or sets the region that takes effect
@@ -45,12 +41,11 @@ namespace Isles.UI
         /// </summary>
         public Rectangle EffectiveRegion
         {
-            get { return effectiveRegion; }
-            set { effectiveRegion = value; }
+            get => effectiveRegion;
+            set => effectiveRegion = value;
         }
 
-
-        Rectangle actualEffectiveRegion;
+        private Rectangle actualEffectiveRegion;
         public Rectangle ActualEffectiveRegion
         {
             get
@@ -62,7 +57,6 @@ namespace Isles.UI
                 return actualEffectiveRegion;
             }
         }
-
 
         public override Rectangle DestinationRectangle
         {
@@ -115,16 +109,19 @@ namespace Isles.UI
         public virtual void Clear()
         {
             foreach (IUIElement element in elements)
+            {
                 element.Parent = null;
+            }
 
             elements.Clear();
         }
 
-
         protected override void OnEnableStateChanged()
         {
             foreach (IUIElement element in elements)
+            {
                 element.Enabled = Enabled;
+            }
         }
 
         /// <summary>
@@ -136,7 +133,9 @@ namespace Isles.UI
             elements.Update();
 
             foreach (IUIElement element in elements)
+            {
                 element.Update(gameTime);
+            }
         }
 
         /// <summary>
@@ -148,10 +147,14 @@ namespace Isles.UI
             if (Visible)
             {
                 if (Texture != null)
+                {
                     sprite.Draw(Texture, DestinationRectangle, SourceRectangle, Color.White);
+                }
 
                 foreach (IUIElement element in elements)
+                {
                     element.Draw(gameTime, sprite);
+                }
             }
         }
 
@@ -159,12 +162,16 @@ namespace Isles.UI
         {
             if (Visible && Enabled)
             {
-                Input input = sender as Input;
+                var input = sender as Input;
 
                 foreach (IUIElement element in elements)
+                {
                     if (element.Enabled &&
                         element.HandleEvent(type, sender, tag) == EventResult.Handled)
+                    {
                         return EventResult.Handled;
+                    }
+                }
 
                 // Block mouse events
                 if ((type == EventType.LeftButtonDown || type == EventType.RightButtonDown ||
@@ -178,7 +185,6 @@ namespace Isles.UI
             return EventResult.Unhandled;
         }
 
-
     }
     #endregion
 
@@ -191,14 +197,13 @@ namespace Isles.UI
         /// <summary>
         /// Index of the left most UIElement shown currently
         /// </summary>
-        int current;
+        private int current;
 
         /// <summary>
         /// Max number of UIElement visible
         /// </summary>
-        int max;
-
-        int buttonWidth, scrollButtonWidth, buttonHeight;
+        private int max;
+        private readonly int buttonWidth, scrollButtonWidth, buttonHeight;
 
         public Button Left;
         public Button Right;
@@ -207,7 +212,7 @@ namespace Isles.UI
             : base(area)
         {
             this.buttonWidth = buttonWidth;
-            this.buttonHeight = DestinationRectangle.Height;
+            buttonHeight = DestinationRectangle.Height;
             this.scrollButtonWidth = scrollButtonWidth;
 
             current = 0;
@@ -227,7 +232,7 @@ namespace Isles.UI
             Right.Click += new EventHandler(RightScroll_Click);
         }
 
-        void RightScroll_Click(object sender, EventArgs e)
+        private void RightScroll_Click(object sender, EventArgs e)
         {
             if (Enabled)
             {
@@ -237,12 +242,14 @@ namespace Isles.UI
                     Left.Enabled = true;
 
                     if (current == elements.Count - max)
+                    {
                         Right.Enabled = false;
+                    }
                 }
             }
         }
 
-        void LeftScroll_Click(object sender, EventArgs e)
+        private void LeftScroll_Click(object sender, EventArgs e)
         {
             if (Enabled)
             {
@@ -252,21 +259,25 @@ namespace Isles.UI
                     Right.Enabled = true;
 
                     if (current == 0)
+                    {
                         Left.Enabled = false;
+                    }
                 }
             }
         }
 
         public override void Add(IUIElement element)
         {
-            UIElement e = element as UIElement;
+            var e = element as UIElement;
 
             // Scroll panel works only with UIElement
             if (e == null)
+            {
                 throw new ArgumentException();
+            }
 
             // Reset element area
-            Rectangle rect = new Rectangle(
+            var rect = new Rectangle(
                 scrollButtonWidth + (elements.Count - current) * buttonWidth,
                 0, buttonWidth, buttonHeight);
 
@@ -275,9 +286,13 @@ namespace Isles.UI
             e.ScaleMode = ScaleMode.ScaleY;
 
             if (elements.Count < current + max)
+            {
                 Right.Enabled = false;
+            }
             else
+            {
                 Right.Enabled = true;
+            }
 
             rect.X += buttonWidth;
             rect.Width = scrollButtonWidth;
@@ -310,7 +325,9 @@ namespace Isles.UI
         public override void Update(GameTime gameTime)
         {
             if (!Visible)
+            {
                 return;
+            }
 
             Left.Update(gameTime);
             Right.Update(gameTime);
@@ -321,7 +338,9 @@ namespace Isles.UI
         public override void Draw(GameTime gameTime, SpriteBatch sprite)
         {
             if (!Visible)
+            {
                 return;
+            }
 
             Rectangle rect;
 
@@ -330,11 +349,13 @@ namespace Isles.UI
             rect.Width = buttonWidth;
             rect.Height = buttonHeight;
 
-            int n = current + max - 1;
+            var n = current + max - 1;
             if (n > elements.Count)
+            {
                 n = elements.Count;
+            }
 
-            for (int i = 0; i < elements.Count; i++)
+            for (var i = 0; i < elements.Count; i++)
             {
                 if (i >= current && i < n)
                 {
@@ -363,14 +384,14 @@ namespace Isles.UI
     #region TextField
     public class TextField : Panel
     {
-        String text;
+        private String text;
 
         /// <summary>
         /// Gets or sets the text to be displayed
         /// </summary>
         public String Text
         {
-            get { return text; }
+            get => text;
             set
             {
                 text = value;
@@ -393,37 +414,32 @@ namespace Isles.UI
             }
         }
 
-        String formatedText;
+        private String formatedText;
 
         /// <summary>
         /// Gets the formatted text
         /// </summary>
-        public String FormatedText
-        {
-            get { return formatedText; }
-        }
-
+        public String FormatedText => formatedText;
 
         /// <summary>
         /// Color of the text
         /// </summary>
-        Color color;
+        private Color color;
         public Color Color
         {
-            get { return color; }
-            set { color = value; }
+            get => color;
+            set => color = value;
         }
 
-
-        bool centered = false;
+        private bool centered = false;
         /// <summary>
         /// Gets or sets whether the text is centered
         /// </summary>
         public bool Centered
         {
-            get { return centered; }
-            set 
-            { 
+            get => centered;
+            set
+            {
                 centered = value;
 
                 if (centered)
@@ -434,30 +450,27 @@ namespace Isles.UI
             }
         }
 
-        float fontSize = 13f / 23;
+        private float fontSize = 13f / 23;
 
         /// <summary>
         /// Gets or sets the font size
         /// </summary>
         public float FontSize
         {
-            get { return fontSize; }
-            set { fontSize = value; }
+            get => fontSize;
+            set => fontSize = value;
 
         }
 
-        public int RealHeight
-        {
-            get { return (int)(Graphics2D.Font.MeasureString(formatedText).Y * fontSize); }
-        }
+        public int RealHeight => (int)(Graphics2D.Font.MeasureString(formatedText).Y * fontSize);
 
         // Whether the text is shadowed
-        bool shadowed = false;
+        private bool shadowed = false;
 
         public bool Shadowed
         {
-            get { return shadowed; }
-            set { shadowed = value; }
+            get => shadowed;
+            set => shadowed = value;
         }
 
         /// <summary>
@@ -467,10 +480,10 @@ namespace Isles.UI
 
         public Color ShadowColor
         {
-            get { return shadowColor; }
-            set { shadowColor = value; }
+            get => shadowColor;
+            set => shadowColor = value;
         }
-	
+
         /// <summary>
         /// Constructors
         /// </summary>
@@ -481,8 +494,8 @@ namespace Isles.UI
         {
             this.color = color;
             this.fontSize = fontSize;
-            this.EffectiveRegion = Rectangle.Empty;
-            this.Text = text;   // Note this upper case Text
+            EffectiveRegion = Rectangle.Empty;
+            Text = text;   // Note this upper case Text
         }
 
         /// <summary>
@@ -497,8 +510,8 @@ namespace Isles.UI
             this.shadowColor = shadowColor;
             this.color = color;
             this.fontSize = fontSize;
-            this.Text = text;
-            this.EffectiveRegion = Rectangle.Empty;
+            Text = text;
+            EffectiveRegion = Rectangle.Empty;
         }
 
         /// <summary>
@@ -509,7 +522,7 @@ namespace Isles.UI
             return EventResult.Unhandled;
         }
 
-        String[] lines;
+        private String[] lines;
 
         public override Rectangle DestinationRectangle
         {
@@ -532,15 +545,17 @@ namespace Isles.UI
         public override void Draw(GameTime gameTime, SpriteBatch sprite)
         {
             if (text == null)
+            {
                 return;
+            }
 
-            int width = DestinationRectangle.Width;
+            var width = DestinationRectangle.Width;
             
             if (Centered)
             {
                 Vector2 size = Graphics2D.Font.MeasureString(formatedText) * fontSize;
-                float heightOffset = (DestinationRectangle.Height - size.Y) / 2 + DestinationRectangle.Top;
-                for (int i = 0; i < lines.Length; i++)
+                var heightOffset = (DestinationRectangle.Height - size.Y) / 2 + DestinationRectangle.Top;
+                for (var i = 0; i < lines.Length; i++)
                 {
                     size = Graphics2D.Font.MeasureString(lines[i]) * fontSize;
                     sprite.DrawString(  Graphics2D.Font, lines[i],
@@ -549,11 +564,14 @@ namespace Isles.UI
                                         color, 0, Vector2.Zero, fontSize,
                                         SpriteEffects.None, 0);
                     if (shadowed)
+                    {
                         sprite.DrawString(Graphics2D.Font, lines[i],
                                         new Vector2((DestinationRectangle.Width - size.X) / 2 + 
                                                     1 + DestinationRectangle.Left, heightOffset + 1),
                                          shadowColor, 0, Vector2.Zero, fontSize,
                                         SpriteEffects.None, 0);
+                    }
+
                     heightOffset += size.Y;
                 }
             }
@@ -564,10 +582,12 @@ namespace Isles.UI
                                    color, 0, Vector2.Zero, fontSize,
                                    SpriteEffects.None, 0);
                 if (shadowed)
+                {
                     sprite.DrawString(  Graphics2D.Font, formatedText,
                                         new Vector2(DestinationRectangle.X + 1, DestinationRectangle.Y + 1),
                                         shadowColor, 0, Vector2.Zero, fontSize,
                                         SpriteEffects.None, 0);
+                }
             }
             base.Draw(gameTime, sprite);
         }
@@ -579,19 +599,19 @@ namespace Isles.UI
     {
         public int MaxCharactors
         {
-            get { return maxCharactors; }
-            set { maxCharactors = value; }
+            get => maxCharactors;
+            set => maxCharactors = value;
         }
 
-        int maxCharactors = 20;
+        private int maxCharactors = 20;
 
         public TextBox(float fontSize, Color color, Rectangle area)
             : base("", fontSize, color, area)
         {
         }
 
-        bool flash = false;
-        double flashElapsedTime = 0;
+        private bool flash = false;
+        private double flashElapsedTime = 0;
 
         public override void Draw(GameTime gameTime, SpriteBatch sprite)
         {
@@ -608,15 +628,17 @@ namespace Isles.UI
                 base.Draw(gameTime, sprite);
                 Text = Text.Remove(Text.Length - 1);
             }
-            else 
+            else
+            {
                 base.Draw(gameTime, sprite);
+            }
         }
 
         public override EventResult HandleEvent(EventType type, object sender, object tag)
         {
             if (type == EventType.KeyDown && tag is Keys? && sender is Input)
             {
-                Input input = sender as Input;
+                var input = sender as Input;
                 Keys key = (tag as Keys?).Value;
 
                 // Delete a charactor
@@ -627,9 +649,9 @@ namespace Isles.UI
                 }
 
                 // New charactor
-                bool upperCase = input.Keyboard.IsKeyDown(Keys.CapsLock);//input.IsShiftPressed;
+                var upperCase = input.Keyboard.IsKeyDown(Keys.CapsLock);//input.IsShiftPressed;
 
-                char inputChar = Input.KeyToChar(key, upperCase);
+                var inputChar = Input.KeyToChar(key, upperCase);
 
                 if (Text.Length < maxCharactors &&
                    (inputChar != ' ' || (inputChar == ' ' && key == Keys.Space)))

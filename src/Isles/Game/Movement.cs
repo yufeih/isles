@@ -58,22 +58,23 @@ namespace Isles.Engine
     public class StateMoveToTarget : BaseState
     {
         public float FollowDistance = 30;
-        const float SensorDistance = 10;
-
-        IMovable owner;
-        IWorldObject target;
-        PathManager pathManager;
-        StateMoveToPosition move;
-        Vector2 lastPosition;
-        float priority;
-        Random random = new Random();
-        double reactivateTimer = 0;
+        private const float SensorDistance = 10;
+        private readonly IMovable owner;
+        private readonly IWorldObject target;
+        private readonly PathManager pathManager;
+        private StateMoveToPosition move;
+        private Vector2 lastPosition;
+        private readonly float priority;
+        private readonly Random random = new();
+        private double reactivateTimer = 0;
 
         public StateMoveToTarget(IMovable owner, IWorldObject target,
                                  float priority, PathManager pathManager)
         {
             if (owner == null || target == null || pathManager == null)
+            {
                 throw new ArgumentNullException();
+            }
 
             this.owner = owner;
             this.target = target;
@@ -97,7 +98,9 @@ namespace Isles.Engine
         public override void Terminate()
         {
             if (move != null)
+            {
                 move.Terminate();
+            }
         }
 
         public override StateResult Update(GameTime gameTime)
@@ -105,7 +108,9 @@ namespace Isles.Engine
             ActivateIfInactive();
 
             if (reactivateTimer > 0)
+            {
                 reactivateTimer -= gameTime.ElapsedGameTime.TotalSeconds;
+            }
 
             // Checks if the target has changed its position
             Vector2 distance;
@@ -140,7 +145,9 @@ namespace Isles.Engine
                     move = null;
 
                     if (!(target is IMovable))
+                    {
                         return StateResult.Completed;
+                    }
                 }
 
                 // Stop following
@@ -150,7 +157,9 @@ namespace Isles.Engine
                     move = null;
 
                     if (result == StateResult.Failed)
+                    {
                         return State = StateResult.Failed;
+                    }
                 }
             }
             else
@@ -166,32 +175,34 @@ namespace Isles.Engine
     #region StateMoveToPosition
     public class StateMoveToPosition : BaseState
     {
-        IMovable owner;
-        Vector2 destination;
-        PathManager pathManager;
-        Path path;
-        LinkedListNode<PathEdge> currentEdge;
-        StateMoveToPositionPrecise move;
-        float distanceThreshold;
-        float priority;
+        private readonly IMovable owner;
+        private Vector2 destination;
+        private readonly PathManager pathManager;
+        private Path path;
+        private LinkedListNode<PathEdge> currentEdge;
+        private StateMoveToPositionPrecise move;
+        private float distanceThreshold;
+        private readonly float priority;
 
         public StateMoveToPosition(Vector2 target, IMovable owner, float priority, PathManager pathManager)
         {
             if (owner == null || pathManager == null)
+            {
                 throw new ArgumentNullException();
+            }
 
             this.priority = priority;
             this.owner = owner;
-            this.destination = target;
+            destination = target;
             this.pathManager = pathManager;
         }
 
         public override void Activate()
         {
-            Vector2 start = new Vector2(owner.Position.X, owner.Position.Y);
+            var start = new Vector2(owner.Position.X, owner.Position.Y);
             Vector2 toDestination = destination - start;
 
-            float minSearchDistance = PathManager.AreaSize * pathManager.Graph.CellSize * 0.6f;
+            var minSearchDistance = PathManager.AreaSize * pathManager.Graph.CellSize * 0.6f;
 
             if (toDestination.LengthSquared() > minSearchDistance * minSearchDistance)
             {
@@ -240,7 +251,9 @@ namespace Isles.Engine
         public override void Terminate()
         {
             if (move != null)
+            {
                 move.Terminate();
+            }
         }
 
         public override StateResult Update(GameTime gameTime)
@@ -248,17 +261,21 @@ namespace Isles.Engine
             ActivateIfInactive();
 
             if (move == null)
+            {
                 return State;
+            }
 
             //pathManager.DrawPath(path);
 
             StateResult result = move.Update(gameTime);
 
             if (result == StateResult.Failed)
+            {
                 return StateResult.Failed;
+            }
 
             // Smoothing on the large graph
-            bool stepNext = false;
+            var stepNext = false;
 
             if (currentEdge != null && currentEdge.Next != null)
             {
@@ -299,28 +316,30 @@ namespace Isles.Engine
     #region StateMoveToPositionPrecise
     public class StateMoveToPositionPrecise : BaseState
     {
-        IMovable owner;
-        PathManager pathManager;
-        Vector2 originalDestination;
-        Vector2 destination;
-        StateSeekToPosition seek;
-        Path path;
-        LinkedListNode<PathEdge> currentEdge;
-        bool includeDynamic = false;
-        bool pathQuerying = false;
-        int retryCounter = 0;
-        int maxRetryTimes = 20;
-        float priority;
+        private readonly IMovable owner;
+        private readonly PathManager pathManager;
+        private Vector2 originalDestination;
+        private Vector2 destination;
+        private StateSeekToPosition seek;
+        private Path path;
+        private LinkedListNode<PathEdge> currentEdge;
+        private bool includeDynamic = false;
+        private bool pathQuerying = false;
+        private int retryCounter = 0;
+        private readonly int maxRetryTimes = 20;
+        private readonly float priority;
 
         public StateMoveToPositionPrecise(Vector2 target, IMovable owner,
                                           float priority, PathManager pathManager)
         {
             if (null == owner || null == pathManager)
+            {
                 throw new ArgumentNullException();
+            }
 
             this.priority = priority;
-            this.originalDestination = target;
-            this.destination = target;
+            originalDestination = target;
+            destination = target;
             this.owner = owner;
             this.pathManager = pathManager;
         }
@@ -328,7 +347,9 @@ namespace Isles.Engine
         public override void Terminate()
         {
             if (seek != null)
+            {
                 seek.Terminate();
+            }
 
             if (destination.X != owner.Position.X &&
                 destination.Y != owner.Position.Y)
@@ -376,7 +397,9 @@ namespace Isles.Engine
             ActivateIfInactive();
 
             if (seek == null)
+            {
                 return State;
+            }
 
             //pathManager.DrawPath(path);
 
@@ -400,7 +423,9 @@ namespace Isles.Engine
                 seek.Terminate();
 
                 if (retryCounter++ > maxRetryTimes)
+                {
                     return StateResult.Failed;
+                }
 
                 // Reactivate
                 State = StateResult.Inactive;
@@ -434,7 +459,9 @@ namespace Isles.Engine
                 path = tag as Path;
 
                 if (path == null || path.Edges == null || path.Edges.Count < 1)
+                {
                     throw new InvalidOperationException();
+                }
 
                 currentEdge = path.Edges.First;
 
@@ -472,14 +499,14 @@ namespace Isles.Engine
     public class StateSeekToPosition : BaseState
     {
         public float WaitTime = 0;
-        IMovable owner;
-        PathManager pathManager;
-        Vector2 destination;
-        float elapsedWaitTime = 0;
-        float totalWaitTime = MaxTotalWaitTime;
-        const float MaxSeperation = 0.2f;
-        const float MaxTotalWaitTime = 0.2f;
-        const float MinTotalWaitTime = 0.05f;
+        private readonly IMovable owner;
+        private readonly PathManager pathManager;
+        private Vector2 destination;
+        private float elapsedWaitTime = 0;
+        private float totalWaitTime = MaxTotalWaitTime;
+        private const float MaxSeperation = 0.2f;
+        private const float MaxTotalWaitTime = 0.2f;
+        private const float MinTotalWaitTime = 0.05f;
 
         public override void Activate()
         {
@@ -494,18 +521,20 @@ namespace Isles.Engine
         public StateSeekToPosition(Vector2 target, IMovable owner, PathManager pathManager)
         {
             if (null == owner || null == pathManager)
+            {
                 throw new ArgumentNullException();
+            }
 
             this.owner = owner;
             this.pathManager = pathManager;
-            this.destination = target;
+            destination = target;
         }
 
         public override StateResult Update(GameTime gameTime)
         {
             ActivateIfInactive();
 
-            float elapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            var elapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             // We don't want to make the entity moving too physically
             // Moves the agent towards the target.
@@ -515,8 +544,10 @@ namespace Isles.Engine
             facing.Z = 0;
 
             if (facing.X == 0 && facing.Y == 0)
+            {
                 return StateResult.Completed;
-                
+            }
+
             facing.Normalize();
 
             // Set entity facing
@@ -558,10 +589,7 @@ namespace Isles.Engine
                     //    totalWaitTime = 0.2f;
                 }
 
-                if (totalWaitTime < (elapsedWaitTime += elapsedSeconds))
-                    return State = StateResult.Failed;
-
-                return State = StateResult.Active;
+                return totalWaitTime < (elapsedWaitTime += elapsedSeconds) ? (State = StateResult.Failed) : (State = StateResult.Active);
             }
 
             return State;

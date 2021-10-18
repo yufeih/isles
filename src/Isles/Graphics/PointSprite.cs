@@ -50,27 +50,27 @@ namespace Isles.Graphics
         /// <summary>
         /// PointSprite effect
         /// </summary>
-        Effect effect;
+        private readonly Effect effect;
 
         /// <summary>
         /// Internal pointSprite list
         /// </summary>
-        List<PointSprite> pointSprites = new List<PointSprite>();
+        private readonly List<PointSprite> pointSprites = new();
 
         /// <summary>
         /// Point sprite vertices
         /// </summary>
-        DynamicVertexBuffer vertices;
+        private readonly DynamicVertexBuffer vertices;
 
         /// <summary>
         /// Vertex buffer used to generate vertices
         /// </summary>
-        VertexPositionTexture[] workingVertices = new VertexPositionTexture[ChunkSize];
+        private readonly VertexPositionTexture[] workingVertices = new VertexPositionTexture[ChunkSize];
 
         /// <summary>
         /// Graphics device
         /// </summary>
-        BaseGame game;
+        private readonly BaseGame game;
         #endregion
 
         #region Methods
@@ -120,7 +120,9 @@ namespace Isles.Graphics
         public void Present(GameTime gameTime)
         {
             if (pointSprites.Count <= 0)
+            {
                 return;
+            }
 
             game.GraphicsDevice.VertexDeclaration = new VertexDeclaration(
                 game.GraphicsDevice, VertexPositionTexture.VertexElements);
@@ -131,9 +133,9 @@ namespace Isles.Graphics
 
             Texture texture = pointSprites[0].Texture;
 
-            int baseVertex = 0;
+            var baseVertex = 0;
             int begin = 0, end = 0;
-            for (int i = 0; i <= pointSprites.Count; i++)
+            for (var i = 0; i <= pointSprites.Count; i++)
             {
                 // We are at the end of the chunk
                 if (i != pointSprites.Count &&    // End of list
@@ -145,7 +147,9 @@ namespace Isles.Graphics
                 end = i;
 
                 if (end == begin)
+                {
                     continue;
+                }
 
                 // Setup graphics device
                 game.GraphicsDevice.Vertices[0].SetSource(null, 0, 0);
@@ -153,7 +157,7 @@ namespace Isles.Graphics
 
                 // Build the mesh for this chunk of pointSprites
                 baseVertex = 0;
-                for (int k = begin; k < end; k++)
+                for (var k = begin; k < end; k++)
                 {
                     workingVertices[baseVertex].Position = pointSprites[k].Position;
                     workingVertices[baseVertex].TextureCoordinate.X = pointSprites[k].Size;
@@ -222,10 +226,14 @@ namespace Isles.Graphics
             if (disposing)
             {
                 if (effect != null)
+                {
                     effect.Dispose();
+                }
 
                 if (vertices != null)
+                {
                     vertices.Dispose();
+                }
             }
         }
 

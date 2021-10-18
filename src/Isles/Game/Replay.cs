@@ -34,11 +34,9 @@ namespace Isles
         /// </summary>
         public const string Magic = "Isles Replay";
         public const byte Version = 0;
-
-        uint currentOffset = 0;
-
-        List<Keyframe> keyframes = new List<Keyframe>();
-        List<byte[]> keyValues = new List<byte[]>();
+        private uint currentOffset = 0;
+        private readonly List<Keyframe> keyframes = new();
+        private readonly List<byte[]> keyValues = new();
 
         public GameRecorder()
         {
@@ -55,9 +53,11 @@ namespace Isles
             frame.Time = time;
             frame.Offset = currentOffset;
 
-            byte[] value = new byte[length];
-            for (int i = 0; i < length; i++)
+            var value = new byte[length];
+            for (var i = 0; i < length; i++)
+            {
                 value[i] = bytes[i + offset];
+            }
 
             keyframes.Add(frame);
             keyValues.Add(value);
@@ -82,29 +82,31 @@ namespace Isles
         public void Save(Stream output, string worldFilename, Stream worldStream)
         {
             // Write replay header
-            byte[] magic = Encoding.ASCII.GetBytes(Magic);            
+            var magic = Encoding.ASCII.GetBytes(Magic);            
             output.Write(magic, 0, magic.Length);
             output.WriteByte(Version);
 
             // Write map info & map identifier
             if (worldFilename.Length > byte.MaxValue)
+            {
                 throw new Exception("Filename too long: " + worldFilename);
+            }
 
             output.WriteByte((byte)(worldFilename.Length));
-            byte[] file = Encoding.Default.GetBytes(worldFilename);
+            var file = Encoding.Default.GetBytes(worldFilename);
             output.Write(file, 0, file.Length);
 
             // Compute MD5 hash key
             MD5 md5 = new MD5CryptoServiceProvider();
-            byte[] worldIdentifier = md5.ComputeHash(worldStream);
+            var worldIdentifier = md5.ComputeHash(worldStream);
             output.Write(worldIdentifier, 0, worldIdentifier.Length);
 
             // Write keyframe count
-            byte[] keyframeCount = BitConverter.GetBytes(keyframes.Count);
+            var keyframeCount = BitConverter.GetBytes(keyframes.Count);
             output.Write(keyframeCount, 0, keyframeCount.Length);
 
             // Store header offset
-            uint headerOffset = (uint)output.Position;
+            var headerOffset = (uint)output.Position;
 
             // Write each keyframe
             foreach (Keyframe keyframe in keyframes)
@@ -116,14 +118,14 @@ namespace Isles
                 frame.Offset += headerOffset + (uint)(keyframes.Count * Keyframe.SizeInBytes);
 
                 // Convert keyframe to bytes
-                byte[] bytes = Helper.ObjectToByteArray(frame);
+                var bytes = Helper.ObjectToByteArray(frame);
 
                 // Write it into the output stream
                 output.Write(bytes, 0, bytes.Length);
             }
 
             // Write each key value
-            foreach (byte[] value in keyValues)
+            foreach (var value in keyValues)
             {
                 output.Write(value, 0, value.Length);
             }
@@ -142,22 +144,16 @@ namespace Isles
             public byte[] Bytes;
         }
         #endregion
-        
-        int currentFrame;
 
-        BaseGame game;
-
-        List<Keyframe> keyframes;
-
-        string worldFilename;
+        private int currentFrame;
+        private readonly BaseGame game;
+        private List<Keyframe> keyframes;
+        private string worldFilename;
 
         /// <summary>
         /// Gets the world filename of this replay
         /// </summary>
-        public string WorldFilename
-        {
-            get { return worldFilename; }
-        }
+        public string WorldFilename => worldFilename;
 
         public GameReplay(BaseGame game)
         {
@@ -170,33 +166,43 @@ namespace Isles
         public bool Load(Stream input)
         {
             // Read replay header
-            byte[] magic = Encoding.ASCII.GetBytes(GameRecorder.Magic);
-            byte[] buffer = new byte[magic.Length];
+            var magic = Encoding.ASCII.GetBytes(GameRecorder.Magic);
+            var buffer = new byte[magic.Length];
 
-            int bytesRead = input.Read(buffer, 0, magic.Length);
+            var bytesRead = input.Read(buffer, 0, magic.Length);
 
             if (bytesRead != magic.Length || !Helper.ByteArrayEquals(magic, buffer))
+            {
                 return false;
+            }
 
-            int version = input.ReadByte();
+            var version = input.ReadByte();
 
             // Check replay version
             if (version != (int)GameRecorder.Version)
+            {
                 return false;
+            }
 
             // Read map info
-            int filenameLength = input.ReadByte();
+            var filenameLength = input.ReadByte();
             if (filenameLength < 0)
+            {
                 return false;
+            }
 
             // World filename
             if (buffer.Length < filenameLength)
+            {
                 buffer = new byte[filenameLength];
+            }
 
             bytesRead = input.Read(buffer, 0, filenameLength);
             
             if (bytesRead != filenameLength)
+            {
                 return false;
+            }
 
             worldFilename = Encoding.Default.GetString(buffer, 0, filenameLength);
 
@@ -217,29 +223,37 @@ namespace Isles
             bytesRead = input.Read(buffer, 0, MD5HashLength);
 
             if (bytesRead != MD5HashLength || !Helper.ByteArrayEquals(worldMD5, buffer))
+            {
                 return false;
+            }
 
             // Read keyframes
             bytesRead = input.Read(buffer, 0, 4);
             if (bytesRead != 4)
+            {
                 return false;
+            }
 
-            int keyframeCount = BitConverter.ToInt32(buffer, 0);
+            var keyframeCount = BitConverter.ToInt32(buffer, 0);
             if (keyframeCount <= 0)
+            {
                 return false;
+            }
 
-            List<Keyframe> keyframes = new List<Keyframe>(keyframeCount);
-            uint[] offsets = new uint[keyframeCount + 1];
+            var keyframes = new List<Keyframe>(keyframeCount);
+            var offsets = new uint[keyframeCount + 1];
             offsets[keyframeCount] = (uint)input.Length;
 
             // Read each individual keyframe
             buffer = new byte[GameRecorder.Keyframe.SizeInBytes];
-            for (int i = 0; i < keyframeCount; i++)
+            for (var i = 0; i < keyframeCount; i++)
             {
                 bytesRead = input.Read(buffer, 0, buffer.Length);
 
                 if (bytesRead != buffer.Length)
+                {
                     return false;
+                }
 
                 // Convert from bytes to keyframe
                 GameRecorder.Keyframe frame;
@@ -258,21 +272,25 @@ namespace Isles
             }
 
             // Read each raw data associated with each keyframe
-            for (int i = 0; i < keyframeCount; i++)
+            for (var i = 0; i < keyframeCount; i++)
             {
-                int length = (int)(offsets[i + 1]) - (int)(offsets[i]);
+                var length = (int)(offsets[i + 1]) - (int)(offsets[i]);
 
                 if (length <= 0)
+                {
                     return false;
+                }
 
-                byte[] bytes = new byte[length];
+                var bytes = new byte[length];
 
                 input.Seek((long)offsets[i], SeekOrigin.Begin);
                 
                 bytesRead = input.Read(bytes, 0, length);
 
                 if (bytesRead != length)
+                {
                     return false;
+                }
 
                 Keyframe newFrame = keyframes[i];
                 newFrame.Bytes = bytes;
@@ -287,7 +305,7 @@ namespace Isles
 
             // Store it
             this.keyframes = keyframes;
-            this.currentFrame = 0;
+            currentFrame = 0;
 
             return true;
         }
@@ -295,7 +313,9 @@ namespace Isles
         public void Update(GameTime gameTime)
         {
             if (keyframes == null)
+            {
                 return;
+            }
 
             GameServer server = GameServer.Singleton;
 

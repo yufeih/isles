@@ -21,44 +21,32 @@ namespace Isles.Engine
         /// Use array doubling approach to implement dynamic set.
         /// The first element is not used for easy index generation.
         /// </summary>
-        T[] data;
+        private T[] data;
 
         /// <summary>
         /// Actual data length
         /// </summary>
-        int length;
+        private int length;
 
         /// <summary>
         /// Gets priority queue element count
         /// </summary>
-        public int Count
-        {
-            get { return length; }
-        }
+        public int Count => length;
 
         /// <summary>
         /// Gets priority queue capacity
         /// </summary>
-        public int Capacity
-        {
-            get { return data.Length; }
-        }
+        public int Capacity => data.Length;
 
         /// <summary>
         /// Gets whether the queue is empty
         /// </summary>
-        public bool Empty
-        {
-            get { return length == 0; }
-        }
+        public bool Empty => length == 0;
 
         /// <summary>
         /// Retrive the minimun (top) element without removing it
         /// </summary>
-        public T Top
-        {
-            get { return data[1]; }
-        }
+        public T Top => data[1];
 
         /// <summary>
         /// Creates a priority queue
@@ -104,12 +92,14 @@ namespace Isles.Engine
             if (length >= data.Length - 1)
             {
                 // Double the size of the cache
-                int capacity = data.Length << 1;
-                T[] newData = new T[capacity];
+                var capacity = data.Length << 1;
+                var newData = new T[capacity];
 
                 // Copy to the new buffer
                 for (i = 1; i <= length; i++)
+                {
                     newData[i] = data[i];
+                }
 
                 data = newData;
             }
@@ -125,7 +115,9 @@ namespace Isles.Engine
                     i = x;
                 }
                 else
+                {
                     break;
+                }
             }
 
             // Assign the new element
@@ -138,7 +130,9 @@ namespace Isles.Engine
         public T Pop()
         {
             if (length <= 0)
+            {
                 throw new InvalidOperationException();
+            }
 
             // Make use of the first element here
             T top = data[1];
@@ -163,7 +157,9 @@ namespace Isles.Engine
                     index = x;
                 }
                 else
+                {
                     break;
+                }
             }
 
             // Assign the new element
@@ -177,18 +173,24 @@ namespace Isles.Engine
         /// <param name="i">Root index of the subtree</param>
         /// <param name="n">Subtree size</param>
         /// <param name="k">Element to be add as the root</param>
-        static void FixHeap(T[] E, int i, int n, T k)
+        private static void FixHeap(T[] E, int i, int n, T k)
         {
             int x, min;
             while (i <= n)
             {
                 x = i << 1;         /* Left subtree */
                 if (x > n)
+                {
                     break;
+                }
                 else if (x == n)   /* No right subtree */
+                {
                     min = x;
+                }
                 else
+                {
                     min = (E[x].CompareTo(E[x + 1]) < 0) ? x : x + 1;
+                }
 
                 if (E[min].CompareTo(k) < 0)
                 {
@@ -210,8 +212,10 @@ namespace Isles.Engine
         /// <returns></returns>
         public IEnumerator<T> GetEnumerator()
         {
-            for (int i = 1; i <= length; i++)
+            for (var i = 1; i <= length; i++)
+            {
                 yield return data[i];
+            }
         }
 
         /// <summary>
@@ -239,63 +243,48 @@ namespace Isles.Engine
         /// Internal queue elements.
         /// The first element is not used for easy index generation.
         /// </summary>
-        int[] data;
+        private readonly int[] data;
 
         /// <summary>
         /// Keep track of the position of individual item in the heap.
         /// E.g. index[3] = 5 means that data[5] = 3;
         /// </summary>
-        int[] index;
+        private readonly int[] index;
 
         /// <summary>
         /// Cost of each item
         /// </summary>
-        float[] costs;
+        private readonly float[] costs;
 
         /// <summary>
         /// Actual data length
         /// </summary>
-        int count;
+        private int count;
 
         /// <summary>
         /// Gets element index array
         /// </summary>
-        public int[] Index
-        {
-            get { return index; }
-        }
+        public int[] Index => index;
 
         /// <summary>
         /// Gets priority queue element count
         /// </summary>
-        public int Count
-        {
-            get { return count; }
-        }
+        public int Count => count;
 
         /// <summary>
         /// Gets priority queue capacity
         /// </summary>
-        public int Capacity
-        {
-            get { return data.Length; }
-        }
+        public int Capacity => data.Length;
 
         /// <summary>
         /// Gets whether the queue is empty
         /// </summary>
-        public bool Empty
-        {
-            get { return count == 0; }
-        }
+        public bool Empty => count == 0;
 
         /// <summary>
         /// Retrive the minimun (top) element without removing it
         /// </summary>
-        public int Top
-        {
-            get { return data[1]; }
-        }
+        public int Top => data[1];
 
         /// <summary>
         /// Creates a priority queue to hold n elements
@@ -304,7 +293,9 @@ namespace Isles.Engine
         public IndexedPriorityQueue(int capacity)
         {
             if (capacity <= 0)
+            {
                 throw new ArgumentOutOfRangeException();
+            }
 
             data = new int[capacity];
             costs = new float[capacity];
@@ -318,7 +309,7 @@ namespace Isles.Engine
         /// </summary>
         public void Clear()
         {
-            for (int i = 0; i < costs.Length; i++)
+            for (var i = 0; i < costs.Length; i++)
             {
                 costs[i] = 0;
                 index[i] = -1;
@@ -347,7 +338,9 @@ namespace Isles.Engine
                     i = x;
                 }
                 else
+                {
                     break;
+                }
             }
 
             // Assign the new element
@@ -362,10 +355,12 @@ namespace Isles.Engine
         public int Pop()
         {
             if (count <= 0)
+            {
                 throw new InvalidOperationException();
+            }
 
             // Make use of the first element here
-            int top = data[1];
+            var top = data[1];
             index[top] = 0;
             FixHeap(1, count - 1, data[count], costs[count]);
             count--;
@@ -382,7 +377,9 @@ namespace Isles.Engine
             // Check to see if the element is in the heap
             i = index[element];
             if (i <= 0)
+            {
                 return;
+            }
 
             // Bubble up the heap
             while (i > 0)
@@ -396,7 +393,9 @@ namespace Isles.Engine
                     i = x;
                 }
                 else
+                {
                     break;
+                }
             }
 
             // Assign the new element
@@ -412,18 +411,24 @@ namespace Isles.Engine
         /// <param name="i">Root index of the subtree</param>
         /// <param name="n">Subtree size</param>
         /// <param name="k">Element to be add as the root</param>
-        void FixHeap(int i, int n, int k, float cost)
+        private void FixHeap(int i, int n, int k, float cost)
         {
             int x, min;
             while (i <= n)
             {
                 x = i << 1;         /* Left subtree */
                 if (x > n)
+                {
                     break;
+                }
                 else if (x == n)   /* No right subtree */
+                {
                     min = x;
+                }
                 else
+                {
                     min = (costs[x] < costs[x + 1]) ? x : x + 1;
+                }
 
                 if (costs[min] < cost)
                 {

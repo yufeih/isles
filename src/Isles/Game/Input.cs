@@ -19,7 +19,7 @@ namespace Isles.Engine
         /// <summary>
         /// Mouse state, set every frame in the Update method.
         /// </summary>
-        MouseState mouseState =
+        private MouseState mouseState =
             Microsoft.Xna.Framework.Input.Mouse.GetState(), mouseStateLastFrame;
 
         /// <summary>
@@ -32,46 +32,37 @@ namespace Isles.Engine
         /// information, section Input). We store our own array of keys from
         /// the last frame for comparing stuff.
         /// </summary>
-        KeyboardState keyboardState = 
+        private KeyboardState keyboardState = 
             Microsoft.Xna.Framework.Input.Keyboard.GetState();
 
         /// <summary>
         /// Keys pressed last frame, for comparison if a key was just pressed.
         /// </summary>
-        List<Keys> keysPressedLastFrame = new List<Keys>();
+        private List<Keys> keysPressedLastFrame = new();
 
         /// <summary>
         /// Mouse wheel delta this frame. XNA does report only the total
         /// scroll value, but we usually need the current delta!
         /// </summary>
         /// <returns>0</returns>
-        int mouseWheelDelta = 0;
-        int mouseWheelValue = 0;
+        private int mouseWheelDelta = 0;
+        private int mouseWheelValue = 0;
 
         /// <summary>
         /// Mouse position
         /// </summary>
-        public Point MousePosition
-        {
-            get { return new Point(mouseState.X, mouseState.Y); }
-        }
+        public Point MousePosition => new Point(mouseState.X, mouseState.Y);
 
         /// <summary>
         /// Gets current mouse state
         /// </summary>
-        public MouseState Mouse
-        {
-            get { return mouseState; }
-        }
+        public MouseState Mouse => mouseState;
 
         /// <summary>
         /// Mouse wheel delta
         /// </summary>
         /// <returns>Int</returns>
-        public int MouseWheelDelta
-        {
-            get { return mouseWheelDelta; }
-        }
+        public int MouseWheelDelta => mouseWheelDelta;
 
         /// <summary>
         /// Mouse in box
@@ -90,34 +81,22 @@ namespace Isles.Engine
         /// Keyboard
         /// </summary>
         /// <returns>Keyboard state</returns>
-        public KeyboardState Keyboard
-        {
-            get { return keyboardState; }
-        }
+        public KeyboardState Keyboard => keyboardState;
 
         /// <summary>
         /// Gets whether left ALT or right ALT key is pressed
         /// </summary>
-        public bool IsAltPressed
-        {
-            get { return keyboardState.IsKeyDown(Keys.LeftAlt) || keyboardState.IsKeyDown(Keys.RightAlt); }
-        }
+        public bool IsAltPressed => keyboardState.IsKeyDown(Keys.LeftAlt) || keyboardState.IsKeyDown(Keys.RightAlt);
 
         /// <summary>
         /// Gets whether left shift or right shift key is pressed
         /// </summary>
-        public bool IsShiftPressed
-        {
-            get { return keyboardState.IsKeyDown(Keys.LeftShift) || keyboardState.IsKeyDown(Keys.RightShift); }
-        }
+        public bool IsShiftPressed => keyboardState.IsKeyDown(Keys.LeftShift) || keyboardState.IsKeyDown(Keys.RightShift);
 
         /// <summary>
         /// Gets whether left ctrl or right ctrl key is pressed
         /// </summary>
-        public bool IsCtrlPressed
-        {
-            get { return keyboardState.IsKeyDown(Keys.LeftControl) || keyboardState.IsKeyDown(Keys.RightControl); }
-        }
+        public bool IsCtrlPressed => keyboardState.IsKeyDown(Keys.LeftControl) || keyboardState.IsKeyDown(Keys.RightControl);
         #endregion
 
         #region Method
@@ -126,7 +105,7 @@ namespace Isles.Engine
             // All keys except A-Z, 0-9 and `-\[];',./= (and space) are special keys.
             // With shift pressed this also results in this keys:
             // ~_|{}:"<>? !@#$%^&*().
-            int keyNum = (int)key;
+            var keyNum = (int)key;
             if ((keyNum >= (int)Keys.A && keyNum <= (int)Keys.Z) ||
                 (keyNum >= (int)Keys.D0 && keyNum <= (int)Keys.D9) ||
                 key == Keys.Space || // well, space ^^
@@ -158,14 +137,18 @@ namespace Isles.Engine
         public static char KeyToChar(Keys key, bool shiftPressed)
         {
             // If key will not be found, just return space
-            char ret = ' ';
-            int keyNum = (int)key;
+            var ret = ' ';
+            var keyNum = (int)key;
             if (keyNum >= (int)Keys.A && keyNum <= (int)Keys.Z)
             {
                 if (shiftPressed)
+                {
                     ret = key.ToString()[0];
+                }
                 else
+                {
                     ret = key.ToString().ToLower()[0];
+                }
             }
             else if (keyNum >= (int)Keys.D0 && keyNum <= (int)Keys.D9 &&
                 shiftPressed == false)
@@ -173,47 +156,89 @@ namespace Isles.Engine
                 ret = (char)((int)'0' + (keyNum - Keys.D0));
             }
             else if (key == Keys.D1 && shiftPressed)
+            {
                 ret = '!';
+            }
             else if (key == Keys.D2 && shiftPressed)
+            {
                 ret = '@';
+            }
             else if (key == Keys.D3 && shiftPressed)
+            {
                 ret = '#';
+            }
             else if (key == Keys.D4 && shiftPressed)
+            {
                 ret = '$';
+            }
             else if (key == Keys.D5 && shiftPressed)
+            {
                 ret = '%';
+            }
             else if (key == Keys.D6 && shiftPressed)
+            {
                 ret = '^';
+            }
             else if (key == Keys.D7 && shiftPressed)
+            {
                 ret = '&';
+            }
             else if (key == Keys.D8 && shiftPressed)
+            {
                 ret = '*';
+            }
             else if (key == Keys.D9 && shiftPressed)
+            {
                 ret = '(';
+            }
             else if (key == Keys.D0 && shiftPressed)
+            {
                 ret = ')';
+            }
             else if (key == Keys.OemTilde)
+            {
                 ret = shiftPressed ? '~' : '`';
+            }
             else if (key == Keys.OemMinus)
+            {
                 ret = shiftPressed ? '_' : '-';
+            }
             else if (key == Keys.OemPipe)
+            {
                 ret = shiftPressed ? '|' : '\\';
+            }
             else if (key == Keys.OemOpenBrackets)
+            {
                 ret = shiftPressed ? '{' : '[';
+            }
             else if (key == Keys.OemCloseBrackets)
+            {
                 ret = shiftPressed ? '}' : ']';
+            }
             else if (key == Keys.OemSemicolon)
+            {
                 ret = shiftPressed ? ':' : ';';
+            }
             else if (key == Keys.OemQuotes)
+            {
                 ret = shiftPressed ? '"' : '\'';
+            }
             else if (key == Keys.OemComma)
+            {
                 ret = shiftPressed ? '<' : '.';
+            }
             else if (key == Keys.OemPeriod)
+            {
                 ret = shiftPressed ? '>' : ',';
+            }
             else if (key == Keys.OemQuestion)
+            {
                 ret = shiftPressed ? '?' : '/';
+            }
             else if (key == Keys.OemPlus)
+            {
                 ret = shiftPressed ? '+' : '=';
+            }
 
             // Return result
             return ret;
@@ -227,12 +252,13 @@ namespace Isles.Engine
         public void HandleKeyboardInput(ref string inputText)
         {
             // Is a shift key pressed (we have to check both, left and right)
-            bool isShiftPressed =
+            var isShiftPressed =
                 keyboardState.IsKeyDown(Keys.LeftShift) ||
                 keyboardState.IsKeyDown(Keys.RightShift);
 
             // Go through all pressed keys
             foreach (Keys pressedKey in keyboardState.GetPressedKeys())
+            {
                 // Only process if it was not pressed last frame
                 if (keysPressedLastFrame.Contains(pressedKey) == false)
                 {
@@ -252,9 +278,10 @@ namespace Isles.Engine
                         inputText = inputText.Substring(0, inputText.Length - 1);
                     }
                 }
+            }
         }
 
-        struct Entry
+        private struct Entry
         {
             public float Order;
             public IEventListener Handler;
@@ -266,7 +293,7 @@ namespace Isles.Engine
             }
         }
 
-        LinkedList<Entry> handlers = new LinkedList<Entry>();
+        private readonly LinkedList<Entry> handlers = new();
 
         /// <summary>
         /// Registers a new input event handler
@@ -278,7 +305,9 @@ namespace Isles.Engine
         public void Register(IEventListener handler, float order)
         {
             if (null == handler)
+            {
                 throw new ArgumentNullException();
+            }
 
             // Check if this handler already exists in the list
             LinkedListNode<Entry> p = handlers.First;
@@ -318,7 +347,9 @@ namespace Isles.Engine
         public void Unregister(IEventListener handler)
         {
             if (null == handler)
+            {
                 throw new ArgumentNullException();
+            }
 
             LinkedListNode<Entry> p = handlers.First;
 
@@ -342,7 +373,7 @@ namespace Isles.Engine
             handlers.Clear();
         }
 
-        IEventListener captured;
+        private IEventListener captured;
 
         /// <summary>
         /// Capture input event. All input events will always (only) be 
@@ -351,7 +382,9 @@ namespace Isles.Engine
         public void Capture(IEventListener handler)
         {
             if (captured != null)
+            {
                 throw new InvalidOperationException();
+            }
 
             captured = handler;
         }
@@ -375,8 +408,8 @@ namespace Isles.Engine
         /// <summary>
         /// Flag for simulating double click
         /// </summary>
-        int doubleClickFlag = 0;
-        double doubleClickTime = 0;
+        private int doubleClickFlag = 0;
+        private double doubleClickTime = 0;
 
         /// <summary>
         /// Update, called from BaseGame.Update().
@@ -397,7 +430,9 @@ namespace Isles.Engine
 
             // Mouse wheel event
             if (mouseWheelDelta != 0)
+            {
                 TriggerEvent(EventType.Wheel, null);
+            }
 
             // Mouse Left Button Events
             if (mouseState.LeftButton == ButtonState.Pressed &&
@@ -457,26 +492,32 @@ namespace Isles.Engine
             foreach (Keys key in keyboardState.GetPressedKeys())
             {
                 if (!keysPressedLastFrame.Contains(key))
+                {
                     TriggerEvent(EventType.KeyDown, key);
+                }
             }
 
             // Key up events
             foreach (Keys key in keysPressedLastFrame)
             {
-                bool found = false;
+                var found = false;
                 foreach (Keys keyCurrent in keyboardState.GetPressedKeys())
+                {
                     if (keyCurrent == key)
                     {
                         found = true;
                         break;
                     }
+                }
 
                 if (!found)
+                {
                     TriggerEvent(EventType.KeyUp, key);
+                }
             }
         }
 
-        void TriggerEvent(EventType type, Keys? key)
+        private void TriggerEvent(EventType type, Keys? key)
         {
             // If we're captured, only send the event to
             // the hooker.
@@ -492,7 +533,9 @@ namespace Isles.Engine
             {
                 if (entry.Handler.HandleEvent(type, this, key) == 
                     EventResult.Handled)
+                {
                     break;
+                }
             }
         }
         #endregion

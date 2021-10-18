@@ -77,7 +77,7 @@ namespace Isles.Engine
     /// </summary>
     public static class Event
     {
-        struct Message
+        private struct Message
         {
             public EventType Type;
             public IEventListener Receiver;
@@ -102,7 +102,7 @@ namespace Isles.Engine
             }
         }
 
-        static LinkedList<Message> queue = new LinkedList<Message>();
+        private static readonly LinkedList<Message> queue = new();
 
         /// <summary>
         /// Send a message to the receiver immediately
@@ -112,12 +112,8 @@ namespace Isles.Engine
                                               object sender,
                                               object tag)
         {
-            if (receiver == null)
-                return EventResult.Unhandled;
-
-            return receiver.HandleEvent(type, sender, tag);
+            return receiver == null ? EventResult.Unhandled : receiver.HandleEvent(type, sender, tag);
         }
-
 
         /// <summary>
         /// Send a delayed message to the receiver
@@ -129,12 +125,16 @@ namespace Isles.Engine
                                        float delayTime)
         {
             if (delayTime < 0)
+            {
                 throw new ArgumentException();
+            }
 
             if (receiver == null)
+            {
                 return;
+            }
 
-            Message message = new Message(type, receiver, sender, tag, delayTime);
+            var message = new Message(type, receiver, sender, tag, delayTime);
 
             // Add to the list
             LinkedListNode<Message> p = queue.First;
@@ -165,7 +165,6 @@ namespace Isles.Engine
         {
             throw new NotImplementedException();
         }
-
 
         /// <summary>
         /// Update the event dispatcher

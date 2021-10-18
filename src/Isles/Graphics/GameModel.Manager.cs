@@ -10,7 +10,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Isles.Engine;
 
-
 namespace Isles.Graphics
 {
     #region Material
@@ -29,11 +28,11 @@ namespace Isles.Graphics
         /// </summary>
         public bool IsDirty
         {
-            get { return isDirty; }
-            set { isDirty = value; }
+            get => isDirty;
+            set => isDirty = value;
         }
 
-        bool isDirty = true;
+        private bool isDirty = true;
 
         
         /// <summary>
@@ -41,23 +40,30 @@ namespace Isles.Graphics
         /// </summary>
         public EffectTechnique Technique
         {
-            get { return technique; }
-            set { technique = value; IsDirty = true; }
+            get => technique;
+            set
+            {
+                technique = value;
+                IsDirty = true;
+            }
         }
 
-        EffectTechnique technique;
-
+        private EffectTechnique technique;
 
         /// <summary>
         /// Base model texture
         /// </summary>
         public Texture2D Texture
         {
-            get { return texture; }
-            set { texture = value; IsDirty = true; }
+            get => texture;
+            set
+            {
+                texture = value;
+                IsDirty = true;
+            }
         }
 
-        Texture2D texture;
+        private Texture2D texture;
   
 
         /// <summary>
@@ -65,60 +71,75 @@ namespace Isles.Graphics
         /// </summary>
         public Texture2D NormalTexture
         {
-            get { return normalTexture; }
-            set { normalTexture = value; IsDirty = true; }
+            get => normalTexture;
+            set
+            {
+                normalTexture = value;
+                IsDirty = true;
+            }
         }
 
-        Texture2D normalTexture;
-
+        private Texture2D normalTexture;
 
         /// <summary>
         /// Ambient color
         /// </summary>
         public Vector4 AmbientColor
         {
-            get { return ambientColor; }
-            set { ambientColor = value; IsDirty = true; }
+            get => ambientColor;
+            set
+            {
+                ambientColor = value;
+                IsDirty = true;
+            }
         }
 
-        Vector4 ambientColor = new Vector4(0.2f, 0.2f, 0.25f, 1.0f);
-
+        private Vector4 ambientColor = new(0.2f, 0.2f, 0.25f, 1.0f);
 
         /// <summary>
         /// Diffuse color
         /// </summary>
         public Vector4 EmissiveColor
         {
-            get { return emissiveColor; }
-            set { emissiveColor = value; IsDirty = true; }
+            get => emissiveColor;
+            set
+            {
+                emissiveColor = value;
+                IsDirty = true;
+            }
         }
 
-        Vector4 emissiveColor = Vector4.One;
-
+        private Vector4 emissiveColor = Vector4.One;
 
         /// <summary>
         /// Specular color
         /// </summary>
         public Vector4 SpecularColor
         {
-            get { return specularColor; }
-            set { specularColor = value; IsDirty = true; }
+            get => specularColor;
+            set
+            {
+                specularColor = value;
+                IsDirty = true;
+            }
         }
 
-        Vector4 specularColor = Vector4.One;
-
+        private Vector4 specularColor = Vector4.One;
 
         /// <summary>
         /// Specular power
         /// </summary>
         public float SpecularPower
         {
-            get { return specularPower; }
-            set { specularPower = value; IsDirty = true; }
+            get => specularPower;
+            set
+            {
+                specularPower = value;
+                IsDirty = true;
+            }
         }
 
-        float specularPower = 12;
-
+        private float specularPower = 12;
 
         /// <summary>
         /// Trick: Enable AlphaTest for trees
@@ -133,12 +154,15 @@ namespace Isles.Graphics
         /// </summary>
         public bool IsTransparent
         {
-            get { return isTransparent; }
-            set { isTransparent = value; IsDirty = true; }
+            get => isTransparent;
+            set
+            {
+                isTransparent = value;
+                IsDirty = true;
+            }
         }
 
-        bool isTransparent = false;
-
+        private bool isTransparent = false;
 
         /// <summary>
         /// Creates a new material
@@ -174,23 +198,20 @@ namespace Isles.Graphics
         /// <summary>
         /// An empty material
         /// </summary>
-        public static Material Default = new Material();
+        public static Material Default = new();
 
         /// <summary>
         /// The shadow map material
         /// </summary>
-        public static Material ShadowMap = new Material("ShadowMapping");
-        public static Material ShadowMapSkinned = new Material("ShadowMappingSkinned");
+        public static Material ShadowMap = new("ShadowMapping");
+        public static Material ShadowMapSkinned = new("ShadowMappingSkinned");
 
         /// <summary>
         /// Gets the effect technique with the speicific name
         /// </summary>
         public static EffectTechnique GetTechnique(string techniqueName)
         {
-            if (ModelManager.ModelEffect == null)
-                throw new InvalidOperationException();
-
-            return ModelManager.ModelEffect.Techniques[techniqueName];
+            return ModelManager.ModelEffect == null ? throw new InvalidOperationException() : ModelManager.ModelEffect.Techniques[techniqueName];
         }
     }
     #endregion
@@ -205,42 +226,31 @@ namespace Isles.Graphics
     {
         public class Renderable
         {
-            BaseGame game = BaseGame.Singleton;
+            private readonly BaseGame game = BaseGame.Singleton;
+            private readonly Effect effect = ModelManager.ModelEffect;
+            private readonly EffectParameter world;
+            private readonly EffectParameter bones;
+            private readonly EffectParameter diffuse;
+            private readonly EffectParameter light;
+            private readonly EffectParameter worldInverse;
+            private readonly EffectParameter worldInverseTranspose;
+            private readonly ModelMesh mesh;
+            private readonly ModelMeshPart part;
+            private readonly ModelManager manager;
+            private readonly bool isTransparent;
 
-            Effect effect = ModelManager.ModelEffect;
-            EffectParameter world;
-            EffectParameter bones;
-            EffectParameter diffuse;
-            EffectParameter light;
-            EffectParameter worldInverse;
-            EffectParameter worldInverseTranspose;
+            public bool IsTransparent => isTransparent;
 
-            ModelMesh mesh;
-            ModelMeshPart part;
-            ModelManager manager;
-            bool isTransparent;
+            public ModelMesh Mesh => mesh;
 
-            public bool IsTransparent
-            {
-                get { return isTransparent; }
-            }
+            public ModelMeshPart MeshPart => part;
 
-            public ModelMesh Mesh
-            {
-                get { return mesh; }
-            }
-
-            public ModelMeshPart MeshPart
-            {
-                get { return part; }
-            }
-
-            List<Matrix> worldTransforms = new List<Matrix>();
-            List<Matrix[]> skinTransforms = new List<Matrix[]>();
-            List<Vector4> staticColors = new List<Vector4>();
-            List<Vector4> skinnedColors = new List<Vector4>();
-            List<Vector4> staticLights = new List<Vector4>();
-            List<Vector4> skinnedLights = new List<Vector4>();
+            private readonly List<Matrix> worldTransforms = new();
+            private readonly List<Matrix[]> skinTransforms = new();
+            private readonly List<Vector4> staticColors = new();
+            private readonly List<Vector4> skinnedColors = new();
+            private readonly List<Vector4> staticLights = new();
+            private readonly List<Vector4> skinnedLights = new();
 
             /// <summary>
             /// Store vertex / index buffers previously set. Set this
@@ -280,7 +290,9 @@ namespace Isles.Graphics
             public void Add(Matrix[] bones, Vector4 diffuse, Vector4 light)
             {
                 if (bones == null)
+                {
                     throw new ArgumentNullException();
+                }
 
                 skinTransforms.Add(bones);
                 skinnedColors.Add(diffuse);
@@ -290,10 +302,14 @@ namespace Isles.Graphics
             public void Draw(GameTime gameTime)
             {
                 if (worldTransforms.Count <= 0 && skinTransforms.Count <= 0)
+                {
                     return;
+                }
 
                 if (part.PrimitiveCount <= 0)
+                {
                     return;
+                }
 
                 // Set index buffer
                 if (mesh.IndexBuffer != CachedIndexBuffer)
@@ -314,21 +330,35 @@ namespace Isles.Graphics
                 game.GraphicsDevice.VertexDeclaration = part.VertexDeclaration;
 
                 // Draw static renderables
-                for (int i = 0; i < worldTransforms.Count; i++)
+                for (var i = 0; i < worldTransforms.Count; i++)
                 {
-                    Matrix worldInvert = Matrix.Invert(worldTransforms[i]);
+                    var worldInvert = Matrix.Invert(worldTransforms[i]);
 
                     if (world != null)
+                    {
                         world.SetValue(worldTransforms[i]);
+                    }
+
                     if (worldInverse != null)
+                    {
                         worldInverse.SetValue(worldInvert);
+                    }
+
                     if (diffuse != null)
+                    {
                         diffuse.SetValue(staticColors[i]);
+                    }
+
                     if (light != null)
+                    {
                         light.SetValue(staticLights[i]);
+                    }
+
                     if (worldInverseTranspose != null)
+                    {
                         worldInverseTranspose.SetValue(Matrix.Transpose(worldInvert));
-                    
+                    }
+
                     effect.CommitChanges();
 
                     ResolveAlphaIssues(staticColors[i].W);
@@ -339,14 +369,22 @@ namespace Isles.Graphics
                 }
 
                 // Draw skinned renderables
-                for (int i = 0; i < skinTransforms.Count; i++)
+                for (var i = 0; i < skinTransforms.Count; i++)
                 {
                     if (bones != null)
+                    {
                         bones.SetValue(skinTransforms[i]);
+                    }
+
                     if (diffuse != null)
+                    {
                         diffuse.SetValue(skinnedColors[i]);
+                    }
+
                     if (light != null)
+                    {
                         light.SetValue(skinnedLights[i]);
+                    }
 
                     effect.CommitChanges();
 
@@ -394,21 +432,18 @@ namespace Isles.Graphics
 
         public class RenderablePerMaterial
         {
-            Effect effect = ModelManager.ModelEffect;
+            private readonly Effect effect = ModelManager.ModelEffect;
+
             //EffectParameter ambient;
             //EffectParameter emissive;
             //EffectParameter specular;
             //EffectParameter specularPower;
-            EffectParameter basicTexture;
-            EffectParameter normalTexture;
+            private readonly EffectParameter basicTexture;
+            private readonly EffectParameter normalTexture;
+            private readonly Material material;
+            private readonly List<Renderable> renderables = new();
 
-            Material material;
-            List<Renderable> renderables = new List<Renderable>();
-
-            public Material Material
-            {
-                get { return material; }
-            }
+            public Material Material => material;
 
             public RenderablePerMaterial(Material material)
             {
@@ -426,7 +461,9 @@ namespace Isles.Graphics
             public void Draw(GameTime gameTime)
             {
                 if (renderables.Count <= 0)
+                {
                     return;
+                }
 
                 //if (ambient != null)
                 //    ambient.SetValue(material.AmbientColor);
@@ -438,9 +475,14 @@ namespace Isles.Graphics
                 //    specularPower.SetValue(material.SpecularPower);
 
                 if (basicTexture != null)
+                {
                     basicTexture.SetValue(material.Texture);
+                }
+
                 if (normalTexture != null)
+                {
                     normalTexture.SetValue(material.NormalTexture);
+                }
 
                 if (material.IsTransparent)
                 {
@@ -449,7 +491,9 @@ namespace Isles.Graphics
                 }
 
                 foreach (Renderable r in renderables)
+                {
                     r.Draw(gameTime);
+                }
             }
 
             public Renderable GetRenderable(
@@ -457,15 +501,17 @@ namespace Isles.Graphics
             {
                 // Search for all renderables
                 foreach (Renderable r in renderables)
+                {
                     if (r.MeshPart == part &&
                         r.IsTransparent == material.IsTransparent)
                     {
                         System.Diagnostics.Debug.Assert(mesh == r.Mesh);
                         return r;
                     }
+                }
 
                 // If it is a new model mesh part, create a new renderable
-                Renderable newRenderable = new Renderable(manager, mesh,
+                var newRenderable = new Renderable(manager, mesh,
                                                           part, material.IsTransparent);
                 renderables.Add(newRenderable);
                 return newRenderable;
@@ -474,13 +520,10 @@ namespace Isles.Graphics
 
         public class RenderablePerTechnique
         {
-            public EffectTechnique Technique
-            {
-                get { return technique; }
-            }
+            public EffectTechnique Technique => technique;
 
-            EffectTechnique technique;
-            List<RenderablePerMaterial> renderables = new List<RenderablePerMaterial>();
+            private readonly EffectTechnique technique;
+            private readonly List<RenderablePerMaterial> renderables = new();
 
             public RenderablePerTechnique(EffectTechnique technique)
             {
@@ -500,7 +543,7 @@ namespace Isles.Graphics
                 }
 
                 // Add a new material
-                RenderablePerMaterial newRenderable = new RenderablePerMaterial(material);
+                var newRenderable = new RenderablePerMaterial(material);
                 renderables.Add(newRenderable);
                 return newRenderable.GetRenderable(manager, mesh, part, material);
             }
@@ -508,7 +551,9 @@ namespace Isles.Graphics
             public void Draw(Effect effect, GameTime gameTime)
             {
                 if (renderables.Count <= 0)
+                {
                     return;
+                }
 
                 effect.CurrentTechnique = technique;
 
@@ -519,7 +564,9 @@ namespace Isles.Graphics
                     pass.Begin();
 
                     foreach (RenderablePerMaterial r in renderables)
+                    {
                         r.Draw(gameTime);
+                    }
 
                     pass.End();
                 }
@@ -531,36 +578,33 @@ namespace Isles.Graphics
         /// <summary>
         /// Our base game
         /// </summary>
-        BaseGame game = BaseGame.Singleton;
+        private readonly BaseGame game = BaseGame.Singleton;
 
         /// <summary>
         /// Effect used to draw everything
         /// </summary>
-        static Effect effect;
+        private static Effect effect;
 
         /// <summary>
         /// Effect parameters
         /// </summary>
-        EffectParameter view;
-        EffectParameter projection;
-        EffectParameter viewProjection;
-        EffectParameter viewInverse;
+        private EffectParameter view;
+        private EffectParameter projection;
+        private EffectParameter viewProjection;
+        private EffectParameter viewInverse;
 
         public Matrix ViewProjectionMatrix;
 
         /// <summary>
         /// Gets the model effect used by the model manager
         /// </summary>
-        public static Effect ModelEffect
-        {
-            get { return effect; }
-        }
+        public static Effect ModelEffect => effect;
 
         /// <summary>
         /// A list storing all opaque renderables, drawed first.
         /// </summary>
-        List<RenderablePerTechnique> opaque = new List<RenderablePerTechnique>();
-        List<RenderablePerTechnique> transparent = new List<RenderablePerTechnique>();
+        private readonly List<RenderablePerTechnique> opaque = new();
+        private readonly List<RenderablePerTechnique> transparent = new();
 
         /// <summary>
         /// Creates a new model manager
@@ -594,19 +638,29 @@ namespace Isles.Graphics
         {
             // Assign a default technique
             if (material.Technique == null)
+            {
                 material.Technique = effect.Techniques[0];
+            }
 
             if (material.IsTransparent)
             {
                 foreach (RenderablePerTechnique r in transparent)
+                {
                     if (r.Technique == material.Technique)
+                    {
                         return r.GetRenderable(this, mesh, part, material);
+                    }
+                }
             }
             else
             {
                 foreach (RenderablePerTechnique r in opaque)
+                {
                     if (r.Technique == material.Technique)
+                    {
                         return r.GetRenderable(this, mesh, part, material);
+                    }
+                }
             }
 
             return null;
@@ -641,7 +695,9 @@ namespace Isles.Graphics
                             ShadowEffect shadow, bool showOpaque, bool showTransparent)
         {
             if (opaque.Count <= 0 || (!showOpaque && !showTransparent))
+            {
                 return;
+            }
 
             // Setup render state
             game.GraphicsDevice.RenderState.DepthBufferEnable = true;
@@ -656,30 +712,46 @@ namespace Isles.Graphics
             ViewProjectionMatrix = v * p;
 
             if (view != null)
+            {
                 view.SetValue(v);
+            }
+
             if (projection != null)
+            {
                 projection.SetValue(p);
+            }
+
             if (viewInverse != null)
+            {
                 viewInverse.SetValue(Matrix.Invert(v));
+            }
+
             if (viewProjection != null)
+            {
                 viewProjection.SetValue(ViewProjectionMatrix);
+            }
 
             if (shadow != null)
+            {
                 effect.Parameters["LightViewProjection"].SetValue(shadow.ViewProjection);
+            }
 
             if (showOpaque)
             {
                 foreach (RenderablePerTechnique r in opaque)
+                {
                     r.Draw(effect, gameTime);
+                }
             }
 
             game.GraphicsDevice.RenderState.AlphaBlendEnable = true;
 
-
             if (showTransparent)
             {
                 foreach (RenderablePerTechnique r in transparent)
+                {
                     r.Draw(effect, gameTime);
+                }
             }
 
             game.GraphicsDevice.RenderState.AlphaBlendEnable = false;

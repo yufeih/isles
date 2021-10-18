@@ -9,7 +9,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Isles.Engine;
 
-
 namespace Isles
 {
     #region GameIsles
@@ -18,38 +17,27 @@ namespace Isles
     /// </summary>
     public class GameIsles : BaseGame
     {
-        const string ConfigFile = "Settings.xml";
+        private const string ConfigFile = "Settings.xml";
 
         /// <summary>
         /// Game screen
         /// </summary>
-        GameScreen gameScreen;
+        private GameScreen gameScreen;
 
         /// <summary>
         /// Gets game screen
         /// </summary>
-        public GameScreen GameScreen
-        {
-            get { return gameScreen; }
-        }
+        public GameScreen GameScreen => gameScreen;
 
         /// <summary>
         /// Gets settins stream
         /// </summary>
-        static Stream SettingsStream
-        {
-            get
-            {
-                if (File.Exists(ConfigFile))
-                    return new FileStream(ConfigFile, FileMode.Open);
-                return null;
-            }
-        }
+        private static Stream SettingsStream => File.Exists(ConfigFile) ? new FileStream(ConfigFile, FileMode.Open) : null;
 
         public GameIsles()
             : base(Settings.CreateDefaultSettings(SettingsStream)) { }
 
-        TitleScreen titleScreen;
+        private TitleScreen titleScreen;
 
         /// <summary>
         /// Initialize everything here
@@ -200,7 +188,6 @@ namespace Isles
             Player.RegisterCharactor("Rifleman");
             Player.RegisterCharactor("Steambot");
 
-
             GameWorld.RegisterCreator("Arrow", delegate(GameWorld world) { return new Arrow(world); });
 
             // Register spells
@@ -227,38 +214,38 @@ namespace Isles
             get
             {
                 if (audio == null)
+                {
                     audio = BaseGame.Singleton.Audio;
+                }
+
                 return audio;
             }
         }
 
-        static AudioManager audio;
-
-        static Cue music;
-        static Cue building;
-        static Cue unit;
-        static Cue ui;
-        static Cue underAttack;
+        private static AudioManager audio;
+        private static Cue music;
+        private static Cue building;
+        private static Cue unit;
+        private static Cue ui;
+        private static Cue underAttack;
 
         // There seems to be some bugs with XACT, so we have to
         // use fixed time intervals.
         //static float buildingTimer = BuildingDuration;
         //static float unitTimer = UnitDuration;
         //static float uiTimer = UIDuration;
-        static float underAttackTimer = UnderAttackDuration;
-
-        const float BuildingDuration = 1.5f;
-        const float UnitDuration = 1.5f;
-        const float UIDuration = 2;
-        const float UnderAttackDuration = 30;
-
-        static float preValue;
-        static float postValue;
-        static float preTimer;
-        static float postTimer;
-        static int musicState;
-        static bool loopMusic;
-        static string musicName;
+        private static float underAttackTimer = UnderAttackDuration;
+        private const float BuildingDuration = 1.5f;
+        private const float UnitDuration = 1.5f;
+        private const float UIDuration = 2;
+        private const float UnderAttackDuration = 30;
+        private static float preValue;
+        private static float postValue;
+        private static float preTimer;
+        private static float postTimer;
+        private static int musicState;
+        private static bool loopMusic;
+        private static string musicName;
         public static int Counter = 0;
 
         public static void Play(string name)
@@ -338,14 +325,17 @@ namespace Isles
             postTimer = 0;
             musicState = 0;
             if (music != null)
+            {
                 music.Stop(AudioStopOptions.AsAuthored);
+            }
+
             music = Audio.Sound.GetCue(name);
             musicName = name;
         }
 
         public static void Update(GameTime gameTime)
         {
-            float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            var elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             if (music != null)
             {
@@ -386,7 +376,9 @@ namespace Isles
             //    uiTimer += elapsed;
 
             if (underAttack != null && underAttackTimer < UnderAttackDuration)
+            {
                 underAttackTimer += elapsed;
+            }
         }
     }
     #endregion

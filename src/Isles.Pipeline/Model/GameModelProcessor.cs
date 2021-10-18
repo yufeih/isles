@@ -31,7 +31,7 @@ namespace Isles.Pipeline
     {
         // Maximum number of bone matrices we can render using shader 2.0
         // in a single pass. If you change this, update SkinnedModel.fx to match.
-        const int MaxBones = 59;
+        private const int MaxBones = 59;
 
     
         /// <summary>
@@ -56,7 +56,10 @@ namespace Isles.Pipeline
                 model = base.Process(input, context);
                 animationClips = ProcessAnimations(input);
                 if (animationClips != null && animationClips.Count > 0)
+                {
                     dictionary.Add("AnimationData", animationClips);
+                }
+
                 AddSpacePartitionData(dictionary, model);
                 model.Tag = dictionary;
                 AddNormalTextureToTag(model);
@@ -136,8 +139,9 @@ namespace Isles.Pipeline
                         if (animations.ContainsKey(entry.Key))
                         {
                             foreach (Keyframe frame in entry.Value.Keyframes)
+                            {
                                 animations[entry.Key].Keyframes.Add(frame);
-                            (animations[entry.Key].Keyframes as List<Keyframe>).Sort(CompareKeyframeTimes);
+                            } (animations[entry.Key].Keyframes as List<Keyframe>).Sort(CompareKeyframeTimes);
                         }
                         else
                         {
@@ -147,7 +151,9 @@ namespace Isles.Pipeline
                 }
 
                 foreach (NodeContent child in input.Children)
+                {
                     ProcessAnimation(child, animations, bones);
+                }
             }
         }
 
@@ -167,16 +173,20 @@ namespace Isles.Pipeline
                 nodes.Add(input);
 
                 foreach (NodeContent child in input.Children)
+                {
                     FlattenNodes(child, nodes);
+                }
             }
         }
 
-        IList<NodeContent> BonesToNodes(IList<BoneContent> bones)
+        private IList<NodeContent> BonesToNodes(IList<BoneContent> bones)
         {
             List<NodeContent> nodes = new List<NodeContent>(bones.Count);
 
             foreach (BoneContent bone in bones)
+            {
                 nodes.Add(bone);
+            }
 
             return nodes;
         }
@@ -209,29 +219,32 @@ namespace Isles.Pipeline
             position.Y = (info.Box.Max.Y - info.Box.Min.Y) / 16;
             position.Z = (info.Box.Max.Z - info.Box.Min.Z) / 16;
             for(int i = 2; i < 6;i++)
-                for(int j = 2; j < 6;j++)
+            {
+                for (int j = 2; j < 6;j++)
+                {
                     for (int k = 2; k < 6; k++)
                     {
                         info.Set( info.Box.Min + 
                                   new Vector3(position.X * (2 * i + 1), position.Y * (2 * j + 1), position.Z * (2 * k + 1)));
                     }
+                }
+            }
 
             dictionary.Add("SpacePartition", info.BitMap);
 
-
         }
 
-
-
-        void AddNormalTextureToTag(ModelContent model)
+        private void AddNormalTextureToTag(ModelContent model)
         {
             foreach (ModelMeshContent mesh in model.Meshes)
+            {
                 foreach (ModelMeshPartContent part in mesh.MeshParts)
                 {
                     ExternalReference<TextureContent> value;
                     part.Material.Textures.TryGetValue("NormalTexture", out value);
                     part.Tag = value;
                 }
+            }
         }
 
         /// <summary>
@@ -284,12 +297,11 @@ namespace Isles.Pipeline
             return base.ConvertMaterial(basicMaterial, context);
         }
 
-
         /// <summary>
         /// Converts an intermediate format content pipeline AnimationContentDictionary
         /// object to our runtime AnimationClip format.
         /// </summary>
-        static Dictionary<string, AnimationClip> ProcessAnimations(
+        private static Dictionary<string, AnimationClip> ProcessAnimations(
             AnimationContentDictionary animations, IList<NodeContent> bones)
         {
             // Build up a table mapping bone names to indices.
@@ -300,7 +312,9 @@ namespace Isles.Pipeline
                 string boneName = bones[i].Name;
 
                 if (!string.IsNullOrEmpty(boneName))
+                {
                     boneMap.Add(boneName, i);
+                }
             }
 
             // Convert each animation in turn.
@@ -314,21 +328,17 @@ namespace Isles.Pipeline
                 animationClips.Add(animation.Key, processed);
             }
 
-            if (animationClips.Count == 0)
-            {
-                throw new InvalidContentException(
-                            "Input file does not contain any animations.");
-            }
-
-            return animationClips;
+            return animationClips.Count == 0
+                ? throw new InvalidContentException(
+                            "Input file does not contain any animations.")
+                : animationClips;
         }
-
 
         /// <summary>
         /// Converts an intermediate format content pipeline AnimationContent
         /// object to our runtime AnimationClip format.
         /// </summary>
-        static AnimationClip ProcessAnimation(AnimationContent animation,
+        private static AnimationClip ProcessAnimation(AnimationContent animation,
                                               Dictionary<string, int> boneMap)
         {
             //System.Diagnostics.Debugger.Launch();
@@ -361,28 +371,27 @@ namespace Isles.Pipeline
             keyframes.Sort(CompareKeyframeTimes);
 
             if (keyframes.Count == 0)
+            {
                 throw new InvalidContentException("Animation has no keyframes.");
+            }
 
-            if (animation.Duration <= TimeSpan.Zero)
-                throw new InvalidContentException("Animation has a zero duration.");
-
-            return new AnimationClip(animation.Duration, keyframes);
+            return animation.Duration <= TimeSpan.Zero
+                ? throw new InvalidContentException("Animation has a zero duration.")
+                : new AnimationClip(animation.Duration, keyframes);
         }
-
 
         /// <summary>
         /// Comparison function for sorting keyframes into ascending time order.
         /// </summary>
-        static int CompareKeyframeTimes(Keyframe a, Keyframe b)
+        private static int CompareKeyframeTimes(Keyframe a, Keyframe b)
         {
             return a.Time.CompareTo(b.Time);
         }
 
-
         /// <summary>
         /// Makes sure this mesh contains the kind of data we know how to animate.
         /// </summary>
-        static void ValidateMesh(NodeContent node, ContentProcessorContext context,
+        private static void ValidateMesh(NodeContent node, ContentProcessorContext context,
                                  string parentBoneName)
         {
             MeshContent mesh = node as MeshContent;
@@ -417,19 +426,22 @@ namespace Isles.Pipeline
             // Recurse (iterating over a copy of the child collection,
             // because validating children may delete some of them).
             foreach (NodeContent child in new List<NodeContent>(node.Children))
+            {
                 ValidateMesh(child, context, parentBoneName);
+            }
         }
-
 
         /// <summary>
         /// Checks whether a mesh contains skininng information.
         /// </summary>
-        static bool MeshHasSkinning(MeshContent mesh)
+        private static bool MeshHasSkinning(MeshContent mesh)
         {
             foreach (GeometryContent geometry in mesh.Geometry)
             {
                 if (!geometry.Vertices.Channels.Contains(VertexChannelNames.Weights()))
+                {
                     return false;
+                }
             }
 
             return true;
@@ -438,18 +450,24 @@ namespace Isles.Pipeline
         /// <summary>
         /// Checks whether a mesh is a skinned mesh
         /// </summary>
-        static bool IsSkinned(NodeContent node)
+        private static bool IsSkinned(NodeContent node)
         {
             MeshContent mesh = node as MeshContent;
 
             if (mesh != null && MeshHasSkinning(mesh))
+            {
                 return true;
+            }
 
             // Recurse (iterating over a copy of the child collection,
             // because validating children may delete some of them).
             foreach (NodeContent child in new List<NodeContent>(node.Children))
+            {
                 if (IsSkinned(child))
+                {
                     return true;
+                }
+            }
 
             return false;
         }
@@ -458,13 +476,15 @@ namespace Isles.Pipeline
         /// Bakes unwanted transforms into the model geometry,
         /// so everything ends up in the same coordinate system.
         /// </summary>
-        static void FlattenTransforms(NodeContent node, BoneContent skeleton)
+        private static void FlattenTransforms(NodeContent node, BoneContent skeleton)
         {
             foreach (NodeContent child in node.Children)
             {
                 // Don't process the skeleton, because that is special.
                 if (child == skeleton)
+                {
                     continue;
+                }
 
                 // Bake the local transform into the actual geometry.
                 MeshHelper.TransformScene(child, child.Transform);
@@ -488,8 +508,7 @@ namespace Isles.Pipeline
 
         // 585 = 1 + 8 * 8 + 8 * 8 * 8
         public bool[] BitMap = new bool[585];
-
-        readonly static int[] spliter = new int[5] { 0, 1, 9, 73, 585};
+        private static readonly int[] spliter = new int[5] { 0, 1, 9, 73, 585};
 
         /// <summary>
         /// Test if that position is occupied
@@ -501,17 +520,35 @@ namespace Isles.Pipeline
             int x = (int)((position.X - Box.Min.X) / ((Box.Max.X - Box.Min.X) / 8));
             int y = (int)((position.Y - Box.Min.Y) / ((Box.Max.Y - Box.Min.Y) / 8));
             int z = (int)((position.Z - Box.Min.Z) / ((Box.Max.Z - Box.Min.Z) / 8));
-            if (x == 8) x = 7;
-            if (y == 8) y = 7;
-            if (z == 8) z = 7;
+            if (x == 8)
+            {
+                x = 7;
+            }
+
+            if (y == 8)
+            {
+                y = 7;
+            }
+
+            if (z == 8)
+            {
+                z = 7;
+            }
+
             int p = 0;
             int[] power = new int[3] { 1, 2, 4 };
             for (int l = 0; l < 4; l++)
             {
                 if (!BitMap[p])
+                {
                     return false;
+                }
+
                 if (l == 3)
+                {
                     return true;
+                }
+
                 int pow = power[2 - l];
                 p = SonOf(p, 4 * (x / pow) + 2 * (y / pow) + (z / pow), l);
                 x %= pow;
@@ -562,9 +599,21 @@ namespace Isles.Pipeline
             int x = (int)((position.X - Box.Min.X) / ((Box.Max.X - Box.Min.X) / 8));
             int y = (int)((position.Y - Box.Min.Y) / ((Box.Max.Y - Box.Min.Y) / 8));
             int z = (int)((position.Z - Box.Min.Z) / ((Box.Max.Z - Box.Min.Z) / 8));
-            if (x == 8) x = 7;
-            if (y == 8) y = 7;
-            if (z == 8) z = 7;
+            if (x == 8)
+            {
+                x = 7;
+            }
+
+            if (y == 8)
+            {
+                y = 7;
+            }
+
+            if (z == 8)
+            {
+                z = 7;
+            }
+
             int p = 4 * (x / 4) + 2 * (y / 4) + (z / 4) + spliter[1];
             BitMap[0] = BitMap[p] = true;
 
@@ -611,7 +660,9 @@ namespace Isles.Pipeline
             for (level = 0; level < 4; level++)
             {
                 if (index < spliter[level + 1])
+                {
                     break;
+                }
             }
 
             int[] parents = new int[level + 1];
@@ -672,7 +723,7 @@ namespace Isles.Pipeline
     /// is remapped so that values ranging from 0 to 1 will range from -1 to 1.
     /// </summary>
     [ContentProcessor]
-    class NormalMapTextureProcessor : ContentProcessor<TextureContent, TextureContent>
+    internal class NormalMapTextureProcessor : ContentProcessor<TextureContent, TextureContent>
     {
         /// <summary>
         /// Process converts the encoded normals to the NormalizedByte4 format and 
@@ -738,7 +789,6 @@ namespace Isles.Pipeline
             keyframesValue = keyframes;
         }
 
-
         /// <summary>
         /// Gets the total length of the animation.
         /// </summary>
@@ -747,8 +797,7 @@ namespace Isles.Pipeline
             get { return durationValue; }
         }
 
-        TimeSpan durationValue;
-
+        private TimeSpan durationValue;
 
         /// <summary>
         /// Gets a combined list containing all the keyframes for all bones,
@@ -759,7 +808,7 @@ namespace Isles.Pipeline
             get { return keyframesValue; }
         }
 
-        IList<Keyframe> keyframesValue;
+        private IList<Keyframe> keyframesValue;
     }
     #endregion
 
@@ -771,12 +820,11 @@ namespace Isles.Pipeline
     {
         #region Fields
 
-        int boneValue;
-        TimeSpan timeValue;
-        Matrix transformValue;
+        private int boneValue;
+        private TimeSpan timeValue;
+        private Matrix transformValue;
 
         #endregion
-
 
         /// <summary>
         /// Constructs a new keyframe object.
@@ -788,7 +836,6 @@ namespace Isles.Pipeline
             transformValue = transform;
         }
 
-
         /// <summary>
         /// Gets the index of the target bone that is animated by this keyframe.
         /// </summary>
@@ -797,7 +844,6 @@ namespace Isles.Pipeline
             get { return boneValue; }
         }
 
-
         /// <summary>
         /// Gets the time offset from the start of the animation to this keyframe.
         /// </summary>
@@ -805,7 +851,6 @@ namespace Isles.Pipeline
         {
             get { return timeValue; }
         }
-
 
         /// <summary>
         /// Gets the bone transform for this keyframe.
@@ -826,12 +871,11 @@ namespace Isles.Pipeline
     {
         #region Fields
 
-        IList<Matrix> bindPoseValue;
-        IList<Matrix> inverseBindPoseValue;
-        IList<int> skeletonHierarchyValue;
-        IList<string> boneNameValue;
+        private IList<Matrix> bindPoseValue;
+        private IList<Matrix> inverseBindPoseValue;
+        private IList<int> skeletonHierarchyValue;
+        private IList<string> boneNameValue;
         #endregion
-
 
         /// <summary>
         /// Constructs a new skinning data object.
@@ -845,7 +889,6 @@ namespace Isles.Pipeline
             boneNameValue = boneName;
         }
 
-
         /// <summary>
         /// Bindpose matrices for each bone in the skeleton,
         /// relative to the parent bone.
@@ -855,7 +898,6 @@ namespace Isles.Pipeline
             get { return bindPoseValue; }
         }
 
-
         /// <summary>
         /// Vertex to bonespace transforms for each bone in the skeleton.
         /// </summary>
@@ -863,7 +905,6 @@ namespace Isles.Pipeline
         {
             get { return inverseBindPoseValue; }
         }
-
 
         /// <summary>
         /// For each bone in the skeleton, stores the index of the parent bone.
@@ -905,7 +946,6 @@ namespace Isles.Pipeline
         }
     }
 
-
     /// <summary>
     /// Writes AnimationClip objects into compiled XNB format
     /// </summary>
@@ -924,7 +964,6 @@ namespace Isles.Pipeline
                    "Isles, Version=1.0.0.0, Culture=neutral";
         }
     }
-
 
     /// <summary>
     /// Writes Keyframe objects into compiled XNB format

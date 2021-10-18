@@ -2634,7 +2634,7 @@ namespace Isles
 
         private Vector3 source;
 
-        private TrailEffect trail;
+        private readonly TrailEffect trail;
 
         private Vector3 acceleration;
 
@@ -2657,14 +2657,8 @@ namespace Isles
         /// </summary>
         public Vector3 Destination
         {
-            get
-            {
-                return this.destination;
-            }
-            set
-            {
-                this.destination = value;
-            }
+            get => destination;
+            set => destination = value;
         }
 
         /// <summary>
@@ -2672,40 +2666,25 @@ namespace Isles
         /// </summary>
         public Vector3 Source
         {
-            get
-            {
-                return this.source;
-            }
-            set
-            {
-                this.source = value;
-            }
+            get => source;
+            set => source = value;
         }
 
-        public ArrowState State
-        {
-            get
-            {
-                return this.state;
-            }
-        }
+        public ArrowState State => state;
 
         public float MaxAcceleration
         {
-            get { return this.maxAcceleration; }
-            set { this.maxAcceleration = value; }
+            get => maxAcceleration;
+            set => maxAcceleration = value;
         }
 
         public float MaxSpeed
         {
-            get { return this.MaxSpeed; }
-            set { this.maxSpeed = value; }
+            get => MaxSpeed;
+            set => maxSpeed = value;
         }
 
-        public Vector3 Accerlation
-        {
-            get { return this.acceleration; }
-        }
+        public Vector3 Accerlation => acceleration;
 
         #endregion
 
@@ -2716,29 +2695,28 @@ namespace Isles
         public Arrow(GameWorld world)
             : base(world)
         {
-            this.RestoreDefault();
-            this.trail = new TrailEffect();
-            this.trail.Length = 5;
-            this.trail.Width = 2;
-            this.trail.Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("Textures/ray2");
-
+            RestoreDefault();
+            trail = new TrailEffect();
+            trail.Length = 5;
+            trail.Width = 2;
+            trail.Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("Textures/ray2");
 
         }
 
         public void Launch()
         {
-            this.source = this.Position;
-            this.state = ArrowState.Flying;
-            this.trail.Launch();
-            this.velocity = Vector3.Normalize(this.destination - this.Position) * this.maxSpeed / 12;
-            this.velocity.Z += this.maxSpeed / 1.5f;
+            source = Position;
+            state = ArrowState.Flying;
+            trail.Launch();
+            velocity = Vector3.Normalize(destination - Position) * maxSpeed / 12;
+            velocity.Z += maxSpeed / 1.5f;
         }
 
         private void RestoreDefault()
         {
-            this.maxAcceleration = 0.0003f;
-            this.maxSpeed = 0.08f;
-            this.state = ArrowState.Waiting;
+            maxAcceleration = 0.0003f;
+            maxSpeed = 0.08f;
+            state = ArrowState.Waiting;
         }
 
         #endregion
@@ -2747,65 +2725,65 @@ namespace Isles
 
         public override void Update(GameTime gameTime)
         {
-            if (this.state == ArrowState.Flying)
+            if (state == ArrowState.Flying)
             {
-                this.UpdateVelocity(gameTime);
-                this.UpdatePosition(gameTime);
-                this.trail.Position = this.Position;
-                this.trail.Update(gameTime);
-                if ((this.Position - this.destination).Length() <= 4f || Vector3.Dot((this.Position - this.destination), ((this.destination - this.source))) > 0)
+                UpdateVelocity(gameTime);
+                UpdatePosition(gameTime);
+                trail.Position = Position;
+                trail.Update(gameTime);
+                if ((Position - destination).Length() <= 4f || Vector3.Dot((Position - destination), ((destination - source))) > 0)
                 {
-                    this.state = ArrowState.Fading;
+                    state = ArrowState.Fading;
                 }
             }
-            if (this.state == ArrowState.Fading)
+            if (state == ArrowState.Fading)
             {
-                this.UpdatePosition(gameTime);
-                this.fadingAge += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-                this.trail.Alpha = 1 - this.fadingAge / 300;
-                if (this.fadingAge >= 300)
+                UpdatePosition(gameTime);
+                fadingAge += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+                trail.Alpha = 1 - fadingAge / 300;
+                if (fadingAge >= 300)
                 {
-                    this.state = ArrowState.End;
-                    this.NotifyEnd();
+                    state = ArrowState.End;
+                    NotifyEnd();
                 }
             }
         }
 
         private void UpdatePosition(GameTime gameTime)
         {
-            this.Position += this.velocity * gameTime.ElapsedGameTime.Milliseconds;
+            Position += velocity * gameTime.ElapsedGameTime.Milliseconds;
         }
 
         private void UpdateVelocity(GameTime gameTime)
         {
-            this.UpdateAcceleration(gameTime);
-            this.velocity += this.acceleration * gameTime.ElapsedGameTime.Milliseconds;
-            if (this.velocity.Length() > this.maxSpeed)
+            UpdateAcceleration(gameTime);
+            velocity += acceleration * gameTime.ElapsedGameTime.Milliseconds;
+            if (velocity.Length() > maxSpeed)
             {
-                this.velocity.Normalize();
-                this.velocity *= this.maxSpeed;
+                velocity.Normalize();
+                velocity *= maxSpeed;
             }
         }
 
         private void UpdateAcceleration(GameTime gameTime)
         {
-            Vector3 interval = this.destination - this.Position;
-            Vector3 interval2 = this.Position - this.source;
-            Vector3 desiredVelocity = Vector3.Normalize(interval) * interval2.Length() / this.maxSpeed;
-            this.acceleration = (desiredVelocity - this.velocity) / gameTime.ElapsedGameTime.Milliseconds;
-            if (this.acceleration.Length() > this.maxAcceleration && (this.Position - this.destination).Length() > 20)
+            Vector3 interval = destination - Position;
+            Vector3 interval2 = Position - source;
+            Vector3 desiredVelocity = Vector3.Normalize(interval) * interval2.Length() / maxSpeed;
+            acceleration = (desiredVelocity - velocity) / gameTime.ElapsedGameTime.Milliseconds;
+            if (acceleration.Length() > maxAcceleration && (Position - destination).Length() > 20)
             {
-                this.acceleration.Normalize();
-                this.acceleration *= this.maxAcceleration;
+                acceleration.Normalize();
+                acceleration *= maxAcceleration;
             }
         }
 
         public override void Draw(GameTime gameTime)
         {
-            if (this.trail != null)
+            if (trail != null)
             {
-                this.trail.SetCamera(BaseGame.Singleton.View, BaseGame.Singleton.Projection);
-                this.trail.Draw(gameTime);
+                trail.SetCamera(BaseGame.Singleton.View, BaseGame.Singleton.Projection);
+                trail.Draw(gameTime);
             }
         }
 
@@ -2857,8 +2835,8 @@ namespace Isles
             // Find a random point on the outline
             if (Area.Type == OutlineType.Circle)
             {
-                float angle = Helper.RandomInRange(0, 2 * MathHelper.Pi);
-                float radius = Helper.RandomInRange(0, Area.Radius);
+                var angle = Helper.RandomInRange(0, 2 * MathHelper.Pi);
+                var radius = Helper.RandomInRange(0, Area.Radius);
 
                 position.X = Area.Position.X + radius * (float)Math.Cos(angle);
                 position.Y = Area.Position.Y + radius * (float)Math.Sin(angle);
@@ -2906,10 +2884,13 @@ namespace Isles
             Position.Z = height;
 
             if (area.Type == OutlineType.Circle)
+            {
                 Radius = area.Radius;
+            }
             else if (area.Type == OutlineType.Rectangle)
+            {
                 Radius = Vector2.Subtract(area.Max, area.Min).Length() / 2;
-
+            }
         }
 
         public override void Update(GameTime gameTime)
@@ -2917,8 +2898,8 @@ namespace Isles
             Vector3 position = Vector3.Zero;
 
             // Find a random point on the circle
-            float angle = Helper.RandomInRange(0, 2 * MathHelper.Pi);
-            float radius = Helper.RandomInRange(Radius * 0.9f, Radius * 1.1f);
+            var angle = Helper.RandomInRange(0, 2 * MathHelper.Pi);
+            var radius = Helper.RandomInRange(Radius * 0.9f, Radius * 1.1f);
 
             position.X = Position.X + radius * (float)Math.Cos(angle);
             position.Y = Position.Y + radius * (float)Math.Sin(angle);
@@ -2939,27 +2920,16 @@ namespace Isles
     #region ProjectileEmitter
     public class ProjectileEmitter : ParticleEmitter, IProjectile
     {
-        Vector3 position;
+        private Vector3 position;
+        private Vector3 velocity;
+        private readonly IWorldObject target;
 
-        Vector3 velocity;
+        public IWorldObject Target => target;
 
-        IWorldObject target;
+        public Vector3 Position => position;
 
-        public IWorldObject Target
-        {
-            get { return target; }
-        }
+        public Vector3 Velocity => velocity;
 
-        public Vector3 Position
-        {
-            get { return position; }
-        }
-
-        public Vector3 Velocity
-        {
-            get { return velocity; }
-        }
-        
         public event EventHandler Hit;
 
         public float MaxSpeed = 120;
@@ -2974,10 +2944,9 @@ namespace Isles
             : base(particleSystem, particlesPerSecond, initialPosition)
         {
             this.target = target;
-            this.position = initialPosition;
-            this.velocity = initialVelocity;
+            position = initialPosition;
+            velocity = initialVelocity;
         }
-
 
         public override void Update(GameTime gameTime)
         {
@@ -2989,7 +2958,9 @@ namespace Isles
 
             // For test only
             if (destination.Z <= 0)
+            {
                 destination.Z = target.Position.Z;
+            }
 
             // Creates a force that steer the emitter towards the target position
             Vector3 desiredVelocity = destination - position;
@@ -3006,7 +2977,7 @@ namespace Isles
             }
 
             // Update velocity & position
-            float elapsedSecond = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            var elapsedSecond = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             velocity += elapsedSecond / Mass * force;
             position += elapsedSecond * velocity;
@@ -3022,8 +2993,7 @@ namespace Isles
 
             if (Vector2.Dot(toTarget, facing) <= 0)
             {
-                if (Hit != null)
-                    Hit(this, null);
+                Hit?.Invoke(this, null);
             }
 
             base.Update(gameTime, position, Vector3.Zero, true);
@@ -3034,18 +3004,15 @@ namespace Isles
     #region EffectTest
     public class EffectTest : ParticleEffect
     {
-        ProjectileEmitter emitter;
-        ParticleSystem particle;
+        private readonly ProjectileEmitter emitter;
+        private readonly ParticleSystem particle;
 
-        public override ParticleSystem Particle
-        {
-            get { return particle; }
-        }
+        public override ParticleSystem Particle => particle;
 
         public override float Emission
         {
-            get { return emitter.ParticlesPerSecond; }
-            set { emitter.ParticlesPerSecond = value; }
+            get => emitter.ParticlesPerSecond;
+            set => emitter.ParticlesPerSecond = value;
         }
 
         public EffectTest(GameWorld world, IWorldObject target, Vector3 position)
@@ -3065,18 +3032,15 @@ namespace Isles
     #region EffectConstruct
     public class EffectConstruct : ParticleEffect
     {
-        AreaEmitter emitter;
-        ParticleSystem particle;
+        private readonly AreaEmitter emitter;
+        private readonly ParticleSystem particle;
 
-        public override ParticleSystem Particle
-        {
-            get { return particle; }
-        }
+        public override ParticleSystem Particle => particle;
 
         public override float Emission
         {
-            get { return emitter.ParticlesPerSecond; }
-            set { emitter.ParticlesPerSecond = value; }
+            get => emitter.ParticlesPerSecond;
+            set => emitter.ParticlesPerSecond = value;
         }
 
         public EffectConstruct(GameWorld world, Outline outline, float minHeight, float maxHeight)
@@ -3096,20 +3060,17 @@ namespace Isles
     #region EffectFire
     public class EffectFire : ParticleEffect
     {
-        ParticleSystem fire;
-        ParticleSystem smoke;
-        ParticleEmitter fireEmitter;
-        ParticleEmitter smokeEmitter;
+        private readonly ParticleSystem fire;
+        private readonly ParticleSystem smoke;
+        private readonly ParticleEmitter fireEmitter;
+        private readonly ParticleEmitter smokeEmitter;
 
-        public override ParticleSystem Particle
-        {
-            get { return smoke; }
-        }
+        public override ParticleSystem Particle => smoke;
 
         public override float Emission
         {
-            get { return smokeEmitter.ParticlesPerSecond; }
-            set { smokeEmitter.ParticlesPerSecond = value; }
+            get => smokeEmitter.ParticlesPerSecond;
+            set => smokeEmitter.ParticlesPerSecond = value;
         }
 
         public EffectFire(GameWorld world)
@@ -3136,24 +3097,18 @@ namespace Isles
     #region EffectFireball
     public class EffectFireball : ParticleEffect
     {
-        ParticleSystem fire;
-        ParticleSystem explosion;
-        ProjectileEmitter fireEmitter;
+        private readonly ParticleSystem fire;
+        private readonly ParticleSystem explosion;
+        private readonly ProjectileEmitter fireEmitter;
 
-        public IProjectile Projectile
-        {
-            get { return fireEmitter; }
-        }
+        public IProjectile Projectile => fireEmitter;
 
-        public override ParticleSystem Particle
-        {
-            get { return explosion; }
-        }
+        public override ParticleSystem Particle => explosion;
 
         public override float Emission
         {
-            get { return fireEmitter.ParticlesPerSecond; }
-            set { fireEmitter.ParticlesPerSecond = value; }
+            get => fireEmitter.ParticlesPerSecond;
+            set => fireEmitter.ParticlesPerSecond = value;
         }
 
         public EffectFireball(GameWorld world, Vector3 position, Vector3 velocity, IWorldObject target)
@@ -3169,8 +3124,8 @@ namespace Isles
             fireEmitter.Hit += new EventHandler(delegate(object sender, EventArgs e)
             {
                 // Fill up the particle system
-                int n = (int)Helper.RandomInRange(20, 30);
-                for (int i = 0; i < n; i++)
+                var n = (int)Helper.RandomInRange(20, 30);
+                for (var i = 0; i < n; i++)
                 {
                     explosion.AddParticle(fireEmitter.Position, fireEmitter.Velocity);
                 }
@@ -3189,21 +3144,17 @@ namespace Isles
     #region EffectExplosion
     public class EffectExplosion : ParticleEffect
     {
-        ParticleSystem fire;
-        ParticleSystem smoke;
-        ParticleSystem spark;
+        private readonly ParticleSystem fire;
+        private readonly ParticleSystem smoke;
+        private readonly ParticleSystem spark;
+        private int ParticleCount = 50;
 
-        int ParticleCount = 50;
-
-        public override ParticleSystem Particle
-        {
-            get { return spark; }
-        }
+        public override ParticleSystem Particle => spark;
 
         public override float Emission
         {
-            get { return ParticleCount; }
-            set { ParticleCount = (int)value; }
+            get => ParticleCount;
+            set => ParticleCount = (int)value;
         }
 
         public EffectExplosion(GameWorld world)
@@ -3220,19 +3171,25 @@ namespace Isles
             Trigger();
         }
 
-        void Trigger()
+        private void Trigger()
         {
-            for (int i = 0; i < 100; i++)
+            for (var i = 0; i < 100; i++)
+            {
                 fire.AddParticle(Position, Vector3.Zero);
+            }
 
-            for (int i = 0; i < 100; i++)
+            for (var i = 0; i < 100; i++)
+            {
                 smoke.AddParticle(Position, Vector3.Zero);
+            }
 
-            for (int i = 0; i < 40; i++)
+            for (var i = 0; i < 40; i++)
+            {
                 spark.AddParticle(Position, Vector3.Zero);
+            }
         }
 
-        int counter;
+        private int counter;
 
         public override void Update(GameTime gameTime)
         {
@@ -3251,19 +3208,16 @@ namespace Isles
     #region EffectStar
     public class EffectStar : ParticleEffect
     {
-        GameObject target;
-        ParticleSystem particle;
-        CircularEmitter emitter;
+        private readonly GameObject target;
+        private readonly ParticleSystem particle;
+        private readonly CircularEmitter emitter;
 
-        public override ParticleSystem Particle
-        {
-            get { return particle; }
-        }
+        public override ParticleSystem Particle => particle;
 
         public override float Emission
         {
-            get { return emitter.ParticlesPerSecond; }
-            set { emitter.ParticlesPerSecond = value; }
+            get => emitter.ParticlesPerSecond;
+            set => emitter.ParticlesPerSecond = value;
         }
 
         public EffectStar(GameWorld world)
@@ -3286,7 +3240,9 @@ namespace Isles
         public override void Update(GameTime gameTime)
         {
             if (target != null)
+            {
                 Position = target.Position;
+            }
 
             emitter.Update(gameTime, Position);
         }
@@ -3296,19 +3252,16 @@ namespace Isles
     #region EffectGlow
     public class EffectGlow : ParticleEffect
     {
-        GameObject target;
-        ParticleSystem particle;
-        ParticleEmitter emitter;
+        private readonly GameObject target;
+        private readonly ParticleSystem particle;
+        private readonly ParticleEmitter emitter;
 
-        public override ParticleSystem Particle
-        {
-            get { return particle; }
-        }
+        public override ParticleSystem Particle => particle;
 
         public override float Emission
         {
-            get { return emitter.ParticlesPerSecond; }
-            set { emitter.ParticlesPerSecond = value; }
+            get => emitter.ParticlesPerSecond;
+            set => emitter.ParticlesPerSecond = value;
         }
 
         public EffectGlow(GameWorld world)
@@ -3344,23 +3297,19 @@ namespace Isles
     #region EffectPunishOfNature
     public class EffectPunishOfNature : ParticleEffect
     {
-        const float DropSpeed = 50;
-        const float Height = 200;
+        private const float DropSpeed = 50;
+        private const float Height = 200;
         public const float Radius = 100;
-        const int MaxRainDrops = 60;
+        private const int MaxRainDrops = 60;
+        private readonly ParticleSystem rain;
+        private readonly ParticleEmitter[] rainEmitters = new ParticleEmitter[MaxRainDrops];
+        private readonly float[] sleepTimes = new float[MaxRainDrops];
 
-        ParticleSystem rain;
-        ParticleEmitter[] rainEmitters = new ParticleEmitter[MaxRainDrops];
-        float[] sleepTimes = new float[MaxRainDrops];
-
-        public override ParticleSystem Particle
-        {
-            get { return rain; }
-        }
+        public override ParticleSystem Particle => rain;
 
         public override float Emission
         {
-            get { return 0; }
+            get => 0;
             set { }
         }
 
@@ -3371,19 +3320,19 @@ namespace Isles
 
             rain = ParticleSystem.Create("PunishOfNature");
 
-            for (int i = 0; i < rainEmitters.Length; i++)
+            for (var i = 0; i < rainEmitters.Length; i++)
             {
                 rainEmitters[i] = new ParticleEmitter(rain, 400, RandomPosition());
                 sleepTimes[i] = Helper.RandomInRange(0, 10);
             }
         }
 
-        Vector3 RandomPosition()
+        private Vector3 RandomPosition()
         {
             Vector3 v;
 
-            float angle = Helper.RandomInRange(0, 2 * MathHelper.Pi);
-            float radius = Helper.RandomInRange(0, Radius);
+            var angle = Helper.RandomInRange(0, 2 * MathHelper.Pi);
+            var radius = Helper.RandomInRange(0, Radius);
 
             v.X = Position.X + radius * (float)Math.Cos(angle);
             v.Y = Position.Y + radius * (float)Math.Sin(angle);
@@ -3396,11 +3345,11 @@ namespace Isles
         {
             Vector3 dropAmount = Vector3.Zero;
 
-            float elapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            var elapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             dropAmount.Z = DropSpeed * elapsedSeconds;
 
-            for (int i = 0; i < rainEmitters.Length; i++)
+            for (var i = 0; i < rainEmitters.Length; i++)
             {
                 if (sleepTimes[i] > 0)
                 {
@@ -3428,24 +3377,19 @@ namespace Isles
     #region EffectHalo
     public class EffectHalo : ParticleEffect
     {
-        float angle = 0;
+        private float angle = 0;
         public float Speed = 2.0f;
         public float Radius;
+        private Vector3 spawn;
+        private readonly ParticleEmitter emitter;
+        private readonly ParticleSystem particle;
 
-        Vector3 spawn;
-
-        ParticleEmitter emitter;
-        ParticleSystem particle;
-
-        public override ParticleSystem Particle
-        {
-            get { return particle; }
-        }
+        public override ParticleSystem Particle => particle;
 
         public override float Emission
         {
-            get { return emitter.ParticlesPerSecond; }
-            set { emitter.ParticlesPerSecond = value; }
+            get => emitter.ParticlesPerSecond;
+            set => emitter.ParticlesPerSecond = value;
         }
 
         public EffectHalo(GameWorld world, Vector3 position, float radius, string particleSystem)
@@ -3474,26 +3418,20 @@ namespace Isles
     #region EffectSpawn
     public class EffectSpawn : ParticleEffect
     {
-        float angle = 0;
+        private float angle = 0;
         public float Speed = 4.0f;
         public float Radius;
+        private Vector3 spawn;
+        private const int Count = 5;
+        private readonly ParticleEmitter[] emitters;
+        private readonly ParticleSystem particle;
 
-        Vector3 spawn;
-
-        const int Count = 5;
-
-        ParticleEmitter[] emitters;
-        ParticleSystem particle;
-
-        public override ParticleSystem Particle
-        {
-            get { return particle; }
-        }
+        public override ParticleSystem Particle => particle;
 
         public override float Emission
         {
-            get { return 0; }
-            set {  }
+            get => 0;
+            set { }
         }
 
         public EffectSpawn(GameWorld world, Vector3 position, float radius, string particleSystem)
@@ -3506,19 +3444,21 @@ namespace Isles
             particle = ParticleSystem.Create(particleSystem);
             emitters = new ParticleEmitter[Count];
 
-            for (int i= 0; i < emitters.Length; i++)
+            for (var i= 0; i < emitters.Length; i++)
+            {
                 emitters[i] = new ParticleEmitter(particle, 150, spawn);
+            }
         }
 
         public override void Update(GameTime gameTime)
         {
-            float elapsedSeconds = (float)(gameTime.ElapsedGameTime.TotalSeconds);
+            var elapsedSeconds = (float)(gameTime.ElapsedGameTime.TotalSeconds);
             angle += Speed * elapsedSeconds;
             spawn.Z += 18.0f * elapsedSeconds;
 
-            for (int i = 0; i < Count; i++)
+            for (var i = 0; i < Count; i++)
             {
-                float realAngle = angle + i * MathHelper.Pi * 2 / Count;
+                var realAngle = angle + i * MathHelper.Pi * 2 / Count;
 
                 spawn.X = Position.X + (float)(Radius * Math.Cos(realAngle));
                 spawn.Y = Position.Y + (float)(Radius * Math.Sin(realAngle));
@@ -3527,7 +3467,9 @@ namespace Isles
             }
 
             if (spawn.Z - Position.Z > 15)
+            {
                 GameServer.Singleton.Destroy(this);
+            }
         }
     }
     #endregion

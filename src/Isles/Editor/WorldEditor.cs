@@ -9,7 +9,7 @@ namespace Isles.Editor
 {
     public partial class WorldEditor : Form
     {
-        GameScreen screen;
+        private readonly GameScreen screen;
 
         public WorldEditor(GameScreen screen)
         {
@@ -30,7 +30,7 @@ namespace Isles.Editor
             {
                 using (Stream stream = new FileStream(saveFileDialog.FileName, FileMode.Create))
                 {
-                    XmlDocument doc = new XmlDocument();
+                    var doc = new XmlDocument();
                     screen.World.Save(doc, null);
                     doc.Save(stream);
                 }
@@ -50,24 +50,26 @@ namespace Isles.Editor
             if (Player.LocalPlayer != null)
             {
                 foreach (GameObject o in Player.LocalPlayer.Selected)
+                {
                     screen.World.Destroy(o);
+                }
             }
         }
 
         private void buttonCreate_Click(object sender, EventArgs e)
         {
-            string type = objectList.SelectedItem as string;
+            var type = objectList.SelectedItem as string;
 
             if (type != null)
             {
                 Spell.EndSpell();
-                SpellConstruct construct = new SpellConstruct(screen.World, type);
+                var construct = new SpellConstruct(screen.World, type);
                 construct.AutoReactivate = true;
                 Spell.Cast(construct);                
             }
         }
 
-        SpellDrawPathOcculder drawPathOccluders;
+        private SpellDrawPathOcculder drawPathOccluders;
 
         private void buttonDrawPath_Click(object sender, EventArgs e)
         {
@@ -95,7 +97,9 @@ namespace Isles.Editor
         private void trackBarPathBrushSize_Scroll(object sender, EventArgs e)
         {
             if (drawPathOccluders != null)
+            {
                 drawPathOccluders.BrushRadius = 2.5f * trackBarPathBrushSize.Value;
+            }
         }
     }
 }

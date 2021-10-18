@@ -13,32 +13,27 @@ using Isles.Graphics;
 using Isles.Engine;
 using Isles.UI;
 
-
 namespace Isles
 {
     public class MiniMap : UIElement
     {
-        readonly Rectangle FogOfWarSourceRectangle = new Rectangle(500, 692, 429, 429);
-
-        Dictionary<int, Vector3> GoldMineList = new Dictionary<int,Vector3>();
+        private readonly Rectangle FogOfWarSourceRectangle = new(500, 692, 429, 429);
+        private readonly Dictionary<int, Vector3> GoldMineList = new();
 
         private Texture2D goldMinePointer;
-        GameCamera camera;
-        BaseGame game;
-        GameWorld world;
-
-        const float Factor = 0.7f;
-        const float RadiusFactor = 0.44f;
-
-        Rectangle actualArea;
-        const double GoldMinePointerFactor = 0.13;
-
-        Rectangle goldMineSourceRectangle;
+        private GameCamera camera;
+        private readonly BaseGame game;
+        private readonly GameWorld world;
+        private const float Factor = 0.7f;
+        private const float RadiusFactor = 0.44f;
+        private Rectangle actualArea;
+        private const double GoldMinePointerFactor = 0.13;
+        private Rectangle goldMineSourceRectangle;
 
         public Rectangle GoldMineSourceRectangle
         {
-            get { return goldMineSourceRectangle; }
-            set { goldMineSourceRectangle = value; }
+            get => goldMineSourceRectangle;
+            set => goldMineSourceRectangle = value;
         }
 
         /// <summary>
@@ -84,28 +79,21 @@ namespace Isles
                 return base.DestinationRectangle;
             }
         }
-        
+
         /// <summary>
         /// Gets the center of the actualArea
         /// </summary>
-        public Point Center
-        {
-            get 
-            {
-                return new Point(DestinationRectangle.Left + DestinationRectangle.Width / 2,
-                                 DestinationRectangle.Top  + DestinationRectangle.Height / 2);
-            }   
-        }
+        public Point Center => new Point(DestinationRectangle.Left + DestinationRectangle.Width / 2,
+                                 DestinationRectangle.Top + DestinationRectangle.Height / 2);
 
         /// <summary>
         /// Gets or sets texture for gold mine pointer
         /// </summary>
         public Texture2D GoldMinePointerTexture
         {
-            get { return goldMinePointer; }
-            set { goldMinePointer = value; }
+            get => goldMinePointer;
+            set => goldMinePointer = value;
         }
-
 
         /// <summary>
         /// Constructor
@@ -114,11 +102,11 @@ namespace Isles
         public MiniMap(BaseGame game,  GameWorld world)
         {
             this.game = game;
-            this.camera = game.Camera as GameCamera;
+            camera = game.Camera as GameCamera;
             this.world = world;
         }
 
-        static int GoldmineCounter = 0;
+        private static int GoldmineCounter = 0;
 
         /// <summary>
         /// Add a gold mine
@@ -149,7 +137,7 @@ namespace Isles
             
             if (ActualArea.Contains(mapPoint))
             {
-                Vector3 rtv = new Vector3();
+                var rtv = new Vector3();
                 rtv.X = world.Landscape.Size.X * (mapPoint.X - ActualArea.X) / ActualArea.Width;
                 rtv.Y = world.Landscape.Size.Y * (ActualArea.Bottom - mapPoint.Y) / ActualArea.Height;
                 rtv.Z = world.Landscape.GetHeight(rtv.X, rtv.Y);
@@ -159,15 +147,14 @@ namespace Isles
             return null;
         }
 
-        Vector3 MapPointToWorldPositionNegativeAllowed(Point mapPoint)
+        private Vector3 MapPointToWorldPositionNegativeAllowed(Point mapPoint)
         {
-            Vector3 rtv = new Vector3();
+            var rtv = new Vector3();
             rtv.X = world.Landscape.Size.X * (mapPoint.X - ActualArea.X) / ActualArea.Width;
             rtv.Y = world.Landscape.Size.Y * (ActualArea.Bottom - mapPoint.Y) / ActualArea.Height;
             rtv.Z = world.Landscape.GetHeight(rtv.X, rtv.Y);
             return rtv;
         }
-
 
         /// <summary>
         /// Gets the corresponding point in the map.
@@ -179,7 +166,7 @@ namespace Isles
             if (position.X >= 0 && position.X <= world.Landscape.Size.X &&
                 position.Y >= 0 && position.Y <= world.Landscape.Size.Y)
             {
-                Point mp = new Point();
+                var mp = new Point();
                 mp.X = (int)(position.X / world.Landscape.Size.X * ActualArea.Width + ActualArea.X);
                 mp.Y = (int)((1 - position.Y / world.Landscape.Size.Y) * ActualArea.Height + ActualArea.Y);
                 return mp;
@@ -188,10 +175,9 @@ namespace Isles
             return null;
         }
 
-
-        Point WorldPositionToMapPointNegativeAllowed(Vector3 position)
+        private Point WorldPositionToMapPointNegativeAllowed(Vector3 position)
         {
-            Point mp = new Point();
+            var mp = new Point();
             mp.X = (int)(position.X / world.Landscape.Size.X * ActualArea.Width + ActualArea.X);
             mp.Y = (int)((1 - position.Y / world.Landscape.Size.Y) * ActualArea.Height + ActualArea.Y);
             return mp;
@@ -214,7 +200,10 @@ namespace Isles
             { 
                 goldMinePointerPosition = WorldToMap(position);
                 if(goldMinePointerPosition == null)
+                {
                     throw new InvalidOperationException("Gold Mine position out of range.");
+                }
+
                 goldMineDest.X = goldMinePointerPosition.Value.X - goldMineDest.Width / 2;
                 goldMineDest.Y = goldMinePointerPosition.Value.Y - goldMineDest.Height / 2;
                 sprite.Draw(GoldMinePointerTexture, goldMineDest, goldMineSourceRectangle, Color.White); 
@@ -230,36 +219,48 @@ namespace Isles
         /// <summary>
         /// Draw the sight region
         /// </summary>
-        void DrawSightRegion(GameTime gameTime, SpriteBatch sprite)
+        private void DrawSightRegion(GameTime gameTime, SpriteBatch sprite)
         {
-            Point[] sightRegion = new Point[4];
+            var sightRegion = new Point[4];
 
-            Plane xyPlane = new Plane(0, 0, 1, 0);
+            var xyPlane = new Plane(0, 0, 1, 0);
             Ray ray = game.Unproject(0, 0);
-            float? dist = ray.Intersects(xyPlane);
+            var dist = ray.Intersects(xyPlane);
             if (dist == null)
+            {
                 return;
+            }
+
             Vector3 intersectPoint = ray.Position + Vector3.Normalize(ray.Direction) * dist.Value;
             sightRegion[0] = WorldPositionToMapPointNegativeAllowed(intersectPoint);
 
             ray = game.Unproject(game.ScreenWidth, 0);
             dist = ray.Intersects(xyPlane);
             if (dist == null)
+            {
                 return;
+            }
+
             intersectPoint = ray.Position + Vector3.Normalize(ray.Direction) * dist.Value;
             sightRegion[1] = WorldPositionToMapPointNegativeAllowed(intersectPoint);
 
             ray = game.Unproject(game.ScreenWidth, game.ScreenHeight);
             dist = ray.Intersects(xyPlane);
             if (dist == null)
+            {
                 return;
+            }
+
             intersectPoint = ray.Position + Vector3.Normalize(ray.Direction) * dist.Value;
             sightRegion[2] = WorldPositionToMapPointNegativeAllowed(intersectPoint);
 
             ray = game.Unproject(0, game.ScreenHeight);
             dist = ray.Intersects(xyPlane);
             if (dist == null)
+            {
                 return;
+            }
+
             intersectPoint = ray.Position + Vector3.Normalize(ray.Direction) * dist.Value;
             sightRegion[3] = WorldPositionToMapPointNegativeAllowed(intersectPoint);
 
@@ -268,7 +269,6 @@ namespace Isles
             Graphics2D.DrawLine(sightRegion[2], sightRegion[3], Color.White);
             Graphics2D.DrawLine(sightRegion[3], sightRegion[0], Color.White);
         }
-
 
         /// <summary>
         /// Draw a game object on the minimap
@@ -286,55 +286,59 @@ namespace Isles
             entitySigns.Add(sign);
         }
 
-        struct EntitySign
+        private struct EntitySign
         {
             public Rectangle Destination;
             public Color Tint;
         }
 
-        List<EntitySign> entitySigns = new List<EntitySign>();
+        private readonly List<EntitySign> entitySigns = new();
 
         /// <summary>
         /// Draw the entites
         /// </summary>
         /// <param name="gameTime"></param>
         /// <param name="sprite"></param>
-        void DrawEntitySign(GameTime gameTime, SpriteBatch sprite)
+        private void DrawEntitySign(GameTime gameTime, SpriteBatch sprite)
         {
             foreach (EntitySign sign in entitySigns)
+            {
                 Graphics2D.DrawRectangle(sign.Destination, sign.Tint);
+            }
 
             entitySigns.Clear();
         }
 
-
-
         public override void Update(GameTime gameTime)
         {
             if (camera == null)
+            {
                 camera = game.Camera as GameCamera;
+            }
 
             if (draging)
             {
-                Vector2 dist = new Vector2(game.Input.MousePosition.X - Center.X,
+                var dist = new Vector2(game.Input.MousePosition.X - Center.X,
                                            game.Input.MousePosition.Y - Center.Y);
                 if (dist.X * dist.X + dist.Y * dist.Y <= 
                     RadiusFactor * DestinationRectangle.Width * RadiusFactor * DestinationRectangle.Width)
                 {
                     Vector3 position = MapPointToWorldPositionNegativeAllowed(game.Input.MousePosition);
                     if (position != null)
+                    {
                         camera.FlyTo(position, true);
+                    }
                 }
                 else
                 {
-                    Vector2 offset = new Vector2(dist.X, dist.Y);
+                    var offset = new Vector2(dist.X, dist.Y);
                     offset =  RadiusFactor * DestinationRectangle.Width * Vector2.Normalize(offset);
                     Mouse.SetPosition((int)offset.X + Center.X, (int)offset.Y + Center.Y);
                 }
             }
         }
 
-        bool draging = false;
+        private bool draging = false;
 
         /// <summary>
         /// Event handler
@@ -343,15 +347,15 @@ namespace Isles
         {
             if (Enabled && Visible)
             {
-                Input input = sender as Input;
-                Keys? key = tag as Keys?;
-                Vector2 dist = new Vector2(input.MousePosition.X - Center.X,
+                var input = sender as Input;
+                var key = tag as Keys?;
+                var dist = new Vector2(input.MousePosition.X - Center.X,
                                             input.MousePosition.Y - Center.Y);
                 if (type == EventType.LeftButtonDown &&
                     dist.X * dist.X + dist.Y * dist.Y <=
                     RadiusFactor * DestinationRectangle.Width * RadiusFactor * DestinationRectangle.Width)
                 {
-                    Point pointTo = new Point();
+                    var pointTo = new Point();
                     draging = true;
                     pointTo.X = input.MousePosition.X - ActualArea.X;
                     pointTo.Y = input.MousePosition.Y - ActualArea.Y;
@@ -377,7 +381,9 @@ namespace Isles
                 {
                     Vector3? point = MapToWorld(input.MousePosition);
                     if (point .HasValue)
+                    {
                         Player.LocalPlayer.PerformAction(point.Value);
+                    }
 
                     return EventResult.Handled;
                 }

@@ -59,145 +59,106 @@ namespace Isles
         public const int ProfileBaseX = 440;
         public const int ProfileWidth = 40;
         public const int ProfileSpace = 4;
+        private readonly BaseGame        game;
+        private UIDisplay       ui;
+        private readonly IUIElement[,]   elements = new IUIElement[3,5];
+        private readonly GameWorld       world;
 
-        BaseGame        game;
-        UIDisplay       ui;
-        IUIElement[,]   elements = new IUIElement[3,5];
-        GameWorld       world;
+        public UIDisplay Display => ui;
 
-        public UIDisplay Display
-        {
-            get { return ui; }
-        }
+        private readonly List<SpellButton> profileButtons = new();
+        private int profileNextX = ProfileBaseX;
 
-        List<SpellButton> profileButtons = new List<SpellButton>();
-        int profileNextX = ProfileBaseX;
-        
         #region Singleton
-        public static GameUI Singleton
-        {
-            get { return singleton; }
-        }
+        public static GameUI Singleton => singleton;
 
-        static GameUI singleton;
+        private static GameUI singleton;
         #endregion
 
         #region Panels
 
-        Isles.UI.Panel controlPanel, snapShot, tipBoxContainer, profilePanel;
+        private UI.Panel controlPanel, snapShot, tipBoxContainer, profilePanel;
 
         /// <summary>
         /// Gets the control panel in the game
         /// </summary>
-        public Isles.UI.Panel ControlPanel
-        {
-            get { return controlPanel; }
-        }
+        public UI.Panel ControlPanel => controlPanel;
 
-
-        Isles.UI.Panel resourcePanel;
+        private UI.Panel resourcePanel;
 
         /// <summary>
         /// Gets the resource panel
         /// </summary>
-        public Isles.UI.Panel ResourcePanel
-        {
-            get { return resourcePanel; }
-        }
+        public UI.Panel ResourcePanel => resourcePanel;
 
         /// <summary>
         /// Gets the tip box container
         /// </summary>
-        public Isles.UI.Panel TipBoxContainer
-        {
-            get { return tipBoxContainer; } 
-        }
+        public UI.Panel TipBoxContainer => tipBoxContainer;
 
-        MiniMap minimap;
+        private MiniMap minimap;
 
-        public MiniMap Minimap
-        {
-            get { return minimap; }
-        }
-
+        public MiniMap Minimap => minimap;
 
         #endregion
-        
-        Texture2D dialogTexture, panelsTexture;
+
+        private Texture2D dialogTexture, panelsTexture;
 
         /// <summary>
         /// Screen border fadeout texture
         /// </summary>
-        Texture2D borderFadeout;
+        private Texture2D borderFadeout;
 
         /// <summary>
         /// Distortion pic
         /// </summary>
-        Texture2D distortion;
+        private Texture2D distortion;
 
         /// <summary>
         /// For the disappearing effect
         /// </summary>
-        Texture2D LoadingDisplayFinished;
-
-
-        TextField snapShotName;
-
-
-        Texture2D[] focusAnimation = new Texture2D[8];
-        Vector3 focusPosition;
-        Color focusColor = Color.Green;
-        double focusElapsedTime = 0;
-
-        TextField lumberTextField, goldTextField, foodTextField;
-
-        readonly float[] StatisticsTextX = {4.6f / 24.25f, 11.6f / 24.25f, 18.3f / 24.25f};
-
-        readonly Rectangle StatisticsDestination = new Rectangle(400, 2, 400, 36);
-        readonly Rectangle StatisticsSource = new Rectangle(0, 0, 690, 64);
-        readonly Rectangle StatusDestination = new Rectangle(5, 495, 150, 120);
-        readonly Rectangle StatusSource = new Rectangle(0, 62, 256, 256);
-        readonly Rectangle SignSource = new Rectangle(246, 80, 236, 226);
-        readonly Rectangle StatusRectangle = new Rectangle(5, 400, 400, 100);
-
-
-        readonly Rectangle ResourcePanelSourceRectangle = new Rectangle(0, 0, 885, 70);
-        readonly Rectangle ControlPanelSourceRectangle = new Rectangle(0, 70, 1718, 622);
-        readonly Rectangle GoldMineSourceRectangle = new Rectangle(885, 0, 41, 41);
-        readonly Rectangle MapSourceRectangle = new Rectangle(0, 692, 429, 429);
-
-
-        readonly Rectangle ResourcePanelDestinationRectangle = new Rectangle(526, 1, 284, 23);
-        readonly Rectangle ControlPanelDestinationRectangle = new Rectangle(0, 442, 442, 160);
-        readonly Rectangle ControlPanelEffectiveRegion = new Rectangle(0, 480, 442, 122);
-        readonly Rectangle MapDestinationRectangle = new Rectangle(26, 38, 120, 120);
-        readonly Rectangle SnapshotDestinationRectangle = new Rectangle(314, 44, 85, 85);
-        readonly Rectangle EnvironmentIndicatorSource= new Rectangle(960, 0, 46, 46);
-        readonly Rectangle EnvironmentIndicatorDestination = new Rectangle(760, 6, 12, 12);
-        readonly Rectangle SnapShotNameDestination = new Rectangle(0, 78, 85, 30);
-
-        const int SpellButtonBaseX = 145;
-        const int SpellButtonBaseY = 53;
-        const int SpellButtonWidth = 29;
-        const int SpellButtonShorterHeight = 22;
-        const int SpellButtonFullHeight = 34;
-        const int SpellButtonWidthSpace = 1;
-
-
-        readonly Rectangle[] ElementAreas = new Rectangle[]
+        private readonly Texture2D LoadingDisplayFinished;
+        private TextField snapShotName;
+        private readonly Texture2D[] focusAnimation = new Texture2D[8];
+        private Vector3 focusPosition;
+        private Color focusColor = Color.Green;
+        private double focusElapsedTime = 0;
+        private TextField lumberTextField, goldTextField, foodTextField;
+        private readonly float[] StatisticsTextX = {4.6f / 24.25f, 11.6f / 24.25f, 18.3f / 24.25f};
+        private readonly Rectangle StatisticsDestination = new(400, 2, 400, 36);
+        private readonly Rectangle StatisticsSource = new(0, 0, 690, 64);
+        private readonly Rectangle StatusDestination = new(5, 495, 150, 120);
+        private readonly Rectangle StatusSource = new(0, 62, 256, 256);
+        private readonly Rectangle SignSource = new(246, 80, 236, 226);
+        private readonly Rectangle StatusRectangle = new(5, 400, 400, 100);
+        private readonly Rectangle ResourcePanelSourceRectangle = new(0, 0, 885, 70);
+        private readonly Rectangle ControlPanelSourceRectangle = new(0, 70, 1718, 622);
+        private readonly Rectangle GoldMineSourceRectangle = new(885, 0, 41, 41);
+        private readonly Rectangle MapSourceRectangle = new(0, 692, 429, 429);
+        private readonly Rectangle ResourcePanelDestinationRectangle = new(526, 1, 284, 23);
+        private readonly Rectangle ControlPanelDestinationRectangle = new(0, 442, 442, 160);
+        private readonly Rectangle ControlPanelEffectiveRegion = new(0, 480, 442, 122);
+        private readonly Rectangle MapDestinationRectangle = new(26, 38, 120, 120);
+        private readonly Rectangle SnapshotDestinationRectangle = new(314, 44, 85, 85);
+        private readonly Rectangle EnvironmentIndicatorSource= new(960, 0, 46, 46);
+        private readonly Rectangle EnvironmentIndicatorDestination = new(760, 6, 12, 12);
+        private readonly Rectangle SnapShotNameDestination = new(0, 78, 85, 30);
+        private const int SpellButtonBaseX = 145;
+        private const int SpellButtonBaseY = 53;
+        private const int SpellButtonWidth = 29;
+        private const int SpellButtonShorterHeight = 22;
+        private const int SpellButtonFullHeight = 34;
+        private const int SpellButtonWidthSpace = 1;
+        private readonly Rectangle[] ElementAreas = new Rectangle[]
         {
             new Rectangle(664, 528, 64, 32), new Rectangle(732, 528, 64, 32),
             new Rectangle(664, 564, 64, 32), new Rectangle(732, 564, 64, 32),
         };
-
-        readonly Color TextColor = Color.White;
-        readonly Color TextColorDark = Color.Black;
-
-
-        const double DisappearingTime = 3;
-        double startTime = 0;
-
-        Effect disappearEffect;
+        private readonly Color TextColor = Color.White;
+        private readonly Color TextColorDark = Color.Black;
+        private const double DisappearingTime = 3;
+        private double startTime = 0;
+        private Effect disappearEffect;
 
         #endregion
 
@@ -220,7 +181,7 @@ namespace Isles
         public void LoadContent()
         {
             // Create a new UI display
-            this.ui = new UIDisplay(BaseGame.Singleton);
+            ui = new UIDisplay(BaseGame.Singleton);
 
             // Load UI textures
             borderFadeout = game.ZipContent.Load<Texture2D>("Textures/Fadeout");
@@ -230,16 +191,19 @@ namespace Isles
             dialogTexture = game.ZipContent.Load<Texture2D>("UI/Tipbox");
 
              
-            for (int i = 0; i < focusAnimation.Length; i++)
+            for (var i = 0; i < focusAnimation.Length; i++)
+            {
                 focusAnimation[i] = game.ZipContent.Load<Texture2D>("UI/Focus/" + (i + 1));
+            }
+
             Rectangle relativeRect = UIElement.GetRelativeRectangle(new Rectangle
                                             ((int)(StartLineForMessage.X), (int)(StartLineForMessage.Y), 0, 0),
                                             ui, ScaleMode.ScaleX, Anchor.TopLeft);
-            tipBoxContainer = new Isles.UI.Panel(ui.Area);
+            tipBoxContainer = new UI.Panel(ui.Area);
             tipBoxContainer.ScaleMode = ScaleMode.Stretch;
             tipBoxContainer.EffectiveRegion = Rectangle.Empty;
 
-            profilePanel = new Isles.UI.Panel(ui.Area);
+            profilePanel = new UI.Panel(ui.Area);
             profilePanel.ScaleMode = ScaleMode.Stretch;
             profilePanel.EffectiveRegion = Rectangle.Empty;
 
@@ -248,16 +212,15 @@ namespace Isles
             RelativeMessageStep.Y = StepForOneMessage.Y * ui.Area.Height / ui.DestinationRectangle.Height;
             RelativeMessageStep.X = 0;
 
-            controlPanel = new Isles.UI.Panel(ControlPanelDestinationRectangle);
+            controlPanel = new UI.Panel(ControlPanelDestinationRectangle);
             controlPanel.Anchor = Anchor.BottomLeft;
             controlPanel.SourceRectangle = ControlPanelSourceRectangle;
             controlPanel.Texture = panelsTexture;
             controlPanel.EffectiveRegion = ControlPanelEffectiveRegion;
 
-            snapShot = new Isles.UI.Panel(SnapshotDestinationRectangle);
+            snapShot = new UI.Panel(SnapshotDestinationRectangle);
             snapShot.Anchor = Anchor.BottomLeft;
             snapShot.EffectiveRegion = Rectangle.Empty;
-
 
             snapShotName = new TextField("Name", 17f / 23, Color.Gold, SnapShotNameDestination, Color.Black);//NameDestination);
             snapShotName.Centered = true;
@@ -266,7 +229,7 @@ namespace Isles
 
             controlPanel.Add(snapShot);
 
-            resourcePanel = new Isles.UI.Panel(ResourcePanelDestinationRectangle);
+            resourcePanel = new UI.Panel(ResourcePanelDestinationRectangle);
             resourcePanel.Anchor = Anchor.TopRight;
             resourcePanel.SourceRectangle = ResourcePanelSourceRectangle;
             resourcePanel.Texture = panelsTexture;
@@ -277,11 +240,13 @@ namespace Isles
             resourcePanel.Add(  goldTextField = new TextField(Player.LocalPlayer.Gold.ToString(),
                                 17f / 23, color, new Rectangle(128, 2, 150, 20)));
             if (Player.LocalPlayer.Food > Player.LocalPlayer.FoodCapacity)
+            {
                 color = Color.Red;
+            }
+
             resourcePanel.Add(  foodTextField = new TextField(Player.LocalPlayer.Food.ToString() 
                                 + "/" + Player.LocalPlayer.FoodCapacity,
                                 17f / 23, color, new Rectangle(184, 2, 150, 20)));
-
 
             minimap = new MiniMap(game, world);
             minimap.Texture = panelsTexture;
@@ -316,30 +281,42 @@ namespace Isles
         public void SetUIElement(int x, bool specialItem, IUIElement element)
         {
             if (!specialItem && (x < 0 || x > 4) )
+            {
                 return;
+            }
+
             if (specialItem && (x < 0 || x > 9))
+            {
                 return;
-            int y = 0;
+            }
+
+            var y = 0;
             if (specialItem)
             {
                 y = x / 5 + 1;
                 x %= 5;
             }
             if (elements[y, x] != null)
+            {
                 controlPanel.Remove(elements[y, x]);
+            }
 
             // Remove old one
             if (element != null)
             {
                 
-                Rectangle area = new  Rectangle(SpellButtonBaseX + x * (SpellButtonWidth + SpellButtonWidthSpace), 
+                var area = new  Rectangle(SpellButtonBaseX + x * (SpellButtonWidth + SpellButtonWidthSpace), 
                                                 SpellButtonBaseY + y * SpellButtonFullHeight,
                                                 SpellButtonWidth, SpellButtonShorterHeight);
                 if(y > 0)
+                {
                     area.Height = SpellButtonWidth;
+                }
 
                 if (y == 1)
+                {
                     area.Y--;
+                }
                 // Adjust element position
                 element.Area = area;
 
@@ -351,13 +328,11 @@ namespace Isles
                 controlPanel.Add(element);
             }
 
-
-            this.tipBoxContainer.Clear();
+            tipBoxContainer.Clear();
 
             // Store it in the array
             elements[y, x] = element;
         }
-
 
         /// <summary>
         /// Remove a UI element 
@@ -367,10 +342,12 @@ namespace Isles
         public void RemoveUIElement(int x, int y)
         {
             if (elements[x, y] == null)
+            {
                 return;
+            }
+
             controlPanel.Remove(elements[x, y]);
         }
-
 
         /// <summary>
         /// Clear all ui elements
@@ -380,13 +357,13 @@ namespace Isles
             foreach (IUIElement e in elements)
             {
                 if( e != null)
+                {
                     controlPanel.Remove(e);
+                }
             }
             tipBoxContainer.Clear();
 
         }
-
-
 
         #region Messages
         /// <summary>
@@ -400,7 +377,7 @@ namespace Isles
             {
                 messageQueue.Dequeue();
             }
-            int count = messageQueue.Count;
+            var count = messageQueue.Count;
             double remainingTime;
             Vector2 actualBaseLine = RelativeMessageStartLine;
             remainingTime = lastPushTime + PushingPeriodLength - gameTime.TotalGameTime.TotalSeconds;
@@ -414,9 +391,9 @@ namespace Isles
                 GameMessage message = messageQueue.Peek();
                 if (gameTime.TotalGameTime.TotalSeconds < lastPushTime + MessageEmergingPeriodLength)
                 {
-                    Color transparentColor = new Color(message.Color.R, message.Color.G, message.Color.B,
+                    var transparentColor = new Color(message.Color.R, message.Color.G, message.Color.B,
                                     (byte)(message.Color.A * ((gameTime.TotalGameTime.TotalSeconds - lastPushTime) / MessageEmergingPeriodLength)));
-                    Color transparentShadowColor = new Color(0, 0, 0,
+                    var transparentShadowColor = new Color(0, 0, 0,
                         (byte)(message.Color.A * ((gameTime.TotalGameTime.TotalSeconds - lastPushTime) / MessageEmergingPeriodLength)));
                     game.Graphics2D.DrawShadowedString(message.Message, MessageFontSize, RelativeMessageStartLine, transparentColor, transparentShadowColor);
 
@@ -428,9 +405,9 @@ namespace Isles
                 else if (gameTime.TotalGameTime.TotalSeconds < message.PushTime + MessageEmergingPeriodLength + MessagePresentingPeriodLength + MessageDisappearingPeriodLength)
                 {
                     remainingTime = message.PushTime + MessagePresentingPeriodLength + MessageEmergingPeriodLength + MessageDisappearingPeriodLength - gameTime.TotalGameTime.TotalSeconds;
-                    Color transparentColor = new Color(message.Color.R,
+                    var transparentColor = new Color(message.Color.R,
                                     message.Color.G, message.Color.B, (byte)(message.Color.A * (1 + remainingTime / MessageDisappearingPeriodLength)));
-                    Color transparentShadowColor = new Color(0, 0, 0,
+                    var transparentShadowColor = new Color(0, 0, 0,
                         (byte)(message.Color.A * (1 + remainingTime / MessageDisappearingPeriodLength)));
                     game.Graphics2D.DrawShadowedString(message.Message, MessageFontSize, RelativeMessageStartLine, transparentColor, transparentShadowColor);
                 }
@@ -445,16 +422,16 @@ namespace Isles
                 // Last line
                 if (count == 1) 
                 {
-                    double pushFinishedTime = lastPushTime + PushingPeriodLength;
+                    var pushFinishedTime = lastPushTime + PushingPeriodLength;
                     // Not stable
                     if (gameTime.TotalGameTime.TotalSeconds < pushFinishedTime + MessageEmergingPeriodLength)
                     {
                         // Emerging
                         if (gameTime.TotalGameTime.TotalSeconds > pushFinishedTime)
                         {
-                            Color transparentColor = new Color(message.Color.R, message.Color.G, message.Color.B,
+                            var transparentColor = new Color(message.Color.R, message.Color.G, message.Color.B,
                                 (byte)(message.Color.A * ((gameTime.TotalGameTime.TotalSeconds - pushFinishedTime) / MessageEmergingPeriodLength)));
-                            Color transparentShadowColor = new Color(0,0,0,
+                            var transparentShadowColor = new Color(0,0,0,
                                 (byte)(message.Color.A * ((gameTime.TotalGameTime.TotalSeconds - pushFinishedTime) / MessageEmergingPeriodLength)));
                             game.Graphics2D.DrawShadowedString(message.Message, MessageFontSize, RelativeMessageStartLine + RelativeMessageStep * (count - 1), transparentColor, transparentShadowColor);
                         }
@@ -465,9 +442,9 @@ namespace Isles
                 {
                     if (-remainingTime < MessageDisappearingPeriodLength)
                     {
-                        Color transparentColor = new Color(message.Color.R,
+                        var transparentColor = new Color(message.Color.R,
                                     message.Color.G, message.Color.B, (byte)(message.Color.A * (1 + remainingTime / MessageDisappearingPeriodLength)));
-                        Color transparentShadowColor = new Color(0, 0, 0,
+                        var transparentShadowColor = new Color(0, 0, 0,
                             (byte)(message.Color.A * (1 + remainingTime / MessageDisappearingPeriodLength)));
                         game.Graphics2D.DrawShadowedString(message.Message, MessageFontSize, actualBaseLine + RelativeMessageStep * (count - 1), transparentColor, transparentShadowColor);
                     }
@@ -483,36 +460,35 @@ namespace Isles
         #region Fields for Game Messages
 
         // Message Queues
-        Queue<GameMessage> BubbleUpMessageQueue = new Queue<GameMessage>();
-        Queue<GameMessage> FlyAwayMessageQueue = new Queue<GameMessage>();
-        Queue<GameMessage> NoneStyleMessageQueue = new Queue<GameMessage>();
-        Queue<GameMessage> messageQueue = new Queue<GameMessage>();
+        private readonly Queue<GameMessage> BubbleUpMessageQueue = new();
+        private readonly Queue<GameMessage> FlyAwayMessageQueue = new();
+        private readonly Queue<GameMessage> NoneStyleMessageQueue = new();
+        private readonly Queue<GameMessage> messageQueue = new();
 
         // Constants for wherever messages
-        const double BubbleUpSustainingPeriodLength = 1.5;
-        const double BubbleUpPeriodLength = 1.5;
-        const int BubbleUpSustainingHeight = 10;
-        const int BubbleUpHeight = 15;
-        const double NoneStyleMessageShowingPeriodLength = 2;
+        private const double BubbleUpSustainingPeriodLength = 1.5;
+        private const double BubbleUpPeriodLength = 1.5;
+        private const int BubbleUpSustainingHeight = 10;
+        private const int BubbleUpHeight = 15;
+        private const double NoneStyleMessageShowingPeriodLength = 2;
 
         // Constants for side bar message
-        const double MessagePresentingPeriodLength = 12;
-        const double MessageDisappearingPeriodLength = 5;
-        const double MessageEmergingPeriodLength = 0.2;
-        const double PushingPeriodLength = 0.3;
+        private const double MessagePresentingPeriodLength = 12;
+        private const double MessageDisappearingPeriodLength = 5;
+        private const double MessageEmergingPeriodLength = 0.2;
+        private const double PushingPeriodLength = 0.3;
 
         // Side bar message line-height controls
-        static readonly Vector2 StartLineForMessage = new Vector2(30, 350);
-        static readonly Vector2 StepForOneMessage = new Vector2(0, -20);
-
-        Vector2 RelativeMessageStartLine;
-        Vector2 RelativeMessageStep;
+        private static readonly Vector2 StartLineForMessage = new(30, 350);
+        private static readonly Vector2 StepForOneMessage = new(0, -20);
+        private Vector2 RelativeMessageStartLine;
+        private Vector2 RelativeMessageStep;
 
         // Message Font Sizes
-        const float BubbleUpMessageFontSize = 15f / 23;
-        const float FlyAwayMessageFontSize = 15f / 23;
-        const float NoneStyleMessageFontSize = 17f / 23;
-        const float MessageFontSize = 18f / 23;
+        private const float BubbleUpMessageFontSize = 15f / 23;
+        private const float FlyAwayMessageFontSize = 15f / 23;
+        private const float NoneStyleMessageFontSize = 17f / 23;
+        private const float MessageFontSize = 18f / 23;
 
         // Switcher
         public bool BubbleUpMessageOn = true;
@@ -521,7 +497,7 @@ namespace Isles
         public bool SideBarMessageOn = true;
 
         // Time when the last push happened
-        double lastPushTime;
+        private double lastPushTime;
 
         #endregion
 
@@ -537,24 +513,22 @@ namespace Isles
             public Vector3 Position;
             public GameMessage(string message, MessageType type, Color color, double pushTime)
             {
-                this.Message = message;
-                this.Type = type;
-                this.Color = color;
-                this.PushTime = pushTime;
-                this.Position = new Vector3(0, 0, 0);
+                Message = message;
+                Type = type;
+                Color = color;
+                PushTime = pushTime;
+                Position = new Vector3(0, 0, 0);
             }
 
             public GameMessage(string message, MessageType type, Color color, double pushTime, Vector3 position)
             {
-                this.Message = message;
-                this.Type = type;
-                this.Color = color;
-                this.PushTime = pushTime;
-                this.Position = position;
+                Message = message;
+                Type = type;
+                Color = color;
+                PushTime = pushTime;
+                Position = position;
             }
         }
-
-
 
         #region Present Wherever Messages
         /// <summary>
@@ -564,13 +538,19 @@ namespace Isles
         private void PresentWhereverMessages(GameTime gameTime)
         {
             if(BubbleUpMessageOn)
+            {
                 PresentBubbleUpMessage(gameTime);
+            }
 
-            if(FlyAwayMessageOn)
+            if (FlyAwayMessageOn)
+            {
                 PresentFlyAwayMessage(gameTime);
+            }
 
-            if(NoneStyleMessageOn)
+            if (NoneStyleMessageOn)
+            {
                 PresentNoneStyleMessage(gameTime);
+            }
         }
 
         /// <summary>
@@ -595,9 +575,9 @@ namespace Isles
                     passedTime -= BubbleUpSustainingPeriodLength;
                     position = new Vector2(game.Project(message.Position).X, game.Project(message.Position).Y) - 
                                 new Vector2(0, (float)(BubbleUpSustainingHeight + BubbleUpHeight * (passedTime / BubbleUpPeriodLength)));
-                    Color textColor = new Color(message.Color.R, message.Color.G, message.Color.B,
+                    var textColor = new Color(message.Color.R, message.Color.G, message.Color.B,
                                     (byte)(255 * (1 - passedTime / BubbleUpPeriodLength)));
-                    Color shadowColor = new Color(0, 0, 0,
+                    var shadowColor = new Color(0, 0, 0,
                                     (byte)(255 * (1 - passedTime / BubbleUpPeriodLength)));
                     game.Graphics2D.DrawShadowedString(message.Message, BubbleUpMessageFontSize, position, textColor, shadowColor);
                 }
@@ -651,10 +631,12 @@ namespace Isles
         private void PresentMessages(GameTime gameTime)
         {
             if(SideBarMessageOn)
+            {
                 PresentSideBarMessages(gameTime);
+            }
+
             PresentWhereverMessages(gameTime);
         }
-
 
         /// <summary>
         /// Shows a message at specific position
@@ -690,9 +672,7 @@ namespace Isles
             messageQueue.Enqueue(new GameMessage(message, type, color, lastPushTime));
         }
 
-
         #endregion
-
 
         public void SetCursorFocus(Vector3 position, Color color)
         {
@@ -701,10 +681,9 @@ namespace Isles
             focusColor = color;
         }
 
-
         // The size of the plain progress bar in pixel.
         // Used to show blood and magic of an Entity.
-        readonly Point progressFullSize = new Point(80, 5);
+        private readonly Point progressFullSize = new(80, 5);
 
         /// <summary>
         /// Draw a progress bar for either style
@@ -716,10 +695,10 @@ namespace Isles
         {
             Point position2D = game.Project(position);
 
-            Rectangle fullRect = new Rectangle((int)position2D.X - 1, (int)position2D.Y - 1 - yOffset,
+            var fullRect = new Rectangle((int)position2D.X - 1, (int)position2D.Y - 1 - yOffset,
                                               length + 2, progressFullSize.Y + 2);
 
-            Rectangle percentagedRect = new Rectangle((int)position2D.X, (int)position2D.Y - yOffset,
+            var percentagedRect = new Rectangle((int)position2D.X, (int)position2D.Y - yOffset,
                                             (int)(length * percentage / 100), progressFullSize.Y);
 
             fullRect.X -= length / 2;
@@ -729,7 +708,6 @@ namespace Isles
             game.Graphics2D.DrawRectangle(percentagedRect, color);
         }
 
-
         public void Update(GameTime gameTime)
         {
             LocalPlayer player = Player.LocalPlayer;
@@ -737,7 +715,7 @@ namespace Isles
             {
                 player.SelectionDirty = false;
                 ClearProfile();
-                for (int i = 0; i < player.Groups.Count; i++)
+                for (var i = 0; i < player.Groups.Count; i++)
                 {
                     List<GameObject> list = player.Groups[i];
 
@@ -751,11 +729,18 @@ namespace Isles
                 if (player.CurrentGroup != null && player.CurrentGroup.Count > 0)
                 {
                     if (player.CurrentGroup[0].Owner == null)
+                    {
                         snapShotName.Color = Color.White;
+                    }
                     else if (player.CurrentGroup[0].Owner is LocalPlayer)
+                    {
                         snapShotName.Color = Color.Yellow;
+                    }
                     else
+                    {
                         snapShotName.Color = Color.Red;
+                    }
+
                     snapShotName.Text = player.CurrentGroup[0].Name;
                 }
                 else
@@ -802,11 +787,13 @@ namespace Isles
             goldTextField.Text = currentPlayer.Gold.ToString();
             Color color = Color.White;
             if (currentPlayer.Food > currentPlayer.FoodCapacity)
+            {
                 color = Color.Red;
+            }
+
             foodTextField.Text = currentPlayer.Food.ToString() + "/" + currentPlayer.FoodCapacity.ToString();
             foodTextField.Color = color;
         }
-
 
         //private void ResetProfileButtonArea()
         //{
@@ -847,8 +834,7 @@ namespace Isles
 
             ui.Sprite.End();
 
-            int currentProfileIndex = Player.LocalPlayer.CurrentGroupIndex;
-
+            var currentProfileIndex = Player.LocalPlayer.CurrentGroupIndex;
 
             ui.Draw(gameTime);
 
@@ -862,9 +848,7 @@ namespace Isles
             Rectangle status = UIElement.GetRelativeRectangle(
                 StatusDestination, ui, ScaleMode.ScaleX, Anchor.BottomLeft);
 
-
             ui.Sprite.Begin();
-
 
             Player player = Player.LocalPlayer;
 
@@ -882,7 +866,6 @@ namespace Isles
                 UIElement.GetRelativeRectangle(EnvironmentIndicatorDestination, ui,
                                                ScaleMode.ScaleY, Anchor.TopRight),
                 EnvironmentIndicatorSource, GameObject.ColorFromPercentage(1 - player.EnvironmentLevel));
-
 
             DrawCursorFocus(gameTime, ui.Sprite);
 
@@ -907,7 +890,7 @@ namespace Isles
 
             if (focusElapsedTime < FocusDuration)
             {
-                int frame = (int)(focusAnimation.Length * focusElapsedTime / FocusDuration);
+                var frame = (int)(focusAnimation.Length * focusElapsedTime / FocusDuration);
 
                 if (frame < focusAnimation.Length)
                 {
@@ -925,8 +908,8 @@ namespace Isles
             }
         }
 
-        VertexPositionTexture[] fogOfWarVertices;
-        VertexDeclaration fogOfWarDeclaration;
+        private VertexPositionTexture[] fogOfWarVertices;
+        private VertexDeclaration fogOfWarDeclaration;
 
         private void DrawFogOfWar()
         {
@@ -949,7 +932,7 @@ namespace Isles
                 effect.CurrentTechnique.Passes[0].Begin();
 
                 game.GraphicsDevice.VertexDeclaration = fogOfWarDeclaration;
-                game.GraphicsDevice.DrawUserPrimitives<VertexPositionTexture>
+                game.GraphicsDevice.DrawUserPrimitives
                     (PrimitiveType.TriangleFan, fogOfWarVertices, 0, 2);
 
                 effect.CurrentTechnique.Passes[0].End();
@@ -963,12 +946,12 @@ namespace Isles
         /// <summary>
         /// Helper for moving a value around in a circle.
         /// </summary>
-        Vector2 MoveInCircle(GameTime gameTime, double intensity)
+        private Vector2 MoveInCircle(GameTime gameTime, double intensity)
         {
-            double time = (gameTime.TotalGameTime.TotalSeconds - startTime) * intensity / DisappearingTime * 2 *Math.PI;
+            var time = (gameTime.TotalGameTime.TotalSeconds - startTime) * intensity / DisappearingTime * 2 *Math.PI;
 
-            float x = (float)Math.Cos(time);
-            float y = (float)Math.Sin(time);
+            var x = (float)Math.Cos(time);
+            var y = (float)Math.Sin(time);
 
             return new Vector2(x, y);
         }
@@ -976,12 +959,11 @@ namespace Isles
         /// <summary>
         /// Helper computes a value that oscillates over time.
         /// </summary>
-        float Pulsate(GameTime gameTime)
+        private float Pulsate(GameTime gameTime)
         {
-            double amount = (gameTime.TotalGameTime.TotalSeconds - startTime) / DisappearingTime * Math.PI;
+            var amount = (gameTime.TotalGameTime.TotalSeconds - startTime) / DisappearingTime * Math.PI;
             return ((float)Math.Sin(amount - Math.PI/2) + 1) / 2 * 255;
         }
-
 
         /// <summary>
         /// Set the profile button when character is selected
@@ -1000,7 +982,9 @@ namespace Isles
         public void AddProfile(SpellButton[] buttons)
         {
             foreach (SpellButton button in buttons)
+            {
                 AddProfile(button, false);
+            }
         }
 
         /// <summary>
@@ -1009,7 +993,7 @@ namespace Isles
         /// <param name="button"></param>
         public void AddProfile(SpellButton button, bool enlarge)
         {
-            int size = enlarge ? (int)(ProfileWidth * 1.2f) : ProfileWidth;
+            var size = enlarge ? (int)(ProfileWidth * 1.2f) : ProfileWidth;
             button.Area = new Rectangle(profileNextX, 590 - size, size, size);
             button.Anchor = Anchor.BottomLeft;
             button.ScaleMode = ScaleMode.ScaleY;
@@ -1048,9 +1032,10 @@ namespace Isles
             profileNextX = ProfileBaseX;
         }
 
-        Random rand = new Random();
-        Vector2 randomOffset;
-        void DrawDisappear(GameTime gameTime)
+        private readonly Random rand = new();
+        private Vector2 randomOffset;
+
+        private void DrawDisappear(GameTime gameTime)
         {
             if (startTime == 0)
             {
@@ -1074,7 +1059,6 @@ namespace Isles
             
             game.GraphicsDevice.Textures[1] = distortion;
 
-
             // Set an effect parameter to make our overlay
             // texture scroll in a giant circle.
 
@@ -1090,7 +1074,7 @@ namespace Isles
 
             // Draw the sprite, passing the fade amount as the
             // alpha of the SpriteBatch.Draw color parameter.
-            byte fade = (byte)Pulsate(gameTime);
+            var fade = (byte)Pulsate(gameTime);
             spriteBatch.Draw(LoadingDisplayFinished, ui.DestinationRectangle, 
                                 new Rectangle(0, 0, LoadingDisplayFinished.Width, LoadingDisplayFinished.Height),
                              //MoveInCircle(gameTime, LoadingDisplayFinished, 1),
@@ -1103,16 +1087,12 @@ namespace Isles
             disappearEffect.End();
         }
 
-
         /// <summary>
         /// Gets whether the UI overlaps the specified point on the screen
         /// </summary>
         public bool Overlaps(Point p)
         {
-            if (controlPanel.ActualEffectiveRegion.Contains(p) || resourcePanel.ActualEffectiveRegion.Contains(p))
-                return true;
-            else
-                return false;
+            return controlPanel.ActualEffectiveRegion.Contains(p) || resourcePanel.ActualEffectiveRegion.Contains(p);
         }
         #endregion
 
@@ -1120,10 +1100,10 @@ namespace Isles
         public EventResult HandleEvent(EventType type, object sender, object tag)
         {
 
-            if (ui != null &&
-                ui.HandleEvent(type, sender, tag) == EventResult.Handled)
-                return EventResult.Handled;
-            return EventResult.Unhandled;
+            return ui != null &&
+                ui.HandleEvent(type, sender, tag) == EventResult.Handled
+                ? EventResult.Handled
+                : EventResult.Unhandled;
         }
         #endregion
     }
@@ -1139,7 +1119,10 @@ namespace Isles
             get 
             {
                 if (menuDefaultCursor == null)
+                {
                     menuDefaultCursor = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/NormalCursor.cur");
+                }
+
                 return menuDefaultCursor;
             }
         }
@@ -1148,7 +1131,10 @@ namespace Isles
             get
             {
                 if (menuHighlightCursor == null)
+                {
                     menuHighlightCursor = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/LightedCursor.cur");
+                }
+
                 return menuHighlightCursor;
             }
         }
@@ -1157,7 +1143,10 @@ namespace Isles
             get
             {
                 if (defaultCursor == null)
+                {
                     defaultCursor = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/default.ani");
+                }
+
                 return defaultCursor;
             }
         }
@@ -1167,7 +1156,10 @@ namespace Isles
             get
             {
                 if (attack == null)
+                {
                     attack = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/attack.ani");
+                }
+
                 return attack;
             }
         }
@@ -1177,7 +1169,10 @@ namespace Isles
             get
             {
                 if (gather == null)
+                {
                     gather = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/gather.ani");
+                }
+
                 return gather;
             }
         }
@@ -1187,7 +1182,10 @@ namespace Isles
             get
             {
                 if (targetRed == null)
+                {
                     targetRed = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/target_red.ani");
+                }
+
                 return targetRed;
             }
         }
@@ -1197,7 +1195,10 @@ namespace Isles
             get
             {
                 if (targetGreen == null)
+                {
                     targetGreen = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/target_green.ani");
+                }
+
                 return targetGreen;
             }
         }
@@ -1207,7 +1208,10 @@ namespace Isles
             get
             {
                 if (targetNeutral == null)
+                {
                     targetNeutral = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/target_neutral.ani");
+                }
+
                 return targetNeutral;
             }
         }
@@ -1217,7 +1221,10 @@ namespace Isles
             get
             {
                 if (targetDisable == null)
+                {
                     targetDisable = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/target_disable.ani");
+                }
+
                 return targetDisable;
             }
         }
@@ -1227,7 +1234,10 @@ namespace Isles
             get
             {
                 if (top == null)
+                {
                     top = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/screen_top.cur");
+                }
+
                 return top;
             }
         }
@@ -1237,7 +1247,10 @@ namespace Isles
             get
             {
                 if (bottom == null)
+                {
                     bottom = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/screen_bottom.cur");
+                }
+
                 return bottom;
             }
         }
@@ -1247,7 +1260,10 @@ namespace Isles
             get
             {
                 if (left == null)
+                {
                     left = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/screen_left.cur");
+                }
+
                 return left;
             }
         }
@@ -1257,7 +1273,10 @@ namespace Isles
             get
             {
                 if (right == null)
+                {
                     right = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/screen_right.cur");
+                }
+
                 return right;
             }
         }
@@ -1267,7 +1286,10 @@ namespace Isles
             get
             {
                 if (move == null)
+                {
                     move = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/screen_move.cur");
+                }
+
                 return move;
             }
         }
@@ -1277,26 +1299,29 @@ namespace Isles
             get
             {
                 if (rotate == null)
+                {
                     rotate = BaseGame.Singleton.ZipContent.LoadCursor("Content/Cursors/screen_rotate.cur");
+                }
+
                 return rotate;
             }
         }
 
-        static Cursor menuDefaultCursor;
-        static Cursor menuHighlightCursor;
-        static Cursor defaultCursor;
-        static Cursor attack;
-        static Cursor gather;
-        static Cursor targetRed;
-        static Cursor targetGreen;
-        static Cursor targetNeutral;
-        static Cursor targetDisable;
-        static Cursor top;
-        static Cursor bottom;
-        static Cursor left;
-        static Cursor right;
-        static Cursor move;
-        static Cursor rotate;
+        private static Cursor menuDefaultCursor;
+        private static Cursor menuHighlightCursor;
+        private static Cursor defaultCursor;
+        private static Cursor attack;
+        private static Cursor gather;
+        private static Cursor targetRed;
+        private static Cursor targetGreen;
+        private static Cursor targetNeutral;
+        private static Cursor targetDisable;
+        private static Cursor top;
+        private static Cursor bottom;
+        private static Cursor left;
+        private static Cursor right;
+        private static Cursor move;
+        private static Cursor rotate;
     }
     #endregion
 }

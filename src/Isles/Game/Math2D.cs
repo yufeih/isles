@@ -23,8 +23,6 @@ namespace Isles.Engine
         /// </summary>
         public const float Epsilon = float.Epsilon;
 
-
-
         /// <summary>
         /// Test to see if two float equals using epslion
         /// </summary>
@@ -33,8 +31,6 @@ namespace Isles.Engine
             return ((n1 - n2) < Epsilon) && ((n2 - n1) < Epsilon);
         }
 
-
-
         /// <summary>
         /// Test to see if a float equals zero using epslion
         /// </summary>
@@ -42,8 +38,6 @@ namespace Isles.Engine
         {
             return (n < Epsilon) && (n > -Epsilon);
         }
-
-
 
         /// <summary>
         /// Transform a world point p to local space specified by position and rotation
@@ -57,16 +51,14 @@ namespace Isles.Engine
             p -= translation;
 
             // Apply rotation
-            float sin = (float)Math.Sin(-rotation);
-            float cos = (float)Math.Cos(-rotation);
+            var sin = (float)Math.Sin(-rotation);
+            var cos = (float)Math.Cos(-rotation);
 
             v.X = p.X * cos - p.Y * sin;
             v.Y = p.X * sin + p.Y * cos;
 
             return v;
         }
-
-
 
         /// <summary>
         /// Transform a local point p to world space specified by position and rotation
@@ -77,8 +69,8 @@ namespace Isles.Engine
             Vector2 v;
 
             // Apply rotation
-            float sin = (float)Math.Sin(rotation);
-            float cos = (float)Math.Cos(rotation);
+            var sin = (float)Math.Sin(rotation);
+            var cos = (float)Math.Cos(rotation);
 
             v.X = p.X * cos - p.Y * sin;
             v.Y = p.X * sin + p.Y * cos;
@@ -87,8 +79,6 @@ namespace Isles.Engine
             return v + translation;
         }
 
-
-
         /// <summary>
         /// given a plane and a ray this function determins how far along the ray 
         /// an interestion occurs. Returns null if the ray is parallel
@@ -96,18 +86,13 @@ namespace Isles.Engine
         public static float? RayPlaneIntersects(
             Vector2 rayOrigin, Vector2 rayDirection, Vector2 planePoint, Vector2 planeNormal)
         {
-            float d = Vector2.Dot(planeNormal, planePoint);
-            float numer = Vector2.Dot(planeNormal, rayOrigin) - d;
-            float denom = Vector2.Dot(planeNormal, rayDirection);
+            var d = Vector2.Dot(planeNormal, planePoint);
+            var numer = Vector2.Dot(planeNormal, rayOrigin) - d;
+            var denom = Vector2.Dot(planeNormal, rayDirection);
 
             // Normal is parallel to vector
-            if (FloatEqualsZero(denom))
-                return null;
-
-            return -(numer / denom);
+            return FloatEqualsZero(denom) ? null : (float?)-(numer / denom);
         }
-
-
 
         /// <summary>
         /// Span relation
@@ -117,26 +102,21 @@ namespace Isles.Engine
             Local, Front, Back
         }
 
-
-
         /// <summary>
         /// Gets the relation between a point and a plane
         /// </summary>
         public static SpanType PointLineRelation(
             Vector2 point, Vector2 planePoint, Vector2 planeNormal)
         {
-            float d = Vector2.Dot(planeNormal, planePoint - point);
+            var d = Vector2.Dot(planeNormal, planePoint - point);
 
             if (d < -Epsilon)
+            {
                 return SpanType.Front;
+            }
 
-            if (d > Epsilon)
-                return SpanType.Back;
-
-            return SpanType.Local;
+            return d > Epsilon ? SpanType.Back : SpanType.Local;
         }
-
-
 
         /// <summary>
         /// Test to see if a ray intersects a circle
@@ -146,18 +126,13 @@ namespace Isles.Engine
         {
             Vector2 toCircle = circle - rayOrigin;
 
-            float length = toCircle.Length();
-            float v = Vector2.Dot(toCircle, rayHeading);
-            float d = radius * radius - (length * length - v * v);
+            var length = toCircle.Length();
+            var v = Vector2.Dot(toCircle, rayHeading);
+            var d = radius * radius - (length * length - v * v);
 
             // No intersection, return null
-            if (d < 0)
-                return null;
-
-            return v - (float)Math.Sqrt(d);
+            return d < 0 ? null : (float?)(v - (float)Math.Sqrt(d));
         }
-
-
 
         /// <summary>
         /// Whether a ray intersects a circle
@@ -167,14 +142,12 @@ namespace Isles.Engine
         {
             Vector2 toCircle = circle - rayOrigin;
 
-            float length = toCircle.Length();
-            float v = Vector2.Dot(toCircle, rayHeading);
-            float d = radius * radius - (length * length - v * v);
+            var length = toCircle.Length();
+            var v = Vector2.Dot(toCircle, rayHeading);
+            var d = radius * radius - (length * length - v * v);
 
             return d < 0;
         }
-
-
 
         /// <summary>
         /// Given a point P and a circle of radius R centered at C this function
@@ -187,15 +160,17 @@ namespace Isles.Engine
         {
             Vector2 PmC = P - C;
 
-            float sqrLen = PmC.LengthSquared();
-            float rSqr = R * R;
+            var sqrLen = PmC.LengthSquared();
+            var rSqr = R * R;
 
             // P is inside or on the circle
             if (sqrLen <= rSqr)
+            {
                 return false;
+            }
 
-            float InvSqrLen = 1.0f / sqrLen;
-            float Root = (float)Math.Sqrt(Math.Abs(sqrLen - rSqr));
+            var InvSqrLen = 1.0f / sqrLen;
+            var Root = (float)Math.Sqrt(Math.Abs(sqrLen - rSqr));
 
             T1.X = C.X + R * (R * PmC.X - PmC.Y * Root) * InvSqrLen;
             T1.Y = C.Y + R * (R * PmC.Y + PmC.X * Root) * InvSqrLen;
@@ -204,8 +179,6 @@ namespace Isles.Engine
 
             return true;
         }
-
-
 
         /// <summary>
         /// given a line segment AB and a point P, this function returns the
@@ -216,17 +189,21 @@ namespace Isles.Engine
         {
             //if the angle is obtuse between PA and AB is obtuse then the closest
             //vertex must be a
-            float dotA = (p.X - a.X) * (b.X - a.X) + (p.Y - a.Y) * (b.Y - a.Y);
+            var dotA = (p.X - a.X) * (b.X - a.X) + (p.Y - a.Y) * (b.Y - a.Y);
 
             if (dotA <= 0)
+            {
                 return Vector2.Distance(a, p);
+            }
 
             //if the angle is obtuse between PB and AB is obtuse then the closest
             //vertex must be b
-            float dotB = (p.X - b.X) * (a.X - b.X) + (p.Y - b.Y) * (a.Y - b.Y);
+            var dotB = (p.X - b.X) * (a.X - b.X) + (p.Y - b.Y) * (a.Y - b.Y);
 
             if (dotB <= 0)
+            {
                 return Vector2.Distance(b, p);
+            }
 
             //calculate the point along AB that is the closest to p
             Vector2 Point = a + ((b - a) * dotA) / (dotA + dotB);
@@ -234,8 +211,6 @@ namespace Isles.Engine
             //calculate the distance p-Point
             return Vector2.Distance(p, Point);
         }
-
-
 
         /// <summary>
         /// given a line segment AB and a point P, this function returns the
@@ -246,17 +221,21 @@ namespace Isles.Engine
         {
             //if the angle is obtuse between PA and AB is obtuse then the closest
             //vertex must be a
-            float dotA = (p.X - a.X) * (b.X - a.X) + (p.Y - a.Y) * (b.Y - a.Y);
+            var dotA = (p.X - a.X) * (b.X - a.X) + (p.Y - a.Y) * (b.Y - a.Y);
 
             if (dotA <= 0)
+            {
                 return Vector2.DistanceSquared(a, p);
+            }
 
             //if the angle is obtuse between PB and AB is obtuse then the closest
             //vertex must be b
-            float dotB = (p.X - b.X) * (a.X - b.X) + (p.Y - b.Y) * (a.Y - b.Y);
+            var dotB = (p.X - b.X) * (a.X - b.X) + (p.Y - b.Y) * (a.Y - b.Y);
 
             if (dotB <= 0)
+            {
                 return Vector2.DistanceSquared(b, p);
+            }
 
             //calculate the point along AB that is the closest to p
             Vector2 Point = a + ((b - a) * dotA) / (dotA + dotB);
@@ -264,7 +243,6 @@ namespace Isles.Engine
             //calculate the distance p-Point
             return Vector2.DistanceSquared(p, Point);
         }
-
 
         /// <summary>
         /// Gets the nearest distance from point P to the specified rectangle
@@ -315,15 +293,18 @@ namespace Isles.Engine
             }
 
             if (p.Y > max.Y)
+            {
                 return p.Y - max.Y;
+            }
 
             if (p.Y < min.Y)
+            {
                 return min.Y - p.Y;
+            }
 
             // Inside the rectangle
             return 0;
         }
-
 
         /// <summary>
         /// Given 2 lines in 2D space AB, CD this returns true if an 
@@ -332,19 +313,19 @@ namespace Isles.Engine
         public static bool LineSegmentIntersects(
             Vector2 a, Vector2 b, Vector2 c, Vector2 d)
         {
-            float rTop = (a.Y - c.Y) * (d.X - c.X) - (a.X - c.X) * (d.Y - c.Y);
-            float sTop = (a.Y - c.Y) * (b.X - a.X) - (a.X - c.X) * (b.Y - a.Y);
+            var rTop = (a.Y - c.Y) * (d.X - c.X) - (a.X - c.X) * (d.Y - c.Y);
+            var sTop = (a.Y - c.Y) * (b.X - a.X) - (a.X - c.X) * (b.Y - a.Y);
 
-            float Bot = (b.X - a.X) * (d.Y - c.Y) - (b.Y - a.Y) * (d.X - c.X);
+            var Bot = (b.X - a.X) * (d.Y - c.Y) - (b.Y - a.Y) * (d.X - c.X);
 
             if (Bot == 0)//parallel
             {
                 return (FloatEqualsZero(rTop) && FloatEqualsZero(sTop));
             }
 
-            float invBot = 1.0f / Bot;
-            float r = rTop * invBot;
-            float s = sTop * invBot;
+            var invBot = 1.0f / Bot;
+            var r = rTop * invBot;
+            var s = sTop * invBot;
 
             if ((r > 0) && (r < 1) && (s > 0) && (s < 1))
             {
@@ -356,8 +337,6 @@ namespace Isles.Engine
             return false;
         }
 
-
-
         /// <summary>
         /// Given 2 lines in 2D space AB, CD this returns true if an 
         /// intersection occurs and sets dist to the distance the intersection
@@ -367,22 +346,19 @@ namespace Isles.Engine
         public static float? LineSegmentIntersectionTest(
             Vector2 a, Vector2 b, Vector2 c, Vector2 d)
         {
-            float rTop = (a.Y - c.Y) * (d.X - c.X) - (a.X - c.X) * (d.Y - c.Y);
-            float sTop = (a.Y - c.Y) * (b.X - a.X) - (a.X - c.X) * (b.Y - a.Y);
+            var rTop = (a.Y - c.Y) * (d.X - c.X) - (a.X - c.X) * (d.Y - c.Y);
+            var sTop = (a.Y - c.Y) * (b.X - a.X) - (a.X - c.X) * (b.Y - a.Y);
 
-            float Bot = (b.X - a.X) * (d.Y - c.Y) - (b.Y - a.Y) * (d.X - c.X);
+            var Bot = (b.X - a.X) * (d.Y - c.Y) - (b.Y - a.Y) * (d.X - c.X);
 
             if (Bot == 0)//parallel
             {
-                if (FloatEqualsZero(rTop) && FloatEqualsZero(sTop))
-                    return 0;
-
-                return null;
+                return FloatEqualsZero(rTop) && FloatEqualsZero(sTop) ? 0 : (float?)null;
             }
 
-            float invBot = 1.0f / Bot;
-            float r = rTop * invBot;
-            float s = sTop * invBot;
+            var invBot = 1.0f / Bot;
+            var r = rTop * invBot;
+            var s = sTop * invBot;
 
             if ((r > 0) && (r < 1) && (s > 0) && (s < 1))
             {
@@ -394,8 +370,6 @@ namespace Isles.Engine
             return null;
         }
 
-
-
         /// <summary>
         /// Given 2 lines in 2D space AB, CD this returns true if an 
         /// intersection occurs and sets dist to the distance the intersection
@@ -405,10 +379,10 @@ namespace Isles.Engine
         public static bool LineSegmentIntersectionTest(
             Vector2 a, Vector2 b, Vector2 c, Vector2 d, ref float distance, ref Vector2 point)
         {
-            float rTop = (a.Y - c.Y) * (d.X - c.X) - (a.X - c.X) * (d.Y - c.Y);
-            float sTop = (a.Y - c.Y) * (b.X - a.X) - (a.X - c.X) * (b.Y - a.Y);
+            var rTop = (a.Y - c.Y) * (d.X - c.X) - (a.X - c.X) * (d.Y - c.Y);
+            var sTop = (a.Y - c.Y) * (b.X - a.X) - (a.X - c.X) * (b.Y - a.Y);
 
-            float Bot = (b.X - a.X) * (d.Y - c.Y) - (b.Y - a.Y) * (d.X - c.X);
+            var Bot = (b.X - a.X) * (d.Y - c.Y) - (b.Y - a.Y) * (d.X - c.X);
 
             if (Bot == 0)//parallel
             {
@@ -422,9 +396,9 @@ namespace Isles.Engine
                 return false;
             }
 
-            float invBot = 1.0f / Bot;
-            float r = rTop * invBot;
-            float s = sTop * invBot;
+            var invBot = 1.0f / Bot;
+            var r = rTop * invBot;
+            var s = sTop * invBot;
 
             if ((r > 0) && (r < 1) && (s > 0) && (s < 1))
             {
@@ -438,8 +412,6 @@ namespace Isles.Engine
             return false;
         }
 
-
-
         /// <summary>
         /// Tests two polygons for intersection.
         /// </summary>
@@ -447,18 +419,20 @@ namespace Isles.Engine
         public static bool PolygonIntersects(Vector2[] object1, Vector2[] object2)
         {
             // Test each line segment of object1 against each segment of object2
-            for (int i = 0; i < object1.Length - 1; i++)
-                for (int j = 0; j < object2.Length - 1; j++)
+            for (var i = 0; i < object1.Length - 1; i++)
+            {
+                for (var j = 0; j < object2.Length - 1; j++)
+                {
                     if (LineSegmentIntersects(
                         object2[j], object2[j + 1], object1[i], object1[i + 1]))
                     {
                         return true;
                     }
+                }
+            }
 
             return false;
         }
-
-
 
         /// <summary>
         /// Tests to see if a polygon and a line segment intersects
@@ -466,17 +440,17 @@ namespace Isles.Engine
         /// <remarks>This algorithm does not check for enclosure</remarks>
         public static bool PolygonSegmentIntersects(Vector2[] polygon, Vector2 a, Vector2 b)
         {
-            for (int i = 0; i < polygon.Length - 1; i++)
+            for (var i = 0; i < polygon.Length - 1; i++)
+            {
                 if (LineSegmentIntersects(
                     polygon[i], polygon[i + 1], a, b))
                 {
                     return true;
                 }
+            }
 
             return false;
         }
-
-
 
         /// <summary>
         /// Tests to see if two circle overlaps
@@ -485,20 +459,15 @@ namespace Isles.Engine
         public static ContainmentType CircleIntersects(
             Vector2 c1, float r1, Vector2 c2, float r2)
         {
-            float distBetweenCenters = Vector2.Distance(c2, c1);
+            var distBetweenCenters = Vector2.Distance(c2, c1);
 
             if ((distBetweenCenters < (r1 + r2)))
             {
-                if ((distBetweenCenters < Math.Abs(r1 - r2)))
-                    return ContainmentType.Contains;
-
-                return ContainmentType.Intersects;
+                return distBetweenCenters < Math.Abs(r1 - r2) ? ContainmentType.Contains : ContainmentType.Intersects;
             }
 
             return ContainmentType.Disjoint;
         }
-
-
 
         /// <summary>
         /// Given two circles this function calculates the intersection points
@@ -511,13 +480,12 @@ namespace Isles.Engine
             Vector2 v1, float r1, Vector2 v2, float r2, out Vector2 p1, out Vector2 p2)
         {
             //calculate the distance between the circle centers
-            double d = Math.Sqrt((v1.X - v2.X) * (v1.X - v2.X) + (v1.Y - v2.Y) * (v1.Y - v2.Y));
+            var d = Math.Sqrt((v1.X - v2.X) * (v1.X - v2.X) + (v1.Y - v2.Y) * (v1.Y - v2.Y));
 
             //Now calculate the distance from the center of each circle to the center
             //of the line which connects the intersection points.
-            double a = (r1 - r2 + (d * d)) / (2 * d);
-            double b = (r2 - r1 + (d * d)) / (2 * d);
-
+            var a = (r1 - r2 + (d * d)) / (2 * d);
+            var b = (r2 - r1 + (d * d)) / (2 * d);
 
             //MAYBE A TEST FOR EXACT OVERLAP? 
 
@@ -529,20 +497,17 @@ namespace Isles.Engine
             p2Y = v1.Y + a * (v2.Y - v1.Y) / d;
 
             //calculate first point
-            double h1 = Math.Sqrt((r1 * r1) - (a * a));
+            var h1 = Math.Sqrt((r1 * r1) - (a * a));
 
             p1.X = (float)(p2X - h1 * (v2.Y - v1.Y) / d);
             p1.Y = (float)(p2Y + h1 * (v2.X - v1.X) / d);
 
-
             //calculate second point
-            double h2 = Math.Sqrt((r2 * r2) - (a * a));
+            var h2 = Math.Sqrt((r2 * r2) - (a * a));
 
             p2.X = (float)(p2X + h2 * (v2.Y - v1.Y) / d);
             p2.Y = (float)(p2Y - h2 * (v2.X - v1.X) / d);
         }
-
-
 
         /// <summary>
         /// Tests to see if a point is in a circle
@@ -551,8 +516,6 @@ namespace Isles.Engine
         {
             return Vector2.DistanceSquared(p, c) < r * r;
         }
-
-
 
         /// <summary>
         /// Returns true if the line segemnt AB intersects with a circle at
@@ -564,21 +527,18 @@ namespace Isles.Engine
         {
             // First determine the distance from the center of the circle to
             // the line segment (working in distance squared space)
-            float distToLineSq = DistanceToLineSegmentSquared(a, b, c);
+            var distToLineSq = DistanceToLineSegmentSquared(a, b, c);
 
             if (distToLineSq < r * r)
             {
-                if (PointInCircle(a, c, r) &&
-                    PointInCircle(b, c, r))
-                    return ContainmentType.Contains;
-
-                return ContainmentType.Intersects;
+                return PointInCircle(a, c, r) &&
+                    PointInCircle(b, c, r)
+                    ? ContainmentType.Contains
+                    : ContainmentType.Intersects;
             }
 
             return ContainmentType.Disjoint;
         }
-
-
 
         /// <summary>
         /// Given a line segment AB and a circle position and radius, this function
@@ -594,8 +554,6 @@ namespace Isles.Engine
             throw new NotImplementedException();
         }
 
-
-
         /// <summary>
         /// Tests to see if a rectangle contains a point.
         /// Note that min should be smaller than max.
@@ -606,8 +564,6 @@ namespace Isles.Engine
         {
             return (p.X > min.X && p.X < max.X && p.Y > min.Y && p.Y < max.Y);
         }
-
-
 
         /// <summary>
         /// Tests to see if a rectangle contains a point. 
@@ -622,8 +578,6 @@ namespace Isles.Engine
 
             return PointInRectangle(pLocal, min, max);
         }
-
-
 
         /// <summary>
         /// Tests to see if a rectangle and a line segment intersects.
@@ -643,26 +597,34 @@ namespace Isles.Engine
             // 4 rectangle edges
 
             if (LineSegmentIntersects(a, b, min, v1))
+            {
                 return ContainmentType.Intersects;
+            }
 
             if (LineSegmentIntersects(a, b, v1, max))
+            {
                 return ContainmentType.Intersects;
+            }
 
             if (LineSegmentIntersects(a, b, max, v2))
+            {
                 return ContainmentType.Intersects;
+            }
 
             if (LineSegmentIntersects(a, b, v2, min))
+            {
                 return ContainmentType.Intersects;
+            }
 
             // Contains
             if (PointInRectangle(a, min, max))
+            {
                 return ContainmentType.Contains;
+            }
 
             // No intersection
             return ContainmentType.Disjoint;
         }
-
-
 
         /// <summary>
         /// Returns true if two rectangles intersect.
@@ -674,8 +636,8 @@ namespace Isles.Engine
             Vector2 min2, Vector2 max2, Vector2 position2, float rotation2)
         {
             // Compute 8 vertices of the two rectangle
-            Vector2[] rect1 = new Vector2[4];
-            Vector2[] rect2 = new Vector2[4];
+            var rect1 = new Vector2[4];
+            var rect2 = new Vector2[4];
 
             rect1[0] = min1;
             rect1[2] = max1;
@@ -692,7 +654,7 @@ namespace Isles.Engine
             rect2[3].Y = min2.Y;
 
             // Transform rectangle 2 to rectangle 1 local space
-            for (int i = 0; i < 4; i++)
+            for (var i = 0; i < 4; i++)
             {
                 rect1[i] = LocalToWorld(rect1[i], position1, rotation1);
                 rect2[i] = LocalToWorld(rect2[i], position2, rotation2);
@@ -701,13 +663,17 @@ namespace Isles.Engine
             // Polygon intersection test
             if (PolygonIntersects(rect1, rect2))
             {
-                for (int i = 0; i < 4; i++)
+                for (var i = 0; i < 4; i++)
                 {
                     if (PointInRectangle(rect1[i], min2, max2, position2, rotation2))
+                    {
                         return ContainmentType.Intersects;
+                    }
 
                     if (PointInRectangle(rect2[i], min1, max1, position1, rotation1))
+                    {
                         return ContainmentType.Intersects;
+                    }
                 }
 
                 return ContainmentType.Contains;
@@ -716,8 +682,6 @@ namespace Isles.Engine
             // No intersection
             return ContainmentType.Disjoint;
         }
-
-
 
         /// <summary>
         /// Returns true if a rectangle and a circle intersects.
@@ -728,7 +692,7 @@ namespace Isles.Engine
             Vector2 circlePosition, float circleRadius)
         {
             // Compute 8 vertices of the two rectangle
-            Vector2[] rect = new Vector2[4];
+            var rect = new Vector2[4];
 
             rect[0] = min;
             rect[2] = max;
@@ -737,7 +701,7 @@ namespace Isles.Engine
             rect[3].X = max.X;
             rect[3].Y = min.Y;
 
-            for (int i = 0; i < 4; i++)
+            for (var i = 0; i < 4; i++)
             {
                 // Transform to world space
                 rect[i] = LocalToWorld(rect[i], rectanglePosition, rotation);
@@ -745,21 +709,26 @@ namespace Isles.Engine
 
             if (LineSegmentCircleIntersects(
                 rect[0], rect[1], circlePosition, circleRadius) != ContainmentType.Disjoint)
+            {
                 return ContainmentType.Intersects;
+            }
 
             if (LineSegmentCircleIntersects(
                 rect[1], rect[2], circlePosition, circleRadius) != ContainmentType.Disjoint)
+            {
                 return ContainmentType.Intersects;
+            }
 
             if (LineSegmentCircleIntersects(
                 rect[2], rect[3], circlePosition, circleRadius) != ContainmentType.Disjoint)
+            {
                 return ContainmentType.Intersects;
+            }
 
-            if (LineSegmentCircleIntersects(
-                rect[3], rect[0], circlePosition, circleRadius) != ContainmentType.Disjoint)
-                return ContainmentType.Intersects;
-
-            return ContainmentType.Disjoint;
+            return LineSegmentCircleIntersects(
+                rect[3], rect[0], circlePosition, circleRadius) != ContainmentType.Disjoint
+                ? ContainmentType.Intersects
+                : ContainmentType.Disjoint;
         }
         #endregion
 
@@ -769,8 +738,8 @@ namespace Isles.Engine
         /// </summary>
         public static void Test()
         {
-            Vector2 min = new Vector2(-10, -30);
-            Vector2 max = new Vector2(10, 30);
+            var min = new Vector2(-10, -30);
+            var max = new Vector2(10, 30);
 
             for (float theta = 0; theta < 2; theta += 0.2f)
             {
@@ -797,65 +766,47 @@ namespace Isles.Engine
     /// </summary>
     public sealed class Outline
     {
-        Random random = new Random();
+        private readonly Random random = new();
 
         /// <summary>
         /// Gets the outline type
         /// </summary>
-        public OutlineType Type
-        {
-            get { return type; }
-        }
+        public OutlineType Type => type;
 
-        OutlineType type;
+        private OutlineType type;
 
         /// <summary>
         /// Gets the position of the outline
         /// </summary>
-        public Vector2 Position
-        {
-            get { return position; }
-        }
+        public Vector2 Position => position;
 
-        Vector2 position;
+        private Vector2 position;
 
         /// <summary>
         /// Gets the radius of the circle
         /// </summary>
-        public float Radius
-        {
-            get { return radius; }
-        }
+        public float Radius => radius;
 
-        float radius;
+        private float radius;
 
         /// <summary>
         /// Gets the rotation of the rectangle, in radius
         /// </summary>
-        public float Rotation
-        {
-            get { return rotation; }
-        }
+        public float Rotation => rotation;
 
-        float rotation;
+        private float rotation;
 
         /// <summary>
         /// Gets the min point of the rectangle
         /// </summary>
-        public Vector2 Min
-        {
-            get { return min; }
-        }
+        public Vector2 Min => min;
 
         private Vector2 min;
 
         /// <summary>
         /// Gets the min point of the rectangle
         /// </summary>
-        public Vector2 Max
-        {
-            get { return max; }
-        }
+        public Vector2 Max => max;
 
         private Vector2 max;
 
@@ -866,16 +817,19 @@ namespace Isles.Engine
         {
             get
             {
-                if (this.type == OutlineType.Circle)
+                if (type == OutlineType.Circle)
                 {
-                    return (float)Math.PI * this.radius * this.radius;
+                    return (float)Math.PI * radius * radius;
                 }
-                else if (this.type == OutlineType.Rectangle)
+                else if (type == OutlineType.Rectangle)
                 {
-                    Vector2 c = this.max - this.min;
+                    Vector2 c = max - min;
                     return c.X * c.Y;
                 }
-                else return 0;
+                else
+                {
+                    return 0;
+                }
             }
         }
 
@@ -907,7 +861,7 @@ namespace Isles.Engine
         /// </summary>
         public void SetCircle(Vector2 position, float radius)
         {
-            this.type = OutlineType.Circle;
+            type = OutlineType.Circle;
             this.position = position;
             this.radius = radius;
         }
@@ -917,7 +871,7 @@ namespace Isles.Engine
         /// </summary>
         public void SetRectangle(Vector2 min, Vector2 max, Vector2 position, float rotation)
         {
-            this.type = OutlineType.Rectangle;
+            type = OutlineType.Rectangle;
             this.min = min;
             this.max = max;
             this.position = position;
@@ -930,15 +884,16 @@ namespace Isles.Engine
         public bool Overlaps(Vector2 point)
         {
             if (type == OutlineType.Empty)
+            {
                 return false;
+            }
 
             if (type == OutlineType.Circle)
+            {
                 return Math2D.PointInCircle(point, position, radius);
+            }
 
-            if (type == OutlineType.Rectangle)
-                return Math2D.PointInRectangle(point, min, max, position, rotation);
-
-            return false;
+            return type == OutlineType.Rectangle ? Math2D.PointInRectangle(point, min, max, position, rotation) : false;
         }
 
         /// <summary>
@@ -947,34 +902,33 @@ namespace Isles.Engine
         public float DistanceTo(Vector2 point)
         {
             if (type == OutlineType.Empty)
+            {
                 return 0;
+            }
 
             if (type == OutlineType.Circle)
             {
-                float distance = Vector2.Subtract(point, position).Length() - radius;
+                var distance = Vector2.Subtract(point, position).Length() - radius;
                 return distance < 0 ? 0 : distance;
             }
 
-            if (type == OutlineType.Rectangle)
-                return Math2D.DistanceToRectangle(min, max, position, rotation, point);
-
-            return 0;
+            return type == OutlineType.Rectangle ? Math2D.DistanceToRectangle(min, max, position, rotation, point) : 0;
         }
 
         public Vector2 GenerateAPointInsideOutline()
         {
-            if(this.type == OutlineType.Rectangle)
+            if(type == OutlineType.Rectangle)
             {
-                Vector2 p = this.max - this.min;
-                Vector2 ret = new Vector2((float)(this.min.X + p.X * this.random.NextDouble()),(float)(this.min.Y + p.Y * this.random.NextDouble()));
-                return Math2D.LocalToWorld(ret, this.position, this.rotation);
+                Vector2 p = max - min;
+                var ret = new Vector2((float)(min.X + p.X * random.NextDouble()),(float)(min.Y + p.Y * random.NextDouble()));
+                return Math2D.LocalToWorld(ret, position, rotation);
             }
-            else if (this.type == OutlineType.Circle)
+            else if (type == OutlineType.Circle)
             {
-                Double angle = 2* Math.PI * this.random.NextDouble();
-                Double r = this.radius * this.random.NextDouble();
-                Vector2 ret = new Vector2((float)(r * Math.Cos(angle)), (float)(r * Math.Sin(angle)));
-                return Math2D.LocalToWorld(ret, this.position, this.rotation);
+                var angle = 2* Math.PI * random.NextDouble();
+                var r = radius * random.NextDouble();
+                var ret = new Vector2((float)(r * Math.Cos(angle)), (float)(r * Math.Sin(angle)));
+                return Math2D.LocalToWorld(ret, position, rotation);
             }
             else
             {
@@ -1013,9 +967,12 @@ namespace Isles.Engine
         {            
             if (outline.type == OutlineType.Circle)
             {
-                float newRadius = outline.radius + n;
+                var newRadius = outline.radius + n;
                 if (newRadius < 0)
+                {
                     newRadius = 0;
+                }
+
                 return new Outline(outline.position, outline.radius + n);
             }
 
@@ -1028,8 +985,15 @@ namespace Isles.Engine
                 max.X = outline.max.X + n;
                 max.Y = outline.max.Y + n;
 
-                if (min.X > max.X) min.X = max.X;
-                if (min.Y > max.Y) min.Y = max.Y;
+                if (min.X > max.X)
+                {
+                    min.X = max.X;
+                }
+
+                if (min.Y > max.Y)
+                {
+                    min.Y = max.Y;
+                }
 
                 return new Outline(min, max, outline.position, outline.rotation);
             }
@@ -1043,7 +1007,9 @@ namespace Isles.Engine
         public static ContainmentType Intersects(Outline o1, Outline o2)
         {
             if (null == o1 || null == o2)
+            {
                 throw new ArgumentNullException();
+            }
 
             // Ignore dummy outlines
             if (o1.type == OutlineType.Empty ||
@@ -1079,15 +1045,12 @@ namespace Isles.Engine
             }
 
             // Circle vs Rectangle
-            if (o1.type == OutlineType.Circle &&
-                o2.type == OutlineType.Rectangle)
-            {
-                return Math2D.RectangleCircleIntersects(
+            return o1.type == OutlineType.Circle &&
+                o2.type == OutlineType.Rectangle
+                ? Math2D.RectangleCircleIntersects(
                     o2.min, o2.max, o2.position, o2.rotation,
-                    o1.position, o1.radius);
-            }
-
-            return ContainmentType.Disjoint;
+                    o1.position, o1.radius)
+                : ContainmentType.Disjoint;
         }
     }
     #endregion

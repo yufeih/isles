@@ -22,30 +22,28 @@ namespace Isles.Pipeline
     public partial class Landscape
     {
         #region Fields
-        string heightmap;
-        string waterTexture;
-        string waterBumpTexture;
-        float earthRadius;
-        string skyBox;
-        List<Layer> layers = new List<Layer>();
-        List<Vegetation> vegetations = new List<Vegetation>();
-        float width, depth, height, baseHeight;
-        int xPatchCount, yPatchCount;
-        int heightFieldWidth, heightFieldHeight;
-        float[,] heightData;
-        Vector3[,] normalData;
-        Vector3[,] tangentData;
-
-        List<Vector3> boundingBoxes = new List<Vector3>();
-        List<int>[] patchGroups;
-
-        ExternalReference<TextureContent> waterColorTexture;
-        ExternalReference<TextureContent> waterBumpTextureContent;
-        ExternalReference<TextureCubeContent> skyBoxCubeTexture;
+        private string heightmap;
+        private string waterTexture;
+        private string waterBumpTexture;
+        private float earthRadius;
+        private string skyBox;
+        private List<Layer> layers = new List<Layer>();
+        private List<Vegetation> vegetations = new List<Vegetation>();
+        private float width, depth, height, baseHeight;
+        private int xPatchCount, yPatchCount;
+        private int heightFieldWidth, heightFieldHeight;
+        private float[,] heightData;
+        private Vector3[,] normalData;
+        private Vector3[,] tangentData;
+        private List<Vector3> boundingBoxes = new List<Vector3>();
+        private List<int>[] patchGroups;
+        private ExternalReference<TextureContent> waterColorTexture;
+        private ExternalReference<TextureContent> waterBumpTextureContent;
+        private ExternalReference<TextureCubeContent> skyBoxCubeTexture;
 
         [NonSerialized()]
         public string SourceFilename;
-        string directory;
+        private string directory;
         #endregion
 
         #region Properties
@@ -132,14 +130,13 @@ namespace Isles.Pipeline
         [Serializable()]
         public class Layer
         {
-            string colorTexture = "";
-            string alphaTexture = "";
-            string normalTexture = "";
-            string technique = "";
-            
-            ExternalReference<TextureContent> colorTextureContent;
-            ExternalReference<TextureContent> alphaTextureContent;
-            ExternalReference<TextureContent> normalTextureContent;
+            private string colorTexture = "";
+            private string alphaTexture = "";
+            private string normalTexture = "";
+            private string technique = "";
+            private ExternalReference<TextureContent> colorTextureContent;
+            private ExternalReference<TextureContent> alphaTextureContent;
+            private ExternalReference<TextureContent> normalTextureContent;
 
             public int PatchGroup;
             public bool[] TargetPatches;
@@ -222,11 +219,14 @@ namespace Isles.Pipeline
                 TargetPatches = new bool[xPatchCount * yPatchCount];
 
                 for (int y = 0; y < yPatchCount; y++)
+                {
                     for (int x = 0; x < xPatchCount; x++)
                     {
                         bool render = false;
                         for (int yy = 0; yy < pixmap.Height / yPatchCount; yy++)
+                        {
                             for (int xx = 0; xx < pixmap.Width / xPatchCount; xx++)
+                            {
                                 if (pixmap.GetPixel(
                                     x * pixmap.Width / xPatchCount + xx,
                                     y * pixmap.Height / yPatchCount + yy).A != 0)
@@ -234,9 +234,13 @@ namespace Isles.Pipeline
                                     render = true;
                                     goto FinishPatch;
                                 }
+                            }
+                        }
+
                     FinishPatch:
                         TargetPatches[y * xPatchCount + x] = render;
                     }
+                }
             }
 
             public void Write(ContentWriter output)
@@ -286,9 +290,13 @@ namespace Isles.Pipeline
             heightFieldHeight = heightfield.Height;
             heightData = new float[heightFieldWidth, heightFieldHeight];
             for (int y = 0; y < heightFieldHeight; y++)
+            {
                 for (int x = 0; x < heightFieldWidth; x++)
+                {
                     // Negate Y value
                     heightData[x, y] = baseHeight + height * heightfield.GetPixel(x, y);
+                }
+            }
 
             #endregion
 
@@ -304,22 +312,30 @@ namespace Isles.Pipeline
             float min, max;
             boundingBoxes = new List<Vector3>(2 * xPatchCount * yPatchCount);
             for (int y = 0; y < yPatchCount; y++)
+            {
                 for (int x = 0; x < xPatchCount; x++)
                 {
                     min = height;
                     max = 0;
 
                     for (int yy = 0; yy <= 16; yy++)
+                    {
                         for (int xx = 0; xx <= 16; xx++)
                         {
                             float h = heightData
                                 [x * 16 + xx, y * 16 + yy];
 
                             if (h < min)
+                            {
                                 min = h;
+                            }
+
                             if (h > max)
+                            {
                                 max = h;
+                            }
                         }
+                    }
 
                     // Write bounding boxes (min, max point)
                     boundingBoxes.Add(new Vector3
@@ -327,13 +343,16 @@ namespace Isles.Pipeline
                     boundingBoxes.Add(new Vector3
                         ((x + 1) * width / xPatchCount, (y + 1) * depth / yPatchCount, max));
                 }
+            }
 
             #endregion
 
             #region Layers & Patch groups
 
             foreach (Layer layer in layers)
+            {
                 layer.Process(context, directory, xPatchCount, yPatchCount);
+            }
 
             // Generate patch groups
             // A patch group is a set of patches that would be drawed within
@@ -351,15 +370,24 @@ namespace Isles.Pipeline
                 if (i > 0)
                 {
                     for (int k = 0; k < layers[i].TargetPatches.Length; k++)
+                    {
                         if (layers[i].TargetPatches[k] != layers[i - 1].TargetPatches[k])
+                        {
                             equal = false;
+                        }
+                    }
+
                     if (equal)
+                    {
                         unionFindIndex[i] = i - 1;
+                    }
                 }
 
                 // A new patch group is found
                 if (unionFindIndex[i] == -1)
+                {
                     patchGroupCount++;
+                }
             }
 
             // Create patch groups, set index to patch groups on each layer
@@ -372,8 +400,12 @@ namespace Isles.Pipeline
                     // A a new patch group
                     patchGroups[iPatchGroup] = new List<int>();
                     for (int k = 0; k < layers[i].TargetPatches.Length; k++)
+                    {
                         if (layers[i].TargetPatches[k])
+                        {
                             patchGroups[iPatchGroup].Add(k);
+                        }
+                    }
 
                     // Set layer patch group pointer
                     layers[i].PatchGroup = iPatchGroup;
@@ -386,7 +418,10 @@ namespace Isles.Pipeline
                     // Find the root
                     int k = i;
                     while (unionFindIndex[k] != -1)
+                    {
                         k = unionFindIndex[k];
+                    }
+
                     layers[i].PatchGroup = layers[k].PatchGroup;
                 }
             }
@@ -425,24 +460,38 @@ namespace Isles.Pipeline
             output.Write(heightFieldWidth);
             output.Write(heightFieldHeight);
             for (int y = 0; y < heightFieldHeight; y++)
+            {
                 for (int x = 0; x < heightFieldWidth; x++)
+                {
                     output.Write(heightData[x, y]);
+                }
+            }
 
             // Normals
             for (int y = 0; y < heightFieldHeight; y++)
+            {
                 for (int x = 0; x < heightFieldWidth; x++)
+                {
                     output.Write(normalData[x, y]);
+                }
+            }
 
             // Tangents
             for (int y = 0; y < heightFieldHeight; y++)
+            {
                 for (int x = 0; x < heightFieldWidth; x++)
+                {
                     output.Write(tangentData[x, y]);
+                }
+            }
 
             // bounding boxes
             output.Write(xPatchCount);
             output.Write(yPatchCount);
             for (int i = 0; i < boundingBoxes.Count; i++)
+            {
                 output.Write(boundingBoxes[i]);
+            }
 
             // patch groups
             output.Write(patchGroups.Length);
@@ -450,13 +499,17 @@ namespace Isles.Pipeline
             {
                 output.Write(patchGroups[i].Count);
                 for (int k = 0; k < patchGroups[i].Count; k++)
+                {
                     output.Write(patchGroups[i][k]);
+                }
             }
 
             // layers
             output.Write(layers.Count);
             for (int i = 0; i < layers.Count; i++)
+            {
                 layers[i].Write(output);
+            }
 
             // water model
             output.Write(earthRadius);
@@ -495,6 +548,7 @@ namespace Isles.Pipeline
             #region Build tangent vertices
             // Build our tangent vertices
             for (int x = 0; x < heightFieldWidth; x++)
+            {
                 for (int y = 0; y < heightFieldHeight; y++)
                 {
                     // Step 1: Calculate position
@@ -519,32 +573,42 @@ namespace Isles.Pipeline
                     // Step 4: Set tangent data, just use edge1
                     tangentData[x, y] = Vector3.Normalize(edge1);
                 }
+            }
             #endregion
 
             #region Smooth normals
             // Smooth all normals, first copy them over, then smooth everything
             Vector3[,] normalsForSmoothing = new Vector3[heightFieldWidth, heightFieldHeight];
             for (int x = 0; x < heightFieldWidth; x++)
+            {
                 for (int y = 0; y < heightFieldHeight; y++)
                 {
                     normalsForSmoothing[x, y] = normalData[x, y];
                 }
+            }
 
             // Time to smooth to normals we just saved
             for (int x = 1; x < heightFieldWidth - 1; x++)
+            {
                 for (int y = 1; y < heightFieldHeight - 1; y++)
                 {
                     // Smooth 3x3 normals, but still use old normal to 40% (5 of 13)
                     Vector3 normal = normalData[x, y] * 4;
                     for (int xAdd = -1; xAdd <= 1; xAdd++)
+                    {
                         for (int yAdd = -1; yAdd <= 1; yAdd++)
+                        {
                             normal += normalsForSmoothing[x + xAdd, y + yAdd];
+                        }
+                    }
+
                     normalData[x, y] = Vector3.Normalize(normal);
 
                     // Also recalculate tangent to let it stay 90 degrees on the normal
                     Vector3 helperVector = Vector3.Cross(normalData[x, y], tangentData[x, y]);
                     tangentData[x, y] = Vector3.Cross(helperVector, normalData[x, y]);
                 }
+            }
             #endregion
         }
 

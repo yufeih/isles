@@ -22,46 +22,44 @@ namespace Isles.Engine
         #region String parser
         public static Color StringToColor(string value)
         {
-            string[] split = value.Split(new char[] { ',' }, 3);
+            var split = value.Split(new char[] { ',' }, 3);
 
-            if (split.Length >= 3)
-                return new Color(byte.Parse(split[0]),
+            return split.Length >= 3
+                ? new Color(byte.Parse(split[0]),
                                  byte.Parse(split[1]),
-                                 byte.Parse(split[2]), 255);
-            return Color.White;
+                                 byte.Parse(split[2]), 255)
+                : Color.White;
         }
 
         public static Vector2 StringToVector2(string value)
         {
-            string[] split = value.Split(new Char[] { ',' }, 2);
+            var split = value.Split(new Char[] { ',' }, 2);
 
-            if (split.Length >= 2)
-                return new Vector2(
+            return split.Length >= 2
+                ? new Vector2(
                     float.Parse(split[0]),
-                    float.Parse(split[1]));
-
-            return Vector2.Zero;
+                    float.Parse(split[1]))
+                : Vector2.Zero;
         }
 
         public static Vector3 StringToVector3(string value)
         {
-            string[] split = value.Split(new Char[] { ',' }, 3);
+            var split = value.Split(new Char[] { ',' }, 3);
 
-            if (split.Length >= 3)
-                return new Vector3(
+            return split.Length >= 3
+                ? new Vector3(
                     float.Parse(split[0]),
                     float.Parse(split[1]),
-                    float.Parse(split[2]));
-            
-            return Vector3.Zero;
+                    float.Parse(split[2]))
+                : Vector3.Zero;
         }
 
         public static Matrix StringToMatrix(string value)
         {
-            string[] split = value.Split(new Char[] { ',' }, 16);
+            var split = value.Split(new Char[] { ',' }, 16);
 
-            if (split.Length >= 16)
-                return new Matrix(
+            return split.Length >= 16
+                ? new Matrix(
                     float.Parse(split[0]),
                     float.Parse(split[1]),
                     float.Parse(split[2]),
@@ -77,23 +75,21 @@ namespace Isles.Engine
                     float.Parse(split[12]),
                     float.Parse(split[13]),
                     float.Parse(split[14]),
-                    float.Parse(split[15]));
-
-            return Matrix.Identity;
+                    float.Parse(split[15]))
+                : Matrix.Identity;
         }
 
         public static Quaternion StringToQuaternion(string value)
         {
-            string[] split = value.Split(new Char[] { ',' }, 4);
+            var split = value.Split(new Char[] { ',' }, 4);
 
-            if (split.Length >= 3)
-                return new Quaternion(
+            return split.Length >= 3
+                ? new Quaternion(
                     float.Parse(split[0]),
                     float.Parse(split[1]),
                     float.Parse(split[2]),
-                    float.Parse(split[3]));
-
-            return Quaternion.Identity;
+                    float.Parse(split[3]))
+                : Quaternion.Identity;
         }
         #endregion
 
@@ -129,15 +125,12 @@ namespace Isles.Engine
         #endregion
 
         #region Misc
-        static Random random = new Random();
+        private static readonly Random random = new();
 
         /// <summary>
         /// Gets the global random number generator
         /// </summary>
-        public static Random Random
-        {
-            get { return random; }
-        }
+        public static Random Random => random;
 
         /// <summary>
         /// Gets a random number with a range
@@ -180,12 +173,14 @@ namespace Isles.Engine
         public static byte[] ObjectToByteArray(Object obj)
         {
             if (obj == null)
+            {
                 return null;
+            }
 
-            int structSize = Marshal.SizeOf(obj);
+            var structSize = Marshal.SizeOf(obj);
             IntPtr buffer = Marshal.AllocHGlobal(structSize);
             Marshal.StructureToPtr(obj, buffer, false);
-            byte[] streamData = new byte[structSize];
+            var streamData = new byte[structSize];
             Marshal.Copy(buffer, streamData, 0, structSize);
             Marshal.FreeHGlobal(buffer);
             return streamData;
@@ -196,13 +191,15 @@ namespace Isles.Engine
         /// </summary>
         public static Object ByteArrayToObject(byte[] rawData, Type type)
         {
-            int rawSize = Marshal.SizeOf(type);
+            var rawSize = Marshal.SizeOf(type);
             if (rawSize > rawData.Length)
+            {
                 return null;
+            }
 
             IntPtr buffer = Marshal.AllocHGlobal(rawSize);
             Marshal.Copy(rawData, 0, buffer, rawSize);
-            object retObject = Marshal.PtrToStructure(buffer, type);
+            var retObject = Marshal.PtrToStructure(buffer, type);
             Marshal.FreeHGlobal(buffer);
             return retObject;
         }
@@ -213,11 +210,17 @@ namespace Isles.Engine
         public static bool ByteArrayEquals(byte[] raw1, byte[] raw2)
         {
             if (raw1.Length != raw2.Length)
+            {
                 return false;
+            }
 
-            for (int i = 0; i < raw1.Length; i++)
+            for (var i = 0; i < raw1.Length; i++)
+            {
                 if (raw1[i] != raw2[i])
+                {
                     return false;
+                }
+            }
 
             return true;
         }
@@ -237,18 +240,15 @@ namespace Isles.Engine
         : IEnumerable<TValue>, ICollection<TValue> where TList : ICollection<TValue>, new()
     {
         private bool isDirty = true;
-        private TList elements = new TList();
-        private TList copy = new TList();
+        private readonly TList elements = new();
+        private readonly TList copy = new();
 
         public void Update()
         {
 
         }
 
-        public TList Elements
-        {
-            get { return elements; }
-        }
+        public TList Elements => elements;
 
         public IEnumerator<TValue> GetEnumerator()
         {
@@ -257,7 +257,10 @@ namespace Isles.Engine
             {
                 copy.Clear();
                 foreach (TValue e in elements)
+                {
                     copy.Add(e);
+                }
+
                 isDirty = false;
             }
             
@@ -287,15 +290,9 @@ namespace Isles.Engine
             elements.Clear();
         }
 
-        public bool IsReadOnly
-        {
-            get { return true; }
-        }
+        public bool IsReadOnly => true;
 
-        public int Count
-        {
-            get { return elements.Count; }
-        }
+        public int Count => elements.Count;
 
         public bool Contains(TValue item)
         {

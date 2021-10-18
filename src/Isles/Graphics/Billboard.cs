@@ -71,10 +71,7 @@ namespace Isles.Graphics
         /// </summary>
         public String TextureName
         {
-            get
-            {
-                return this.textureName;
-            }
+            get => textureName;
             set
             {
                 texture = BaseGame.Singleton.ZipContent.Load<Texture2D>(value);
@@ -84,14 +81,8 @@ namespace Isles.Graphics
 
         public Texture2D Texture
         {
-            get
-            {
-                return this.texture;
-            }
-            set
-            {
-                this.texture = value;
-            }
+            get => texture;
+            set => texture = value;
         }
         private String textureName;
         private Texture2D texture;
@@ -102,31 +93,19 @@ namespace Isles.Graphics
         private Vector3 position;
         public Vector3 Position
         {
-            get
-            {
-                return this.position;
-            }
+            get => position;
 
-            set
-            {
-                this.position = value;
-            }
+            set => position = value;
         }
-        
+
 
         /// <summary>
         /// Type of the billboard
         /// </summary>
         public BillboardType Type
         {
-            get
-            {
-                return this.type;
-            }
-            set
-            {
-                this.type = value;
-            }
+            get => type;
+            set => type = value;
         }
         private BillboardType type;
 
@@ -135,14 +114,8 @@ namespace Isles.Graphics
         /// </summary>
         public AnchorType AchorType
         {
-            get
-            {
-                return this.achorType;
-            }
-            set
-            {
-                this.achorType = value;
-            }
+            get => achorType;
+            set => achorType = value;
         }
         private AnchorType achorType;
         
@@ -168,12 +141,12 @@ namespace Isles.Graphics
         /// <summary>
         /// Default source rectangle
         /// </summary>
-        public static readonly Vector4 DefaultSourceRectangle = new Vector4(0, 0, 1, 1);
-        public static readonly Vector4 DefaultSourceRectangleXInversed = new Vector4(1, 0, 0, 1);
+        public static readonly Vector4 DefaultSourceRectangle = new(0, 0, 1, 1);
+        public static readonly Vector4 DefaultSourceRectangleXInversed = new(1, 0, 0, 1);
 
         public Billboard()
         {
-            this.achorType = AnchorType.Center;
+            achorType = AnchorType.Center;
         }
 
         public void Draw()
@@ -195,13 +168,9 @@ namespace Isles.Graphics
             {
                 return billboard.Position - new Vector3(0, 0, billboard.Size.Y / 2);
             }
-            else if (billboard.AchorType == AnchorType.Bottom)
-            {
-                return billboard.Position + new Vector3(0, 0, billboard.Size.Y / 2);
-            }
             else
             {
-                return billboard.Position;
+                return billboard.AchorType == AnchorType.Bottom ? billboard.Position + new Vector3(0, 0, billboard.Size.Y / 2) : billboard.Position;
             }
         }
 
@@ -214,45 +183,45 @@ namespace Isles.Graphics
         /// <summary>
         /// Billboard effect
         /// </summary>
-        Effect effect;
+        private readonly Effect effect;
 
         /// <summary>
         /// Billboard effect techniques
         /// </summary>
-        EffectTechnique techniqueVegetation;
-        EffectTechnique techniqueNormal;
-        EffectTechnique techniqueCenter;
+        private readonly EffectTechnique techniqueVegetation;
+        private readonly EffectTechnique techniqueNormal;
+        private readonly EffectTechnique techniqueCenter;
 
         /// <summary>
         /// Internal billboard list
         /// </summary>
-        List<Billboard> billboards = new List<Billboard>();
+        private readonly List<Billboard> billboards = new();
 
         /// <summary>
         /// Quad vertices
         /// </summary>
-        DynamicVertexBuffer vertices;
+        private readonly DynamicVertexBuffer vertices;
 
         /// <summary>
         /// Quad indices
         /// </summary>
-        DynamicIndexBuffer indices;
+        private readonly DynamicIndexBuffer indices;
 
         /// <summary>
         /// Vertex buffer used to generate vertices
         /// </summary>
-        VertexPositionNormalDuoTexture[] workingVertices =
+        private VertexPositionNormalDuoTexture[] workingVertices =
             new VertexPositionNormalDuoTexture[ChunkSize * 4];
 
         /// <summary>
         /// Index buffer used to generate indices
         /// </summary>
-        Int16[] workingIndices = new short[ChunkSize * 6];
+        private Int16[] workingIndices = new short[ChunkSize * 6];
 
         /// <summary>
         /// Graphics device
         /// </summary>
-        BaseGame game;
+        private readonly BaseGame game;
         #endregion
 
         #region Methods
@@ -284,7 +253,7 @@ namespace Isles.Graphics
         /// </summary>
         public void Draw(Texture2D texture, Vector3 position, Vector2 size, AnchorType achorType)
         {
-            Billboard billboard = new Billboard();
+            var billboard = new Billboard();
 
             billboard.AchorType = achorType;
             billboard.Texture = texture;
@@ -300,7 +269,7 @@ namespace Isles.Graphics
         public void Draw(Texture2D texture, Vector3 position,
             Vector2 size, Vector3 normal, Vector4 sourceRectangle, AnchorType achorType)
         {
-            Billboard billboard = new Billboard() ;
+            var billboard = new Billboard() ;
 
             billboard.AchorType = achorType;
             billboard.Texture = texture;
@@ -329,7 +298,9 @@ namespace Isles.Graphics
         public void Present(GameTime gameTime)
         {
             if (billboards.Count <= 0)
+            {
                 return;
+            }
 
             game.GraphicsDevice.VertexDeclaration = new VertexDeclaration(
                 game.GraphicsDevice, VertexPositionNormalDuoTexture.VertexElements);
@@ -356,7 +327,7 @@ namespace Isles.Graphics
 
             int baseIndex = 0, baseVertex = 0;
             int begin = 0, end = 0;
-            for (int i = 1; i <= billboards.Count; i++)
+            for (var i = 1; i <= billboards.Count; i++)
             {
                 // We are at the end of the chunk
                 if (i != billboards.Count &&    // End of list
@@ -367,7 +338,9 @@ namespace Isles.Graphics
 
                 end = i;
                 if (i != billboards.Count)
+                {
                     texture = billboards[i].Texture;
+                }
 
                 // Setup graphics device
                 game.GraphicsDevice.Vertices[0].SetSource(null, 0, 0);
@@ -375,14 +348,16 @@ namespace Isles.Graphics
 
                 // Build the mesh for this chunk of billboards
                 baseIndex = baseVertex = 0;
-                for (int k = begin; k < end; k++)
+                for (var k = begin; k < end; k++)
                 {
                     CreateQuad(billboards[k],
                         ref workingVertices, ref baseVertex, ref workingIndices, ref baseIndex);
                 }
 
                 if (baseVertex <= 0 || baseIndex <= 0)
+                {
                     continue;
+                }
 
                 // Update vertex/index buffer
                 vertices.SetData(workingVertices, 0, baseVertex);
@@ -402,11 +377,17 @@ namespace Isles.Graphics
                     currentType = billboards[begin].Type;
 
                     if ((currentType & BillboardType.Vegetation) == BillboardType.Vegetation)
+                    {
                         effect.CurrentTechnique = techniqueVegetation;
+                    }
                     else if ((currentType & BillboardType.CenterOriented) == BillboardType.CenterOriented)
+                    {
                         effect.CurrentTechnique = techniqueCenter;
+                    }
                     else if ((currentType & BillboardType.NormalOriented) == BillboardType.NormalOriented)
+                    {
                         effect.CurrentTechnique = techniqueNormal;
+                    }
 
                     game.GraphicsDevice.RenderState.DepthBufferEnable = (
                         (currentType & BillboardType.DepthBufferEnable) == BillboardType.DepthBufferEnable);
@@ -454,7 +435,7 @@ namespace Isles.Graphics
             // |   \ |
             // 3 --- 2
 
-            for (int i = 0; i < 4; i++)
+            for (var i = 0; i < 4; i++)
             {
                 vertices[baseVertex + i].Position = GetCenterPosition(billboard);
                 vertices[baseVertex + i].Normal = billboard.Normal;
@@ -497,7 +478,6 @@ namespace Isles.Graphics
             vertices[baseVertex + 1].TextureCoordinate1.X =
             vertices[baseVertex + 2].TextureCoordinate1.X = billboard.Size.X / 2;
 
-
             // Fill indices
             indices[baseIndex + 0] = (short)(baseVertex + 0);
             indices[baseIndex + 1] = (short)(baseVertex + 1);
@@ -534,13 +514,19 @@ namespace Isles.Graphics
             if (disposing)
             {
                 if (effect != null)
+                {
                     effect.Dispose();
+                }
 
                 if (vertices != null)
+                {
                     vertices.Dispose();
+                }
 
                 if (indices != null)
+                {
                     indices.Dispose();
+                }
             }
         }
 

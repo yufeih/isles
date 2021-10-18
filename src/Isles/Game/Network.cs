@@ -16,73 +16,51 @@ namespace Isles
     public class GameServer
     {
         #region Singleton
-        public static GameServer Singleton
-        {
-            get { return singleton; }
-        }
+        public static GameServer Singleton => singleton;
 
-        static GameServer singleton;
+        private static GameServer singleton;
         #endregion
 
-        Dictionary<ushort, IGameObject> idToObject = new Dictionary<ushort, IGameObject>();
-        Dictionary<IGameObject, ushort> objectToID = new Dictionary<IGameObject, ushort>();
-        
+        private readonly Dictionary<ushort, IGameObject> idToObject = new();
+        private readonly Dictionary<IGameObject, ushort> objectToID = new();
+
         /// <summary>
         /// Make sure every game object has a unique ID
         /// </summary>
-        UInt16 currentValidID = MinID;
-        const UInt16 MinID = 128;
+        private UInt16 currentValidID = MinID;
+        private const UInt16 MinID = 128;
 
         /// <summary>
         /// Record all game object changes
         /// </summary>
-        GameRecorder recorder;
-
-        GameWorld world;
+        private readonly GameRecorder recorder;
+        private readonly GameWorld world;
 
         /// <summary>
         /// Gets or sets game world
         /// </summary>
-        public GameWorld World
-        {
-            get { return world; }
-        }
+        public GameWorld World => world;
 
-        double time;
+        private double time;
 
         /// <summary>
         /// Gets game elapsed time since server started
         /// </summary>
-        public double Time
-        {
-            get { return time; }
-        }
+        public double Time => time;
 
         /// <summary>
         /// Gets the next valid ID from this game server
         /// </summary>
-        public ushort NextValidID
-        {
-            get
-            {
-                if (currentValidID == ushort.MaxValue)
-                    throw new InvalidOperationException();
-
-                return currentValidID++;
-            }
-        }
+        public ushort NextValidID => currentValidID == ushort.MaxValue ? throw new InvalidOperationException() : currentValidID++;
 
         /// <summary>
         /// Creates a new game server
         /// </summary>
         public GameServer(GameWorld world, GameRecorder recorder)
         {
-            if (world == null)
-                throw new ArgumentNullException();
-
             singleton = this;
 
-            this.world = world;
+            this.world = world ?? throw new ArgumentNullException();
             this.recorder = recorder;
         }
 
@@ -93,10 +71,7 @@ namespace Isles
         {
             IGameObject value;
 
-            if (idToObject.TryGetValue(id, out value))
-                return value;
-
-            return null;
+            return idToObject.TryGetValue(id, out value) ? value : null;
         }
 
         /// <summary>
@@ -106,10 +81,7 @@ namespace Isles
         {
             ushort id;
 
-            if (objectToID.TryGetValue(o, out id))
-                return id;
-
-            return 0;
+            return objectToID.TryGetValue(o, out id) ? id : (ushort)0;
         }
 
         /// <summary>
@@ -129,28 +101,36 @@ namespace Isles
 
             if (o is IGameObject)
             {
-                IGameObject newObject = o as IGameObject;
+                var newObject = o as IGameObject;
 
                 if (idToObject.ContainsKey(id))
+                {
                     throw new ArgumentException("ID already exists");
+                }
 
                 if (objectToID.ContainsKey(newObject))
+                {
                     throw new ArgumentException("Object already added");
+                }
 
                 idToObject.Add(id, newObject);
                 objectToID.Add(newObject, id);
 
                 // Dispatch create object event
-                int index = GameWorld.CreatorIndexFromType(type);
+                var index = GameWorld.CreatorIndexFromType(type);
 
                 if (index < 0)
+                {
                     throw new ArgumentException("Unrecognized type: " + type);
+                }
 
                 if (index >= ushort.MaxValue)
+                {
                     throw new Exception();
+                }
 
-                byte[] bytes = new byte[4];
-                byte[] buffer = BitConverter.GetBytes((ushort)index);
+                var bytes = new byte[4];
+                var buffer = BitConverter.GetBytes((ushort)index);
                 bytes[0] = buffer[0];
                 bytes[1] = buffer[1];
                 buffer = BitConverter.GetBytes((ushort)id);
@@ -175,17 +155,19 @@ namespace Isles
 
             if (o is IGameObject)
             {
-                IGameObject existingObject = o as IGameObject;
+                var existingObject = o as IGameObject;
 
                 if (objectToID.ContainsKey(existingObject))
                 {
                     // Dispatch destroy object event
-                    ushort id = IDFromObject(existingObject);
+                    var id = IDFromObject(existingObject);
 
                     if (id < MinID)
+                    {
                         throw new ArgumentException("The input object has an invalid ID.");
+                    }
 
-                    byte[] bytes = BitConverter.GetBytes((ushort)id);
+                    var bytes = BitConverter.GetBytes((ushort)id);
                     Dispatch(1, bytes, 0, bytes.Length);
 
                     // Remove the object from registry
@@ -201,12 +183,16 @@ namespace Isles
         public void Dispatch(ushort id, byte[] bytes, int offset, int length)
         {
             if (id < 0 || offset < 0 || length < 0 || id >= byte.MaxValue || bytes == null)
+            {
                 throw new ArgumentException();
+            }
 
             if (length > 0)
             {
                 if (recorder != null)
+                {
                     recorder.Record(id, (float)time, bytes, offset, length);
+                }
             }
         }
 
@@ -220,28 +206,32 @@ namespace Isles
             // Special commands: Create [0], Destroy [1]
             if (id == 0 && length == 4)
             {
-                ushort type = BitConverter.ToUInt16(bytes, offset);
-                ushort oID = BitConverter.ToUInt16(bytes, offset + 2);
+                var type = BitConverter.ToUInt16(bytes, offset);
+                var oID = BitConverter.ToUInt16(bytes, offset + 2);
 
                 Create(GameWorld.CreatorTypeFromIndex((int)type), oID);
             }
             else if (id == 1 && length == 2)
             {
-                ushort oID = BitConverter.ToUInt16(bytes, offset);
+                var oID = BitConverter.ToUInt16(bytes, offset);
                 o = ObjectFromID(oID);
                 if (o != null && o is IWorldObject)
+                {
                     Destroy(o as IWorldObject);
+                }
             }
             else
             {
                 o = ObjectFromID(id);
 
                 if (o != null)
+                {
                     o.Deserialize(new MemoryStream(bytes, offset, length));
+                }
             }
         }
 
-        MemoryStream stream = new MemoryStream();
+        private readonly MemoryStream stream = new();
 
         public void Update(GameTime gameTime)
         {

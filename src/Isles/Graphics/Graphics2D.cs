@@ -21,14 +21,14 @@ namespace Isles.Graphics
         /// <summary>
         /// Limit line count since we're using a fixed vertex buffer.
         /// </summary>
-        const int MaxLineCount = 512;
-        const int MaxPrimitiveVertexCount = 1024;
-        const int MaxPrimitiveIndexCount = 2048;
+        private const int MaxLineCount = 512;
+        private const int MaxPrimitiveVertexCount = 1024;
+        private const int MaxPrimitiveIndexCount = 2048;
 
         /// <summary>
         /// Entry type for string drawing
         /// </summary>
-        struct StringValue
+        private struct StringValue
         {
             public string Text;
             public float Size;
@@ -36,44 +36,35 @@ namespace Isles.Graphics
             public Color Color;
         }
 
-        BaseGame game;
-        Effect effect;
-        SpriteFont font;
-        SpriteBatch sprite;
-        BasicEffect basicEffect;
-        List<StringValue> strings = new List<StringValue>();
-        VertexPositionColor[] lines = new VertexPositionColor[MaxLineCount];
-        VertexPositionColor[] primitives = new VertexPositionColor[MaxPrimitiveVertexCount];
-        ushort[] primitiveIndices = new ushort[MaxPrimitiveIndexCount];
-        int primitiveIndexCount = 0;
-        int primitiveVertexCount = 0;
-        int lineCount = 0;
-        DynamicVertexBuffer vertices;
-        DynamicIndexBuffer indices;
+        private readonly BaseGame game;
+        private readonly Effect effect;
+        private readonly SpriteFont font;
+        private readonly SpriteBatch sprite;
+        private readonly BasicEffect basicEffect;
+        private readonly List<StringValue> strings = new();
+        private readonly VertexPositionColor[] lines = new VertexPositionColor[MaxLineCount];
+        private readonly VertexPositionColor[] primitives = new VertexPositionColor[MaxPrimitiveVertexCount];
+        private readonly ushort[] primitiveIndices = new ushort[MaxPrimitiveIndexCount];
+        private int primitiveIndexCount = 0;
+        private int primitiveVertexCount = 0;
+        private int lineCount = 0;
+        private readonly DynamicVertexBuffer vertices;
+        private readonly DynamicIndexBuffer indices;
 
         /// <summary>
         /// Gets graphics 2D effect
         /// </summary>
-        public Effect Effect
-        {
-            get { return effect; }
-        }
+        public Effect Effect => effect;
 
         /// <summary>
         /// Get sprite font
         /// </summary>
-        public SpriteFont Font
-        {
-            get { return font; }
-        }
+        public SpriteFont Font => font;
 
         /// <summary>
         /// Gets or Sets sprite batch used to drawing the text
         /// </summary>
-        public SpriteBatch Sprite
-        {
-            get { return sprite; }
-        }
+        public SpriteBatch Sprite => sprite;
 
         /// <summary>
         /// Initialize text system
@@ -209,8 +200,8 @@ namespace Isles.Graphics
         /// </param>
         public void DrawPrimitive(IEnumerable<VertexPositionColor> vertices, IEnumerable<ushort> indices)
         {
-            int iCount = 0;
-            int indexBias = primitiveVertexCount;
+            var iCount = 0;
+            var indexBias = primitiveVertexCount;
             VertexPositionColor value;
 
             // Add new vertices
@@ -232,7 +223,7 @@ namespace Isles.Graphics
             }
 
             // Add new indices
-            foreach (ushort index in indices)
+            foreach (var index in indices)
             {
                 if (primitiveIndexCount >= MaxPrimitiveIndexCount)
                 {
@@ -248,7 +239,9 @@ namespace Isles.Graphics
 
             // Make sure our vertices and indices match triangle list
             if (iCount % 3 != 0)
+            {
                 throw new ArgumentException("Index count must be a multiple of 3");
+            }
         }
 
         /// <summary>
@@ -258,7 +251,7 @@ namespace Isles.Graphics
         /// <param name="color"></param>
         public void DrawRectangle(Rectangle rect, Color color)
         {
-            VertexPositionColor[] vertices = new VertexPositionColor[4]
+            var vertices = new VertexPositionColor[4]
             {
                 new VertexPositionColor(new Vector3(rect.Left, rect.Top, 0), color),
                 new VertexPositionColor(new Vector3(rect.Right, rect.Top, 0), color),
@@ -266,10 +259,10 @@ namespace Isles.Graphics
                 new VertexPositionColor(new Vector3(rect.Left, rect.Bottom, 0), color)
             };
 
-            ushort[] indices = new ushort[6] { 0, 1, 2, 0, 2, 3 };
+            var indices = new ushort[6] { 0, 1, 2, 0, 2, 3 };
 
             // Error when drawing up to more than 2 triangles
-            this.DrawPrimitive(vertices, indices);
+            DrawPrimitive(vertices, indices);
         }
 
         /// <summary>
@@ -287,13 +280,18 @@ namespace Isles.Graphics
         public void PresentText()
         {
             if (strings.Count <= 0)
+            {
                 return;
-            
+            }
+
             sprite.Begin();
             foreach (StringValue value in strings)
+            {
                 sprite.DrawString(
                     font, value.Text, value.Position, value.Color, 0,
                     Vector2.Zero, value.Size, SpriteEffects.None, 0);
+            }
+
             sprite.End();
 
             // Clear all string in this frame
@@ -303,12 +301,14 @@ namespace Isles.Graphics
         public void PresentLine()
         {
             if (lineCount <= 0)
+            {
                 return;
+            }
 
             game.GraphicsDevice.Vertices[0].SetSource(null, 0, 0);
 
             // Update line vertices
-            vertices.SetData<VertexPositionColor>(lines, 0, lineCount);
+            vertices.SetData(lines, 0, lineCount);
 
             // Draw all lines
             game.GraphicsDevice.VertexDeclaration = new VertexDeclaration(
@@ -335,13 +335,15 @@ namespace Isles.Graphics
         public void PresentPrimitives()
         {
             if (primitiveIndexCount < 3)
+            {
                 return;
+            }
 
             game.GraphicsDevice.Vertices[0].SetSource(null, 0, 0);
 
             // Update primitive vertices
-            vertices.SetData<VertexPositionColor>(primitives, 0, primitiveVertexCount);
-            indices.SetData<ushort>(primitiveIndices, 0, primitiveIndexCount);
+            vertices.SetData(primitives, 0, primitiveVertexCount);
+            indices.SetData(primitiveIndices, 0, primitiveIndexCount);
 
             // Draw all lines
             game.GraphicsDevice.VertexDeclaration = new VertexDeclaration(
@@ -395,16 +397,16 @@ namespace Isles.Graphics
             float offset = 0;
 
             //Identify whether the next word is the first word in its line
-            bool firstWordInLine = true;
+            var firstWordInLine = true;
 
             //Iterate words in the text
-            WordIterator wi = new WordIterator(text);
+            var wi = new WordIterator(text);
 
             //Return value
-            StringBuilder rtvSB = new StringBuilder();
+            var rtvSB = new StringBuilder();
 
             //Store each word in the text
-            string str = wi.NextWord();
+            var str = wi.NextWord();
 
             if (str == null)
             {
@@ -443,9 +445,13 @@ namespace Isles.Graphics
                     {
                         rtvSB.Append(str);
                         if (str[str.Length - 1] == '\n')
+                        {
                             offset = 0;
+                        }
                         else
+                        {
                             offset += font.MeasureString(str).X;
+                        }
                     }
                 }
                 str = wi.NextWord();
@@ -471,16 +477,16 @@ namespace Isles.Graphics
             float offset = 0;
 
             //Identify whether the next word is the first word in its line
-            bool firstWordInLine = true;
+            var firstWordInLine = true;
 
             //Iterate words in the text
-            WordIterator wi = new WordIterator(text);
+            var wi = new WordIterator(text);
 
             //Return value
-            StringBuilder rtvSB = new StringBuilder("");
+            var rtvSB = new StringBuilder("");
 
             //Store each word in the text
-            string str = wi.NextWord();
+            var str = wi.NextWord();
 
             if (str == null)
             {
@@ -525,7 +531,9 @@ namespace Isles.Graphics
                             firstWordInLine = true;
                         }
                         else
+                        {
                             offset += font.MeasureString(str).X;
+                        }
                     }
                 }
                 if (font.MeasureString(rtvSB.ToString()).Y > height)
@@ -538,7 +546,6 @@ namespace Isles.Graphics
             return rtvSB.ToString();
         }
 
-
         /// <summary>
         /// Used to Iterate each word in the text. 
         /// This class is designed to help to implement FormatString.
@@ -546,17 +553,17 @@ namespace Isles.Graphics
         /// or with only the last being '\n' or ' '.
         /// eg. "word \n " is combination of 3 words: "word ", "\n", " ".
         /// </summary>
-        class WordIterator
+        private class WordIterator
         {
             /// <summary>
             /// Hold the text to be processed
             /// </summary>
-            string text;
+            private readonly string text;
 
             /// <summary>
             /// Identify the index of the first char of the next word
             /// </summary>
-            int currentIndex;
+            private int currentIndex;
 
             /// <summary>
             /// Constructor
@@ -612,8 +619,8 @@ namespace Isles.Graphics
             /// </summary>
             public int CurrentIndex
             {
-                get { return currentIndex; }
-                set { currentIndex = value; }
+                get => currentIndex;
+                set => currentIndex = value;
             }
 
         }

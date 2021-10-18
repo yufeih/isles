@@ -39,25 +39,19 @@ namespace Isles
         /// <summary>
         /// Gets the building state
         /// </summary>
-        public new BuildingState State
-        {
-            get { return state; }
-        }
+        public new BuildingState State => state;
 
         protected BuildingState state = BuildingState.Normal;
-
 
         /// <summary>
         /// Gets or sets the time to construct this building
         /// </summary>
         public float ConstructionTime, ConstructionTimeElapsed;
 
-
         /// <summary>
         /// Gets or sets how much wood needed for the building
         /// </summary>
         public int Lumber;
-
 
         /// <summary>
         /// Gets or sets how much gold needed for the building
@@ -74,7 +68,7 @@ namespace Isles
         /// </summary>
         public int BuilderCount
         {
-            get { return builderCount; }
+            get => builderCount;
             set
             {
                 System.Diagnostics.Debug.Assert(value >= 0);
@@ -83,46 +77,39 @@ namespace Isles
             }
         }
 
-        const float CorporationTradeoff = 0.5f;
-
-        int builderCount;
+        private const float CorporationTradeoff = 0.5f;
+        private int builderCount;
 
         /// <summary>
         /// Gets or sets the rotation on the xy plane
         /// </summary>
         public float RotationZ
         {
-            get { return rotationZ; }
-            set { rotationZ = value; }
+            get => rotationZ;
+            set => rotationZ = value;
         }
 
-        float rotationZ;
+        private float rotationZ;
 
         /// <summary>
         /// Path brush
         /// </summary>
-        Vector2 obstructorSize;
-        List<Point> pathGrids = new List<Point>();
+        private Vector2 obstructorSize;
+        private readonly List<Point> pathGrids = new();
 
         /// <summary>
         /// Gets the units that can be trained from this building
         /// </summary>
-        public List<string> Units
-        {
-            get { return units; }
-        }
+        public List<string> Units => units;
 
-        List<string> units = new List<string>();
+        private List<string> units = new();
 
         /// <summary>
         /// Gets the pending requests that are going to be handled
         /// </summary>
-        public Queue<Spell> QueuedSpells
-        {
-            get { return pendingSpells; }
-        }
+        public Queue<Spell> QueuedSpells => pendingSpells;
 
-        Queue<Spell> pendingSpells = new Queue<Spell>();
+        private readonly Queue<Spell> pendingSpells = new();
 
         /// <summary>
         /// Gets or sets the spawn point of this building
@@ -130,14 +117,13 @@ namespace Isles
         public Vector3 SpawnPoint;
         public Worker Builder;
 
-
         /// <summary>
         /// Effects
         /// </summary>
-        EffectConstruct construct;
-        List<EffectFire> fire;
-        List<Vector3> fireSpawnPoints;
-        List<Vector3> fireSpawnPointsLeft;
+        private EffectConstruct construct;
+        private List<EffectFire> fire;
+        private List<Vector3> fireSpawnPoints;
+        private List<Vector3> fireSpawnPointsLeft;
 
         /// <summary>
         /// Gets the rally point model for all buildings
@@ -147,18 +133,21 @@ namespace Isles
             get 
             {
                 if (rallyPointModel == null)
+                {
                     rallyPointModel = new GameModel("Models/rally");
+                }
+
                 return rallyPointModel;
             }
         }
 
-        static GameModel rallyPointModel;
+        private static GameModel rallyPointModel;
 
         /// <summary>
         /// Halo effect
         /// </summary>
-        EffectHalo halo;
-        string haloParticle;
+        private EffectHalo halo;
+        private string haloParticle;
         #endregion
 
         #region Methods
@@ -178,10 +167,14 @@ namespace Isles
             string value;
 
             if ((value = xml.GetAttribute("ObstructorSize")) != "")
+            {
                 obstructorSize = Helper.StringToVector2(value) / 2;
+            }
 
             if ((value = xml.GetAttribute("SpawnPoint")) != "")
+            {
                 SpawnPoint = Helper.StringToVector3(value);
+            }
 
             if ((value = xml.GetAttribute("Units")) != "")
             {
@@ -191,7 +184,9 @@ namespace Isles
             }
 
             if ((value = xml.GetAttribute("Halo")) != "")
+            {
                 haloParticle = value;
+            }
 
             // Deserialize models after default attributes are assigned
             base.Deserialize(xml);
@@ -227,7 +222,7 @@ namespace Isles
 
         protected override void OnCreateSpell(Spell spell)
         {
-            SpellTraining training = spell as SpellTraining;
+            var training = spell as SpellTraining;
             if (training != null)
             {
                 training.Enable = false;
@@ -238,7 +233,9 @@ namespace Isles
         protected override void ShowSpells(GameUI ui)
         {
             if (Sound != null)
+            {
                 Audios.Play(Sound, Audios.Channel.Building, this);
+            }
 
             base.ShowSpells(ui);
         }
@@ -252,13 +249,17 @@ namespace Isles
 
                 // Refresh ruined land if we are steamer
                 if (Owner.Race == Race.Steamer && RuinedLand.Singleton != null)
+                {
                     RuinedLand.Singleton.Refresh();
+                }
             }
 
             foreach (Spell spell in Spells)
+            {
                 spell.Enable = true;
+            }
 
-            LocalPlayer local = Owner as LocalPlayer;
+            var local = Owner as LocalPlayer;
 
             if (local != null &&
                 local.CurrentGroup != null && local.CurrentGroup.Contains(this))
@@ -296,7 +297,9 @@ namespace Isles
         protected override void OnDie()
         {
             if (pathGrids != null)
+            {
                 World.PathManager.Unmark(pathGrids);
+            }
 
             if (Owner != null && state == BuildingState.Normal)
             {
@@ -306,12 +309,16 @@ namespace Isles
 
                 // Refresh ruined land if we are steamer
                 if (Owner.Race == Race.Steamer && RuinedLand.Singleton != null)
+                {
                     RuinedLand.Singleton.Refresh();
+                }
             }
 
             // Create explosion
             if (ShouldDrawModel)
+            {
                 new EffectExplosion(World, (TopCenter + Position) / 2);
+            }
 
             state = BuildingState.Destroyed;
 
@@ -325,9 +332,7 @@ namespace Isles
         {
             if (state == BuildingState.Normal && units != null && units.Contains(type))
             {
-                if (Owner.IsUnique(type) && Owner.IsFutureAvailable(type))
-                    return false;
-                return true;
+                return !Owner.IsUnique(type) || !Owner.IsFutureAvailable(type);
             }
             return false;
         }
@@ -376,7 +381,7 @@ namespace Isles
 
                 foreach (Spell s in Spells)
                 {
-                    SpellTraining train = s as SpellTraining;
+                    var train = s as SpellTraining;
                     if (train != null && train.Type == type)
                     {
                         train.Count++;
@@ -396,23 +401,29 @@ namespace Isles
             {
                 Spell[] spells = pendingSpells.ToArray();
                 pendingSpells.Clear();
-                for (int i = 0; i < spells.Length - 1; i++)
+                for (var i = 0; i < spells.Length - 1; i++)
+                {
                     pendingSpells.Enqueue(spells[i]);
+                }
 
                 Spell removed = spells[spells.Length - 1];
                 if (removed is SpellTraining)
                 {
-                    SpellTraining spell = removed as SpellTraining;
-                    string type = spell.Type;
+                    var spell = removed as SpellTraining;
+                    var type = spell.Type;
                     Owner.Gold += GameDefault.Singleton.GetGold(type);
                     Owner.Lumber += GameDefault.Singleton.GetLumber(type);
                     Owner.Food -= GameDefault.Singleton.GetFood(type);
 
                     if (Owner is ComputerPlayer)
+                    {
                         (Owner as ComputerPlayer).UnmarkFutureObject(type);
+                    }
 
                     if (--spell.Count <= 0)
+                    {
                         spell.CoolDownElapsed = spell.CoolDown;
+                    }
                 }
             }
         }
@@ -425,26 +436,34 @@ namespace Isles
                 Spell[] spells = pendingSpells.ToArray();
                 pendingSpells.Clear();
 
-                int removedIndex = -1;
-                for (int i = spells.Length - 1; i >= 0; i--)
+                var removedIndex = -1;
+                for (var i = spells.Length - 1; i >= 0; i--)
+                {
                     if (spells[i] == target)
                     {
                         removedIndex = i;
                         break;
                     }
+                }
 
                 if (removedIndex < 0)
+                {
                     throw new ArgumentException();
+                }
 
-                for (int i = 0; i < spells.Length; i++)
+                for (var i = 0; i < spells.Length; i++)
+                {
                     if (i != removedIndex)
+                    {
                         pendingSpells.Enqueue(spells[i]);
+                    }
+                }
 
                 Spell removed = spells[removedIndex];
                 if (removed is SpellTraining)
                 {
-                    SpellTraining spell = removed as SpellTraining;
-                    string type = spell.Type;
+                    var spell = removed as SpellTraining;
+                    var type = spell.Type;
                     Owner.Gold += GameDefault.Singleton.GetGold(type);
                     Owner.Lumber += GameDefault.Singleton.GetLumber(type);
                     Owner.Food -= GameDefault.Singleton.GetFood(type);
@@ -452,33 +471,43 @@ namespace Isles
                     Owner.UnmarkFutureObject(type);
 
                     if (--spell.Count <= 0)
+                    {
                         spell.CoolDownElapsed = spell.CoolDown;
+                    }
                 }
             }
         }
 
-        public List<object> RallyPoints = new List<object>();
+        public List<object> RallyPoints = new();
 
         public override void PerformAction(Entity entity, bool queueAction)
         {
             if (!queueAction)
+            {
                 RallyPoints.Clear();
+            }
 
             RallyPoints.Add(entity);
 
             if (Owner is LocalPlayer)
+            {
                 Audios.Play("Rally");
+            }
         }
 
         public override void PerformAction(Vector3 position, bool queueAction)
         {
             if (!queueAction)
+            {
                 RallyPoints.Clear();
+            }
 
             RallyPoints.Add(position);
 
             if (Owner is LocalPlayer)
+            {
                 Audios.Play("Rally");
+            }
         }
         #endregion
 
@@ -498,7 +527,9 @@ namespace Isles
         {
             if (state != BuildingState.PreConstruct &&
                 state != BuildingState.Constructing)
+            {
                 base.DrawFogOfWar();
+            }
         }
 
         /// <summary>
@@ -548,12 +579,16 @@ namespace Isles
             if (state == BuildingState.Constructing && BuilderCount > 0)
             {
                 if (construct == null)
+                {
                     construct = new EffectConstruct(World, Outline * 0.5f, Position.Z, Position.Z + 10);
+                }
 
                 if (ShouldDrawModel)
+                {
                     construct.Update(gameTime);
+                }
 
-                float elapsedSeconds = (float)(gameTime.ElapsedGameTime.TotalSeconds);
+                var elapsedSeconds = (float)(gameTime.ElapsedGameTime.TotalSeconds);
                 ConstructionTimeElapsed += elapsedSeconds * (1 + (builderCount - 1) * CorporationTradeoff);
 
                 if (ConstructionTimeElapsed > ConstructionTime)
@@ -579,8 +614,8 @@ namespace Isles
                     fireSpawnPoints = new List<Vector3>();
                     fireSpawnPointsLeft = new List<Vector3>();
 
-                    int index = 1;
-                    int bone = 0;
+                    var index = 1;
+                    var bone = 0;
 
                     while ((bone = Model.GetBone("fire" + index)) >= 0)
                     {
@@ -592,9 +627,11 @@ namespace Isles
                 }
 
                 // How many fire we should set
-                int count = 1 + (int)(fireSpawnPoints.Count * (1 - Health / (MaximumHealth * StartBurnPercentage)));
+                var count = 1 + (int)(fireSpawnPoints.Count * (1 - Health / (MaximumHealth * StartBurnPercentage)));
                 if (count > fireSpawnPoints.Count)
+                {
                     count = fireSpawnPoints.Count;
+                }
 
                 if (count > fire.Count)
                 {
@@ -611,7 +648,7 @@ namespace Isles
                 else if (count < fire.Count)
                 {
                     // Remove an existing fire
-                    int index = Helper.Random.Next(fire.Count);
+                    var index = Helper.Random.Next(fire.Count);
                     
                     Vector3 position = fire[index].Position;
                     
@@ -624,15 +661,16 @@ namespace Isles
                 if (ShouldDrawModel)
                 {
                     foreach (EffectFire effect in fire)
+                    {
                         effect.Update(gameTime);
+                    }
                 }
             }
-
 
             // Repair building
             if (state == BuildingState.Normal && Health < MaximumHealth && builderCount > 0)
             {
-                float elapsedSeconds = (float)(gameTime.ElapsedGameTime.TotalSeconds);
+                var elapsedSeconds = (float)(gameTime.ElapsedGameTime.TotalSeconds);
                 Health += 0.2f * MaximumHealth / ConstructionTime * elapsedSeconds *
                                 (1 + (builderCount - 1) * CorporationTradeoff);
             }
@@ -641,13 +679,17 @@ namespace Isles
             if (state == BuildingState.Normal && pendingSpells.Count > 0)
             {
                 if (pendingSpells.Peek().Ready)
+                {
                     pendingSpells.Peek().Cast();
+                }
 
                 // Create halo effect
                 if (ShouldDrawModel && haloParticle != null)
                 {
                     if (halo == null)
+                    {
                         halo = new EffectHalo(World, TopCenter, 30, haloParticle);
+                    }
 
                     halo.Update(gameTime);
                 }
@@ -668,9 +710,13 @@ namespace Isles
                 Vector3 position = Vector3.Zero;
 
                 if (RallyPoints[0] is Entity)
+                {
                     position = (RallyPoints[0] as Entity).Position;
+                }
                 else if (RallyPoints[0] is Vector3)
+                {
                     position = (Vector3)RallyPoints[0];
+                }
 
                 RallyPointModel.Transform = Matrix.CreateTranslation(position);
                 RallyPointModel.Draw(gameTime);
@@ -691,7 +737,9 @@ namespace Isles
 
                 // Cancel last spell
                 if (state == BuildingState.Normal)
+                {
                     CancelTraining();
+                }
             }
 
             return EventResult.Unhandled;
@@ -705,7 +753,6 @@ namespace Isles
                 pair.Key.State = pair.Value;
             }
         }
-
 
         private void UpdateSmoke()
         {
@@ -745,18 +792,20 @@ namespace Isles
             return true;
         }
 
-        List<Charactor> GetNegotiables()
+        private List<Charactor> GetNegotiables()
         {
-            List<Charactor> obstructors = new List<Charactor>();
+            var obstructors = new List<Charactor>();
             IEnumerable<IWorldObject> nearbyObjects;
             nearbyObjects = World.GetNearbyObjects(Position, Math.Max(obstructorSize.X,
                                                                       obstructorSize.Y));
             foreach (IWorldObject wo in nearbyObjects)
             {
-                Charactor c = wo as Charactor;
+                var c = wo as Charactor;
 
                 if (c != null && c.IsAlive && c.Owner == Owner)
+                {
                     obstructors.Add(c);
+                }
             }
 
             return obstructors;
@@ -767,38 +816,48 @@ namespace Isles
             if (Owner is LocalPlayer)
             {
                 if (World.FogOfWar.Contains(Position.X, Position.Y))
+                {
                     return false;
+                }
 
                 if (Owner.Race == Race.Steamer && ClassID != Owner.TownhallName &&
                     !RuinedLand.Singleton.Contains(Position.X, Position.Y))
+                {
                     return false;
-                
+                }
+
                 if (GameUI.Singleton.Overlaps(World.Game.Input.MousePosition))
+                {
                     return false;
+                }
             }
 
             // Exclude nearby units with the same owner
             List<Charactor> negotiables = GetNegotiables();
 
             foreach (Charactor c in negotiables)
+            {
                 World.PathManager.Unmark(c);
+            }
 
-            bool canPlace = CanPlace(true);
+            var canPlace = CanPlace(true);
 
             foreach (Charactor c in negotiables)
+            {
                 World.PathManager.Mark(c);
+            }
 
             return canPlace;
         }
 
-        bool CanPlace(bool enlargeOutline)
+        private bool CanPlace(bool enlargeOutline)
         {
             const float RadiusSquared = 80 * 80;
 
             // Buildings can't be placed near the goldmine
             foreach (IWorldObject o in World.GetNearbyObjects(Position, 50))
             {
-                Goldmine g = o as Goldmine;
+                var g = o as Goldmine;
 
                 if (g != null)
                 {
@@ -806,7 +865,9 @@ namespace Isles
                     v.X = g.Position.X - Position.X;
                     v.Y = g.Position.Y - Position.Y;
                     if (v.LengthSquared() < RadiusSquared)
+                    {
                         return false;
+                    }
                 }
             }
 
@@ -815,13 +876,15 @@ namespace Isles
                    enlargeOutline ? Outline + 5 : Outline), true);
         }
 
-        double waitTimer = 0;
-        List<KeyValuePair<Charactor, IState>> negotiables = new List<KeyValuePair<Charactor, IState>>();
+        private double waitTimer = 0;
+        private readonly List<KeyValuePair<Charactor, IState>> negotiables = new();
 
         public void Place()
         {
             if (Owner is LocalPlayer)
+            {
                 Audios.Play("Place");
+            }
 
             // Check if the building can be directly placed at the target
             if (!CanPlace(false))
@@ -830,8 +893,8 @@ namespace Isles
                 Vector2 position;
                 position.X = Position.X;
                 position.Y = Position.Y;
-                List<Point> temp = new List<Point>();
-                List<Point> grids = new List<Point>(World.PathManager.EnumerateGridsInOutline(Outline * 1.5f));
+                var temp = new List<Point>();
+                var grids = new List<Point>(World.PathManager.EnumerateGridsInOutline(Outline * 1.5f));
                 World.PathManager.Mark(grids);
 
                 negotiables.Clear();
@@ -869,9 +932,13 @@ namespace Isles
             {
                 IState state = new StateConstruct(World, Builder, this);
                 if (World.Game.Input.IsShiftPressed)
+                {
                     Builder.QueuedStates.Enqueue(state);
+                }
                 else
+                {
                     Builder.State = state;
+                }
             }
         }
 
@@ -888,8 +955,8 @@ namespace Isles
     #region Tower
     public class Tower : Building
     {
-        SpellCombat combat;
-        GameObject currentTarget;
+        private readonly SpellCombat combat;
+        private GameObject currentTarget;
 
         public Tower(GameWorld world, string classID)
             : base(world, classID)
@@ -906,14 +973,16 @@ namespace Isles
             velocity.Normalize();
             velocity *= 75;
 
-            EffectFireball fireball = new EffectFireball(
+            var fireball = new EffectFireball(
                 World, TopCenter - Vector3.UnitZ * 5, velocity, target,
                 "Frost", "FrostExplosion");
             fireball.Projectile.Hit += new EventHandler(Hit);
             World.Add(fireball);
 
             if (ShouldDrawModel)
+            {
                 Audios.Play("FireballCast", this);
+            }
         }           
 
         public override void PerformAction(Entity entity, bool queueAction)
@@ -929,27 +998,35 @@ namespace Isles
                 if (IsOpponent(currentTarget) &&
                     combat.CanAttakTarget(currentTarget) &&
                     combat.TargetWithinRange(currentTarget))
+                {
                     combat.Cast(currentTarget);
+                }
                 else
+                {
                     currentTarget = StateAttack.FindAnotherTarget(World, this, null, combat);
+                }
 
                 if (combat != null)
+                {
                     combat.Update(gameTime);
+                }
             }
 
             base.Update(gameTime);
         }
 
-        void Hit(object sender, EventArgs e)
+        private void Hit(object sender, EventArgs e)
         {
-            IProjectile projectile = sender as IProjectile;
+            var projectile = sender as IProjectile;
 
             if (projectile != null && projectile.Target is GameObject)
             {
-                GameObject target = projectile.Target as GameObject;
+                var target = projectile.Target as GameObject;
 
                 if (target.ShouldDrawModel)
+                {
                     Audios.Play("FireballHit", target);
+                }
 
                 target.Health -= ComputeHit(this, target);
             }
@@ -966,13 +1043,17 @@ namespace Isles
         public void LiveOfNatureResearched()
         {
             foreach (Tree tree in EnumerateAffectedTrees())
+            {
                 tree.EverGreen = true;
+            }
         }
 
         protected override void OnComplete()
         {
             if (Owner != null && Owner.IsAvailable("LiveOfNature"))
+            {
                 LiveOfNatureResearched();
+            }
 
             base.OnComplete();
         }
@@ -982,12 +1063,14 @@ namespace Isles
             if (affectedTrees != null)
             {
                 foreach (Tree tree in EnumerateAffectedTrees())
+                {
                     tree.EverGreen = false;
+                }
             }
             base.OnDestroy();
         }
 
-        IEnumerable<Tree> EnumerateAffectedTrees()
+        private IEnumerable<Tree> EnumerateAffectedTrees()
         {
             if (affectedTrees == null)
             {
@@ -999,7 +1082,7 @@ namespace Isles
                 // Set nearby tree to evergreen
                 foreach (IWorldObject wo in World.GetNearbyObjects(Position, EffectRadius))
                 {
-                    Tree tree = wo as Tree;
+                    var tree = wo as Tree;
 
                     if (tree != null)
                     {
@@ -1018,7 +1101,7 @@ namespace Isles
             return affectedTrees;
         }
 
-        List<Tree> affectedTrees;
+        private List<Tree> affectedTrees;
     }
     #endregion
 }

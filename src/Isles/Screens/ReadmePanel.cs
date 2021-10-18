@@ -13,8 +13,6 @@ using System.IO;
 using Isles.Engine;
 using Isles.UI;
 
-
-
 namespace Isles.Screens
 {
     public class ReadmePanel : TipBox
@@ -22,40 +20,39 @@ namespace Isles.Screens
         /// <summary>
         /// Page titles
         /// </summary>
-        List<TextField> titles;
+        private readonly List<TextField> titles;
 
         /// <summary>
         /// Page contents
         /// </summary>
-        List<List<TextField>> contents;
+        private readonly List<List<TextField>> contents;
 
         /// <summary>
         /// Tatol page num
         /// </summary>
-        int pages = 0;
+        private readonly int pages = 0;
 
         /// <summary>
         /// Current page index
         /// </summary>
-        int currentPageIndex = 0;
+        private int currentPageIndex = 0;
 
         public int CurrentPageIndex
         {
-            get { return currentPageIndex;}
-            set 
-            { 
-                if(value >= 0 && value < pages)
+            get => currentPageIndex;
+            set
+            {
+                if (value >= 0 && value < pages)
+                {
                     currentPageIndex = value;
+                }
             }
         }
 
-        Button previousPage, nextPage;
-        Button ok;
+        private readonly Button previousPage, nextPage;
+        private readonly Button ok;
 
-        public Button OK
-        {
-            get { return ok; }
-        }
+        public Button OK => ok;
 
         /// <summary>
         /// Constructor
@@ -65,13 +62,13 @@ namespace Isles.Screens
         public ReadmePanel(Stream readmeText, Rectangle area)
             : base(area)
         {
-            this.DialogCornerWidth = 6;
+            DialogCornerWidth = 6;
 
-            Rectangle preButtonArea = new Rectangle(area.Width / 7, area.Height * 6 / 7,
+            var preButtonArea = new Rectangle(area.Width / 7, area.Height * 6 / 7,
                                                     area.Width / 7, area.Width / 21);
-            Rectangle nextButtonArea = new Rectangle(area.Width * 5 / 7, area.Height * 6 / 7,
+            var nextButtonArea = new Rectangle(area.Width * 5 / 7, area.Height * 6 / 7,
                                                     area.Width / 7, area.Width / 21);
-            Rectangle okButtonArea = new Rectangle(area.Width * 3 / 7, area.Height * 6 / 7,
+            var okButtonArea = new Rectangle(area.Width * 3 / 7, area.Height * 6 / 7,
                                                     area.Width / 7, area.Width / 21);
 
             #region deleted
@@ -99,25 +96,27 @@ namespace Isles.Screens
             nextPage.HotKey = Keys.Right;
             ok.HotKey = Keys.Space;
 
-            this.Add(previousPage);
-            this.Add(nextPage);
-            this.Add(ok);
+            Add(previousPage);
+            Add(nextPage);
+            Add(ok);
 
             previousPage.Click += delegate(object o, EventArgs e)
             {
                 Audios.Play("OK");
 
                 CurrentPageIndex--;
-                foreach (UIElement ui in this.elements)
+                foreach (UIElement ui in elements)
                 {
                     if (ui is TextField)
-                        this.Remove(ui);
+                    {
+                        Remove(ui);
+                    }
                 }
-                this.Add(titles[CurrentPageIndex]);
+                Add(titles[CurrentPageIndex]);
                 titles[CurrentPageIndex].ResetDestinationRectangle();
                 foreach (TextField t in contents[currentPageIndex])
                 {
-                    this.Add(t);
+                    Add(t);
                     t.ResetDestinationRectangle();
                 }
 
@@ -128,45 +127,50 @@ namespace Isles.Screens
                 Audios.Play("OK");
 
                 CurrentPageIndex++;
-                foreach (UIElement ui in this.elements)
+                foreach (UIElement ui in elements)
                 {
                     if (ui is TextField)
-                        this.Remove(ui);
+                    {
+                        Remove(ui);
+                    }
                 }
-                this.Add(titles[CurrentPageIndex]);
+                Add(titles[CurrentPageIndex]);
                 foreach (TextField t in contents[currentPageIndex])
                 {
-                    this.Add(t);
+                    Add(t);
                 }
             };
 
-            this.Mask = true;
+            Mask = true;
 
             // Set page title and content
 
             titles = new List<TextField>();
             contents = new List<List<TextField>>();
-            bool title = true;
+            var title = true;
             Color color = Color.White;
-            int fontSize = 16;
-            int heightOffset = 0;
+            var fontSize = 16;
+            var heightOffset = 0;
             TextField currentTitle = null, currentContent = null;
-            List<TextField> currentContentList = new List<TextField>();
-            Rectangle contentArea = new Rectangle(area.Width / 8, area.Height / 6,
+            var currentContentList = new List<TextField>();
+            var contentArea = new Rectangle(area.Width / 8, area.Height / 6,
                                                     area.Width * 3 / 4, area.Height * 9 / 14);
 
-            Rectangle titleArea = new Rectangle(area.Width / 20, area.Height / 20,
+            var titleArea = new Rectangle(area.Width / 20, area.Height / 20,
                                                 area.Width * 11 / 12, 30);
 
-            IOException ex = new IOException("The readme text is not well-formated.");
-            using(StreamReader sr = new StreamReader(readmeText))
+            var ex = new IOException("The readme text is not well-formated.");
+            using(var sr = new StreamReader(readmeText))
             {
                 String line;
                 while (null != (line = sr.ReadLine()))
                 {
                     line.Trim();
                     if (line.Length == 0)
+                    {
                         continue;
+                    }
+
                     if (line.StartsWith("$FontSize$"))
                     {
                         line = line.Substring(10);
@@ -176,16 +180,16 @@ namespace Isles.Screens
                     {
                         line = line.Substring(7);
                         line.Trim();
-                        string[] colorElements = line.Split(new char[] {'(', ')', ','}, 
+                        var colorElements = line.Split(new char[] {'(', ')', ','}, 
                                                         StringSplitOptions.RemoveEmptyEntries);
                         if (colorElements.Length != 3 && colorElements.Length != 4)
                         {
                             // Ill-formatted color tag, use white as defalut
                             color = Color.White;
                         }
-                        byte r = byte.Parse(colorElements[0]);
-                        byte g = byte.Parse(colorElements[1]);
-                        byte b = byte.Parse(colorElements[2]);
+                        var r = byte.Parse(colorElements[0]);
+                        var g = byte.Parse(colorElements[1]);
+                        var b = byte.Parse(colorElements[2]);
                         if (colorElements.Length == 3)
                         {
                             color = new Color(r, g, b);
@@ -201,7 +205,10 @@ namespace Isles.Screens
                         {
                             titles.Add(currentTitle);
                             if (currentContent != null)
+                            {
                                 currentContentList.Add(currentContent);
+                            }
+
                             contents.Add(currentContentList);
                             currentContentList = new List<TextField>();
                             currentContent = null;
@@ -221,7 +228,7 @@ namespace Isles.Screens
                             heightOffset += currentContent.RealHeight + 10;
                             currentContentList.Add(currentContent);
                         }
-                        Rectangle tempContentRect = new Rectangle(contentArea.X, contentArea.Y + heightOffset,
+                        var tempContentRect = new Rectangle(contentArea.X, contentArea.Y + heightOffset,
                                                                     contentArea.Width, contentArea.Height);
 
                         currentContent = new TextField(line.Substring(9), fontSize / 23f, color, tempContentRect);
@@ -246,10 +253,10 @@ namespace Isles.Screens
             pages = titles.Count;
             if (pages > 0)
             {
-                this.Add(titles[0]);
+                Add(titles[0]);
                 foreach (TextField t in contents[0])
                 {
-                    this.Add(t);
+                    Add(t);
                 }
             }
         }
@@ -261,7 +268,6 @@ namespace Isles.Screens
         {
             base.Draw(gameTime, sprite);
         }
-
 
         /// <summary>
         /// Event Handler
@@ -287,9 +293,14 @@ namespace Isles.Screens
             previousPage.Enabled = true;
             nextPage.Enabled = true;
             if (currentPageIndex == 0)
+            {
                 previousPage.Enabled = false;
+            }
+
             if (currentPageIndex == pages - 1)
-                nextPage.Enabled = false;            
+            {
+                nextPage.Enabled = false;
+            }
         }
     }
 }

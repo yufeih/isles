@@ -11,7 +11,6 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Isles.Engine;
 
-
 namespace Isles.Graphics
 {
     #region LandscapeReader
@@ -42,28 +41,24 @@ namespace Isles.Graphics
         /// </summary>
         public class Layer : IDisposable
         {
-            int patchGroup;
-            string technology;
-
-            Texture2D colorTexture;
-            Texture2D alphaTexture;
-            Texture2D normalTexture;
+            private readonly int patchGroup;
+            private string technology;
+            private Texture2D colorTexture;
+            private Texture2D alphaTexture;
+            private Texture2D normalTexture;
 
             /// <summary>
             /// Gets Which patch group the layer is in
             /// </summary>
-            public int PatchGroup
-            {
-                get { return patchGroup; }
-            }
+            public int PatchGroup => patchGroup;
 
             /// <summary>
             /// Gets or sets the technology used to render this layer
             /// </summary>
             public string Technology
             {
-                get { return technology; }
-                set { technology = value; }
+                get => technology;
+                set => technology = value;
             }
 
             /// <summary>
@@ -71,8 +66,8 @@ namespace Isles.Graphics
             /// </summary>
             public Texture2D ColorTexture
             {
-                get { return colorTexture; }
-                set { colorTexture = value; }
+                get => colorTexture;
+                set => colorTexture = value;
             }
 
             /// <summary>
@@ -84,8 +79,8 @@ namespace Isles.Graphics
             /// </remarks>
             public Texture2D AlphaTexture
             {
-                get { return alphaTexture; }
-                set { alphaTexture = value; }
+                get => alphaTexture;
+                set => alphaTexture = value;
             }
 
             /// <summary>
@@ -93,8 +88,8 @@ namespace Isles.Graphics
             /// </summary>
             public Texture2D NormalTexture
             {
-                get { return normalTexture; }
-                set { normalTexture = value; }
+                get => normalTexture;
+                set => normalTexture = value;
             }
 
             /// <summary>
@@ -133,11 +128,19 @@ namespace Isles.Graphics
                 if (disposing)
                 {
                     if (colorTexture != null)
+                    {
                         colorTexture.Dispose();
+                    }
+
                     if (alphaTexture != null)
+                    {
                         alphaTexture.Dispose();
+                    }
+
                     if (normalTexture != null)
+                    {
                         normalTexture.Dispose();
+                    }
                 }
             }
         }
@@ -151,12 +154,12 @@ namespace Isles.Graphics
         {
             #region Misc
 
-            int lod = 0;    // 0, 1, 2, 3, 4
-            int index, xIndex, yIndex;
-            bool visible = true;
-            BoundingBox boundingBox;
-            BaseLandscape landscape;
-            Vector3 center;
+            private int lod = 0;    // 0, 1, 2, 3, 4
+            private readonly int index, xIndex, yIndex;
+            private bool visible = true;
+            private BoundingBox boundingBox;
+            private readonly BaseLandscape landscape;
+            private Vector3 center;
 
             /// <summary>
             /// Gets or sets starting vertex index when filling patch indices
@@ -167,7 +170,7 @@ namespace Isles.Graphics
             public UInt32 StartingVertex = 0;
 #endif
 
-            static int i = 0;
+            private static int i = 0;
             /// <summary>
             /// Contruct a patch from content input
             /// </summary>
@@ -178,13 +181,13 @@ namespace Isles.Graphics
                 xIndex = index % landscape.PatchCountOnXAxis;
                 yIndex = index / landscape.PatchCountOnYAxis;
 
-                this.lod = (i++) % 5;
+                lod = (i++) % 5;
                 this.index = index;
                 this.landscape = landscape;
 
                 boundingBox = new BoundingBox(input.ReadVector3(), input.ReadVector3());
 
-                this.center = (boundingBox.Max + boundingBox.Max) / 2;
+                center = (boundingBox.Max + boundingBox.Max) / 2;
             }
 
             /// <summary>
@@ -194,14 +197,18 @@ namespace Isles.Graphics
             public bool UpdateLOD(Vector3 eye, float errorRatio)
             {
                 // Compute distance
-                float distance = Vector3.Distance(eye, center);
-                int newLOD = 4 - (int)(distance * errorRatio);
+                var distance = Vector3.Distance(eye, center);
+                var newLOD = 4 - (int)(distance * errorRatio);
 
                 // Clamp LOD value
                 if (newLOD < 0)
+                {
                     newLOD = 0;
+                }
                 else if (newLOD > 4)
+                {
                     newLOD = 4;
+                }
 
                 if (newLOD != lod)
                 {
@@ -215,18 +222,15 @@ namespace Isles.Graphics
             /// <summary>
             /// Gets patch center position
             /// </summary>
-            public Vector3 Center
-            {
-                get { return center; }
-            }
+            public Vector3 Center => center;
 
             /// <summary>
             /// Gets or sets patch visibility
             /// </summary>
             public bool Visible
             {
-                get { return visible; }
-                set { visible = value; }
+                get => visible;
+                set => visible = value;
             }
 
             public const int HighestLOD = 4;
@@ -237,41 +241,29 @@ namespace Isles.Graphics
             /// </summary>
             public int LevelOfDetail
             {
-                get { return lod; }
-                set { lod = value; }
+                get => lod;
+                set => lod = value;
             }
 
             /// <summary>
             /// Gets index in all terrain patches
             /// </summary>
-            public int Index
-            {
-                get { return index; }
-            }
+            public int Index => index;
 
             /// <summary>
             /// Gets the patch index on the x axis
             /// </summary>
-            public int IndexOnXAxis
-            {
-                get { return xIndex; }
-            }
+            public int IndexOnXAxis => xIndex;
 
             /// <summary>
             /// Gets the patch index on the y axis
             /// </summary>
-            public int IndexOnYAxis
-            {
-                get { return yIndex; }
-            }
+            public int IndexOnYAxis => yIndex;
 
             /// <summary>
             /// Gets patch bounding box
             /// </summary>
-            public BoundingBox BoundingBox
-            {
-                get { return boundingBox; }
-            }
+            public BoundingBox BoundingBox => boundingBox;
 
             #endregion
 
@@ -291,7 +283,7 @@ namespace Isles.Graphics
                                                      SetVertex setVertex)
             {
                 int x, y, xPatch, yPatch, lowerLOD, t, k;
-                for (int i = 0; i < MagicVertices[lod].Length; i++)
+                for (var i = 0; i < MagicVertices[lod].Length; i++)
                 {
                     xPatch = (int)MagicVertices[lod][i] % (MaxPatchResolution + 1);
                     yPatch = (int)MagicVertices[lod][i] / (MaxPatchResolution + 1);
@@ -366,15 +358,21 @@ namespace Isles.Graphics
             /// <returns>Number of indices added to the list</returns>
             public UInt16 FillIndices16(ref UInt16[] indices, uint baseIndex)
             {
-                for (int i = 0; i < MagicIndices[lod].Length; i++)
+                for (var i = 0; i < MagicIndices[lod].Length; i++)
+                {
                     indices[baseIndex++] = (UInt16)(MagicIndices[lod][i] + StartingVertex);
+                }
+
                 return (UInt16)MagicIndices[lod].Length;
             }
 
             public UInt32 FillIndices32(ref UInt32[] indices, uint baseIndex)
             {
-                for (int i = 0; i < MagicIndices[lod].Length; i++)
+                for (var i = 0; i < MagicIndices[lod].Length; i++)
+                {
                     indices[baseIndex++] = (UInt32)(MagicIndices[lod][i] + StartingVertex);
+                }
+
                 return (UInt32)MagicIndices[lod].Length;
             }
 
@@ -388,14 +386,14 @@ namespace Isles.Graphics
             public const int MaxPatchResolution = 16;
 
             // Vertices
-            static readonly uint[] Vertices0 = new uint[] { 0, 16, 272, 288 };
-            static readonly uint[] Vertices1 = new uint[] { 0, 8, 16, 136, 144, 152, 272, 280, 288 };
-            static readonly uint[] Vertices2 = new uint[]
+            private static readonly uint[] Vertices0 = new uint[] { 0, 16, 272, 288 };
+            private static readonly uint[] Vertices1 = new uint[] { 0, 8, 16, 136, 144, 152, 272, 280, 288 };
+            private static readonly uint[] Vertices2 = new uint[]
             {
                 0, 4, 8, 12, 16, 68, 72, 76, 80, 84, 136, 140, 144, 148, 152,
                 204, 208, 212, 216, 220, 272, 276, 280, 284, 288
             };
-            static readonly uint[] Vertices3 = new uint[]
+            private static readonly uint[] Vertices3 = new uint[]
             { 
                 0, 2, 4, 6, 8, 10, 12, 14, 16, 34, 36, 38, 40, 42, 44, 46, 48, 50, 68, 70, 72,
                 74, 76, 78, 80, 82, 84, 102, 104, 106, 108, 110, 112, 114, 116, 118, 136, 138,
@@ -403,7 +401,7 @@ namespace Isles.Graphics
                 204, 206, 208, 210, 212, 214, 216, 218, 220, 238, 240, 242, 244, 246, 248, 250,
                 252, 254, 272, 274, 276, 278, 280, 282, 284, 286, 288
             };
-            static readonly uint[] Vertices4 = new uint[]
+            private static readonly uint[] Vertices4 = new uint[]
             { 
                 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22
                 , 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42
@@ -425,12 +423,12 @@ namespace Isles.Graphics
             };
 
             // Indices
-            static readonly UInt32[] Indices0 = new UInt32[] { 0, 1, 3, 0, 3, 2 };
-            static readonly UInt32[] Indices1 = new UInt32[]
+            private static readonly UInt32[] Indices0 = new UInt32[] { 0, 1, 3, 0, 3, 2 };
+            private static readonly UInt32[] Indices1 = new UInt32[]
             {
                 0, 1, 4, 0, 4, 3, 1, 2, 5, 1, 5, 4, 3, 4, 7, 3, 7, 6, 4, 5, 8, 4, 8, 7
             };
-            static readonly UInt32[] Indices2 = new UInt32[]
+            private static readonly UInt32[] Indices2 = new UInt32[]
             {
                 0, 1, 6, 0, 6, 5, 1, 2, 7, 1, 7, 6, 2, 3, 8, 2, 8, 7, 3, 4, 9, 3, 9, 8, 5, 6, 11
                 , 5, 11, 10, 6, 7, 12, 6, 12, 11, 7, 8, 13, 7, 13, 12, 8, 9, 14, 8, 14, 13, 10,
@@ -438,7 +436,7 @@ namespace Isles.Graphics
                 13, 19, 18, 15, 16, 21, 15, 21, 20, 16, 17, 22, 16, 22, 21, 17, 18, 23, 17, 23,
                 22, 18, 19, 24, 18, 24, 23
             };
-            static readonly UInt32[] Indices3 = new UInt32[]
+            private static readonly UInt32[] Indices3 = new UInt32[]
             { 
                 0, 1, 10, 0, 10, 9, 1, 2, 11, 1, 11, 10, 2, 3, 12, 2, 12, 11, 3, 4, 13, 3, 13, 
                 12, 4, 5, 14, 4, 14, 13, 5, 6, 15, 5, 15, 14, 6, 7, 16, 6, 16, 15, 7, 8, 17, 7, 
@@ -460,7 +458,7 @@ namespace Isles.Graphics
                 73, 65, 66, 75, 65, 75, 74, 66, 67, 76, 66, 76, 75, 67, 68, 77, 67, 77, 76, 68,
                 69, 78, 68, 78, 77, 69, 70, 79, 69, 79, 78, 70, 71, 80, 70, 80, 79
             };
-            static readonly UInt32[] Indices4 = new UInt32[]
+            private static readonly UInt32[] Indices4 = new UInt32[]
             { 
                 0, 1, 18, 0, 18, 17, 1, 2, 19, 1, 19, 18, 2, 3, 20, 2, 20, 19, 3, 4, 21, 3, 21,
                 20, 4, 5, 22, 4, 22, 21, 5, 6, 23, 5, 23, 22, 6, 7, 24, 6, 24, 23, 7, 8, 25, 7,
@@ -555,12 +553,10 @@ namespace Isles.Graphics
             };
 
             // Vertices & Indices
-            static readonly uint[][] MagicVertices = new uint[][] { Vertices0, Vertices1, Vertices2, Vertices3, Vertices4 };
-
-            static readonly UInt32[][] MagicIndices = new UInt32[][] { Indices0, Indices1, Indices2, Indices3, Indices4 };
-
-            static readonly int[] MagicBase = new int[] { 1, 2, 4, 8, 16 };
-            static readonly int[] MagicLength = new int[] { 16, 8, 4, 2, 1 };
+            private static readonly uint[][] MagicVertices = new uint[][] { Vertices0, Vertices1, Vertices2, Vertices3, Vertices4 };
+            private static readonly UInt32[][] MagicIndices = new UInt32[][] { Indices0, Indices1, Indices2, Indices3, Indices4 };
+            private static readonly int[] MagicBase = new int[] { 1, 2, 4, 8, 16 };
+            private static readonly int[] MagicLength = new int[] { 16, 8, 4, 2, 1 };
 
             #endregion
         }
@@ -572,136 +568,95 @@ namespace Isles.Graphics
         /// </summary>
         protected BaseGame game;
 
-
         /// <summary>
         /// Graphics device
         /// </summary>
         protected GraphicsDevice graphics;
 
-
         /// <summary>
         /// Gets terrain size (x, y, z)
         /// </summary>
-        public Vector3 Size
-        {
-            get { return size; }
-        }
+        public Vector3 Size => size;
 
-        Vector3 size;
-
+        private Vector3 size;
 
         /// <summary>
         /// Gets the heightfield data of the landscape
         /// </summary>
-        public float[,] HeightField
-        {
-            get { return heightField; }
-        }
+        public float[,] HeightField => heightField;
 
-        float[,] heightField;
-
+        private float[,] heightField;
 
         /// <summary>
         /// Gets the normal field of the landscape
         /// </summary>
-        public Vector3[,] NormalField
-        {
-            get { return normalField; }
-        }
+        public Vector3[,] NormalField => normalField;
 
-        Vector3[,] normalField;
+        private Vector3[,] normalField;
 
         /// <summary>
         /// Gets the tangent field of the landscape
         /// </summary>
-        public Vector3[,] TangentField
-        {
-            get { return tangentData; }
-        }
+        public Vector3[,] TangentField => tangentData;
 
-        Vector3[,] tangentData;
+        private Vector3[,] tangentData;
 
         /// <summary>
         /// Gets the terrain bounding box
         /// </summary>
-        public BoundingBox TerrainBoundingBox
-        {
-            get { return terrainBoundingBox; }
-        }
+        public BoundingBox TerrainBoundingBox => terrainBoundingBox;
 
-        BoundingBox terrainBoundingBox;
+        private BoundingBox terrainBoundingBox;
 
         /// <summary>
         /// Gets the number of patches on the x axis
         /// </summary>
-        public int PatchCountOnXAxis
-        {
-            get { return xPatchCount; }
-        }
+        public int PatchCountOnXAxis => xPatchCount;
 
         /// <summary>
         /// Gets the number of patches on the y axis
         /// </summary>
-        public int PatchCountOnYAxis
-        {
-            get { return yPatchCount; }
-        }
+        public int PatchCountOnYAxis => yPatchCount;
 
         /// <summary>
         /// Describes the patch count
         /// </summary>
-        int xPatchCount, yPatchCount;
-
-        List<Layer> layers = new List<Layer>();
+        private int xPatchCount, yPatchCount;
+        private List<Layer> layers = new();
 
         /// <summary>
         /// All terrain layers
         /// </summary>
-        public List<Layer> Layers
-        {
-            get { return layers; }
-        }
+        public List<Layer> Layers => layers;
 
         /// <summary>
         /// Patch groups
         /// </summary>
-        public List<int>[] PatchGroups
-        {
-            get { return patchGroups; }
-        }
+        public List<int>[] PatchGroups => patchGroups;
 
-        List<int>[] patchGroups;
+        private List<int>[] patchGroups;
 
         /// <summary>
         /// Gets terrain patches
         /// </summary>
-        public List<Patch> Patches
-        {
-            get { return patches; }
-        }
+        public List<Patch> Patches => patches;
 
-        List<Patch> patches;
+        private List<Patch> patches;
 
         /// <summary>
         /// Describes the size of heightfield
         /// </summary>
-        int gridCountOnXAxis, gridCountOnYAxis;
+        private int gridCountOnXAxis, gridCountOnYAxis;
 
         /// <summary>
         /// Gets the width of grid
         /// </summary>
-        public int GridCountOnXAxis
-        {
-            get { return gridCountOnXAxis; }
-        }
+        public int GridCountOnXAxis => gridCountOnXAxis;
 
         /// <summary>
         /// Gets the height of grid
         /// </summary>
-        public int GridCountOnYAxis
-        {
-            get { return gridCountOnYAxis; }
-        }
+        public int GridCountOnYAxis => gridCountOnYAxis;
         #endregion
 
         #region Method
@@ -719,58 +674,76 @@ namespace Isles.Graphics
             gridCountOnXAxis = input.ReadInt32();
             gridCountOnYAxis = input.ReadInt32();
             heightField = new float[gridCountOnXAxis, gridCountOnYAxis];
-            for (int y = 0; y < gridCountOnYAxis; y++)
-                for (int x = 0; x < gridCountOnXAxis; x++)
+            for (var y = 0; y < gridCountOnYAxis; y++)
+            {
+                for (var x = 0; x < gridCountOnXAxis; x++)
                 {
                     // Remember how we write heighfield data
                     heightField[x, y] = input.ReadSingle();
 
                     // TEST: Lower vertices under water
                     if (heightField[x, y] < 0)
+                    {
                         heightField[x, y] *= 1.4f;
+                    }
                 }
+            }
 
             // Normals
             normalField = new Vector3[gridCountOnXAxis, gridCountOnYAxis];
-            for (int y = 0; y < gridCountOnYAxis; y++)
-                for (int x = 0; x < gridCountOnXAxis; x++)
+            for (var y = 0; y < gridCountOnYAxis; y++)
+            {
+                for (var x = 0; x < gridCountOnXAxis; x++)
+                {
                     normalField[x, y] = input.ReadVector3();
+                }
+            }
 
             // Tangents
             tangentData = new Vector3[GridCountOnXAxis, GridCountOnYAxis];
-            for (int y = 0; y < GridCountOnYAxis; y++)
-                for (int x = 0; x < GridCountOnXAxis; x++)
+            for (var y = 0; y < GridCountOnYAxis; y++)
+            {
+                for (var x = 0; x < GridCountOnXAxis; x++)
+                {
                     tangentData[x, y] = input.ReadVector3();
+                }
+            }
 
             // Patches
             xPatchCount = input.ReadInt32();
             yPatchCount = input.ReadInt32();
             patches = new List<Patch>(PatchCountOnXAxis * PatchCountOnYAxis);
-            for (int i = 0; i < PatchCountOnXAxis * PatchCountOnYAxis; i++)
+            for (var i = 0; i < PatchCountOnXAxis * PatchCountOnYAxis; i++)
+            {
                 patches.Add(new Patch(input, i, this));
+            }
 
             // Patch groups
-            int patchGroupCount = input.ReadInt32();
+            var patchGroupCount = input.ReadInt32();
             patchGroups = new List<int>[patchGroupCount];
-            for (int i = 0; i < patchGroupCount; i++)
+            for (var i = 0; i < patchGroupCount; i++)
             {
-                int n = input.ReadInt32();
+                var n = input.ReadInt32();
                 patchGroups[i] = new List<int>(n);
-                for (int k = 0; k < n; k++)
+                for (var k = 0; k < n; k++)
+                {
                     patchGroups[i].Add(input.ReadInt32());
+                }
             }
 
             // Layers
-            int layerCount = input.ReadInt32();
+            var layerCount = input.ReadInt32();
             layers = new List<Layer>(layerCount);
-            for (int i = 0; i < layerCount; i++)
+            for (var i = 0; i < layerCount; i++)
+            {
                 layers.Add(new Layer(input));
+            }
         }
 
         public virtual void Initialize(BaseGame game)
         {
             this.game = game;
-            this.graphics = game.GraphicsDevice;
+            graphics = game.GraphicsDevice;
         }
 
         /// <summary>
@@ -804,10 +777,7 @@ namespace Isles.Graphics
                 (int)(y * (gridCountOnYAxis - 1) / size.Y));
         }
 
-        public Point GridCount
-        {
-            get { return new Point(gridCountOnXAxis, gridCountOnYAxis); }
-        }
+        public Point GridCount => new Point(gridCountOnXAxis, gridCountOnYAxis);
 
         /// <summary>
         /// Gets the landscape size.Z of a given point on the heightfield
@@ -839,14 +809,22 @@ namespace Isles.Graphics
             // Grabbed and modified from racing game
             // We don't want to cause any exception here
             if (x < 0)
+            {
                 x = 0;
+            }
             else if (x >= size.X)
+            {
                 x = size.X - 1;  // x can't be heightfieldWidth-1
+            }
             // or there'll be an out of range
             if (y < 0)          // exception. So is y.
+            {
                 y = 0;
+            }
             else if (y >= size.Y)
+            {
                 y = size.Y - 1;
+            }
 
             // Rescale to our heightfield dimensions
             x *= (gridCountOnXAxis - 1) / size.X;
@@ -858,11 +836,11 @@ namespace Isles.Graphics
                 fY = y - ((float)((int)y));
 
             // Interpolate the current position
-            int ix2 = (int)x;
-            int iy2 = (int)y;
+            var ix2 = (int)x;
+            var iy2 = (int)y;
 
-            int ix1 = ix2 + 1;
-            int iy1 = iy2 + 1;
+            var ix1 = ix2 + 1;
+            var iy1 = iy2 + 1;
 
             if (fX + fY > 1) // opt. version
             {
@@ -886,7 +864,7 @@ namespace Isles.Graphics
             //  |   \
             //  |    \
             //  2_____3
-            float height =
+            var height =
                 heightField[ix2, iy2] + // 2
                 fX * (heightField[ix1, iy2] - heightField[ix2, iy2]) +    // 3
                 fY * (heightField[ix2, iy1] - heightField[ix2, iy2]); // 0
@@ -916,14 +894,22 @@ namespace Isles.Graphics
         {
             // We don't want to cause any exception here
             if (x < 0)
+            {
                 x = 0;
+            }
             else if (x >= size.X)
+            {
                 x = size.X - 1;     // x can't be heightfieldWidth-1
+            }
             // or there'll be an out of range
             if (y < 0)              // exception. So is y.
+            {
                 y = 0;
+            }
             else if (y >= size.Y)
+            {
                 y = size.Y - 1;
+            }
 
             // Rescale to our heightfield dimensions
             x *= (gridCountOnXAxis - 1) / size.X;
@@ -935,15 +921,15 @@ namespace Isles.Graphics
                 fY = y - ((float)((int)y));
 
             // Interpolate the current position
-            int ix2 = (int)x;
-            int iy2 = (int)y;
+            var ix2 = (int)x;
+            var iy2 = (int)y;
 
-            int ix1 = ix2 + 1;
-            int iy1 = iy2 + 1;
+            var ix1 = ix2 + 1;
+            var iy1 = iy2 + 1;
 
             // Perform bilinear interpolation instead of spliting triangles :)
-            Vector3 a = Vector3.Lerp(normalField[ix2, iy2], normalField[ix2, iy1], fY);
-            Vector3 b = Vector3.Lerp(normalField[ix1, iy2], normalField[ix1, iy1], fY);
+            var a = Vector3.Lerp(normalField[ix2, iy2], normalField[ix2, iy1], fY);
+            var b = Vector3.Lerp(normalField[ix1, iy2], normalField[ix1, iy1], fY);
 
             return Vector3.Lerp(a, b, fX);
         }
@@ -951,17 +937,14 @@ namespace Isles.Graphics
         /// <summary>
         /// Cached pick position. Remember to set it to null each frame.
         /// </summary>
-        Vector3? picked = null;
+        private Vector3? picked = null;
 
         /// <summary>
         /// Gets the current point of the terrain picked by the cursor
         /// </summary>
         public Vector3? Pick()
         {
-            if (picked != null)
-                return picked;
-
-            return Intersects(game.PickRay);
+            return picked != null ? picked : Intersects(game.PickRay);
         }
 
         /// <summary>
@@ -972,7 +955,7 @@ namespace Isles.Graphics
         /// </remarks>
         /// <param name="ray"></param>
         /// <returns>Intersection point or null if there's no intersection</returns>
-        Nullable<Vector3> Intersects(Ray ray, ref List<VertexPositionColor> track)
+        private Vector3? Intersects(Ray ray, ref List<VertexPositionColor> track)
         {
             // Get two vertices to draw a line through the
             // heightfield.
@@ -981,13 +964,13 @@ namespace Isles.Graphics
             // 2. Compute the 2 intersections of the ray and
             //    terrain bounding box (Projected)
             // 3. Find the 2 points to draw
-            int i = 0;
-            Vector3[] points = new Vector3[2];
+            var i = 0;
+            var points = new Vector3[2];
 
             // Line equation: y = k * (x - x0) + y0
-            float k = ray.Direction.Y / ray.Direction.X;
-            float invK = ray.Direction.X / ray.Direction.Y;
-            float r = ray.Position.Y - ray.Position.X * k;
+            var k = ray.Direction.Y / ray.Direction.X;
+            var invK = ray.Direction.X / ray.Direction.Y;
+            var r = ray.Position.Y - ray.Position.X * k;
             if (r >= 0 && r <= size.Y)
             {
                 points[i++] = new Vector3(0, r,
@@ -1005,24 +988,30 @@ namespace Isles.Graphics
             {
                 r = ray.Position.X - ray.Position.Y * invK;
                 if (r >= 0 && r <= size.X)
+                {
                     points[i++] = new Vector3(r, 0,
                         ray.Position.Z - ray.Position.Y *
                         ray.Direction.Z / ray.Direction.Y);
+                }
             }
             if (i < 2)
             {
                 r = ray.Position.X + (size.Y - ray.Position.Y) * invK;
                 if (r >= 0 && r <= size.X)
+                {
                     points[i++] = new Vector3(r, size.Y,
                         ray.Position.Z + (size.Y - ray.Position.Y) *
                         ray.Direction.Z / ray.Direction.Y);
+                }
             }
             if (i < 2)
+            {
                 return null;
+            }
 
             // When ray position is inside the box, it should be one
             // of the starting point
-            bool inside = ray.Position.X > 0 && ray.Position.X < size.X &&
+            var inside = ray.Position.X > 0 && ray.Position.X < size.X &&
                           ray.Position.Y > 0 && ray.Position.Y < size.Y;
 
             Vector3 v1 = Vector3.Zero, v2 = Vector3.Zero;
@@ -1054,7 +1043,6 @@ namespace Isles.Graphics
                 }
             }
 
-
             //Log.NewLine();
             //Log.Write("v1: " + v1, false);
             //Log.Write("v2: " + v2, false);
@@ -1070,13 +1058,13 @@ namespace Isles.Graphics
             Point p1 = PositionToGrid(v1.X, v1.Y);
             Point p2 = PositionToGrid(v2.X, v2.Y);
 
-            bool invert = false;
-            int x = p1.X;
-            int y = p1.Y;
-            int sx = p2.X - p1.X;
-            int sy = p2.Y - p1.Y;
-            int dx = Math.Abs(sx);
-            int dy = Math.Abs(sy);
+            var invert = false;
+            var x = p1.X;
+            var y = p1.Y;
+            var sx = p2.X - p1.X;
+            var sy = p2.Y - p1.Y;
+            var dx = Math.Abs(sx);
+            var dy = Math.Abs(sy);
 
             sx = (sx != 0) ? (sx > 0 ? 1 : -1) : 0;
             sy = (sy != 0) ? (sy > 0 ? 1 : -1) : 0;
@@ -1084,16 +1072,16 @@ namespace Isles.Graphics
             if (dy > dx)
             {
                 // Swap dx, dy
-                int t = dx;
+                var t = dx;
                 dx = dy;
                 dy = t;
                 invert = true;
             }
 
             // Init error term
-            int e = (dy << 1) - dx;
+            var e = (dy << 1) - dx;
 
-            int n = dx;
+            var n = dx;
             dx = dx * 2;
             dy = dy * 2;
 
@@ -1105,13 +1093,13 @@ namespace Isles.Graphics
             //    (new Vector2(ray.Direction.X, ray.Direction.Y).Length());
             if (invert)
             {
-                Vector2 v = Vector2.Normalize(new Vector2(ray.Direction.X, ray.Direction.Z));
+                var v = Vector2.Normalize(new Vector2(ray.Direction.X, ray.Direction.Z));
                 v /= v.X;
                 dz = v.Y * size.X / (gridCountOnXAxis - 1) / v.X;
             }
             else
             {
-                Vector2 v = Vector2.Normalize(new Vector2(ray.Direction.Y, ray.Direction.Z));
+                var v = Vector2.Normalize(new Vector2(ray.Direction.Y, ray.Direction.Z));
                 v /= v.X;
                 dz = v.Y * size.Y / (gridCountOnYAxis - 1) / v.X;
             }
@@ -1133,17 +1121,17 @@ namespace Isles.Graphics
                     {
                         // Find the first intersection, we
                         // need a precise value of the position
-                        Vector3[] v = new Vector3[4];
+                        var v = new Vector3[4];
 
-                        Point min = new Point();
-                        Point max = new Point();
+                        var min = new Point();
+                        var max = new Point();
 
-                        int[] xDirection = new int[] { -1, 0, -1, 0 };
-                        int[] yDirection = new int[] { -1, -1, 0, 0 };
+                        var xDirection = new int[] { -1, 0, -1, 0 };
+                        var yDirection = new int[] { -1, -1, 0, 0 };
 
                         Point grid;
                         Vector3 ret;
-                        for (int m = 0; m < 4; m++)
+                        for (var m = 0; m < 4; m++)
                         {
                             min.X = x + xDirection[m];
                             min.Y = y + yDirection[m];
@@ -1160,8 +1148,8 @@ namespace Isles.Graphics
                                 GridToPosition(max.X, max.Y), heightField[max.X, max.Y]);
 
                             // Test the first triangles
-                            Plane plane = new Plane(v[0], v[1], v[3]);
-                            Nullable<float> result = ray.Intersects(plane);
+                            var plane = new Plane(v[0], v[1], v[3]);
+                            var result = ray.Intersects(plane);
                             if (result != null)
                             {
                                 ret = ray.Position + result.Value * ray.Direction;
@@ -1170,7 +1158,9 @@ namespace Isles.Graphics
                                 //Log.Write("Intersection: " + grid + "min: " + min + "max: " + max, false);
 
                                 if (grid.X == min.X || grid.Y == min.Y)
+                                {
                                     return ret;
+                                }
                             }
 
                             // Test the second triangle
@@ -1182,7 +1172,9 @@ namespace Isles.Graphics
                                 grid = PositionToGrid(ret.X, ret.Y);
 
                                 if (grid.X == min.X || grid.Y == min.Y)
+                                {
                                     return ret;
+                                }
                             }
                         }
 
@@ -1195,17 +1187,25 @@ namespace Isles.Graphics
                 while (e > 0)
                 {
                     if (invert)
+                    {
                         x = x + sx;
+                    }
                     else
+                    {
                         y = y + sy;
+                    }
 
                     e = e - dx;
                 }
 
                 if (invert)
+                {
                     y = y + sy;
+                }
                 else
+                {
                     x = x + sx;
+                }
 
                 e = e + dy;
                 z += dz;
@@ -1219,7 +1219,7 @@ namespace Isles.Graphics
         /// </summary>
         /// <param name="ray"></param>
         /// <returns>Intersection point or null if there's no intersection</returns>
-        public Nullable<Vector3> Intersects(Ray ray)
+        public Vector3? Intersects(Ray ray)
         {
             // Normalize ray direction
             ray.Direction.Normalize();
@@ -1231,13 +1231,13 @@ namespace Isles.Graphics
             // 2. Compute the 2 intersections of the ray and
             //    terrain bounding box (Projected)
             // 3. Find the 2 points to draw
-            int i = 0;
-            Vector3[] points = new Vector3[2];
+            var i = 0;
+            var points = new Vector3[2];
 
             // Line equation: y = k * (x - x0) + y0
-            float k = ray.Direction.Y / ray.Direction.X;
-            float invK = ray.Direction.X / ray.Direction.Y;
-            float r = ray.Position.Y - ray.Position.X * k;
+            var k = ray.Direction.Y / ray.Direction.X;
+            var invK = ray.Direction.X / ray.Direction.Y;
+            var r = ray.Position.Y - ray.Position.X * k;
             if (r >= 0 && r <= size.Y)
             {
                 points[i++] = new Vector3(0, r,
@@ -1255,24 +1255,30 @@ namespace Isles.Graphics
             {
                 r = ray.Position.X - ray.Position.Y * invK;
                 if (r >= 0 && r <= size.X)
+                {
                     points[i++] = new Vector3(r, 0,
                         ray.Position.Z - ray.Position.Y *
                         ray.Direction.Z / ray.Direction.Y);
+                }
             }
             if (i < 2)
             {
                 r = ray.Position.X + (size.Y - ray.Position.Y) * invK;
                 if (r >= 0 && r <= size.X)
+                {
                     points[i++] = new Vector3(r, size.Y,
                         ray.Position.Z + (size.Y - ray.Position.Y) *
                         ray.Direction.Z / ray.Direction.Y);
+                }
             }
             if (i < 2)
+            {
                 return null;
+            }
 
             // When ray position is inside the box, it should be one
             // of the starting point
-            bool inside = ray.Position.X > 0 && ray.Position.X < size.X &&
+            var inside = ray.Position.X > 0 && ray.Position.X < size.X &&
                           ray.Position.Y > 0 && ray.Position.Y < size.Y;
 
             Vector3 v1 = Vector3.Zero, v2 = Vector3.Zero;
@@ -1312,17 +1318,19 @@ namespace Isles.Graphics
             const float SamplePrecision = 5.0f;
             const int RefineSteps = 5;
 
-            float length = Vector3.Subtract(v2, v1).Length();
+            var length = Vector3.Subtract(v2, v1).Length();
             float current = 0;
 
-            Vector3[] point = new Vector3[2];
+            var point = new Vector3[2];
             Vector3 step = ray.Direction * SamplePrecision;
             point[0] = v1;
 
             while (current < length)
             {
                 if (GetHeight(point[0].X, point[0].Y) >= point[0].Z)
+                {
                     break;
+                }
 
                 point[0] += step;
                 current += SamplePrecision;
@@ -1340,9 +1348,13 @@ namespace Isles.Graphics
                     p = (point[0] + point[1]) * 0.5f;
 
                     if (GetHeight(p.X, p.Y) >= p.Z)
+                    {
                         point[0] = p;
+                    }
                     else
+                    {
                         point[1] = p;
+                    }
                 }
 
                 return p;

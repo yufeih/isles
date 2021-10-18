@@ -27,37 +27,37 @@ namespace Isles.Engine
         /// <summary>
         /// Windows cursor
         /// </summary>
-        Cursor cursor;
+        private Cursor cursor;
 
         /// <summary>
         /// XNA graphics device manager
         /// </summary>
-        GraphicsDeviceManager graphics;
+        private readonly GraphicsDeviceManager graphics;
 
         /// <summary>
         /// ZipContent manager
         /// </summary>
-        ZipContentManager content;
+        private readonly ZipContentManager content;
 
         /// <summary>
         /// Background color used to clear the scene
         /// </summary>
-        Color backgroundColor = Color.Black;// new Color(47, 62, 97);
+        private Color backgroundColor = Color.Black;// new Color(47, 62, 97);
 
         /// <summary>
         /// Game settings
         /// </summary>
-        Settings settings;
+        private Settings settings;
 
         /// <summary>
         /// Game camera interface
         /// </summary>
-        ICamera camera;
+        private ICamera camera;
 
         /// <summary>
         /// Cached matrices of this frame
         /// </summary>
-        Matrix
+        private Matrix
             view,
             projection,
             viewProjection,
@@ -68,102 +68,102 @@ namespace Isles.Engine
         /// <summary>
         /// view frustum of this frame
         /// </summary>
-        BoundingFrustum viewFrustum;
+        private BoundingFrustum viewFrustum;
 
         /// <summary>
         /// Ray casted from cursor
         /// </summary>
-        Ray pickRay = new Ray();
+        private Ray pickRay = new();
 
         /// <summary>
         /// Eye position of this frame
         /// </summary>
-        Vector3 eye;
-        
+        private Vector3 eye;
+
         /// <summary>
         /// Facing direction of this frame
         /// </summary>
-        Vector3 facing;
+        private Vector3 facing;
 
         /// <summary>
         /// Game profiler
         /// </summary>
-        Profiler profiler = new Profiler();
+        private Profiler profiler = new();
 
         /// <summary>
         /// Game screenshot capturer
         /// </summary>
-        ScreenshotCapturer screenshotCapturer;
+        private ScreenshotCapturer screenshotCapturer;
 
         /// <summary>
         /// Current game screen
         /// </summary>
-        IScreen currentScreen;
+        private IScreen currentScreen;
 
         /// <summary>
         /// All game screens
         /// </summary>
-        Dictionary<string, IScreen> screens = new Dictionary<string,IScreen>();
+        private readonly Dictionary<string, IScreen> screens = new();
 
         /// <summary>
         /// Game screen width and height
         /// </summary>
-        int screenWidth, screenHeight;
+        private int screenWidth, screenHeight;
 
         /// <summary>
         /// Billboard manager
         /// </summary>
-        BillboardManager billboard;
+        private BillboardManager billboard;
 
         /// <summary>
         /// Point sprite manager
         /// </summary>
-        PointSpriteManager pointSprite;
+        private PointSpriteManager pointSprite;
 
         /// <summary>
         /// Game model manager
         /// </summary>
-        ModelManager modelManager;
+        private ModelManager modelManager;
 
         /// <summary>
         /// Game 2D graphics
         /// </summary>
-        Graphics2D graphics2D;
+        private Graphics2D graphics2D;
 
         /// <summary>
         /// Store game time in this frame
         /// </summary>
-        GameTime currentGameTime;
+        private GameTime currentGameTime;
 
         /// <summary>
         /// GameSound
         /// </summary>
-        AudioManager sound;
+        private AudioManager sound;
 
         /// <summary>
         /// Game input
         /// </summary>
-        Input input;
+        private Input input;
 
         /// <summary>
         /// Shadow mapping effect
         /// </summary>
-        ShadowEffect shadow;
+        private ShadowEffect shadow;
 
         /// <summary>
         /// Post-screen bloom effect
         /// </summary>
-        BloomEffect bloom;
+        private BloomEffect bloom;
 
         /// <summary>
         /// Whether the game is paused
         /// </summary>
-        bool paused = false;
+        private bool paused = false;
 
         /// <summary>
         /// Gets or sets game speed
         /// </summary>
-        double gameSpeed = 1;
+        private double gameSpeed = 1;
         #endregion
 
         #region Properties
@@ -172,262 +172,178 @@ namespace Isles.Engine
         /// </summary>
         public Cursor Cursor
         {
-            get { return cursor; }
+            get => cursor;
             set
             {
-                Control control = Control.FromHandle(Window.Handle);
+                var control = Control.FromHandle(Window.Handle);
                 control.Cursor = cursor;
-                cursor = value; 
+                cursor = value;
             }
         }
 
         /// <summary>
         /// Gets content manager
         /// </summary>
-        public ZipContentManager ZipContent
-        {
-            get { return content; }
-        }
+        public ZipContentManager ZipContent => content;
 
         /// <summary>
         /// Gets game input
         /// </summary>
-        public Input Input
-        {
-            get { return input; }
-        }
+        public Input Input => input;
 
         /// <summary>
         /// Gets game sound
         /// </summary>
-        public AudioManager Audio
-        {
-            get { return sound; }
-        }
+        public AudioManager Audio => sound;
 
         /// <summary>
         /// Gets game profiler
         /// </summary>
-        public Profiler Profiler
-        {
-            get { return profiler; }
-        }
+        public Profiler Profiler => profiler;
 
         /// <summary>
         /// Gets game screenshot capturer
         /// </summary>
-        public ScreenshotCapturer ScreenshotCapturer
-        {
-            get { return screenshotCapturer; }
-        }
+        public ScreenshotCapturer ScreenshotCapturer => screenshotCapturer;
 
         /// <summary>
         /// Gets current game screen
         /// </summary>
-        public IScreen CurrentScreen
-        {
-            get { return currentScreen; }
-        }
+        public IScreen CurrentScreen => currentScreen;
 
         /// <summary>
         /// Gets game frame per second
         /// </summary>
-        public float FramePerSecond
-        {
-            get { return (float)profiler.FramesPerSecond; }
-        }
+        public float FramePerSecond => (float)profiler.FramesPerSecond;
 
         /// <summary>
         /// Gets Game camera
         /// </summary>
         public ICamera Camera
         {
-            get { return camera; }
-            set { camera = value; }
+            get => camera;
+            set => camera = value;
         }
 
         /// <summary>
         /// Gets view matrix
         /// </summary>
-        public Matrix View
-        {
-            get { return view; }
-        }
+        public Matrix View => view;
 
         /// <summary>
         /// Gets projection matrix
         /// </summary>
-        public Matrix Projection
-        {
-            get { return projection; }
-        }
+        public Matrix Projection => projection;
 
         /// <summary>
         /// Gets view projection matrix
         /// </summary>
-        public Matrix ViewProjection
-        {
-            get { return viewProjection; }
-        }
+        public Matrix ViewProjection => viewProjection;
 
         /// <summary>
         /// Gets view inverse matrix
         /// </summary>
-        public Matrix ViewInverse
-        {
-            get { return viewInverse; }
-        }
+        public Matrix ViewInverse => viewInverse;
 
         /// <summary>
         /// Gets projection inverse matrix
         /// </summary>
-        public Matrix ProjectionInverse
-        {
-            get { return projectionInverse; }
-        }
-        
+        public Matrix ProjectionInverse => projectionInverse;
+
         /// <summary>
         /// Gets view projection inverse matrix
         /// </summary>
-        public Matrix ViewProjectionInverse
-        {
-            get { return viewProjectionInverse; }
-        }
+        public Matrix ViewProjectionInverse => viewProjectionInverse;
 
         /// <summary>
         /// Gets current view frustum
         /// </summary>
-        public BoundingFrustum ViewFrustum
-        {
-            get { return viewFrustum; }
-        }
+        public BoundingFrustum ViewFrustum => viewFrustum;
 
         /// <summary>
         /// Gets the ray casted from current cursor position
         /// </summary>
-        public Ray PickRay
-        {
-            get { return pickRay; }
-        }
+        public Ray PickRay => pickRay;
 
         /// <summary>
         /// Gets the eye position of this frame
         /// </summary>
-        public Vector3 Eye
-        {
-            get { return eye; }
-        }
+        public Vector3 Eye => eye;
 
         /// <summary>
         /// Gets the facing direction of this frame
         /// </summary>
-        public Vector3 Facing
-        {
-            get { return facing; }
-        }
+        public Vector3 Facing => facing;
 
         /// <summary>
         /// Gets or sets Game settings
         /// </summary>
         public Settings Settings
         {
-            get { return settings; }
-            set { settings = value; }
+            get => settings;
+            set => settings = value;
         }
 
         public Color BackgroundColor
         {
-            get { return backgroundColor; }
-            set { backgroundColor = value; }
+            get => backgroundColor;
+            set => backgroundColor = value;
         }
 
         /// <summary>
         /// Gets Xna graphics device manager
         /// </summary>
-        public GraphicsDeviceManager Graphics
-        {
-            get { return graphics; }
-        }
+        public GraphicsDeviceManager Graphics => graphics;
 
         /// <summary>
         /// Gets screen width
         /// </summary>
-        public int ScreenWidth
-        {
-            get { return screenWidth; }
-        }
+        public int ScreenWidth => screenWidth;
 
         /// <summary>
         /// Gets screen height
         /// </summary>
-        public int ScreenHeight
-        {
-            get { return screenHeight; }
-        }
+        public int ScreenHeight => screenHeight;
 
         /// <summary>
         /// Gets game billboard manager
         /// </summary>
-        public BillboardManager Billboard
-        {
-            get { return billboard; }
-        }
+        public BillboardManager Billboard => billboard;
 
         /// <summary>
         /// Gets point sprite manager
         /// </summary>
-        public PointSpriteManager PointSprite
-        {
-            get { return pointSprite; }
-        }
+        public PointSpriteManager PointSprite => pointSprite;
 
         /// <summary>
         /// Gets game model manager
         /// </summary>
-        public ModelManager ModelManager
-        {
-            get { return modelManager; }
-        }
+        public ModelManager ModelManager => modelManager;
 
         /// <summary>
         /// Gets game 2D graphics
         /// </summary>
-        public Graphics2D Graphics2D
-        {
-            get { return graphics2D; }
-        }
+        public Graphics2D Graphics2D => graphics2D;
 
         /// <summary>
         /// Gets all game screens
         /// </summary>
-        public Dictionary<string, IScreen> Screens
-        {
-            get { return screens; }
-        }
+        public Dictionary<string, IScreen> Screens => screens;
 
         /// <summary>
         /// Gets current game time
         /// </summary>
-        public GameTime CurrentGameTime
-        {
-            get { return currentGameTime; }
-        }
+        public GameTime CurrentGameTime => currentGameTime;
 
         /// <summary>
         /// Gets game shadow effect
         /// </summary>
-        public ShadowEffect Shadow
-        {
-            get { return shadow; }
-        }
+        public ShadowEffect Shadow => shadow;
 
         /// <summary>
         /// Gets game bloom effect
         /// </summary>
-        public BloomEffect Bloom
-        {
-            get { return bloom; }
-        }
+        public BloomEffect Bloom => bloom;
 
         /// <summary>
         /// Gets whether the game is been paused
@@ -435,8 +351,8 @@ namespace Isles.Engine
         /// TODO: Fixe issues caused by pausing. (E.g., Timer)
         public bool Paused
         {
-            get { return paused; }
-            set { paused = value; }
+            get => paused;
+            set => paused = value;
         }
 
         /// <summary>
@@ -444,8 +360,8 @@ namespace Isles.Engine
         /// </summary>
         public double GameSpeed
         {
-            get { return gameSpeed; }
-            set { gameSpeed = value; }
+            get => gameSpeed;
+            set => gameSpeed = value;
         }
         #endregion
 
@@ -490,11 +406,15 @@ namespace Isles.Engine
             {
                 // Leave current screen
                 if (currentScreen != null)
+                {
                     currentScreen.Leave();
+                }
 
                 // Enter the new screen
                 if (newScreen != null)
+                {
                     newScreen.Enter();
+                }
 
                 // Set current screen
                 currentScreen = newScreen;
@@ -523,7 +443,9 @@ namespace Isles.Engine
         public void RemoveScreen(string name)
         {
             if (screens.Remove(name))
+            {
                 Log.Write("Screen Removed: " + name);
+            }
         }
 
         #endregion
@@ -538,7 +460,7 @@ namespace Isles.Engine
         {
             singleton = this;
 
-            Assembly assembly = Assembly.GetCallingAssembly();
+            var assembly = Assembly.GetCallingAssembly();
 
             // Initialize log
             Log.Initialize();
@@ -552,7 +474,10 @@ namespace Isles.Engine
 
             // Initialize settings
             if (settings == null)
+            {
                 settings = Settings.CreateDefaultSettings(null);
+            }
+
             this.settings = settings;
             gameSpeed = settings.GameSpeed;
 
@@ -590,10 +515,7 @@ namespace Isles.Engine
         /// actually the current game. Typically an app only creates 1 game instance, that won't
         /// be a problem most of the time.
         /// </remarks>
-        public static BaseGame Singleton
-        {
-            get { return singleton; }
-        }
+        public static BaseGame Singleton => singleton;
 
         private static BaseGame singleton;
 
@@ -672,7 +594,9 @@ namespace Isles.Engine
 
             // Notify all screens to load contents
             foreach (KeyValuePair<string, IScreen> screen in screens)
+            {
                 screen.Value.LoadContent();
+            }
 
             modelManager = new ModelManager();
             Log.Write("Model Manager Initialized...");
@@ -680,7 +604,7 @@ namespace Isles.Engine
             base.Initialize();
         }
 
-        void graphics_DeviceReset(object sender, EventArgs e)
+        private void graphics_DeviceReset(object sender, EventArgs e)
         {
             screenWidth = GraphicsDevice.Viewport.Width;
             screenHeight = GraphicsDevice.Viewport.Height;
@@ -724,7 +648,9 @@ namespace Isles.Engine
         {
             // Notify all screens to unload contents
             foreach (KeyValuePair<string, IScreen> screen in screens)
+            {
                 screen.Value.UnloadContent();
+            }
 
             //Content.Unload();
 
@@ -734,7 +660,7 @@ namespace Isles.Engine
         #endregion
 
         #region Update
-        bool initialized = false;
+        private bool initialized = false;
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input and playing audio.
@@ -753,8 +679,10 @@ namespace Isles.Engine
 
             // Do not update other stuff when the game is paused
             if (paused)
+            {
                 return;
-            
+            }
+
             // Update events
             Event.Update(gameTime);
 
@@ -781,7 +709,9 @@ namespace Isles.Engine
             
             // Update current screen
             if (currentScreen != null)
+            {
                 currentScreen.Update(gameTime);
+            }
 
             // Update particle system
             ParticleSystem.UpdateAll(gameTime);
@@ -867,7 +797,7 @@ namespace Isles.Engine
         //    pickRay.Direction = direction;
         //}
 
-        void UpdatePickRay()
+        private void UpdatePickRay()
         {
             MouseState mouseState = Mouse.GetState();
 
@@ -912,7 +842,7 @@ namespace Isles.Engine
         /// </summary>
         public Point Project(Vector3 position)
         {
-            Vector4 hPosition = Vector4.Transform(position, viewProjection);
+            var hPosition = Vector4.Transform(position, viewProjection);
             hPosition.X /= hPosition.W;
             hPosition.Y /= hPosition.W;
 
@@ -925,7 +855,7 @@ namespace Isles.Engine
         /// <summary>
         /// Update view/projection matrices
         /// </summary>
-        void UpdateMatrices()
+        private void UpdateMatrices()
         {
             if (camera != null)
             {
@@ -976,20 +906,26 @@ namespace Isles.Engine
 
             // Draw current screen
             if (currentScreen != null)
+            {
                 currentScreen.Draw(gameTime);
+            }
 
             if (modelManager != null)
+            {
                 modelManager.Present(gameTime);
+            }
 
             if (billboard != null)
+            {
                 billboard.Present(gameTime);
+            }
 
             ParticleSystem.Present(gameTime);
             
             if (pointSprite != null)
+            {
                 pointSprite.Present(gameTime);
-
-
+            }
 
             Graphics2D.Present();
 
@@ -997,7 +933,9 @@ namespace Isles.Engine
 
             // Take screen shot
             if (screenshotCapturer != null && screenshotCapturer.ShouldCapture)
+            {
                 screenshotCapturer.TakeScreenshot();
+            }
 
             GraphicsDevice.Vertices[0].SetSource(null, 0, 0);
             GraphicsDevice.Indices = null;
@@ -1012,17 +950,20 @@ namespace Isles.Engine
         {
             // Take screenshot
             if (type == EventType.KeyDown && (tag as Keys?).Value == Keys.PrintScreen)
+            {
                 screenshotCapturer.ShouldCapture = true;
+            }
 
             if (currentScreen != null &&
                 currentScreen.HandleEvent(type, sender, tag) == EventResult.Handled)
+            {
                 return EventResult.Handled;
+            }
 
-            if (camera != null &&
-                camera.HandleEvent(type, sender, tag) == EventResult.Handled)
-                return EventResult.Handled;
-
-            return EventResult.Unhandled;
+            return camera != null &&
+                camera.HandleEvent(type, sender, tag) == EventResult.Handled
+                ? EventResult.Handled
+                : EventResult.Unhandled;
         }
         #endregion
 
@@ -1033,17 +974,25 @@ namespace Isles.Engine
             if (disposing)
             {
                 if (profiler != null)
+                {
                     profiler.Dispose();
+                }
 
                 if (billboard != null)
+                {
                     billboard.Dispose();
+                }
 
                 if (shadow != null)
+                {
                     shadow.Dispose();
+                }
 
                 // Notify all screens to unload contents
                 foreach (KeyValuePair<string, IScreen> screen in screens)
+                {
                     screen.Value.Dispose();
+                }
             }
 
             base.Dispose(disposing);

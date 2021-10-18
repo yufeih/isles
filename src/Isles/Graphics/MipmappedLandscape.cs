@@ -19,9 +19,8 @@ namespace Isles.Graphics
         /// <summary>
         /// Effect for drawing surface
         /// </summary>
-        BasicEffect surfaceEffect;
-
-        VertexDeclaration surfaceDeclaraction;
+        private BasicEffect surfaceEffect;
+        private VertexDeclaration surfaceDeclaraction;
 
         /// <summary>
         /// Draw a texture on the landscape surface
@@ -38,39 +37,47 @@ namespace Isles.Graphics
             Point pMin = PositionToGrid(vMin.X, vMin.Y);
             Point pMax = PositionToGrid(vMax.X, vMax.Y);
 
-            pMax.X++; pMax.Y++;
+            pMax.X++;
+            pMax.Y++;
 
-            int width = pMax.X - pMin.X + 1;
-            int height = pMax.Y - pMin.Y + 1;
+            var width = pMax.X - pMin.X + 1;
+            var height = pMax.Y - pMin.Y + 1;
 
             int iIndex = 0, iVertex = 0;
-            int vertexCount = width * height;
-            int indexCount = (width - 1) * (height - 1) * 6; // Triangle list
+            var vertexCount = width * height;
+            var indexCount = (width - 1) * (height - 1) * 6; // Triangle list
 
-            VertexPositionTexture[] vertices = new VertexPositionTexture[vertexCount];
-            int[] indices = new int[indexCount];
+            var vertices = new VertexPositionTexture[vertexCount];
+            var indices = new int[indexCount];
 
             float z;
             Vector2 v;
 
             // Generate vertices
-            for (int y = pMin.Y; y <= pMax.Y; y++)
-                for (int x = pMin.X; x <= pMax.X; x++)
+            for (var y = pMin.Y; y <= pMax.Y; y++)
+            {
+                for (var x = pMin.X; x <= pMax.X; x++)
                 {
                     v = GridToPosition(x, y);
                     if (x >= 0 && x < GridCountOnXAxis &&
                         y >= 0 && y < GridCountOnYAxis && HeightField[x, y] > 0)
+                    {
                         z = HeightField[x, y] + 0.5f; // Offset a little bit :)
+                    }
                     else
+                    {
                         z = 0;
+                    }
 
                     vertices[iVertex++] = new VertexPositionTexture(
                         new Vector3(v, z), (v - vMin) / Size);
                 }
+            }
 
             // Generate indices
-            for (int y = 0; y < height - 1; y++)
-                for (int x = 0; x < width - 1; x++)
+            for (var y = 0; y < height - 1; y++)
+            {
+                for (var x = 0; x < width - 1; x++)
                 {
                     indices[iIndex++] = width * y + x;              // 0
                     indices[iIndex++] = width * y + x + 1;          // 1
@@ -79,6 +86,7 @@ namespace Isles.Graphics
                     indices[iIndex++] = width * (y + 1) + x + 1;    // 3
                     indices[iIndex++] = width * (y + 1) + x;        // 2
                 }
+            }
 
             // Finally draw the mesh
             surfaceEffect.Texture = texture;
@@ -102,7 +110,7 @@ namespace Isles.Graphics
             {
                 pass.Begin();
 
-                graphics.DrawUserIndexedPrimitives<VertexPositionTexture>(
+                graphics.DrawUserIndexedPrimitives(
                     PrimitiveType.TriangleList,
                     vertices, 0, vertexCount,
                     indices, 0, indexCount / 3);
@@ -120,46 +128,45 @@ namespace Isles.Graphics
         }
 
         #endregion
-        
+
         #region Fields
 
         /// <summary>
         /// Effect used to render the terrain
         /// </summary>
-        Effect terrainEffect;
+        private Effect terrainEffect;
 
         /// <summary>
         /// Terrain vertices
         /// </summary>
-        TerrainVertex[,] terrainVertices;
+        private TerrainVertex[,] terrainVertices;
 
         /// <summary>
         /// Terrain vertex buffer
         /// </summary>
-        VertexBuffer terrainVertexBuffer;
+        private VertexBuffer terrainVertexBuffer;
 
         /// <summary>
         /// Terrain index buffer set.
         /// One index buffer for each patch group.
         /// </summary>
-        List<IndexBuffer> terrainIndexBufferSet = new List<IndexBuffer>();
+        private readonly List<IndexBuffer> terrainIndexBufferSet = new();
 
         /// <summary>
         /// Terrain vertex declaration
         /// </summary>
-        VertexDeclaration terrainVertexDeclaration;
-
+        private VertexDeclaration terrainVertexDeclaration;
 
         /// <summary>
         /// Gets or sets the error ratio when computing terrain LOD
         /// </summary>
         public float TerrainErrorRatio
         {
-            get { return terrainErrorRatio; }
-            set { terrainErrorRatio = value; }
+            get => terrainErrorRatio;
+            set => terrainErrorRatio = value;
         }
 
-        float terrainErrorRatio = 0.0012f;
+        private float terrainErrorRatio = 0.0012f;
         #endregion
 
         #region Methods
@@ -169,7 +176,9 @@ namespace Isles.Graphics
         public override void DrawTerrain(Matrix view, Matrix projection, bool upper)
         {
             if (terrainVertexCount == 0 || Layers.Count <= 0)
+            {
                 return;
+            }
 
             graphics.VertexDeclaration = terrainVertexDeclaration;
             graphics.Vertices[0].SetSource(
@@ -189,7 +198,7 @@ namespace Isles.Graphics
             {
                 pass.Begin();
 
-                for (int i = 0; i < Layers.Count; i++)
+                for (var i = 0; i < Layers.Count; i++)
                 {
                     graphics.DrawIndexedPrimitives(
                         PrimitiveType.TriangleList,
@@ -207,7 +216,9 @@ namespace Isles.Graphics
         public override void DrawTerrain(GameTime gameTime, ShadowEffect shadow)
         {
             if (terrainVertexCount == 0)
+            {
                 return;
+            }
 
             // This code would go between a device 
             // BeginScene-EndScene block.
@@ -215,7 +226,7 @@ namespace Isles.Graphics
                 terrainVertexBuffer, 0, TerrainVertex.SizeInBytes);
             graphics.VertexDeclaration = terrainVertexDeclaration;
 
-            Matrix viewInv = Matrix.Invert(game.View);
+            var viewInv = Matrix.Invert(game.View);
             terrainEffect.Parameters["ViewInverse"].SetValue(viewInv);
             terrainEffect.Parameters["WorldViewProjection"].SetValue(game.ViewProjection);
             terrainEffect.Parameters["WorldView"].SetValue(game.View);
@@ -232,15 +243,15 @@ namespace Isles.Graphics
                     [game.Settings.NormalMappedTerrain ? "NormalMapping" : "Default"];
             }
 
-            int layerCount = 0;
-            int patchCount = 0;
+            var layerCount = 0;
+            var patchCount = 0;
 
             terrainEffect.Begin();
             foreach (EffectPass pass in terrainEffect.CurrentTechnique.Passes)
             {
                 pass.Begin();
 
-                for (int i = 0; i < Layers.Count; i++)
+                for (var i = 0; i < Layers.Count; i++)
                 {
                     // Disable alpha blending when drawing our first layer
                     graphics.RenderState.AlphaBlendEnable = true;//(i != 0);
@@ -279,8 +290,8 @@ namespace Isles.Graphics
         {
             base.Initialize(game);
 
-            this.surfaceEffect = new BasicEffect(graphics, null);
-            this.surfaceDeclaraction = new VertexDeclaration(
+            surfaceEffect = new BasicEffect(graphics, null);
+            surfaceDeclaraction = new VertexDeclaration(
                 graphics, VertexPositionTexture.VertexElements);
 
             terrainVertexDeclaration = new VertexDeclaration(
@@ -293,8 +304,9 @@ namespace Isles.Graphics
             terrainVertices =
                 new TerrainVertex[GridCountOnXAxis, GridCountOnYAxis];
 
-            for (int x = 0; x < GridCountOnXAxis; x++)
-                for (int y = 0; y < GridCountOnYAxis; y++)
+            for (var x = 0; x < GridCountOnXAxis; x++)
+            {
+                for (var y = 0; y < GridCountOnYAxis; y++)
                 {
                     terrainVertices[x, y] = new TerrainVertex(
                         // Position
@@ -308,6 +320,7 @@ namespace Isles.Graphics
                         TangentField[x, y]
                     );
                 }
+            }
 
             LoadManualContent();
         }
@@ -323,29 +336,27 @@ namespace Isles.Graphics
             return terrainVertices[x, y];
         }
 
-
 #if SHORTINDEX
         UInt16[] workingIndices;
 #else
-        UInt32[] workingIndices;
+        private UInt32[] workingIndices;
 #endif
 
-        TerrainVertex[] workingVertices;
+        private TerrainVertex[] workingVertices;
+        private uint terrainVertexCount;
+        private uint[] terrainIndexCount;
 
-        uint terrainVertexCount;
-        uint[] terrainIndexCount;
-
-        Vector3 GetVertexPosition(int x, int y)
+        private Vector3 GetVertexPosition(int x, int y)
         {
             return terrainVertices[x, y].Position;
         }
 
-        void SetVertexPosition(uint index, Vector3 position)
+        private void SetVertexPosition(uint index, Vector3 position)
         {
             workingVertices[index].Position = position;
         }
 
-        void SetVertex(uint index, int x, int y)
+        private void SetVertex(uint index, int x, int y)
         {
             workingVertices[index] = terrainVertices[x, y];
         }
@@ -361,7 +372,7 @@ namespace Isles.Graphics
             }
 
             terrainVertexCount = 0;
-            for (int i = 0; i < Patches.Count; i++)
+            for (var i = 0; i < Patches.Count; i++)
             {
                 if (Patches[i].Visible)
                 {
@@ -380,7 +391,7 @@ namespace Isles.Graphics
 
             if (terrainVertexCount > 0)
             {
-                terrainVertexBuffer.SetData<TerrainVertex>(
+                terrainVertexBuffer.SetData(
                     workingVertices, 0, (int)terrainVertexCount);
             }
         }
@@ -401,10 +412,10 @@ namespace Isles.Graphics
                 terrainIndexCount = new uint[PatchGroups.Length];
             }
 
-            for (int i = 0; i < PatchGroups.Length; i++)
+            for (var i = 0; i < PatchGroups.Length; i++)
             {
                 terrainIndexCount[i] = 0;
-                foreach (int index in PatchGroups[i])
+                foreach (var index in PatchGroups[i])
                 {
                     if (Patches[index].Visible)
                         terrainIndexCount[i] += Patches[index].
@@ -425,7 +436,7 @@ namespace Isles.Graphics
                     terrainIndexBufferSet[i].SetData<UInt16>(
                         workingIndices, 0, (int)terrainIndexCount[i]);
 #else
-                    terrainIndexBufferSet[i].SetData<UInt32>(
+                    terrainIndexBufferSet[i].SetData(
                         workingIndices, 0, (int)terrainIndexCount[i]);
 #endif
                 }
@@ -438,16 +449,24 @@ namespace Isles.Graphics
         protected virtual void DisposeTerrain()
         {
             if (terrainVertexBuffer != null)
+            {
                 terrainVertexBuffer.Dispose();
+            }
 
             if (terrainEffect != null)
+            {
                 terrainEffect.Dispose();
+            }
 
             foreach (IndexBuffer indexBuffer in terrainIndexBufferSet)
+            {
                 indexBuffer.Dispose();
+            }
 
             foreach (Layer layer in Layers)
+            {
                 layer.Dispose();
+            }
         }
 
         #endregion
@@ -466,38 +485,48 @@ namespace Isles.Graphics
             BoundingFrustum viewFrustum = game.ViewFrustum;
 
             bool visible;
-            bool LODChanged = false;
-            bool visibleAreaChanged = false;
-            bool visibleAreaEnlarged = false;
+            var LODChanged = false;
+            var visibleAreaChanged = false;
+            var visibleAreaEnlarged = false;
 
-            Vector3 eye = Vector3.Transform(Vector3.Zero, game.ViewInverse);
+            var eye = Vector3.Transform(Vector3.Zero, game.ViewInverse);
 
-            for (int i = 0; i < Patches.Count; i++)
+            for (var i = 0; i < Patches.Count; i++)
             {
                 // Perform a bounding box test on each terrain patch
                 visible = viewFrustum.Intersects(Patches[i].BoundingBox);
                 if (visible != Patches[i].Visible)
                 {
                     if (visible)
+                    {
                         visibleAreaEnlarged = true;
+                    }
+
                     visibleAreaChanged = true;
                     Patches[i].Visible = visible;
                 }
 
                 // Update patch LOD if patch visibility has changed
                 if (Patches[i].UpdateLOD(eye, terrainErrorRatio))
+                {
                     LODChanged = true;
+                }
             }
 
             // No need to update anything if visibility hasn't changed.
             // (That means terrain LOD hasn't changed too)
             if (!visibleAreaChanged && !LODChanged)
+            {
                 return;
+            }
 
             // If patch LOD hasn't changed and the visible area
             // isn't enlarged, we only need to update index buffers :)
             if (LODChanged || visibleAreaEnlarged)
+            {
                 UpdateTerrainVertexBuffer();
+            }
+
             UpdateTerrainIndexBufferSet();
         }
 
@@ -508,7 +537,7 @@ namespace Isles.Graphics
         /// <summary>
         /// Call this when device is reset
         /// </summary>
-        void LoadManualContent()
+        private void LoadManualContent()
         {
             // Initialize vertex buffer
             terrainVertexBuffer = new DynamicVertexBuffer(
@@ -518,13 +547,13 @@ namespace Isles.Graphics
                 BufferUsage.WriteOnly);
 
             // Initialize index buffer
-            for (int i = 0; i < PatchGroups.Length; i++)
+            for (var i = 0; i < PatchGroups.Length; i++)
             {
                 // Note we use 16 bit index buffer now.
                 // Some video card do not support 32 bit index buffer :(
                 // Using LOD control, we are likely to limit the number
                 // of 256 * 256 terrain triangles within 65535.
-                int elementCount = 6 * PatchGroups[i].Count *
+                var elementCount = 6 * PatchGroups[i].Count *
                     Patch.MaxPatchResolution * Patch.MaxPatchResolution;
 
 #if SHORTINDEX
@@ -546,13 +575,18 @@ namespace Isles.Graphics
         /// <summary>
         /// Call this when device is lost
         /// </summary>
-        void UnloadManualContent()
+        private void UnloadManualContent()
         {
             if (terrainVertexBuffer != null)
+            {
                 terrainVertexBuffer.Dispose();
+            }
 
             foreach (IndexBuffer indexBuffer in terrainIndexBufferSet)
+            {
                 indexBuffer.Dispose();
+            }
+
             terrainIndexBufferSet.Clear();
         }
 
@@ -592,30 +626,19 @@ namespace Isles.Graphics
             /// <summary>
             /// Stride Size, in XNA called SizeInBytes. I'm just conforming with that.
             /// </summary>
-            public static int SizeInBytes
-            {
-                // 4 bytes per float:
-                // 3 floats pos, 2 floats uv, 3 floats normal and 3 float tangent.
-                get { return 4 * (3 + 2 + 3 + 3); }
-            }
+            public static int SizeInBytes => 4 * (3 + 2 + 3 + 3);
 
             /// <summary>
             /// U texture coordinate
             /// </summary>
             /// <returns>Float</returns>
-            public float U
-            {
-                get { return TextureCoordinate.X; }
-            }
+            public float U => TextureCoordinate.X;
 
             /// <summary>
             /// V texture coordinate
             /// </summary>
             /// <returns>Float</returns>
-            public float V
-            {
-                get { return TextureCoordinate.Y; }
-            }
+            public float V => TextureCoordinate.Y;
             #endregion
 
             #region Constructor
@@ -671,7 +694,7 @@ namespace Isles.Graphics
             /// </summary>
             private static VertexElement[] GenerateVertexElements()
             {
-                VertexElement[] decl = new VertexElement[]
+                var decl = new VertexElement[]
                 {
                     // Construct new vertex declaration with tangent info
                     // First the normal stuff (we should already have that)
@@ -697,11 +720,9 @@ namespace Isles.Graphics
             public static bool IsTangentVertexDeclaration(
                 VertexElement[] declaration)
             {
-                if (declaration == null)
-                    throw new ArgumentNullException("declaration");
-
-                return
-                    declaration.Length == 4 &&
+                return declaration == null
+                    ? throw new ArgumentNullException("declaration")
+                    : declaration.Length == 4 &&
                     declaration[0].VertexElementUsage == VertexElementUsage.Position &&
                     declaration[1].VertexElementUsage ==
                     VertexElementUsage.TextureCoordinate &&

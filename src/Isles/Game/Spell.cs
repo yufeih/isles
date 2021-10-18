@@ -57,16 +57,17 @@ namespace Isles
             get
             {
                 if (texture == null || texture.IsDisposed)
+                {
                     texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/Icons");
+                }
+
                 return texture;
             }
         }
 
-        static Texture2D texture;
-
-
-        const int XCount = 8;
-        const int YCount = 8;
+        private static Texture2D texture;
+        private const int XCount = 8;
+        private const int YCount = 8;
 
         public static Icon FromTiledTexture(int n)
         {
@@ -81,20 +82,20 @@ namespace Isles
 
         public static Rectangle RectangeFromIndex(int n)
         {
-            int x = n % XCount;
-            int y = n / XCount;
-            int w = DefaultTexture.Width / XCount;
-            int h = DefaultTexture.Height / YCount;
+            var x = n % XCount;
+            var y = n / XCount;
+            var w = DefaultTexture.Width / XCount;
+            var h = DefaultTexture.Height / YCount;
             return new Rectangle(x * w, y * h, w, h);
         }
 
         public static Icon FromTiledTexture(
             int n, int xCount, int yCount, Texture2D texture)
         {
-            int x = n % xCount;
-            int y = n / xCount;
-            int w = texture.Width / xCount;
-            int h = texture.Height / yCount;
+            var x = n % xCount;
+            var y = n / xCount;
+            var w = texture.Width / xCount;
+            var h = texture.Height / yCount;
             return new Icon(texture, new Rectangle(x * w, y * h, w, h));
         }
     }
@@ -116,7 +117,7 @@ namespace Isles
         /// <summary>
         /// Spell creators
         /// </summary>
-        static Dictionary<string, Creator> creators = new Dictionary<string, Creator>();
+        private static readonly Dictionary<string, Creator> creators = new();
 
         /// <summary>
         /// Register a new spell
@@ -151,10 +152,9 @@ namespace Isles
         {
             Creator creator;
 
-            if (!creators.TryGetValue(spellTypeName, out creator))
-                throw new Exception("Failed to create spell, unknown spell type: " + spellTypeName);
-
-            return creator(world);
+            return !creators.TryGetValue(spellTypeName, out creator)
+                ? throw new Exception("Failed to create spell, unknown spell type: " + spellTypeName)
+                : creator(world);
         }
 
         /// <summary>
@@ -163,7 +163,9 @@ namespace Isles
         public static void Cast(Spell spell)
         {
             if (currentSpell == null && spell.Trigger())
+            {
                 currentSpell = spell;
+            }
         }
 
         /// <summary>
@@ -177,40 +179,42 @@ namespace Isles
         /// <summary>
         /// Gets the active spell
         /// </summary>
-        public static Spell CurrentSpell
-        {
-            get { return currentSpell; }
-        }
+        public static Spell CurrentSpell => currentSpell;
 
-        static Spell currentSpell;
+        private static Spell currentSpell;
         #endregion
 
         protected GameWorld world;
 
-
         public GameObject Owner
         {
-            get { return owner; }
-            set { owner = value; OnOwnerChanged(); }
+            get => owner;
+            set
+            {
+                owner = value;
+                OnOwnerChanged();
+            }
         }
 
         protected virtual void OnOwnerChanged() { }
 
-        GameObject owner;
+        private GameObject owner;
 
         public bool Enable
         {
-            get { return enable; }
+            get => enable;
 
             set
             {
                 enable = value;
                 if (spellButton != null)
+                {
                     spellButton.Visible = value;
+                }
             }
         }
 
-        bool enable = true;
+        private bool enable = true;
 
         public Spell(GameWorld world)
         {
@@ -224,9 +228,14 @@ namespace Isles
             // Initialize from xml element
             XmlElement xml;
             if (GameDefault.Singleton.WorldObjectDefaults.TryGetValue(classID, out xml))
+            {
                 Deserialize(xml);
+            }
+
             if (GameDefault.Singleton.SpellDefaults.TryGetValue(classID, out xml))
+            {
                 Deserialize(xml);
+            }
         }
 
         public virtual void Deserialize(XmlElement xml)
@@ -238,16 +247,24 @@ namespace Isles
             string value;
 
             if ((value = xml.GetAttribute("Icon")) != "")
+            {
                 Icon = Icon.FromTiledTexture(int.Parse(value));
+            }
 
             if ((value = xml.GetAttribute("Hotkey")) != "")
+            {
                 Hotkey = (Keys)Enum.Parse(typeof(Keys), value);
+            }
 
             if ((value = xml.GetAttribute("CoolDown")) != "")
+            {
                 CoolDown = float.Parse(value);
+            }
 
             if ((value = xml.GetAttribute("AutoCast")) != "")
+            {
                 AutoCast = bool.Parse(value);
+            }
         }
 
         /// <summary>
@@ -273,51 +290,50 @@ namespace Isles
         /// <summary>
         /// Gets whether the spell is ready for cast
         /// </summary>
-        public virtual bool Ready
-        {
-            get { return CoolDownElapsed >= CoolDown; }
-        }
+        public virtual bool Ready => CoolDownElapsed >= CoolDown;
 
         /// <summary>
         /// Gets the cool down time after the spell has been casted
         /// </summary>
         public virtual float CoolDown
         {
-            get { return coolDown; }
+            get => coolDown;
 
             set
             {
                 if (value < 0)
+                {
                     value = 0;
+                }
 
                 coolDown = value;
                 coolDownElapsed = coolDown;
             }
         }
 
-        float coolDown;
+        private float coolDown;
 
         /// <summary>
         /// Gets how many seconds elapsed after the spell has been casted
         /// </summary>
         public virtual float CoolDownElapsed
         {
-            get { return coolDownElapsed; }
-            set { coolDownElapsed = value; }
+            get => coolDownElapsed;
+            set => coolDownElapsed = value;
         }
 
-        float coolDownElapsed;
+        private float coolDownElapsed;
 
         /// <summary>
         /// Gets or sets whether auto cast is enable for this spell
         /// </summary>
         public virtual bool AutoCast
         {
-            get { return autoCast; }
-            set { autoCast = value; }
+            get => autoCast;
+            set => autoCast = value;
         }
 
-        bool autoCast;
+        private bool autoCast;
 
         /// <summary>
         /// Gets the button for this spell
@@ -338,7 +354,7 @@ namespace Isles
         }
 
         protected SpellButton spellButton;
-        TipBox spellTip;
+        private TipBox spellTip;
 
         /// <summary>
         /// Creates an UIElement for the spell
@@ -346,9 +362,11 @@ namespace Isles
         protected virtual SpellButton CreateUIElement(GameUI ui)
         {
             if (ui == null)
+            {
                 throw new ArgumentNullException();
+            }
 
-            int baseIcon = Icon.IndexFromRectangle(Icon.Region);
+            var baseIcon = Icon.IndexFromRectangle(Icon.Region);
             spellButton = new SpellButton();
             spellButton.Texture = Icon.Texture == null ? Icon.DefaultTexture : Icon.Texture;
             spellButton.SourceRectangle = Icon.Region;
@@ -359,15 +377,16 @@ namespace Isles
 
             spellButton.Click += new EventHandler(delegate(object sender, EventArgs e)
             {
-                Spell spell = (sender as Button).Tag as Spell;
+                var spell = (sender as Button).Tag as Spell;
 
                 if (spell == null)
+                {
                     throw new InvalidOperationException();
+                }
 
                 // Cast the spell
                 Spell.Cast(spell);
             });
-
 
             spellButton.Enter += new EventHandler(delegate(object sender, EventArgs e)
             {
@@ -381,7 +400,9 @@ namespace Isles
             spellButton.Leave += new EventHandler(delegate(object sender, EventArgs e)
             {
                 if (spellTip != null)
+                {
                     GameUI.Singleton.TipBoxContainer.Remove(spellTip);
+                }
             });
 
             return spellButton;
@@ -390,19 +411,24 @@ namespace Isles
         protected virtual TipBox CreateTipBox()
         {
             TextField content = null;
-            TextField title = new TextField(this.Name, 16f / 23, Color.Gold, 
+            var title = new TextField(Name, 16f / 23, Color.Gold, 
                                              new Rectangle(6, 6, 210, 30));
             if (Description != null && Description != "")
-                content = new TextField(this.Description, 15f/23, Color.White,
+            {
+                content = new TextField(Description, 15f/23, Color.White,
                                         new Rectangle(6, 30, 210, 100));
-            TipBox spellTip = new TipBox(222, title.RealHeight +
+            }
+
+            var spellTip = new TipBox(222, title.RealHeight +
                                         (content != null ? content.RealHeight : 0) + 20);
             spellTip.Add(title);
             if (content != null)
+            {
                 spellTip.Add(content);
+            }
+
             return spellTip;
         }
-
 
         public virtual void Update(GameTime gameTime)
         {
@@ -412,10 +438,14 @@ namespace Isles
                 coolDownElapsed += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
                 if (coolDownElapsed > coolDown)
+                {
                     coolDownElapsed = coolDown;
+                }
 
                 if (spellButton != null)
+                {
                     spellButton.Percentage = 100 * coolDownElapsed / coolDown;
+                }
             }
         }
 
@@ -457,7 +487,9 @@ namespace Isles
         public virtual void Cast()
         {
             if (Ready)
+            {
                 coolDownElapsed = 0;
+            }
         }
 
         /// <summary>
@@ -487,35 +519,34 @@ namespace Isles
         /// </summary>
         public int Count
         {
-            get { return count; }
-            set { count = value; }
+            get => count;
+            set => count = value;
         }
 
-        int count;
+        private int count;
 
         /// <summary>
         /// Gets or sets the percentage drawed over the button
         /// </summary>
         public float Percentage
         {
-            get { return percentage; }
-            set { percentage = value; }
+            get => percentage;
+            set => percentage = value;
         }
 
-        float percentage = 0;
+        private float percentage = 0;
 
         public bool ShowCount = true;
         public bool ShowPercentage = true;
-
-        bool autoCast = false;
+        private bool autoCast = false;
 
         /// <summary>
         /// Gets or sets whether the spell is autoReleasable
         /// </summary>
         public bool AutoCast
         {
-            get { return autoCast; }
-            set { autoCast = value; }
+            get => autoCast;
+            set => autoCast = value;
         }
         #endregion
 
@@ -524,15 +555,17 @@ namespace Isles
         /// The fade mask is divided into 5 parts to draw
         /// </summary>
         /// <param name="sprite"></param>
-        void DrawFade()
+        private void DrawFade()
         {
             if (percentage <= 0)
+            {
                 return;
+            }
 
-            double baseAngle = Math.Atan2(DestinationRectangle.Width, DestinationRectangle.Height);
+            var baseAngle = Math.Atan2(DestinationRectangle.Width, DestinationRectangle.Height);
 
-            Color color = new Color(0, 0, 0, 85);
-            VertexPositionColor[] vertices = new VertexPositionColor[3]
+            var color = new Color(0, 0, 0, 85);
+            var vertices = new VertexPositionColor[3]
             {
                 new VertexPositionColor(new Vector3
                             (DestinationRectangle.Left + DestinationRectangle.Width / 2, 
@@ -544,8 +577,8 @@ namespace Isles
                             DestinationRectangle.Top, 0), color),
             };
 
-            ushort[] indices = new ushort[3] { 0, 1, 2 };
-            double angle = (100 - percentage) / 100 * Math.PI * 2;
+            var indices = new ushort[3] { 0, 1, 2 };
+            var angle = (100 - percentage) / 100 * Math.PI * 2;
 
             // Part one: 0 ~ baseAngle
             if (angle > baseAngle)
@@ -640,7 +673,9 @@ namespace Isles
             base.Draw(gameTime, sprite);
 
             if (ShowPercentage)
+            {
                 DrawFade();
+            }
 
             if (count > 1 && ShowCount)
             {
@@ -659,14 +694,10 @@ namespace Isles
         /// <summary>
         /// Gets the type of unit that's going to be trained
         /// </summary>
-        public string Type
-        {
-            get { return type; }
-        }
+        public string Type => type;
 
-        string type;
-
-        Building ownerBuilding;
+        private readonly string type;
+        private Building ownerBuilding;
         public bool ShowCount = true;
         public delegate void UpgradeEventHandler(Spell spell, Building owner);
         public event UpgradeEventHandler Complete;
@@ -676,7 +707,9 @@ namespace Isles
             ownerBuilding = Owner as Building;
 
             if (ownerBuilding == null)
+            {
                 throw new ArgumentException();
+            }
         }
 
         /// <summary>
@@ -684,24 +717,29 @@ namespace Isles
         /// </summary>
         public int Count
         {
-            get { return spellButton != null ? spellButton.Count : 0; }
-            set { if (spellButton != null) spellButton.Count = value; }
+            get => spellButton != null ? spellButton.Count : 0;
+            set
+            {
+                if (spellButton != null)
+                {
+                    spellButton.Count = value;
+                }
+            }
         }
 
         public SpellTraining(GameWorld world, string type, Building owner)
             : base(world)
         {
-            if (type == null)
-                throw new ArgumentNullException();
-
-            this.type = type;
-            this.ownerBuilding = owner;
+            this.type = type ?? throw new ArgumentNullException();
+            ownerBuilding = owner;
         }
 
         public override void Deserialize(XmlElement xml)
         {
             if (xml.HasAttribute("TrainingTime"))
+            {
                 CoolDown = float.Parse(xml.GetAttribute("TrainingTime"));
+            }
 
             base.Deserialize(xml);
         }
@@ -731,12 +769,12 @@ namespace Isles
                 Player.LocalPlayer.CurrentGroup[0] is Building)
             {
                 // Find a building with the minimum number of pending request
-                int min = int.MaxValue;
+                var min = int.MaxValue;
                 Building building = null;
 
                 foreach (GameObject o in Player.LocalPlayer.CurrentGroup)
                 {
-                    Building b = o as Building;
+                    var b = o as Building;
 
                     if (b != null && b.QueuedSpells.Count < min)
                     {
@@ -750,9 +788,14 @@ namespace Isles
                     Audios.Play("OK");
 
                     if (Player.LocalPlayer.CurrentGroup.Count > 1 && !building.CanTrain(type))
+                    {
                         Enable = false;
+                    }
                 }
-                else Audios.Play("Invalid");
+                else
+                {
+                    Audios.Play("Invalid");
+                }
             }
 
             return false;
@@ -761,12 +804,12 @@ namespace Isles
         protected override TipBox CreateTipBox()
         {
             GameDefault def = GameDefault.Singleton;
-            int height = 6;
+            var height = 6;
             TextField gold = null, lumber = null, food = null;
-            TextField title = new TextField(this.Name + "  [" + this.Hotkey.ToString() + "]",
+            var title = new TextField(Name + "  [" + Hotkey.ToString() + "]",
                                             16f/23, Color.Gold, new Rectangle(6, 6, 210, 30));
             height += 30;
-            TextField content = new TextField(this.Description, 15f/23, Color.White,
+            var content = new TextField(Description, 15f/23, Color.White,
                                                 new Rectangle(6, 30, 210, 100));
             height += content.RealHeight + 10;
             if (def.GetGold(Type) != 0)
@@ -790,15 +833,24 @@ namespace Isles
                                             new Rectangle(6, height, 210, 19));
                 height += food.RealHeight;
             }
-            TipBox spellTip = new TipBox(220, height + 10);
+            var spellTip = new TipBox(220, height + 10);
             spellTip.Add(title);
             spellTip.Add(content);
             if(gold != null)
+            {
                 spellTip.Add(gold);
-            if(lumber != null)
+            }
+
+            if (lumber != null)
+            {
                 spellTip.Add(lumber);
-            if(food != null)
+            }
+
+            if (food != null)
+            {
                 spellTip.Add(food);
+            }
+
             return spellTip;
         }
 
@@ -809,7 +861,7 @@ namespace Isles
             // Show count...
             if (ownerBuilding != null && ownerBuilding.Owner is LocalPlayer)
             {
-                bool multipleBuildings = false;
+                var multipleBuildings = false;
                 if (ShowCount)
                 {
                     if (Player.LocalPlayer != null &&
@@ -833,16 +885,23 @@ namespace Isles
                         }
                     }
                 }
-                else spellButton.ShowCount = false;
+                else
+                {
+                    spellButton.ShowCount = false;
+                }
 
                 // Update enable states
                 if (ownerBuilding != null)
                 {
                     if (multipleBuildings)
+                    {
                         Enable = ownerBuilding.CanTrain(type);
+                    }
                     else
+                    {
                         Enable = ownerBuilding.CanTrain(type) || !Ready ||
                                  ownerBuilding.QueuedSpells.Contains(this);
+                    }
                 }
             }
 
@@ -855,11 +914,14 @@ namespace Isles
 
                 // Start next spell?
                 if (ownerBuilding.QueuedSpells.Count > 0)
+                {
                     if (ownerBuilding.QueuedSpells.Peek() is SpellTraining)
+                    {
                         (ownerBuilding.QueuedSpells.Peek() as SpellTraining).CoolDownElapsed = 0;
+                    }
+                }
 
-                if (Complete != null)
-                    Complete(this, ownerBuilding);
+                Complete?.Invoke(this, ownerBuilding);
 
                 OnComplete();
             }
@@ -867,12 +929,14 @@ namespace Isles
 
         protected virtual void OnComplete()
         {
-            Charactor c = world.Create(type) as Charactor;
+            var c = world.Create(type) as Charactor;
 
             if (c != null)
             {
                 if (ownerBuilding.Owner != null)
+                {
                     ownerBuilding.Owner.UnmarkFutureObject(type);
+                }
 
                 c.Position = ownerBuilding.Position + ownerBuilding.SpawnPoint;
                 c.Owner = ownerBuilding.Owner;
@@ -881,14 +945,20 @@ namespace Isles
                 world.Add(c);
 
                 if (c.IsHero && spellButton != null)
+                {
                     spellButton.Visible = false;
+                }
 
-                foreach (object o in ownerBuilding.RallyPoints)
+                foreach (var o in ownerBuilding.RallyPoints)
                 {
                     if (o is Entity)
+                    {
                         c.PerformAction(o as Entity, true);
+                    }
                     else if (o is Vector3)
+                    {
                         c.PerformAction((Vector3)o, true);
+                    }
                 }
             }
         }
@@ -914,7 +984,9 @@ namespace Isles
         protected override void OnComplete()
         {
             if (Owner.Owner is LocalPlayer)
+            {
                 Audios.Play("UpgradeComplete");
+            }
         }
     }
 
@@ -930,7 +1002,9 @@ namespace Isles
                 foreach (GameObject o in owner.Owner.EnumerateObjects("Lumbermill"))
                 {
                     if (o is Lumbermill)
+                    {
                         (o as Lumbermill).LiveOfNatureResearched();
+                    }
                 }
 
                 owner.Owner.MarkAvailable("LiveOfNature");
@@ -1022,18 +1096,17 @@ namespace Isles
     public class SpellConstruct : Spell
     {
         public bool AutoReactivate = false;
-
-        int step = 0;
-        string entityType;
-        Input input;
-        Entity entity;
-        BaseEntity baseEntity;
-        IPlaceable placeable;
+        private int step = 0;
+        private readonly string entityType;
+        private readonly Input input;
+        private Entity entity;
+        private BaseEntity baseEntity;
+        private IPlaceable placeable;
 
         public SpellConstruct(GameWorld world, string entityType)
             : base(world)
         {
-            this.input = BaseGame.Singleton.Input;
+            input = BaseGame.Singleton.Input;
             this.entityType = entityType;
         }
 
@@ -1041,11 +1114,13 @@ namespace Isles
             : base(world)
         {
             if (null == baseEntity || null == world)
+            {
                 throw new ArgumentNullException();
+            }
 
-            this.input = BaseGame.Singleton.Input;
+            input = BaseGame.Singleton.Input;
             this.baseEntity = baseEntity;
-            this.entityType = baseEntity.ClassID;
+            entityType = baseEntity.ClassID;
         }
 
         public override bool Trigger()
@@ -1054,7 +1129,9 @@ namespace Isles
             step = 0;
 
             if (baseEntity == null)
+            {
                 baseEntity = world.Create(entityType) as BaseEntity;
+            }
 
             if (baseEntity != null)
             {
@@ -1062,9 +1139,11 @@ namespace Isles
                 placeable = baseEntity as IPlaceable;
 
                 // Set owner if it's a building
-                Building building = baseEntity as Building;
+                var building = baseEntity as Building;
                 if (Player.LocalPlayer != null && building != null)
+                {
                     building.Owner = Player.LocalPlayer;
+                }
 
                 if (placeable != null && !placeable.BeginPlace())
                 {
@@ -1080,11 +1159,11 @@ namespace Isles
         protected override TipBox CreateTipBox()
         {
             GameDefault def = GameDefault.Singleton;
-            int height = 6;
-            TextField title = new TextField(this.Name + "  [" + this.Hotkey.ToString() + "]",
+            var height = 6;
+            var title = new TextField(Name + "  [" + Hotkey.ToString() + "]",
                                             16f / 23, Color.Gold, new Rectangle(6, 6, 210, 30));
             height += 30;
-            TextField content = new TextField(this.Description, 15f/23, Color.White,
+            var content = new TextField(Description, 15f/23, Color.White,
                                                 new Rectangle(6, 30, 210, 100));
             height += content.RealHeight + 10;
             TextField gold = null, lumber = null;
@@ -1100,13 +1179,19 @@ namespace Isles
                                             15f / 23, Color.Green, new Rectangle(6, height, 210, 29));
                 height += lumber.RealHeight;
             }
-            TipBox spellTip = new TipBox(220, height + 10);
+            var spellTip = new TipBox(220, height + 10);
             spellTip.Add(title);
             spellTip.Add(content);
             if(gold != null)
+            {
                 spellTip.Add(gold);
-            if(lumber != null)
+            }
+
+            if (lumber != null)
+            {
                 spellTip.Add(lumber);
+            }
+
             return spellTip;
         }
 
@@ -1116,21 +1201,27 @@ namespace Isles
             if (step == 0)
             {
                 if (world.TargetPosition.HasValue)
+                {
                     baseEntity.Position = world.TargetPosition.Value;
+                }
             }
             // Adjusting entity rotation
             else if (step == 1 && input.Mouse.LeftButton == ButtonState.Pressed && entity != null)
             {
-                float rotation = beginDropRotation + MathHelper.PiOver2 + (float)Math.Atan2(
+                var rotation = beginDropRotation + MathHelper.PiOver2 + (float)Math.Atan2(
                                 -(double)(input.MousePosition.Y - beginDropPosition.Y),
                                  (double)(input.MousePosition.X - beginDropPosition.X));
 
                 entity.Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, rotation);
 
                 if (entity is Building)
+                {
                     (entity as Building).RotationZ = rotation;
+                }
                 else if (entity is Goldmine)
+                {
                     (entity as Goldmine).RotationZ = rotation;
+                }
             }
 
             baseEntity.Update(gameTime);
@@ -1141,10 +1232,9 @@ namespace Isles
             baseEntity.Draw(gameTime);
         }
 
-        Point beginDropPosition;
-        float beginDropRotation;
-
-        bool hasCasted = false;
+        private Point beginDropPosition;
+        private float beginDropRotation;
+        private bool hasCasted = false;
         public override EventResult HandleEvent(EventType type, object sender, object tag)
         {
             // Cancel build if right clicked for Esc is pressed
@@ -1154,7 +1244,9 @@ namespace Isles
                 (hasCasted && type == EventType.KeyUp && (key == Keys.LeftShift) || key == Keys.RightShift))
             {
                 if (placeable != null)
+                {
                     placeable.CancelPlace();
+                }
 
                 input.Uncapture();
                 Spell.EndSpell();
@@ -1166,7 +1258,9 @@ namespace Isles
             {
                 // Click on the minimap to change location
                 if (GameUI.Singleton.Minimap.MapToWorld(input.MousePosition).HasValue)
+                {
                     return EventResult.Unhandled;
+                }
 
                 // Check if the current position if placable
                 if (placeable != null && !placeable.IsLocationPlacable())
@@ -1212,7 +1306,9 @@ namespace Isles
                     foreach (GameObject o in Player.LocalPlayer.CurrentGroup)
                     {
                         if (firstBuilder == null)
+                        {
                             firstBuilder = o as Worker;
+                        }
 
                         if (o is Worker && !(o.State is StateConstruct))
                         {
@@ -1223,13 +1319,15 @@ namespace Isles
 
                     // If no idle builder is found, use the first builder
                     if (builder == null)
+                    {
                         builder = firstBuilder;
-
-                    (baseEntity as Building).Builder = builder;
+                    } (baseEntity as Building).Builder = builder;
                 }
 
                 if (placeable != null)
+                {
                     placeable.Place();
+                }
 
                 world.Add(baseEntity);
 
@@ -1271,9 +1369,14 @@ namespace Isles
         public override bool Trigger()
         {
             if (Helper.Random.Next(20) == 0)
+            {
                 Audios.Play("Hawk");
+            }
             else
+            {
                 Audios.Play("OK");
+            }
+
             world.Game.Cursor = Cursors.TargetRed;
             return true;
         }
@@ -1282,7 +1385,7 @@ namespace Isles
         {
             if (type == EventType.LeftButtonDown)
             {
-                Input input = sender as Input;
+                var input = sender as Input;
                 // Checks if we have clicked the minimap
                 Vector3? minimapPoint = GameUI.Singleton.Minimap.MapToWorld(input.MousePosition);
 
@@ -1296,10 +1399,12 @@ namespace Isles
 
                 // Checks if we've cliked the UI
                 if (GameUI.Singleton.Overlaps(input.MousePosition))
+                {
                     return EventResult.Handled;
+                }
 
                 // Attack entity
-                GameObject picked = world.Pick() as GameObject;
+                var picked = world.Pick() as GameObject;
 
                 if (picked != null && world.FogOfWar != null &&
                                       world.FogOfWar.Contains(picked.Position.X, picked.Position.Y))
@@ -1316,7 +1421,11 @@ namespace Isles
                         world.Game.Cursor = Cursors.Default;
                         Spell.EndSpell();
                     }
-                    else Audios.Play("Invalid");
+                    else
+                    {
+                        Audios.Play("Invalid");
+                    }
+
                     return EventResult.Handled;
                 }
 
@@ -1373,7 +1482,7 @@ namespace Isles
         {
             if (type == EventType.LeftButtonDown)
             {
-                Input input = sender as Input;
+                var input = sender as Input;
                 // Checks if we have clicked the minimap
                 Vector3? minimapPoint = GameUI.Singleton.Minimap.MapToWorld(input.MousePosition);
 
@@ -1387,10 +1496,12 @@ namespace Isles
 
                 // Checks if we've cliked the UI
                 if (GameUI.Singleton.Overlaps(input.MousePosition))
+                {
                     return EventResult.Handled;
+                }
 
                 // Attack entity
-                GameObject picked = world.Pick() as GameObject;
+                var picked = world.Pick() as GameObject;
 
                 if (picked != null && world.FogOfWar != null &&
                                       world.FogOfWar.Contains(picked.Position.X, picked.Position.Y))
@@ -1465,20 +1576,19 @@ namespace Isles
         public SpellCombat(GameWorld world, GameObject owner)
             : base(world)
         {
-            if (owner == null)
-                throw new ArgumentNullException();
-
-            Owner = owner;
+            Owner = owner ?? throw new ArgumentNullException();
         }
 
         protected override void OnOwnerChanged()
         {
             if (Owner == null)
+            {
                 throw new ArgumentNullException();
+            }
 
-            this.MinimumRange = Owner.AttackRange.X;
-            this.MaximumRange = Owner.AttackRange.Y;
-            this.CoolDown = Owner.AttackDuration;
+            MinimumRange = Owner.AttackRange.X;
+            MaximumRange = Owner.AttackRange.Y;
+            CoolDown = Owner.AttackDuration;
         }
 
         /// <summary>
@@ -1490,10 +1600,13 @@ namespace Isles
             position.X = Owner.Position.X;
             position.Y = Owner.Position.Y;
 
-            float distance = target.Outline.DistanceTo(position);
+            var distance = target.Outline.DistanceTo(position);
             distance -= Owner.Outline.Radius;
             if (distance < 0)
+            {
                 distance = 0;
+            }
+
             return distance >= MinimumRange && distance <= MaximumRange;
         }
 
@@ -1508,12 +1621,14 @@ namespace Isles
 
         public override void Cast(Entity target)
         {
-            GameObject gameObject = target as GameObject;
+            var gameObject = target as GameObject;
 
             if (Ready && CanAttakTarget(gameObject) && TargetWithinRange(target))
             {
                 if (gameObject != null && gameObject.Owner is LocalPlayer)
+                {
                     (gameObject.Owner as LocalPlayer).AddAttacker(Owner);
+                }
 
                 Owner.TriggerAttack(target);
                 base.Cast();
@@ -1525,7 +1640,7 @@ namespace Isles
     #region SpellSummon
     public class SpellSummon : Spell
     {
-        string type;
+        private readonly string type;
 
         public SpellSummon(GameWorld world, string type)
             : base(world, type) 
@@ -1537,7 +1652,9 @@ namespace Isles
         {
             Enable = true;
             if (Owner != null && Owner.Owner.IsAvailable(type))
+            {
                 Enable = false;
+            }
 
             base.Update(gameTime);
         }
@@ -1556,10 +1673,14 @@ namespace Isles
                 wo.Position = Owner.Position;
 
                 if (wo is GameObject)
+                {
                     (wo as GameObject).Owner = Owner.Owner;
+                }
 
                 if (wo is Charactor && Owner is Charactor)
+                {
                     (wo as Charactor).Facing = (Owner as Charactor).Facing;
+                }
 
                 world.Add(wo);
 
@@ -1567,9 +1688,11 @@ namespace Isles
                 float radius = 10;
 
                 if (wo is GameObject)
+                {
                     radius = (wo as GameObject).SelectionAreaRadius;
-                
-                EffectSpawn effect = new EffectSpawn(world, wo.Position, radius, "Summon");
+                }
+
+                var effect = new EffectSpawn(world, wo.Position, radius, "Summon");
 
                 world.Add(effect);
 
@@ -1583,9 +1706,9 @@ namespace Isles
     #region SpellDrawPathOccluder
     public class SpellDrawPathOcculder : Spell
     {
-        bool? drawing;
-        Input input;
-        bool[,] pathOcculders;
+        private bool? drawing;
+        private readonly Input input;
+        private readonly bool[,] pathOcculders;
 
         public float BrushRadius;
 
@@ -1694,11 +1817,13 @@ namespace Isles
         {
             PathGraph graph = world.PathManager.Graph;
 
-            StreamWriter writer = new StreamWriter(stream);
+            var writer = new StreamWriter(stream);
 
-            int counter = 0;
-            for (int y = 0; y < graph.EntryHeight; y++)
-                for (int x = 0; x < graph.EntryWidth; x++)
+            var counter = 0;
+            for (var y = 0; y < graph.EntryHeight; y++)
+            {
+                for (var x = 0; x < graph.EntryWidth; x++)
+                {
                     if (pathOcculders[x, y])
                     {
                         writer.Write(x + " " + y + " ");
@@ -1708,6 +1833,8 @@ namespace Isles
                             writer.Write(writer.NewLine);
                         }
                     }
+                }
+            }
         }
     }
     #endregion
@@ -1715,11 +1842,9 @@ namespace Isles
     #region SpellPunishOfNature
     public class SpellPunishOfNature : Spell
     {
-        const float Duration = 60;
-
-        float elapsedTime;
-
-        EffectPunishOfNature effect;
+        private const float Duration = 60;
+        private float elapsedTime;
+        private EffectPunishOfNature effect;
 
         public SpellPunishOfNature(GameWorld world)
             : base(world, "PunishOfNature")
@@ -1758,28 +1883,32 @@ namespace Isles
             {
                 effect.Update(gameTime);
 
-                float elapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
+                var elapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
                 elapsedTime += elapsedSeconds;
 
                 foreach (IWorldObject wo in
                     world.GetNearbyObjectsPrecise(effect.Position, EffectPunishOfNature.Radius))
                 {
-                    Charactor o = wo as Charactor;
+                    var o = wo as Charactor;
 
                     if (o == null || o.Owner == null)
+                    {
                         continue;
+                    }
 
                     if (Owner.IsOpponent(o))
                     {
-                        float damage = (0.2f + o.Owner.EnvironmentLevel * 0.6f) * 30;
+                        var damage = (0.2f + o.Owner.EnvironmentLevel * 0.6f) * 30;
                         o.Health -= damage * elapsedSeconds;
                     }
                     else if (Owner.IsAlly(o))
                     {
-                        float health = (0.2f + (1 - o.Owner.EnvironmentLevel) * 0.6f) * 40;
+                        var health = (0.2f + (1 - o.Owner.EnvironmentLevel) * 0.6f) * 40;
                         o.Health += health * elapsedSeconds;
                         if (o.Health < o.MaximumHealth)
+                        {
                             o.ShowGlow = true;
+                        }
                     }
                 }
 
@@ -1803,37 +1932,34 @@ namespace Isles
         /// <summary>
         /// Gets or sets the velocity of the fireball
         /// </summary>        
-        public override Vector3 Velocity
-        {
-            get { return velocity; }
-        }
+        public override Vector3 Velocity => velocity;
 
-        Vector3 velocity;
+        private Vector3 velocity;
 
         /// <summary>
         /// Whether the fireball is exploding
         /// </summary>
-        bool explode = false;
+        private bool explode = false;
 
         /// <summary>
         /// Fire ball animation texture
         /// </summary>
-        Texture2D[] texture;
+        private readonly Texture2D[] texture;
 
         /// <summary>
         /// Number of texture frames
         /// </summary>
-        const int FireBallTextureFrames = 23;
+        private const int FireBallTextureFrames = 23;
 
         /// <summary>
         /// Animation speed
         /// </summary>
-        const double FrameRate = 30;
+        private const double FrameRate = 30;
 
         /// <summary>
         /// Current frame
         /// </summary>
-        double frame;
+        private double frame;
 
         /// <summary>
         /// Create a fireball entity
@@ -1846,7 +1972,7 @@ namespace Isles
 
             texture = new Texture2D[FireBallTextureFrames];
 
-            for (int i = 0; i < FireBallTextureFrames; i++)
+            for (var i = 0; i < FireBallTextureFrames; i++)
             {
                 texture[i] = world.Content.Load<Texture2D>(
                     "Spells/Fireball/areaeffect_" + (i + 1));
@@ -1873,11 +1999,13 @@ namespace Isles
 
                 // Destroy anyway if we're too far away
                 if (Position.LengthSquared() > 1e8)
+                {
                     GameServer.Singleton.Destroy(this);
+                }
             }
 
             // Hit test
-            float height = World.Landscape.GetHeight(Position.X, Position.Y);
+            var height = World.Landscape.GetHeight(Position.X, Position.Y);
             if (height > Position.Z)
             {
                 //Position.Z = height;
@@ -1919,7 +2047,7 @@ namespace Isles
 
             // It's not accurate to use point sprite to draw the fireball,
             // so use center oriented billboard instead.
-            Billboard billboard = new Billboard();
+            var billboard = new Billboard();
 
             billboard.Texture = texture[(int)frame];
             billboard.Normal = Vector3.Zero;
@@ -1930,7 +2058,9 @@ namespace Isles
 
             // Turn off depth buffer when exploding
             if (!explode)
+            {
                 billboard.Type |= BillboardType.DepthBufferEnable;
+            }
 
             billboard.Draw();
         }

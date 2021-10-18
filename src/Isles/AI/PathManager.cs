@@ -42,7 +42,7 @@ namespace Isles.Engine
     /// </summary>
     public class Path : IEnumerable<PathEdge>
     {
-        public LinkedList<PathEdge> Edges = new LinkedList<PathEdge>();
+        public LinkedList<PathEdge> Edges = new();
 
         public IEnumerator<PathEdge> GetEnumerator()
         {
@@ -83,8 +83,8 @@ namespace Isles.Engine
 
         public PathBrush(IEnumerable<Point> grids)
         {
-            List<int> x = new List<int>();
-            List<int> y = new List<int>();
+            var x = new List<int>();
+            var y = new List<int>();
 
             foreach (Point p in grids)
             {
@@ -103,7 +103,9 @@ namespace Isles.Engine
         private void CreateFromPoints(List<int> x, List<int> y)
         {
             if (x.Count != y.Count || x.Count <= 0)
+            {
                 throw new ArgumentException();
+            }
 
             X = new int[x.Count];
             Y = new int[y.Count];
@@ -113,21 +115,32 @@ namespace Isles.Engine
 
             // Compute size
 
-            int minX = int.MaxValue;
-            int minY = int.MaxValue;
-            int maxX = int.MinValue;
-            int maxY = int.MinValue;
+            var minX = int.MaxValue;
+            var minY = int.MaxValue;
+            var maxX = int.MinValue;
+            var maxY = int.MinValue;
 
-            for (int i = 0; i < x.Count; i++)
+            for (var i = 0; i < x.Count; i++)
             {
                 if (x[i] < minX)
+                {
                     minX = x[i];
+                }
+
                 if (x[i] > maxX)
+                {
                     maxX = x[i];
+                }
+
                 if (y[i] < minY)
+                {
                     minY = y[i];
+                }
+
                 if (y[i] > maxY)
+                {
                     maxY = y[i];
+                }
             }
 
             SizeX = 1 + maxX - minX;
@@ -135,21 +148,25 @@ namespace Isles.Engine
 
             // Complain about about it if the given path brush is too large
             if (SizeX <= 0 || SizeX > 128 || SizeY <= 0 || SizeY > 128)
+            {
                 throw new ArgumentException();
+            }
 
             // Min values of the brush should start from zero
-            for (int i = 0; i < x.Count; i++)
+            for (var i = 0; i < x.Count; i++)
             {
-                X[i] -= minX; x[i] -= minX;
-                Y[i] -= minY; y[i] -= minY;
+                X[i] -= minX;
+                x[i] -= minX;
+                Y[i] -= minY;
+                y[i] -= minY;
             }
 
             // Compute the mask value for 8 directions.
             // Which node we should check for connectivity if we move one step
             // ahead along that direction.
 
-            List<int> dx = new List<int>();
-            List<int> dy = new List<int>();
+            var dx = new List<int>();
+            var dy = new List<int>();
 
             //// Append a border
             //x.Add(SizeX); y.Add(SizeY);
@@ -157,34 +174,40 @@ namespace Isles.Engine
             //x.Add(-1); y.Add(SizeX);
             //x.Add(-1); y.Add(-1);
 
-            for (int k = 0; k < 8; k++)
+            for (var k = 0; k < 8; k++)
             {
                 dx.Clear();
                 dy.Clear();
 
-                for (int i = 0; i < x.Count; i++)
+                for (var i = 0; i < x.Count; i++)
                 {
-                    int xx = x[i] + PathGraph.DX8[k];
-                    int yy = y[i] + PathGraph.DY8[k];
+                    var xx = x[i] + PathGraph.DX8[k];
+                    var yy = y[i] + PathGraph.DY8[k];
 
                     // Checks if the new point excced the boundary
                     if (xx < 0 || xx >= SizeX || yy < 0 || yy >= SizeY)
                     {
-                        dx.Add(xx); dy.Add(yy); continue;
+                        dx.Add(xx);
+                        dy.Add(yy);
+                        continue;
                     }
 
                     // Checks if the new point exists in the old brush
-                    bool exist = false;
+                    var exist = false;
 
-                    for (int n = 0; n < x.Count; n++)
+                    for (var n = 0; n < x.Count; n++)
+                    {
                         if (x[n] == xx && y[n] == yy)
                         {
-                            exist = true; break;
+                            exist = true;
+                            break;
                         }
+                    }
 
                     if (!exist)
                     {
-                        dx.Add(xx); dy.Add(yy);
+                        dx.Add(xx);
+                        dy.Add(yy);
                     }
                 }
 
@@ -206,11 +229,11 @@ namespace Isles.Engine
         /// </summary>
         public ILandscape Landscape
         {
-            get { return landscape; }
-            set { landscape = value; }
+            get => landscape;
+            set => landscape = value;
         }
 
-        ILandscape landscape;
+        private ILandscape landscape;
 
         /// <summary>
         /// Graph data.
@@ -220,46 +243,34 @@ namespace Isles.Engine
         /// Note that we do not consider height in our cost calculation since the landcape
         /// is currently very flat.
         /// </remarks>
-        byte[,] data;
-        byte[,] dynamicData;
+        private byte[,] data;
+        private byte[,] dynamicData;
 
         /// <summary>
         /// Size of the grid bitmap
         /// </summary>
-        int entryWidth, entryHeight, nodeCount;
+        private readonly int entryWidth, entryHeight, nodeCount;
 
-        public int EntryWidth
-        {
-            get { return entryWidth; }
-        }
+        public int EntryWidth => entryWidth;
 
-        public int EntryHeight
-        {
-            get { return entryHeight; }
-        }
+        public int EntryHeight => entryHeight;
 
         /// <summary>
         /// Size of each entry cell
         /// </summary>
-        float cellSize, halfCellSize;
+        private readonly float cellSize, halfCellSize;
 
         /// <summary>
         /// Size of the map
         /// </summary>
-        float mapWidth, mapHeight;
+        private readonly float mapWidth, mapHeight;
 
         /// <summary>
         /// Gets the size of each cell
         /// </summary>
-        public float CellSize
-        {
-            get { return cellSize; }
-        }
+        public float CellSize => cellSize;
 
-        public float HalfCellSize
-        {
-            get { return halfCellSize; }
-        }
+        public float HalfCellSize => halfCellSize;
 
         /// <summary>
         /// Gets or sets the brush of the path finder.
@@ -270,56 +281,57 @@ namespace Isles.Engine
         /// </remarks>
         public PathBrush Brush
         {
-            get { return brush; }
-            set { brush = value; }
+            get => brush;
+            set => brush = value;
         }
 
-        PathBrush brush;
+        private PathBrush brush;
 
         /// <summary>
         /// Gets or sets the boundary of the path graph.
         /// </summary>
         public Rectangle? Boundary
         {
-            get { return boundary; }
-            set { boundary = value; }
+            get => boundary;
+            set => boundary = value;
         }
 
-        Rectangle? boundary;
+        private Rectangle? boundary;
 
         /// <summary>
         /// Gets or sets whether dynamic obstacles are ignored when searching
         /// </summary>
         public bool IgnoreDynamicObstacles
         {
-            get { return ignoreDynamicObstacles; }
-            set { ignoreDynamicObstacles = value; }
+            get => ignoreDynamicObstacles;
+            set => ignoreDynamicObstacles = value;
         }
 
-        bool ignoreDynamicObstacles = false;
+        private bool ignoreDynamicObstacles = false;
 
         /// <summary>
         /// Construct a landscape graph
         /// </summary>
         public PathGraph(ILandscape landscape, float resolution, IEnumerable<Point> occluders)
         {
-            if (landscape == null)
-                throw new ArgumentNullException();
-
-            this.landscape = landscape;
+            this.landscape = landscape ?? throw new ArgumentNullException();
 
             // Note landscape grid include the edges.
             // Currently the maximum grid resolution is 256 * 256, which generates
             // a path graph with a resolution of 2048 * 2048. Pretty large, ha :)
             if (landscape.GridCount.X > 257 || landscape.GridCount.Y > 257)
+            {
                 throw new ArgumentException();
+            }
 
             entryWidth = landscape.GridCount.X - 1;
             entryHeight = landscape.GridCount.Y - 1;
 
             if ((entryWidth != 32 && entryWidth != 64 && entryWidth != 128 && entryWidth != 256) ||
                 (entryHeight != 32 && entryHeight != 64 && entryHeight != 128 && entryHeight != 256))
+            {
                 throw new InvalidOperationException();
+            }
 
             // Give the path graph more detail
             entryWidth = (int)(entryWidth * resolution);
@@ -331,7 +343,9 @@ namespace Isles.Engine
             mapHeight = landscape.Size.Y;
 
             if (!Math2D.FloatEquals(mapWidth / entryWidth, mapHeight / entryHeight))
+            {
                 throw new InvalidOperationException();
+            }
 
             cellSize = mapWidth / entryWidth;
             halfCellSize = cellSize / 2;
@@ -342,7 +356,7 @@ namespace Isles.Engine
             this.landscape = landscape;            
         }
 
-        const int OutDegree = 8;
+        private const int OutDegree = 8;
 
         public static readonly int[] DX8 = new int[8] { 1, 1, 1, 0, -1, -1, -1, 0 };
         public static readonly int[] DY8 = new int[8] { 1, 0, -1, -1, -1, 0, 1, 1 };
@@ -353,13 +367,14 @@ namespace Isles.Engine
         /// <summary>
         /// Initialize grid entries
         /// </summary>
-        void InitializeEntry(float resolution, IEnumerable<Point> occluders)
+        private void InitializeEntry(float resolution, IEnumerable<Point> occluders)
         {
             data = new byte[entryWidth, entryHeight];
             dynamicData = new byte[entryWidth, entryHeight];
 
-            for (int y = 0; y < entryHeight; y++)
-                for (int x = 0; x < entryWidth; x++)
+            for (var y = 0; y < entryHeight; y++)
+            {
+                for (var x = 0; x < entryWidth; x++)
                 {
                     data[x, y] = dynamicData[x, y] = 0;
 
@@ -368,35 +383,46 @@ namespace Isles.Engine
                         // If our resolution is big enough, we only test mid point
                         Vector2 position = GridToPosition(x, y);
                         if (landscape.IsPointOccluded(position.X, position.Y))
+                        {
                             Mark(x, y);
+                        }
                     }
                     else
                     {
                         // Otherwise, count the number of obstacles
                         const int SamplesPerGrid = 8;
 
-                        int size = (int)(SamplesPerGrid / resolution);
-                        int overlappedPoints = 0;
-                        int totalPoints = size * size;
-                        float step = cellSize / size;
+                        var size = (int)(SamplesPerGrid / resolution);
+                        var overlappedPoints = 0;
+                        var totalPoints = size * size;
+                        var step = cellSize / size;
 
-                        for (float xx = x * cellSize; xx < (x + 1) * cellSize; xx += step)
-                            for (float yy = y * cellSize; yy < (y + 1) * cellSize; yy += step)
+                        for (var xx = x * cellSize; xx < (x + 1) * cellSize; xx += step)
+                        {
+                            for (var yy = y * cellSize; yy < (y + 1) * cellSize; yy += step)
                             {
                                 if (landscape.IsPointOccluded(xx, yy))
+                                {
                                     overlappedPoints++;
+                                }
                             }
+                        }
 
                         if (1.0f * overlappedPoints / totalPoints >= 0.5f)
+                        {
                             Mark(x, y);
+                        }
                     }
                 }
+            }
 
             // Mark custom occluders
             if (occluders != null)
             {
                 foreach (Point p in occluders)
+                {
                     Mark(p.X, p.Y);
+                }
             }
         }
 
@@ -474,7 +500,9 @@ namespace Isles.Engine
             Vector2 position = GridToPosition(x, y);
 
             if (brush == null)
+            {
                 return position;
+            }
 
             position.X += brush.SizeX * halfCellSize - halfCellSize;
             position.Y += brush.SizeY * halfCellSize - halfCellSize;
@@ -490,19 +518,29 @@ namespace Isles.Engine
         public Point PositionToGrid(float x, float y, PathBrush brush)
         {
             if (brush == null)
+            {
                 return PositionToGrid(x, y);
+            }
 
             int xGrid, yGrid;
 
             if (brush.SizeX % 2 == 0)
+            {
                 xGrid = (int)Math.Round(x / cellSize) - brush.SizeX / 2;
+            }
             else
+            {
                 xGrid = (int)(x / cellSize) - brush.SizeX / 2;
+            }
 
             if (brush.SizeY % 2 == 0)
+            {
                 yGrid = (int)Math.Round(y / cellSize) - brush.SizeY / 2;
+            }
             else
+            {
                 yGrid = (int)(y / cellSize) - brush.SizeY / 2;
+            }
 
             return new Point(xGrid, yGrid);
         }
@@ -527,16 +565,13 @@ namespace Isles.Engine
         public Vector2 IndexToPosition(int index)
         {
             // Return grid center
-            int x = index % entryWidth;
-            int y = index / entryWidth;
+            var x = index % entryWidth;
+            var y = index / entryWidth;
 
             return new Vector2(x * cellSize + halfCellSize, y * cellSize + halfCellSize);
         }
 
-        public int NodeCount
-        {
-            get { return nodeCount; }
-        }
+        public int NodeCount => nodeCount;
 
         /// <summary>
         /// Checks whether a position is obstructed on the path graph
@@ -548,9 +583,7 @@ namespace Isles.Engine
             if (p.X >= 0 && p.X < entryWidth &&
                 p.Y >= 0 && p.Y < entryHeight)
             {
-                if (includeDynamic)
-                    return data[p.X, p.Y] > 0 || dynamicData[p.X, p.Y] > 0;
-                return data[p.X, p.Y] > 0;
+                return includeDynamic ? data[p.X, p.Y] > 0 || dynamicData[p.X, p.Y] > 0 : data[p.X, p.Y] > 0;
             }
 
             return false;
@@ -562,12 +595,18 @@ namespace Isles.Engine
         public bool IsBrushObstructed(float x, float y, PathBrush brush, bool includeDynamic)
         {
             if (brush == null)
+            {
                 return IsPositionObstructed(x, y, includeDynamic);
+            }
 
             // Check each individual grid
             foreach (Point p in EnumerateGridsInBrush(new Vector2(x, y), brush))
+            {
                 if (IsGridObstructed(p.X, p.Y, includeDynamic))
+                {
                     return true;
+                }
+            }
 
             return false;
         }
@@ -580,18 +619,21 @@ namespace Isles.Engine
             bool withinBounds;
 
             if (boundary == null)
+            {
                 withinBounds = (x >= 0 && x < entryWidth && y >= 0 && y < entryHeight);
+            }
             else
+            {
                 withinBounds = (x >= boundary.Value.X && x < boundary.Value.Right &&
                                 y >= boundary.Value.Y && y < boundary.Value.Bottom);
+            }
 
             if (!withinBounds)
+            {
                 return true;
+            }
 
-            if (includeDynamic)
-                return data[x, y] > 0 || dynamicData[x, y] > 0;
-
-            return data[x, y] > 0;
+            return includeDynamic ? data[x, y] > 0 || dynamicData[x, y] > 0 : data[x, y] > 0;
         }
 
         public IEnumerable<Point> EnumerateGridsInBrush(Vector2 position, PathBrush brush)
@@ -600,7 +642,7 @@ namespace Isles.Engine
             {
                 Point p = PositionToGrid(position.X, position.Y, brush);
 
-                for (int i = 0; i < brush.X.Length; i++)
+                for (var i = 0; i < brush.X.Length; i++)
                 {
                     yield return new Point(brush.X[i] + p.X, brush.Y[i] + p.Y);
                 }
@@ -614,10 +656,10 @@ namespace Isles.Engine
         {
             GraphEdge edge; 
             bool connected;
-            int x = nodeIndex % entryWidth;
-            int y = nodeIndex / entryWidth;
+            var x = nodeIndex % entryWidth;
+            var y = nodeIndex / entryWidth;
 
-            for (int k = 0; k < 8; k++)
+            for (var k = 0; k < 8; k++)
             {
                 connected = true;
 
@@ -628,11 +670,12 @@ namespace Isles.Engine
                 }
                 else
                 {
-                    for (int i = 0; i < brush.DX[k].Length; i++)
+                    for (var i = 0; i < brush.DX[k].Length; i++)
                     {
                         if (IsGridObstructed(x + brush.DX[k][i], y + brush.DY[k][i], !ignoreDynamicObstacles))
                         {
-                            connected = false; break;
+                            connected = false;
+                            break;
                         }
                     }
                 }
@@ -676,8 +719,8 @@ namespace Isles.Engine
         /// </summary>
         public ILandscape Landscape
         {
-            get { return landscape; }
-            set 
+            get => landscape;
+            set
             {
                 landscape = value;
                 graph.Landscape = value;
@@ -685,79 +728,72 @@ namespace Isles.Engine
             }
         }
 
-        ILandscape landscape;
+        private ILandscape landscape;
 
         /// <summary>
         /// Graph search
         /// </summary>
-        GraphSearchAStar search;
-        GraphSearchAStar largeSearch;
+        private readonly GraphSearchAStar search;
+        private readonly GraphSearchAStar largeSearch;
 
         /// <summary>
         /// Gets the detailed path graph used for searching
         /// </summary>
-        public PathGraph Graph
-        {
-            get { return graph; }
-        }
+        public PathGraph Graph => graph;
 
         /// <summary>
         /// Gets the large path graph for path searching on the landscape
         /// </summary>
-        public PathGraph LargeGraph
-        {
-            get { return largeGraph; }
-        }
+        public PathGraph LargeGraph => largeGraph;
 
-        PathGraph graph;
-        PathGraph largeGraph;
+        private readonly PathGraph graph;
+        private readonly PathGraph largeGraph;
 
         /// <summary>
         /// Dynamic entities
         /// </summary>
-        List<IMovable> dynamicObstacles = new List<IMovable>();
+        private readonly List<IMovable> dynamicObstacles = new();
 
         /// <summary>
         /// Gets or sets the maximun number of search steps per update
         /// </summary>
         public int MaxSearchStepsPerUpdate
         {
-            get { return maxSearchStepsPerUpdate; }
+            get => maxSearchStepsPerUpdate;
 
             set
             {
                 if (value <= 0)
+                {
                     throw new ArgumentOutOfRangeException();
+                }
 
                 maxSearchStepsPerUpdate = value;
             }
         }
 
-        int maxSearchStepsPerUpdate = 2000;
+        private int maxSearchStepsPerUpdate = 2000;
 
         /// <summary>
         /// Gets whether the path manager is busy at the moment
         /// </summary>
-        public bool Busy
-        {
-            get { return pendingRequestsCount > 0; }
-        }
+        public bool Busy => pendingRequestsCount > 0;
 
         /// <summary>
         /// Pending query requests.
         /// </summary>
-        List<PathQuery> pendingRequests = new List<PathQuery>(8);
+        private readonly List<PathQuery> pendingRequests = new(8);
 
         /// <summary>
         /// Number of pending path finding requests.
         /// Note that the length of the array pendingRequests isn't the real request count.
         /// </summary>
-        int pendingRequestsCount = 0;
+        private int pendingRequestsCount = 0;
 
         /// <summary>
         /// The query current active
         /// </summary>
-        PathQuery currentQuery;
+        private PathQuery currentQuery;
         #endregion
 
         #region PathQuery
@@ -810,16 +846,13 @@ namespace Isles.Engine
             public PathQuery(int start, int end, Vector2 destination, float priority,
                              Rectangle boundary, IEventListener subscriber, IMovable obstacle)
             {
-                if (subscriber == null)
-                    throw new ArgumentException();
-
-                this.Start = start;
-                this.End = end;
-                this.Destination = destination;
-                this.Priority = priority;
-                this.Subscriber = subscriber;
-                this.Obstacle = obstacle;
-                this.Boundary = boundary;
+                Start = start;
+                End = end;
+                Destination = destination;
+                Priority = priority;
+                Subscriber = subscriber ?? throw new ArgumentException();
+                Obstacle = obstacle;
+                Boundary = boundary;
             }
         }
         #endregion
@@ -849,52 +882,64 @@ namespace Isles.Engine
         public PathBrush CreateBrush(float radius)
         {
             if (radius < 0)
+            {
                 throw new ArgumentException();
+            }
 
-            int size = (int)(2 * radius / graph.CellSize);
+            var size = (int)(2 * radius / graph.CellSize);
             if (size < 1)
+            {
                 size = 1;
+            }
 
-            int halfSize = size / 2;
+            var halfSize = size / 2;
             if (halfSize < 0)
+            {
                 halfSize = 0;
-     
+            }
+
             radius = halfSize * graph.CellSize;
 
-            List<int> xPoints = new List<int>();
-            List<int> yPoints = new List<int>();
+            var xPoints = new List<int>();
+            var yPoints = new List<int>();
 
             if (size % 2 == 0)
             {
                 // If we have even number of grids
 
-                for (int x = -halfSize; x < halfSize; x++)
-                    for (int y = -halfSize; y < halfSize; y++)
+                for (var x = -halfSize; x < halfSize; x++)
+                {
+                    for (var y = -halfSize; y < halfSize; y++)
                     {
-                        float xx = x * graph.CellSize + graph.HalfCellSize;
-                        float yy = y * graph.CellSize + graph.HalfCellSize;
+                        var xx = x * graph.CellSize + graph.HalfCellSize;
+                        var yy = y * graph.CellSize + graph.HalfCellSize;
 
                         if (xx * xx + yy * yy <= radius * radius)
                         {
-                            xPoints.Add(x); yPoints.Add(y);
+                            xPoints.Add(x);
+                            yPoints.Add(y);
                         }
                     }
+                }
             }
             else
             {
                 // If we have odd number of grids
 
-                for (int x = -halfSize; x <= halfSize; x++)
-                    for (int y = -halfSize; y <= halfSize; y++)
+                for (var x = -halfSize; x <= halfSize; x++)
+                {
+                    for (var y = -halfSize; y <= halfSize; y++)
                     {
-                        float xx = x * graph.CellSize;
-                        float yy = y * graph.CellSize;
+                        var xx = x * graph.CellSize;
+                        var yy = y * graph.CellSize;
 
                         if (xx * xx + yy * yy <= radius * radius)
                         {
-                            xPoints.Add(x); yPoints.Add(y);
+                            xPoints.Add(x);
+                            yPoints.Add(y);
                         }
                     }
+                }
             }
 
             return new PathBrush(xPoints.ToArray(), yPoints.ToArray());
@@ -906,7 +951,9 @@ namespace Isles.Engine
         public void AddMovable(IMovable obstacle)
         {
             if (obstacle == null || obstacle.MovementTag != null)
+            {
                 throw new ArgumentException();
+            }
 
             System.Diagnostics.Debug.Assert(!dynamicObstacles.Contains(obstacle));
 
@@ -914,7 +961,7 @@ namespace Isles.Engine
             dynamicObstacles.Add(obstacle);
 
             // Store marked grids in the tag of the obstacle
-            Tag tag = new Tag();
+            var tag = new Tag();
 
             tag.Position = obstacle.Position;
             tag.Marks = new List<Point>();
@@ -925,7 +972,9 @@ namespace Isles.Engine
 
             // Change graph structure
             foreach (Point p in tag.Marks)
+            {
                 graph.MarkDynamic(p.X, p.Y);
+            }
         }
 
         /// <summary>
@@ -934,57 +983,68 @@ namespace Isles.Engine
         public void RemoveMovable(IMovable obstacle)
         {
             if (obstacle == null)
+            {
                 throw new ArgumentException();
+            }
 
             // Removes the entity from internal list
-            for (int i = 0; i < dynamicObstacles.Count; i++)
+            for (var i = 0; i < dynamicObstacles.Count; i++)
+            {
                 if (dynamicObstacles[i] == obstacle)
                 {
-                    Tag tag = obstacle.MovementTag as Tag;
+                    var tag = obstacle.MovementTag as Tag;
 
                     // Change path graph structure
                     foreach (Point p in tag.Marks)
+                    {
                         graph.UnmarkDynamic(p.X, p.Y);
+                    }
 
                     obstacle.MovementTag = null;
                     dynamicObstacles.RemoveAt(i);
                     return;
                 }
+            }
         }
 
         public IEnumerable<Point> EnumerateGridsInAxisAlignedRectangle(Vector2 position, int grids)
         {
-            float x = position.X / graph.CellSize;
-            float y = position.Y / graph.CellSize;
+            var x = position.X / graph.CellSize;
+            var y = position.Y / graph.CellSize;
 
             if (grids % 2 == 1)
             {
-                int xx = (int)x;
-                int yy = (int)y;
+                var xx = (int)x;
+                var yy = (int)y;
 
-                for (int i = -grids / 2; i <= grids / 2; i++)
+                for (var i = -grids / 2; i <= grids / 2; i++)
+                {
                     yield return new Point(xx + i, yy + i);
+                }
             }
             else
             {
-                int xx = (x - (int)x) > 0.5f ? (int)x + 1 : (int)x;
-                int yy = (y - (int)y) > 0.5f ? (int)y + 1 : (int)y;
+                var xx = (x - (int)x) > 0.5f ? (int)x + 1 : (int)x;
+                var yy = (y - (int)y) > 0.5f ? (int)y + 1 : (int)y;
 
-                for (int i = -grids / 2; i < grids / 2; i++)
+                for (var i = -grids / 2; i < grids / 2; i++)
+                {
                     yield return new Point(xx + i, yy + i);
+                }
             }
         }
 
         public IEnumerable<Point> EnumerateGridsInOutline(Outline outline)
         {
             if (outline.Type == OutlineType.Circle)
+            {
                 return EnumerateGridsInCircle(outline.Position, outline.Radius);
+            }
 
-            if (outline.Type == OutlineType.Rectangle)
-                return EnumerateGridsInRectangle(outline.Min, outline.Max,
-                                                 outline.Position, outline.Rotation);
-
-            return null;
+            return outline.Type == OutlineType.Rectangle
+                ? EnumerateGridsInRectangle(outline.Min, outline.Max,
+                                                 outline.Position, outline.Rotation)
+                : null;
         }
 
         public IEnumerable<Point> EnumerateGridsInRectangle(
@@ -993,17 +1053,21 @@ namespace Isles.Engine
             Vector2 mid = Math2D.LocalToWorld((min + max) / 2, translation, rotation);
 
             Point midGrid = graph.PositionToGrid(mid.X, mid.Y);
-            int radius = 1 + (int)(Math.Max(max.X - min.X, max.Y - min.Y) / graph.CellSize / 2);
+            var radius = 1 + (int)(Math.Max(max.X - min.X, max.Y - min.Y) / graph.CellSize / 2);
 
             Vector2 p;
 
-            for (int x = midGrid.X - radius; x <= midGrid.X + radius; x++)
-                for (int y = midGrid.Y - radius; y < midGrid.Y + radius; y++)
+            for (var x = midGrid.X - radius; x <= midGrid.X + radius; x++)
+            {
+                for (var y = midGrid.Y - radius; y < midGrid.Y + radius; y++)
                 {
                     p = graph.GridToPosition(x, y);
                     if (Math2D.PointInRectangle(p, min, max, translation, rotation))
+                    {
                         yield return new Point(x, y);
+                    }
                 }
+            }
         }
 
         public IEnumerable<Point> EnumerateGridsInCircle(Vector2 position, float radius)
@@ -1011,17 +1075,18 @@ namespace Isles.Engine
             Vector2 min = position - new Vector2(radius, radius);
             Vector2 max = position + new Vector2(radius, radius);
 
-            int xMin = (int)(min.X / graph.CellSize);
-            int xMax = (int)(max.X / graph.CellSize);
-            int yMin = (int)(min.Y / graph.CellSize);
-            int yMax = (int)(max.Y / graph.CellSize);
+            var xMin = (int)(min.X / graph.CellSize);
+            var xMax = (int)(max.X / graph.CellSize);
+            var yMin = (int)(min.Y / graph.CellSize);
+            var yMax = (int)(max.Y / graph.CellSize);
 
-            float radiusSquared = radius * radius;
+            var radiusSquared = radius * radius;
 
-            int counter = 0;
+            var counter = 0;
             Vector2 center;
-            for (int y = yMin; y <= yMax; y++)
-                for (int x = xMin; x <= xMax; x++)
+            for (var y = yMin; y <= yMax; y++)
+            {
+                for (var x = xMin; x <= xMax; x++)
                 {
                     center.X = x * graph.CellSize + graph.CellSize / 2;
                     center.Y = y * graph.CellSize + graph.CellSize / 2;
@@ -1033,17 +1098,20 @@ namespace Isles.Engine
                         yield return new Point(x, y);
                     }
                 }
+            }
 
             if (counter == 0)
+            {
                 // At least one grid must be returned
                 yield return new Point(xMin, yMin);
+            }
         }
 
         public IEnumerable<Point> EnumerateGridsInnerOut(int x, int y, int maxRadius)
         {
-            for (int r = 1; r < maxRadius; r++)
+            for (var r = 1; r < maxRadius; r++)
             {
-                for (int i = -r; i < r; i++)
+                for (var i = -r; i < r; i++)
                 {
                     yield return new Point(x + r, y + i);
                     yield return new Point(x - r, y + i + 1);
@@ -1064,27 +1132,27 @@ namespace Isles.Engine
             this.landscape = landscape;
 
             // Create a new graph
-            this.graph = new PathGraph(landscape, Resolution, occluders);
-            this.largeGraph = new PathGraph(landscape, 0.25f, null);
+            graph = new PathGraph(landscape, Resolution, occluders);
+            largeGraph = new PathGraph(landscape, 0.25f, null);
 
             // Create a new graph searcher
-            this.search = new GraphSearchAStar();
-            this.largeSearch = new GraphSearchAStar();
+            search = new GraphSearchAStar();
+            largeSearch = new GraphSearchAStar();
 
             // Read in settings value
-            this.MaxSearchStepsPerUpdate = BaseGame.Singleton.Settings
+            MaxSearchStepsPerUpdate = BaseGame.Singleton.Settings
                                                              .MaxPathSearchStepsPerUpdate;
         }
 
         private void Test()
         {
-            Random random = new Random();
+            var random = new Random();
 
-            int queryCount = 1000;
-            int nodeCount = graph.NodeCount;
+            var queryCount = 1000;
+            var nodeCount = graph.NodeCount;
 
             DateTime start = DateTime.Now;
-            for (int i = 0; i < queryCount; i++)
+            for (var i = 0; i < queryCount; i++)
             {
                 search.Search(graph, random.Next(graph.NodeCount),
                                      random.Next(graph.NodeCount));
@@ -1099,10 +1167,12 @@ namespace Isles.Engine
         {
             if (agent != null && agent.MovementTag is Tag)
             {
-                Tag tag = agent.MovementTag as Tag;
+                var tag = agent.MovementTag as Tag;
 
                 foreach (Point p in tag.Marks)
+                {
                     graph.MarkDynamic(p.X, p.Y);
+                }
             }
         }
 
@@ -1110,24 +1180,30 @@ namespace Isles.Engine
         {
             if (agent != null && agent.MovementTag is Tag)
             {
-                Tag tag = agent.MovementTag as Tag;
+                var tag = agent.MovementTag as Tag;
 
                 foreach (Point p in tag.Marks)
+                {
                     graph.UnmarkDynamic(p.X, p.Y);
+                }
             }
         }
 
         public void Mark(IEnumerable<Point> staticMarks)
         {
             foreach (Point p in staticMarks)
+            {
                 graph.Mark(p.X, p.Y);
+            }
         }
 
         public void Unmark(IEnumerable<Point> staticMarks)
         {
 
             foreach (Point p in staticMarks)
+            {
                 graph.Unmark(p.X, p.Y);
+            }
         }
         
 
@@ -1136,12 +1212,14 @@ namespace Isles.Engine
         /// </summary>
         public Vector2 FindValidPosition(Vector2 position, PathBrush brush)
         {
-            int x = (int)(position.X / graph.CellSize);
-            int y = (int)(position.Y / graph.CellSize);
+            var x = (int)(position.X / graph.CellSize);
+            var y = (int)(position.Y / graph.CellSize);
 
             // First check the input grid
             if (!graph.IsBrushObstructed(position.X, position.Y, brush, true))
+            {
                 return position;
+            }
 
             // look up its adjancent grids
             foreach (Point p in EnumerateGridsInnerOut(x, y, 512))
@@ -1167,7 +1245,7 @@ namespace Isles.Engine
                                              Vector2? lastPosition, IMovable agent, bool includeDynamics)
         {
             Unmark(agent);
-            if (this.CanBePlacedAt(target.X, target.Y, agent))
+            if (CanBePlacedAt(target.X, target.Y, agent))
             {
                 Mark(agent);
                 return target;
@@ -1175,7 +1253,9 @@ namespace Isles.Engine
             Vector2 lastPositionValue;
             Vector2 startValue;
             if (lastPosition.HasValue && lastPosition.Value == target)
+            {
                 lastPosition = null;
+            }
 
             if (start.HasValue)
             {
@@ -1213,7 +1293,7 @@ namespace Isles.Engine
             Vector2 newDirection, newTarget, lastDirection, originalDirection, prep;
             float distance = 0;
             float angle;
-            int count = 0;
+            var count = 0;
 
             originalDirection = target - startValue;
             while (true)
@@ -1233,12 +1313,18 @@ namespace Isles.Engine
                 distance = lastDirection.Length();
                 prep = new Vector2(-originalDirection.Y, originalDirection.X);
 
-                float factor = Vector2.Dot(originalDirection, lastDirection)
+                var factor = Vector2.Dot(originalDirection, lastDirection)
                         / originalDirection.Length() / lastDirection.Length();
                 if (factor > 1)
+                {
                     factor = 1;
+                }
+
                 if (factor < -1)
+                {
                     factor = -1;
+                }
+
                 angle = (float)Math.Acos(factor);
                 angle += (float)Math.PI / 15;
                 if (angle > Math.PI)
@@ -1249,9 +1335,13 @@ namespace Isles.Engine
                 else
                 {
                     if (Vector2.Dot(lastDirection, prep) > 0)
+                    {
                         newDirection = Math2D.LocalToWorld(originalDirection, Vector2.Zero, -angle);
+                    }
                     else
+                    {
                         newDirection = Math2D.LocalToWorld(originalDirection, Vector2.Zero, angle);
+                    }
                 }
                 newDirection.Normalize();
                 newDirection *= distance;
@@ -1341,14 +1431,15 @@ namespace Isles.Engine
             return true;
         }
 
-
         /// <summary>
         /// Tests to see if the specified brush can be placed at a given location
         /// </summary>
         public bool CanBePlacedAt(float x, float y, PathBrush brush, bool includingDynamics)
         {
             if (brush == null)
+            {
                 throw new ArgumentNullException();
+            }
 
             foreach (Point p in graph.EnumerateGridsInBrush(new Vector2(x, y), brush))
             {
@@ -1367,7 +1458,9 @@ namespace Isles.Engine
         public bool CanBePlacedAt(float x, float y, IMovable agent)
         {
             if (agent == null || !(agent.MovementTag is Tag))
+            {
                 return true;
+            }
 
             Unmark(agent);
 
@@ -1390,23 +1483,25 @@ namespace Isles.Engine
         public bool CanMoveBetween(Vector2 start, Vector2 end, IMovable agent, bool includeDynamic)
         {
             if (agent == null || !(agent.MovementTag is Tag))
+            {
                 return true;
+            }
 
             Unmark(agent);
             
-            Vector2 step = Vector2.Subtract(end, start);
+            var step = Vector2.Subtract(end, start);
             step.Normalize();
             step *= graph.CellSize * 0.5f;
 
-            bool firstGrid = true;
-            int steps = (int)(Vector2.Subtract(end, start).Length() / step.Length());
+            var firstGrid = true;
+            var steps = (int)(Vector2.Subtract(end, start).Length() / step.Length());
                 
-            for (int i = 0; i < steps; i++)
+            for (var i = 0; i < steps; i++)
             {
                 // Make it more precise on the first grid
                 if (firstGrid)
                 {
-                    for (int k = 0; k < 5; k++)
+                    for (var k = 0; k < 5; k++)
                     {
                         if (graph.IsBrushObstructed(start.X, start.Y, agent.Brush, includeDynamic))
                         {
@@ -1445,11 +1540,13 @@ namespace Isles.Engine
             // Adjust end position to avoid searching on the whole graph
             if (largeGraph.IsGridObstructed(endGrid.X, endGrid.Y, true))
             {
-                int counter = 0;
+                var counter = 0;
                 foreach (Point p in EnumerateGridsInnerOut(endGrid.X, endGrid.Y, 512))
                 {
                     if (counter++ > 512)
+                    {
                         return new Path();
+                    }
 
                     if (p.X >= 0 && p.X < largeGraph.EntryWidth &&
                         p.Y >= 0 && p.Y < largeGraph.EntryHeight &&
@@ -1470,7 +1567,9 @@ namespace Isles.Engine
 
                 // If we moved the end position, don't forget to append it to the end
                 if (path.Edges.Count > 0)
+                {
                     path.Edges.AddLast(new PathEdge(end));
+                }
 
                 return path;
             }
@@ -1478,9 +1577,8 @@ namespace Isles.Engine
             return null;
         }
 
-
         public const int AreaSize = (int)(16 * Resolution);
-        const float FactorToStart = 0.55f;
+        private const float FactorToStart = 0.55f;
 
         /// <summary>
         /// Query a path asychroniously from start node to end node.
@@ -1512,28 +1610,32 @@ namespace Isles.Engine
             bounds.Y = (endGrid.Y + startGrid.Y) / 2 - (int)(bounds.Height * FactorToStart);
 
             // Creates a new path query
-            PathQuery query = new PathQuery(graph.GridToIndex(startGrid.X, startGrid.Y),
+            var query = new PathQuery(graph.GridToIndex(startGrid.X, startGrid.Y),
                                             graph.GridToIndex(endGrid.X, endGrid.Y),
                                             end, priority, bounds, subscriber, obstacle);
 
             // One subscriber can only query one path at a time,
             // the new path query will replace the old one.
-            for (int i = 0; i < pendingRequests.Count; i++)
+            for (var i = 0; i < pendingRequests.Count; i++)
+            {
                 if (pendingRequests[i] != null &&
                     pendingRequests[i].Subscriber == subscriber)
                 {
                     pendingRequests[i] = query;
                     return;
                 }
+            }
 
             // Check if there's any space for we to insert into the  list
-            for (int i = 0; i < pendingRequests.Count; i++)
+            for (var i = 0; i < pendingRequests.Count; i++)
+            {
                 if (pendingRequests[i] == null)
                 {
                     pendingRequests[i] = query;
                     pendingRequestsCount++;
                     return;
                 }
+            }
 
             // Add a new query to the priority queue
             pendingRequests.Add(query);
@@ -1545,7 +1647,8 @@ namespace Isles.Engine
         /// </summary>
         public void CancelQuery(IEventListener subscriber)
         {
-            for (int i = 0; i < pendingRequests.Count; i++)
+            for (var i = 0; i < pendingRequests.Count; i++)
+            {
                 if (pendingRequests[i] != null &&
                     pendingRequests[i].Subscriber == subscriber)
                 {
@@ -1553,6 +1656,7 @@ namespace Isles.Engine
                     pendingRequestsCount--;
                     break;
                 }
+            }
         }
         #endregion
 
@@ -1572,7 +1676,7 @@ namespace Isles.Engine
         private void UpdatePathGraph()
         {
             // Change the structure of the graph if any dynamic obstacle moves
-            for (int i = 0; i < dynamicObstacles.Count; i++)
+            for (var i = 0; i < dynamicObstacles.Count; i++)
             {
                 IMovable obstacle = dynamicObstacles[i];
 
@@ -1580,13 +1684,15 @@ namespace Isles.Engine
                 // because that method will reset entity.IsDirty to false...
                 if (obstacle != null && obstacle.MovementTag is Tag)
                 {
-                    Tag tag = obstacle.MovementTag as Tag;
+                    var tag = obstacle.MovementTag as Tag;
 
                     if (obstacle.Position != tag.Position)
                     {
                         // Unmark previous grids
                         foreach (Point p in tag.Marks)
+                        {
                             graph.UnmarkDynamic(p.X, p.Y);
+                        }
 
                         // Gets grids from brush
                         tag.Marks.Clear();
@@ -1595,7 +1701,9 @@ namespace Isles.Engine
                                                              obstacle.Brush));
                         // Mark new grids
                         foreach (Point p in tag.Marks)
+                        {
                             graph.MarkDynamic(p.X, p.Y);
+                        }
                     }
                 }
             }
@@ -1608,11 +1716,13 @@ namespace Isles.Engine
         {
             if (obstacle != null && obstacle.MovementTag is Tag)
             {
-                Tag tag = obstacle.MovementTag as Tag;
+                var tag = obstacle.MovementTag as Tag;
 
                 // Unmark previous grids
                 foreach (Point p in tag.Marks)
+                {
                     graph.UnmarkDynamic(p.X, p.Y);
+                }
 
                 // Gets grids from brush
                 tag.Marks.Clear();
@@ -1621,34 +1731,43 @@ namespace Isles.Engine
                                                      obstacle.Brush));
                 // Mark new grids
                 foreach (Point p in tag.Marks)
+                {
                     graph.MarkDynamic(p.X, p.Y);
+                }
             }
         }
 
         private void UpdateSearch()
         {
-            int steps = 0;
-            int totalSteps = 0;
+            var steps = 0;
+            var totalSteps = 0;
 
             // Do nothing if there's no pending requests
             if (pendingRequestsCount <= 0)
+            {
                 return;
+            }
 
             while (totalSteps < maxSearchStepsPerUpdate && pendingRequestsCount > 0)
             {
-                int min = -1;
-                float priority = float.MaxValue;
+                var min = -1;
+                var priority = float.MaxValue;
 
                 // Gets the query with the highest priority
-                for (int i = 0; i < pendingRequests.Count; i++)
+                for (var i = 0; i < pendingRequests.Count; i++)
+                {
                     if (pendingRequests[i] != null &&
                         pendingRequests[i].Priority < priority)
                     {
                         priority = pendingRequests[i].Priority;
                         min = i;
                     }
+                }
 
-                if (min < 0) break;
+                if (min < 0)
+                {
+                    break;
+                }
 
                 PathQuery query = pendingRequests[min];
 
@@ -1669,7 +1788,7 @@ namespace Isles.Engine
                 Unmark(query.Obstacle);
 
                 // Handle current query
-                bool? result = search.Search(
+                var result = search.Search(
                     graph, query.Start, query.End, maxSearchStepsPerUpdate, out steps);
 
                 Mark(query.Obstacle);
@@ -1710,7 +1829,6 @@ namespace Isles.Engine
 
                     System.Diagnostics.Debug.Assert(pendingRequestsCount >= 0);
 
-
                     //BaseGame game = BaseGame.Singleton;
                     //Vector2 s = graph.IndexToPosition(query.Start);
                     //Vector2 e = graph.IndexToPosition(query.End);
@@ -1727,8 +1845,10 @@ namespace Isles.Engine
 
 #if DEBUG
             if (totalSteps > 0)
+            {
                 BaseGame.Singleton.Graphics2D.DrawString(
                     "Finding Path...", 15f/23, new Vector2(0, 100), Color.White);
+            }
 #endif
         }
 
@@ -1737,26 +1857,26 @@ namespace Isles.Engine
         /// </summary>
         private Path BuildPath(IEnumerable<int> path, PathGraph graph, IMovable agent, bool simplifyPath)
         {
-            Point previous = new Point();
-            Path resultPath = new Path();
+            var previous = new Point();
+            var resultPath = new Path();
             PathBrush brush = (agent != null ? agent.Brush : null);
 
             // Ignore first edge
-            bool firstEdge = true;
+            var firstEdge = true;
 
-            int direction = -1;
-            foreach (int i in path)
+            var direction = -1;
+            foreach (var i in path)
             {
                 // Note how we invert the path.
                 // Since the path from graph search are actually from the end to start.
                 Point p = graph.IndexToGrid(i);
 
-                PathEdge edge = new PathEdge(graph.GridToPosition(p.X, p.Y, brush));
+                var edge = new PathEdge(graph.GridToPosition(p.X, p.Y, brush));
 
                 // Simplify path, leaving only corners.
                 if (!firstEdge && simplifyPath && resultPath.Edges.Count > 0)
                 {
-                    int newDirection = GetDirection(previous, p);
+                    var newDirection = GetDirection(previous, p);
                     previous = p;
 
                     // Add a new node only if it's in the corner
@@ -1784,13 +1904,17 @@ namespace Isles.Engine
 
             // Ignore the first edge
             if (current != null)
+            {
                 current = current.Next;
+            }
 
             while (current != null)
             {
                 // Traverse the path nodes, remove as much nodes as we can
                 if (current.Next == null)
+                {
                     return;
+                }
 
                 // Advance two steps ahead and see if we can remove some nodes
                 next = current.Next.Next;
@@ -1820,20 +1944,24 @@ namespace Isles.Engine
         private int GetDirection(Point from, Point to)
         {
             if (Math2D.FloatEquals(to.X, from.X))
+            {
                 return to.Y > from.Y ? 7 : 3;
+            }
+
             if (Math2D.FloatEquals(to.Y, from.Y))
+            {
                 return to.X > from.X ? 1 : 5;
-            if (to.X > from.X)
-                return to.Y > from.Y ? 0 : 2;
+            }
 
-            return to.Y > from.Y ? 6 : 4;
+            return to.X > from.X ? to.Y > from.Y ? 0 : 2 : to.Y > from.Y ? 6 : 4;
         }
-
 
         public void DrawPath(Path path)
         {
             if (path == null)
+            {
                 return;
+            }
 
             BaseGame game = BaseGame.Singleton;
 
@@ -1841,8 +1969,8 @@ namespace Isles.Engine
 
             while (p != null && p.Next != null)
             {
-                Vector3 a = new Vector3(p.Value.Position, 0);
-                Vector3 b = new Vector3(p.Next.Value.Position, 0);
+                var a = new Vector3(p.Value.Position, 0);
+                var b = new Vector3(p.Next.Value.Position, 0);
 
                 a.Z = Landscape.GetHeight(a.X, a.Y);
                 b.Z = Landscape.GetHeight(b.X, b.Y);

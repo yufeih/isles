@@ -135,12 +135,15 @@ namespace Isles.UI
         /// </summary>
         virtual public Rectangle Area
         {
-            get { return area; }
-            set { area = value; IsDirty = true; }
+            get => area;
+            set
+            {
+                area = value;
+                IsDirty = true;
+            }
         }
 
-        Rectangle area;
-
+        private Rectangle area;
 
         /// <summary>
         /// Gets button destination rectangle
@@ -170,32 +173,33 @@ namespace Isles.UI
         /// Whether destination rectangle is dirty
         /// </summary>
         public bool IsDirty = true;
-
-        Rectangle destinationRectangle;
-
+        private Rectangle destinationRectangle;
 
         /// <summary>
         /// Gets or sets button source rectangle
         /// </summary>
         public Rectangle SourceRectangle
         {
-            get { return sourceRectangle; }
-            set { sourceRectangle = value; }
+            get => sourceRectangle;
+            set => sourceRectangle = value;
         }
 
-        Rectangle sourceRectangle;
-
+        private Rectangle sourceRectangle;
 
         /// <summary>
         /// Gets or sets UI element visibility
         /// </summary>
         public bool Visible
         {
-            get { return visible; }
-            set { visible = value; OnVisibleChanged(); }
+            get => visible;
+            set
+            {
+                visible = value;
+                OnVisibleChanged();
+            }
         }
 
-        bool visible = true;
+        private bool visible = true;
 
         protected virtual void OnVisibleChanged() { }
 
@@ -204,82 +208,99 @@ namespace Isles.UI
         /// </summary>
         public bool Enabled
         {
-            get { return enabled; }
-            set { enabled = value; OnEnableStateChanged(); }
+            get => enabled;
+            set
+            {
+                enabled = value;
+                OnEnableStateChanged();
+            }
         }
 
-        bool enabled = true;
+        private bool enabled = true;
 
         protected virtual void OnEnableStateChanged() { }
-
 
         /// <summary>
         /// Gets or sets the texture used to draw the button
         /// </summary>
         public Texture2D Texture
         {
-            get { return texture; }
-            set { texture = value; }
+            get => texture;
+            set => texture = value;
         }
 
-        Texture2D texture;
-
+        private Texture2D texture;
 
         /// <summary>
         /// Gets or sets UI element x position
         /// </summary>
         public int X
         {
-            get { return area.X; }
-            set { area.X = value; IsDirty = true; }
+            get => area.X;
+            set
+            {
+                area.X = value;
+                IsDirty = true;
+            }
         }
-
 
         /// <summary>
         /// Gets or sets UI element x position
         /// </summary>
         public int Y
         {
-            get { return area.Y; }
-            set { area.Y = value; IsDirty = true; }
+            get => area.Y;
+            set
+            {
+                area.Y = value;
+                IsDirty = true;
+            }
         }
-
 
         /// <summary>
         /// Gets or sets the anchor mode of the UI element
         /// </summary>
         public Anchor Anchor
         {
-            get { return anchor; }
-            set { anchor = value; IsDirty = true; }
+            get => anchor;
+            set
+            {
+                anchor = value;
+                IsDirty = true;
+            }
         }
 
-        Anchor anchor = Anchor.TopLeft;
-
+        private Anchor anchor = Anchor.TopLeft;
 
         /// <summary>
         /// Gets or sets the scale mode of the UI element
         /// </summary>
         public ScaleMode ScaleMode
         {
-            get { return scaleMode; }
-            set { scaleMode = value; IsDirty = true; }
+            get => scaleMode;
+            set
+            {
+                scaleMode = value;
+                IsDirty = true;
+            }
         }
 
-        ScaleMode scaleMode = ScaleMode.ScaleY;
-
+        private ScaleMode scaleMode = ScaleMode.ScaleY;
 
         /// <summary>
         /// Gets or sets the parent of this UI element
         /// </summary>
         public IUIElement Parent
         {
-            get { return parent; }
-            set { parent = value; IsDirty = true; }
+            get => parent;
+            set
+            {
+                parent = value;
+                IsDirty = true;
+            }
         }
 
-        IUIElement parent;
-
+        private IUIElement parent;
 
         /// <summary>
         /// Gets or sets a tag
@@ -344,7 +365,6 @@ namespace Isles.UI
             return GetRelativeRectangle(rectangle, parent, scaleMode, anchor);
         }
 
-
         /// <summary>
         /// Gets the relative rectangle based on current anchor,
         /// scale mode and parent reference rectangle.
@@ -355,7 +375,9 @@ namespace Isles.UI
             Rectangle rectangle, IUIElement parent, ScaleMode scaleMode, Anchor anchor)
         {
             if (parent == null)
+            {
                 return rectangle;
+            }
 
             Rectangle relativeRectangle;
 
@@ -394,7 +416,6 @@ namespace Isles.UI
                 relativeRectangle.Width = rectangle.Width;
                 relativeRectangle.Height = rectangle.Height;
             }
-
 
             // anchor
 

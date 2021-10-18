@@ -74,7 +74,6 @@ namespace Isles.Engine
         }
     }
 
-
     /// <summary>
     /// Represents a composite game state.
     /// All child states will be executed.
@@ -84,7 +83,7 @@ namespace Isles.Engine
         public override void Activate() { }
         public override void Terminate() { }
 
-        protected LinkedList<IState> SubStates = new LinkedList<IState>();
+        protected LinkedList<IState> SubStates = new();
 
         /// <remarks>
         /// Should be called before attaching this state to a state machine
@@ -147,20 +146,25 @@ namespace Isles.Engine
         public override void Draw(GameTime gameTime)
         {
             foreach (IState state in SubStates)
+            {
                 state.Draw(gameTime);
+            }
         }
 
         public override EventResult HandleEvent(EventType type, object sender, object tag)
         {
             // Pass to all sub states
             foreach (IState state in SubStates)
+            {
                 if (state.HandleEvent(type, state, tag) == EventResult.Handled)
+                {
                     return EventResult.Handled;
+                }
+            }
 
             return EventResult.Unhandled;
         }
     }
-
 
     /// <summary>
     /// Represents a sequence of game states.
@@ -171,7 +175,7 @@ namespace Isles.Engine
         public override void Activate() { }
         public override void Terminate() { }
 
-        protected LinkedList<IState> SubStates = new LinkedList<IState>();
+        protected LinkedList<IState> SubStates = new();
 
         /// <remarks>
         /// Should be called before attaching this state to a state machine
@@ -225,15 +229,15 @@ namespace Isles.Engine
         {
             // Only draw the first state
             if (SubStates.First != null)
+            {
                 SubStates.First.Value.Draw(gameTime);
+            }
         }
 
         public override EventResult HandleEvent(EventType type, object sender, object tag)
         {
             // Only pass to the first state
-            if (SubStates.First != null)
-                return SubStates.First.Value.HandleEvent(type, sender, tag);
-            return EventResult.Unhandled;
+            return SubStates.First != null ? SubStates.First.Value.HandleEvent(type, sender, tag) : EventResult.Unhandled;
         }
     }
     #endregion
@@ -251,19 +255,16 @@ namespace Isles.Engine
         /// <summary>
         /// Game world
         /// </summary>
-        public GameWorld World
-        {
-            get { return world; }
-        }
+        public GameWorld World => world;
 
-        GameWorld world;
+        private readonly GameWorld world;
 
         /// <summary>
         /// Gets or sets the 3D position of the entity.
         /// </summary>
         public virtual Vector3 Position
         {
-            get { return position; }
+            get => position;
 
             set
             {
@@ -273,28 +274,20 @@ namespace Isles.Engine
             }
         }
 
-        Vector3 position;
-        
+        private Vector3 position;
+
 
         /// <summary>
         /// Gets or sets which way the entity is facing.
         /// Used for 3D sound.
         /// </summary>
-        public virtual Vector3 Forward
-        {
-            get { return Vector3.UnitZ; }
-        }
-
+        public virtual Vector3 Forward => Vector3.UnitZ;
 
         /// <summary>
         /// Gets or sets the orientation of this entity.
         /// Used for 3D sound.
         /// </summary>
-        public Vector3 Up
-        {
-            get { return Vector3.UnitZ; }
-        }
-
+        public Vector3 Up => Vector3.UnitZ;
 
         /// <summary>
         /// Gets or sets how fast this entity is moving.
@@ -302,10 +295,9 @@ namespace Isles.Engine
         /// </summary>
         public virtual Vector3 Velocity
         {
-            get { return Vector3.Zero; }
+            get => Vector3.Zero;
             set { }
         }
-
 
         /// <summary>
         /// By marking the IsDirty property of a scene object, the scene
@@ -314,7 +306,7 @@ namespace Isles.Engine
         /// </summary>
         public virtual bool IsDirty
         {
-            get { return false; }
+            get => false;
             set { }
         }
 
@@ -323,28 +315,24 @@ namespace Isles.Engine
         /// </summary>
         public object SceneManagerTag
         {
-            get { return sceneManagerTag; }
-            set { sceneManagerTag = value; }
+            get => sceneManagerTag;
+            set => sceneManagerTag = value;
         }
 
-        object sceneManagerTag;
+        private object sceneManagerTag;
 
-        public virtual BoundingBox BoundingBox
-        {
-            get { return new BoundingBox(); }
-        }
-
+        public virtual BoundingBox BoundingBox => new BoundingBox();
 
         /// <summary>
         /// Gets or sets entity name
         /// </summary>
         public string Name
         {
-            get { return name; }
-            set { name = value; }
+            get => name;
+            set => name = value;
         }
 
-        string name;
+        private string name;
         
 
         /// <summary>
@@ -352,20 +340,19 @@ namespace Isles.Engine
         /// </summary>
         public string ClassID
         {
-            get { return classID; }
-            set { classID = value; }
+            get => classID;
+            set => classID = value;
         }
 
-        string classID;
-
+        private string classID;
 
         /// <summary>
         /// Gets or sets whether this world object is active
         /// </summary>
         public virtual bool IsActive
         {
-            get { return false; }
-            set { throw new Exception("Base entity is inactive by default"); }
+            get => false;
+            set => throw new Exception("Base entity is inactive by default");
         }
 
         #endregion
@@ -376,7 +363,7 @@ namespace Isles.Engine
         public BaseEntity(GameWorld world)
         {
             this.world = world;
-            this.name = "Entity " + (EntityCount++);
+            name = "Entity " + (EntityCount++);
         }
 
         /// <summary>
@@ -448,11 +435,15 @@ namespace Isles.Engine
             string value;
 
             if (xml.HasAttribute("Name"))
+            {
                 name = xml.GetAttribute("Name");
+            }
 
             if ((value = xml.GetAttribute("Position")) != "")
+            {
                 // Note this should be the upper case Position!!!
                 Position = Helper.StringToVector3(value);
+            }
         }
 
         /// <summary>
@@ -482,7 +473,7 @@ namespace Isles.Engine
         /// </summary>
         public IState State
         {
-            get { return state; }
+            get => state;
 
             set
             {
@@ -491,13 +482,16 @@ namespace Isles.Engine
                 if (OnStateChanged(value, ref resultState))
                 {
                     if (state != null)
+                    {
                         state.Terminate();
+                    }
+
                     state = resultState;
                 }
             }
         }
 
-        IState state;
+        private IState state;
 
         protected virtual bool OnStateChanged(IState newState, ref IState resultState) { return true; }
 
@@ -506,7 +500,7 @@ namespace Isles.Engine
         /// </summary>
         public GameModel Model
         {
-            get { return model; }
+            get => model;
 
             set
             {
@@ -515,76 +509,83 @@ namespace Isles.Engine
             }
         }
 
-        GameModel model;
-
+        private GameModel model;
 
         /// <summary>
         /// Gets or sets whether this entity is visible
         /// </summary>
         public bool Visible
         {
-            get { return visible; }
-            set { visible = value; }
+            get => visible;
+            set => visible = value;
         }
 
-        bool visible = true;
-
+        private bool visible = true;
 
         /// <summary>
         /// Gets or sets whether the entity is within the view frustum
         /// </summary>
-        public bool WithinViewFrustum
-        {
-            get { return withinViewFrustum; }
-        }
+        public bool WithinViewFrustum => withinViewFrustum;
 
-        bool withinViewFrustum;
-
+        private bool withinViewFrustum;
 
         /// <summary>
         /// Gets or sets entity position.
         /// </summary>
         public override Vector3 Position
         {
-            get { return base.Position; }
-            set { MarkDirty(); base.Position = value; }
+            get => base.Position;
+            set
+            {
+                MarkDirty();
+                base.Position = value;
+            }
         }
-
 
         /// <summary>
         /// Gets or sets entity rotation
         /// </summary>
         public Quaternion Rotation
         {
-            get { return rotation; }
-            set { MarkDirty(); rotation = value; }
+            get => rotation;
+            set
+            {
+                MarkDirty();
+                rotation = value;
+            }
         }
 
-        Quaternion rotation = Quaternion.Identity;
-
+        private Quaternion rotation = Quaternion.Identity;
 
         /// <summary>
         /// Gets or sets entity scale
         /// </summary>
         public Vector3 Scale
         {
-            get { return scale; }
-            set { MarkDirty(); scale = value; }
+            get => scale;
+            set
+            {
+                MarkDirty();
+                scale = value;
+            }
         }
 
-        Vector3 scale = Vector3.One;
-
+        private Vector3 scale = Vector3.One;
 
         /// <summary>
         /// Gets or sets the bias of model transform
         /// </summary>
         public Matrix TransformBias
         {
-            get { return transformBias; }
-            set { MarkDirty(); transformBias = value; }
+            get => transformBias;
+            set
+            {
+                MarkDirty();
+                transformBias = value;
+            }
         }
 
-        Matrix transformBias = Matrix.Identity;
+        private Matrix transformBias = Matrix.Identity;
 
         /// <summary>
         /// Gets model transform
@@ -607,31 +608,28 @@ namespace Isles.Engine
             }
         }
 
-        Matrix transform = Matrix.Identity;
-
+        private Matrix transform = Matrix.Identity;
 
         /// <summary>
         /// Interface member for IWorldObject
         /// </summary>
         public override bool IsDirty
         {
-            get { return isDirty; }
-            set { isDirty = value; }
+            get => isDirty;
+            set => isDirty = value;
         }
 
-        bool isDirty = true;
-        bool isTransformDirty = true;
-
+        private bool isDirty = true;
+        private bool isTransformDirty = true;
 
         /// <summary>
         /// Mark both bounding box and transform
         /// </summary>
-        void MarkDirty()
+        private void MarkDirty()
         {
             isDirty = true;
             isTransformDirty = true;
         }
-
 
         /// <summary>
         /// Returns the axis aligned bounding box of the game model
@@ -641,10 +639,14 @@ namespace Isles.Engine
             get
             {
                 if (model == null)
+                {
                     return new BoundingBox();
+                }
 
                 if (isDirty)
+                {
                     model.Transform = transformBias * Transform;
+                }
 
                 return model.BoundingBox;
             }
@@ -653,11 +655,8 @@ namespace Isles.Engine
         /// <summary>
         /// Gets the size of the entity
         /// </summary>
-        public virtual Vector3 Size
-        {
-            get { return BoundingBox.Max - BoundingBox.Min; }
-        }
-        
+        public virtual Vector3 Size => BoundingBox.Max - BoundingBox.Min;
+
         /// <summary>
         /// Gets entity outline
         /// </summary>
@@ -666,7 +665,9 @@ namespace Isles.Engine
             get
             {
                 if (isDirty)
+                {
                     UpdateOutline(outline);
+                }
 
                 return outline; 
             }
@@ -682,7 +683,7 @@ namespace Isles.Engine
             outline.SetCircle(new Vector2(Position.X, Position.Y), outline.Radius);
         }
 
-        Outline outline = new Outline();
+        private readonly Outline outline = new();
 
         /// <summary>
         /// Gets or sets whether this world object is active
@@ -694,21 +695,17 @@ namespace Isles.Engine
         /// </remarks>
         public override bool IsActive
         {
-            get { return isActive; }
-            set { isActive = value; }
+            get => isActive;
+            set => isActive = value;
         }
 
-        bool isActive;
-
+        private bool isActive;
 
         /// <summary>
         /// Gets whether the entity is interactive. you can make an entity
         /// interactive by calling GameWorld.Activate();
         /// </summary>
-        public virtual bool IsInteractive
-        {
-            get { return true; }
-        }
+        public virtual bool IsInteractive => true;
         #endregion
 
         #region Methods
@@ -735,31 +732,43 @@ namespace Isles.Engine
             // Make entity fall on the ground
             Fall();
 
-            string value = "";
+            var value = "";
 
             // Treat game model as level content
             if ((value = xml.GetAttribute("Model")) != "")
+            {
                 Model = new GameModel(World.Content.Load<Model>(value));
-            
+            }
+
             Vector3 scaleBias = Vector3.One;
             Vector3 translation = Vector3.Zero;
             float rotationX = 0, rotationY = 0, rotationZ = 0;
 
             // Get entity transform bias
             if ((value = xml.GetAttribute("RotationXBias")) != "")
+            {
                 rotationX = MathHelper.ToRadians(float.Parse(value));
+            }
 
             if ((value = xml.GetAttribute("RotationYBias")) != "")
+            {
                 rotationY = MathHelper.ToRadians(float.Parse(value));
+            }
 
             if ((value = xml.GetAttribute("RotationZBias")) != "")
+            {
                 rotationZ = MathHelper.ToRadians(float.Parse(value));
+            }
 
             if ((value = xml.GetAttribute("ScaleBias")) != "")
+            {
                 scaleBias = Helper.StringToVector3(value);
+            }
 
             if ((value = xml.GetAttribute("PositionBias")) != "")
+            {
                 translation = Helper.StringToVector3(value);
+            }
 
             if (scaleBias != Vector3.One || rotationX != 0 || rotationY != 0 || rotationZ != 0 ||
                 translation != Vector3.Zero)
@@ -785,13 +794,19 @@ namespace Isles.Engine
             rotationX = rotationY = rotationZ = 0;
 
             if ((value = xml.GetAttribute("RotationX")) != "")
+            {
                 rotationX = MathHelper.ToRadians(float.Parse(value));
+            }
 
             if ((value = xml.GetAttribute("RotationY")) != "")
+            {
                 rotationY = MathHelper.ToRadians(float.Parse(value));
+            }
 
             if ((value = xml.GetAttribute("RotationZ")) != "")
+            {
                 rotationZ = MathHelper.ToRadians(float.Parse(value));
+            }
 
             if (rotationX != 0 || rotationX != 0 || rotationZ != 0)
             {
@@ -802,10 +817,14 @@ namespace Isles.Engine
             }
 
             if ((value = xml.GetAttribute("Rotation")) != "")
+            {
                 Rotation = Helper.StringToQuaternion(value);
+            }
 
             if ((value = xml.GetAttribute("Scale")) != "")
+            {
                 Scale = Helper.StringToVector3(value);
+            }
 
             // Deserialize is probably always called during initialization,
             // so calculate outline radius at this time.
@@ -818,9 +837,14 @@ namespace Isles.Engine
             base.Serialize(xml);
 
             if (scale != Vector3.One)
+            {
                 xml.SetAttribute("Scale", Helper.Vector3Tostring(scale));
+            }
+
             if (rotation != Quaternion.Identity)
+            {
                 xml.SetAttribute("Rotation", Helper.QuaternionTostring(rotation));
+            }
         }
 
         /// <summary>
@@ -830,7 +854,7 @@ namespace Isles.Engine
         public virtual bool IsVisible(Matrix viewProjection)
         {
             // Transform position to projection space
-            BoundingFrustum f = new BoundingFrustum(viewProjection);
+            var f = new BoundingFrustum(viewProjection);
 
             if (f.Intersects(BoundingBox))
             {
@@ -870,7 +894,9 @@ namespace Isles.Engine
             }
 
             if (model != null)
+            {
                 model.Update(gameTime);
+            }
 
             withinViewFrustum = IsVisible(BaseGame.Singleton.ViewProjection);
         }
@@ -881,7 +907,9 @@ namespace Isles.Engine
             {
                 // Draw current state
                 if (state != null)
+                {
                     state.Draw(gameTime);
+                }
 
                 if (model != null && withinViewFrustum)
                 {
@@ -894,22 +922,25 @@ namespace Isles.Engine
         public override void DrawShadowMap(GameTime gameTime, ShadowEffect shadow)
         {
             if (visible && model != null && IsVisible(shadow.ViewProjection))
+            {
                 model.DrawShadowMap(gameTime, shadow);
+            }
         }
 
         public override void DrawReflection(GameTime gameTime, Matrix view, Matrix projection)
         {
             if (visible && model != null && IsVisible(view * projection))
+            {
                 model.Draw(gameTime);
+            }
         }
 
         public override EventResult HandleEvent(EventType type, object sender, object tag)
         {
-            if (state != null &&
-                state.HandleEvent(type, sender, tag) == EventResult.Handled)
-                return EventResult.Handled;
-
-            return base.HandleEvent(type, sender, tag);
+            return state != null &&
+                state.HandleEvent(type, sender, tag) == EventResult.Handled
+                ? EventResult.Handled
+                : base.HandleEvent(type, sender, tag);
         }
 
         /// <summary>

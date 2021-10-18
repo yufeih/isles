@@ -9,14 +9,13 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Isles.Engine;
 
-
 namespace Isles
 {
     #region Goal
     public abstract class Goal : BaseState
     {
         public float ArbitrateInterval = 2;
-        double arbitrateTimer;
+        private double arbitrateTimer;
 
         public abstract void Arbitrate();
 
@@ -41,27 +40,28 @@ namespace Isles
     #region GoalDevelop
     public class GoalDevelop : Goal
     {
-        GameWorld world;
-        ComputerPlayer owner;
-
-        float WorkerFactor = 1.0f;
-        float FarmFactor = 1.0f;
-        float HeroFactor = 1.0f;
-        float TownhallFactor = 1.0f;
-        float AltarFactor = 1.0f;
-        float BarracksFactor = 1.0f;
-        float MilitiaFactor = 1.0f;
-        float HunterFactor = 1.0f;
-        float AttackUpgradeFactor = 1.0f;
-        float DefenseUpgradeFactor = 1.0f;
-        float LumbermillFactor = 1.0f;
+        private readonly GameWorld world;
+        private readonly ComputerPlayer owner;
+        private float WorkerFactor = 1.0f;
+        private float FarmFactor = 1.0f;
+        private float HeroFactor = 1.0f;
+        private float TownhallFactor = 1.0f;
+        private float AltarFactor = 1.0f;
+        private float BarracksFactor = 1.0f;
+        private float MilitiaFactor = 1.0f;
+        private float HunterFactor = 1.0f;
+        private float AttackUpgradeFactor = 1.0f;
+        private float DefenseUpgradeFactor = 1.0f;
+        private float LumbermillFactor = 1.0f;
 
         public GoalDevelop(GameWorld world, ComputerPlayer player)
         {
             if (player == null || world == null)
+            {
                 throw new ArgumentNullException();
+            }
 
-            this.owner = player;
+            owner = player;
             this.world = world;
 
             RandomizeFactors();
@@ -82,12 +82,14 @@ namespace Isles
             LumbermillFactor = Helper.RandomInRange(0.9f, 1.1f);
         }
 
-        int arbitrateCounter = 0;
+        private int arbitrateCounter = 0;
 
         public override void Arbitrate()
         {
             if (++arbitrateCounter > 10)
+            {
                 RandomizeFactors();
+            }
 
             GatherResource();
 
@@ -100,33 +102,43 @@ namespace Isles
 
         private void GatherResource()
         {
-            int index = 0;
-            int count = 0;
-            int goldmineDiggerCount = 0;
-            int lumberHarvesterCount = 0;
-            int builderCount = 0;
+            var index = 0;
+            var count = 0;
+            var goldmineDiggerCount = 0;
+            var lumberHarvesterCount = 0;
+            var builderCount = 0;
 
             const int MineDiggerCount = 5;
             const int HarvesterCount = 7;
 
-            List<Worker> idles = new List<Worker>();
+            var idles = new List<Worker>();
 
             // Check peon states
             foreach (Entity e in owner.EnumerateObjects(owner.WorkerName))
             {
-                Worker o = e as Worker;
+                var o = e as Worker;
 
                 if (o == null || o.Owner != owner)
+                {
                     continue;
+                }
 
                 if (o.State is StateHarvestGold)
+                {
                     goldmineDiggerCount++;
+                }
                 else if (o.State is StateHarvestLumber)
+                {
                     lumberHarvesterCount++;
+                }
                 else if (o.State is StateConstruct)
+                {
                     builderCount++;
+                }
                 else
+                {
                     idles.Add(o);
+                }
 
                 count++;
             }
@@ -134,7 +146,7 @@ namespace Isles
             // Harvest gold
             if (goldmineDiggerCount < MineDiggerCount)
             {
-                int number = MineDiggerCount - goldmineDiggerCount;
+                var number = MineDiggerCount - goldmineDiggerCount;
                 for (index = 0; index < number; index++)
                 {
                     if (index < idles.Count)
@@ -149,7 +161,7 @@ namespace Isles
             // Harvest lumber
             if (lumberHarvesterCount < HarvesterCount)
             {
-                int number = MineDiggerCount - goldmineDiggerCount;
+                var number = MineDiggerCount - goldmineDiggerCount;
                 for (; index < number; index++)
                 {
                     if (index < idles.Count && idles[index] != null)
@@ -175,13 +187,18 @@ namespace Isles
         private void FeedRequests()
         {
             // Check for food capacity
-            float lack = owner.Food + 5;
+            var lack = owner.Food + 5;
             if (lack > Player.MaxFoodCapacity)
+            {
                 lack = Player.MaxFoodCapacity;
+            }
+
             lack /= GameDefault.Singleton.GetFood(owner.HouseName);
 
             if (lack < 0)
+            {
                 lack = 0;
+            }
 
             owner.Request(owner.HouseName, (int)lack,
                 (1.2f + 2.3f * (owner.Food - owner.FoodCapacity + 5) / 5) * FarmFactor);
@@ -234,7 +251,7 @@ namespace Isles
             if (owner.Requests.Count > 0)
             {
                 string type = null;
-                float max = float.MinValue;
+                var max = float.MinValue;
 
                 foreach (KeyValuePair<string, float> pair in owner.Requests)
                 {
@@ -246,12 +263,18 @@ namespace Isles
                 }
 
                 if (type == null || !owner.HasEnoughMoney(type))
+                {
                     return;
+                }
 
                 if (Player.IsBuilding(type))
+                {
                     owner.Construct(type);
+                }
                 else // FIXME
+                {
                     owner.Train(type);
+                }
             }
         }
     }
@@ -260,17 +283,19 @@ namespace Isles
     #region GoalAttack
     public class GoalAttack : Goal
     {
-        GameWorld world;
-        ComputerPlayer owner;
+        private readonly GameWorld world;
+        private readonly ComputerPlayer owner;
         public float MilitaryAdvantage;
-        int advantageCounter = 0;
+        private int advantageCounter = 0;
 
         public GoalAttack(GameWorld world, ComputerPlayer player)
         {
             if (player == null || world == null)
+            {
                 throw new ArgumentNullException();
+            }
 
-            this.owner = player;
+            owner = player;
             this.world = world;
         }
 
@@ -314,13 +339,13 @@ namespace Isles
 
             foreach (GameObject o in owner.Enermy.EnumerateObjects())
             {
-                float threat = ComputeThreat(o);
+                var threat = ComputeThreat(o);
                 enermyForce += (o is Worker ? threat / 5 : threat);
             }
 
             foreach (GameObject o in owner.EnumerateObjects())
             {
-                float threat = ComputeThreat(o);
+                var threat = ComputeThreat(o);
                 ourForce += (o is Worker ? threat / 5 : threat);
             }
 
@@ -343,23 +368,25 @@ namespace Isles
 
         public static float ComputeThreat(GameObject o)
         {
-            float threat = (o.AttackPoint.X + o.AttackPoint.Y) / 2 +
+            var threat = (o.AttackPoint.X + o.AttackPoint.Y) / 2 +
                            (o.DefensePoint.X + o.DefensePoint.Y) * 1.0f / 300.0f;
 
             return threat > 1 ? 1 : 0;
         }
 
-        int squadCount = 5;
+        private int squadCount = 5;
 
         public void Attack()
         {
-            List<Charactor> charactors = new List<Charactor>();
+            var charactors = new List<Charactor>();
 
             // Find all the soldiers we've got
             foreach (GameObject o in owner.EnumerateObjects())
             {
                 if (o is Charactor && !(o is Worker))
+                {
                     charactors.Add(o as Charactor);
+                }
             }
 
             if (charactors.Count >= squadCount)
@@ -367,24 +394,30 @@ namespace Isles
                 Vector3 target = GetAttackTarget(owner.Enermy);
 
                 foreach (Charactor c in charactors)
+                {
                     c.AttackTo(target, false);
+                }
 
                 squadCount += 5;
                 if (squadCount > 20)
+                {
                     squadCount = 20;
+                }
             }
         }
 
-        Vector3 GetAttackTarget(Player enermy)
+        private Vector3 GetAttackTarget(Player enermy)
         {
             GameObject target = null;
-            float min = float.MaxValue;
+            var min = float.MaxValue;
 
             foreach (GameObject o in enermy.EnumerateObjects())
             {
-                float priority = o.Priority;
+                var priority = o.Priority;
                 if (o is Building)
+                {
                     priority -= 200;
+                }
 
                 if (priority < min)
                 {
@@ -402,15 +435,17 @@ namespace Isles
     #region GoalDefend
     public class GoalDefend : Goal
     {
-        GameWorld world;
-        ComputerPlayer owner;
+        private readonly GameWorld world;
+        private readonly ComputerPlayer owner;
 
         public GoalDefend(GameWorld world, ComputerPlayer player)
         {
             if (player == null || world == null)
+            {
                 throw new ArgumentNullException();
+            }
 
-            this.owner = player;
+            owner = player;
             this.world = world;
         }
 
@@ -422,12 +457,12 @@ namespace Isles
             if (attacker.HasValue)
             {
                 // Defense
-                int defenderCounter = 0;
+                var defenderCounter = 0;
 
                 foreach (IWorldObject o in
                     world.GetNearbyObjects(owner.Townhall.Position, 200))
                 {
-                    Charactor c = o as Charactor;
+                    var c = o as Charactor;
 
                     if (c != null && c.Owner == owner && !(c is Worker))
                     {
@@ -439,7 +474,7 @@ namespace Isles
                 if (defenderCounter < attackerCount)
                 {
                     // Peons, attack!
-                    int number = (attackerCount - defenderCounter) * 2;
+                    var number = (attackerCount - defenderCounter) * 2;
 
                     foreach (Worker peon in owner.EnumerateObjects(owner.WorkerName))
                     {
@@ -473,13 +508,13 @@ namespace Isles
                 {
                     count++;
                     if (attacker == null)
+                    {
                         attacker = o as GameObject;
+                    }
                 }
             }
 
-            if (attacker != null)
-                return attacker.Position;
-            return null;
+            return attacker != null ? (Vector3?)attacker.Position : null;
         }
     }
     #endregion

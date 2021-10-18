@@ -88,7 +88,7 @@ namespace Isles.Graphics
             //DrawGridStates();
         }
 
-        struct TexturedSurface
+        private struct TexturedSurface
         {
             public Texture2D Texture;
             public Vector3 Position;
@@ -97,28 +97,24 @@ namespace Isles.Graphics
             public float Height;
         }
 
-        const int MaxSurfaceVertices = 512;
-        const int MaxSurfaceIndices = 768;
-
-        Effect surfaceEffect;
-        DynamicVertexBuffer surfaceVertexBuffer;
-        DynamicIndexBuffer surfaceIndexBuffer;
-        VertexDeclaration surfaceDeclaration;
-        List<ushort> surfaceIndices = new List<ushort>();
-        List<VertexPositionColorTexture> surfaceVertices = new List<VertexPositionColorTexture>();
-        LinkedList<TexturedSurface> texturedSurfaces = new LinkedList<TexturedSurface>();
+        private const int MaxSurfaceVertices = 512;
+        private const int MaxSurfaceIndices = 768;
+        private Effect surfaceEffect;
+        private DynamicVertexBuffer surfaceVertexBuffer;
+        private DynamicIndexBuffer surfaceIndexBuffer;
+        private VertexDeclaration surfaceDeclaration;
+        private readonly List<ushort> surfaceIndices = new();
+        private readonly List<VertexPositionColorTexture> surfaceVertices = new();
+        private readonly LinkedList<TexturedSurface> texturedSurfaces = new();
 
         /// <summary>
         /// Draw a textured surface on top of the landscape. (But below all world objects).
         /// </summary>
         public void DrawSurface(Texture2D texture, Vector3 position, float width, float height, Color color)
         {
-            if (texture == null)
-                throw new ArgumentNullException();
-
             TexturedSurface surface;
             surface.Color = color;
-            surface.Texture = texture;
+            surface.Texture = texture ?? throw new ArgumentNullException();
             surface.Position = position;
             
             // Plus a little offset
@@ -135,21 +131,29 @@ namespace Isles.Graphics
             while (p != null)
             {
                 if (p.Value.Texture != texture)
+                {
                     break;
+                }
 
                 p = p.Next;
             }
 
             if (p == null)
+            {
                 texturedSurfaces.AddFirst(surface);
+            }
             else
+            {
                 texturedSurfaces.AddBefore(p, surface);
+            }
         }
 
         public void PresentSurface(GameTime gameTime)
         {
             if (texturedSurfaces.Count <= 0)
+            {
                 return;
+            }
 
             graphics.VertexDeclaration = surfaceDeclaration;
 
@@ -189,7 +193,7 @@ namespace Isles.Graphics
             texturedSurfaces.Clear();
         }
 
-        void PresentSurface(LinkedListNode<TexturedSurface> start,
+        private void PresentSurface(LinkedListNode<TexturedSurface> start,
                             LinkedListNode<TexturedSurface> end)
         {
             Texture2D texture = start.Value.Texture;
@@ -246,8 +250,8 @@ namespace Isles.Graphics
             // Draw user primitives
             surfaceEffect.Parameters["BasicTexture"].SetValue(texture);
 
-            surfaceIndexBuffer.SetData<ushort>(surfaceIndices.ToArray());
-            surfaceVertexBuffer.SetData<VertexPositionColorTexture>(surfaceVertices.ToArray());
+            surfaceIndexBuffer.SetData(surfaceIndices.ToArray());
+            surfaceVertexBuffer.SetData(surfaceVertices.ToArray());
 
             game.GraphicsDevice.Indices = surfaceIndexBuffer;
             game.GraphicsDevice.Vertices[0].SetSource(surfaceVertexBuffer, 0,
@@ -260,18 +264,18 @@ namespace Isles.Graphics
 
         #region Sky
 
-        TextureCube skyTexture;
-        Effect skyEffect;
-        Model skyModel;
+        private TextureCube skyTexture;
+        private Effect skyEffect;
+        private Model skyModel;
 
-        void ReadSkyContent(ContentReader input)
+        private void ReadSkyContent(ContentReader input)
         {
             skyEffect = input.ContentManager.Load<Effect>("Effects/Sky");
             skyModel = input.ContentManager.Load<Model>("Models/Cube");
             skyTexture = input.ReadExternalReference<TextureCube>();
         }
 
-        void InitializeSky()
+        private void InitializeSky()
         {
         }
 
@@ -280,7 +284,7 @@ namespace Isles.Graphics
             DrawSky(gameTime, game.View, game.Projection);
         }
 
-        void DrawSky(GameTime gameTime, Matrix view, Matrix projection)
+        private void DrawSky(GameTime gameTime, Matrix view, Matrix projection)
         {
             // We have to retrieve the new graphics device every frame,
             // since graphics device will be changed when resetting.
@@ -310,35 +314,40 @@ namespace Isles.Graphics
         /// <summary>
         /// Dispose
         /// </summary>
-        void DisposeSky()
+        private void DisposeSky()
         {
             if (skyTexture != null)
+            {
                 skyTexture.Dispose();
+            }
+
             if (skyEffect != null)
+            {
                 skyEffect.Dispose();
+            }
         }
 
         #endregion
 
         #region Vegetation
 
-        float grassViewDistanceSquared = 400000;
-        List<Billboard> vegetations = new List<Billboard>(512);
+        private readonly float grassViewDistanceSquared = 400000;
+        private readonly List<Billboard> vegetations = new(512);
 
-        void ReadVegetationContent(ContentReader input)
+        private void ReadVegetationContent(ContentReader input)
         {
-            int count = input.ReadInt32();
+            var count = input.ReadInt32();
 
             Vector2 position;
-            Billboard billboard = new Billboard();
+            var billboard = new Billboard();
             Texture2D texture;
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
                 texture = input.ReadExternalReference<Texture2D>();
 
-                int n = input.ReadInt32();
+                var n = input.ReadInt32();
 
-                for (int k = 0; k < n; k++)
+                for (var k = 0; k < n; k++)
                 {
                     billboard.Texture = texture;
                     position = input.ReadVector2();
@@ -353,12 +362,12 @@ namespace Isles.Graphics
             }
         }
 
-        void InitializeVegetation()
+        private void InitializeVegetation()
         {
 
         }
 
-        void DrawVegetation(GameTime gameTime)
+        private void DrawVegetation(GameTime gameTime)
         {
             foreach (Billboard billboard in vegetations)
             {
@@ -374,18 +383,12 @@ namespace Isles.Graphics
 
         #region Water
 
-        bool IsSpheralWaterSurface = false;
+        private readonly bool IsSpheralWaterSurface = false;
 
         /// <summary>
         /// Gets or sets the fog texture used to draw the landscape
         /// </summary>
-        public Texture2D FogTexture
-        {
-            get { return fogTexture; }
-            set { fogTexture = value; }
-        }
-
-        Texture2D fogTexture;
+        public Texture2D FogTexture { get; set; }
 
         /// <summary>
         /// The water is part of a spherical surface to make it look vast.
@@ -393,64 +396,53 @@ namespace Isles.Graphics
         /// the water is treated as a flat plane with the height of zero.
         /// This value determines the shape of the surface
         /// </summary>
-        float earthRadius;
+        private float earthRadius;
 
         /// <summary>
         /// A static texture applied to the water surface
         /// </summary>
-        Texture waterTexture;
+        private Texture waterTexture;
 
         /// <summary>
         /// This texture is used as a bump map to simulate water
         /// </summary>
-        Texture waterDstortion;
+        private Texture waterDstortion;
 
         /// <summary>
         /// Render target used to draw the reflection & refraction texture
         /// </summary>
-        RenderTarget2D reflectionRenderTarget;
+        private RenderTarget2D reflectionRenderTarget;
 
         /// <summary>
         /// Depth stencil buffer used when drawing reflection and refraction
         /// </summary>
-        DepthStencilBuffer waterDepthStencil;
+        private DepthStencilBuffer waterDepthStencil;
 
         /// <summary>
         /// This texture is generated each frame for water reflection color sampling
         /// </summary>
-        Texture2D waterReflection;
-
-        /// <summary>
-        /// See Effects/Water.fx
-        /// </summary>
-        Effect waterEffect;
+        private Texture2D waterReflection;
 
         /// <summary>
         /// Water mesh
         /// </summary>
-        int waterVertexCount;
-        int waterPrimitiveCount;
+        private int waterVertexCount;
+        private int waterPrimitiveCount;
+        private VertexBuffer waterVertices;
+        private IndexBuffer waterIndices;
+        private VertexDeclaration waterVertexDeclaration;
 
-        VertexBuffer waterVertices;
-        IndexBuffer waterIndices;
+        public Effect WaterEffect { get; set; }
 
-        VertexDeclaration waterVertexDeclaration;
-
-        public Effect WaterEffect
-        {
-            get { return waterEffect; }
-            set { waterEffect = value; }
-        }
-
-        void ReadWaterContent(ContentReader input)
+        private void ReadWaterContent(ContentReader input)
         {
             earthRadius = input.ReadSingle();
             waterTexture = input.ReadExternalReference<Texture>();
             waterDstortion = input.ReadExternalReference<Texture>();
-            waterEffect = input.ContentManager.Load<Effect>("Effects/Water");
+            WaterEffect = input.ContentManager.Load<Effect>("Effects/Water");
         }
 
-        void InitializeWater()
+        private void InitializeWater()
         {
             // Reflection & Refraction textures
             reflectionRenderTarget = new RenderTarget2D(
@@ -469,22 +461,23 @@ namespace Isles.Graphics
 
             waterVertexCount = (CellCount + 1) * (CellCount + 1);
             waterPrimitiveCount = CellCount * CellCount * 2;
-            VertexPositionTexture[] vertexData = new VertexPositionTexture[waterVertexCount];
+            var vertexData = new VertexPositionTexture[waterVertexCount];
 
             // Water height is zero at the 4 corners of the terrain quad
-            float highest = earthRadius - (float)Math.Sqrt(
+            var highest = earthRadius - (float)Math.Sqrt(
                 earthRadius * earthRadius - Size.X * Size.X / 4);
 
-            float waterSize = Math.Max(Size.X, Size.Y) * 2;
-            float cellSize = waterSize / CellCount;
+            var waterSize = Math.Max(Size.X, Size.Y) * 2;
+            var cellSize = waterSize / CellCount;
 
-            int i = 0;
+            var i = 0;
             float len = 0;
             Vector2 pos;
-            Vector2 center = new Vector2(Size.X / 2, Size.Y / 2);
+            var center = new Vector2(Size.X / 2, Size.Y / 2);
 
-            for (int y = 0; y <= CellCount; y++)
-                for (int x = 0; x <= CellCount; x++)
+            for (var y = 0; y <= CellCount; y++)
+            {
+                for (var x = 0; x <= CellCount; x++)
                 {
                     pos.X = (Size.X - waterSize) / 2 + cellSize * x;
                     pos.Y = (Size.Y - waterSize) / 2 + cellSize * y;
@@ -496,22 +489,28 @@ namespace Isles.Graphics
 
                     // Make the water a sphere surface
                     if (IsSpheralWaterSurface)
+                    {
                         vertexData[i].Position.Z = highest - earthRadius +
                             (float)Math.Sqrt(earthRadius * earthRadius - len * len);
+                    }
                     else
+                    {
                         vertexData[i].Position.Z = 0;
+                    }
 
                     vertexData[i].TextureCoordinate.X = 1.0f * x * TextureRepeat / CellCount;
                     vertexData[i].TextureCoordinate.Y = 1.0f * y * TextureRepeat / CellCount;
 
                     i++;
                 }
+            }
 
-            short[] indexData = new short[waterPrimitiveCount * 3];
+            var indexData = new short[waterPrimitiveCount * 3];
 
             i = 0;
-            for (int y = 0; y < CellCount; y++)
-                for (int x = 0; x < CellCount; x++)
+            for (var y = 0; y < CellCount; y++)
+            {
+                for (var x = 0; x < CellCount; x++)
                 {
                     indexData[i++] = (short)((CellCount + 1) * (y + 1) + x);     // 0
                     indexData[i++] = (short)((CellCount + 1) * y + x + 1);       // 2
@@ -520,17 +519,17 @@ namespace Isles.Graphics
                     indexData[i++] = (short)((CellCount + 1) * y + x);           // 3
                     indexData[i++] = (short)((CellCount + 1) * y + x + 1);       // 2
                 }
-
+            }
 
             waterVertices = new VertexBuffer(
                 graphics, typeof(VertexPositionTexture), waterVertexCount, BufferUsage.WriteOnly);
 
-            waterVertices.SetData<VertexPositionTexture>(vertexData);
+            waterVertices.SetData(vertexData);
 
             waterIndices = new IndexBuffer(
                 graphics, typeof(short), waterPrimitiveCount * 3, BufferUsage.WriteOnly);
 
-            waterIndices.SetData<short>(indexData);
+            waterIndices.SetData(indexData);
         }
 
         public event DrawDelegate DrawWaterReflection;
@@ -544,7 +543,9 @@ namespace Isles.Graphics
         public void UpdateWaterReflectionAndRefraction(GameTime gameTime)
         {
             if (!game.Settings.RealisticWater)
+            {
                 return;
+            }
 
             DepthStencilBuffer prevDepth = graphics.DepthStencilBuffer;
             graphics.DepthStencilBuffer = waterDepthStencil;
@@ -553,24 +554,30 @@ namespace Isles.Graphics
             graphics.Clear(Color.Black);
 
             // Create a reflection view matrix
-            Matrix viewReflect = Matrix.Multiply(
+            var viewReflect = Matrix.Multiply(
                 Matrix.CreateReflection(new Plane(Vector3.UnitZ, 0)), game.View);
 
             DrawSky(gameTime, viewReflect, game.Projection);
 
             if (game.Settings.ShowLandscape)
+            {
                 DrawTerrain(viewReflect, game.Projection, true);
+            }
 
             // Draw other reflections
             if (game.Settings.ReflectionEnabled)
+            {
                 DrawWaterReflection(gameTime, viewReflect, game.Projection);
+            }
 
             // Present the model manager to draw those models
             game.ModelManager.Present(gameTime, viewReflect, game.Projection);
 
             // Draw refraction onto the reflection texture
             if (game.Settings.ShowLandscape)
+            {
                 DrawTerrain(game.View, game.Projection, false);
+            }
 
             graphics.SetRenderTarget(0, null);
             graphics.DepthStencilBuffer = prevDepth;
@@ -589,7 +596,9 @@ namespace Isles.Graphics
             graphics.Vertices[0].SetSource(waterVertices, 0, VertexPositionTexture.SizeInBytes);
 
             if (FogTexture != null)
+            {
                 WaterEffect.Parameters["FogTexture"].SetValue(FogTexture);
+            }
 
             if (game.Settings.RealisticWater)
             {
@@ -599,24 +608,24 @@ namespace Isles.Graphics
             else
             {
                 WaterEffect.CurrentTechnique = WaterEffect.Techniques["Default"];
-                waterEffect.Parameters["ColorTexture"].SetValue(waterTexture);
+                WaterEffect.Parameters["ColorTexture"].SetValue(waterTexture);
             }
 
-            waterEffect.Parameters["DistortionTexture"].SetValue(waterDstortion);
+            WaterEffect.Parameters["DistortionTexture"].SetValue(waterDstortion);
             WaterEffect.Parameters["ViewInverse"].SetValue(game.ViewInverse);
-            waterEffect.Parameters["WorldViewProj"].SetValue(game.ViewProjection);
+            WaterEffect.Parameters["WorldViewProj"].SetValue(game.ViewProjection);
             WaterEffect.Parameters["WorldView"].SetValue(game.View);
-            waterEffect.Parameters["DisplacementScroll"].SetValue(MoveInCircle(gameTime, 0.01f));
+            WaterEffect.Parameters["DisplacementScroll"].SetValue(MoveInCircle(gameTime, 0.01f));
 
-            waterEffect.Begin();
-            foreach (EffectPass pass in waterEffect.CurrentTechnique.Passes)
+            WaterEffect.Begin();
+            foreach (EffectPass pass in WaterEffect.CurrentTechnique.Passes)
             {
                 pass.Begin();
                 graphics.DrawIndexedPrimitives(
                     PrimitiveType.TriangleList, 0, 0, waterVertexCount, 0, waterPrimitiveCount);
                 pass.End();
             }
-            waterEffect.End();
+            WaterEffect.End();
 
             graphics.RenderState.DepthBufferWriteEnable = true;
         }
@@ -624,12 +633,12 @@ namespace Isles.Graphics
         /// <summary>
         /// Helper for moving a value around in a circle.
         /// </summary>
-        static Vector2 MoveInCircle(GameTime gameTime, float speed)
+        private static Vector2 MoveInCircle(GameTime gameTime, float speed)
         {
-            double time = gameTime.TotalGameTime.TotalSeconds * speed;
+            var time = gameTime.TotalGameTime.TotalSeconds * speed;
 
-            float x = (float)Math.Cos(time);
-            float y = (float)Math.Sin(time);
+            var x = (float)Math.Cos(time);
+            var y = (float)Math.Sin(time);
 
             return new Vector2(x, y);
         }
@@ -638,12 +647,17 @@ namespace Isles.Graphics
         /// Dispose
         /// </summary>
         /// <param name="disposing">Disposing</param>
-        void DisposeWater()
+        private void DisposeWater()
         {
             if (waterVertices != null)
+            {
                 waterVertices.Dispose();
+            }
+
             if (waterIndices != null)
+            {
                 waterIndices.Dispose();
+            }
         }
 
         #endregion
@@ -657,7 +671,7 @@ namespace Isles.Graphics
     public class FogMask
     {
         #region Field
-        const int Size = 128;
+        private const int Size = 128;
 
         /// <summary>
         /// Gets the default glow texture for each unit
@@ -667,32 +681,25 @@ namespace Isles.Graphics
             get
             {
                 if (glow == null || glow.IsDisposed)
+                {
                     glow = BaseGame.Singleton.ZipContent.Load<Texture2D>("Textures/Glow");
+                }
+
                 return glow;
             }
         }
 
-        static Texture2D glow;
+        private static Texture2D glow;
 
         /// <summary>
         /// Gets the width of the mask
         /// </summary>
-        public float Width
-        {
-            get { return width; }
-        }
-
-        float width;
+        public float Width { get; }
 
         /// <summary>
         /// Gets the height of the mask
         /// </summary>
-        public float Height
-        {
-            get { return height; }
-        }
-
-        float height;
+        public float Height { get; }
 
         /// <summary>
         /// Objects are invisible when the intensity is below this value
@@ -702,56 +709,40 @@ namespace Isles.Graphics
         /// <summary>
         /// Common stuff
         /// </summary>
-        GraphicsDevice graphics;
-        SpriteBatch sprite;
-        Rectangle textureRectangle;
+        private readonly GraphicsDevice graphics;
+        private readonly SpriteBatch sprite;
+        private Rectangle textureRectangle;
 
         /// <summary>
         /// Gets the result mask texture (Fog of war)
         /// </summary>
-        public Texture2D Mask
-        {
-            get { return mask; }
-        }
+        public Texture2D Mask { get; private set; }
 
-        public Texture2D Discovered
-        {
-            get { return discovered; }
-        }
+        public Texture2D Discovered { get; private set; }
 
-        public Texture2D Current
-        {
-            get { return current; }
-        }
+        public Texture2D Current => current;
 
-        /// <summary>
-        /// Textures & render targets
-        /// </summary>
-        Texture2D mask;
-        Texture2D discovered;
-        Texture2D current;
-
-        RenderTarget2D discoveredCanvas;
-        RenderTarget2D currentCanvas;
-        RenderTarget2D maskCanvas;
-
-        DepthStencilBuffer depthBuffer;
+        private Texture2D current;
+        private readonly RenderTarget2D discoveredCanvas;
+        private readonly RenderTarget2D currentCanvas;
+        private readonly RenderTarget2D maskCanvas;
+        private readonly DepthStencilBuffer depthBuffer;
 
         /// <summary>
         /// Fog intensities
         /// </summary>
-        bool[] visibility;
+        private readonly bool[] visibility;
 
         /// <summary>
         /// Visible areas
         /// </summary>
-        struct Entry
+        private struct Entry
         {
             public float Radius;
             public Vector2 Position;
         }
 
-        List<Entry> visibleAreas = new List<Entry>();
+        private readonly List<Entry> visibleAreas = new();
         #endregion
 
         #region Method
@@ -761,18 +752,20 @@ namespace Isles.Graphics
         public FogMask(GraphicsDevice graphics, float width, float height)
         {
             if (graphics == null || width <= 0 || height <= 0)
+            {
                 throw new ArgumentException();
+            }
 
-            this.width = width;
-            this.height = height;
+            this.Width = width;
+            this.Height = height;
             this.graphics = graphics;
-            this.sprite = new SpriteBatch(graphics);
-            this.visibility = new bool[Size * Size];
-            this.textureRectangle = new Rectangle(0, 0, Size, Size);
-            this.depthBuffer = new DepthStencilBuffer(graphics, Size, Size, graphics.DepthStencilBuffer.Format);
-            this.discoveredCanvas = new RenderTarget2D(graphics, Size, Size, 0, SurfaceFormat.Color);
-            this.currentCanvas = new RenderTarget2D(graphics, Size, Size, 0, SurfaceFormat.Color);
-            this.maskCanvas = new RenderTarget2D(graphics, Size, Size, 0, SurfaceFormat.Color, RenderTargetUsage.PreserveContents);
+            sprite = new SpriteBatch(graphics);
+            visibility = new bool[Size * Size];
+            textureRectangle = new Rectangle(0, 0, Size, Size);
+            depthBuffer = new DepthStencilBuffer(graphics, Size, Size, graphics.DepthStencilBuffer.Format);
+            discoveredCanvas = new RenderTarget2D(graphics, Size, Size, 0, SurfaceFormat.Color);
+            currentCanvas = new RenderTarget2D(graphics, Size, Size, 0, SurfaceFormat.Color);
+            maskCanvas = new RenderTarget2D(graphics, Size, Size, 0, SurfaceFormat.Color, RenderTargetUsage.PreserveContents);
         }
 
         /// <summary>
@@ -780,10 +773,7 @@ namespace Isles.Graphics
         /// </summary>
         public bool Contains(float x, float y)
         {
-            if (x <= 0 || y <= 0 || x >= width || y >= height)
-                return true;
-
-            return !visibility[Size * (int)(Size * y / height) + (int)(Size * x / width)];
+            return x <= 0 || y <= 0 || x >= Width || y >= Height ? true : !visibility[Size * (int)(Size * y / Height) + (int)(Size * x / Width)];
         }
 
         /// <summary>
@@ -808,13 +798,14 @@ namespace Isles.Graphics
         /// </summary>
         public void Refresh(GameTime gameTime)
         {
-            if (mask != null && visibleAreas.Count <= 0)
+            if (Mask != null && visibleAreas.Count <= 0)
+            {
                 return;
+            }
 
             DepthStencilBuffer prevDepth = graphics.DepthStencilBuffer;
 
             graphics.DepthStencilBuffer = depthBuffer;
-
 
             // Draw current glows
             graphics.SetRenderTarget(0, currentCanvas);
@@ -826,17 +817,16 @@ namespace Isles.Graphics
             Rectangle destination;
             foreach (Entry entry in visibleAreas)
             {
-                destination.X = (int)(Size * (entry.Position.X - entry.Radius) / width);
-                destination.Y = (int)(Size * (entry.Position.Y - entry.Radius) / height);
-                destination.Width = (int)(Size * entry.Radius * 2 / width);
-                destination.Height = (int)(Size * entry.Radius * 2 / height);
+                destination.X = (int)(Size * (entry.Position.X - entry.Radius) / Width);
+                destination.Y = (int)(Size * (entry.Position.Y - entry.Radius) / Height);
+                destination.Width = (int)(Size * entry.Radius * 2 / Width);
+                destination.Height = (int)(Size * entry.Radius * 2 / Height);
 
                 // Draw the glow texture
                 sprite.Draw(Glow, destination, Color.White);
             }
 
             sprite.End();
-
 
             // Draw discovered area texture without clearing it
             graphics.SetRenderTarget(0, discoveredCanvas);
@@ -846,31 +836,32 @@ namespace Isles.Graphics
             current = currentCanvas.GetTexture();
 
             sprite.Begin(SpriteBlendMode.Additive);
-            if (discovered != null)
-                sprite.Draw(discovered, textureRectangle, Color.White);
+            if (Discovered != null)
+            {
+                sprite.Draw(Discovered, textureRectangle, Color.White);
+            }
+
             sprite.Draw(current, textureRectangle, Color.White);
             sprite.End();
-
 
             // Draw final mask texture
             graphics.SetRenderTarget(0, maskCanvas);
             graphics.Clear(Color.Black);
 
             // Retrieve discovered area
-            discovered = discoveredCanvas.GetTexture();
+            Discovered = discoveredCanvas.GetTexture();
 
             sprite.Begin(SpriteBlendMode.Additive);
-            sprite.Draw(discovered, textureRectangle, new Color(128, 128, 128, 128));
+            sprite.Draw(Discovered, textureRectangle, new Color(128, 128, 128, 128));
             sprite.Draw(current, textureRectangle, Color.White);
             sprite.End();
-
 
             // Restore states
             graphics.SetRenderTarget(0, null);
             graphics.DepthStencilBuffer = prevDepth;
 
             // Retrieve final mask texture
-            mask = maskCanvas.GetTexture();
+            Mask = maskCanvas.GetTexture();
 
             // Update intensity map
             //mask.GetData<float>(intensity);
@@ -884,26 +875,44 @@ namespace Isles.Graphics
 
         private void UpdateIntensity()
         {
-            for (int i = 0; i < visibility.Length; i++)
+            for (var i = 0; i < visibility.Length; i++)
+            {
                 visibility[i] = false;
+            }
 
-            float CellWidth = width / Size;
-            float CellHeight = height / Size;
+            var CellWidth = Width / Size;
+            var CellHeight = Height / Size;
 
             foreach (Entry entry in visibleAreas)
             {
-                int minX = (int)(Size * (entry.Position.X - entry.Radius) / width);
-                int minY = (int)(Size * (entry.Position.Y - entry.Radius) / height);
-                int maxX = (int)(Size * (entry.Position.X + entry.Radius) / width) + 1;
-                int maxY = (int)(Size * (entry.Position.Y + entry.Radius) / height) + 1;
+                var minX = (int)(Size * (entry.Position.X - entry.Radius) / Width);
+                var minY = (int)(Size * (entry.Position.Y - entry.Radius) / Height);
+                var maxX = (int)(Size * (entry.Position.X + entry.Radius) / Width) + 1;
+                var maxY = (int)(Size * (entry.Position.Y + entry.Radius) / Height) + 1;
 
-                if (minX < 0) minX = 0;
-                if (minY < 0) minY = 0;
-                if (maxX >= Size) maxX = Size - 1;
-                if (maxY >= Size) maxY = Size - 1;
+                if (minX < 0)
+                {
+                    minX = 0;
+                }
 
-                for (int y = minY; y <= maxY; y++)
-                    for (int x = minX; x <= maxX; x++)
+                if (minY < 0)
+                {
+                    minY = 0;
+                }
+
+                if (maxX >= Size)
+                {
+                    maxX = Size - 1;
+                }
+
+                if (maxY >= Size)
+                {
+                    maxY = Size - 1;
+                }
+
+                for (var y = minY; y <= maxY; y++)
+                {
+                    for (var x = minX; x <= maxX; x++)
                     {
                         Vector2 v;
 
@@ -911,8 +920,11 @@ namespace Isles.Graphics
                         v.Y = y * CellHeight + CellHeight / 2 - entry.Position.Y;
 
                         if (v.LengthSquared() <= entry.Radius * entry.Radius)
+                        {
                             visibility[y * Size + x] = true;
+                        }
                     }
+                }
             }
         }
         #endregion

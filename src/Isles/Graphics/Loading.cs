@@ -53,34 +53,29 @@ namespace Isles.Graphics
         /// <summary>
         /// 2D drawing functions
         /// </summary>
-        Graphics2D graphics2D;
+        private readonly Graphics2D graphics2D;
 
         /// <summary>
         /// Game graphics
         /// </summary>
-        GraphicsDevice graphics;
-
-        ProgressBar progressBar;
+        private readonly GraphicsDevice graphics;
+        private readonly ProgressBar progressBar;
 
         /// <summary>
         /// Current progress
         /// </summary>
-        float progress;
-
-        UIDisplay uiDisplay;
+        private float progress;
+        private readonly UIDisplay uiDisplay;
 
         /// <summary>
         /// Loading message
         /// </summary>
-        string message = "Loading...";
+        private string message = "Loading...";
 
         /// <summary>
         /// Gets current progress.
         /// </summary>
-        public float Progress
-        {
-            get { return progress; }
-        }
+        public float Progress => progress;
 
         /// <summary>
         /// Refresh the loading screen with the new progress
@@ -104,9 +99,14 @@ namespace Isles.Graphics
             progress = newProgress;
             progressBar.SetProgress((int)newProgress);
             if (progress < 0)
+            {
                 progress = 0;
+            }
             else if (progress > 100)
+            {
                 progress = 100;
+            }
+
             Draw();
         }
 
@@ -115,8 +115,8 @@ namespace Isles.Graphics
         /// </summary>
         public string Message
         {
-            get { return message; }
-            set { message = value; }
+            get => message;
+            set => message = value;
         }
 
         /// <summary>
@@ -125,9 +125,9 @@ namespace Isles.Graphics
         /// <param name="graphics"></param>
         public Loading(GraphicsDevice graphics, Graphics2D gfx2D)
         {
-            this.graphics2D = gfx2D;
+            graphics2D = gfx2D;
             this.graphics = graphics;
-            this.uiDisplay = new UIDisplay(BaseGame.Singleton);
+            uiDisplay = new UIDisplay(BaseGame.Singleton);
             progressBar = new ProgressBar();
             progressBar.Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/ProgressBar");
             progressBar.SourceRectangleLeftEnd = new Rectangle(0, 0, 64, 63);
@@ -141,16 +141,16 @@ namespace Isles.Graphics
             progressBar.Anchor = Anchor.TopLeft;
             progressBar.ScaleMode = ScaleMode.Stretch;
 
-            double height = 875.0 * uiDisplay.Area.Width / 1400;
+            var height = 875.0 * uiDisplay.Area.Width / 1400;
 
-            Panel backgroundPanel = new Panel(new Rectangle(0, (int)((uiDisplay.Area.Height - height) / 2),
+            var backgroundPanel = new Panel(new Rectangle(0, (int)((uiDisplay.Area.Height - height) / 2),
                                     uiDisplay.Area.Width, (int)height));
             backgroundPanel.Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/LoadingDisplay");
             backgroundPanel.SourceRectangle = new Rectangle(0, 0, backgroundPanel.Texture.Width, backgroundPanel.Texture.Height);
             backgroundPanel.Anchor = Anchor.Center;
             backgroundPanel.ScaleMode = ScaleMode.Stretch;
 
-            Panel panel = new Panel(new Rectangle(0, (int)((uiDisplay.Area.Height - height) / 2),
+            var panel = new Panel(new Rectangle(0, (int)((uiDisplay.Area.Height - height) / 2),
                                     uiDisplay.Area.Width, (int)height));
             panel.Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/LoadingDisplay");
             panel.SourceRectangle = new Rectangle(0, 0, panel.Texture.Width, panel.Texture.Height);
@@ -210,7 +210,7 @@ namespace Isles.Graphics
             }
         }
 
-        bool captured = false;
+        private bool captured = false;
 
         public Texture2D LoadingFinished;
     }

@@ -8,7 +8,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Isles.Engine;
 
-
 namespace Isles.UI
 {
     public class ProgressBar : UIElement
@@ -23,35 +22,27 @@ namespace Isles.UI
 
         public double HightLightCycle
         {
-            get { return hightLightCycle; }
-            set { hightLightCycle = value; }
+            get => hightLightCycle;
+            set => hightLightCycle = value;
         }
 
         private double staringTime;
 
         public double  StartingTime
         {
-            get { return staringTime; }
-            set { staringTime = value; }
+            get => staringTime;
+            set => staringTime = value;
         }
 
-
-        double highLightRollingSpeed;
-
+        private double highLightRollingSpeed;
 
         /// <summary>
         /// Pixels per second
         /// </summary>
         public double HighLightRollingSpeed
         {
-            get
-            {
-                return highLightRollingSpeed;
-            }
-            set
-            {
-                highLightRollingSpeed = value;
-            }
+            get => highLightRollingSpeed;
+            set => highLightRollingSpeed = value;
         }
 
         // About length
@@ -60,76 +51,77 @@ namespace Isles.UI
 
         public int EndLength
         {
-            get { return endLength; }
-            set { endLength = value; }
+            get => endLength;
+            set => endLength = value;
         }
 
         private int hightLightLength = 20;
 
         public int HighLightLength
         {
-            get { return hightLightLength; }
-            set { hightLightLength = value; }
+            get => hightLightLength;
+            set => hightLightLength = value;
         }
 
 
-	    
         // About Textures: 5 in total including the Frame of the bar
 
-        Rectangle sourceRectangleLeftEnd;
+        private Rectangle sourceRectangleLeftEnd;
 
         public Rectangle SourceRectangleLeftEnd
         {
-            get { return sourceRectangleLeftEnd; }
-            set { sourceRectangleLeftEnd = value; }
+            get => sourceRectangleLeftEnd;
+            set => sourceRectangleLeftEnd = value;
         }
 
-        Rectangle sourceRectangleRightEnd;
+        private Rectangle sourceRectangleRightEnd;
 
         public Rectangle SourceRectangleRightEnd
         {
-            get { return sourceRectangleRightEnd; }
-            set { sourceRectangleRightEnd = value; }
+            get => sourceRectangleRightEnd;
+            set => sourceRectangleRightEnd = value;
         }
 
-        Rectangle sourceRectangleHighLight;
+        private Rectangle sourceRectangleHighLight;
 
         public Rectangle SourceRectangleHightLight
         {
-            get { return sourceRectangleHighLight; }
-            set { sourceRectangleHighLight = value; }
+            get => sourceRectangleHighLight;
+            set => sourceRectangleHighLight = value;
         }
 
-        Rectangle sourceRectangleFiller;
+        private Rectangle sourceRectangleFiller;
 
         public Rectangle SourceRectangleFiller
         {
-            get { return sourceRectangleFiller; }
-            set { sourceRectangleFiller = value; }
+            get => sourceRectangleFiller;
+            set => sourceRectangleFiller = value;
         }
 
-        int persentage = 0;
+        private int persentage = 0;
 
         public int Persentage
         {
-            get
-            {
-                return persentage;
-            }
+            get => persentage;
             set
             {
                 if (value > 100)
+                {
                     value = 100;
+                }
+
                 if (value < 0)
+                {
                     value = 0;
+                }
+
                 persentage = value;
                 fillingRectangleDirty = true;
             }
         }
 
-        bool fillingRectangleDirty = true;
-
-        Rectangle fillingRectangle;
+        private bool fillingRectangleDirty = true;
+        private Rectangle fillingRectangle;
 
         public Rectangle FillingRectangle
         {
@@ -160,25 +152,24 @@ namespace Isles.UI
             Persentage = persentage;
         }
 
-
         public override void Draw(GameTime gameTime, SpriteBatch sprite)
         {
             // Draw the progress
             if(FillingRectangle.Width > 2 * EndLength)
             {
                 sprite.Draw(Texture, new Rectangle(FillingRectangle.X, FillingRectangle.Y, 
-                            EndLength, FillingRectangle.Height), this.sourceRectangleLeftEnd, Color.White);
+                            EndLength, FillingRectangle.Height), sourceRectangleLeftEnd, Color.White);
                 sprite.Draw(Texture, new Rectangle(FillingRectangle.Right - EndLength, 
-                            FillingRectangle.Y, EndLength, FillingRectangle.Height),this.sourceRectangleRightEnd, Color.White);
+                            FillingRectangle.Y, EndLength, FillingRectangle.Height),sourceRectangleRightEnd, Color.White);
                 sprite.Draw(Texture, new Rectangle(FillingRectangle.X + EndLength, FillingRectangle.Y, 
-                            FillingRectangle.Width - 2 * EndLength, FillingRectangle.Height),this.SourceRectangleFiller, Color.White);
+                            FillingRectangle.Width - 2 * EndLength, FillingRectangle.Height),SourceRectangleFiller, Color.White);
             }
             else
             {
                 sprite.Draw(Texture, new Rectangle(FillingRectangle.X, FillingRectangle.Y, FillingRectangle.Width / 2, 
-                            FillingRectangle.Height), this.sourceRectangleLeftEnd, Color.White);
+                            FillingRectangle.Height), sourceRectangleLeftEnd, Color.White);
                 sprite.Draw(Texture, new Rectangle(FillingRectangle.X + FillingRectangle.Width / 2, FillingRectangle.Y, 
-                            FillingRectangle.Width / 2, FillingRectangle.Height), this.sourceRectangleRightEnd, Color.White);
+                            FillingRectangle.Width / 2, FillingRectangle.Height), sourceRectangleRightEnd, Color.White);
             }
             /*
             // Draw the rolling highlight

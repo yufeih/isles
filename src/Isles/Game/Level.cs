@@ -16,8 +16,8 @@ namespace Isles
     #region Level
     public class Level : IEventListener
     {
-        RuinedLand ruinedLand;
-        List<PlayerInfo> playerInfoFromMap = new List<PlayerInfo>();
+        private RuinedLand ruinedLand;
+        private readonly List<PlayerInfo> playerInfoFromMap = new();
 
         public virtual void Load(XmlElement xml, ILoading progress)
         {
@@ -26,19 +26,33 @@ namespace Isles
 
             foreach (XmlElement child in childNodes)
             {
-                PlayerInfo info = new PlayerInfo();
+                var info = new PlayerInfo();
 
                 info.Name = child.GetAttribute("Name");
                 if (child.HasAttribute("Team"))
+                {
                     info.Team = int.Parse(child.GetAttribute("Team"));
+                }
+
                 if (child.HasAttribute("TeamColor"))
+                {
                     info.TeamColor = Helper.StringToColor(child.GetAttribute("TeamColor"));
+                }
+
                 if (child.HasAttribute("Race"))
+                {
                     info.Race = (Race)Enum.Parse(typeof(Race), child.GetAttribute("Race"));
+                }
+
                 if (child.HasAttribute("Type"))
+                {
                     info.Type = (PlayerType)Enum.Parse(typeof(PlayerType), child.GetAttribute("Type"));
+                }
+
                 if (child.HasAttribute("SpawnPoint"))
+                {
                     info.SpawnPoint = Helper.StringToVector2(child.GetAttribute("SpawnPoint"));
+                }
 
                 playerInfoFromMap.Add(info);
             
@@ -52,12 +66,14 @@ namespace Isles
             Player.LocalPlayer = null;
             Player player = null;
 
-            for (int i = 0; i < playerInfoFromMap.Count; i++)
+            for (var i = 0; i < playerInfoFromMap.Count; i++)
             {
                 if (playerInfoFromMap[i].Type == PlayerType.Local)
                 {
                     if (Player.LocalPlayer != null)
+                    {
                         throw new Exception("Only one local player is allowed");
+                    }
 
                     player = Player.LocalPlayer = new LocalPlayer();
                 }
@@ -69,7 +85,10 @@ namespace Isles
                 {
                     player = new DummyPlayer();
                 }
-                else throw new NotImplementedException();
+                else
+                {
+                    throw new NotImplementedException();
+                }
 
                 player.Name = playerInfoFromMap[i].Name;
                 player.Race = playerInfoFromMap[i].Race;
@@ -89,18 +108,19 @@ namespace Isles
 
         protected virtual void CreatePlayers(List<PlayerInfo> info) { }
 
-
         public virtual void Start(GameWorld world)
         {
             // Reset gameTime
             world.Game.ResetElapsedTime();
 
             // Initialize local player
-            bool hasSteamer = false;
+            var hasSteamer = false;
             foreach (Player player in Player.AllPlayers)
             {
                 if (player.Race == Race.Steamer)
+                {
                     hasSteamer = true;
+                }
 
                 player.Start(world);
             }
@@ -108,18 +128,26 @@ namespace Isles
             foreach (IWorldObject o in world.WorldObjects)
             {
                 if (o is GameObject)
+                {
                     (o as GameObject).Start(world);
+                }
             }
 
             // Create ruined land
             if (hasSteamer)
+            {
                 ruinedLand = RuinedLand.Create(BaseGame.Singleton, world, world.FogOfWar);
+            }
 
             // Player sound
             if (Player.LocalPlayer.Race == Race.Islander)
+            {
                 Audios.PlayMusic("Islander", true, 40, 10);
+            }
             else
+            {
                 Audios.PlayMusic("Steamer", true, 40, 10);
+            }
         }
 
         public virtual void Update(GameTime gameTime) { }
@@ -127,7 +155,9 @@ namespace Isles
         public virtual void Draw(GameTime gameTime)
         {
             if (ruinedLand != null)
+            {
                 ruinedLand.Draw(gameTime);
+            }
         }
 
         public virtual EventResult HandleEvent(EventType type, object sender, object tag)
@@ -143,8 +173,8 @@ namespace Isles
     /// </summary>
     public class Skirmish : Level
     {
-        GameScreen screen;
-        List<PlayerInfo> playerInfos;
+        private readonly GameScreen screen;
+        private readonly List<PlayerInfo> playerInfos;
 
         /// <summary>
         /// Create a new stone
@@ -152,7 +182,9 @@ namespace Isles
         public Skirmish(GameScreen screen, IEnumerable<PlayerInfo> info)
         {
             if (screen == null || info == null)
+            {
                 throw new ArgumentNullException();
+            }
 
             this.screen = screen;
             playerInfos = new List<PlayerInfo>(info);
@@ -164,14 +196,16 @@ namespace Isles
         protected override void CreatePlayers(List<PlayerInfo> playerInfoFromMap)
         {
             if (playerInfos.Count > playerInfoFromMap.Count)
+            {
                 throw new Exception("This map only support " + playerInfoFromMap.Count + " players");
+            }
 
             // Randomize player position
-            Random random = new Random();
+            var random = new Random();
 
-            for (int i = 0; i < playerInfos.Count; i++)
+            for (var i = 0; i < playerInfos.Count; i++)
             {
-                int index = random.Next(playerInfoFromMap.Count);
+                var index = random.Next(playerInfoFromMap.Count);
                 //int index = i;
                 playerInfos[i].SpawnPoint = playerInfoFromMap[index].SpawnPoint;
                 playerInfoFromMap.RemoveAt(index);
@@ -201,7 +235,7 @@ namespace Isles
                     Player.LocalPlayer.WorkerName), false);
 
             // Create box of pandora
-            for (int i = 0; i < 12; i++)
+            for (var i = 0; i < 12; i++)
             {
                 IWorldObject box = GameServer.Singleton.Create("BoxOfPandora");
 
@@ -260,11 +294,11 @@ namespace Isles
 
         public void CreateStartup(GameWorld world, Player player, Vector3 position)
         {
-            string townhall = (player.Race == Race.Islander ? "Townhall" : "SteamFort");
-            string worker = (player.Race == Race.Islander ? "Follower" : "Miner");
+            var townhall = (player.Race == Race.Islander ? "Townhall" : "SteamFort");
+            var worker = (player.Race == Race.Islander ? "Follower" : "Miner");
 
             // Create a townhall and 4 followers if this player is not used for quest
-            Building building = GameServer.Singleton.Create(townhall) as Building;
+            var building = GameServer.Singleton.Create(townhall) as Building;
 
             if (building != null)
             {
@@ -274,9 +308,9 @@ namespace Isles
                 world.Add(building);
             }
 
-            for (int i = 0; i < 5; i++)
+            for (var i = 0; i < 5; i++)
             {
-                Worker peon = GameServer.Singleton.Create(worker) as Worker;
+                var peon = GameServer.Singleton.Create(worker) as Worker;
 
                 if (peon != null)
                 {
@@ -293,8 +327,7 @@ namespace Isles
             player.Lumber = 500;
         }
 
-
-        double checkTimer = 5;
+        private double checkTimer = 5;
 
         public override void Update(GameTime gameTime)
         {
@@ -310,9 +343,14 @@ namespace Isles
                     if (IsPlayerDefeated(player))
                     {
                         if (player is LocalPlayer)
+                        {
                             screen.ShowDefeated();
+                        }
                         else
+                        {
                             screen.ShowVictory();
+                        }
+
                         break;
                     }
                 }
@@ -325,7 +363,9 @@ namespace Isles
             foreach (GameObject o in player.EnumerateObjects())
             {
                 if (o is Building && o.IsAlive)
+                {
                     return false;
+                }
             }
 
             return true;

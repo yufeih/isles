@@ -23,18 +23,17 @@ namespace Isles
         /// the inner dictionary stores its default {attribute, value} pair.
         /// </summary>
         public Dictionary<string, XmlElement>
-            WorldObjectDefaults = new Dictionary<string, XmlElement>();
+            WorldObjectDefaults = new();
 
         /// <summary>
         /// Gets or sets the default attributes for spells
         /// </summary>
         public Dictionary<string, XmlElement>
-            SpellDefaults = new Dictionary<string, XmlElement>();
-
-        Dictionary<string, float> lumber = new Dictionary<string, float>();
-        Dictionary<string, float> gold = new Dictionary<string, float>();
-        Dictionary<string, float> food = new Dictionary<string, float>();
-        Dictionary<string, bool> isUnique = new Dictionary<string, bool>();
+            SpellDefaults = new();
+        private readonly Dictionary<string, float> lumber = new();
+        private readonly Dictionary<string, float> gold = new();
+        private readonly Dictionary<string, float> food = new();
+        private readonly Dictionary<string, bool> isUnique = new();
 
         /// <summary>
         /// Gets the lumber property of a given type
@@ -43,25 +42,32 @@ namespace Isles
         {
             float i;
             if (lumber.TryGetValue(type, out i))
+            {
                 return i;
+            }
 
             string value;
             XmlElement element;
             if (WorldObjectDefaults.TryGetValue(type, out element))
+            {
                 if ((value = element.GetAttribute("Lumber")) != "")
                 {
                     i = float.Parse(value);
                     lumber.Add(type, i);
                     return i;
                 }
-            
+            }
+
             if (SpellDefaults.TryGetValue(type, out element))
+            {
                 if ((value = element.GetAttribute("Lumber")) != "")
                 {
                     i = float.Parse(value);
                     lumber.Add(type, i);
                     return i;
                 }
+            }
+
             return 0;
         }
 
@@ -72,25 +78,31 @@ namespace Isles
         {
             float i;
             if (gold.TryGetValue(type, out i))
+            {
                 return i;
+            }
 
             string value;
             XmlElement element;
             if (WorldObjectDefaults.TryGetValue(type, out element))
+            {
                 if ((value = element.GetAttribute("Gold")) != "")
                 {
                     i = float.Parse(value);
                     gold.Add(type, i);
                     return i;
                 }
+            }
 
             if (SpellDefaults.TryGetValue(type, out element))
+            {
                 if ((value = element.GetAttribute("Gold")) != "")
                 {
                     i = float.Parse(value);
                     gold.Add(type, i);
                     return i;
                 }
+            }
 
             return 0;
         }
@@ -102,25 +114,31 @@ namespace Isles
         {
             float i;
             if (food.TryGetValue(type, out i))
+            {
                 return i;
+            }
 
             string value;
             XmlElement element;
             if (WorldObjectDefaults.TryGetValue(type, out element))
+            {
                 if ((value = element.GetAttribute("Food")) != "")
                 {
                     i = float.Parse(value);
                     food.Add(type, i);
                     return i;
                 }
+            }
 
             if (SpellDefaults.TryGetValue(type, out element))
+            {
                 if ((value = element.GetAttribute("Food")) != "")
                 {
                     i = float.Parse(value);
                     food.Add(type, i);
                     return i;
                 }
+            }
 
             return 0;
         }
@@ -132,17 +150,21 @@ namespace Isles
         {
             bool i;
             if (isUnique.TryGetValue(type, out i))
+            {
                 return i;
+            }
 
             string value;
             XmlElement element;
             if (WorldObjectDefaults.TryGetValue(type, out element))
+            {
                 if ((value = element.GetAttribute("IsUnique")) != "")
                 {
                     i = bool.Parse(value);
                     isUnique.Add(type, i);
                     return i;
                 }
+            }
 
             return false;
         }
@@ -153,9 +175,13 @@ namespace Isles
         public void SetUnique(string type)
         {
             if (isUnique.ContainsKey(type))
+            {
                 isUnique[type] = true;
+            }
             else
+            {
                 isUnique.Add(type, true);
+            }
         }
 
         /// <summary>
@@ -164,21 +190,23 @@ namespace Isles
         /// <param name="stream"></param>
         public void Load(Stream stream)
         {
-            XmlDocument doc = new XmlDocument();
+            var doc = new XmlDocument();
             doc.Load(stream);
 
             if (doc.DocumentElement.Name != "GameDefault")
+            {
                 throw new InvalidDataException();
+            }
 
             // Gets world object defaults
-            XmlElement element =
+            var element =
                 doc.DocumentElement.SelectSingleNode("WorldObject") as XmlElement;
 
             if (element != null)
             {
                 foreach (XmlNode node in element.ChildNodes)
                 {
-                    XmlElement child = node as XmlElement;
+                    var child = node as XmlElement;
 
                     if (child != null)
                     {
@@ -194,7 +222,7 @@ namespace Isles
             {
                 foreach (XmlNode node in element.ChildNodes)
                 {
-                    XmlElement child = node as XmlElement;
+                    var child = node as XmlElement;
 
                     if (child != null)
                     {
@@ -251,7 +279,9 @@ namespace Isles
         public void MergeAttributes(string type, XmlElement xml)
         {
             if (xml == null || type == null)
+            {
                 return;
+            }
 
             XmlElement value;
 
@@ -261,7 +291,9 @@ namespace Isles
                 foreach (XmlAttribute attribute in value.Attributes)
                 {
                     if (!xml.HasAttribute(attribute.Name))
+                    {
                         xml.SetAttribute(attribute.Name, attribute.Value);
+                    }
                 }
             }
         }
@@ -277,7 +309,9 @@ namespace Isles
             get
             {
                 if (gameDefault != null)
+                {
                     return gameDefault;
+                }
 
                 using (Stream stream =
                        BaseGame.Singleton.ZipContent.GetFileStream("Content/Settings/Defaults.xml"))

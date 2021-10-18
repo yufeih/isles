@@ -11,7 +11,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Isles.Pipeline;
 using Isles.Engine;
 
-
 namespace Isles
 {
     #region StateHarvestGold
@@ -27,32 +26,34 @@ namespace Isles
         /// <summary>
         /// State transitions
         /// </summary>
-        enum StateType
+        private enum StateType
         {
             MoveToGoldmine, Wait, Harvest, BackToDeposit
         }
 
-        StateType state;
+        private StateType state;
 
         /// <summary>
         /// Common stuff
         /// </summary>
-        Worker owner;
-        GameWorld world;
-        Goldmine goldmine;
-        Building deposit;
-        StateMoveToPosition move;
-        double elapsedWorkTime;
+        private readonly Worker owner;
+        private readonly GameWorld world;
+        private Goldmine goldmine;
+        private Building deposit;
+        private StateMoveToPosition move;
+        private double elapsedWorkTime;
 
         public StateHarvestGold(GameWorld world, Worker peon, Goldmine goldmine)
         {
             if (world == null || peon == null)
+            {
                 throw new ArgumentNullException();
+            }
 
-            this.owner = peon;
+            owner = peon;
             this.world = world;
             this.goldmine = goldmine;
-            this.owner.LumberCarried = 0;
+            owner.LumberCarried = 0;
 
             // Initialize state
             goldmine = FindAnotherGoldmine();
@@ -62,7 +63,9 @@ namespace Isles
         public StateHarvestGold(GameWorld world, Worker peon, Building deposit)
         {
             if (world == null || peon == null || deposit == null)
+            {
                 throw new ArgumentNullException();
+            }
 
             if (peon.Owner != deposit.Owner ||
                 deposit.State != Building.BuildingState.Normal)
@@ -70,10 +73,10 @@ namespace Isles
                 throw new InvalidOperationException();
             }
 
-            this.owner = peon;
+            owner = peon;
             this.world = world;
             this.deposit = deposit;
-            this.owner.LumberCarried = 0;
+            owner.LumberCarried = 0;
 
             // Initialize state
             deposit = owner.Owner.FindNearestObject(
@@ -99,7 +102,9 @@ namespace Isles
 
             // Make sure we do not ignore dynamic obstacles when we leave this state
             if (owner.IgnoreDynamicObstacles)
+            {
                 owner.IgnoreDynamicObstacles = false;
+            }
 
             owner.Stop();
             state = StateType.MoveToGoldmine;
@@ -118,7 +123,9 @@ namespace Isles
                     if (goldmine == null)
                     {
                         if (owner.GoldCarried == 0)
+                        {
                             return StateResult.Failed;
+                        }
 
                         // If we have some lumber in our pocket, send them back to deposit
                         state = StateType.BackToDeposit;
@@ -143,7 +150,9 @@ namespace Isles
 
                 // Return failure if we can't get there?
                 if (result == StateResult.Failed)
+                {
                     return StateResult.Failed;
+                }
 
                 if (owner.TargetReached(goldmine))
                 {
@@ -165,7 +174,9 @@ namespace Isles
             {
                 // Checks if the goldmine has collapsed
                 if (goldmine == null || goldmine.Gold <= 0)
+                {
                     return StateResult.Failed;
+                }
 
                 // Checks if we can start to work
                 if (goldmine.HarvesterCount < MaxPeonsPerGoldmine)
@@ -181,11 +192,17 @@ namespace Isles
                 // See if we've worked enough time
                 if ((elapsedWorkTime += gameTime.ElapsedGameTime.TotalSeconds) >= WorkTime)
                 {
-                    int harvested = GoldHarvestedPerTime;
+                    var harvested = GoldHarvestedPerTime;
                     if (harvested > goldmine.Gold)
+                    {
                         harvested = goldmine.Gold;
+                    }
+
                     if (harvested > owner.GoldCapacity - owner.GoldCarried)
+                    {
                         harvested = owner.GoldCapacity - owner.GoldCarried;
+                    }
+
                     goldmine.Gold -= harvested;
                     owner.GoldCarried += harvested;
 
@@ -237,7 +254,9 @@ namespace Isles
 
                 // Return failure if we can't get there?
                 if (result == StateResult.Failed)
+                {
                     return StateResult.Failed;
+                }
 
                 if (owner.TargetReached(deposit))
                 {
@@ -251,7 +270,9 @@ namespace Isles
 
                     // Cheat! Cheat!
                     if (owner.Owner is ComputerPlayer && BaseGame.Singleton.Settings.Cheat)
+                    {
                         owner.Owner.Gold += owner.GoldCarried;
+                    }
 
                     owner.GoldCarried = 0;
 
@@ -266,7 +287,9 @@ namespace Isles
                               owner.Position, owner.Owner.TownhallName, deposit) as Building;
 
                     if (deposit == null)
+                    {
                         return StateResult.Failed;
+                    }
 
                     move = null;
                 }
@@ -283,19 +306,21 @@ namespace Isles
         private Goldmine FindAnotherGoldmine()
         {
             Goldmine minGoldmine = null;
-            float distanceSq = float.MaxValue;
+            var distanceSq = float.MaxValue;
 
             foreach (IWorldObject o in world.GetNearbyObjects(owner.Position, 500))
             {
                 if (o is Goldmine)
                 {
-                    Goldmine anotherGoldmine = o as Goldmine;
+                    var anotherGoldmine = o as Goldmine;
 
                     if (anotherGoldmine == null || anotherGoldmine == goldmine ||
                         !CanGoldmineBeHarvested(anotherGoldmine))
+                    {
                         continue;
+                    }
 
-                    float lenSq = Vector3.Subtract(anotherGoldmine.Position, owner.Position).LengthSquared();
+                    var lenSq = Vector3.Subtract(anotherGoldmine.Position, owner.Position).LengthSquared();
                     if (lenSq < distanceSq)
                     {
                         minGoldmine = anotherGoldmine;
@@ -321,38 +346,42 @@ namespace Isles
         /// <summary>
         /// State transitions
         /// </summary>
-        enum StateType
+        private enum StateType
         {
             MoveToTree, Harvest, BackToDeposit
         }
 
-        StateType state;
+        private StateType state;
 
         /// <summary>
         /// Common stuff
         /// </summary>
-        Worker owner;
-        GameWorld world;
-        Tree tree;
-        Building deposit;
-        StateMoveToPosition move;
-        KeyValuePair<TimeSpan, EventHandler>[] trigger;
+        private readonly Worker owner;
+        private readonly GameWorld world;
+        private Tree tree;
+        private Building deposit;
+        private StateMoveToPosition move;
+        private readonly KeyValuePair<TimeSpan, EventHandler>[] trigger;
 
         public StateHarvestLumber(GameWorld world, Worker peon, Tree tree)
         {
             if (world == null || peon == null)
+            {
                 throw new ArgumentNullException();
+            }
 
-            this.owner = peon;
+            owner = peon;
             this.tree = tree;
             this.world = world;
-            this.owner.GoldCarried = 0;
+            owner.GoldCarried = 0;
 
             AnimationClip clip = owner.Model.GetAnimationClip(owner.AttackAnimation);
             if (clip == null)
+            {
                 throw new InvalidOperationException();
+            }
 
-            TimeSpan time = new TimeSpan((long)(clip.Duration.Ticks * 13.0f / 20));
+            var time = new TimeSpan((long)(clip.Duration.Ticks * 13.0f / 20));
             trigger = new KeyValuePair<TimeSpan, EventHandler>[]
             {
                 new KeyValuePair<TimeSpan, EventHandler>(time, HarvestOnce),
@@ -366,7 +395,9 @@ namespace Isles
         public StateHarvestLumber(GameWorld world, Worker peon, Building deposit)
         {
             if (world == null || peon == null || deposit == null)
+            {
                 throw new ArgumentNullException();
+            }
 
             if (deposit.Owner != peon.Owner ||
                 deposit.State != Building.BuildingState.Normal)
@@ -374,16 +405,18 @@ namespace Isles
                 throw new InvalidOperationException();
             }
 
-            this.owner = peon;
+            owner = peon;
             this.world = world;
-            this.owner.GoldCarried = 0;
+            owner.GoldCarried = 0;
             this.deposit = deposit;
 
             AnimationClip clip = owner.Model.GetAnimationClip(owner.AttackAnimation);
             if (clip == null)
+            {
                 throw new InvalidOperationException();
+            }
 
-            TimeSpan time = new TimeSpan((long)(clip.Duration.Ticks * 13.0f / 20));
+            var time = new TimeSpan((long)(clip.Duration.Ticks * 13.0f / 20));
             trigger = new KeyValuePair<TimeSpan, EventHandler>[]
             {
                 new KeyValuePair<TimeSpan, EventHandler>(time, HarvestOnce),
@@ -396,20 +429,26 @@ namespace Isles
 
         private Building FindDeposit()
         {
-            Building townhall = owner.Owner.FindNearestObject(
+            var townhall = owner.Owner.FindNearestObject(
                       owner.Position, owner.Owner.TownhallName, null) as Building;
 
-            Building lumbermill = owner.Owner.FindNearestObject(
+            var lumbermill = owner.Owner.FindNearestObject(
                       owner.Position, owner.Owner.LumbermillName, null) as Building;
 
             if (lumbermill == null && townhall != null)
+            {
                 return townhall;
+            }
 
             if (townhall == null && lumbermill != null)
+            {
                 return lumbermill;
+            }
 
             if (townhall == null && lumbermill == null)
+            {
                 return null;
+            }
 
             Vector2 v1, v2;
 
@@ -419,10 +458,7 @@ namespace Isles
             v2.X = lumbermill.Position.X - owner.Position.X;
             v2.Y = lumbermill.Position.Y - owner.Position.Y;
 
-            if (v1.LengthSquared() < v2.LengthSquared())
-                return townhall;
-
-            return lumbermill;
+            return v1.LengthSquared() < v2.LengthSquared() ? townhall : lumbermill;
         }
 
         public override void Activate() { }
@@ -452,7 +488,9 @@ namespace Isles
                     if (tree == null)
                     {
                         if (owner.LumberCarried == 0)
+                        {
                             return StateResult.Failed;
+                        }
 
                         // If we have some lumber in our pocket, send them back to deposit
                         state = StateType.BackToDeposit;
@@ -476,7 +514,9 @@ namespace Isles
 
                 // Return failure if we can't get there?
                 if (result == StateResult.Failed)
+                {
                     return StateResult.Failed;
+                }
 
                 if (tree != null && owner.TargetPointReached(tree.Position))
                 {
@@ -507,7 +547,9 @@ namespace Isles
                     deposit = FindDeposit();
 
                     if (deposit == null)
+                    {
                         return StateResult.Failed;
+                    }
 
                     // Move to the new deposit
                     move = null;
@@ -526,7 +568,9 @@ namespace Isles
 
                 // Return failure if we can't get there?
                 if (result == StateResult.Failed)
+                {
                     return StateResult.Failed;
+                }
 
                 if (owner.TargetReached(deposit))
                 {
@@ -542,7 +586,9 @@ namespace Isles
 
                     // Cheat! Cheat!
                     if (owner.Owner is ComputerPlayer && BaseGame.Singleton.Settings.Cheat)
+                    {
                         owner.Owner.Lumber += owner.LumberCarried;
+                    }
 
                     owner.LumberCarried = 0;
 
@@ -561,7 +607,7 @@ namespace Isles
             return StateResult.Active;
         }
 
-        void OnComplete(object sender, EventArgs e)
+        private void OnComplete(object sender, EventArgs e)
         {
             //string anim = owner.AttackAnimation;
 
@@ -581,17 +627,27 @@ namespace Isles
         {
             // Make sure we are in the correct state
             if (state != StateType.Harvest || tree == null || tree.Lumber < 0)
+            {
                 return;
+            }
 
             if (owner.Owner is LocalPlayer && Helper.Random.Next(2) == 0)
+            {
                 Audios.Play("ChopWood", owner);
+            }
 
             // Harvest once
-            int harvested = LumberHarvestedPerHit;
+            var harvested = LumberHarvestedPerHit;
             if (harvested > tree.Lumber)
+            {
                 harvested = tree.Lumber;
+            }
+
             if (harvested > owner.LumberCapacity - owner.LumberCarried)
+            {
                 harvested = owner.LumberCapacity - owner.LumberCarried;
+            }
+
             tree.Lumber -= harvested;
             owner.LumberCarried += harvested;
 
@@ -610,7 +666,9 @@ namespace Isles
             if (owner.LumberCarried == owner.LumberCapacity)
             {
                 if (tree != null)
+                {
                     tree.HarvesterCount--;
+                }
 
                 move = null;
                 state = StateType.BackToDeposit;
@@ -625,16 +683,18 @@ namespace Isles
         public static Tree FindAnotherTree(Tree existingTree, Vector3 position, GameWorld world)
         {
             Tree minTree = null;
-            float distanceSq = float.MaxValue;
+            var distanceSq = float.MaxValue;
 
             foreach (IWorldObject o in world.GetNearbyObjects(position, 500))
             {
-                Tree anotherTree = o as Tree;
+                var anotherTree = o as Tree;
 
                 if (anotherTree == null || anotherTree == existingTree || !CanTreeBeHarvested(anotherTree))
+                {
                     continue;
+                }
 
-                float lenSq = Vector3.Subtract(anotherTree.Position, position).LengthSquared();
+                var lenSq = Vector3.Subtract(anotherTree.Position, position).LengthSquared();
                 if (lenSq < distanceSq)
                 {
                     minTree = anotherTree;
@@ -653,25 +713,27 @@ namespace Isles
         /// <summary>
         /// State transitions
         /// </summary>
-        enum StateType
+        private enum StateType
         {
             MoveToBuilding, Build
         }
 
-        StateType state;
+        private StateType state;
 
         /// <summary>
         /// Common stuff
         /// </summary>
-        Charactor owner;
-        Building building;
-        GameWorld world;
-        StateMoveToPosition move;
+        private readonly Charactor owner;
+        private readonly Building building;
+        private readonly GameWorld world;
+        private StateMoveToPosition move;
 
         public StateConstruct(GameWorld world, Charactor builder, Building building)
         {
             if (building == null || builder == null || world == null)
+            {
                 throw new ArgumentNullException();
+            }
 
             if (building.Owner != builder.Owner ||
                 building.State != Building.BuildingState.Constructing)
@@ -680,9 +742,9 @@ namespace Isles
             }
 
             this.world = world;
-            this.owner = builder;
+            owner = builder;
             this.building = building;
-            this.state = StateType.MoveToBuilding;
+            state = StateType.MoveToBuilding;
         }
 
         public override void Activate() { }
@@ -717,11 +779,15 @@ namespace Isles
 
                 // Notify failure if we failed to move to the target
                 if (result == StateResult.Failed)
+                {
                     return StateResult.Failed;
+                }
 
                 // Checks if the build is completed
                 if (IsBuildCompleted(building))
+                {
                     return StateResult.Completed;
+                }
 
                 // Checks if we've reached the building
                 if (owner.TargetReached(building))
@@ -745,7 +811,9 @@ namespace Isles
             {
                 // Check if the build is completed
                 if (IsBuildCompleted(building))
+                {
                     return StateResult.Completed;
+                }
             }
 
             return StateResult.Active;
@@ -754,7 +822,9 @@ namespace Isles
         private void Hit(object sender, EventArgs e)
         {
             if (owner.Owner is LocalPlayer)
+            {
                 Audios.Play("ChopWood", owner);
+            }
         }
 
         private bool IsBuildCompleted(Building building)
@@ -770,25 +840,27 @@ namespace Isles
         /// <summary>
         /// State transitions
         /// </summary>
-        enum StateType
+        private enum StateType
         {
             MoveToBuilding, Repair
         }
 
-        StateType state;
+        private StateType state;
 
         /// <summary>
         /// Common stuff
         /// </summary>
-        Charactor owner;
-        Building building;
-        GameWorld world;
-        StateMoveToPosition move;
+        private readonly Charactor owner;
+        private readonly Building building;
+        private readonly GameWorld world;
+        private StateMoveToPosition move;
 
         public StateRepair(GameWorld world, Charactor owner, Building building)
         {
             if (building == null || owner == null || world == null)
+            {
                 throw new ArgumentNullException();
+            }
 
             if (building.Owner != owner.Owner ||
                 building.State != Building.BuildingState.Normal)
@@ -799,7 +871,7 @@ namespace Isles
             this.world = world;
             this.owner = owner;
             this.building = building;
-            this.state = StateType.MoveToBuilding;
+            state = StateType.MoveToBuilding;
         }
 
         public override void Activate() { }
@@ -834,11 +906,15 @@ namespace Isles
 
                 // Notify failure if we failed to move to the target
                 if (result == StateResult.Failed)
+                {
                     return StateResult.Failed;
+                }
 
                 // Checks if the build is completed
                 if (IsRepairCompleted(building))
+                {
                     return StateResult.Completed;
+                }
 
                 // Checks if we've reached the building
                 if (owner.TargetReached(building))
@@ -862,7 +938,9 @@ namespace Isles
             {
                 // Just check if the repair is completed
                 if (IsRepairCompleted(building))
+                {
                     return StateResult.Completed;
+                }
             }
 
             return StateResult.Active;
@@ -871,7 +949,9 @@ namespace Isles
         private void Hit(object sender, EventArgs e)
         {
             if (owner.Owner is LocalPlayer)
+            {
                 Audios.Play("ChopWood", owner);
+            }
         }
 
         private bool IsRepairCompleted(Building building)
@@ -886,16 +966,13 @@ namespace Isles
     #region StateCharactorIdle
     public class StateCharactorIdle : BaseState
     {
-        double arbitrateTimer = 0;
-        Random random = new Random();
-        Charactor owner;
+        private double arbitrateTimer = 0;
+        private readonly Random random = new();
+        private readonly Charactor owner;
 
         public StateCharactorIdle(Charactor owner)
         {
-            if (owner == null)
-                throw new ArgumentNullException();
-
-            this.owner = owner;
+            this.owner = owner ?? throw new ArgumentNullException();
         }
 
         public override void Activate() { }
@@ -905,7 +982,9 @@ namespace Isles
         {
             // Check for queued states
             if (owner.QueuedStates.Count > 0)
+            {
                 return StateResult.Completed;
+            }
 
             arbitrateTimer -= gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -917,7 +996,7 @@ namespace Isles
                 foreach (IWorldObject worldObject in
                     owner.World.GetNearbyObjects(owner.Position, owner.ViewDistance))
                 {
-                    GameObject o = worldObject as GameObject;
+                    var o = worldObject as GameObject;
 
                     if (o != null && owner.IsOpponent(o) && 
                         o.IsAlive && o.Visible && !o.InFogOfWar)
@@ -936,10 +1015,10 @@ namespace Isles
     #region StateCharactorDie
     public class StateCharactorDie : BaseState
     {
-        bool sink = false;
-        float height = 5.0f;
-        float baseHeight;
-        Charactor owner;
+        private bool sink = false;
+        private float height = 5.0f;
+        private float baseHeight;
+        private readonly Charactor owner;
 
         public StateCharactorDie(Charactor owner)
         {
@@ -949,15 +1028,21 @@ namespace Isles
         public override void Activate()
         {
             if (owner.Model != null)
+            {
                 owner.Model.Play("Die", false, 0.0f, BeginSink, null);
+            }
             else
+            {
                 BeginSink(null, EventArgs.Empty);
+            }
         }
 
         private void BeginSink(object sender, EventArgs e)
         {
             if (owner.Model != null)
+            {
                 owner.Model.Pause();
+            }
 
             sink = true;
             baseHeight = owner.World.Landscape.GetHeight(
@@ -993,53 +1078,61 @@ namespace Isles
         /// <summary>
         /// State transitions
         /// </summary>
-        enum StateType
+        private enum StateType
         {
             MoveToTarget, MoveToPosition, Attack
         }
 
-        StateType state;
+        private StateType state;
 
         /// <summary>
         /// Common stuff
         /// </summary>
-        Charactor owner;
-        GameWorld world;
-        GameObject target;
-        Vector3? targetPosition;
-        SpellCombat spell;
-        StateMoveToPosition moveToPosition;
-        StateMoveToTarget moveToTarget;
-        double arbitrateTimer = 0;
+        private readonly Charactor owner;
+        private readonly GameWorld world;
+        private GameObject target;
+        private Vector3? targetPosition;
+        private readonly SpellCombat spell;
+        private StateMoveToPosition moveToPosition;
+        private StateMoveToTarget moveToTarget;
+        private double arbitrateTimer = 0;
 
         public StateAttack(GameWorld world, Charactor owner, GameObject target, SpellCombat spell)
         {
             if (world == null || owner == null || spell == null)
+            {
                 throw new ArgumentNullException();
+            }
 
             this.owner = owner;
             this.target = target;
             this.world = world;
             this.spell = spell;
-            this.state = StateType.MoveToTarget;
+            state = StateType.MoveToTarget;
 
             if (this.target == null)
+            {
                 this.target = FindAnotherTarget(world, owner, target, spell);
+            }
 
             if (this.target != null)
-                this.targetPosition = this.target.Position;
+            {
+                targetPosition = this.target.Position;
+            }
         }
 
         public StateAttack(GameWorld world, Charactor owner, Vector3 target, SpellCombat spell)
         {
             if (world == null || owner == null || spell == null)
+            {
                 throw new ArgumentNullException();
+            }
 
             this.owner = owner;
             this.world = world;
             this.spell= spell;
-            this.targetPosition = target;
-            this.state = StateType.MoveToPosition;
+            targetPosition = target;
+            state = StateType.MoveToPosition;
         }
 
         public override void Activate() { }
@@ -1049,10 +1142,16 @@ namespace Isles
             target = null;
             targetPosition = null;
             if (moveToPosition != null)
+            {
                 moveToPosition.Terminate();
+            }
+
             moveToPosition = null;
             if (moveToTarget != null)
+            {
                 moveToTarget.Terminate();
+            }
+
             moveToTarget = null;
 
             owner.Stop();
@@ -1066,10 +1165,14 @@ namespace Isles
             {
                 // Find a target if we don't have one
                 if (!spell.CanAttakTarget(target))
+                {
                     target = FindAnotherTarget(world, owner, target, spell);
+                }
 
                 if (targetPosition == null)
+                {
                     return StateResult.Completed;
+                }
 
                 if (target != null)
                 {
@@ -1091,10 +1194,14 @@ namespace Isles
                 StateResult result = moveToPosition.Update(gameTime);
 
                 if (result == StateResult.Failed)
+                {
                     return StateResult.Failed;
+                }
 
                 if (result == StateResult.Completed)
+                {
                     return StateResult.Completed;
+                }
             }
             else if (state == StateType.MoveToTarget)
             {
@@ -1153,7 +1260,6 @@ namespace Isles
                 // cool down, aimation stuff.
                 spell.Cast(target);
 
-
                 const double ArbitrateInterval = 1.0;
 
                 arbitrateTimer += gameTime.ElapsedGameTime.TotalSeconds;
@@ -1178,17 +1284,19 @@ namespace Isles
             GameWorld world, GameObject owner, GameObject existingTarget, SpellCombat spell)
         {
             GameObject minTarget = null;
-            float distanceSq = float.MaxValue;
+            var distanceSq = float.MaxValue;
 
             foreach (IWorldObject o in world.GetNearbyObjects(owner.Position, owner.ViewDistance))
             {
-                GameObject anotherTarget = o as GameObject;
+                var anotherTarget = o as GameObject;
 
                 if (anotherTarget == existingTarget || anotherTarget == owner ||
                     !owner.IsOpponent(anotherTarget) || !spell.CanAttakTarget(anotherTarget))
+                {
                     continue;
+                }
 
-                float lenSq = Vector3.Subtract(anotherTarget.Position, owner.Position).LengthSquared();
+                var lenSq = Vector3.Subtract(anotherTarget.Position, owner.Position).LengthSquared();
                 if (lenSq < distanceSq)
                 {
                     // Attack object that can attack us

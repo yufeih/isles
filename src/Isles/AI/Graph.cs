@@ -35,12 +35,11 @@ namespace Isles.Engine
         /// </summary>
         public GraphEdge(int from, int to, float cost)
         {
-            this.From = from;
-            this.To = to;
-            this.Cost = cost;
+            From = from;
+            To = to;
+            Cost = cost;
         }
     }
-
 
     /// <summary>
     /// Interface for a directed graph
@@ -77,30 +76,24 @@ namespace Isles.Engine
         /// <summary>
         /// All graph nodes
         /// </summary>
-        List<TNode> nodes;
+        private readonly List<TNode> nodes;
 
         /// <summary>
         /// Graph edge adjacency list
         /// </summary>
-        List<LinkedList<GraphEdge>> edges;
+        private readonly List<LinkedList<GraphEdge>> edges;
         #endregion
 
         #region IGraph
         /// <summary>
         /// Gets the total number of nodes in the graph
         /// </summary>
-        public int NodeCount
-        {
-            get { return nodes.Count; } 
-        }
+        public int NodeCount => nodes.Count;
 
         /// <summary>
         /// Gets all nodes
         /// </summary>
-        public IEnumerable<TNode> Nodes
-        {
-            get { return nodes; }
-        }
+        public IEnumerable<TNode> Nodes => nodes;
 
         /// <summary>
         /// Gets a graph node from a given index
@@ -152,7 +145,7 @@ namespace Isles.Engine
             nodes = new List<TNode>(nodeCount);
             edges = new List<LinkedList<GraphEdge>>(nodeCount);
 
-            for (int i = 0; i < nodeCount; i++)
+            for (var i = 0; i < nodeCount; i++)
             {
                 edges[i] = new LinkedList<GraphEdge>();
             }
@@ -211,8 +204,8 @@ namespace Isles.Engine
         /// </summary>
         public static void Test()
         {
-            SparseGraph<int> graph = new SparseGraph<int>();
-            GraphSearchAStar search = new GraphSearchAStar();
+            var graph = new SparseGraph<int>();
+            var search = new GraphSearchAStar();
 
             graph.AddNode(0);
             graph.AddNode(1);
@@ -231,7 +224,7 @@ namespace Isles.Engine
 
             search.Search(graph, 0, 2);
 
-            List<int> path = new List<int>();
+            var path = new List<int>();
             path.AddRange(search.Path);
         }
         #endregion
@@ -284,7 +277,6 @@ namespace Isles.Engine
         IEnumerable<int> Path { get; }
     }
 
-
     /// <summary>
     /// Performs an A* graph search on a given graph
     /// </summary>
@@ -293,47 +285,44 @@ namespace Isles.Engine
         /// <summary>
         /// Whether a search has finished
         /// </summary>
-        bool finished = true;
+        private bool finished = true;
 
         /// <summary>
         /// Start, end node of the search
         /// </summary>
-        int start, end;
+        private int start, end;
 
         /// <summary>
         /// The graph we're currently searching
         /// </summary>
-        IGraph graph;
+        private IGraph graph;
 
         /// <summary>
         /// A list holding the path information.
         /// For a given node index, the value at that index is the parent
         /// (or the previous step) index.
         /// </summary>
-        int[] path;
+        private int[] path;
 
         /// <summary>
         /// Contains the real accumulative cost to that node
         /// </summary>
-        float[] costs;
+        private float[] costs;
 
         /// <summary>
         /// Current length of path or costs (Node count)
         /// </summary>
-        int length;
+        private int length;
 
         /// <summary>
         /// Create an priority queue to store node indices.
         /// </summary>
-        IndexedPriorityQueue queue;
+        private IndexedPriorityQueue queue;
 
         /// <summary>
         /// Gets whether a search query has finished
         /// </summary>
-        public bool Finished
-        {
-            get { return finished; }
-        }
+        public bool Finished => finished;
 
         /// <summary>
         /// Creates a graph searcher using Dijkstra's algorithm
@@ -357,12 +346,14 @@ namespace Isles.Engine
                 queue = new IndexedPriorityQueue(length);
 
                 // Reset path to -1
-                for (int i = 0; i < length; i++)
+                for (var i = 0; i < length; i++)
+                {
                     path[i] = -1;
+                }
             }
 
             // Clear costs (path don't need to be cleared)
-            for (int i = 0; i < length; i++)
+            for (var i = 0; i < length; i++)
             {
                 costs[i] = 0;
             }
@@ -401,12 +392,12 @@ namespace Isles.Engine
         /// </returns>
         public bool? Search(IGraph graph, int start, int end, int steps, out int stepCount)
         {
-            int nodeCount = graph.NodeCount;
+            var nodeCount = graph.NodeCount;
 
             // Start a new search
             if (finished || this.start != start || this.end != end || this.graph != graph)
             {
-                this.finished = false;
+                finished = false;
                 this.graph = graph;
                 this.start = start;
                 this.end = end;
@@ -433,7 +424,7 @@ namespace Isles.Engine
             {
                 // Get the next node with the lowest cost
                 // and removes it from the queue
-                int top = queue.Pop();
+                var top = queue.Pop();
 
                 // If we reached the end, everything is done
                 if (end == top)
@@ -446,10 +437,10 @@ namespace Isles.Engine
                 foreach (GraphEdge edge in graph.GetEdges(top))
                 {
                     // Calculate the heuristic cost from this node to the target (H)                       
-                    float HCost = graph.GetHeuristicValue(edge.To, end);
+                    var HCost = graph.GetHeuristicValue(edge.To, end);
 
                     // Calculate the 'real' cost to this node from the source (G)
-                    float GCost = costs[top] + edge.Cost;
+                    var GCost = costs[top] + edge.Cost;
 
                     // If the node is discoverted for the first time,
                     // Setup it's cost then add it to the priority queue.
@@ -497,7 +488,7 @@ namespace Isles.Engine
         {
             get
             {
-                int i = end;
+                var i = end;
                 while (i != start && i >= 0)
                 {
                     yield return i;

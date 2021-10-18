@@ -28,49 +28,49 @@ namespace Isles.UI
         /// <summary>
         /// UI content manager
         /// </summary>
-        BaseGame game;
+        private readonly BaseGame game;
 
         /// <summary>
         /// Sprite batch used to draw all UI elements
         /// </summary>
-        SpriteBatch sprite;
+        private SpriteBatch sprite;
 
         /// <summary>
         /// Default UI font
         /// </summary>
-        SpriteFont font;
+        private SpriteFont font;
 
         /// <summary>
         /// UI effect
         /// </summary>
-        Effect effect;
+        private Effect effect;
 
         /// <summary>
         /// Area of the UI dialog
         /// </summary>
-        Rectangle area;
+        private Rectangle area;
 
         /// <summary>
         /// UI Elements
         /// </summary>
-        BroadcastList<IUIElement, List<IUIElement>> elements = new
-                  BroadcastList<IUIElement, List<IUIElement>>();
+        private readonly BroadcastList<IUIElement, List<IUIElement>> elements = new
+();
 
         /// <summary>
         /// Visible
         /// </summary>
-        bool visible = true;
+        private bool visible = true;
 
         /// <summary>
         /// Enable
         /// </summary>
-        bool enabled = true;
+        private bool enabled = true;
 
         /// <summary>
         /// Reference area
         /// </summary>
-        readonly Rectangle referenceArea =
-            new Rectangle(0, 0, ReferenceScreenWidth, ReferenceScreenHeight);
+        private readonly Rectangle referenceArea =
+            new(0, 0, ReferenceScreenWidth, ReferenceScreenHeight);
         #endregion
 
         #region Properties
@@ -79,8 +79,8 @@ namespace Isles.UI
         /// </summary>
         public SpriteBatch Sprite
         {
-            get { return sprite; }
-            set { sprite = value; }
+            get => sprite;
+            set => sprite = value;
         }
 
         /// <summary>
@@ -88,8 +88,8 @@ namespace Isles.UI
         /// </summary>
         public SpriteFont Font
         {
-            get { return font; }
-            set { font = value; }
+            get => font;
+            set => font = value;
         }
 
         /// <summary>
@@ -97,8 +97,8 @@ namespace Isles.UI
         /// </summary>
         public Effect Effect
         {
-            get { return effect; }
-            set { effect = value; }
+            get => effect;
+            set => effect = value;
         }
 
         /// <summary>
@@ -106,13 +106,13 @@ namespace Isles.UI
         /// </summary>
         public Rectangle Area
         {
-            get { return referenceArea; }
+            get => referenceArea;
             set { }
         }
 
         public Rectangle DestinationRectangle
         {
-            get { return area; }
+            get => area;
             set { }
         }
 
@@ -121,7 +121,7 @@ namespace Isles.UI
         /// </summary>
         public IUIElement Parent
         {
-            get { return null; }
+            get => null;
 
             // Can't set the parent of a display
             set { }
@@ -131,7 +131,7 @@ namespace Isles.UI
         /// </summary>
         public Anchor Anchor
         {
-            get { return Anchor.TopLeft; }
+            get => Anchor.TopLeft;
             set { }
         }
 
@@ -140,7 +140,7 @@ namespace Isles.UI
         /// </summary>
         public ScaleMode ScaleMode
         {
-            get { return ScaleMode.Fixed; }
+            get => ScaleMode.Fixed;
             set { }
         }
 
@@ -149,8 +149,8 @@ namespace Isles.UI
         /// </summary>
         public bool Visible
         {
-            get { return visible; }
-            set { visible = value; }
+            get => visible;
+            set => visible = value;
         }
 
         /// <summary>
@@ -158,8 +158,8 @@ namespace Isles.UI
         /// </summary>
         public bool Enabled
         {
-            get { return enabled; }
-            set { enabled = value; }
+            get => enabled;
+            set => enabled = value;
         }
         #endregion
 
@@ -171,9 +171,9 @@ namespace Isles.UI
             LoadContent();
         }
 
-        void GraphicsDevice_DeviceReset(object sender, EventArgs e)
+        private void GraphicsDevice_DeviceReset(object sender, EventArgs e)
         {
-            GraphicsDevice device = sender as GraphicsDevice;
+            var device = sender as GraphicsDevice;
 
             area.X = area.Y = 0;
             area.Width = device.Viewport.Width;
@@ -216,16 +216,14 @@ namespace Isles.UI
         public void Clear()
         {
             foreach (IUIElement element in elements)
+            {
                 element.Parent = null;
+            }
 
             elements.Clear();
         }
 
-        public IEnumerable<IUIElement> Elements
-        {
-            get { return elements; }
-        }
-
+        public IEnumerable<IUIElement> Elements => elements;
 
         /// <summary>
         /// Update all UI elements
@@ -234,10 +232,14 @@ namespace Isles.UI
         public void Update(GameTime gameTime)
         {
             if (!enabled)
+            {
                 return;
+            }
 
             foreach (IUIElement element in elements)
+            {
                 element.Update(gameTime);
+            }
         }
 
         /// <summary>
@@ -256,13 +258,19 @@ namespace Isles.UI
         public void Draw(GameTime gameTime, SpriteBatch sprite)
         {
             if (!visible)
+            {
                 return;
+            }
 
             sprite.Begin();
 
             foreach (IUIElement element in elements)
+            {
                 if (element.Visible)
+                {
                     element.Draw(gameTime, sprite);
+                }
+            }
 
             sprite.End();
         }
@@ -272,10 +280,14 @@ namespace Isles.UI
         /// </summary>
         public EventResult HandleEvent(EventType type, object sender, object tag)
         {
-            for(int i = elements.Count -1 ; i >= 0; i--)
+            for(var i = elements.Count -1 ; i >= 0; i--)
+            {
                 if (elements.Elements[i].Enabled &&
                     elements.Elements[i].HandleEvent(type, sender, tag) == EventResult.Handled)
+                {
                     return EventResult.Handled;
+                }
+            }
 
             return EventResult.Unhandled;
         }
@@ -289,14 +301,21 @@ namespace Isles.UI
         public void Dispose()
         {
             if (sprite != null)
+            {
                 sprite.Dispose();
+            }
 
             if (effect != null)
+            {
                 effect.Dispose();
+            }
 
             foreach (IUIElement element in elements)
+            {
                 element.Dispose();
-            this.Clear();
+            }
+
+            Clear();
 
             GC.SuppressFinalize(this);
         }

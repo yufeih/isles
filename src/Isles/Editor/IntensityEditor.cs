@@ -6,7 +6,7 @@ namespace Isles.Editor
 {
     public partial class IntensityEditor : Form
     {
-        IWorldObject o;
+        private readonly IWorldObject o;
 
         public IntensityEditor(GameWorld world)
         {
