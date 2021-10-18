@@ -24,10 +24,6 @@ namespace Isles
         private ushort currentValidID = MinID;
         private const ushort MinID = 128;
 
-        /// <summary>
-        /// Record all game object changes.
-        /// </summary>
-        private readonly GameRecorder recorder;
         private readonly GameWorld world;
 
         /// <summary>
@@ -50,12 +46,11 @@ namespace Isles
         /// <summary>
         /// Creates a new game server.
         /// </summary>
-        public GameServer(GameWorld world, GameRecorder recorder)
+        public GameServer(GameWorld world)
         {
             singleton = this;
 
             this.world = world ?? throw new ArgumentNullException();
-            this.recorder = recorder;
         }
 
         /// <summary>
@@ -126,8 +121,6 @@ namespace Isles
                 buffer = BitConverter.GetBytes((ushort)id);
                 bytes[2] = buffer[0];
                 bytes[3] = buffer[1];
-
-                Dispatch(0, bytes, 0, 4);
             }
 
             return o;
@@ -157,31 +150,9 @@ namespace Isles
                         throw new ArgumentException("The input object has an invalid ID.");
                     }
 
-                    var bytes = BitConverter.GetBytes((ushort)id);
-                    Dispatch(1, bytes, 0, bytes.Length);
-
                     // Remove the object from registry
                     objectToID.Remove(existingObject);
                     idToObject.Remove(IDFromObject(existingObject));
-                }
-            }
-        }
-
-        /// <summary>
-        /// Dispatch the input to the replay recorder & game clients.
-        /// </summary>
-        public void Dispatch(ushort id, byte[] bytes, int offset, int length)
-        {
-            if (id < 0 || offset < 0 || length < 0 || id >= byte.MaxValue || bytes == null)
-            {
-                throw new ArgumentException();
-            }
-
-            if (length > 0)
-            {
-                if (recorder != null)
-                {
-                    recorder.Record(id, (float)time, bytes, offset, length);
                 }
             }
         }
@@ -240,9 +211,6 @@ namespace Isles
 
                     // Serialize into our memory stream
                     pair.Value.Serialize(stream);
-
-                    // Dispatch the serialized data
-                    Dispatch(pair.Key, stream.GetBuffer(), 0, (int)stream.Position);
                 }
             }
         }

@@ -77,16 +77,6 @@ namespace Isles
         private string levelFilename;
 
         /// <summary>
-        /// Gets game recorder.
-        /// </summary>
-        public GameRecorder Recorder { get; private set; }
-
-        /// <summary>
-        /// Gets game replay.
-        /// </summary>
-        public GameReplay Replay { get; private set; }
-
-        /// <summary>
         /// Gets game server interface.
         /// </summary>
         public GameServer Server { get; private set; }
@@ -121,21 +111,6 @@ namespace Isles
         }
 
         /// <summary>
-        /// Starts a new replay.
-        /// </summary>
-        public void StartReplay(string replayFilename)
-        {
-            // Create a replay for test purpose
-            using (Stream stream = new FileStream(DefaultReplayFilename, FileMode.Open))
-            {
-                Replay = new GameReplay(Game);
-                Replay.Load(stream);
-            }
-
-            LoadWorld(Replay.WorldFilename, null);
-        }
-
-        /// <summary>
         /// Starts a new level.
         /// </summary>
         /// <param name="newLevel"></param>
@@ -157,9 +132,6 @@ namespace Isles
 
             this.levelFilename = levelFilename ?? throw new ArgumentNullException();
             Level = level;
-
-            // Reset game recorder
-            Recorder = new GameRecorder();
 
             // Hide cursor
             Game.IsMouseVisible = false;
@@ -186,7 +158,7 @@ namespace Isles
             World.Load(doc.DocumentElement, loadContext);
 
             // Set world
-            Server = new GameServer(World, Recorder);
+            Server = new GameServer(World);
 
             loadContext.Refresh(100);
 
@@ -487,11 +459,6 @@ namespace Isles
                 Level.Update(gameTime);
             }
 
-            if (Replay != null)
-            {
-                Replay.Update(gameTime);
-            }
-
             // Update game server
             if (Server != null)
             {
@@ -690,42 +657,7 @@ namespace Isles
             Game.IsMouseVisible = true;
             postScreen = false;
             Game.StartScreen(new TitleScreen(this));
-
-            // Save replay
-            SaveReplay(DefaultReplayName);
         }
-
-        private bool SaveReplay(string name)
-        {
-            try
-            {
-                if (Recorder != null)
-                {
-                    // Make sure replays directory exists
-                    if (Directory.Exists(ReplayDirectory) == false)
-                    {
-                        Directory.CreateDirectory(ReplayDirectory);
-                    }
-
-                    using Stream replay = new FileStream(
-                        ReplayDirectory + "/" + name + "." + ReplayExtension, FileMode.Create);
-                    using Stream world = Game.ZipContent.GetFileStream(levelFilename);
-                    Recorder.Save(replay, levelFilename, world);
-                }
-            }
-
-            // We don't wanna cause any exceptions when creating the replay file,
-            // so just ignore all exceptions.
-            catch (Exception e)
-            {
-                Log.Write(e.Message);
-                return false;
-            }
-
-            return true;
-        }
-
-        public static string DefaultReplayFilename => ReplayDirectory + "/" + DefaultReplayName + "." + ReplayExtension;
 
         /// <summary>
         /// Dispose.

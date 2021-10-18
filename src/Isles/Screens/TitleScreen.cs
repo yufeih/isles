@@ -224,9 +224,7 @@ namespace Isles
             buttons[0].Click += (o, e) =>
             {
                 Audios.Play("OK");
-                gameScreen.StartReplay(GameScreen.DefaultReplayFilename);
                 BaseGame.Singleton.StartScreen(gameScreen);
-                // StartLANGame();
             };
 
             buttons[1].Click += (o, e) =>
