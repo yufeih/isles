@@ -153,7 +153,7 @@ namespace Isles.Engine
             queue.AddLast(new Message(type, receiver, sender, tag, delayTime));
         }
 
-        
+
         /// <summary>
         /// Send a message to a remote receiver through the network
         /// </summary>

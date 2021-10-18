@@ -26,7 +26,7 @@ namespace Isles.Graphics
         /// <param name="input"></param>
         public override void ReadContent(ContentReader input)
         {
- 	        base.ReadContent(input);
+            base.ReadContent(input);
 
             // Initialize Water
             ReadWaterContent(input);
@@ -116,12 +116,12 @@ namespace Isles.Graphics
             surface.Color = color;
             surface.Texture = texture ?? throw new ArgumentNullException();
             surface.Position = position;
-            
+
             // Plus a little offset
-            surface.Position.Z = GetHeight(position.X, position.Y) + 6; 
-            
+            surface.Position.Z = GetHeight(position.X, position.Y) + 6;
+
             // Divided by 2 so we don't have to do this during presentation
-            surface.Width = width / 2;  
+            surface.Width = width / 2;
             surface.Height = height / 2;
 
             // Add a new textured surface to the list.
@@ -383,8 +383,6 @@ namespace Isles.Graphics
 
         #region Water
 
-        private readonly bool IsSpheralWaterSurface = false;
-
         /// <summary>
         /// Gets or sets the fog texture used to draw the landscape
         /// </summary>
@@ -488,15 +486,8 @@ namespace Isles.Graphics
                     vertexData[i].Position.Y = pos.Y;
 
                     // Make the water a sphere surface
-                    if (IsSpheralWaterSurface)
-                    {
-                        vertexData[i].Position.Z = highest - earthRadius +
+                    vertexData[i].Position.Z = highest - earthRadius +
                             (float)Math.Sqrt(earthRadius * earthRadius - len * len);
-                    }
-                    else
-                    {
-                        vertexData[i].Position.Z = 0;
-                    }
 
                     vertexData[i].TextureCoordinate.X = 1.0f * x * TextureRepeat / CellCount;
                     vertexData[i].TextureCoordinate.Y = 1.0f * y * TextureRepeat / CellCount;
@@ -663,7 +654,7 @@ namespace Isles.Graphics
         #endregion
     }
     #endregion
-    
+
     #region FogMask
     /// <summary>
     /// Game fog of war

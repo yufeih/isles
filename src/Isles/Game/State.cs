@@ -56,7 +56,7 @@ namespace Isles
             owner.LumberCarried = 0;
 
             // Initialize state
-            goldmine = FindAnotherGoldmine();
+            _ = FindAnotherGoldmine();
             state = StateType.MoveToGoldmine;
         }
 
@@ -79,7 +79,7 @@ namespace Isles
             owner.LumberCarried = 0;
 
             // Initialize state
-            deposit = owner.Owner.FindNearestObject(
+            _ = owner.Owner.FindNearestObject(
                       owner.Position, owner.Owner.TownhallName, null) as Building;
             state = StateType.BackToDeposit;
         }
@@ -312,9 +312,7 @@ namespace Isles
             {
                 if (o is Goldmine)
                 {
-                    var anotherGoldmine = o as Goldmine;
-
-                    if (anotherGoldmine == null || anotherGoldmine == goldmine ||
+                    if (o is not Goldmine anotherGoldmine || anotherGoldmine == goldmine ||
                         !CanGoldmineBeHarvested(anotherGoldmine))
                     {
                         continue;
@@ -653,7 +651,7 @@ namespace Isles
 
             // Tell the tree to play hit animation
             tree.Hit(owner);
-            
+
             // Check if the tree falls
             if (tree.Lumber <= 0)
             {
@@ -687,9 +685,7 @@ namespace Isles
 
             foreach (IWorldObject o in world.GetNearbyObjects(position, 500))
             {
-                var anotherTree = o as Tree;
-
-                if (anotherTree == null || anotherTree == existingTree || !CanTreeBeHarvested(anotherTree))
+                if (o is not Tree anotherTree || anotherTree == existingTree || !CanTreeBeHarvested(anotherTree))
                 {
                     continue;
                 }
@@ -966,7 +962,7 @@ namespace Isles
     #region StateCharactorIdle
     public class StateCharactorIdle : BaseState
     {
-        private double arbitrateTimer = 0;
+        private double arbitrateTimer;
         private readonly Random random = new();
         private readonly Charactor owner;
 
@@ -996,9 +992,7 @@ namespace Isles
                 foreach (IWorldObject worldObject in
                     owner.World.GetNearbyObjects(owner.Position, owner.ViewDistance))
                 {
-                    var o = worldObject as GameObject;
-
-                    if (o != null && owner.IsOpponent(o) && 
+                    if (worldObject is GameObject o && owner.IsOpponent(o) &&
                         o.IsAlive && o.Visible && !o.InFogOfWar)
                     {
                         owner.AttackTo(o, false);
@@ -1015,7 +1009,7 @@ namespace Isles
     #region StateCharactorDie
     public class StateCharactorDie : BaseState
     {
-        private bool sink = false;
+        private bool sink;
         private float height = 5.0f;
         private float baseHeight;
         private readonly Charactor owner;
@@ -1095,7 +1089,7 @@ namespace Isles
         private readonly SpellCombat spell;
         private StateMoveToPosition moveToPosition;
         private StateMoveToTarget moveToTarget;
-        private double arbitrateTimer = 0;
+        private double arbitrateTimer;
 
         public StateAttack(GameWorld world, Charactor owner, GameObject target, SpellCombat spell)
         {
@@ -1130,7 +1124,7 @@ namespace Isles
 
             this.owner = owner;
             this.world = world;
-            this.spell= spell;
+            this.spell = spell;
             targetPosition = target;
             state = StateType.MoveToPosition;
         }

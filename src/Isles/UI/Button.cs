@@ -104,9 +104,9 @@ namespace Isles.UI
         /// <summary>
         /// Used when a group of buttons are set
         /// </summary>
-        public int Index = 0;
+        public int Index;
 
-        private bool ignoreMessage = false;
+        private bool ignoreMessage;
 
         /// <summary>
         /// A fake button handles no messages
@@ -143,7 +143,7 @@ namespace Isles.UI
         /// <summary>
         /// For generating enter & leave events
         /// </summary>
-        private bool cursorInButton = false;
+        private bool cursorInButton;
 
         protected override void OnVisibleChanged()
         {
@@ -221,7 +221,7 @@ namespace Isles.UI
         /// <summary>
         /// Whether this button overlaps the cursor when left button is down
         /// </summary>
-        private bool clickThis = false;
+        private bool clickThis;
 
         public override EventResult HandleEvent(EventType type, object sender, object tag)
         {
@@ -414,7 +414,7 @@ namespace Isles.UI
             {
                 textField.Y--;
                 textField.X--;
-            }          
+            }
         }
     }
     #endregion

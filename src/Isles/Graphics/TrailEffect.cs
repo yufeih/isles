@@ -19,12 +19,12 @@ namespace Isles.Graphics
         /// <summary>
         /// The ealpsed time
         /// </summary>
-        private int elapsedTime = 0;
+        private int elapsedTime;
 
         /// <summary>
         /// The span to update the blocks
         /// </summary>
-        private readonly int updateSpan = 0;
+        private readonly int updateSpan;
 
         /// <summary>
         /// Leading Position of the trail
@@ -55,12 +55,12 @@ namespace Isles.Graphics
         /// <summary>
         /// 
         /// </summary>
-        private float halfWidth = 0;
+        private float halfWidth;
 
         /// <summary>
         /// 
         /// </summary>
-        private bool animationStarted = false;
+        private bool animationStarted;
 
         /// <summary>
         /// 
@@ -281,7 +281,7 @@ namespace Isles.Graphics
         /// </summary>
         private BasicEffect effect;
 
-        private float updateSpan = 0;
+        private float updateSpan;
 
         private readonly int chunckSize = 100;
 

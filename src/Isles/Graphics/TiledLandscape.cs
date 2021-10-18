@@ -71,7 +71,7 @@ namespace Isles.Graphics
             Patches[0].FillIndices16(ref indices, 0);
 
             indexBuffer.SetData(indices);
-            
+
 
             // Initialize vertices
             var vertexBufferElementCount = (Patch.MaxPatchResolution + 1) *
@@ -94,17 +94,17 @@ namespace Isles.Graphics
                 {
                     // Fill patch vertices
                     Patches[patchIndex].FillVertices(0,
-                    delegate(int x, int y)
+                    delegate (int x, int y)
                     {
                         return new Vector3(x * Size.X / (GridCountOnXAxis - 1),
                                            y * Size.Y / (GridCountOnYAxis - 1),
                                            HeightField[x, y]);
                     },
-                    delegate(uint index, Vector3 position)
+                    delegate (uint index, Vector3 position)
                     {
                         vertices[index].Position = position;
                     },
-                    delegate(uint index, int x, int y)
+                    delegate (uint index, int x, int y)
                     {
                         vertices[index].Normal = NormalField[x, y];
                         vertices[index].Tangent = TangentField[x, y];
@@ -123,7 +123,7 @@ namespace Isles.Graphics
                             1.0f * x / (GridCountOnXAxis - 1),
                             1.0f * y / (GridCountOnYAxis - 1));
                     });
-                    
+
                     // Create a vertex buffer for the patch
                     vertexBuffers[patchIndex] = new VertexBuffer(game.GraphicsDevice,
                                                                  typeof(TerrainVertex),
@@ -172,7 +172,7 @@ namespace Isles.Graphics
 
             terrainEffect.Parameters["WorldView"].SetValue(view);
             terrainEffect.Parameters["WorldViewProjection"].SetValue(viewProjection);
-            
+
             var viewFrustum = new BoundingFrustum(viewProjection);
 
             // Set indices and vertices

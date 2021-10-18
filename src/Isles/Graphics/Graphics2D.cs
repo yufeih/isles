@@ -45,9 +45,9 @@ namespace Isles.Graphics
         private readonly VertexPositionColor[] lines = new VertexPositionColor[MaxLineCount];
         private readonly VertexPositionColor[] primitives = new VertexPositionColor[MaxPrimitiveVertexCount];
         private readonly ushort[] primitiveIndices = new ushort[MaxPrimitiveIndexCount];
-        private int primitiveIndexCount = 0;
-        private int primitiveVertexCount = 0;
-        private int lineCount = 0;
+        private int primitiveIndexCount;
+        private int primitiveVertexCount;
+        private int lineCount;
         private readonly DynamicVertexBuffer vertices;
         private readonly DynamicIndexBuffer indices;
 
@@ -141,7 +141,7 @@ namespace Isles.Graphics
                 //Log.Write("Warning: Line capacity exceeded...");
                 return;
             }
-                        
+
             VertexPositionColor value;
 
             // Transform from screen space to projection space
@@ -212,7 +212,7 @@ namespace Isles.Graphics
                     //Log.Write("Warning: 2D primitive vertex capacity exceeded...");
                     return;
                 }
-                
+
                 // Transform from screen space to projection space
                 value.Position.X = (2 * v.Position.X - game.ScreenWidth) / game.ScreenWidth;
                 value.Position.Y = (game.ScreenHeight - 2 * v.Position.Y) / game.ScreenHeight;
@@ -496,7 +496,7 @@ namespace Isles.Graphics
             //Arrange each word in the formatted lines
             while (str != null)
             {
-                Vector2 currSize = font.MeasureString(rtvSB.ToString());
+                _ = font.MeasureString(rtvSB.ToString());
                 if (firstWordInLine)
                 {
                     rtvSB.Append(str);

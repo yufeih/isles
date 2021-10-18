@@ -48,8 +48,8 @@ namespace Isles
         public BaseGame Game => game;
 
         private readonly BaseGame game;
-        private bool paused = false;
-        private IEventListener activeObject = null;
+        private bool paused;
+        private IEventListener activeObject;
 
         public void Pause(IEventListener activeObject)
         {
@@ -239,7 +239,7 @@ namespace Isles
                 game.IsMouseVisible = true;
 
                 Event.SendMessage(EventType.Unknown, this, this, 1, 0.2f);
-            }            
+            }
         }
 
         private void ResetUI(ILoading loadContext)
@@ -252,7 +252,7 @@ namespace Isles
                                         new Rectangle(65, 70, 530, 460));
                 readme.ScaleMode = ScaleMode.ScaleY;
                 readme.Anchor = Anchor.Center;
-                readme.OK.Click += delegate(object o, EventArgs e)
+                readme.OK.Click += delegate (object o, EventArgs e)
                 {
                     readme.Visible = false;
                     Audios.Play("OK");
@@ -280,7 +280,7 @@ namespace Isles
                                                           game.ScreenWidth / 7,
                                                           game.ScreenHeight * 2 / 35));
             ok.HotKey = Keys.Space;
-            ok.Click += delegate(object o, EventArgs e)
+            ok.Click += delegate (object o, EventArgs e)
             {
                 pausePanel.Visible = false;
                 Resume();
@@ -288,7 +288,7 @@ namespace Isles
             };
 
             cancel.HotKey = Keys.Escape;
-            cancel.Click += delegate(object o, EventArgs e)
+            cancel.Click += delegate (object o, EventArgs e)
             {
                 pausePanel.Visible = false;
                 Resume();
@@ -304,7 +304,7 @@ namespace Isles
             ui.Display.Add(pausePanel);
         }
 
-        private bool scrollingCamera = false;
+        private bool scrollingCamera;
 
         private void ResetCamera()
         {
@@ -312,23 +312,23 @@ namespace Isles
             camera.FlyTo(new Vector3(Player.LocalPlayer.SpawnPoint, 0), true);
             game.Camera = camera;
 
-            camera.BeginMove += new EventHandler(delegate(object sender, EventArgs e)
+            camera.BeginMove += new EventHandler(delegate (object sender, EventArgs e)
             {
                 Cursors.StoredCursor = game.Cursor;
                 game.Cursor = Cursors.Move;
                 scrollingCamera = true;
             });
-            camera.EndMove += new EventHandler(delegate(object sender, EventArgs e)
+            camera.EndMove += new EventHandler(delegate (object sender, EventArgs e)
             {
                 scrollingCamera = false;
                 game.Cursor = Cursors.StoredCursor;
             });
-            camera.BeginRotate += new EventHandler(delegate(object sender, EventArgs e)
+            camera.BeginRotate += new EventHandler(delegate (object sender, EventArgs e)
             {
                 Cursors.StoredCursor = game.Cursor;
                 game.Cursor = Cursors.Rotate;
             });
-            camera.EndRotate += new EventHandler(delegate(object sender, EventArgs e)
+            camera.EndRotate += new EventHandler(delegate (object sender, EventArgs e)
             {
                 game.Cursor = Cursors.StoredCursor;
             });
@@ -393,13 +393,13 @@ namespace Isles
 
         }
 
-        private bool postScreen = false;
+        private bool postScreen;
         private Texture2D victoryTexture;
         private Texture2D failureTexture;
         private Rectangle postScreenRectangle;
         private BloomSettings targetSettings;
         private BloomSettings defaultSettings;
-        private float bloomLerpElapsedTime = 0;
+        private float bloomLerpElapsedTime;
 
         public void ShowVictory()
         {
@@ -505,7 +505,7 @@ namespace Isles
                 return;
             }
 
-            UpdateCursorArrows();            
+            UpdateCursorArrows();
 
             // Update UI first
             if (ui != null)
@@ -616,7 +616,7 @@ namespace Isles
             game.Graphics2D.Present();
             game.PointSprite.Present(gameTime);
             ParticleSystem.Present(gameTime);
-            
+
             if (postScreen)
             {
                 // Draw post screen texture
@@ -652,13 +652,13 @@ namespace Isles
 
         public EventResult HandleEvent(EventType type, object sender, object tag)
         {
-            if (type == EventType.Unknown && sender == this &&(int)tag == 1)
+            if (type == EventType.Unknown && sender == this && (int)tag == 1)
             {
                 readme.Visible = true;
                 Pause(readme);
                 return EventResult.Handled;
             }
-            
+
             if (paused)
             {
                 if (activeObject != null)

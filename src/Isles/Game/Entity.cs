@@ -250,7 +250,7 @@ namespace Isles.Engine
     {
         #region Field
 
-        public static int EntityCount = 0;
+        public static int EntityCount;
 
         /// <summary>
         /// Game world
@@ -321,7 +321,7 @@ namespace Isles.Engine
 
         private object sceneManagerTag;
 
-        public virtual BoundingBox BoundingBox => new BoundingBox();
+        public virtual BoundingBox BoundingBox => new();
 
         /// <summary>
         /// Gets or sets entity name
@@ -333,7 +333,7 @@ namespace Isles.Engine
         }
 
         private string name;
-        
+
 
         /// <summary>
         /// Gets or sets the class ID of this world object
@@ -669,7 +669,7 @@ namespace Isles.Engine
                     UpdateOutline(outline);
                 }
 
-                return outline; 
+                return outline;
             }
         }
 
@@ -717,7 +717,7 @@ namespace Isles.Engine
         {
 
         }
-        
+
         public Entity(GameWorld world, GameModel model)
             : base(world)
         {
@@ -831,7 +831,7 @@ namespace Isles.Engine
             outline.SetCircle(Vector2.Zero, (Size.X + Size.Y) / 4);
             UpdateOutline(outline);
         }
-        
+
         public override void Serialize(XmlElement xml)
         {
             base.Serialize(xml);

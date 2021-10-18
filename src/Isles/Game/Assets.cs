@@ -33,7 +33,7 @@ namespace Isles.Engine
         /// <summary>
         /// Writer
         /// </summary>
-        private static StreamWriter writer = null;
+        private static StreamWriter writer;
 
         /// <summary>
         /// Log filename
@@ -61,7 +61,7 @@ namespace Isles.Engine
                     file.Close();
                     file = new FileStream(
                         LogFilename, FileMode.Create,
-                        FileAccess.Write, FileShare.ReadWrite );
+                        FileAccess.Write, FileShare.ReadWrite);
                 }
                 // Associate writer with that, when writing to a new file,
                 // make sure UTF-8 sign is written, else don't write it again!
@@ -136,7 +136,7 @@ namespace Isles.Engine
                 {
                     s = message;
                 }
-                    
+
                 writer.WriteLine(s);
 #if DEBUG
                 // In debug mode write that message to the console as well!
@@ -191,7 +191,7 @@ namespace Isles.Engine
         /// </summary>
         public static void Remove(IEventListener handler)
         {
-            var i = handlers.FindIndex(delegate(IEventListener item)
+            var i = handlers.FindIndex(delegate (IEventListener item)
             {
                 return item == handler;
             });
@@ -231,13 +231,13 @@ namespace Isles.Engine
     public class Profiler : DrawableGameComponent
     {
         private readonly BaseGame game;
-        private int updateCount = 0;
-        private int currentFrame = 0;
-        private int counter = 0;
-        private double storedTime = 0;
-        private float fps = 0;
+        private int updateCount;
+        private int currentFrame;
+        private int counter;
+        private double storedTime;
+        private float fps;
         private float fpsInterpolated = 60.0f;
-        private float overallFps = 0;
+        private float overallFps;
 
         /// <summary>
         /// Time needed to calculate FPS, Measured in milliseconds
@@ -336,7 +336,7 @@ namespace Isles.Engine
         }
     }
     #endregion
-    
+
     #region ScreenshotCapturer
     /// <summary>
     /// Screenshot capturer grabbed from Racing game
@@ -349,7 +349,7 @@ namespace Isles.Engine
         /// <summary>
         /// Internal screenshot number (will increase by one each screenshot)
         /// </summary>
-        private int screenshotNum = 0;
+        private int screenshotNum;
 
         /// <summary>
         /// Link to BaseGame class instance. Also holds windows title,
@@ -610,7 +610,7 @@ namespace Isles.Engine
         {
             graphics.VertexDeclaration = declaraction;
             graphics.RenderState.DepthBufferFunction = CompareFunction.Always;
-            
+
             effect.World = Matrix.Identity;
             effect.View = game.View;
             effect.Projection = game.Projection;

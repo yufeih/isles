@@ -130,7 +130,7 @@ namespace Isles
         /// </summary>
         public static GameModel RallyPointModel
         {
-            get 
+            get
             {
                 if (rallyPointModel == null)
                 {
@@ -180,7 +180,7 @@ namespace Isles
             {
                 units = new List<string>(
                     value.Split(new char[] { ',', ' ', '\n', '\r' }));
-                units.RemoveAll(delegate(string v) { return v.Length <= 0; });
+                units.RemoveAll(delegate (string v) { return v.Length <= 0; });
             }
 
             if ((value = xml.GetAttribute("Halo")) != "")
@@ -222,8 +222,7 @@ namespace Isles
 
         protected override void OnCreateSpell(Spell spell)
         {
-            var training = spell as SpellTraining;
-            if (training != null)
+            if (spell is SpellTraining training)
             {
                 training.Enable = false;
                 units.Add(training.Type);
@@ -259,9 +258,8 @@ namespace Isles
                 spell.Enable = true;
             }
 
-            var local = Owner as LocalPlayer;
 
-            if (local != null &&
+            if (Owner is LocalPlayer local &&
                 local.CurrentGroup != null && local.CurrentGroup.Contains(this))
             {
                 Focused = true;
@@ -381,8 +379,7 @@ namespace Isles
 
                 foreach (Spell s in Spells)
                 {
-                    var train = s as SpellTraining;
-                    if (train != null && train.Type == type)
+                    if (s is SpellTraining train && train.Type == type)
                     {
                         train.Count++;
                         pendingSpells.Enqueue(train);
@@ -610,7 +607,7 @@ namespace Isles
                 if (fire == null)
                 {
                     fire = new List<EffectFire>();
-                    
+
                     fireSpawnPoints = new List<Vector3>();
                     fireSpawnPointsLeft = new List<Vector3>();
 
@@ -649,9 +646,9 @@ namespace Isles
                 {
                     // Remove an existing fire
                     var index = Helper.Random.Next(fire.Count);
-                    
+
                     Vector3 position = fire[index].Position;
-                    
+
                     fire.RemoveAt(index);
 
                     fireSpawnPointsLeft.Add(position);
@@ -800,9 +797,7 @@ namespace Isles
                                                                       obstructorSize.Y));
             foreach (IWorldObject wo in nearbyObjects)
             {
-                var c = wo as Charactor;
-
-                if (c != null && c.IsAlive && c.Owner == Owner)
+                if (wo is Charactor c && c.IsAlive && c.Owner == Owner)
                 {
                     obstructors.Add(c);
                 }
@@ -857,9 +852,7 @@ namespace Isles
             // Buildings can't be placed near the goldmine
             foreach (IWorldObject o in World.GetNearbyObjects(Position, 50))
             {
-                var g = o as Goldmine;
-
-                if (g != null)
+                if (o is Goldmine g)
                 {
                     Vector2 v;
                     v.X = g.Position.X - Position.X;
@@ -876,7 +869,7 @@ namespace Isles
                    enlargeOutline ? Outline + 5 : Outline), true);
         }
 
-        private double waitTimer = 0;
+        private double waitTimer;
         private readonly List<KeyValuePair<Charactor, IState>> negotiables = new();
 
         public void Place()
@@ -983,7 +976,7 @@ namespace Isles
             {
                 Audios.Play("FireballCast", this);
             }
-        }           
+        }
 
         public override void PerformAction(Entity entity, bool queueAction)
         {
@@ -1017,9 +1010,7 @@ namespace Isles
 
         private void Hit(object sender, EventArgs e)
         {
-            var projectile = sender as IProjectile;
-
-            if (projectile != null && projectile.Target is GameObject)
+            if (sender is IProjectile projectile && projectile.Target is GameObject)
             {
                 var target = projectile.Target as GameObject;
 
@@ -1082,9 +1073,7 @@ namespace Isles
                 // Set nearby tree to evergreen
                 foreach (IWorldObject wo in World.GetNearbyObjects(Position, EffectRadius))
                 {
-                    var tree = wo as Tree;
-
-                    if (tree != null)
+                    if (wo is Tree tree)
                     {
 
                         v.X = tree.Position.X - Position.X;

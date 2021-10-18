@@ -35,7 +35,7 @@ namespace Isles
     public interface ISelectable : IEventListener
     {
         bool Highlighted { get; set; }
-        bool Selected { get; set;}
+        bool Selected { get; set; }
     }
     #endregion
 
@@ -59,10 +59,10 @@ namespace Isles
         public const int ProfileBaseX = 440;
         public const int ProfileWidth = 40;
         public const int ProfileSpace = 4;
-        private readonly BaseGame        game;
-        private UIDisplay       ui;
-        private readonly IUIElement[,]   elements = new IUIElement[3,5];
-        private readonly GameWorld       world;
+        private readonly BaseGame game;
+        private UIDisplay ui;
+        private readonly IUIElement[,] elements = new IUIElement[3, 5];
+        private readonly GameWorld world;
 
         public UIDisplay Display => ui;
 
@@ -122,9 +122,9 @@ namespace Isles
         private readonly Texture2D[] focusAnimation = new Texture2D[8];
         private Vector3 focusPosition;
         private Color focusColor = Color.Green;
-        private double focusElapsedTime = 0;
+        private double focusElapsedTime;
         private TextField lumberTextField, goldTextField, foodTextField;
-        private readonly float[] StatisticsTextX = {4.6f / 24.25f, 11.6f / 24.25f, 18.3f / 24.25f};
+        private readonly float[] StatisticsTextX = { 4.6f / 24.25f, 11.6f / 24.25f, 18.3f / 24.25f };
         private readonly Rectangle StatisticsDestination = new(400, 2, 400, 36);
         private readonly Rectangle StatisticsSource = new(0, 0, 690, 64);
         private readonly Rectangle StatusDestination = new(5, 495, 150, 120);
@@ -140,7 +140,7 @@ namespace Isles
         private readonly Rectangle ControlPanelEffectiveRegion = new(0, 480, 442, 122);
         private readonly Rectangle MapDestinationRectangle = new(26, 38, 120, 120);
         private readonly Rectangle SnapshotDestinationRectangle = new(314, 44, 85, 85);
-        private readonly Rectangle EnvironmentIndicatorSource= new(960, 0, 46, 46);
+        private readonly Rectangle EnvironmentIndicatorSource = new(960, 0, 46, 46);
         private readonly Rectangle EnvironmentIndicatorDestination = new(760, 6, 12, 12);
         private readonly Rectangle SnapShotNameDestination = new(0, 78, 85, 30);
         private const int SpellButtonBaseX = 145;
@@ -157,7 +157,7 @@ namespace Isles
         private readonly Color TextColor = Color.White;
         private readonly Color TextColorDark = Color.Black;
         private const double DisappearingTime = 3;
-        private double startTime = 0;
+        private double startTime;
         private Effect disappearEffect;
 
         #endregion
@@ -176,7 +176,7 @@ namespace Isles
             LoadingDisplayFinished = loadingFinished;
 
             LoadContent();
-        }        
+        }
 
         public void LoadContent()
         {
@@ -190,7 +190,7 @@ namespace Isles
             panelsTexture = game.ZipContent.Load<Texture2D>("UI/Panels");
             dialogTexture = game.ZipContent.Load<Texture2D>("UI/Tipbox");
 
-             
+
             for (var i = 0; i < focusAnimation.Length; i++)
             {
                 focusAnimation[i] = game.ZipContent.Load<Texture2D>("UI/Focus/" + (i + 1));
@@ -235,16 +235,16 @@ namespace Isles
             resourcePanel.Texture = panelsTexture;
 
             Color color = Color.White;
-            resourcePanel.Add(  lumberTextField = new TextField(Player.LocalPlayer.Lumber.ToString(), 
-                                17f/23, color, new Rectangle(72, 2, 150, 20)));
-            resourcePanel.Add(  goldTextField = new TextField(Player.LocalPlayer.Gold.ToString(),
+            resourcePanel.Add(lumberTextField = new TextField(Player.LocalPlayer.Lumber.ToString(),
+                                17f / 23, color, new Rectangle(72, 2, 150, 20)));
+            resourcePanel.Add(goldTextField = new TextField(Player.LocalPlayer.Gold.ToString(),
                                 17f / 23, color, new Rectangle(128, 2, 150, 20)));
             if (Player.LocalPlayer.Food > Player.LocalPlayer.FoodCapacity)
             {
                 color = Color.Red;
             }
 
-            resourcePanel.Add(  foodTextField = new TextField(Player.LocalPlayer.Food.ToString() 
+            resourcePanel.Add(foodTextField = new TextField(Player.LocalPlayer.Food.ToString()
                                 + "/" + Player.LocalPlayer.FoodCapacity,
                                 17f / 23, color, new Rectangle(184, 2, 150, 20)));
 
@@ -280,7 +280,7 @@ namespace Isles
         /// </summary>
         public void SetUIElement(int x, bool specialItem, IUIElement element)
         {
-            if (!specialItem && (x < 0 || x > 4) )
+            if (!specialItem && (x < 0 || x > 4))
             {
                 return;
             }
@@ -304,11 +304,11 @@ namespace Isles
             // Remove old one
             if (element != null)
             {
-                
-                var area = new  Rectangle(SpellButtonBaseX + x * (SpellButtonWidth + SpellButtonWidthSpace), 
+
+                var area = new Rectangle(SpellButtonBaseX + x * (SpellButtonWidth + SpellButtonWidthSpace),
                                                 SpellButtonBaseY + y * SpellButtonFullHeight,
                                                 SpellButtonWidth, SpellButtonShorterHeight);
-                if(y > 0)
+                if (y > 0)
                 {
                     area.Height = SpellButtonWidth;
                 }
@@ -356,7 +356,7 @@ namespace Isles
         {
             foreach (IUIElement e in elements)
             {
-                if( e != null)
+                if (e != null)
                 {
                     controlPanel.Remove(e);
                 }
@@ -420,7 +420,7 @@ namespace Isles
                 remainingTime = (message.PushTime + MessagePresentingPeriodLength) - gameTime.TotalGameTime.TotalSeconds;
 
                 // Last line
-                if (count == 1) 
+                if (count == 1)
                 {
                     var pushFinishedTime = lastPushTime + PushingPeriodLength;
                     // Not stable
@@ -431,7 +431,7 @@ namespace Isles
                         {
                             var transparentColor = new Color(message.Color.R, message.Color.G, message.Color.B,
                                 (byte)(message.Color.A * ((gameTime.TotalGameTime.TotalSeconds - pushFinishedTime) / MessageEmergingPeriodLength)));
-                            var transparentShadowColor = new Color(0,0,0,
+                            var transparentShadowColor = new Color(0, 0, 0,
                                 (byte)(message.Color.A * ((gameTime.TotalGameTime.TotalSeconds - pushFinishedTime) / MessageEmergingPeriodLength)));
                             game.Graphics2D.DrawShadowedString(message.Message, MessageFontSize, RelativeMessageStartLine + RelativeMessageStep * (count - 1), transparentColor, transparentShadowColor);
                         }
@@ -537,7 +537,7 @@ namespace Isles
         /// <param name="gameTime"></param>
         private void PresentWhereverMessages(GameTime gameTime)
         {
-            if(BubbleUpMessageOn)
+            if (BubbleUpMessageOn)
             {
                 PresentBubbleUpMessage(gameTime);
             }
@@ -573,7 +573,7 @@ namespace Isles
                 if (passedTime > BubbleUpSustainingPeriodLength)
                 {
                     passedTime -= BubbleUpSustainingPeriodLength;
-                    position = new Vector2(game.Project(message.Position).X, game.Project(message.Position).Y) - 
+                    position = new Vector2(game.Project(message.Position).X, game.Project(message.Position).Y) -
                                 new Vector2(0, (float)(BubbleUpSustainingHeight + BubbleUpHeight * (passedTime / BubbleUpPeriodLength)));
                     var textColor = new Color(message.Color.R, message.Color.G, message.Color.B,
                                     (byte)(255 * (1 - passedTime / BubbleUpPeriodLength)));
@@ -584,7 +584,7 @@ namespace Isles
                 // Bubbling up and remaining stable
                 else
                 {
-                    position = new Vector2(game.Project(message.Position).X, game.Project(message.Position).Y) - 
+                    position = new Vector2(game.Project(message.Position).X, game.Project(message.Position).Y) -
                                 new Vector2(0, (float)(BubbleUpSustainingHeight * (passedTime / BubbleUpSustainingPeriodLength)));
                     game.Graphics2D.DrawShadowedString(message.Message, BubbleUpMessageFontSize, position, message.Color, Color.Black);
                 }
@@ -599,7 +599,7 @@ namespace Isles
         private void PresentFlyAwayMessage(GameTime gameTime)
         {
             // ! Time not finished 
-            while (FlyAwayMessageQueue.Count != 0 && gameTime.TotalGameTime.TotalSeconds > FlyAwayMessageQueue.Peek().PushTime )
+            while (FlyAwayMessageQueue.Count != 0 && gameTime.TotalGameTime.TotalSeconds > FlyAwayMessageQueue.Peek().PushTime)
             {
                 FlyAwayMessageQueue.Dequeue();
             }
@@ -630,7 +630,7 @@ namespace Isles
         /// <param name="gameTime"></param>
         private void PresentMessages(GameTime gameTime)
         {
-            if(SideBarMessageOn)
+            if (SideBarMessageOn)
             {
                 PresentSideBarMessages(gameTime);
             }
@@ -646,9 +646,9 @@ namespace Isles
                                                                   Color color)
         {
 
-            switch(style)
+            switch (style)
             {
-                case MessageStyle.BubbleUp : 
+                case MessageStyle.BubbleUp:
                     BubbleUpMessageQueue.Enqueue(new GameMessage
                         (message, type, color, game.CurrentGameTime.TotalGameTime.TotalSeconds, position));
                     break;
@@ -722,7 +722,7 @@ namespace Isles
                     if (list.Count > 0 && list[0].ProfileButton != null)
                     {
                         list[0].ProfileButton.Count = list.Count;
-                        AddProfile(list[0].ProfileButton, player.CurrentGroupIndex == i );
+                        AddProfile(list[0].ProfileButton, player.CurrentGroupIndex == i);
                     }
                 }
 
@@ -810,7 +810,7 @@ namespace Isles
         //        else
         //        {
         //            profileButtons[i].Area = rect;
-                    
+
         //        }
         //        rect.X += ProfileWidth + ProfileSpace;
         //        profileButtons[i].ResetDestinationRectangle();
@@ -948,7 +948,7 @@ namespace Isles
         /// </summary>
         private Vector2 MoveInCircle(GameTime gameTime, double intensity)
         {
-            var time = (gameTime.TotalGameTime.TotalSeconds - startTime) * intensity / DisappearingTime * 2 *Math.PI;
+            var time = (gameTime.TotalGameTime.TotalSeconds - startTime) * intensity / DisappearingTime * 2 * Math.PI;
 
             var x = (float)Math.Cos(time);
             var y = (float)Math.Sin(time);
@@ -962,7 +962,7 @@ namespace Isles
         private float Pulsate(GameTime gameTime)
         {
             var amount = (gameTime.TotalGameTime.TotalSeconds - startTime) / DisappearingTime * Math.PI;
-            return ((float)Math.Sin(amount - Math.PI/2) + 1) / 2 * 255;
+            return ((float)Math.Sin(amount - Math.PI / 2) + 1) / 2 * 255;
         }
 
         /// <summary>
@@ -1000,7 +1000,7 @@ namespace Isles
             profilePanel.Add(button);
             profileButtons.Add(button);
             profileNextX += (ProfileSpace + size);
-            button.Click += delegate(object o, EventArgs e)
+            button.Click += delegate (object o, EventArgs e)
             {
                 Player.LocalPlayer.SelectionDirty = true;
             };
@@ -1056,7 +1056,7 @@ namespace Isles
 
             game.GraphicsDevice.SamplerStates[0].AddressU = TextureAddressMode.Mirror;
             game.GraphicsDevice.SamplerStates[0].AddressV = TextureAddressMode.Mirror;
-            
+
             game.GraphicsDevice.Textures[1] = distortion;
 
             // Set an effect parameter to make our overlay
@@ -1075,7 +1075,7 @@ namespace Isles
             // Draw the sprite, passing the fade amount as the
             // alpha of the SpriteBatch.Draw color parameter.
             var fade = (byte)Pulsate(gameTime);
-            spriteBatch.Draw(LoadingDisplayFinished, ui.DestinationRectangle, 
+            spriteBatch.Draw(LoadingDisplayFinished, ui.DestinationRectangle,
                                 new Rectangle(0, 0, LoadingDisplayFinished.Width, LoadingDisplayFinished.Height),
                              //MoveInCircle(gameTime, LoadingDisplayFinished, 1),
                              new Color(255, 255, 255, (byte)(255 - fade)));
@@ -1116,7 +1116,7 @@ namespace Isles
 
         public static Cursor MenuDefault
         {
-            get 
+            get
             {
                 if (menuDefaultCursor == null)
                 {

@@ -125,12 +125,12 @@ namespace Isles.Graphics
         /// <summary>
         /// Points to the primary player
         /// </summary>
-        private int currentPlayer = 0;
+        private int currentPlayer;
 
         /// <summary>
         /// Whether we are blending between two animations
         /// </summary>
-        private bool blending = false;
+        private bool blending;
 
         /// <summary>
         /// Time value for animation blending
@@ -364,8 +364,7 @@ namespace Isles.Graphics
                 {
                     var dictionary = model.Tag as Dictionary<string, object>;
 
-                    object value;
-                    if (dictionary.TryGetValue("SkinningData", out value))
+                    if (dictionary.TryGetValue("SkinningData", out var value))
                     {
                         skin = value as SkinningData;
                     }
@@ -409,7 +408,7 @@ namespace Isles.Graphics
                     // Adjust bone array size
                     bones = new Matrix[model.Bones.Count];
                 }
-                
+
                 // Initialize mesh parts and renderables
                 meshParts.Clear();
                 materials.Clear();
@@ -425,7 +424,7 @@ namespace Isles.Graphics
                         var effect = part.Effect as BasicEffect;
 
                         var material = new Material(effect);
-                        
+
                         // Read normal texture from mesh part tag
                         material.NormalTexture = part.Tag as Texture2D;
 
@@ -490,8 +489,7 @@ namespace Isles.Graphics
             }
             else
             {
-                ModelBone bone;
-                if (model.Bones.TryGetValue(boneName, out bone))
+                if (model.Bones.TryGetValue(boneName, out ModelBone bone))
                 {
                     return bone.Index;
                 }
@@ -534,9 +532,9 @@ namespace Isles.Graphics
         {
             BoundingBox box;
             float? dist = null;
-            if(level == 3)
+            if (level == 3)
             {
-                if(spacePartitionInfo.BitMap[index])
+                if (spacePartitionInfo.BitMap[index])
                 {
                     box = spacePartitionInfo.IndexToBoundingBox(index);
                     dist = ray.Intersects(box);
@@ -545,10 +543,10 @@ namespace Isles.Graphics
             }
 
             var minLength = float.PositiveInfinity;
-            if(!spacePartitionInfo.BitMap[index])
+            if (!spacePartitionInfo.BitMap[index])
             {
                 dist = ray.Intersects(spacePartitionInfo.IndexToBoundingBox(index));
-                if(!dist.HasValue)
+                if (!dist.HasValue)
                 {
                     return dist;
                 }
@@ -606,9 +604,8 @@ namespace Isles.Graphics
         /// </summary>
         public AnimationClip GetAnimationClip(string clipName)
         {
-            AnimationClip value;
 
-            return animationClips.TryGetValue(clipName, out value) ? value : null;
+            return animationClips.TryGetValue(clipName, out AnimationClip value) ? value : null;
         }
 
         /// <summary>
@@ -656,9 +653,8 @@ namespace Isles.Graphics
             }
 
             // Play the animation clip with the specified name
-            AnimationClip clip;
 
-            if (animationClips.TryGetValue(clipName, out clip))
+            if (animationClips.TryGetValue(clipName, out AnimationClip clip))
             {
                 // Do nothing if it's still the same animation clip
                 if (clip == currentClip)
@@ -674,7 +670,7 @@ namespace Isles.Graphics
                 animationState = AnimationState.Playing;
                 return true;
             }
-            
+
             // Stop if the clip is invalid
             Stop();
             return false;
@@ -701,9 +697,8 @@ namespace Isles.Graphics
             }
 
             // Play the animation clip with the specified name
-            AnimationClip clip;
 
-            if (animationClips.TryGetValue(clipName, out clip))
+            if (animationClips.TryGetValue(clipName, out AnimationClip clip))
             {
                 // Do nothing if it's still the same animation clip
                 if (clip == currentClip)
@@ -794,7 +789,7 @@ namespace Isles.Graphics
                 UpdateBoneTransform(gameTime);
             }
         }
-        
+
         private void UpdateBoneTransform(GameTime gameTime)
         {
             // Update skin transforms (stored in bones)
@@ -878,9 +873,8 @@ namespace Isles.Graphics
             for (var i = 0; i < meshParts.Count; i++)
             {
                 ModelMeshPart part = meshParts[i];
-                var mesh = part.Tag as ModelMesh;
 
-                if (mesh == null)
+                if (part.Tag is not ModelMesh mesh)
                 {
                     throw new Exception("ModelMesh not attached to ModelMeshPart");
                 }
@@ -923,9 +917,8 @@ namespace Isles.Graphics
             for (var i = 0; i < meshParts.Count; i++)
             {
                 ModelMeshPart part = meshParts[i];
-                var mesh = part.Tag as ModelMesh;
 
-                if (mesh == null)
+                if (part.Tag is not ModelMesh mesh)
                 {
                     throw new Exception("ModelMesh not attached to ModelMeshPart");
                 }

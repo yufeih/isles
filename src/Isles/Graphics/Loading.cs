@@ -210,7 +210,7 @@ namespace Isles.Graphics
             }
         }
 
-        private bool captured = false;
+        private bool captured;
 
         public Texture2D LoadingFinished;
     }

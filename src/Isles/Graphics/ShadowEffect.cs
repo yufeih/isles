@@ -184,7 +184,7 @@ namespace Isles.Graphics
         }
 
         #endregion
-        
+
         #region Dispose
 
         /// <summary>

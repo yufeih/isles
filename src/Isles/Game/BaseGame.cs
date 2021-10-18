@@ -73,7 +73,7 @@ namespace Isles.Engine
         /// <summary>
         /// Ray casted from cursor
         /// </summary>
-        private Ray pickRay = new();
+        private Ray pickRay;
 
         /// <summary>
         /// Eye position of this frame
@@ -158,7 +158,7 @@ namespace Isles.Engine
         /// <summary>
         /// Whether the game is paused
         /// </summary>
-        private bool paused = false;
+        private bool paused;
 
         /// <summary>
         /// Gets or sets game speed
@@ -484,25 +484,25 @@ namespace Isles.Engine
             content = new ZipContentManager(Services, settings.ArchiveFile, settings.ContentDirectory);
             Content.RootDirectory = settings.ContentDirectory;
             Log.Write("Archive File:" + settings.ArchiveFile + "...");
-            Log.Write("Content Directory:" + settings.ContentDirectory +"...");
+            Log.Write("Content Directory:" + settings.ContentDirectory + "...");
 
             graphics = new GraphicsDeviceManager(this);
 
-            graphics.IsFullScreen               = settings.Fullscreen;
-            graphics.PreferredBackBufferWidth   = settings.ScreenWidth;
-            graphics.PreferredBackBufferHeight  = settings.ScreenHeight;
+            graphics.IsFullScreen = settings.Fullscreen;
+            graphics.PreferredBackBufferWidth = settings.ScreenWidth;
+            graphics.PreferredBackBufferHeight = settings.ScreenHeight;
             graphics.SynchronizeWithVerticalRetrace = settings.VSync;
-            graphics.MinimumPixelShaderProfile  = ShaderProfile.PS_2_0;
+            graphics.MinimumPixelShaderProfile = ShaderProfile.PS_2_0;
             graphics.MinimumVertexShaderProfile = ShaderProfile.VS_2_0;
 
             // Show cursor
             IsMouseVisible = settings.IsMouseVisible;
-//#if DEBUG
+            //#if DEBUG
             // Use variant time step to trace frame performance
             //IsFixedTimeStep = true;
             IsFixedTimeStep = settings.IsFixedTimeStep;
             //TargetElapsedTime = new TimeSpan(5000000);
-//#endif
+            //#endif
         }
 
         /// <summary>
@@ -608,7 +608,7 @@ namespace Isles.Engine
         {
             screenWidth = GraphicsDevice.Viewport.Width;
             screenHeight = GraphicsDevice.Viewport.Height;
-            
+
             Log.Write("Device Reset <" + screenWidth + ", " + screenHeight + ">...");
 
             // Re-Set device
@@ -636,7 +636,7 @@ namespace Isles.Engine
         {
             base.LoadContent();
         }
-        
+
         /// <summary>
         /// Unload your graphics content.  If unloadAllContent is true, you should
         /// unload content from both ResourceManagementMode pools.  Otherwise, just
@@ -660,7 +660,7 @@ namespace Isles.Engine
         #endregion
 
         #region Update
-        private bool initialized = false;
+        private bool initialized;
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input and playing audio.
@@ -706,7 +706,7 @@ namespace Isles.Engine
                 // Update audio listener
                 UpdateAudioListener();
             }
-            
+
             // Update current screen
             if (currentScreen != null)
             {
@@ -754,7 +754,7 @@ namespace Isles.Engine
             {
                 sound.Listener.Position = eye;
                 sound.Listener.Forward = facing;
-                
+
                 // Trick! we assume the camera is always facing upwards
                 sound.Listener.Up = Vector3.UnitZ;
 
@@ -921,7 +921,7 @@ namespace Isles.Engine
             }
 
             ParticleSystem.Present(gameTime);
-            
+
             if (pointSprite != null)
             {
                 pointSprite.Present(gameTime);

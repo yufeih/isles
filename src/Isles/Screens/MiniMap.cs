@@ -41,7 +41,7 @@ namespace Isles
         /// </summary>
         public Rectangle ActualArea
         {
-            get 
+            get
             {
                 if (IsDirty)
                 {
@@ -50,7 +50,7 @@ namespace Isles
                     actualArea.Y = (int)(DestinationRectangle.Top +
                                          DestinationRectangle.Height / 2 * (1 - Factor));
 
-                    actualArea.Width  = (int)(Factor * DestinationRectangle.Width);
+                    actualArea.Width = (int)(Factor * DestinationRectangle.Width);
                     actualArea.Height = (int)(Factor * DestinationRectangle.Height);
                 }
                 return actualArea;
@@ -83,7 +83,7 @@ namespace Isles
         /// <summary>
         /// Gets the center of the actualArea
         /// </summary>
-        public Point Center => new Point(DestinationRectangle.Left + DestinationRectangle.Width / 2,
+        public Point Center => new(DestinationRectangle.Left + DestinationRectangle.Width / 2,
                                  DestinationRectangle.Top + DestinationRectangle.Height / 2);
 
         /// <summary>
@@ -99,14 +99,14 @@ namespace Isles
         /// Constructor
         /// </summary>
         /// <param name="game"></param>
-        public MiniMap(BaseGame game,  GameWorld world)
+        public MiniMap(BaseGame game, GameWorld world)
         {
             this.game = game;
             camera = game.Camera as GameCamera;
             this.world = world;
         }
 
-        private static int GoldmineCounter = 0;
+        private static int GoldmineCounter;
 
         /// <summary>
         /// Add a gold mine
@@ -126,7 +126,7 @@ namespace Isles
             GoldMineList.Remove(key);
         }
 
-        
+
         /// <summary>
         /// Gets the corresponding position in the real world.
         /// </summary>
@@ -134,7 +134,7 @@ namespace Isles
         /// <returns></returns>
         public Vector3? MapToWorld(Point mapPoint)
         {
-            
+
             if (ActualArea.Contains(mapPoint))
             {
                 var rtv = new Vector3();
@@ -143,7 +143,7 @@ namespace Isles
                 rtv.Z = world.Landscape.GetHeight(rtv.X, rtv.Y);
                 return rtv;
             }
-            
+
             return null;
         }
 
@@ -171,7 +171,7 @@ namespace Isles
                 mp.Y = (int)((1 - position.Y / world.Landscape.Size.Y) * ActualArea.Height + ActualArea.Y);
                 return mp;
             }
-            
+
             return null;
         }
 
@@ -197,16 +197,16 @@ namespace Isles
             goldMineDest.Height = goldMineDest.Width;
             Point? goldMinePointerPosition;
             foreach (Vector3 position in GoldMineList.Values)
-            { 
+            {
                 goldMinePointerPosition = WorldToMap(position);
-                if(goldMinePointerPosition == null)
+                if (goldMinePointerPosition == null)
                 {
                     throw new InvalidOperationException("Gold Mine position out of range.");
                 }
 
                 goldMineDest.X = goldMinePointerPosition.Value.X - goldMineDest.Width / 2;
                 goldMineDest.Y = goldMinePointerPosition.Value.Y - goldMineDest.Height / 2;
-                sprite.Draw(GoldMinePointerTexture, goldMineDest, goldMineSourceRectangle, Color.White); 
+                sprite.Draw(GoldMinePointerTexture, goldMineDest, goldMineSourceRectangle, Color.White);
             }
 
             // Draw the entities
@@ -276,7 +276,7 @@ namespace Isles
         public void DrawGameObject(Vector3 position, float size, Color color)
         {
             EntitySign sign;
-            
+
             Point mapPoint = WorldPositionToMapPointNegativeAllowed(position);
 
             sign.Tint = color;
@@ -320,7 +320,7 @@ namespace Isles
             {
                 var dist = new Vector2(game.Input.MousePosition.X - Center.X,
                                            game.Input.MousePosition.Y - Center.Y);
-                if (dist.X * dist.X + dist.Y * dist.Y <= 
+                if (dist.X * dist.X + dist.Y * dist.Y <=
                     RadiusFactor * DestinationRectangle.Width * RadiusFactor * DestinationRectangle.Width)
                 {
                     Vector3 position = MapPointToWorldPositionNegativeAllowed(game.Input.MousePosition);
@@ -332,13 +332,13 @@ namespace Isles
                 else
                 {
                     var offset = new Vector2(dist.X, dist.Y);
-                    offset =  RadiusFactor * DestinationRectangle.Width * Vector2.Normalize(offset);
+                    offset = RadiusFactor * DestinationRectangle.Width * Vector2.Normalize(offset);
                     Mouse.SetPosition((int)offset.X + Center.X, (int)offset.Y + Center.Y);
                 }
             }
         }
 
-        private bool draging = false;
+        private bool draging;
 
         /// <summary>
         /// Event handler
@@ -380,7 +380,7 @@ namespace Isles
                     RadiusFactor * DestinationRectangle.Width * RadiusFactor * DestinationRectangle.Width)
                 {
                     Vector3? point = MapToWorld(input.MousePosition);
-                    if (point .HasValue)
+                    if (point.HasValue)
                     {
                         Player.LocalPlayer.PerformAction(point.Value);
                     }

@@ -30,12 +30,12 @@ namespace Isles.Screens
         /// <summary>
         /// Tatol page num
         /// </summary>
-        private readonly int pages = 0;
+        private readonly int pages;
 
         /// <summary>
         /// Current page index
         /// </summary>
-        private int currentPageIndex = 0;
+        private int currentPageIndex;
 
         public int CurrentPageIndex
         {
@@ -100,7 +100,7 @@ namespace Isles.Screens
             Add(nextPage);
             Add(ok);
 
-            previousPage.Click += delegate(object o, EventArgs e)
+            previousPage.Click += delegate (object o, EventArgs e)
             {
                 Audios.Play("OK");
 
@@ -122,7 +122,7 @@ namespace Isles.Screens
 
             };
 
-            nextPage.Click += delegate(object o, EventArgs e)
+            nextPage.Click += delegate (object o, EventArgs e)
             {
                 Audios.Play("OK");
 
@@ -160,7 +160,7 @@ namespace Isles.Screens
                                                 area.Width * 11 / 12, 30);
 
             var ex = new IOException("The readme text is not well-formated.");
-            using(var sr = new StreamReader(readmeText))
+            using (var sr = new StreamReader(readmeText))
             {
                 String line;
                 while (null != (line = sr.ReadLine()))
@@ -176,11 +176,11 @@ namespace Isles.Screens
                         line = line.Substring(10);
                         fontSize = Int32.Parse(line);
                     }
-                    else if(line.StartsWith("$Color$"))
+                    else if (line.StartsWith("$Color$"))
                     {
                         line = line.Substring(7);
                         line.Trim();
-                        var colorElements = line.Split(new char[] {'(', ')', ','}, 
+                        var colorElements = line.Split(new char[] { '(', ')', ',' },
                                                         StringSplitOptions.RemoveEmptyEntries);
                         if (colorElements.Length != 3 && colorElements.Length != 4)
                         {

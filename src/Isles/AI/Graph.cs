@@ -50,7 +50,7 @@ namespace Isles.Engine
         /// Gets the total number of nodes in the graph
         /// </summary>
         int NodeCount { get; }
-        
+
         /// <summary>
         /// Gets all the out-going edges of a given node
         /// </summary>
@@ -65,7 +65,7 @@ namespace Isles.Engine
         float GetHeuristicValue(int currentIndex, int endIndex);
     }
     #endregion
-    
+
     #region SparseGraph
     /// <summary>
     /// Sparse graph using adjacency list representation
@@ -282,10 +282,6 @@ namespace Isles.Engine
     /// </summary>
     public class GraphSearchAStar : IGraphSearch
     {
-        /// <summary>
-        /// Whether a search has finished
-        /// </summary>
-        private bool finished = true;
 
         /// <summary>
         /// Start, end node of the search
@@ -322,7 +318,7 @@ namespace Isles.Engine
         /// <summary>
         /// Gets whether a search query has finished
         /// </summary>
-        public bool Finished => finished;
+        public bool Finished { get; private set; } = true;
 
         /// <summary>
         /// Creates a graph searcher using Dijkstra's algorithm
@@ -371,9 +367,8 @@ namespace Isles.Engine
         /// <returns>Whether a path has been found</returns>
         public bool Search(IGraph graph, int start, int end)
         {
-            int steps;
             // Simple call our step search using infinite steps
-            return Search(graph, start, end, int.MaxValue, out steps).Value;
+            return Search(graph, start, end, int.MaxValue, out _).Value;
         }
 
         /// <summary>
@@ -395,9 +390,9 @@ namespace Isles.Engine
             var nodeCount = graph.NodeCount;
 
             // Start a new search
-            if (finished || this.start != start || this.end != end || this.graph != graph)
+            if (Finished || this.start != start || this.end != end || this.graph != graph)
             {
-                finished = false;
+                Finished = false;
                 this.graph = graph;
                 this.start = start;
                 this.end = end;
@@ -429,7 +424,7 @@ namespace Isles.Engine
                 // If we reached the end, everything is done
                 if (end == top)
                 {
-                    finished = true;
+                    Finished = true;
                     return true;
                 }
 
@@ -469,13 +464,13 @@ namespace Isles.Engine
                 // pause the search and return null.
                 if (++stepCount >= steps)
                 {
-                    finished = false;
+                    Finished = false;
                     return null;
                 }
             }
 
             // Finish the search
-            finished = true;
+            Finished = true;
             return false;
         }
 

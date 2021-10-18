@@ -52,7 +52,7 @@ namespace Isles
         /// </summary>
         public Vector3 Facing
         {
-            get => new Vector3((float)Math.Cos(rotation), (float)Math.Sin(rotation), 0);
+            get => new((float)Math.Cos(rotation), (float)Math.Sin(rotation), 0);
             set => targetRotation = (float)(Math.Atan2(value.Y, value.X));
         }
 
@@ -90,7 +90,7 @@ namespace Isles
 
         }
 
-        private bool ignoreDynamicObstacles = false;
+        private bool ignoreDynamicObstacles;
 
         /// <summary>
         /// Gets or sets the combat spell for this charactor
@@ -161,8 +161,8 @@ namespace Isles
             {
                 elapsedAnimationTime = 0;
                 moving = false;
-            }  
-            
+            }
+
             Model.Play(IdleAnimation, true, 0.2f);
             positionLastFrame = Position;
         }
@@ -308,7 +308,7 @@ namespace Isles
             return entity == null ? false :
                    entity.Outline.DistanceTo(new Vector2(Position.X, Position.Y)) < Outline.Radius;
         }
-        
+
         /// <summary>
         /// Make the charactor visible and active in the world. Should be called after Unspawn
         /// </summary>
@@ -398,7 +398,7 @@ namespace Isles
             State = new StateCharactorDie(this);
         }
 
-        protected override bool OnStateChanged(IState newState, ref IState resultState) 
+        protected override bool OnStateChanged(IState newState, ref IState resultState)
         {
             if (!IsAlive && !(newState is StateCharactorDie))
             {
@@ -426,7 +426,7 @@ namespace Isles
             }
 
             base.ShowSpells(ui);
-            
+
             if (Owner is LocalPlayer)
             {
                 ui.SetUIElement(0, false, (Owner as LocalPlayer).Attack.Button);
@@ -436,9 +436,9 @@ namespace Isles
 
         // Variables to avoid animation jittering
         private const float MinAnimationDuraction = 0.2f;
-        private float elapsedAnimationTime = 0;
+        private float elapsedAnimationTime;
         private Vector3 positionLastFrame;
-        private bool moving = false;
+        private bool moving;
 
         public override void Draw(GameTime gameTime)
         {
@@ -455,7 +455,7 @@ namespace Isles
 
             base.Draw(gameTime);
         }
-        
+
         public override void Update(GameTime gameTime)
         {
             if (IsAlive)
@@ -550,8 +550,8 @@ namespace Isles
     #region Worker
     public class Worker : Charactor
     {
-        public int LumberCarried = 0;
-        public int GoldCarried = 0;
+        public int LumberCarried;
+        public int GoldCarried;
         public int LumberCapacity = 10;
         public int GoldCapacity = 10;
         private GameModel wood;
@@ -660,9 +660,7 @@ namespace Isles
                 // Action on buildings
                 else if (entity is Building)
                 {
-                    var building = entity as Building;
-
-                    if (building != null && building.Owner == Owner)
+                    if (entity is Building building && building.Owner == Owner)
                     {
                         // Help construct building
                         if (building.State == Building.BuildingState.Constructing)
@@ -738,7 +736,7 @@ namespace Isles
         public override void OnCreate()
         {
             base.OnCreate();
-            
+
             // Get weapon from attachment
             weapon = GetAttachment("Weapon");
 
@@ -810,9 +808,7 @@ namespace Isles
 
         private void Hit(object sender, EventArgs e)
         {
-            var projectile = sender as IProjectile;
-
-            if (projectile != null && projectile.Target is GameObject)
+            if (sender is IProjectile projectile && projectile.Target is GameObject)
             {
                 var target = projectile.Target as GameObject;
 
@@ -928,9 +924,7 @@ namespace Isles
 
         private void Hit(object sender, EventArgs e)
         {
-            var projectile = sender as IProjectile;
-
-            if (projectile != null && projectile.Target is GameObject)
+            if (sender is IProjectile projectile && projectile.Target is GameObject)
             {
                 var target = projectile.Target as GameObject;
 

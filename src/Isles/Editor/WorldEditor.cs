@@ -58,14 +58,12 @@ namespace Isles.Editor
 
         private void buttonCreate_Click(object sender, EventArgs e)
         {
-            var type = objectList.SelectedItem as string;
-
-            if (type != null)
+            if (objectList.SelectedItem is string type)
             {
                 Spell.EndSpell();
                 var construct = new SpellConstruct(screen.World, type);
                 construct.AutoReactivate = true;
-                Spell.Cast(construct);                
+                Spell.Cast(construct);
             }
         }
 

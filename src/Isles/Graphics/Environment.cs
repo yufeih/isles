@@ -63,10 +63,10 @@ namespace Isles.Graphics
         /// <summary>
         /// Pre-defined environments
         /// </summary>
-        public static Atmosphere Day => new Atmosphere();
+        public static Atmosphere Day => new();
 
-        public static Atmosphere Night => new Atmosphere();
+        public static Atmosphere Night => new();
 
-        public static Atmosphere Storm => new Atmosphere();
+        public static Atmosphere Storm => new();
     }
 }

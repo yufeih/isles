@@ -30,12 +30,12 @@ namespace Isles
 
         public int DialogCornerWidth = 6;
 
-        public bool Mask = false;
+        public bool Mask;
 
         /// <summary>
         /// Whather to track the cursor
         /// </summary>
-        private readonly bool trackCursor = false;
+        private readonly bool trackCursor;
         public bool TrackCursor => trackCursor;
 
         /// <summary>

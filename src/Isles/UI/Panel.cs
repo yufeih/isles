@@ -268,10 +268,8 @@ namespace Isles.UI
 
         public override void Add(IUIElement element)
         {
-            var e = element as UIElement;
-
             // Scroll panel works only with UIElement
-            if (e == null)
+            if (element is not UIElement e)
             {
                 throw new ArgumentException();
             }
@@ -431,7 +429,7 @@ namespace Isles.UI
             set => color = value;
         }
 
-        private bool centered = false;
+        private bool centered;
         /// <summary>
         /// Gets or sets whether the text is centered
         /// </summary>
@@ -465,7 +463,7 @@ namespace Isles.UI
         public int RealHeight => (int)(Graphics2D.Font.MeasureString(formatedText).Y * fontSize);
 
         // Whether the text is shadowed
-        private bool shadowed = false;
+        private bool shadowed;
 
         public bool Shadowed
         {
@@ -549,8 +547,8 @@ namespace Isles.UI
                 return;
             }
 
-            var width = DestinationRectangle.Width;
-            
+            _ = DestinationRectangle.Width;
+
             if (Centered)
             {
                 Vector2 size = Graphics2D.Font.MeasureString(formatedText) * fontSize;
@@ -558,15 +556,15 @@ namespace Isles.UI
                 for (var i = 0; i < lines.Length; i++)
                 {
                     size = Graphics2D.Font.MeasureString(lines[i]) * fontSize;
-                    sprite.DrawString(  Graphics2D.Font, lines[i],
-                                        new Vector2((DestinationRectangle.Width - size.X) / 2 + 
+                    sprite.DrawString(Graphics2D.Font, lines[i],
+                                        new Vector2((DestinationRectangle.Width - size.X) / 2 +
                                                     DestinationRectangle.Left, heightOffset),
                                         color, 0, Vector2.Zero, fontSize,
                                         SpriteEffects.None, 0);
                     if (shadowed)
                     {
                         sprite.DrawString(Graphics2D.Font, lines[i],
-                                        new Vector2((DestinationRectangle.Width - size.X) / 2 + 
+                                        new Vector2((DestinationRectangle.Width - size.X) / 2 +
                                                     1 + DestinationRectangle.Left, heightOffset + 1),
                                          shadowColor, 0, Vector2.Zero, fontSize,
                                         SpriteEffects.None, 0);
@@ -577,13 +575,13 @@ namespace Isles.UI
             }
             else
             {
-                sprite.DrawString( Graphics2D.Font, formatedText, 
+                sprite.DrawString(Graphics2D.Font, formatedText,
                                    new Vector2(DestinationRectangle.X, DestinationRectangle.Y),
                                    color, 0, Vector2.Zero, fontSize,
                                    SpriteEffects.None, 0);
                 if (shadowed)
                 {
-                    sprite.DrawString(  Graphics2D.Font, formatedText,
+                    sprite.DrawString(Graphics2D.Font, formatedText,
                                         new Vector2(DestinationRectangle.X + 1, DestinationRectangle.Y + 1),
                                         shadowColor, 0, Vector2.Zero, fontSize,
                                         SpriteEffects.None, 0);
@@ -610,8 +608,8 @@ namespace Isles.UI
         {
         }
 
-        private bool flash = false;
-        private double flashElapsedTime = 0;
+        private bool flash;
+        private double flashElapsedTime;
 
         public override void Draw(GameTime gameTime, SpriteBatch sprite)
         {
@@ -658,7 +656,7 @@ namespace Isles.UI
                 {
                     Text += inputChar;
                 }
-                
+
                 return EventResult.Handled;
             }
 

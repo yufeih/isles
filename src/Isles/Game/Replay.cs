@@ -34,7 +34,7 @@ namespace Isles
         /// </summary>
         public const string Magic = "Isles Replay";
         public const byte Version = 0;
-        private uint currentOffset = 0;
+        private uint currentOffset;
         private readonly List<Keyframe> keyframes = new();
         private readonly List<byte[]> keyValues = new();
 
@@ -82,7 +82,7 @@ namespace Isles
         public void Save(Stream output, string worldFilename, Stream worldStream)
         {
             // Write replay header
-            var magic = Encoding.ASCII.GetBytes(Magic);            
+            var magic = Encoding.ASCII.GetBytes(Magic);
             output.Write(magic, 0, magic.Length);
             output.WriteByte(Version);
 
@@ -198,7 +198,7 @@ namespace Isles
             }
 
             bytesRead = input.Read(buffer, 0, filenameLength);
-            
+
             if (bytesRead != filenameLength)
             {
                 return false;
@@ -284,7 +284,7 @@ namespace Isles
                 var bytes = new byte[length];
 
                 input.Seek((long)offsets[i], SeekOrigin.Begin);
-                
+
                 bytesRead = input.Read(bytes, 0, length);
 
                 if (bytesRead != length)
@@ -298,7 +298,7 @@ namespace Isles
             }
 
             // Sort keyframes by time
-            keyframes.Sort(delegate(Keyframe frame1, Keyframe frame2)
+            keyframes.Sort(delegate (Keyframe frame1, Keyframe frame2)
             {
                 return frame1.Time.CompareTo(frame2.Time);
             });

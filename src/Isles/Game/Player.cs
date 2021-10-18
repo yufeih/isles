@@ -219,7 +219,7 @@ namespace Isles
             }
         }
 
-        private int treesCuttedDown = 0;
+        private int treesCuttedDown;
 
         /// <summary>
         /// Gets or sets the attack point of this player
@@ -248,7 +248,7 @@ namespace Isles
             }
         }
 
-        private float smokeProduced = 0;
+        private float smokeProduced;
 
         /// <summary>
         /// Gets the environment condition of the player
@@ -311,8 +311,7 @@ namespace Isles
         /// </summary>
         public LinkedList<GameObject> GetObjects(string type)
         {
-            LinkedList<GameObject> value;
-            return objects.TryGetValue(type, out value) ? value : null;
+            return objects.TryGetValue(type, out LinkedList<GameObject> value) ? value : null;
         }
 
         /// <summary>
@@ -387,15 +386,13 @@ namespace Isles
         /// </summary>
         public bool IsAvailable(string name)
         {
-            var value = 0;
-            availability.TryGetValue(name, out value);
+            availability.TryGetValue(name, out var value);
             return value > 0;
         }
 
         public bool IsFutureAvailable(string name)
         {
-            var value = 0;
-            futureObjects.TryGetValue(name, out value);
+            futureObjects.TryGetValue(name, out var value);
             return value > 0;
         }
 
@@ -484,9 +481,8 @@ namespace Isles
         /// </summary>
         public IEnumerable<GameObject> EnumerateObjects(string type)
         {
-            LinkedList<GameObject> value;
 
-            if (objects.TryGetValue(type, out value))
+            if (objects.TryGetValue(type, out LinkedList<GameObject> value))
             {
                 foreach (GameObject o in value)
                 {
@@ -553,7 +549,7 @@ namespace Isles
             // Currently there are only allies and opponents
             return (player != null && player.Team == Team) ? PlayerRelation.Ally :
                                                              PlayerRelation.Opponent;
-           // return PlayerRelation.Opponent;
+            // return PlayerRelation.Opponent;
         }
         #endregion
 
@@ -636,7 +632,7 @@ namespace Isles
             }
 
             // Sort start position by Y value
-            startPositions.Sort(delegate(KeyValuePair<GameObject, Vector2> a,
+            startPositions.Sort(delegate (KeyValuePair<GameObject, Vector2> a,
                                          KeyValuePair<GameObject, Vector2> b)
             {
                 return a.Value.Y.CompareTo(b.Value.Y);
@@ -680,7 +676,7 @@ namespace Isles
             }
 
             // Sort orders by object priority to make sound effect working correctly
-            orders.Sort(delegate(KeyValuePair<GameObject, Vector2> pair1,
+            orders.Sort(delegate (KeyValuePair<GameObject, Vector2> pair1,
                                  KeyValuePair<GameObject, Vector2> pair2)
             {
                 return (int)(pair1.Key.Priority - pair2.Key.Priority);
@@ -759,17 +755,17 @@ namespace Isles
         private readonly List<List<GameObject>> groups = new();
         private readonly List<GameObject> highlighted = new();
         private readonly List<GameObject>[] teams = new List<GameObject>[10];
-        private int currentGroup = 0;
+        private int currentGroup;
 
         /// <summary>
         /// Multiselecting
         /// </summary>
-        private bool multiSelecting = false;
+        private bool multiSelecting;
         private Rectangle multiSelectRectangle;
         private Point multiSelectStart;
-        private bool keyDoublePressed = false;
+        private bool keyDoublePressed;
         private double doubleClickTime;
-        private bool traceCamera = false;
+        private bool traceCamera;
 
         /// <summary>
         /// Spells
@@ -951,7 +947,7 @@ namespace Isles
             }
 
             // Sorted selected by priority
-            selected.Sort(delegate(GameObject x, GameObject y)
+            selected.Sort(delegate (GameObject x, GameObject y)
             {
                 var result = x.Priority.CompareTo(y.Priority);
                 return result != 0 ? result : string.Compare(x.ClassID, y.ClassID);
@@ -965,7 +961,7 @@ namespace Isles
             selectionDirty = true;
 
             groups.Clear();
-            
+
             if (selected.Count != 0)
             {
                 var currentClassID = selected[0].ClassID;
@@ -1003,8 +999,7 @@ namespace Isles
             }
 
             // Select multiple objects
-            Matrix rectProject;
-            Matrix transform = Matrix.Identity;
+            _ = Matrix.Identity;
 
             var left = (float)(2 * rectangle.Left - game.ScreenWidth) / game.ScreenWidth;
             var right = (float)(2 * rectangle.Right - game.ScreenWidth) / game.ScreenWidth;
@@ -1014,7 +1009,7 @@ namespace Isles
             var size = Vector3.Transform(new Vector3(1, 1, 0), game.ProjectionInverse);
 
             Matrix.CreatePerspectiveOffCenter(
-                left * size.X, right * size.X, bottom * size.Y, top * size.Y, 1.0f, 5000.0f, out rectProject);
+                left * size.X, right * size.X, bottom * size.Y, top * size.Y, 1.0f, 5000.0f, out Matrix rectProject);
 
             return SelectablesFromObjects(world.ObjectsFromRegion(
                                             new BoundingFrustum(game.View * rectProject)));
@@ -1120,9 +1115,7 @@ namespace Isles
 
             foreach (Entity e in gameObject.Owner.EnumerateObjects(gameObject.ClassID))
             {
-                var o = e as GameObject;
-
-                if (o != null && o.Owner == gameObject.Owner &&
+                if (e is GameObject o && o.Owner == gameObject.Owner &&
                     o.Visible && o.IsVisible(game.ViewProjection) &&
                     o.IsAlive && o.ClassID == gameObject.ClassID)
                 {
@@ -1176,7 +1169,7 @@ namespace Isles
             }
 
             // Remove dead members
-            selected.RemoveAll(delegate(GameObject o)
+            selected.RemoveAll(delegate (GameObject o)
             {
                 if (o != null && !o.IsAlive)
                 {
@@ -1187,7 +1180,7 @@ namespace Isles
                 return false;
             });
 
-            highlighted.RemoveAll(delegate(GameObject o)
+            highlighted.RemoveAll(delegate (GameObject o)
             {
                 if (o != null && !o.IsAlive)
                 {
@@ -1199,7 +1192,7 @@ namespace Isles
 
             for (var i = 0; i < teams.Length; i++)
             {
-                teams[i].RemoveAll(delegate(GameObject o)
+                teams[i].RemoveAll(delegate (GameObject o)
                 {
                     return o != null && !o.IsAlive;
                 });
@@ -1208,7 +1201,7 @@ namespace Isles
             var hasRemoved = false;
             foreach (List<GameObject> list in groups)
             {
-                list.RemoveAll(delegate(GameObject o)
+                list.RemoveAll(delegate (GameObject o)
                 {
                     if (o != null && !o.IsAlive)
                     {
@@ -1479,7 +1472,7 @@ namespace Isles
                 (tag as Keys?).Value == Keys.Tab && groups != null && groups.Count > 0)
             {
                 selectionDirty = true;
-                Focus((currentGroup+1) % groups.Count);
+                Focus((currentGroup + 1) % groups.Count);
 
                 return EventResult.Handled;
             }
@@ -1498,7 +1491,7 @@ namespace Isles
                                       world.FogOfWar.Contains(picked.Position.X, picked.Position.Y))
                 {
                     picked = null;
-                }                        
+                }
 
                 if (picked != null)
                 {
@@ -1770,7 +1763,7 @@ namespace Isles
 
     #region ComputerPlayer
     public class ComputerPlayer : Player
-    {        
+    {
         public GameWorld World;
         public GoalDevelop Develop;
         public GoalAttack Attack;
@@ -1790,8 +1783,7 @@ namespace Isles
             {
                 if (townhall == null || !townhall.IsAlive)
                 {
-                    LinkedList<GameObject> value;
-                    if (Objects.TryGetValue(TownhallName, out value) && value.Count > 0)
+                    if (Objects.TryGetValue(TownhallName, out LinkedList<GameObject> value) && value.Count > 0)
                     {
                         townhall = value.First.Value as Building;
                     }
@@ -1822,7 +1814,7 @@ namespace Isles
                     }
                 }
 
-                return enermy; 
+                return enermy;
             }
         }
 
@@ -1863,8 +1855,7 @@ namespace Isles
         /// </summary>
         public void Request(string type, int count, float scaler)
         {
-            var existingCount = 0;
-            FutureObjects.TryGetValue(type, out existingCount);
+            FutureObjects.TryGetValue(type, out var existingCount);
 
             count -= existingCount;
             Request(type, count > 0 ? scaler : 0.5f);
@@ -1940,9 +1931,7 @@ namespace Isles
                 // Find a peon
                 foreach (GameObject o in EnumerateObjects(WorkerName))
                 {
-                    var p = o as Worker;
-
-                    if (p == null)
+                    if (o is not Worker p)
                     {
                         continue;
                     }
@@ -1972,9 +1961,7 @@ namespace Isles
 
                 if (builder != null)
                 {
-                    var building = World.Create(type) as Building;
-
-                    if (building == null)
+                    if (World.Create(type) is not Building building)
                     {
                         throw new ArgumentException();
                     }
@@ -2025,9 +2012,7 @@ namespace Isles
 
             foreach (GameObject o in EnumerateObjects())
             {
-                var b = o as Building;
-
-                if (b != null && b.CanTrain(type) && b.QueuedSpells.Count < minRequest)
+                if (o is Building b && b.CanTrain(type) && b.QueuedSpells.Count < minRequest)
                 {
                     minRequest = b.QueuedSpells.Count;
                     building = b;
@@ -2068,8 +2053,7 @@ namespace Isles
 
                 foreach (KeyValuePair<string, float> pair in Requests)
                 {
-                    var existing = 0;
-                    FutureObjects.TryGetValue(pair.Key, out existing);
+                    FutureObjects.TryGetValue(pair.Key, out var existing);
 
                     World.Game.Graphics2D.DrawShadowedString(
                         pair.Key + ": " + pair.Value + "   " + existing, 0.85f, position,

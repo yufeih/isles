@@ -66,7 +66,7 @@ namespace Isles.Engine
         private Vector2 lastPosition;
         private readonly float priority;
         private readonly Random random = new();
-        private double reactivateTimer = 0;
+        private double reactivateTimer;
 
         public StateMoveToTarget(IMovable owner, IWorldObject target,
                                  float priority, PathManager pathManager)
@@ -290,7 +290,7 @@ namespace Isles.Engine
                     distanceThreshold = Helper.RandomInRange(0.3f, 0.7f) * pathManager.LargeGraph.CellSize;
                 }
             }
-            
+
             if (result == StateResult.Completed || stepNext)
             {
                 // If we are traversing the path and the end is not reached
@@ -323,9 +323,9 @@ namespace Isles.Engine
         private StateSeekToPosition seek;
         private Path path;
         private LinkedListNode<PathEdge> currentEdge;
-        private bool includeDynamic = false;
-        private bool pathQuerying = false;
-        private int retryCounter = 0;
+        private bool includeDynamic;
+        private bool pathQuerying;
+        private int retryCounter;
         private readonly int maxRetryTimes = 20;
         private readonly float priority;
 
@@ -372,7 +372,7 @@ namespace Isles.Engine
             start.Y = owner.Position.Y;
 
             // Ignore dynamic obstacles on the first try
-            destination = pathManager.FindNextValidPosition(originalDestination, 
+            destination = pathManager.FindNextValidPosition(originalDestination,
                                     start, destination, owner, !owner.IgnoreDynamicObstacles);
 
             // Query a path if we can't directly walk through
@@ -388,7 +388,7 @@ namespace Isles.Engine
                 seek = new StateSeekToPosition(destination, owner, pathManager);
                 seek.WaitTime = 0.1f * retryCounter;
             }
-            
+
             includeDynamic = true;
         }
 
@@ -446,7 +446,7 @@ namespace Isles.Engine
                 seek.Terminate();
                 return State = StateResult.Completed;
             }
-            
+
             return State;
         }
 
@@ -498,11 +498,11 @@ namespace Isles.Engine
     #region StateSeekToPosition
     public class StateSeekToPosition : BaseState
     {
-        public float WaitTime = 0;
+        public float WaitTime;
         private readonly IMovable owner;
         private readonly PathManager pathManager;
         private Vector2 destination;
-        private float elapsedWaitTime = 0;
+        private float elapsedWaitTime;
         private float totalWaitTime = MaxTotalWaitTime;
         private const float MaxSeperation = 0.2f;
         private const float MaxTotalWaitTime = 0.2f;
@@ -575,7 +575,7 @@ namespace Isles.Engine
 
                 // Move one step forward
                 target.Z = pathManager.Landscape.GetHeight(target.X, target.Y);
-                                
+
                 owner.Position = target;
                 pathManager.UpdateMovable(owner);
             }

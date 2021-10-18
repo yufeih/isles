@@ -44,7 +44,7 @@ namespace Isles
         private Vector2 randomOffset;
         private int highLightMoveTo;
         private double modeChangeTimeRecord;
-        private bool modeChange = false;
+        private bool modeChange;
 
         // Time for changing into the new screen
         private const double ChangingTime = 1;
@@ -58,7 +58,7 @@ namespace Isles
 
         private double expectedHighlightPos;
         private double creditStartTime;
-        private bool creditStarted = false;
+        private bool creditStarted;
         private const double CreditEmergingTime = 1;
         private const float CreditFontSize = 26f / 23;
         private readonly double creditRollingTime = 10;
@@ -160,7 +160,7 @@ namespace Isles
                         color = Color.White;
                     }
 
-                    var width = (int) (BaseGame.Singleton.Graphics2D.Font.MeasureString(textSegment).X * CreditFontSize);
+                    var width = (int)(BaseGame.Singleton.Graphics2D.Font.MeasureString(textSegment).X * CreditFontSize);
 
                     creditSegment = new TextField(textSegment, CreditFontSize, color,
                                                     new Rectangle(offset, 0, width, 30), Color.Black);
@@ -201,22 +201,22 @@ namespace Isles
             highLight.Anchor = Anchor.TopLeft;
             highLight.ScaleMode = ScaleMode.ScaleY;
 
-            
+
             // Set buttons
             for (var i = 0; i < 5; i++)
             {
-                buttons[i] = new MenuButton(buttonsTexture, 
-                             new Rectangle(buttonBias * i + buttonBias * 4/5, buttonY, buttonDestinationWidth, buttonDestinationHeight),
+                buttons[i] = new MenuButton(buttonsTexture,
+                             new Rectangle(buttonBias * i + buttonBias * 4 / 5, buttonY, buttonDestinationWidth, buttonDestinationHeight),
                              new Rectangle(0, i * 32, buttonSourceWidth, buttonSourceHeight), Keys.F1 + i, null);
                 buttons[i].Texture = buttonsTexture;
                 buttons[i].Disabled = buttons[i].SourceRectangle
                     = new Rectangle(0, i * buttonSourceHeight, buttonSourceWidth, buttonSourceHeight);
-                buttons[i].Pressed = buttons[i].Hovered 
+                buttons[i].Pressed = buttons[i].Hovered
                     = new Rectangle(0, 263 + 38 * i, buttonSourceWidth, buttonSourceHeight);
                 buttons[i].Anchor = Anchor.TopLeft;
                 buttons[i].ScaleMode = ScaleMode.ScaleY;
                 buttons[i].Index = i;
-                buttons[i].Enter += delegate(Object o, EventArgs e) { HighLightMoveTo((o as MenuButton).Index); };
+                buttons[i].Enter += delegate (Object o, EventArgs e) { HighLightMoveTo((o as MenuButton).Index); };
                 titlePanel.Add(buttons[i]);
             }
 
@@ -231,7 +231,7 @@ namespace Isles
             titlePanel.Add(highLight);
 
             // Click event for Campaign button
-            buttons[0].Click += delegate(object o, EventArgs e)
+            buttons[0].Click += delegate (object o, EventArgs e)
             {
                 Audios.Play("OK");
                 gameScreen.StartReplay(GameScreen.DefaultReplayFilename);
@@ -239,26 +239,26 @@ namespace Isles
                 //StartLANGame();
             };
 
-            buttons[1].Click += delegate(object o, EventArgs e)
+            buttons[1].Click += delegate (object o, EventArgs e)
             {
                 Audios.Play("OK");
                 modeChange = true;
             };
 
-            buttons[3].Click += delegate(object o, EventArgs e)
+            buttons[3].Click += delegate (object o, EventArgs e)
             {
                 Event.SendMessage(EventType.Hit, this, this, null, 7);
                 Audios.Play("OK");
-                StartCredit();   
+                StartCredit();
             };
 
             // Click even for Exit button
-            buttons[4].Click += delegate(object o, EventArgs e) { BaseGame.Singleton.Exit(); };
+            buttons[4].Click += delegate (object o, EventArgs e) { BaseGame.Singleton.Exit(); };
             //BaseGame.Singleton.Cursor = Helper.CursorFromFile("Content/UI/NormalCursor.cur");
             highLightMoveTo = buttons[0].Area.X;
             expectedHighlightPos = highLightMoveTo;
             var rand = new Random();
-            randomOffset = new Vector2( (float)rand.NextDouble(),
+            randomOffset = new Vector2((float)rand.NextDouble(),
                                         (float)rand.NextDouble()) * 0.1f;
         }
 
@@ -344,7 +344,7 @@ namespace Isles
             }
             else if (elapsedTime < CreditEmergingTime * 2 + creditRollingTime)
             {
-                var a = (byte)((elapsedTime - CreditEmergingTime  - creditRollingTime) /
+                var a = (byte)((elapsedTime - CreditEmergingTime - creditRollingTime) /
                                     (CreditEmergingTime) * 255);
                 for (var i = 0; i < 5; i++)
                 {
@@ -363,7 +363,7 @@ namespace Isles
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
-            expectedHighlightPos += ((highLightMoveTo - expectedHighlightPos) 
+            expectedHighlightPos += ((highLightMoveTo - expectedHighlightPos)
                                     * 5.5 * gameTime.ElapsedGameTime.TotalSeconds);
             highLight.X = (int)expectedHighlightPos;
             foreach (TextField t in credit.Elements)
@@ -424,9 +424,9 @@ namespace Isles
 
                     // Draw the sprite, passing the fade amount as the
                     // alpha of the SpriteBatch.Draw color parameter.
-                    var fade = (byte)(modeChangeTimeRecord / ChangingTime * 255) ;
+                    var fade = (byte)(modeChangeTimeRecord / ChangingTime * 255);
                     spriteBatch.Draw(titleDisplayShotTexture, ui.DestinationRectangle,
-                        //MoveInCircle(gameTime, LoadingDisplayFinished, 1),
+                                     //MoveInCircle(gameTime, LoadingDisplayFinished, 1),
                                      new Color(255, 255, 255, (byte)(255 - fade)));
 
                     // End the sprite batch, then end our custom effect.
@@ -442,8 +442,8 @@ namespace Isles
             BaseGame.Singleton.Graphics2D.DrawString(highLightMoveTo.ToString() + ", " + highLight.X.ToString(),
                                     15f / 23, new Vector2(2, 30), Color.White);
 #endif
-   
-            if(modeChange)
+
+            if (modeChange)
             {
                 titleDisplayShotTexture = BaseGame.Singleton.ScreenshotCapturer.Screenshot;
                 ui.Remove(titlePanel);
@@ -451,7 +451,7 @@ namespace Isles
             }
 
             //ui.Sprite.Begin();
-            
+
             //ui.Sprite.Draw(buttonsTexture, new Rectangle((int)highLightPosition, 508,
             //                buttonDestinationWidth, hightLightDestinationHeight), 
             //                new Rectangle(0, 5 * buttonSourceHeight, buttonSourceWidth, 66), Color.White);
@@ -483,7 +483,7 @@ namespace Isles
         /// load ResourceManagementMode.Manual content.
         /// </summary>
         /// <param name="loadAllContent">Which type of content to load.</param>
-        public void LoadContent() 
+        public void LoadContent()
         {
 
         }
@@ -556,7 +556,7 @@ namespace Isles
 
         private float alpha = 1f;
 
-        public void  SetAlpha(byte a)
+        public void SetAlpha(byte a)
         {
             alpha = a / 255f;
         }
@@ -577,7 +577,7 @@ namespace Isles
                     switch (state)
                     {
                         case ButtonState.Normal:
-                            sourRect = SourceRectangle; buttonColor = new Color(255, 255, 255, (byte)(160*alpha));
+                            sourRect = SourceRectangle; buttonColor = new Color(255, 255, 255, (byte)(160 * alpha));
                             break;
                         case ButtonState.Hover:
                             sourRect = Hovered; buttonColor = new Color(255, 255, 255, (byte)(255 * alpha));

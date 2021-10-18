@@ -75,7 +75,7 @@ namespace Isles.Engine
 
             Log.Write("Camera Initialized...");
         }
-        
+
         protected void ResetProjection(object sender, EventArgs e)
         {
             projection = Matrix.CreatePerspectiveFieldOfView(
@@ -83,7 +83,7 @@ namespace Isles.Engine
                 (float)device.Viewport.Width / device.Viewport.Height,
                 nearPlane, farPlane);
         }
-        
+
         /// <summary>
         /// Allows the game component to update itself.
         /// </summary>
@@ -93,14 +93,14 @@ namespace Isles.Engine
             // Update matrix and view frustum
             Matrix.CreateLookAt(ref eye, ref lookAt, ref up, out view);
         }
-        
+
         public virtual EventResult HandleEvent(EventType type, object sender, object tag)
         {
             return EventResult.Unhandled;
         }
     }
     #endregion
-    
+
     #region GameCamera
     /// <summary>
     /// Settings for game camera
@@ -157,18 +157,10 @@ namespace Isles.Engine
     /// </summary>
     public class GameCamera : Camera
     {
-        private readonly bool SnapToLandscape = false;
-
         /// <summary>
         /// Game camera settings
         /// </summary>
-        public GameCameraSettings Settings
-        {
-            get => settings;
-            set => settings = value;
-        }
-
-        private GameCameraSettings settings;
+        public GameCameraSettings Settings { get; set; }
 
         /// <summary>
         /// Landscape for the game camera
@@ -210,9 +202,9 @@ namespace Isles.Engine
         /// <summary>
         /// Height of the camera
         /// </summary>
-        private float eyeZ = 0;
-        private float eyeZTarget = 0;
-        private Vector3 lookAtTarget = new();
+        private float eyeZ;
+        private float eyeZTarget;
+        private Vector3 lookAtTarget;
         private readonly float minRoll = MathHelper.ToRadians(60);
         private readonly float maxRoll = MathHelper.ToRadians(80);
         private Vector3 direction = Vector3.Zero;
@@ -220,31 +212,19 @@ namespace Isles.Engine
         /// <summary>
         /// Variables to adjust orientation
         /// </summary>
-        private bool dragging = false;
+        private bool dragging;
         private float startRoll, startPitch;
         private Point startMousePosition;
 
         /// <summary>
         /// Gets or sets whether this camera is freezed
         /// </summary>
-        public bool Freezed
-        {
-            get => freezed;
-            set => freezed = value;
-        }
-
-        private bool freezed;
+        public bool Freezed { get; set; }
 
         /// <summary>
         /// Gets or sets whether this camera is been moved by user
         /// </summary>
-        public bool MovedByUser
-        {
-            get => movedByUser;
-            set => movedByUser = value;
-        }
-
-        private bool movedByUser = false;
+        public bool MovedByUser { get; set; }
 
         /// <summary>
         /// Events
@@ -254,8 +234,8 @@ namespace Isles.Engine
         public event EventHandler BeginMove;
         public event EventHandler EndMove;
 
-        private bool moving = false;
-        private bool orbit = false;
+        private bool moving;
+        private bool orbit;
         private float orbitSpeed;
 
         /// <summary>
@@ -278,15 +258,15 @@ namespace Isles.Engine
             Settings = settings;
 
             radius = radiusScaler = radiusTarget = settings.DefaultRadius;
-            
+
             // Apply changes
             ResetProjection(null, EventArgs.Empty);
-            
+
             // Center camera
             FlyTo(new Vector3(
                 world.Landscape.Size.X / 2, world.Landscape.Size.Y / 2, 0), true);
         }
-        
+
         /// <summary>
         /// Fly the camera to a given location
         /// </summary>
@@ -300,7 +280,7 @@ namespace Isles.Engine
 
             if (teleport)
             {
-                movedByUser = true;
+                MovedByUser = true;
                 lookAtTarget = lookAt = position;
             }
             else
@@ -335,7 +315,7 @@ namespace Isles.Engine
             radiusTarget = radius;
             rollTarget = roll;
             orbit = true;
-            freezed = true;
+            Freezed = true;
         }
 
         public void CancelOrbit()
@@ -355,9 +335,9 @@ namespace Isles.Engine
         public override void Update(GameTime gameTime)
         {
             // Apply global camera sensitivity
-            var elapsedTime = settings.Sensitivity *
+            var elapsedTime = Settings.Sensitivity *
                 (float)(gameTime.ElapsedGameTime.TotalMilliseconds);
-            var smoother = elapsedTime * 0.005f * settings.Smoothness;
+            var smoother = elapsedTime * 0.005f * Settings.Smoothness;
             if (smoother > 1)
             {
                 smoother = 1;
@@ -383,19 +363,8 @@ namespace Isles.Engine
             eye = lookAt + direction;
 
             // Avoid collision with heightmap
-            if (SnapToLandscape)
-            {
-                eyeZTarget = world.Landscape.GetHeight(eye.X, eye.Y) + settings.MinHeightAboveGround;
-                eyeZTarget += (settings.MaxRadius - eyeZTarget) * eye.Z / settings.MaxRadius;
-            }
-            else
-            {
-                eyeZTarget = world.Landscape.GetHeight(eye.X, eye.Y) + settings.MinHeightAboveGround;
-                if (eyeZTarget < eye.Z)
-                {
-                    eyeZTarget = eye.Z;
-                }
-            }
+            eyeZTarget = world.Landscape.GetHeight(eye.X, eye.Y) + Settings.MinHeightAboveGround;
+            eyeZTarget += (Settings.MaxRadius - eyeZTarget) * eye.Z / Settings.MaxRadius;
 
             eyeZ += (eyeZTarget - eyeZ) * smoother;
             eye.Z = eyeZ;
@@ -407,9 +376,9 @@ namespace Isles.Engine
         /// <param name="elapsedTime"></param>
         private void UpdateViewDistance(float elapsedTime, float smoother)
         {
-            if (!freezed && !orbit)
+            if (!Freezed && !orbit)
             {
-                radiusScaler -= game.Input.MouseWheelDelta * settings.WheelFactor;
+                radiusScaler -= game.Input.MouseWheelDelta * Settings.WheelFactor;
 
                 if (game.Input.Keyboard.IsKeyDown(Keys.PageUp))
                 {
@@ -421,13 +390,13 @@ namespace Isles.Engine
                 }
 
                 radiusScaler = MathHelper.Clamp(
-                    radiusScaler, settings.MinHeightAboveGround, settings.MaxRadius);
+                    radiusScaler, Settings.MinHeightAboveGround, Settings.MaxRadius);
 
-                radiusTarget = (float)(settings.MaxRadius *
-                    (Math.Exp(radiusScaler / settings.MaxRadius) - 1) / (Math.E - 1));
+                radiusTarget = (float)(Settings.MaxRadius *
+                    (Math.Exp(radiusScaler / Settings.MaxRadius) - 1) / (Math.E - 1));
 
                 radiusTarget = MathHelper.Clamp(
-                    radiusTarget, settings.MinHeightAboveGround, settings.MaxRadius);
+                    radiusTarget, Settings.MinHeightAboveGround, Settings.MaxRadius);
             }
 
             // Smooth radius
@@ -449,34 +418,34 @@ namespace Isles.Engine
 
             // Compute camera speed based on radius
             var speed = MathHelper.Lerp(
-                settings.MinSpeed, settings.MaxSpeed, radius / settings.MaxRadius);
+                Settings.MinSpeed, Settings.MaxSpeed, radius / Settings.MaxRadius);
 
             var sin = (float)(speed * Math.Sin(pitch)) * elapsedTime;
             var cos = (float)(speed * Math.Cos(pitch)) * elapsedTime;
 
-            if (!freezed && !orbit)
+            if (!Freezed && !orbit)
             {
                 // Navigation
-                if (game.Input.MousePosition.X <= settings.ScrollAreaSize)
+                if (game.Input.MousePosition.X <= Settings.ScrollAreaSize)
                 {
                     xMove = true;
                     xDelta = sin;
                     yDelta -= cos;
                 }
-                else if (game.Input.MousePosition.X >= game.ScreenWidth - settings.ScrollAreaSize)
+                else if (game.Input.MousePosition.X >= game.ScreenWidth - Settings.ScrollAreaSize)
                 {
                     xMove = true;
                     xDelta -= sin;
                     yDelta = cos;
                 }
 
-                if (game.Input.MousePosition.Y <= settings.ScrollAreaSize)
+                if (game.Input.MousePosition.Y <= Settings.ScrollAreaSize)
                 {
                     yMove = true;
                     xDelta -= cos;
                     yDelta -= sin;
                 }
-                else if (game.Input.MousePosition.Y >= game.ScreenHeight - settings.ScrollAreaSize)
+                else if (game.Input.MousePosition.Y >= game.ScreenHeight - Settings.ScrollAreaSize)
                 {
                     yMove = true;
                     xDelta += cos;
@@ -495,7 +464,7 @@ namespace Isles.Engine
             // Update look at position
             if (xDelta != 0 || yDelta != 0)
             {
-                movedByUser = true;
+                MovedByUser = true;
 
                 if (!moving)
                 {
@@ -559,7 +528,7 @@ namespace Isles.Engine
                     (game.Input.MousePosition.Y - startMousePosition.Y) * RotationFactorY;
             }
 
-            if (!freezed && !orbit)
+            if (!Freezed && !orbit)
             {
                 // Adjust roll/pitch using arrow keys
                 if (game.Input.Keyboard.IsKeyDown(Keys.Left))
@@ -626,14 +595,14 @@ namespace Isles.Engine
             var key = tag as Keys?;
 
             // Start adjusting view by pressing middle button
-            if (type == EventType.MiddleButtonDown && !moving && !freezed && !orbit)
+            if (type == EventType.MiddleButtonDown && !moving && !Freezed && !orbit)
             {
                 input.Capture(this);
                 dragging = true;
                 startRoll = roll;
                 startPitch = pitch;
                 startMousePosition = input.MousePosition;
-                freezed = true;
+                Freezed = true;
                 BeginRotate(this, EventArgs.Empty);
                 return EventResult.Handled;
             }
@@ -642,13 +611,13 @@ namespace Isles.Engine
             {
                 input.Uncapture();
                 dragging = false;
-                freezed = false;
+                Freezed = false;
                 EndRotate(this, EventArgs.Empty);
                 return EventResult.Handled;
             }
 
             // Press space to return to normal view
-            if (!freezed && !orbit && type == EventType.KeyDown && (tag as Keys?).Value == Keys.Back)
+            if (!Freezed && !orbit && type == EventType.KeyDown && (tag as Keys?).Value == Keys.Back)
             {
                 rollTarget = DefaultRoll;
                 radiusScaler = radiusTarget = DefaultRadius;

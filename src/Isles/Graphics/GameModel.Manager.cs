@@ -34,7 +34,7 @@ namespace Isles.Graphics
 
         private bool isDirty = true;
 
-        
+
         /// <summary>
         /// The effect technique for the material
         /// </summary>
@@ -64,7 +64,7 @@ namespace Isles.Graphics
         }
 
         private Texture2D texture;
-  
+
 
         /// <summary>
         /// Model normal texture
@@ -162,7 +162,7 @@ namespace Isles.Graphics
             }
         }
 
-        private bool isTransparent = false;
+        private bool isTransparent;
 
         /// <summary>
         /// Creates a new material
@@ -411,7 +411,7 @@ namespace Isles.Graphics
                 const float ReferenceAlpha = 128;
 
                 if (isTransparent)
-                {        
+                {
                     game.GraphicsDevice.RenderState.AlphaTestEnable = true;
                     game.GraphicsDevice.RenderState.ReferenceAlpha = (int)(ReferenceAlpha * alpha);
                     game.GraphicsDevice.RenderState.AlphaBlendEnable = true;

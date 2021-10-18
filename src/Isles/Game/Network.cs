@@ -69,9 +69,8 @@ namespace Isles
         /// </summary>
         public IGameObject ObjectFromID(ushort id)
         {
-            IGameObject value;
 
-            return idToObject.TryGetValue(id, out value) ? value : null;
+            return idToObject.TryGetValue(id, out IGameObject value) ? value : null;
         }
 
         /// <summary>
@@ -79,9 +78,8 @@ namespace Isles
         /// </summary>
         public ushort IDFromObject(IGameObject o)
         {
-            ushort id;
 
-            return objectToID.TryGetValue(o, out id) ? id : (ushort)0;
+            return objectToID.TryGetValue(o, out var id) ? id : (ushort)0;
         }
 
         /// <summary>

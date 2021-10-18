@@ -36,10 +36,10 @@ namespace Isles.Editor
         {
             private readonly IWorldObject center;
             private readonly float radius = 75;
-            private float angle = 0;
+            private float angle;
 
             public TestTarget(GameWorld world, IWorldObject center)
-                :base(world)
+                : base(world)
             {
                 this.center = center;
             }

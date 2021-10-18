@@ -47,7 +47,7 @@ namespace Isles.Engine
         /// </summary>
         /// <param name="loadAllContent">Which type of content to load.</param>
         void LoadContent();
-        
+
         /// <summary>
         /// Unload your graphics content.  If unloadAllContent is true, you should
         /// unload content from both ResourceManagementMode pools.  Otherwise, just
@@ -58,7 +58,7 @@ namespace Isles.Engine
         void UnloadContent();
     }
     #endregion
-    
+
     #region IWorldObject
     /// <summary>
     /// Interface for a class of object that can be load from a file
@@ -92,7 +92,7 @@ namespace Isles.Engine
         /// manager will be able to adjust its internal data structure
         /// to adopt to the change of transformation.
         /// </summary>
-        bool IsDirty { get; set;}
+        bool IsDirty { get; set; }
 
         /// <summary>
         /// Gets or sets whether this world object is active

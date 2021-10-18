@@ -307,7 +307,7 @@ namespace Isles.Engine
             set => ignoreDynamicObstacles = value;
         }
 
-        private bool ignoreDynamicObstacles = false;
+        private bool ignoreDynamicObstacles;
 
         /// <summary>
         /// Construct a landscape graph
@@ -353,7 +353,7 @@ namespace Isles.Engine
             // Initialize grid data
             InitializeEntry(resolution, occluders);
 
-            this.landscape = landscape;            
+            this.landscape = landscape;
         }
 
         private const int OutDegree = 8;
@@ -445,7 +445,7 @@ namespace Isles.Engine
 
             data[x, y]--;
         }
-        
+
         /// <summary>
         /// Mark one grid as dynamic obstacle. Input boundary is not checked.
         /// </summary>
@@ -512,7 +512,7 @@ namespace Isles.Engine
 
         public Point PositionToGrid(float x, float y)
         {
-            return new Point((int)(x / cellSize), (int)(y / cellSize));   
+            return new Point((int)(x / cellSize), (int)(y / cellSize));
         }
 
         public Point PositionToGrid(float x, float y, PathBrush brush)
@@ -550,7 +550,7 @@ namespace Isles.Engine
         /// </summary>
         public int PositionToIndex(Vector2 position)
         {
-            return (int)(position.X / cellSize) + (int)(position.Y / cellSize) * entryWidth;                   
+            return (int)(position.X / cellSize) + (int)(position.Y / cellSize) * entryWidth;
         }
 
         public int PositionToIndex(Vector2 position, PathBrush brush)
@@ -654,7 +654,7 @@ namespace Isles.Engine
         /// </summary>
         public IEnumerable<GraphEdge> GetEdges(int nodeIndex)
         {
-            GraphEdge edge; 
+            GraphEdge edge;
             bool connected;
             var x = nodeIndex % entryWidth;
             var y = nodeIndex / entryWidth;
@@ -700,7 +700,7 @@ namespace Isles.Engine
         }
     }
     #endregion
-     
+
     #region PathManager
     /// <summary>
     /// Path manager to provide path finding service
@@ -788,7 +788,7 @@ namespace Isles.Engine
         /// Number of pending path finding requests.
         /// Note that the length of the array pendingRequests isn't the real request count.
         /// </summary>
-        private int pendingRequestsCount = 0;
+        private int pendingRequestsCount;
 
         /// <summary>
         /// The query current active
@@ -1149,7 +1149,7 @@ namespace Isles.Engine
             var random = new Random();
 
             var queryCount = 1000;
-            var nodeCount = graph.NodeCount;
+            _ = graph.NodeCount;
 
             DateTime start = DateTime.Now;
             for (var i = 0; i < queryCount; i++)
@@ -1162,7 +1162,7 @@ namespace Isles.Engine
             Log.Write("Path query per frame (60 FPS): " +
                 1000 / 60 / (elapsed.TotalMilliseconds / queryCount));
         }
-        
+
         public void Mark(IMovable agent)
         {
             if (agent != null && agent.MovementTag is Tag)
@@ -1205,7 +1205,7 @@ namespace Isles.Engine
                 graph.Unmark(p.X, p.Y);
             }
         }
-        
+
 
         /// <summary>
         /// Gets the unobstructed grid that are nearest to the specified point.
@@ -1288,7 +1288,7 @@ namespace Isles.Engine
             {
                 lastPositionValue = lastPosition.Value;
             }
-                
+
 
             Vector2 newDirection, newTarget, lastDirection, originalDirection, prep;
             float distance = 0;
@@ -1304,7 +1304,7 @@ namespace Isles.Engine
                     return target + new Vector2(0.2f, 0.2f);
                 }
                 lastDirection = target - lastPositionValue;
-                if(lastDirection == Vector2.Zero)
+                if (lastDirection == Vector2.Zero)
                 {
                     lastDirection = originalDirection;
                     lastDirection.Normalize();
@@ -1464,7 +1464,7 @@ namespace Isles.Engine
 
             Unmark(agent);
 
-            foreach(Point p in graph.EnumerateGridsInBrush(new Vector2(x,y), agent.Brush))
+            foreach (Point p in graph.EnumerateGridsInBrush(new Vector2(x, y), agent.Brush))
             {
                 if (graph.IsGridObstructed(p.X, p.Y, !agent.IgnoreDynamicObstacles))
                 {
@@ -1488,14 +1488,14 @@ namespace Isles.Engine
             }
 
             Unmark(agent);
-            
+
             var step = Vector2.Subtract(end, start);
             step.Normalize();
             step *= graph.CellSize * 0.5f;
 
             var firstGrid = true;
             var steps = (int)(Vector2.Subtract(end, start).Length() / step.Length());
-                
+
             for (var i = 0; i < steps; i++)
             {
                 // Make it more precise on the first grid
@@ -1847,7 +1847,7 @@ namespace Isles.Engine
             if (totalSteps > 0)
             {
                 BaseGame.Singleton.Graphics2D.DrawString(
-                    "Finding Path...", 15f/23, new Vector2(0, 100), Color.White);
+                    "Finding Path...", 15f / 23, new Vector2(0, 100), Color.White);
             }
 #endif
         }

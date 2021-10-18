@@ -118,25 +118,25 @@ namespace Isles.Graphics
             set => achorType = value;
         }
         private AnchorType achorType;
-        
+
 
         /// <summary>
         /// Normalized vector around which the billboard is rotating
         /// </summary>
         public Vector3 Normal;
-       
+
 
         /// <summary>
         /// Size of the billboard
         /// </summary>
         public Vector2 Size;
-        
+
 
         /// <summary>
         /// Source rectangle (min, max). Measured in float [0 ~ 1]
         /// </summary>
         public Vector4 SourceRectangle;
-        
+
 
         /// <summary>
         /// Default source rectangle
@@ -164,7 +164,7 @@ namespace Isles.Graphics
     {
         private static Vector3 GetCenterPosition(Billboard billboard)
         {
-            if(billboard.AchorType == AnchorType.Top)
+            if (billboard.AchorType == AnchorType.Top)
             {
                 return billboard.Position - new Vector3(0, 0, billboard.Size.Y / 2);
             }
@@ -269,7 +269,7 @@ namespace Isles.Graphics
         public void Draw(Texture2D texture, Vector3 position,
             Vector2 size, Vector3 normal, Vector4 sourceRectangle, AnchorType achorType)
         {
-            var billboard = new Billboard() ;
+            var billboard = new Billboard();
 
             billboard.AchorType = achorType;
             billboard.Texture = texture;
@@ -448,7 +448,7 @@ namespace Isles.Graphics
             vertices[baseVertex + 1].TextureCoordinate0.Y =
             vertices[baseVertex + 0].TextureCoordinate0.Y = billboard.SourceRectangle.Y;
 
-            vertices[baseVertex + 1].TextureCoordinate0.X = 
+            vertices[baseVertex + 1].TextureCoordinate0.X =
             vertices[baseVertex + 2].TextureCoordinate0.X = billboard.SourceRectangle.Z;
 
             vertices[baseVertex + 3].TextureCoordinate0.Y =

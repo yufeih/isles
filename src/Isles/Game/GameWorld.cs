@@ -26,7 +26,7 @@ namespace Isles.Engine
         /// </summary>
         public const int Version = 1;
 
-        private sealed class InternalList<T> : BroadcastList<T, LinkedList<T>> {}
+        private sealed class InternalList<T> : BroadcastList<T, LinkedList<T>> { }
 
         /// <summary>
         /// Enumerates all world objects
@@ -284,7 +284,7 @@ namespace Isles.Engine
             //
             // Adjust light view and projection matrix based on current
             // camera position.
-            var eyeDistance = - game.Eye.Z / game.Facing.Z;
+            var eyeDistance = -game.Eye.Z / game.Facing.Z;
             Vector3 target = game.Eye + game.Facing * eyeDistance;
 
             // Make it closer to the eye
@@ -355,7 +355,7 @@ namespace Isles.Engine
                 }
             }
         }
-        
+
 
         /// <summary>
         /// Load the game world from a file
@@ -397,7 +397,7 @@ namespace Isles.Engine
 
             // Create a path manager for the landscape
             pathManager = new PathManager(landscape, ReadOccluders(node));
-            
+
             // Name & description
             Name = node.GetAttribute("Name");
             Description = node.GetAttribute("Description");
@@ -438,9 +438,8 @@ namespace Isles.Engine
         private static List<Point> ReadOccluders(XmlElement node)
         {
             List<Point> occluders = null;
-            var occluderNode = node.SelectSingleNode("PathOccluder") as XmlElement;
 
-            if (occluderNode != null && occluderNode.HasAttribute("Value"))
+            if (node.SelectSingleNode("PathOccluder") is XmlElement occluderNode && occluderNode.HasAttribute("Value"))
             {
                 var p = new Point();
                 var first = true;
@@ -549,7 +548,7 @@ namespace Isles.Engine
         public static void RegisterCreator(string typeName, Creator creator)
         {
             var index = Creators.Count;
-            
+
             Creators.Add(typeName, creator);
             IndexToType.Add(index, typeName);
             TypeToIndex.Add(typeName, index);
@@ -560,9 +559,8 @@ namespace Isles.Engine
         /// </summary>
         public static int CreatorIndexFromType(string typeName)
         {
-            int index;
 
-            return TypeToIndex.TryGetValue(typeName, out index) ? index : -1;
+            return TypeToIndex.TryGetValue(typeName, out var index) ? index : -1;
         }
 
         /// <summary>
@@ -570,9 +568,8 @@ namespace Isles.Engine
         /// </summary>
         public static string CreatorTypeFromIndex(int index)
         {
-            string type;
 
-            return IndexToType.TryGetValue(index, out type) ? type : null;
+            return IndexToType.TryGetValue(index, out var type) ? type : null;
         }
 
         /// <summary>
@@ -675,7 +672,7 @@ namespace Isles.Engine
             // of the ray each step with a value of PickPrecision.
             // A pick precision of half the grid size is good.
             const float PickPrecision = 5.0f;
-            
+
             // This is the bounding box for all game entities
             BoundingBox boundingBox = landscape.TerrainBoundingBox;
             boundingBox.Max.Z += Entity.MaxHeight;
@@ -758,7 +755,7 @@ namespace Isles.Engine
         #endregion
 
         #region ISceneManager Members
-        private int ObjectCounter = 0;
+        private int ObjectCounter;
 
         /// <summary>
         /// Adds a new world object
@@ -767,9 +764,8 @@ namespace Isles.Engine
         {
             worldObjects.Add(worldObject);
 
-            var entity = worldObject as Entity;
 
-            if (entity != null)
+            if (worldObject is Entity entity)
             {
                 entity.OnCreate();
 
@@ -785,7 +781,7 @@ namespace Isles.Engine
                 //Log.Write("[Warning] WorldObject name conflict: " + worldObject.Name);
                 key = worldObject.Name + "_" + (ObjectCounter++);
             }
-            
+
             nameToWorldObject.Add(key, worldObject);
         }
 
@@ -807,9 +803,8 @@ namespace Isles.Engine
             }
 
             // Remove it from selected and highlighed
-            var e = worldObject as Entity;
 
-            if (e != null)
+            if (worldObject is Entity e)
             {
                 e.OnDestroy();
             }
@@ -843,9 +838,8 @@ namespace Isles.Engine
 
             worldObject.IsActive = true;
 
-            var grids = worldObject.SceneManagerTag as List<Point>;
 
-            if (grids == null)
+            if (worldObject.SceneManagerTag is not List<Point> grids)
             {
                 grids = new List<Point>();
                 worldObject.SceneManagerTag = grids;
@@ -883,9 +877,8 @@ namespace Isles.Engine
 
             worldObject.IsActive = false;
 
-            var grids = worldObject.SceneManagerTag as List<Point>;
 
-            if (grids == null)
+            if (worldObject.SceneManagerTag is not List<Point> grids)
             {
                 throw new InvalidOperationException();
             }
@@ -944,9 +937,7 @@ namespace Isles.Engine
 
             foreach (IWorldObject o in Data[grid.X, grid.Y].Owners)
             {
-                var e = o as Entity;
-
-                if (e != null && e.Intersects(point))
+                if (o is Entity e && e.Intersects(point))
                 {
                     yield return e;
                 }
@@ -983,9 +974,7 @@ namespace Isles.Engine
             // This is a really slow method
             foreach (IWorldObject o in worldObjects)
             {
-                var e = o as Entity;
-
-                if (e != null && e.Intersects(boundingFrustum))
+                if (o is Entity e && e.Intersects(boundingFrustum))
                 {
                     yield return e;
                 }
@@ -1031,8 +1020,7 @@ namespace Isles.Engine
 
         public IWorldObject ObjectFromName(string name)
         {
-            IWorldObject o;
-            return nameToWorldObject.TryGetValue(name, out o) ? o : null;
+            return nameToWorldObject.TryGetValue(name, out IWorldObject o) ? o : null;
         }
 
         #endregion
@@ -1085,9 +1073,9 @@ namespace Isles.Engine
         /// </summary>
         public float GridSizeOnYAxis => gridSizeOnYAxis;
 
-        public Vector2 GridSize => new Vector2(gridSizeOnXAxis, gridSizeOnYAxis);
+        public Vector2 GridSize => new(gridSizeOnXAxis, gridSizeOnYAxis);
 
-        public Point GridCount => new Point(gridCountOnXAxis, gridCountOnYAxis);
+        public Point GridCount => new(gridCountOnXAxis, gridCountOnYAxis);
 
         /// <summary>
         /// Checks if a grid is within the boundery of the terrain

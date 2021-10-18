@@ -12,7 +12,7 @@ namespace Isles.Editor
 {
     public partial class ShadowEditor : Form
     {
-        private readonly GameWorld world;        
+        private readonly GameWorld world;
 
         public ShadowEditor(GameWorld gameWorld)
         {

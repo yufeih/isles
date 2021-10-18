@@ -32,7 +32,7 @@ namespace Isles.Engine
         /// information, section Input). We store our own array of keys from
         /// the last frame for comparing stuff.
         /// </summary>
-        private KeyboardState keyboardState = 
+        private KeyboardState keyboardState =
             Microsoft.Xna.Framework.Input.Keyboard.GetState();
 
         /// <summary>
@@ -45,13 +45,13 @@ namespace Isles.Engine
         /// scroll value, but we usually need the current delta!
         /// </summary>
         /// <returns>0</returns>
-        private int mouseWheelDelta = 0;
-        private int mouseWheelValue = 0;
+        private int mouseWheelDelta;
+        private int mouseWheelValue;
 
         /// <summary>
         /// Mouse position
         /// </summary>
-        public Point MousePosition => new Point(mouseState.X, mouseState.Y);
+        public Point MousePosition => new(mouseState.X, mouseState.Y);
 
         /// <summary>
         /// Gets current mouse state
@@ -408,8 +408,8 @@ namespace Isles.Engine
         /// <summary>
         /// Flag for simulating double click
         /// </summary>
-        private int doubleClickFlag = 0;
-        private double doubleClickTime = 0;
+        private int doubleClickFlag;
+        private double doubleClickTime;
 
         /// <summary>
         /// Update, called from BaseGame.Update().
@@ -423,7 +423,7 @@ namespace Isles.Engine
 
             mouseWheelDelta = mouseState.ScrollWheelValue - mouseWheelValue;
             mouseWheelValue = mouseState.ScrollWheelValue;
-                        
+
             // Handle keyboard input
             keysPressedLastFrame = new List<Keys>(keyboardState.GetPressedKeys());
             keyboardState = Microsoft.Xna.Framework.Input.Keyboard.GetState();
@@ -531,7 +531,7 @@ namespace Isles.Engine
             // Stop when the event is handled.
             foreach (Entry entry in handlers)
             {
-                if (entry.Handler.HandleEvent(type, this, key) == 
+                if (entry.Handler.HandleEvent(type, this, key) ==
                     EventResult.Handled)
                 {
                     break;

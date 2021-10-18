@@ -84,7 +84,7 @@ namespace Isles
         /// </summary>
         public static Texture2D SnapshotTexture
         {
-            get 
+            get
             {
                 if (snapshotTexture == null)
                 {
@@ -139,7 +139,7 @@ namespace Isles
         /// Gets or sets the sound effect for combat
         /// </summary>
         public string SoundCombat;
-        
+
         /// <summary>
         /// Gets or sets the sound effect for die
         /// </summary>
@@ -235,8 +235,8 @@ namespace Isles
         /// </summary>
         public bool IsAlive => health > 0 || (health <= 0 && maximumHealth <= 0);
 
-        private float maximumHealth = 0;
-        private float health = 0;
+        private float maximumHealth;
+        private float health;
 
         /// <summary>
         /// Gets or sets game object spells
@@ -343,7 +343,7 @@ namespace Isles
         /// Min/Max defense point
         /// </summary>
         public Vector2 DefensePoint;
-        
+
         /// <summary>
         /// Gets or sets the min/max attack range of this charactor
         /// </summary>
@@ -359,7 +359,7 @@ namespace Isles
         /// </summary>
         private const float FlashDuration = 0.5f;
         private float flashElapsedTime = FlashDuration + 0.1f;
-        
+
         /// <summary>
         /// Get or sets the attachment of the game model
         /// </summary>
@@ -371,12 +371,11 @@ namespace Isles
         public GameObject(GameWorld world, string classID)
             : base(world)
         {
-            XmlElement xml;
 
-            if (GameDefault.Singleton.WorldObjectDefaults.TryGetValue(classID, out xml))
+            if (GameDefault.Singleton.WorldObjectDefaults.TryGetValue(classID, out XmlElement xml))
             {
                 Deserialize(xml);
-            } 
+            }
         }
 
         /// <summary>
@@ -510,12 +509,12 @@ namespace Isles
                 profileButton.Anchor = Anchor.BottomLeft;
                 profileButton.ScaleMode = ScaleMode.ScaleY;
 
-                profileButton.Click += new EventHandler(delegate(object sender, EventArgs e)
+                profileButton.Click += new EventHandler(delegate (object sender, EventArgs e)
                 {
                     Player.LocalPlayer.Focus(this);
                 });
 
-                profileButton.DoubleClick += new EventHandler(delegate(object sender, EventArgs e)
+                profileButton.DoubleClick += new EventHandler(delegate (object sender, EventArgs e)
                 {
                     Player.LocalPlayer.SelectGroup(this);
                 });
@@ -727,7 +726,7 @@ namespace Isles
         /// <summary>
         /// Gets or sets whether this game object is currently in the fog of war
         /// </summary>
-        public bool InFogOfWar = false;
+        public bool InFogOfWar;
 
         /// <summary>
         /// Gets or sets whether this game object will be shown in the fog of war
@@ -806,7 +805,7 @@ namespace Isles
                 }
 
                 if (IsAlive && maximumHealth > 0)
-                {                                        
+                {
                     if (Highlighted || World.Game.Input.Keyboard.IsKeyDown(Keys.LeftAlt) ||
                                        World.Game.Input.Keyboard.IsKeyDown(Keys.RightAlt))
                     {
@@ -830,7 +829,7 @@ namespace Isles
         protected virtual TipBox CreateTipBox()
         {
             TextField content = null;
-            var title = new TextField(Name, 16f / 23, Color.Gold, 
+            var title = new TextField(Name, 16f / 23, Color.Gold,
                                             new Rectangle(0, 6, 150, 20));
             title.Centered = true;
             if (Owner.Name != null && Owner.Name != "")
@@ -905,7 +904,7 @@ namespace Isles
         /// <summary>
         /// Whether this game object has been spotted by local player
         /// </summary>
-        public bool Spotted = false;
+        public bool Spotted;
 
         /// <summary>
         /// Copyed model for drawing in the fog of war
@@ -1025,7 +1024,7 @@ namespace Isles
         /// <summary>
         /// Whether trees are pickable
         /// </summary>
-        public static bool Pickable = false;
+        public static bool Pickable;
 
         /// <summary>
         /// Gets or sets how many wood the tree can provide
@@ -1062,7 +1061,7 @@ namespace Isles
             }
         }
 
-        private bool everGreen = false;
+        private bool everGreen;
 
         /// <summary>
         /// Gets or sets how many peons are harvesting this tree
@@ -1080,9 +1079,9 @@ namespace Isles
             }
         }
 
-        private int harvesterCount = 0;
+        private int harvesterCount;
         private Vector3 rotationAxis;
-        private float shakeTime = 0;
+        private float shakeTime;
         private float totalShakeTime = 0.2f;
         private float maxShakeAngle;
         private Quaternion treeRotation;
@@ -1182,7 +1181,7 @@ namespace Isles
                     glow.Update(gameTime);
                 }
 
-                if (star!= null)
+                if (star != null)
                 {
                     star.Update(gameTime);
                 }
@@ -1230,7 +1229,7 @@ namespace Isles
             }
         }
 
-        private int harvesterCount = 0;
+        private int harvesterCount;
 
         /// <summary>
         /// Gets or sets how much gold the goldmine have
@@ -1286,12 +1285,12 @@ namespace Isles
             }
 
             // Read in obstructor & spawn point
-            if ((value = xml.GetAttribute("ObstructorSize")) != "")
+            if ((_ = xml.GetAttribute("ObstructorSize")) != "")
             {
                 obstructorSize = Helper.StringToVector2(xml.GetAttribute("ObstructorSize")) / 2;
             }
 
-            if ((value = xml.GetAttribute("SpawnPoint")) != "")
+            if ((_ = xml.GetAttribute("SpawnPoint")) != "")
             {
                 SpawnPoint = new Vector3(Helper.StringToVector2(xml.GetAttribute("SpawnPoint")), 0);
             }
@@ -1383,9 +1382,7 @@ namespace Isles
             // Checks if anyone hits me
             foreach (IWorldObject wo in World.GetNearbyObjects(Position, 20))
             {
-                var o = wo as Charactor;
-
-                if (o != null && o.Owner != null && 
+                if (wo is Charactor o && o.Owner != null &&
                     o.Outline.DistanceTo(Outline.Position) < 5)
                 {
                     // Open the box of pandora
@@ -1597,7 +1594,7 @@ namespace Isles
             DepthStencilBuffer prevDepth = graphics.DepthStencilBuffer;
 
             graphics.DepthStencilBuffer = depthBuffer;
-            
+
             // Draw all ruined regions
             graphics.SetRenderTarget(0, currentCanvas);
             graphics.Clear(Color.Black);
@@ -1618,7 +1615,7 @@ namespace Isles
             }
 
             sprite.End();
-            
+
             // Draw discovered area texture without clearing it
             graphics.SetRenderTarget(0, null);
             graphics.DepthStencilBuffer = prevDepth;
@@ -1767,7 +1764,7 @@ namespace Isles
         /// Creates a new missile
         /// </summary>
         public Missile(GameWorld world, GameModel ammo, IWorldObject target)
-            :base(world)
+            : base(world)
         {
             if (ammo == null || target == null)
             {
@@ -1807,7 +1804,7 @@ namespace Isles
             desiredVelocity *= MaxSpeed;
 
             Vector3 force = desiredVelocity - velocity;
-            
+
             if (force.Length() > MaxForce)
             {
                 force.Normalize();
@@ -1843,7 +1840,7 @@ namespace Isles
 
             var rotation = Matrix.CreateFromAxisAngle(rotationAxis, angle);
             var translation = Matrix.CreateTranslation(Position);
-            
+
             if (ammo != null)
             {
                 ammo.Transform = Matrix.CreateScale(scaling) * rotation * translation;

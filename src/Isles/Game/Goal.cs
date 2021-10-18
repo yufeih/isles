@@ -36,7 +36,7 @@ namespace Isles
         }
     }
     #endregion
-   
+
     #region GoalDevelop
     public class GoalDevelop : Goal
     {
@@ -82,7 +82,7 @@ namespace Isles
             LumbermillFactor = Helper.RandomInRange(0.9f, 1.1f);
         }
 
-        private int arbitrateCounter = 0;
+        private int arbitrateCounter;
 
         public override void Arbitrate()
         {
@@ -116,9 +116,7 @@ namespace Isles
             // Check peon states
             foreach (Entity e in owner.EnumerateObjects(owner.WorkerName))
             {
-                var o = e as Worker;
-
-                if (o == null || o.Owner != owner)
+                if (e is not Worker o || o.Owner != owner)
                 {
                     continue;
                 }
@@ -181,7 +179,7 @@ namespace Isles
 
             // Train peons if we're still short of workers
             owner.Request(owner.WorkerName, HarvesterCount + MineDiggerCount,
-                (2.0f + 1.0f * (HarvesterCount + MineDiggerCount - count) / 5 ));
+                (2.0f + 1.0f * (HarvesterCount + MineDiggerCount - count) / 5));
         }
 
         private void FeedRequests()
@@ -204,11 +202,10 @@ namespace Isles
                 (1.2f + 2.3f * (owner.Food - owner.FoodCapacity + 5) / 5) * FarmFactor);
 
             // Currently requests are fixed :(
-            int militiaCount = 0, hunterCount = 0, barracksCount = 0;
 
-            owner.FutureObjects.TryGetValue(owner.Race == Race.Islander ? "Militia" : "Swordman", out militiaCount);
-            owner.FutureObjects.TryGetValue(owner.Race == Race.Islander ? "Hunter" : "Rifleman", out hunterCount);
-            owner.FutureObjects.TryGetValue(owner.Race == Race.Islander ? "Barracks" : "TrainingCenter", out barracksCount);
+            owner.FutureObjects.TryGetValue(owner.Race == Race.Islander ? "Militia" : "Swordman", out var militiaCount);
+            owner.FutureObjects.TryGetValue(owner.Race == Race.Islander ? "Hunter" : "Rifleman", out var hunterCount);
+            owner.FutureObjects.TryGetValue(owner.Race == Race.Islander ? "Barracks" : "TrainingCenter", out var barracksCount);
 
             owner.Request(owner.HeroName, 1, 2.5f * HeroFactor);
             owner.Request(owner.TownhallName, 1, 3.5f * TownhallFactor);
@@ -217,7 +214,7 @@ namespace Isles
             owner.Request(owner.Race == Race.Islander ? "Militia" : "Swordman", 20,
                 (1.5f + 1.0f * (4 - militiaCount) / 4) * MilitiaFactor);
 
-            owner.Request(owner.Race == Race.Islander ? "Hunter" : "Rifleman", 20, 
+            owner.Request(owner.Race == Race.Islander ? "Hunter" : "Rifleman", 20,
                 (1.5f + 1.0f * (4 - hunterCount) / 4) * HunterFactor);
 
             owner.Request(owner.Race == Race.Islander ? "Barracks" : "TrainingCenter", 2,
@@ -225,7 +222,7 @@ namespace Isles
 
             owner.Request(owner.Race == Race.Islander ? "Lumbermill" : "Regenerator", 1, 2 * LumbermillFactor);
 
-            owner.Request("AttackUpgrade", 1, 
+            owner.Request("AttackUpgrade", 1,
                 (1.0f + 1.5f * (militiaCount + hunterCount) / 4) * AttackUpgradeFactor);
 
             owner.Request("DefenseUpgrade", 1,
@@ -286,7 +283,7 @@ namespace Isles
         private readonly GameWorld world;
         private readonly ComputerPlayer owner;
         public float MilitaryAdvantage;
-        private int advantageCounter = 0;
+        private int advantageCounter;
 
         public GoalAttack(GameWorld world, ComputerPlayer player)
         {
@@ -451,8 +448,7 @@ namespace Isles
 
         public override void Arbitrate()
         {
-            int attackerCount;
-            Vector3? attacker = UnderAttack(out attackerCount);
+            Vector3? attacker = UnderAttack(out var attackerCount);
 
             if (attacker.HasValue)
             {
@@ -462,9 +458,7 @@ namespace Isles
                 foreach (IWorldObject o in
                     world.GetNearbyObjects(owner.Townhall.Position, 200))
                 {
-                    var c = o as Charactor;
-
-                    if (c != null && c.Owner == owner && !(c is Worker))
+                    if (o is Charactor c && c.Owner == owner && !(c is Worker))
                     {
                         defenderCounter++;
                         c.AttackTo(attacker.Value, false);

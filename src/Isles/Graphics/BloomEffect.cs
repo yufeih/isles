@@ -100,7 +100,7 @@ namespace Isles.Graphics
         };
     }
     #endregion
-    
+
     #region BloomEffect
     public class BloomEffect : DrawableGameComponent
     {
@@ -178,7 +178,7 @@ namespace Isles.Graphics
             SurfaceFormat format = pp.BackBufferFormat;
 
             // Create a texture for reading back the backbuffer contents.
-            resolveTarget = new ResolveTexture2D(GraphicsDevice, width, height, 1, 
+            resolveTarget = new ResolveTexture2D(GraphicsDevice, width, height, 1,
                 format);
 
             // Create two rendertargets for the bloom processing. These are half the
@@ -188,9 +188,9 @@ namespace Isles.Graphics
             width /= 2;
             height /= 2;
 
-            renderTarget1 = new RenderTarget2D(GraphicsDevice, width, height, 1, 
+            renderTarget1 = new RenderTarget2D(GraphicsDevice, width, height, 1,
                 format);
-            renderTarget2 = new RenderTarget2D(GraphicsDevice, width, height, 1, 
+            renderTarget2 = new RenderTarget2D(GraphicsDevice, width, height, 1,
                 format);
         }
 

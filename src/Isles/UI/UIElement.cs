@@ -104,7 +104,7 @@ namespace Isles.UI
         /// Size of the UI element is alway fixed
         /// </summary>
         Fixed,
-        
+
         /// <summary>
         /// Size changes based on width, but width/height is fixed
         /// </summary>
@@ -115,7 +115,7 @@ namespace Isles.UI
         /// This scale mode is supposed to be used for most UIElement
         /// </summary>
         ScaleY,
-        
+
         /// <summary>
         /// Width and height all changes 
         /// </summary>
@@ -168,7 +168,7 @@ namespace Isles.UI
         }
 
         public Graphics2D Graphics2D = BaseGame.Singleton.Graphics2D;
-        
+
         /// <summary>
         /// Whether destination rectangle is dirty
         /// </summary>
@@ -464,7 +464,7 @@ namespace Isles.UI
                     relativeRectangle.X = (int)((parent.DestinationRectangle.Left + parent.DestinationRectangle.Right
                                             - rectangle.Width * widthScale) / 2);
                     relativeRectangle.Y = (int)((parent.DestinationRectangle.Top + parent.DestinationRectangle.Bottom
-                                            - rectangle.Height * widthScale) / 2); 
+                                            - rectangle.Height * widthScale) / 2);
                 }
                 else
                 {
@@ -473,10 +473,10 @@ namespace Isles.UI
                     relativeRectangle.X = (int)((parent.DestinationRectangle.Left + parent.DestinationRectangle.Right
                                             - rectangle.Width * heightScale) / 2);
                     relativeRectangle.Y = (int)((parent.DestinationRectangle.Top + parent.DestinationRectangle.Bottom
-                                            - rectangle.Height * heightScale) / 2); 
+                                            - rectangle.Height * heightScale) / 2);
                 }
             }
-            
+
 
             return relativeRectangle;
         }

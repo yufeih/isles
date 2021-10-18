@@ -328,7 +328,7 @@ namespace Isles.Engine
         /// <param name="filename"></param>
         private void DeleteExtractedFile(string filename)
         {
-            for (var i =0; i < extractedFiles.Count; i++)
+            for (var i = 0; i < extractedFiles.Count; i++)
             {
                 if (extractedFiles[i].Equals(filename))
                 {
@@ -449,7 +449,7 @@ namespace Isles.Engine
         private const int ZipEntrySignature = 0x04034b50;
         private const int ZipEntryDataDescriptorSignature = 0x08074b50;
 
-        private bool _Debug = false;
+        private bool _Debug;
 
         private DateTime _LastModified;
         public DateTime LastModified => _LastModified;
@@ -572,11 +572,11 @@ namespace Isles.Engine
             var extraFieldLength = (short)(block[i++] + block[i++] * 256);
 
             block = new byte[filenameLength];
-            n = s.Read(block, 0, block.Length);
+            _ = s.Read(block, 0, block.Length);
             ze._FileName = Shared.StringFromBuffer(block, 0, block.Length);
 
             ze._Extra = new byte[extraFieldLength];
-            n = s.Read(ze._Extra, 0, ze._Extra.Length);
+            _ = s.Read(ze._Extra, 0, ze._Extra.Length);
 
             // transform the time data into something usable
             ze._LastModified = Shared.PackedToDateTime(ze._LastModDateTime);
@@ -1187,7 +1187,7 @@ namespace Isles.Engine
 
         internal const int ZipDirEntrySignature = 0x02014b50;
 
-        private bool _Debug = false;
+        private bool _Debug;
 
         private ZipDirEntry() { }
 
@@ -1271,20 +1271,20 @@ namespace Isles.Engine
             var filenameLength = (short)(block[i++] + block[i++] * 256);
             var extraFieldLength = (short)(block[i++] + block[i++] * 256);
             var commentLength = (short)(block[i++] + block[i++] * 256);
-            var diskNumber = (short)(block[i++] + block[i++] * 256);
-            var internalFileAttrs = (short)(block[i++] + block[i++] * 256);
-            var externalFileAttrs = block[i++] + block[i++] * 256 + block[i++] * 256 * 256 + block[i++] * 256 * 256 * 256;
-            var Offset = block[i++] + block[i++] * 256 + block[i++] * 256 * 256 + block[i++] * 256 * 256 * 256;
+            _ = (short)(block[i++] + block[i++] * 256);
+            _ = (short)(block[i++] + block[i++] * 256);
+            _ = block[i++] + block[i++] * 256 + block[i++] * 256 * 256 + block[i++] * 256 * 256 * 256;
+            _ = block[i++] + block[i++] * 256 + block[i++] * 256 * 256 + block[i++] * 256 * 256 * 256;
 
             block = new byte[filenameLength];
-            n = s.Read(block, 0, block.Length);
+            _ = s.Read(block, 0, block.Length);
             zde._FileName = Shared.StringFromBuffer(block, 0, block.Length);
 
             zde._Extra = new byte[extraFieldLength];
-            n = s.Read(zde._Extra, 0, zde._Extra.Length);
+            _ = s.Read(zde._Extra, 0, zde._Extra.Length);
 
             block = new byte[commentLength];
-            n = s.Read(block, 0, block.Length);
+            _ = s.Read(block, 0, block.Length);
             zde._Comment = Shared.StringFromBuffer(block, 0, block.Length);
 
             return zde;
@@ -1646,10 +1646,10 @@ namespace Isles.Engine
 
         private Stream _readstream;
         private FileStream _writestream;
-        private bool _Debug = false;
-        private bool _disposed = false;
-        private List<ZipEntry> _entries = null;
-        private List<ZipDirEntry> _direntries = null;
+        private bool _Debug;
+        private bool _disposed;
+        private List<ZipEntry> _entries;
+        private List<ZipDirEntry> _direntries;
     }
     #endregion
 
@@ -1663,7 +1663,7 @@ namespace Isles.Engine
         private readonly UInt32[] crc32Table;
         private const int BUFFER_SIZE = 8192;
 
-        private Int32 _TotalBytesRead = 0;
+        private Int32 _TotalBytesRead;
         public Int32 TotalBytesRead => _TotalBytesRead;
 
         /// <summary>

@@ -55,10 +55,10 @@ namespace Isles
                 }
 
                 playerInfoFromMap.Add(info);
-            
+
                 // Remove those tag from xml since the world do not recognize them
                 xml.RemoveChild(child);
-            }            
+            }
 
             CreatePlayers(playerInfoFromMap);
 
@@ -224,11 +224,11 @@ namespace Isles
                 CreateDependency(player);
 
                 // Create startup objects
-                CreateStartup(world, player, new Vector3(player.SpawnPoint, 0));   
+                CreateStartup(world, player, new Vector3(player.SpawnPoint, 0));
             }
 
             base.Start(world);
-            
+
             // Select peons
             Player.LocalPlayer.SelectMultiple(
                 Player.LocalPlayer.EnumerateObjects(
@@ -310,9 +310,7 @@ namespace Isles
 
             for (var i = 0; i < 5; i++)
             {
-                var peon = GameServer.Singleton.Create(worker) as Worker;
-
-                if (peon != null)
+                if (GameServer.Singleton.Create(worker) is Worker peon)
                 {
                     peon.Position = building.Position + building.SpawnPoint;
                     peon.Owner = player;

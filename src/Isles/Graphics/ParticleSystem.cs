@@ -37,12 +37,12 @@ namespace Isles.Graphics
         /// <summary>
         /// Name used to identify different settings
         /// </summary>
-        public string Name = null;
+        public string Name;
 
         /// <summary>
         /// Name of the texture used by this particle system.
         /// </summary>
-        public string TextureName = null;
+        public string TextureName;
 
         /// <summary>
         /// Maximum number of particles that can be displayed at one time.
@@ -58,7 +58,7 @@ namespace Isles.Graphics
         /// <summary>
         /// If greater than zero, some particles will last a shorter time than others. 
         /// </summary>
-        public float DurationRandomness = 0;
+        public float DurationRandomness;
 
         /// <summary>
         /// Controls how much particles are influenced by the velocity of the object
@@ -74,16 +74,16 @@ namespace Isles.Graphics
         /// particle. Values for individual particles are randomly chosen from somewhere
         /// between these limits.
         /// </summary>
-        public float MinHorizontalVelocity = 0;
-        public float MaxHorizontalVelocity = 0;
+        public float MinHorizontalVelocity;
+        public float MaxHorizontalVelocity;
 
         /// <summary>
         /// Range of values controlling how much Y axis velocity to give each particle.
         /// Values for individual particles are randomly chosen from somewhere between
         /// these limits.
         /// </summary>
-        public float MinVerticalVelocity = 0;
-        public float MaxVerticalVelocity = 0;
+        public float MinVerticalVelocity;
+        public float MaxVerticalVelocity;
 
         /// <summary>
         /// Direction and strength of the gravity effect. Note that this can point in any
@@ -116,8 +116,8 @@ namespace Isles.Graphics
         /// means if you don't need the rotation effect, you may get a performance
         /// boost from leaving these values at 0.
         /// </summary>
-        public float MinRotateSpeed = 0;
-        public float MaxRotateSpeed = 0;
+        public float MinRotateSpeed;
+        public float MaxRotateSpeed;
 
         /// <summary>
         /// Range of values controlling how big the particles are when first created.
@@ -338,7 +338,7 @@ namespace Isles.Graphics
             return null;
         }
 
-        
+
         /// <summary>
         /// Flush all the particle system effects onto the screen
         /// </summary>
@@ -896,7 +896,7 @@ namespace Isles.Graphics
             if (elapsedTime > 0)
             {
                 // Work out how fast we are moving.
-                Vector3 velocity = newVelocity.HasValue? newVelocity.Value :
+                Vector3 velocity = newVelocity.HasValue ? newVelocity.Value :
                                    (newPosition - previousPosition) / elapsedTime;
 
                 // If we had any time left over that we didn't use during the

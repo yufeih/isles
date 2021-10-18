@@ -40,15 +40,13 @@ namespace Isles
         /// </summary>
         public float GetLumber(string type)
         {
-            float i;
-            if (lumber.TryGetValue(type, out i))
+            if (lumber.TryGetValue(type, out var i))
             {
                 return i;
             }
 
             string value;
-            XmlElement element;
-            if (WorldObjectDefaults.TryGetValue(type, out element))
+            if (WorldObjectDefaults.TryGetValue(type, out XmlElement element))
             {
                 if ((value = element.GetAttribute("Lumber")) != "")
                 {
@@ -76,15 +74,13 @@ namespace Isles
         /// </summary>
         public float GetGold(string type)
         {
-            float i;
-            if (gold.TryGetValue(type, out i))
+            if (gold.TryGetValue(type, out var i))
             {
                 return i;
             }
 
             string value;
-            XmlElement element;
-            if (WorldObjectDefaults.TryGetValue(type, out element))
+            if (WorldObjectDefaults.TryGetValue(type, out XmlElement element))
             {
                 if ((value = element.GetAttribute("Gold")) != "")
                 {
@@ -112,15 +108,13 @@ namespace Isles
         /// </summary>
         public float GetFood(string type)
         {
-            float i;
-            if (food.TryGetValue(type, out i))
+            if (food.TryGetValue(type, out var i))
             {
                 return i;
             }
 
             string value;
-            XmlElement element;
-            if (WorldObjectDefaults.TryGetValue(type, out element))
+            if (WorldObjectDefaults.TryGetValue(type, out XmlElement element))
             {
                 if ((value = element.GetAttribute("Food")) != "")
                 {
@@ -148,15 +142,13 @@ namespace Isles
         /// </summary>
         public bool IsUnique(string type)
         {
-            bool i;
-            if (isUnique.TryGetValue(type, out i))
+            if (isUnique.TryGetValue(type, out var i))
             {
                 return i;
             }
 
             string value;
-            XmlElement element;
-            if (WorldObjectDefaults.TryGetValue(type, out element))
+            if (WorldObjectDefaults.TryGetValue(type, out XmlElement element))
             {
                 if ((value = element.GetAttribute("IsUnique")) != "")
                 {
@@ -199,16 +191,12 @@ namespace Isles
             }
 
             // Gets world object defaults
-            var element =
-                doc.DocumentElement.SelectSingleNode("WorldObject") as XmlElement;
 
-            if (element != null)
+            if (doc.DocumentElement.SelectSingleNode("WorldObject") is XmlElement element)
             {
                 foreach (XmlNode node in element.ChildNodes)
                 {
-                    var child = node as XmlElement;
-
-                    if (child != null)
+                    if (node is XmlElement child)
                     {
                         WorldObjectDefaults.Add(child.Name, child);
                     }
@@ -222,9 +210,7 @@ namespace Isles
             {
                 foreach (XmlNode node in element.ChildNodes)
                 {
-                    var child = node as XmlElement;
-
-                    if (child != null)
+                    if (node is XmlElement child)
                     {
                         SpellDefaults.Add(child.Name, child);
                     }
@@ -283,10 +269,9 @@ namespace Isles
                 return;
             }
 
-            XmlElement value;
 
             // Get default XML node describing the object type
-            if (WorldObjectDefaults.TryGetValue(type, out value))
+            if (WorldObjectDefaults.TryGetValue(type, out XmlElement value))
             {
                 foreach (XmlAttribute attribute in value.Attributes)
                 {

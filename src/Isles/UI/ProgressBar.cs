@@ -16,7 +16,7 @@ namespace Isles.UI
 
         //About time control
 
-        private double hightLightCycle = 2.5 ;
+        private double hightLightCycle = 2.5;
 
         public bool HighLightOn = true;
 
@@ -28,7 +28,7 @@ namespace Isles.UI
 
         private double staringTime;
 
-        public double  StartingTime
+        public double StartingTime
         {
             get => staringTime;
             set => staringTime = value;
@@ -98,7 +98,7 @@ namespace Isles.UI
             set => sourceRectangleFiller = value;
         }
 
-        private int persentage = 0;
+        private int persentage;
 
         public int Persentage
         {
@@ -155,20 +155,20 @@ namespace Isles.UI
         public override void Draw(GameTime gameTime, SpriteBatch sprite)
         {
             // Draw the progress
-            if(FillingRectangle.Width > 2 * EndLength)
+            if (FillingRectangle.Width > 2 * EndLength)
             {
-                sprite.Draw(Texture, new Rectangle(FillingRectangle.X, FillingRectangle.Y, 
+                sprite.Draw(Texture, new Rectangle(FillingRectangle.X, FillingRectangle.Y,
                             EndLength, FillingRectangle.Height), sourceRectangleLeftEnd, Color.White);
-                sprite.Draw(Texture, new Rectangle(FillingRectangle.Right - EndLength, 
-                            FillingRectangle.Y, EndLength, FillingRectangle.Height),sourceRectangleRightEnd, Color.White);
-                sprite.Draw(Texture, new Rectangle(FillingRectangle.X + EndLength, FillingRectangle.Y, 
-                            FillingRectangle.Width - 2 * EndLength, FillingRectangle.Height),SourceRectangleFiller, Color.White);
+                sprite.Draw(Texture, new Rectangle(FillingRectangle.Right - EndLength,
+                            FillingRectangle.Y, EndLength, FillingRectangle.Height), sourceRectangleRightEnd, Color.White);
+                sprite.Draw(Texture, new Rectangle(FillingRectangle.X + EndLength, FillingRectangle.Y,
+                            FillingRectangle.Width - 2 * EndLength, FillingRectangle.Height), SourceRectangleFiller, Color.White);
             }
             else
             {
-                sprite.Draw(Texture, new Rectangle(FillingRectangle.X, FillingRectangle.Y, FillingRectangle.Width / 2, 
+                sprite.Draw(Texture, new Rectangle(FillingRectangle.X, FillingRectangle.Y, FillingRectangle.Width / 2,
                             FillingRectangle.Height), sourceRectangleLeftEnd, Color.White);
-                sprite.Draw(Texture, new Rectangle(FillingRectangle.X + FillingRectangle.Width / 2, FillingRectangle.Y, 
+                sprite.Draw(Texture, new Rectangle(FillingRectangle.X + FillingRectangle.Width / 2, FillingRectangle.Y,
                             FillingRectangle.Width / 2, FillingRectangle.Height), sourceRectangleRightEnd, Color.White);
             }
             /*

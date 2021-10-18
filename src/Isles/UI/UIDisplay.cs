@@ -274,13 +274,13 @@ namespace Isles.UI
 
             sprite.End();
         }
-        
+
         /// <summary>
         /// Handle UI input
         /// </summary>
         public EventResult HandleEvent(EventType type, object sender, object tag)
         {
-            for(var i = elements.Count -1 ; i >= 0; i--)
+            for (var i = elements.Count - 1; i >= 0; i--)
             {
                 if (elements.Elements[i].Enabled &&
                     elements.Elements[i].HandleEvent(type, sender, tag) == EventResult.Handled)

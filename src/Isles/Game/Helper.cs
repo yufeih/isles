@@ -263,7 +263,7 @@ namespace Isles.Engine
 
                 isDirty = false;
             }
-            
+
             return copy.GetEnumerator();
         }
 
@@ -638,7 +638,7 @@ namespace Isles.Engine
         {
             throw new Exception("The method or operation is not implemented.");
         }
-        #endregion
+    #endregion
     }
 #endif
     #endregion

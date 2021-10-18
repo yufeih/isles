@@ -31,16 +31,16 @@ namespace Isles.Engine
         public string PlayerName = "Unnamed";
         public bool EnableScreenshot = true;
         public bool EnableProfile = true;
-        public bool IsMouseVisible = false;
+        public bool IsMouseVisible;
         public bool IsFixedTimeStep = true;
-        public bool ClipCursor = false;
+        public bool ClipCursor;
         public bool EnableSound = true;
-        public bool ShowPathGraph = false;
-        public bool RevealMap = false;
+        public bool ShowPathGraph;
+        public bool RevealMap;
         public int MaxPathSearchStepsPerUpdate = 2000;
-        public bool DirectEnter = false;
-        public bool TraceUnits = false;
-        public bool Cheat = false;
+        public bool DirectEnter;
+        public bool TraceUnits;
+        public bool Cheat;
         public double GameSpeed = 1;
         public GameCameraSettings CameraSettings;
         #endregion
@@ -49,10 +49,10 @@ namespace Isles.Engine
 
         public int ScreenWidth = 960;
         public int ScreenHeight = 600;
-        public bool Fullscreen = false;
-        public bool NormalMappedTerrain = false;
-        public bool RealisticWater = false;
-        public bool ReflectionEnabled = false;
+        public bool Fullscreen;
+        public bool NormalMappedTerrain;
+        public bool RealisticWater;
+        public bool ReflectionEnabled;
         public bool ShadowEnabled = true;
         public bool ShowLandscape = true;
         public bool ShowWater = true;
@@ -63,7 +63,7 @@ namespace Isles.Engine
 
         // We want to trace frame performance, so turn off V'Sync
 #if DEBUG
-        public bool VSync = false;
+        public bool VSync;
 #else
         public bool VSync = false;
 #endif
@@ -71,14 +71,14 @@ namespace Isles.Engine
         [Serializable()]
         public class BloomEffect
         {
-            public bool Enabled = false;
+            public bool Enabled;
             public string Type = "Saturated";
             public float Threshold = 0.25f;
             public float Blur = 2;
             public float BloomIntensity = 1;
             public float BaseIntensity = 1;
             public float BloomSaturation = 2;
-            public float BaseSaturation = 0;
+            public float BaseSaturation;
 
         }
 
