@@ -238,7 +238,7 @@ namespace Isles
 
             // Click even for Exit button
             buttons[4].Click += (o, e) => { BaseGame.Singleton.Exit(); };
-            // BaseGame.Singleton.Cursor = Helper.CursorFromFile("Content/UI/NormalCursor.cur");
+
             highLightMoveTo = buttons[0].Area.X;
             expectedHighlightPos = highLightMoveTo;
             var rand = new Random();

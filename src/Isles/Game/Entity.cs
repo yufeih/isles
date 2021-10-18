@@ -675,13 +675,6 @@ namespace Isles.Engine
         {
         }
 
-        public Entity(GameWorld world, GameModel model)
-            : base(world)
-        {
-            // Note assign to the upper case Model
-            Model = model;
-        }
-
         public override void Deserialize(XmlElement xml)
         {
             base.Deserialize(xml);

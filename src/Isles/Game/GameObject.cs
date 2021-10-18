@@ -1859,9 +1859,6 @@ namespace Isles
         public Decoration(GameWorld world)
             : base(world) { }
 
-        public Decoration(GameWorld world, string modelFile)
-            : base(world, new GameModel(modelFile)) { }
-
         public override bool IsInteractive => false;
 
         public override void Deserialize(XmlElement xml)
