@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text.Json;
 using System.Xml.Serialization;
 using Isles.Engine;
 using Microsoft.Xna.Framework;
@@ -31,30 +33,25 @@ namespace Isles.Graphics
     public class ParticleSettings
     {
         /// <summary>
-        /// Name used to identify different settings.
-        /// </summary>
-        public string Name;
-
-        /// <summary>
         /// Name of the texture used by this particle system.
         /// </summary>
-        public string TextureName;
+        public string TextureName { get; set; }
 
         /// <summary>
         /// Maximum number of particles that can be displayed at one time.
         /// </summary>
-        public int MaxParticles = 100;
+        public int MaxParticles { get; set; } = 100;
 
         /// <summary>
         /// How long these particles will last.
         /// Double is used to represent time for xml serialization.
         /// </summary>
-        public float Duration = 1;
+        public float Duration { get; set; } = 1;
 
         /// <summary>
         /// If greater than zero, some particles will last a shorter time than others.
         /// </summary>
-        public float DurationRandomness;
+        public float DurationRandomness { get; set; }
 
         /// <summary>
         /// Controls how much particles are influenced by the velocity of the object
@@ -63,30 +60,30 @@ namespace Isles.Graphics
         /// projectile. The projectile trail particles, on the other hand, set this
         /// value very low so they are less affected by the velocity of the projectile.
         /// </summary>
-        public float EmitterVelocitySensitivity = 1;
+        public float EmitterVelocitySensitivity { get; set; } = 1;
 
         /// <summary>
         /// Range of values controlling how much X and Z axis velocity to give each
         /// particle. Values for individual particles are randomly chosen from somewhere
         /// between these limits.
         /// </summary>
-        public float MinHorizontalVelocity;
-        public float MaxHorizontalVelocity;
+        public float MinHorizontalVelocity { get; set; }
+        public float MaxHorizontalVelocity { get; set; }
 
         /// <summary>
         /// Range of values controlling how much Y axis velocity to give each particle.
         /// Values for individual particles are randomly chosen from somewhere between
         /// these limits.
         /// </summary>
-        public float MinVerticalVelocity;
-        public float MaxVerticalVelocity;
+        public float MinVerticalVelocity { get; set; }
+        public float MaxVerticalVelocity { get; set; }
 
         /// <summary>
         /// Direction and strength of the gravity effect. Note that this can point in any
         /// direction, not just down! The fire effect points it upward to make the flames
         /// rise, and the smoke plume points it sideways to simulate wind.
         /// </summary>
-        public Vector3 Gravity = Vector3.Zero;
+        public Vector3 Gravity { get; set; }
 
         /// <summary>
         /// Controls how the particle velocity will change over their lifetime. If set
@@ -94,14 +91,14 @@ namespace Isles.Graphics
         /// If set to 0, particles will come to a complete stop right before they die.
         /// Values greater than 1 make the particles speed up over time.
         /// </summary>
-        public float EndVelocity = 1;
+        public float EndVelocity { get; set; } = 1;
 
         /// <summary>
         /// Range of values controlling the particle color and alpha. Values for
         /// individual particles are randomly chosen from somewhere between these limits.
         /// </summary>
-        public Color MinColor = Color.White;
-        public Color MaxColor = Color.White;
+        public Color MinColor { get; set; } = Color.White;
+        public Color MaxColor { get; set; } = Color.White;
 
         /// <summary>
         /// Range of values controlling how fast the particles rotate. Values for
@@ -112,30 +109,30 @@ namespace Isles.Graphics
         /// means if you don't need the rotation effect, you may get a performance
         /// boost from leaving these values at 0.
         /// </summary>
-        public float MinRotateSpeed;
-        public float MaxRotateSpeed;
+        public float MinRotateSpeed { get; set; }
+        public float MaxRotateSpeed { get; set; }
 
         /// <summary>
         /// Range of values controlling how big the particles are when first created.
         /// Values for individual particles are randomly chosen from somewhere between
         /// these limits.
         /// </summary>
-        public float MinStartSize = 100;
-        public float MaxStartSize = 100;
+        public float MinStartSize { get; set; } = 100;
+        public float MaxStartSize { get; set; } = 100;
 
         /// <summary>
         /// Range of values controlling how big particles become at the end of their
         /// life. Values for individual particles are randomly chosen from somewhere
         /// between these limits.
         /// </summary>
-        public float MinEndSize = 100;
-        public float MaxEndSize = 100;
+        public float MinEndSize { get; set; } = 100;
+        public float MaxEndSize { get; set; } = 100;
 
         /// <summary>
         /// Alpha blending settings.
         /// </summary>
-        public Blend SourceBlend = Blend.SourceAlpha;
-        public Blend DestinationBlend = Blend.InverseSourceAlpha;
+        public Blend SourceBlend { get; set; } = Blend.SourceAlpha;
+        public Blend DestinationBlend { get; set; } = Blend.InverseSourceAlpha;
     }
 
     /// <summary>
@@ -277,8 +274,7 @@ namespace Isles.Graphics
         private static readonly Random random = new();
 
         private static BaseGame baseGame;
-        private static List<ParticleSettings> ParticleSettings = new();
-        private static readonly List<ParticleSystem> ParticleSystems = new();
+        private static Dictionary<string, ParticleSystem> ParticleSystems;
 
         /// <summary>
         /// Initialize particle system.
@@ -287,25 +283,11 @@ namespace Isles.Graphics
         {
             baseGame = game;
 
-            // Read in settings
-            using (Stream stream = game.ZipContent.GetFileStream("Content/Settings/ParticleSettings.xml"))
-            {
-                ParticleSettings = (List<ParticleSettings>)
-                    new XmlSerializer(typeof(List<ParticleSettings>)).Deserialize(stream);
-            }
+            var particleSettings = JsonSerializer.Deserialize<Dictionary<string, ParticleSettings>>(
+                    File.ReadAllText("data/settings/particles.json"),
+                    new JsonSerializerOptions { IncludeFields = true });
 
-            // Create particle system
-            foreach (ParticleSettings settings in ParticleSettings)
-            {
-                ParticleSystems.Add(new ParticleSystem(game, settings));
-            }
-        }
-
-        /// <summary>
-        /// Unload particle system content.
-        /// </summary>
-        public static void UnloadContent(BaseGame game)
-        {
+            ParticleSystems = particleSettings.ToDictionary(settings => settings.Key, settings => new ParticleSystem(game, settings.Value));
         }
 
         /// <summary>
@@ -313,16 +295,7 @@ namespace Isles.Graphics
         /// </summary>
         public static ParticleSystem Create(string type)
         {
-            for (var i = 0; i < ParticleSettings.Count; i++)
-            {
-                if (ParticleSettings[i].Name != null &&
-                    ParticleSettings[i].Name.Equals(type))
-                {
-                    return ParticleSystems[i];
-                }
-            }
-
-            return null;
+            return ParticleSystems[type];
         }
 
         /// <summary>
@@ -331,7 +304,7 @@ namespace Isles.Graphics
         /// <param name="gameTime"></param>
         public static void Present(GameTime gameTime)
         {
-            foreach (ParticleSystem ps in ParticleSystems)
+            foreach (ParticleSystem ps in ParticleSystems.Values)
             {
                 ps.SetCamera(baseGame.View, baseGame.Projection);
                 ps.Draw(gameTime);
@@ -343,7 +316,7 @@ namespace Isles.Graphics
         /// </summary>
         public static void UpdateAll(GameTime gameTime)
         {
-            foreach (ParticleSystem ps in ParticleSystems)
+            foreach (ParticleSystem ps in ParticleSystems.Values)
             {
                 ps.Update(gameTime);
             }

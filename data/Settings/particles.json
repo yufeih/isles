@@ -1,0 +1,842 @@
+{
+  "Construct": {
+    "TextureName": "Textures/smoke2",
+    "MaxParticles": 2048,
+    "Duration": 1.45000005,
+    "DurationRandomness": 0.239999995,
+    "EmitterVelocitySensitivity": 1,
+    "MinHorizontalVelocity": 8.39999962,
+    "MaxHorizontalVelocity": 14.6000004,
+    "MinVerticalVelocity": 8.19999981,
+    "MaxVerticalVelocity": 18.2000008,
+    "Gravity": {
+      "X": 0,
+      "Y": 0,
+      "Z": -10
+    },
+    "EndVelocity": 1,
+    "MinColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 80,
+      "PackedValue": 1358954495
+    },
+    "MaxColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 100,
+      "PackedValue": 1694498815
+    },
+    "MinRotateSpeed": 0.00999999978,
+    "MaxRotateSpeed": 0.140000001,
+    "MinStartSize": 35,
+    "MaxStartSize": 35,
+    "MinEndSize": 45,
+    "MaxEndSize": 35,
+    "SourceBlend": 5,
+    "DestinationBlend": 2,
+    "Name": "Construct"
+  },
+  "FireSmoke": {
+    "TextureName": "Textures/Smoke",
+    "MaxParticles": 25000,
+    "Duration": 2.5999999,
+    "DurationRandomness": 0,
+    "EmitterVelocitySensitivity": 1,
+    "MinHorizontalVelocity": 0,
+    "MaxHorizontalVelocity": 3.79999995,
+    "MinVerticalVelocity": 2.79999995,
+    "MaxVerticalVelocity": 12.6000004,
+    "Gravity": {
+      "X": 0,
+      "Y": 0,
+      "Z": 10
+    },
+    "EndVelocity": 0,
+    "MinColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 255,
+      "PackedValue": 4294967295
+    },
+    "MaxColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 255,
+      "PackedValue": 4294967295
+    },
+    "MinRotateSpeed": -1,
+    "MaxRotateSpeed": 1,
+    "MinStartSize": 0,
+    "MaxStartSize": 7,
+    "MinEndSize": 25,
+    "MaxEndSize": 7,
+    "SourceBlend": 5,
+    "DestinationBlend": 6,
+    "Name": "FireSmoke"
+  },
+  "Smoke": {
+    "TextureName": "Textures/Smoke",
+    "MaxParticles": 2048,
+    "Duration": 2,
+    "DurationRandomness": 1,
+    "EmitterVelocitySensitivity": 1,
+    "MinHorizontalVelocity": 0,
+    "MaxHorizontalVelocity": 15,
+    "MinVerticalVelocity": -20,
+    "MaxVerticalVelocity": 10,
+    "Gravity": {
+      "X": 0,
+      "Y": -2,
+      "Z": 0
+    },
+    "EndVelocity": 1,
+    "MinColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 80,
+      "PackedValue": 1358954495
+    },
+    "MaxColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 100,
+      "PackedValue": 1694498815
+    },
+    "MinRotateSpeed": 0,
+    "MaxRotateSpeed": 0,
+    "MinStartSize": 5,
+    "MaxStartSize": 10,
+    "MinEndSize": 10,
+    "MaxEndSize": 40,
+    "SourceBlend": 5,
+    "DestinationBlend": 6,
+    "Name": "Smoke"
+  },
+  "Green": {
+    "TextureName": "Textures/Effect/illusion01",
+    "MaxParticles": 800,
+    "Duration": 2.20000005,
+    "DurationRandomness": 0,
+    "EmitterVelocitySensitivity": 0,
+    "MinHorizontalVelocity": 0,
+    "MaxHorizontalVelocity": 0,
+    "MinVerticalVelocity": 0,
+    "MaxVerticalVelocity": 0,
+    "Gravity": {
+      "X": 0,
+      "Y": 0,
+      "Z": 0
+    },
+    "EndVelocity": 0,
+    "MinColor": {
+      "R": 0,
+      "G": 255,
+      "B": 0,
+      "A": 255,
+      "PackedValue": 4278255360
+    },
+    "MaxColor": {
+      "R": 0,
+      "G": 176,
+      "B": 0,
+      "A": 255,
+      "PackedValue": 4278235136
+    },
+    "MinRotateSpeed": 0,
+    "MaxRotateSpeed": 0,
+    "MinStartSize": 1,
+    "MaxStartSize": 1,
+    "MinEndSize": 2,
+    "MaxEndSize": 5,
+    "SourceBlend": 5,
+    "DestinationBlend": 2,
+    "Name": "Green"
+  },
+  "Yellow": {
+    "TextureName": "Textures/fire",
+    "MaxParticles": 800,
+    "Duration": 2.20000005,
+    "DurationRandomness": 0,
+    "EmitterVelocitySensitivity": 0,
+    "MinHorizontalVelocity": 0,
+    "MaxHorizontalVelocity": 0,
+    "MinVerticalVelocity": 0,
+    "MaxVerticalVelocity": 0,
+    "Gravity": {
+      "X": 0,
+      "Y": 0,
+      "Z": 0
+    },
+    "EndVelocity": 0,
+    "MinColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 255,
+      "PackedValue": 4294967295
+    },
+    "MaxColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 255,
+      "PackedValue": 4294967295
+    },
+    "MinRotateSpeed": 0,
+    "MaxRotateSpeed": 0,
+    "MinStartSize": 1,
+    "MaxStartSize": 1,
+    "MinEndSize": 2,
+    "MaxEndSize": 5,
+    "SourceBlend": 5,
+    "DestinationBlend": 2,
+    "Name": "Yellow"
+  },
+  "Blue": {
+    "TextureName": "Textures/Effect/frostvapors",
+    "MaxParticles": 800,
+    "Duration": 2.70000005,
+    "DurationRandomness": 0,
+    "EmitterVelocitySensitivity": 0,
+    "MinHorizontalVelocity": 0,
+    "MaxHorizontalVelocity": 0,
+    "MinVerticalVelocity": 0,
+    "MaxVerticalVelocity": 0,
+    "Gravity": {
+      "X": 0,
+      "Y": 0,
+      "Z": 0
+    },
+    "EndVelocity": 0,
+    "MinColor": {
+      "R": 3,
+      "G": 199,
+      "B": 220,
+      "A": 255,
+      "PackedValue": 4278437852
+    },
+    "MaxColor": {
+      "R": 3,
+      "G": 199,
+      "B": 220,
+      "A": 255,
+      "PackedValue": 4278437852
+    },
+    "MinRotateSpeed": 0,
+    "MaxRotateSpeed": 0,
+    "MinStartSize": 1,
+    "MaxStartSize": 1,
+    "MinEndSize": 2,
+    "MaxEndSize": 5,
+    "SourceBlend": 5,
+    "DestinationBlend": 2,
+    "Name": "Blue"
+  },
+  "Red": {
+    "TextureName": "Textures/Effect/blooddagak",
+    "MaxParticles": 800,
+    "Duration": 2.20000005,
+    "DurationRandomness": 0,
+    "EmitterVelocitySensitivity": 0,
+    "MinHorizontalVelocity": 0,
+    "MaxHorizontalVelocity": 0,
+    "MinVerticalVelocity": 0,
+    "MaxVerticalVelocity": 0,
+    "Gravity": {
+      "X": 0,
+      "Y": 0,
+      "Z": 0
+    },
+    "EndVelocity": 0,
+    "MinColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 255,
+      "PackedValue": 4294967295
+    },
+    "MaxColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 255,
+      "PackedValue": 4294967295
+    },
+    "MinRotateSpeed": 0,
+    "MaxRotateSpeed": 0,
+    "MinStartSize": 1,
+    "MaxStartSize": 1,
+    "MinEndSize": 2,
+    "MaxEndSize": 5,
+    "SourceBlend": 5,
+    "DestinationBlend": 2,
+    "Name": "Red"
+  },
+  "PunishOfNature": {
+    "TextureName": "Textures/Effect/greenmist",
+    "MaxParticles": 32768,
+    "Duration": 1.60000002,
+    "DurationRandomness": 0.200000003,
+    "EmitterVelocitySensitivity": 0,
+    "MinHorizontalVelocity": 0,
+    "MaxHorizontalVelocity": 0,
+    "MinVerticalVelocity": 2,
+    "MaxVerticalVelocity": 3,
+    "Gravity": {
+      "X": 0,
+      "Y": 0,
+      "Z": 1.20000005
+    },
+    "EndVelocity": 0,
+    "MinColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 255,
+      "PackedValue": 4294967295
+    },
+    "MaxColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 255,
+      "PackedValue": 4294967295
+    },
+    "MinRotateSpeed": 0,
+    "MaxRotateSpeed": 0,
+    "MinStartSize": 0,
+    "MaxStartSize": 1,
+    "MinEndSize": 2,
+    "MaxEndSize": 4,
+    "SourceBlend": 5,
+    "DestinationBlend": 2,
+    "Name": "PunishOfNature"
+  },
+  "Frost": {
+    "TextureName": "Textures/Effect/frostvapors",
+    "MaxParticles": 800,
+    "Duration": 0.449999988,
+    "DurationRandomness": 0.0599999987,
+    "EmitterVelocitySensitivity": 0,
+    "MinHorizontalVelocity": 0,
+    "MaxHorizontalVelocity": 8.19999981,
+    "MinVerticalVelocity": 2,
+    "MaxVerticalVelocity": 7.5999999,
+    "Gravity": {
+      "X": 0,
+      "Y": 0,
+      "Z": 0
+    },
+    "EndVelocity": 0,
+    "MinColor": {
+      "R": 130,
+      "G": 225,
+      "B": 242,
+      "A": 255,
+      "PackedValue": 4286767602
+    },
+    "MaxColor": {
+      "R": 23,
+      "G": 201,
+      "B": 232,
+      "A": 255,
+      "PackedValue": 4279749096
+    },
+    "MinRotateSpeed": 0,
+    "MaxRotateSpeed": 0,
+    "MinStartSize": 1,
+    "MaxStartSize": 1,
+    "MinEndSize": 11,
+    "MaxEndSize": 5,
+    "SourceBlend": 5,
+    "DestinationBlend": 2,
+    "Name": "Frost"
+  },
+  "FrostExplosion": {
+    "TextureName": "Textures/effect/frostvapors",
+    "MaxParticles": 800,
+    "Duration": 1.5,
+    "DurationRandomness": 0.600000024,
+    "EmitterVelocitySensitivity": 0.100000001,
+    "MinHorizontalVelocity": 0,
+    "MaxHorizontalVelocity": 5,
+    "MinVerticalVelocity": -5,
+    "MaxVerticalVelocity": 5,
+    "Gravity": {
+      "X": 0,
+      "Y": 0,
+      "Z": 0
+    },
+    "EndVelocity": 0,
+    "MinColor": {
+      "R": 130,
+      "G": 225,
+      "B": 242,
+      "A": 255,
+      "PackedValue": 4286767602
+    },
+    "MaxColor": {
+      "R": 23,
+      "G": 201,
+      "B": 232,
+      "A": 255,
+      "PackedValue": 4279749096
+    },
+    "MinRotateSpeed": 0,
+    "MaxRotateSpeed": 0,
+    "MinStartSize": 3,
+    "MaxStartSize": 6,
+    "MinEndSize": 4,
+    "MaxEndSize": 5,
+    "SourceBlend": 5,
+    "DestinationBlend": 2,
+    "Name": "FrostExplosion"
+  },
+  "Fireball": {
+    "TextureName": "Textures/fire",
+    "MaxParticles": 800,
+    "Duration": 0.449999988,
+    "DurationRandomness": 0.0599999987,
+    "EmitterVelocitySensitivity": 0,
+    "MinHorizontalVelocity": 0,
+    "MaxHorizontalVelocity": 8.19999981,
+    "MinVerticalVelocity": 2,
+    "MaxVerticalVelocity": 7.5999999,
+    "Gravity": {
+      "X": 0,
+      "Y": 0,
+      "Z": 0
+    },
+    "EndVelocity": 0,
+    "MinColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 255,
+      "PackedValue": 4294967295
+    },
+    "MaxColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 255,
+      "PackedValue": 4294967295
+    },
+    "MinRotateSpeed": 0,
+    "MaxRotateSpeed": 0,
+    "MinStartSize": 1,
+    "MaxStartSize": 1,
+    "MinEndSize": 5,
+    "MaxEndSize": 5,
+    "SourceBlend": 5,
+    "DestinationBlend": 2,
+    "Name": "Fireball"
+  },
+  "FireballExplosion": {
+    "TextureName": "Textures/fire",
+    "MaxParticles": 800,
+    "Duration": 1.5,
+    "DurationRandomness": 0.600000024,
+    "EmitterVelocitySensitivity": 0.100000001,
+    "MinHorizontalVelocity": 0,
+    "MaxHorizontalVelocity": 5,
+    "MinVerticalVelocity": -5,
+    "MaxVerticalVelocity": 5,
+    "Gravity": {
+      "X": 0,
+      "Y": 0,
+      "Z": 0
+    },
+    "EndVelocity": 0,
+    "MinColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 255,
+      "PackedValue": 4294967295
+    },
+    "MaxColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 255,
+      "PackedValue": 4294967295
+    },
+    "MinRotateSpeed": 0,
+    "MaxRotateSpeed": 0,
+    "MinStartSize": 3,
+    "MaxStartSize": 6,
+    "MinEndSize": 4,
+    "MaxEndSize": 5,
+    "SourceBlend": 5,
+    "DestinationBlend": 2,
+    "Name": "FireballExplosion"
+  },
+  "Trail": {
+    "TextureName": "Textures/Smoke2",
+    "MaxParticles": 1000,
+    "Duration": 1.20000005,
+    "DurationRandomness": 0.200000003,
+    "EmitterVelocitySensitivity": 1,
+    "MinHorizontalVelocity": 0.100000001,
+    "MaxHorizontalVelocity": 0.100000001,
+    "MinVerticalVelocity": 0.100000001,
+    "MaxVerticalVelocity": 0,
+    "Gravity": {
+      "X": 0,
+      "Y": 0,
+      "Z": 0
+    },
+    "EndVelocity": 1,
+    "MinColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 128,
+      "PackedValue": 2164260863
+    },
+    "MaxColor": {
+      "R": 64,
+      "G": 96,
+      "B": 128,
+      "A": 255,
+      "PackedValue": 4282409088
+    },
+    "MinRotateSpeed": -4,
+    "MaxRotateSpeed": 4,
+    "MinStartSize": 5,
+    "MaxStartSize": 6,
+    "MinEndSize": 2,
+    "MaxEndSize": 4,
+    "SourceBlend": 5,
+    "DestinationBlend": 6,
+    "Name": "Trail"
+  },
+  "FireballTrail": {
+    "TextureName": "Textures/Smoke",
+    "MaxParticles": 50,
+    "Duration": 1,
+    "DurationRandomness": 1.5,
+    "EmitterVelocitySensitivity": 1,
+    "MinHorizontalVelocity": 1,
+    "MaxHorizontalVelocity": 1,
+    "MinVerticalVelocity": 1,
+    "MaxVerticalVelocity": 2,
+    "Gravity": {
+      "X": 0,
+      "Y": 0,
+      "Z": 0
+    },
+    "EndVelocity": 1,
+    "MinColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 128,
+      "PackedValue": 2164260863
+    },
+    "MaxColor": {
+      "R": 64,
+      "G": 96,
+      "B": 128,
+      "A": 255,
+      "PackedValue": 4282409088
+    },
+    "MinRotateSpeed": -4,
+    "MaxRotateSpeed": 4,
+    "MinStartSize": 2,
+    "MaxStartSize": 4,
+    "MinEndSize": 8,
+    "MaxEndSize": 9,
+    "SourceBlend": 5,
+    "DestinationBlend": 6,
+    "Name": "FireballTrail"
+  },
+  "Summon": {
+    "TextureName": "Textures/Fire",
+    "MaxParticles": 2400,
+    "Duration": 3.8499999,
+    "DurationRandomness": 0.939999998,
+    "EmitterVelocitySensitivity": 0.25,
+    "MinHorizontalVelocity": 0,
+    "MaxHorizontalVelocity": 0,
+    "MinVerticalVelocity": -0.600000024,
+    "MaxVerticalVelocity": 6.4000001,
+    "Gravity": {
+      "X": 0,
+      "Y": 0,
+      "Z": 10
+    },
+    "EndVelocity": 1.10000002,
+    "MinColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 10,
+      "PackedValue": 184549375
+    },
+    "MaxColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 40,
+      "PackedValue": 687865855
+    },
+    "MinRotateSpeed": 0,
+    "MaxRotateSpeed": 0,
+    "MinStartSize": 7,
+    "MaxStartSize": 26,
+    "MinEndSize": 0,
+    "MaxEndSize": 36,
+    "SourceBlend": 5,
+    "DestinationBlend": 2,
+    "Name": "Summon"
+  },
+  "ExplosionSmoke": {
+    "TextureName": "Textures/smoke",
+    "MaxParticles": 1024,
+    "Duration": 3.4000001,
+    "DurationRandomness": 0.75999999,
+    "EmitterVelocitySensitivity": 1.04999995,
+    "MinHorizontalVelocity": 3.79999995,
+    "MaxHorizontalVelocity": 9.19999981,
+    "MinVerticalVelocity": 0.200000003,
+    "MaxVerticalVelocity": 8.60000038,
+    "Gravity": {
+      "X": 0,
+      "Y": 0,
+      "Z": 7.4000001
+    },
+    "EndVelocity": 0,
+    "MinColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 255,
+      "PackedValue": 4294967295
+    },
+    "MaxColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 255,
+      "PackedValue": 4294967295
+    },
+    "MinRotateSpeed": 0,
+    "MaxRotateSpeed": 0,
+    "MinStartSize": 16,
+    "MaxStartSize": 10,
+    "MinEndSize": 36,
+    "MaxEndSize": 10,
+    "SourceBlend": 5,
+    "DestinationBlend": 6,
+    "Name": "ExplosionSmoke"
+  },
+  "Spark": {
+    "TextureName": "Textures/Effect/spark",
+    "MaxParticles": 1024,
+    "Duration": 5,
+    "DurationRandomness": 0.75999999,
+    "EmitterVelocitySensitivity": 1.04999995,
+    "MinHorizontalVelocity": 3,
+    "MaxHorizontalVelocity": 11.8000002,
+    "MinVerticalVelocity": 17,
+    "MaxVerticalVelocity": 20,
+    "Gravity": {
+      "X": 0,
+      "Y": 0,
+      "Z": -8.39999962
+    },
+    "EndVelocity": 0,
+    "MinColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 255,
+      "PackedValue": 4294967295
+    },
+    "MaxColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 255,
+      "PackedValue": 4294967295
+    },
+    "MinRotateSpeed": -4,
+    "MaxRotateSpeed": 4,
+    "MinStartSize": 3,
+    "MaxStartSize": 1,
+    "MinEndSize": 0,
+    "MaxEndSize": 2,
+    "SourceBlend": 5,
+    "DestinationBlend": 2,
+    "Name": "Spark"
+  },
+  "Explosion": {
+    "TextureName": "Textures/fire",
+    "MaxParticles": 5120,
+    "Duration": 2.5999999,
+    "DurationRandomness": 1.74000001,
+    "EmitterVelocitySensitivity": 0.949999988,
+    "MinHorizontalVelocity": 3,
+    "MaxHorizontalVelocity": 10.1999998,
+    "MinVerticalVelocity": 2.4000001,
+    "MaxVerticalVelocity": 13.8000002,
+    "Gravity": {
+      "X": 0,
+      "Y": 0,
+      "Z": 0
+    },
+    "EndVelocity": 0,
+    "MinColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 255,
+      "PackedValue": 4294967295
+    },
+    "MaxColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 255,
+      "PackedValue": 4294967295
+    },
+    "MinRotateSpeed": 0,
+    "MaxRotateSpeed": 0,
+    "MinStartSize": 15,
+    "MaxStartSize": 8,
+    "MinEndSize": 16,
+    "MaxEndSize": 11,
+    "SourceBlend": 5,
+    "DestinationBlend": 2,
+    "Name": "Explosion"
+  },
+  "Glow": {
+    "TextureName": "Textures/Effect/light",
+    "MaxParticles": 200,
+    "Duration": 2.04999995,
+    "DurationRandomness": 0,
+    "EmitterVelocitySensitivity": 0,
+    "MinHorizontalVelocity": 0,
+    "MaxHorizontalVelocity": 3.20000005,
+    "MinVerticalVelocity": 0,
+    "MaxVerticalVelocity": 0,
+    "Gravity": {
+      "X": 0,
+      "Y": 0,
+      "Z": 10
+    },
+    "EndVelocity": 0,
+    "MinColor": {
+      "R": 74,
+      "G": 126,
+      "B": 35,
+      "A": 255,
+      "PackedValue": 4283072035
+    },
+    "MaxColor": {
+      "R": 74,
+      "G": 126,
+      "B": 35,
+      "A": 255,
+      "PackedValue": 4283072035
+    },
+    "MinRotateSpeed": 0,
+    "MaxRotateSpeed": 0,
+    "MinStartSize": 12,
+    "MaxStartSize": 19,
+    "MinEndSize": 10,
+    "MaxEndSize": 16,
+    "SourceBlend": 5,
+    "DestinationBlend": 2,
+    "Name": "Glow"
+  },
+  "Star": {
+    "TextureName": "Textures/Effect/light",
+    "MaxParticles": 200,
+    "Duration": 2.3499999,
+    "DurationRandomness": 1.01999998,
+    "EmitterVelocitySensitivity": 0,
+    "MinHorizontalVelocity": 0,
+    "MaxHorizontalVelocity": 0,
+    "MinVerticalVelocity": 4.19999981,
+    "MaxVerticalVelocity": 11.6000004,
+    "Gravity": {
+      "X": 0,
+      "Y": 0,
+      "Z": 7.5999999
+    },
+    "EndVelocity": 0,
+    "MinColor": {
+      "R": 74,
+      "G": 126,
+      "B": 35,
+      "A": 255,
+      "PackedValue": 4283072035
+    },
+    "MaxColor": {
+      "R": 74,
+      "G": 126,
+      "B": 35,
+      "A": 255,
+      "PackedValue": 4283072035
+    },
+    "MinRotateSpeed": -1,
+    "MaxRotateSpeed": 1,
+    "MinStartSize": 1,
+    "MaxStartSize": 3,
+    "MinEndSize": 2,
+    "MaxEndSize": 5,
+    "SourceBlend": 5,
+    "DestinationBlend": 2,
+    "Name": "Star"
+  },
+  "Fire": {
+    "TextureName": "Textures/Fire",
+    "MaxParticles": 2400,
+    "Duration": 1.75,
+    "DurationRandomness": 0.379999995,
+    "EmitterVelocitySensitivity": 1,
+    "MinHorizontalVelocity": 0,
+    "MaxHorizontalVelocity": 1.39999998,
+    "MinVerticalVelocity": 10.8000002,
+    "MaxVerticalVelocity": 13.3999996,
+    "Gravity": {
+      "X": 0,
+      "Y": 0,
+      "Z": 10
+    },
+    "EndVelocity": 1,
+    "MinColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 10,
+      "PackedValue": 184549375
+    },
+    "MaxColor": {
+      "R": 255,
+      "G": 255,
+      "B": 255,
+      "A": 40,
+      "PackedValue": 687865855
+    },
+    "MinRotateSpeed": 0,
+    "MaxRotateSpeed": 0,
+    "MinStartSize": 5,
+    "MaxStartSize": 10,
+    "MinEndSize": 0,
+    "MaxEndSize": 10,
+    "SourceBlend": 5,
+    "DestinationBlend": 2,
+    "Name": "Fire"
+  }
+}
