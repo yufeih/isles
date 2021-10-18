@@ -1,11 +1,9 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml;
-using Isles.Engine;
 
 namespace Isles
 {
@@ -178,10 +176,10 @@ namespace Isles
         /// Load the game defaults from a stream.
         /// </summary>
         /// <param name="stream"></param>
-        public void Load(Stream stream)
+        public GameDefault()
         {
             var doc = new XmlDocument();
-            doc.Load(stream);
+            doc.Load("data/settings/defaults.xml");
 
             if (doc.DocumentElement.Name != "GameDefault")
             {
@@ -215,91 +213,6 @@ namespace Isles
             }
         }
 
-        /// <summary>
-        /// Save the game defaults to a stream.
-        /// </summary>
-        /// <param name="stream"></param>
-        public void Save(Stream stream)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Assign the default attributes to the xml element of a specific type.
-        /// </summary>
-        /// <remarks>
-        /// If there is an default XML element describing an avator like this:
-        ///
-        /// <Avator Model="models/avator">
-        ///     <Spells>
-        ///         <Fireball Level="1" />
-        ///         <Windwalk Level="1" />
-        ///     </Spells>
-        ///     <Items>
-        ///         <HealthPotion Power="300" />
-        ///         <HealthPotion Power="300" />
-        ///     </Items>
-        /// </Avator>
-        ///
-        /// The game world file only need to store its position, all other attributes
-        /// are appended using MergeAttributes automatically.
-        ///
-        /// <Avator Position="1024, 512, 0" />
-        ///
-        /// However for world object containing the child nodes, it's up to the client
-        /// to determine whether to keep the default settings or not. So in the XML
-        /// element below, the avator has only 1 item, the health potions and spells
-        /// are ignored.
-        ///
-        /// <Avator Position="1024, 512, 0">
-        ///     <Items>
-        ///         <ManaPotion Power="500" />
-        ///     </Items>
-        /// </Avator>
-        ///
-        /// This method only append default attributes that the target xml do not have.
-        /// </remarks>
-        public void MergeAttributes(string type, XmlElement xml)
-        {
-            if (xml == null || type == null)
-            {
-                return;
-            }
-
-            // Get default XML node describing the object type
-            if (WorldObjectDefaults.TryGetValue(type, out XmlElement value))
-            {
-                foreach (XmlAttribute attribute in value.Attributes)
-                {
-                    if (!xml.HasAttribute(attribute.Name))
-                    {
-                        xml.SetAttribute(attribute.Name, attribute.Value);
-                    }
-                }
-            }
-        }
-
-        private static GameDefault gameDefault;
-
-        /// <summary>
-        /// Create a game default from file.
-        /// </summary>
-        public static GameDefault Singleton
-        {
-            get
-            {
-                if (gameDefault != null)
-                {
-                    return gameDefault;
-                }
-
-                using Stream stream =
-                       BaseGame.Singleton.ZipContent.GetFileStream("Content/Settings/Defaults.xml");
-                gameDefault = new GameDefault();
-                gameDefault.Load(stream);
-
-                return gameDefault;
-            }
-        }
+        public static GameDefault Singleton { get; } = new GameDefault();
     }
 }
