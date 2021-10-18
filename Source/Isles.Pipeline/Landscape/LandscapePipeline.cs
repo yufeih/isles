@@ -35,7 +35,7 @@ namespace Isles.Pipeline
         public override string GetRuntimeReader(TargetPlatform targetPlatform)
         {
             return "Isles.Graphics.LandscapeReader, " +
-                   "Isles.Engine, Version=1.0.0.0, Culture=neutral";
+                   "Isles, Version=1.0.0.0, Culture=neutral";
         }
     }
 

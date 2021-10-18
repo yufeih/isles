@@ -902,7 +902,7 @@ namespace Isles.Pipeline
         public override string GetRuntimeReader(TargetPlatform targetPlatform)
         {
             return "Isles.Graphics.SkinningDataReader, " +
-                   "Isles.Engine, Version=1.0.0.0, Culture=neutral";
+                   "Isles, Version=1.0.0.0, Culture=neutral";
         }
     }
 
@@ -922,7 +922,7 @@ namespace Isles.Pipeline
         public override string GetRuntimeReader(TargetPlatform targetPlatform)
         {
             return "Isles.Graphics.AnimationClipReader, " +
-                   "Isles.Engine, Version=1.0.0.0, Culture=neutral";
+                   "Isles, Version=1.0.0.0, Culture=neutral";
         }
     }
 
@@ -943,7 +943,7 @@ namespace Isles.Pipeline
         public override string GetRuntimeReader(TargetPlatform targetPlatform)
         {
             return "Isles.Graphics.KeyframeReader, " +
-                   "Isles.Engine, Version=1.0.0.0, Culture=neutral";
+                   "Isles, Version=1.0.0.0, Culture=neutral";
         }
     }
     #endregion

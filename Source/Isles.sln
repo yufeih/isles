@@ -2,13 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual C# Express 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isles", "Isles\Isles.csproj", "{23F408E0-D6E0-41C6-94C7-C64A7CB373A3}"
-	ProjectSection(ProjectDependencies) = postProject
-		{BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27} = {BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isles.Pipeline", "Isles.Pipeline\Isles.Pipeline.csproj", "{77E31563-2EED-400D-8591-1ACED921E11F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isles.Engine", "Isles.Engine\Isles.Engine.csproj", "{BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,12 +27,6 @@ Global
 		{77E31563-2EED-400D-8591-1ACED921E11F}.Release|x86.Build.0 = Release|x86
 		{77E31563-2EED-400D-8591-1ACED921E11F}.Release|Xbox 360.ActiveCfg = Release|Xbox 360
 		{77E31563-2EED-400D-8591-1ACED921E11F}.Release|Xbox 360.Build.0 = Release|Xbox 360
-		{BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27}.Debug|x86.ActiveCfg = Debug|x86
-		{BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27}.Debug|x86.Build.0 = Debug|x86
-		{BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27}.Debug|Xbox 360.ActiveCfg = Debug|x86
-		{BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27}.Release|x86.ActiveCfg = Release|x86
-		{BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27}.Release|x86.Build.0 = Release|x86
-		{BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27}.Release|Xbox 360.ActiveCfg = Release|x86
 		{3EF57541-D5ED-4B48-A308-5AC5E48E3588}.Debug|x86.ActiveCfg = Debug|x86
 		{3EF57541-D5ED-4B48-A308-5AC5E48E3588}.Debug|Xbox 360.ActiveCfg = Debug|x86
 		{3EF57541-D5ED-4B48-A308-5AC5E48E3588}.Release|x86.ActiveCfg = Release|x86
@@ -45,28 +34,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 6
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://tfs06.codeplex.com/
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = Isles\\Isles.csproj
-		SccProjectName1 = Isles
-		SccLocalPath1 = Isles
-		SccProjectUniqueName2 = Isles.Pipeline\\Isles.Pipeline.csproj
-		SccProjectName2 = Isles.Pipeline
-		SccLocalPath2 = Isles.Pipeline
-		SccProjectUniqueName3 = Isles.Engine\\Isles.Engine.csproj
-		SccProjectName3 = Isles.Engine
-		SccLocalPath3 = Isles.Engine
-		SccProjectUniqueName4 = Isles\\Content\\Content.contentproj
-		SccProjectTopLevelParentUniqueName4 = Isles\\Isles.csproj
-		SccProjectName4 = Isles/Content
-		SccLocalPath4 = Isles\\Content
-		SccProjectUniqueName5 = Isles.Engine\\Content\\Content.contentproj
-		SccProjectTopLevelParentUniqueName5 = Isles.Engine\\Isles.Engine.csproj
-		SccProjectName5 = Isles.Engine/Content
-		SccLocalPath5 = Isles.Engine\\Content
 	EndGlobalSection
 EndGlobal
