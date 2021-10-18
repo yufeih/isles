@@ -1,10 +1,5 @@
-
-//-----------------------------------------------------------------------------
-// AudioManager.cs
-//
-// Microsoft XNA Community Game Platform
-// Copyright (C) Microsoft Corporation. All rights reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
@@ -20,8 +15,11 @@ namespace Isles.Engine
     public interface IAudioEmitter
     {
         Vector3 Position { get; }
+
         Vector3 Forward { get; }
+
         Vector3 Up { get; }
+
         Vector3 Velocity { get; }
     }
 
@@ -32,7 +30,6 @@ namespace Isles.Engine
     /// </summary>
     public class AudioManager : GameComponent
     {
-
         private readonly ZipContentManager content;
 
         public AudioEngine Audio { get; private set; }
@@ -139,7 +136,7 @@ namespace Isles.Engine
 
             // Update the XACT engine.
             // Some bugs with the audio engine. Sometimes it causes the game to stuck :(
-            //audioEngine.Update();
+            // audioEngine.Update();
 
             // Update background musc
             if (backgroundMusic != null && (delayBeforePlaying || backgroundMusic.IsStopped))
@@ -157,7 +154,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Triggers a new sound
+        /// Triggers a new sound.
         /// </summary>
         /// <param name="cueName"></param>
         /// <returns></returns>
@@ -207,7 +204,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Play a background music
+        /// Play a background music.
         /// </summary>
         public Cue PlayBackground(string cueName, float delayedLoopSeconds)
         {

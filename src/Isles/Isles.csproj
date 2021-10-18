@@ -2,12 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <LangVersion>Latest</LangVersion>
-    <TargetFramework>net472</TargetFramework>
-    <Platforms>x86</Platforms>
     <ApplicationIcon>Game.ico</ApplicationIcon>
-    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <EnableNETAnalyzers>true</EnableNETAnalyzers>
   </PropertyGroup>
 
   <ItemGroup>

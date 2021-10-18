@@ -1,27 +1,23 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Isles.Engine;
 using Isles.Graphics;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.UI
 {
-
     /// <summary>
-    /// Interface for implementing UI element
+    /// Interface for implementing UI element.
     /// </summary>
     public interface IUIElement : IDisposable, IEventListener
     {
         /// <summary>
         /// Gets the reference area of an UI element.
         /// The reference area is used to determine the final
-        /// area of the UI element due to resolusion changes
+        /// area of the UI element due to resolusion changes.
         /// </summary>
         Rectangle Area { get; set; }
 
@@ -32,38 +28,38 @@ namespace Isles.UI
         Rectangle DestinationRectangle { get; }
 
         /// <summary>
-        /// Gets or sets the parent of an UI element
+        /// Gets or sets the parent of an UI element.
         /// </summary>
         IUIElement Parent { get; set; }
 
         /// <summary>
-        /// Gets or sets UI element visibility
+        /// Gets or sets UI element visibility.
         /// </summary>
         bool Visible { get; set; }
 
         /// <summary>
-        /// Enable/Disable an UI element
+        /// Enable/Disable an UI element.
         /// </summary>
         bool Enabled { get; set; }
 
         /// <summary>
-        /// Gets or sets UI element anchor
+        /// Gets or sets UI element anchor.
         /// </summary>
         Anchor Anchor { get; set; }
 
         /// <summary>
-        /// Gets or sets UI element scale mode
+        /// Gets or sets UI element scale mode.
         /// </summary>
         ScaleMode ScaleMode { get; set; }
 
         /// <summary>
-        /// Update UI element
+        /// Update UI element.
         /// </summary>
         /// <param name="gameTime"></param>
         void Update(GameTime gameTime);
 
         /// <summary>
-        /// Draw UI element
+        /// Draw UI element.
         /// </summary>
         /// <param name="gameTime"></param>
         void Draw(GameTime gameTime, SpriteBatch sprite);
@@ -81,7 +77,7 @@ namespace Isles.UI
     //
 
     /// <summary>
-    /// Enumeration type used to set the location of an UI element
+    /// Enumeration type used to set the location of an UI element.
     /// </summary>
     public enum Anchor
     {
@@ -89,44 +85,43 @@ namespace Isles.UI
         TopRight,
         BottomLeft,
         BottomRight,
-        Center
+        Center,
     }
 
     /// <summary>
-    /// how UI element scales when resolution changed
+    /// how UI element scales when resolution changed.
     /// </summary>
     public enum ScaleMode
     {
         /// <summary>
-        /// Size of the UI element is alway fixed
+        /// Size of the UI element is alway fixed.
         /// </summary>
         Fixed,
 
         /// <summary>
-        /// Size changes based on width, but width/height is fixed
+        /// Size changes based on width, but width/height is fixed.
         /// </summary>
         ScaleX,
 
         /// <summary>
         /// Size changes based on height, but width/height is fixed
-        /// This scale mode is supposed to be used for most UIElement
+        /// This scale mode is supposed to be used for most UIElement.
         /// </summary>
         ScaleY,
 
         /// <summary>
-        /// Width and height all changes
+        /// Width and height all changes.
         /// </summary>
-        Stretch
+        Stretch,
     }
 
     /// <summary>
-    /// Basic UI element
+    /// Basic UI element.
     /// </summary>
     public abstract class UIElement : IUIElement
     {
-
         /// <summary>
-        /// Gets or sets UIElement area
+        /// Gets or sets UIElement area.
         /// </summary>
         virtual public Rectangle Area
         {
@@ -141,7 +136,7 @@ namespace Isles.UI
         private Rectangle area;
 
         /// <summary>
-        /// Gets button destination rectangle
+        /// Gets button destination rectangle.
         /// </summary>
         virtual public Rectangle DestinationRectangle
         {
@@ -165,13 +160,13 @@ namespace Isles.UI
         public Graphics2D Graphics2D = BaseGame.Singleton.Graphics2D;
 
         /// <summary>
-        /// Whether destination rectangle is dirty
+        /// Whether destination rectangle is dirty.
         /// </summary>
         public bool IsDirty = true;
         private Rectangle destinationRectangle;
 
         /// <summary>
-        /// Gets or sets button source rectangle
+        /// Gets or sets button source rectangle.
         /// </summary>
         public Rectangle SourceRectangle
         {
@@ -182,7 +177,7 @@ namespace Isles.UI
         private Rectangle sourceRectangle;
 
         /// <summary>
-        /// Gets or sets UI element visibility
+        /// Gets or sets UI element visibility.
         /// </summary>
         public bool Visible
         {
@@ -199,7 +194,7 @@ namespace Isles.UI
         protected virtual void OnVisibleChanged() { }
 
         /// <summary>
-        /// Gets or sets whether an UI element is enabled
+        /// Gets or sets whether an UI element is enabled.
         /// </summary>
         public bool Enabled
         {
@@ -216,7 +211,7 @@ namespace Isles.UI
         protected virtual void OnEnableStateChanged() { }
 
         /// <summary>
-        /// Gets or sets the texture used to draw the button
+        /// Gets or sets the texture used to draw the button.
         /// </summary>
         public Texture2D Texture
         {
@@ -227,7 +222,7 @@ namespace Isles.UI
         private Texture2D texture;
 
         /// <summary>
-        /// Gets or sets UI element x position
+        /// Gets or sets UI element x position.
         /// </summary>
         public int X
         {
@@ -240,7 +235,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Gets or sets UI element x position
+        /// Gets or sets UI element x position.
         /// </summary>
         public int Y
         {
@@ -253,7 +248,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Gets or sets the anchor mode of the UI element
+        /// Gets or sets the anchor mode of the UI element.
         /// </summary>
         public Anchor Anchor
         {
@@ -268,7 +263,7 @@ namespace Isles.UI
         private Anchor anchor = Anchor.TopLeft;
 
         /// <summary>
-        /// Gets or sets the scale mode of the UI element
+        /// Gets or sets the scale mode of the UI element.
         /// </summary>
         public ScaleMode ScaleMode
         {
@@ -283,7 +278,7 @@ namespace Isles.UI
         private ScaleMode scaleMode = ScaleMode.ScaleY;
 
         /// <summary>
-        /// Gets or sets the parent of this UI element
+        /// Gets or sets the parent of this UI element.
         /// </summary>
         public IUIElement Parent
         {
@@ -298,14 +293,14 @@ namespace Isles.UI
         private IUIElement parent;
 
         /// <summary>
-        /// Gets or sets a tag
+        /// Gets or sets a tag.
         /// </summary>
         public object Tag;
 
         public UIElement() { }
 
         /// <summary>
-        /// Create the UI element
+        /// Create the UI element.
         /// </summary>
         /// <param name="area"></param>
         public UIElement(Rectangle area)
@@ -314,24 +309,24 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Update UI element
+        /// Update UI element.
         /// </summary>
         /// <param name="gameTime"></param>
         public abstract void Update(GameTime gameTime);
 
         /// <summary>
-        /// Draw UI element
+        /// Draw UI element.
         /// </summary>
         /// <param name="gameTime"></param>
         public abstract void Draw(GameTime gameTime, SpriteBatch sprite);
 
         /// <summary>
-        /// Handle input events
+        /// Handle input events.
         /// </summary>
         public abstract EventResult HandleEvent(EventType type, object sender, object tag);
 
         /// <summary>
-        /// Dispose
+        /// Dispose.
         /// </summary>
         public void Dispose()
         {
@@ -340,17 +335,17 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Dispose
+        /// Dispose.
         /// </summary>
-        /// <param name="disposing">Disposing</param>
+        /// <param name="disposing">Disposing.</param>
         protected virtual void Dispose(bool disposing) { }
 
         /// <summary>
         /// Gets the relative rectangle based on current anchor,
         /// scale mode and parent reference rectangle.
         /// </summary>
-        /// <param name="rectangle">Rectangle in standard resolution</param>
-        /// <return>Rectangle in current resolution</return>
+        /// <param name="rectangle">Rectangle in standard resolution.</param>
+        /// <return>Rectangle in current resolution.</return>
         public Rectangle GetRelativeRectangle(Rectangle rectangle)
         {
             return GetRelativeRectangle(rectangle, parent, scaleMode, anchor);
@@ -360,8 +355,8 @@ namespace Isles.UI
         /// Gets the relative rectangle based on current anchor,
         /// scale mode and parent reference rectangle.
         /// </summary>
-        /// <param name="rectangle">Rectangle in standard resolution</param>
-        /// <return>Rectangle in current resolution</return>
+        /// <param name="rectangle">Rectangle in standard resolution.</param>
+        /// <return>Rectangle in current resolution.</return>
         public static Rectangle GetRelativeRectangle(
             Rectangle rectangle, IUIElement parent, ScaleMode scaleMode, Anchor anchor)
         {
@@ -409,7 +404,6 @@ namespace Isles.UI
             }
 
             // anchor
-
             relativeRectangle.X = anchor == Anchor.TopLeft || anchor == Anchor.BottomLeft
                 ? (int)(parent.DestinationRectangle.Left +
                     rectangle.Left * widthScale)
@@ -432,11 +426,7 @@ namespace Isles.UI
                     widthScale = (double)parent.DestinationRectangle.Width / rectangle.Width;
                     heightScale = (double)parent.DestinationRectangle.Height / rectangle.Height;
                 }
-                //else
-                //{
-                //    widthScale = (double)parent.DestinationRectangle.Width / parent.Area.Width;
-                //    heightScale = (double)parent.DestinationRectangle.Height / parent.Area.Height;
-                //}
+
                 if (heightScale > widthScale)
                 {
                     relativeRectangle.Width = (int)(widthScale * rectangle.Width);
@@ -460,7 +450,5 @@ namespace Isles.UI
 
             return relativeRectangle;
         }
-
     }
-
 }

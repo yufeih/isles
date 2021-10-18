@@ -1,22 +1,18 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.IO;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Graphics;
 using Isles.Engine;
 using Isles.UI;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Isles
 {
-
     /// <summary>
-    /// Screen that shows the Title
+    /// Screen that shows the Title.
     /// </summary>
     public class TitleScreen : IScreen
     {
@@ -55,7 +51,6 @@ namespace Isles
         /// In this way, it can be guaranteed that highLight.X will
         /// finally miss its destination no more than 1 pixel.
         /// </summary>
-
         private double expectedHighlightPos;
         private double creditStartTime;
         private bool creditStarted;
@@ -92,7 +87,7 @@ namespace Isles
         private readonly Panel credit;
 
         /// <summary>
-        /// Constructor
+        /// Constructor.
         /// </summary>
         /// <param name="gameScreen"></param>
         public TitleScreen(GameScreen gameScreen)
@@ -115,7 +110,7 @@ namespace Isles
                 Texture = loadingDisplayTexture,
                 SourceRectangle = new Rectangle(0, 0, loadingDisplayTexture.Width, loadingDisplayTexture.Height),
                 ScaleMode = ScaleMode.Stretch,
-                Anchor = Anchor.Center
+                Anchor = Anchor.Center,
             };
             ui.Add(loadingPanel);
 
@@ -125,16 +120,15 @@ namespace Isles
                 Texture = titleTexture,
                 SourceRectangle = new Rectangle(0, 0, titleTexture.Width, titleTexture.Height),
                 ScaleMode = ScaleMode.Stretch,
-                Anchor = Anchor.Center
+                Anchor = Anchor.Center,
             };
             ui.Add(titlePanel);
 
             // Test textbox
-            //titlePanel.Add(new TextBox(1, Color.White, new Rectangle(0, 0, 400, 50)));
-
+            // titlePanel.Add(new TextBox(1, Color.White, new Rectangle(0, 0, 400, 50)));
             TextField creditSegment;
             credit = new Panel(new Rectangle(800, 430, 0, 30));
-            //credit = new TextField("R", 16, Color.White, new Rectangle(800, 470, 10000, 30));
+            // credit = new TextField("R", 16, Color.White, new Rectangle(800, 470, 10000, 30));
             titlePanel.Add(credit);
             var offset = 0;
             using (Stream creditText = BaseGame.Singleton.ZipContent.GetFileStream("Content/Credits.txt"))
@@ -158,13 +152,14 @@ namespace Isles
                     credit.Add(creditSegment);
                 }
             }
+
             creditStringLength = offset + 200;
             creditRollingTime = creditStringLength * 0.015;
 
             // I'll just hard code the size :(
             leftMaskPanel = new Panel(Rectangle.Empty)
             {
-                Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/LeftMask")
+                Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/LeftMask"),
             };
             leftMaskPanel.SourceRectangle = new Rectangle(0, 0, leftMaskPanel.Texture.Width, leftMaskPanel.Texture.Height);
             leftMaskPanel.ScaleMode = ScaleMode.Fixed;
@@ -175,7 +170,7 @@ namespace Isles
 
             rightMaskPanel = new Panel(Rectangle.Empty)
             {
-                Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/RightMask")
+                Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/RightMask"),
             };
             rightMaskPanel.SourceRectangle = new Rectangle(0, 0, rightMaskPanel.Texture.Width, rightMaskPanel.Texture.Height);
             rightMaskPanel.ScaleMode = ScaleMode.Fixed;
@@ -186,15 +181,13 @@ namespace Isles
 
             buttonBias = titlePanel.Area.Width / 6;
             var buttonY = titlePanel.Area.Height / 8 * 7;
-            //highLight = new Panel(new Rectangle
-            //            (150, 507, buttonDestinationWidth, hightLightDestinationHeight));
             highLight = new Panel(new Rectangle
                        (buttonBias, buttonY, buttonDestinationWidth, hightLightDestinationHeight))
             {
                 Texture = buttonsTexture,
                 SourceRectangle = new Rectangle(0, 5 * buttonSourceHeight, buttonSourceWidth, 66),
                 Anchor = Anchor.TopLeft,
-                ScaleMode = ScaleMode.ScaleY
+                ScaleMode = ScaleMode.ScaleY,
             };
 
             // Set buttons
@@ -204,7 +197,7 @@ namespace Isles
                              new Rectangle(buttonBias * i + buttonBias * 4 / 5, buttonY, buttonDestinationWidth, buttonDestinationHeight),
                              new Rectangle(0, i * 32, buttonSourceWidth, buttonSourceHeight), Keys.F1 + i, null)
                 {
-                    Texture = buttonsTexture
+                    Texture = buttonsTexture,
                 };
                 buttons[i].Disabled = buttons[i].SourceRectangle
                     = new Rectangle(0, i * buttonSourceHeight, buttonSourceWidth, buttonSourceHeight);
@@ -213,7 +206,7 @@ namespace Isles
                 buttons[i].Anchor = Anchor.TopLeft;
                 buttons[i].ScaleMode = ScaleMode.ScaleY;
                 buttons[i].Index = i;
-                buttons[i].Enter += delegate (object o, EventArgs e) { HighLightMoveTo((o as MenuButton).Index); };
+                buttons[i].Enter += (o, e) => { HighLightMoveTo((o as MenuButton).Index); };
                 titlePanel.Add(buttons[i]);
             }
 
@@ -223,26 +216,26 @@ namespace Isles
             buttons[3].HotKey = Keys.D; // Credit
             buttons[4].HotKey = Keys.Q; // Quit
 
-            //buttons[0].Enabled = false;
+            // buttons[0].Enabled = false;
             buttons[2].Enabled = false;
             titlePanel.Add(highLight);
 
             // Click event for Campaign button
-            buttons[0].Click += delegate (object o, EventArgs e)
+            buttons[0].Click += (o, e) =>
             {
                 Audios.Play("OK");
                 gameScreen.StartReplay(GameScreen.DefaultReplayFilename);
                 BaseGame.Singleton.StartScreen(gameScreen);
-                //StartLANGame();
+                // StartLANGame();
             };
 
-            buttons[1].Click += delegate (object o, EventArgs e)
+            buttons[1].Click += (o, e) =>
             {
                 Audios.Play("OK");
                 modeChange = true;
             };
 
-            buttons[3].Click += delegate (object o, EventArgs e)
+            buttons[3].Click += (o, e) =>
             {
                 Event.SendMessage(EventType.Hit, this, this, null, 7);
                 Audios.Play("OK");
@@ -250,8 +243,8 @@ namespace Isles
             };
 
             // Click even for Exit button
-            buttons[4].Click += delegate (object o, EventArgs e) { BaseGame.Singleton.Exit(); };
-            //BaseGame.Singleton.Cursor = Helper.CursorFromFile("Content/UI/NormalCursor.cur");
+            buttons[4].Click += (o, e) => { BaseGame.Singleton.Exit(); };
+            // BaseGame.Singleton.Cursor = Helper.CursorFromFile("Content/UI/NormalCursor.cur");
             highLightMoveTo = buttons[0].Area.X;
             expectedHighlightPos = highLightMoveTo;
             var rand = new Random();
@@ -260,7 +253,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Set the high light destination
+        /// Set the high light destination.
         /// </summary>
         /// <param name="index"></param>
         private void HighLightMoveTo(int index)
@@ -270,14 +263,17 @@ namespace Isles
             {
                 highLightMoveTo -= (int)(10.0 / 800 * ui.DestinationRectangle.Width);
             }
+
             if (index == 2)
             {
                 highLightMoveTo -= (int)(17.0 / 800 * ui.DestinationRectangle.Width);
             }
+
             if (index == 3)
             {
                 highLightMoveTo -= (int)(15.0 / 800 * ui.DestinationRectangle.Width);
             }
+
             if (index == 4)
             {
                 highLightMoveTo -= (int)(25.0 / 800 * ui.DestinationRectangle.Width);
@@ -315,6 +311,7 @@ namespace Isles
                 buttons[i].IgnoreMessage = false;
                 buttons[i].SetAlpha(255);
             }
+
             credit.X = 800;
         }
 
@@ -342,7 +339,7 @@ namespace Isles
             else if (elapsedTime < CreditEmergingTime * 2 + creditRollingTime)
             {
                 var a = (byte)((elapsedTime - CreditEmergingTime - creditRollingTime) /
-                                    (CreditEmergingTime) * 255);
+                                    CreditEmergingTime * 255);
                 for (var i = 0; i < 5; i++)
                 {
                     buttons[i].SetAlpha(a);
@@ -355,18 +352,19 @@ namespace Isles
         }
 
         /// <summary>
-        /// Handle game updates
+        /// Handle game updates.
         /// </summary>
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
-            expectedHighlightPos += ((highLightMoveTo - expectedHighlightPos)
-                                    * 5.5 * gameTime.ElapsedGameTime.TotalSeconds);
+            expectedHighlightPos += (highLightMoveTo - expectedHighlightPos)
+                                    * 5.5 * gameTime.ElapsedGameTime.TotalSeconds;
             highLight.X = (int)expectedHighlightPos;
             foreach (TextField t in credit.Elements)
             {
                 t.ResetDestinationRectangle();
             }
+
             ui.Update(gameTime);
 
             // Update mask destination rectangle
@@ -387,7 +385,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Handle game draw event
+        /// Handle game draw event.
         /// </summary>
         /// <param name="gameTime"></param>
         public void Draw(GameTime gameTime)
@@ -412,7 +410,6 @@ namespace Isles
 
                     // Set an effect parameter to make our overlay
                     // texture scroll in a giant circle.
-
                     disappearEffect.Parameters["Offset"].SetValue(randomOffset);
 
                     // Begin the custom effect.
@@ -423,7 +420,6 @@ namespace Isles
                     // alpha of the SpriteBatch.Draw color parameter.
                     var fade = (byte)(modeChangeTimeRecord / ChangingTime * 255);
                     spriteBatch.Draw(titleDisplayShotTexture, ui.DestinationRectangle,
-                                     //MoveInCircle(gameTime, LoadingDisplayFinished, 1),
                                      new Color(255, 255, 255, (byte)(255 - fade)));
 
                     // End the sprite batch, then end our custom effect.
@@ -432,6 +428,7 @@ namespace Isles
                     disappearEffect.CurrentTechnique.Passes[0].End();
                     disappearEffect.End();
                 }
+
                 return;
             }
 
@@ -447,17 +444,16 @@ namespace Isles
                 Draw(gameTime);
             }
 
-            //ui.Sprite.Begin();
+            // ui.Sprite.Begin();
 
-            //ui.Sprite.Draw(buttonsTexture, new Rectangle((int)highLightPosition, 508,
+            // ui.Sprite.Draw(buttonsTexture, new Rectangle((int)highLightPosition, 508,
             //                buttonDestinationWidth, hightLightDestinationHeight),
             //                new Rectangle(0, 5 * buttonSourceHeight, buttonSourceWidth, 66), Color.White);
-            //ui.Sprite.End();
-
+            // ui.Sprite.End();
         }
 
         /// <summary>
-        /// Called when this screen is activated
+        /// Called when this screen is activated.
         /// </summary>
         public void Enter()
         {
@@ -467,11 +463,10 @@ namespace Isles
         }
 
         /// <summary>
-        /// Called when this screen is deactivated
+        /// Called when this screen is deactivated.
         /// </summary>
         public void Leave()
         {
-
         }
 
         /// <summary>
@@ -482,7 +477,6 @@ namespace Isles
         /// <param name="loadAllContent">Which type of content to load.</param>
         public void LoadContent()
         {
-
         }
 
         /// <summary>
@@ -516,12 +510,10 @@ namespace Isles
 
         public void Dispose()
         {
-
         }
 
         private void StartLANGame()
         {
-
         }
     }
 
@@ -531,7 +523,7 @@ namespace Isles
         private string name;
 
         /// <summary>
-        ///  Gets or sets the name of the menu button
+        ///  Gets or sets the name of the menu button.
         /// </summary>
         public string Name
         {
@@ -540,7 +532,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Construct a new menu button
+        /// Construct a new menu button.
         /// </summary>
         public MenuButton(Texture2D texture,
             Rectangle area, Rectangle srcRectangle, Keys hotKey, string name)
@@ -557,7 +549,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Draw UI element
+        /// Draw UI element.
         /// </summary>
         /// <param name="gameTime"></param>
         public override void Draw(GameTime gameTime, SpriteBatch sprite)
@@ -588,9 +580,9 @@ namespace Isles
                     sourRect = Disabled;
                     buttonColor = new Color(128, 128, 128, (byte)(128 * alpha));
                 }
+
                 sprite.Draw(Texture, destRect, sourRect, buttonColor);
             }
         }
     }
-
 }

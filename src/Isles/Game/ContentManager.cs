@@ -1,41 +1,15 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//-----------------------------------------------------------------------------
-//
-//  Copyright (c) 2006, 2007 Microsoft Corporation.  All rights reserved.
-//
-//  Implements the CRC algorithm, which is used in zip files.  The zip format calls for
-//  the zipfile to contain a CRC for the unencrypted byte stream of each file.
-//
-//  It is based on example source code published at
-//    http://www.vbaccelerator.com/home/net/code/libraries/CRC32/Crc32_zip_CRC32_CRC32_cs.asp
-//
-//  This implementation adds a tweak of that code for use within zip creation.  While
-//  computing the CRC we also compress the byte stream, in the same read loop. This
-//  avoids the need to read through the uncompressed stream twice - once to computer CRC
-//  and another time to compress.
-//
-//
-//  Thu, 30 Mar 2006  13:58
-//-----------------------------------------------------------------------------
-//
-//  ZipContentManager Modified From EasyZip (Copyright?)
-//-----------------------------------------------------------------------------
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Content;
 
 namespace Isles.Engine
 {
-
     /// <summary>
     /// A content manager used to read files stored inside of a .zip file.
     /// </summary>
@@ -52,21 +26,20 @@ namespace Isles.Engine
         /// Creates a new ZipContentManager that loads files from the specified
         /// zip file.
         /// </summary>
-        /// <param name="serviceProvider">Service provider</param>
-        /// <param name="zipFile">Zip file to extract assets from</param>
+        /// <param name="serviceProvider">Service provider.</param>
+        /// <param name="zipFile">Zip file to extract assets from.</param>
         public ZipContentManager(IServiceProvider serviceProvider, string zipFile, string baseDirectory)
             : this(serviceProvider, zipFile, baseDirectory, false)
         {
-
         }
 
         /// <summary>
         /// Creates a new ZipContentManager that loads files from the specified
         /// zip file.
         /// </summary>
-        /// <param name="serviceProvider">Service provider</param>
-        /// <param name="zipFile">Zip file to extract assets from</param>
-        /// <param name="caseSensitive">Whether or not loading assets is case-sensitive</param>
+        /// <param name="serviceProvider">Service provider.</param>
+        /// <param name="zipFile">Zip file to extract assets from.</param>
+        /// <param name="caseSensitive">Whether or not loading assets is case-sensitive.</param>
         public ZipContentManager(IServiceProvider serviceProvider, string zipFile, string baseDirectory, bool caseSensitive)
             : base(serviceProvider)
         {
@@ -113,7 +86,7 @@ namespace Isles.Engine
 
                 foreach (ZipEntry entry in zipFile)
                 {
-                    var entryName = (caseSensitive) ? entry.FileName : entry.FileName.ToLower();
+                    var entryName = caseSensitive ? entry.FileName : entry.FileName.ToLower();
 
                     if (entryName.Equals(fullAssetName))
                     {
@@ -151,8 +124,8 @@ namespace Isles.Engine
         /// Gets an array of asset names from a specific directory within
         /// the zip file.
         /// </summary>
-        /// <param name="directory">The directory to get asset names from</param>
-        /// <returns>An array of strings with all the asset names</returns>
+        /// <param name="directory">The directory to get asset names from.</param>
+        /// <returns>An array of strings with all the asset names.</returns>
         public string[] GetAssetNamesFromDirectory(string directory)
         {
             var filenames = new List<string>();
@@ -185,8 +158,8 @@ namespace Isles.Engine
         /// Gets a Stream for a file inside of the zip folder. For use with non-Content Pipeline
         /// files such as plain images or XML files.
         /// </summary>
-        /// <param name="filename">The name of the file to find (with extension)</param>
-        /// <returns>A Stream that can be used to load the file</returns>
+        /// <param name="filename">The name of the file to find (with extension).</param>
+        /// <returns>A Stream that can be used to load the file.</returns>
         public Stream GetFileStream(string filename)
         {
             try
@@ -212,7 +185,7 @@ namespace Isles.Engine
 
             foreach (ZipEntry entry in zipFile)
             {
-                var entryName = (caseSensitive) ? entry.FileName : entry.FileName.ToLower();
+                var entryName = caseSensitive ? entry.FileName : entry.FileName.ToLower();
 
                 if (entryName.Equals(filename))
                 {
@@ -226,7 +199,7 @@ namespace Isles.Engine
         /// <summary>
         /// Extracts a file from the archive.
         /// </summary>
-        /// <param name="filename">The name of the file to find (with extension)</param>
+        /// <param name="filename">The name of the file to find (with extension).</param>
         private void ExtractFile(string filename)
         {
             filename = filename.Replace("\\", "/");
@@ -238,7 +211,7 @@ namespace Isles.Engine
 
             foreach (ZipEntry entry in zipFile)
             {
-                var entryName = (caseSensitive) ? entry.FileName : entry.FileName.ToLower();
+                var entryName = caseSensitive ? entry.FileName : entry.FileName.ToLower();
 
                 if (entryName.Equals(filename))
                 {
@@ -275,7 +248,7 @@ namespace Isles.Engine
         /// <summary>
         /// Extracts a file from the archive.
         /// </summary>
-        /// <param name="filename">The name of the file to find (with extension)</param>
+        /// <param name="filename">The name of the file to find (with extension).</param>
         private string ExtractFileToTemp(string filename)
         {
             filename = filename.Replace("\\", "/");
@@ -287,7 +260,7 @@ namespace Isles.Engine
 
             foreach (ZipEntry entry in zipFile)
             {
-                var entryName = (caseSensitive) ? entry.FileName : entry.FileName.ToLower();
+                var entryName = caseSensitive ? entry.FileName : entry.FileName.ToLower();
 
                 if (entryName.Equals(filename))
                 {
@@ -365,8 +338,8 @@ namespace Isles.Engine
         /// <summary>
         /// Loads an audio engine from a file inside the archive.
         /// </summary>
-        /// <param name="filename">The name of the audio engine file</param>
-        /// <returns>A new AudioEngine instance</returns>
+        /// <param name="filename">The name of the audio engine file.</param>
+        /// <returns>A new AudioEngine instance.</returns>
         public AudioEngine LoadAudioEngine(string filename)
         {
             if (File.Exists(filename))
@@ -384,9 +357,9 @@ namespace Isles.Engine
         /// <summary>
         /// Loads a SoundBank from a file inside the archive.
         /// </summary>
-        /// <param name="engine">The AudioEngine to associate with the SoundBank</param>
-        /// <param name="filename">The name of the SoundBank file</param>
-        /// <returns>A new SoundBank instance from the file</returns>
+        /// <param name="engine">The AudioEngine to associate with the SoundBank.</param>
+        /// <param name="filename">The name of the SoundBank file.</param>
+        /// <returns>A new SoundBank instance from the file.</returns>
         public SoundBank LoadSoundBank(AudioEngine engine, string filename)
         {
             if (File.Exists(filename))
@@ -404,9 +377,9 @@ namespace Isles.Engine
         /// <summary>
         /// Loads a WaveBank from a file inside the archive.
         /// </summary>
-        /// <param name="engine">The AudioEngine to associate with the WaveBank</param>
-        /// <param name="filename">The name of the WaveBank file</param>
-        /// <returns>A new WaveBank instance from the file</returns>
+        /// <param name="engine">The AudioEngine to associate with the WaveBank.</param>
+        /// <param name="filename">The name of the WaveBank file.</param>
+        /// <returns>A new WaveBank instance from the file.</returns>
         public WaveBank LoadWaveBank(AudioEngine engine, string filename)
         {
             if (File.Exists(filename))
@@ -424,7 +397,7 @@ namespace Isles.Engine
         /// <summary>
         /// This method loads a cursor (.cur or .ani) from a file.
         /// .NET Cursor class does not directly support .ani cursors
-        /// so we have to call the native Win32 functions :(
+        /// so we have to call the native Win32 functions :(.
         /// </summary>
         public Cursor LoadCursor(string filename)
         {
@@ -443,18 +416,19 @@ namespace Isles.Engine
 
     public class ZipEntry
     {
-
         private const int ZipEntrySignature = 0x04034b50;
         private const int ZipEntryDataDescriptorSignature = 0x08074b50;
 
         private bool _Debug;
 
         private DateTime _LastModified;
+
         public DateTime LastModified => _LastModified;
 
         // when this is set, we trim the volume (eg C:\) off any fully-qualified pathname,
         // before writing the ZipEntry into the ZipFile.
         private bool _TrimVolumeFromFullyQualifiedPaths = true;  // by default, trim them.
+
         public bool TrimVolumeFromFullyQualifiedPaths
         {
             get => _TrimVolumeFromFullyQualifiedPaths;
@@ -462,30 +436,37 @@ namespace Isles.Engine
         }
 
         private string _FileName;
+
         public string FileName => _FileName;
 
         private short _VersionNeeded;
+
         public short VersionNeeded => _VersionNeeded;
 
         private short _BitField;
+
         public short BitField => _BitField;
 
         private short _CompressionMethod;
+
         public short CompressionMethod => _CompressionMethod;
 
         private int _CompressedSize;
+
         public int CompressedSize => _CompressedSize;
 
         private int _UncompressedSize;
+
         public int UncompressedSize => _UncompressedSize;
 
-        public double CompressionRatio => 100 * (1.0 - (1.0 * CompressedSize) / (1.0 * UncompressedSize));
+        public double CompressionRatio => 100 * (1.0 - 1.0 * CompressedSize / (1.0 * UncompressedSize));
 
         private int _LastModDateTime;
         private int _Crc32;
         private byte[] _Extra;
 
         private byte[] __filedata;
+
         private byte[] _FileData
         {
             get
@@ -493,12 +474,14 @@ namespace Isles.Engine
                 if (__filedata == null)
                 {
                 }
+
                 return __filedata;
             }
         }
 
         private MemoryStream _UnderlyingMemoryStream;
         private System.IO.Compression.DeflateStream _CompressedStream;
+
         private System.IO.Compression.DeflateStream CompressedStream
         {
             get
@@ -511,11 +494,13 @@ namespace Isles.Engine
                                                     System.IO.Compression.CompressionMode.Compress,
                                                     LeaveUnderlyingStreamOpen);
                 }
+
                 return _CompressedStream;
             }
         }
 
         private byte[] _header;
+
         internal byte[] Header => _header;
 
         private int _RelativeOffsetOfHeader;
@@ -552,7 +537,6 @@ namespace Isles.Engine
             // the PKZIP spec says that if bit 3 is set (0x0008), then the CRC, Compressed size, and uncompressed size
             // come directly after the file data.  The only way to find it is to scan the zip archive for the signature of
             // the Data Descriptor, and presume that that signature does not appear in the (compressed) data of the compressed file.
-
             if ((ze._BitField & 0x0008) != 0x0008)
             {
                 ze._Crc32 = block[i++] + block[i++] * 256 + block[i++] * 256 * 256 + block[i++] * 256 * 256 * 256;
@@ -616,7 +600,7 @@ namespace Isles.Engine
 
         private static bool SignatureIsNotValid(int signature)
         {
-            return (signature != ZipEntrySignature);
+            return signature != ZipEntrySignature;
         }
 
         public static ZipEntry Read(Stream s)
@@ -628,7 +612,7 @@ namespace Isles.Engine
         {
             var entry = new ZipEntry
             {
-                _Debug = TurnOnDebug
+                _Debug = TurnOnDebug,
             };
             if (!ReadHeader(s, entry))
             {
@@ -641,11 +625,13 @@ namespace Isles.Engine
             {
                 throw new Exception("badly formatted zip file.");
             }
+
             // finally, seek past the (already read) Data descriptor if necessary
             if ((entry._BitField & 0x0008) == 0x0008)
             {
                 s.Seek(16, System.IO.SeekOrigin.Current);
             }
+
             return entry;
         }
 
@@ -655,7 +641,7 @@ namespace Isles.Engine
             {
                 _FileName = filename,
 
-                _LastModified = System.IO.File.GetLastWriteTime(filename)
+                _LastModified = System.IO.File.GetLastWriteTime(filename),
             };
             // adjust the time if the .NET BCL thinks it is in DST.
             // see the note elsewhere in this file for more info.
@@ -670,7 +656,6 @@ namespace Isles.Engine
             }
 
             // we don't actually slurp in the file until the caller invokes Write on this entry.
-
             return entry;
         }
 
@@ -734,11 +719,9 @@ namespace Isles.Engine
 
             using (var memstream = new MemoryStream(_FileData))
             {
-
                 Stream input = null;
                 try
                 {
-
                     if (CompressedSize == UncompressedSize)
                     {
                         // the System.IO.Compression.DeflateStream class does not handle uncompressed data.
@@ -777,6 +760,7 @@ namespace Isles.Engine
                                 n = 500;
                                 Console.WriteLine("{0}: truncating dump from {1} to {2} bytes...", TargetFile, _FileData.Length, n);
                             }
+
                             for (var j = 0; j < n; j += 2)
                             {
                                 if ((j > 0) && (j % 40 == 0))
@@ -790,6 +774,7 @@ namespace Isles.Engine
                                     System.Console.Write("{0:X2}", _FileData[j + 1]);
                                 }
                             }
+
                             System.Console.WriteLine("\n");
                         }
 
@@ -874,7 +859,6 @@ namespace Isles.Engine
                         // necessary.  That is to say, if the time in question had occurred
                         // in what the .NET BCL assumed to be DST (an assumption that may be
                         // wrong given the constantly changing DST rules).
-
 #if !XBOX
                         if (LastModified.IsDaylightSavingTime())
                         {
@@ -956,6 +940,7 @@ namespace Isles.Engine
             {
                 System.Console.WriteLine("\ninserting filename into CDS: (length= {0})", Header.Length - 30);
             }
+
             // actual filename (starts at offset 34 in header)
             for (j = 0; j < Header.Length - 30; j++)
             {
@@ -965,6 +950,7 @@ namespace Isles.Engine
                     System.Console.Write(" {0:X2}", bytes[i + j]);
                 }
             }
+
             if (_Debug)
             {
                 System.Console.WriteLine();
@@ -978,7 +964,6 @@ namespace Isles.Engine
         private void WriteHeader(Stream s, byte[] bytes)
         {
             // write the header info
-
             var i = 0;
             // signature
             bytes[i++] = (byte)(ZipEntrySignature & 0x000000FF);
@@ -1014,6 +999,7 @@ namespace Isles.Engine
             {
                 crc = crc32.GetCrc32AndCopy(input, CompressedStream);
             }
+
             CompressedStream.Close();  // to get the footer bytes written to the underlying stream
 
             bytes[i++] = (byte)(crc & 0x000000FF);
@@ -1043,7 +1029,7 @@ namespace Isles.Engine
             // filename length (Int16)
             var length = (short)FileName.Length;
             // see note below about TrimVolumeFromFullyQualifiedPaths.
-            if ((TrimVolumeFromFullyQualifiedPaths) && (FileName[1] == ':') && (FileName[2] == '\\'))
+            if (TrimVolumeFromFullyQualifiedPaths && (FileName[1] == ':') && (FileName[2] == '\\'))
             {
                 length -= 3;
             }
@@ -1068,8 +1054,8 @@ namespace Isles.Engine
             // behavior.  It only affects zip creation.
 
             // actual filename
-            var c = ((TrimVolumeFromFullyQualifiedPaths) && (FileName[1] == ':') && (FileName[2] == '\\')) ?
-          FileName.Substring(3).ToCharArray() :  // trim off volume letter, colon, and slash
+            var c = (TrimVolumeFromFullyQualifiedPaths && (FileName[1] == ':') && (FileName[2] == '\\')) ?
+          FileName.Substring(3).ToCharArray() : // trim off volume letter, colon, and slash
           FileName.ToCharArray();
             var j = 0;
 
@@ -1078,6 +1064,7 @@ namespace Isles.Engine
                 System.Console.WriteLine("local header: writing filename, {0} chars", c.Length);
                 System.Console.WriteLine("starting offset={0}", i);
             }
+
             for (j = 0; (j < c.Length) && (i + j < bytes.Length); j++)
             {
                 bytes[i + j] = System.BitConverter.GetBytes(c[j])[0];
@@ -1086,6 +1073,7 @@ namespace Isles.Engine
                     System.Console.Write(" {0:X2}", bytes[i + j]);
                 }
             }
+
             if (_Debug)
             {
                 System.Console.WriteLine();
@@ -1109,6 +1097,7 @@ namespace Isles.Engine
 
                 System.Console.WriteLine();
             }
+
             // finally, write the header to the stream
             s.Write(bytes, 0, i);
 
@@ -1141,9 +1130,9 @@ namespace Isles.Engine
                 Console.WriteLine("{0}: writing compressed data to zipfile...", FileName);
                 Console.WriteLine("{0}: total data length: {1}", FileName, _UnderlyingMemoryStream.Length);
             }
+
             while ((n = _UnderlyingMemoryStream.Read(bytes, 0, bytes.Length)) != 0)
             {
-
                 if (_Debug)
                 {
                     Console.WriteLine("{0}: transferring {1} bytes...", FileName, n);
@@ -1161,14 +1150,15 @@ namespace Isles.Engine
                             System.Console.Write("{0:X2}", bytes[j + 1]);
                         }
                     }
+
                     System.Console.WriteLine("\n");
                 }
 
                 s.Write(bytes, 0, n);
             }
 
-            //_CompressedStream.Close();
-            //_CompressedStream= null;
+            // _CompressedStream.Close();
+            // _CompressedStream= null;
             _UnderlyingMemoryStream.Close();
             _UnderlyingMemoryStream = null;
         }
@@ -1176,36 +1166,43 @@ namespace Isles.Engine
 
     public class ZipDirEntry
     {
-
         internal const int ZipDirEntrySignature = 0x02014b50;
 
         private ZipDirEntry() { }
 
         private DateTime _LastModified;
+
         public DateTime LastModified => _LastModified;
 
         private string _FileName;
+
         public string FileName => _FileName;
 
         private string _Comment;
+
         public string Comment => _Comment;
 
         private short _VersionMadeBy;
+
         public short VersionMadeBy => _VersionMadeBy;
 
         private short _VersionNeeded;
+
         public short VersionNeeded => _VersionNeeded;
 
         private short _CompressionMethod;
+
         public short CompressionMethod => _CompressionMethod;
 
         private int _CompressedSize;
+
         public int CompressedSize => _CompressedSize;
 
         private int _UncompressedSize;
+
         public int UncompressedSize => _UncompressedSize;
 
-        public double CompressionRatio => 100 * (1.0 - (1.0 * CompressedSize) / (1.0 * UncompressedSize));
+        public double CompressionRatio => 100 * (1.0 - 1.0 * CompressedSize / (1.0 * UncompressedSize));
 
         private int _LastModDateTime;
 
@@ -1220,7 +1217,6 @@ namespace Isles.Engine
 
         public static ZipDirEntry Read(Stream s, bool TurnOnDebug)
         {
-
             var signature = Shared.ReadSignature(s);
             // return null if this is not a local file header signature
             if (SignatureIsNotValid(signature))
@@ -1249,7 +1245,7 @@ namespace Isles.Engine
                 _CompressionMethod = (short)(block[i++] + block[i++] * 256),
                 _LastModDateTime = block[i++] + block[i++] * 256 + block[i++] * 256 * 256 + block[i++] * 256 * 256 * 256,
                 _CompressedSize = block[i++] + block[i++] * 256 + block[i++] * 256 * 256 + block[i++] * 256 * 256 * 256,
-                _UncompressedSize = block[i++] + block[i++] * 256 + block[i++] * 256 * 256 + block[i++] * 256 * 256 * 256
+                _UncompressedSize = block[i++] + block[i++] * 256 + block[i++] * 256 * 256 + block[i++] * 256 * 256 * 256,
             };
 
             zde._LastModified = Shared.PackedToDateTime(zde._LastModDateTime);
@@ -1278,7 +1274,7 @@ namespace Isles.Engine
 
         private static bool SignatureIsNotValid(int signature)
         {
-            return (signature != ZipDirEntrySignature);
+            return signature != ZipDirEntrySignature;
         }
     }
 
@@ -1286,12 +1282,14 @@ namespace Isles.Engine
       IDisposable
     {
         private string _name;
+
         public string Name => _name;
 
         // when this is set, we trim the volume (eg C:) off any fully-qualified pathname,
         // before writing the ZipEntry into the ZipFile.
         // We default this to true.  This allows Windows Explorer to read the zip archives properly.
         private bool _TrimVolumeFromFullyQualifiedPaths = true;
+
         public bool TrimVolumeFromFullyQualifiedPaths
         {
             get => _TrimVolumeFromFullyQualifiedPaths;
@@ -1306,6 +1304,7 @@ namespace Isles.Engine
                 {
                     _readstream = System.IO.File.OpenRead(_name);
                 }
+
                 return _readstream;
             }
         }
@@ -1318,6 +1317,7 @@ namespace Isles.Engine
                 {
                     _writestream = new FileStream(_name, System.IO.FileMode.CreateNew);
                 }
+
                 return _writestream;
             }
         }
@@ -1409,6 +1409,7 @@ namespace Isles.Engine
             {
                 e.WriteCentralDirectoryEntry(WriteStream);
             }
+
             var Finish = WriteStream.Length;
 
             // now, the footer
@@ -1476,12 +1477,11 @@ namespace Isles.Engine
         /// </summary>
         public static ZipFile Read(string zipfilename, bool TurnOnDebug)
         {
-
             var zf = new ZipFile
             {
                 _Debug = TurnOnDebug,
                 _name = zipfilename,
-                _entries = new List<ZipEntry>()
+                _entries = new List<ZipEntry>(),
             };
             ZipEntry e;
             while ((e = ZipEntry.Read(zf.ReadStream, zf._Debug)) != null)
@@ -1541,6 +1541,7 @@ namespace Isles.Engine
                     System.Console.WriteLine(new string('-', 72));
                     header = false;
                 }
+
                 if (WantVerbose)
                 {
                     System.Console.WriteLine("{1,-22} {2,-6} {3,4:F0}%   {4,-8} {0}",
@@ -1576,6 +1577,7 @@ namespace Isles.Engine
                         return e;
                     }
                 }
+
                 return null;
             }
         }
@@ -1611,12 +1613,14 @@ namespace Isles.Engine
                         _readstream.Dispose();
                         _readstream = null;
                     }
+
                     if (_writestream != null)
                     {
                         _writestream.Dispose();
                         _writestream = null;
                     }
                 }
+
                 _disposed = true;
             }
         }
@@ -1639,13 +1643,14 @@ namespace Isles.Engine
         private const int BUFFER_SIZE = 8192;
 
         private int _TotalBytesRead;
+
         public int TotalBytesRead => _TotalBytesRead;
 
         /// <summary>
         /// Returns the CRC32 for the specified stream.
         /// </summary>
-        /// <param name="input">The stream over which to calculate the CRC32</param>
-        /// <returns>the CRC32 calculation</returns>
+        /// <param name="input">The stream over which to calculate the CRC32.</param>
+        /// <returns>the CRC32 calculation.</returns>
         public uint GetCrc32(Stream input)
         {
             return GetCrc32AndCopy(input, null);
@@ -1654,9 +1659,9 @@ namespace Isles.Engine
         /// <summary>
         /// Returns the CRC32 for the specified stream, and writes the input into the output stream.
         /// </summary>
-        /// <param name="input">The stream over which to calculate the CRC32</param>
-        /// <param name="output">The stream into which to deflate the input</param>
-        /// <returns>the CRC32 calculation</returns>
+        /// <param name="input">The stream over which to calculate the CRC32.</param>
+        /// <param name="output">The stream into which to deflate the input.</param>
+        /// <returns>the CRC32 calculation.</returns>
         public uint GetCrc32AndCopy(Stream input, Stream output)
         {
             unchecked
@@ -1680,6 +1685,7 @@ namespace Isles.Engine
                     {
                         crc32Result = ((crc32Result) >> 8) ^ crc32Table[(buffer[i]) ^ ((crc32Result) & 0x000000FF)];
                     }
+
                     count = input.Read(buffer, 0, readSize);
                     if (output != null)
                     {
@@ -1687,7 +1693,6 @@ namespace Isles.Engine
                     }
 
                     _TotalBytesRead += count;
-
                 }
 
                 return ~crc32Result;
@@ -1724,6 +1729,7 @@ namespace Isles.Engine
                             dwCrc >>= 1;
                         }
                     }
+
                     crc32Table[i] = dwCrc;
                 }
             }
@@ -1740,6 +1746,7 @@ namespace Isles.Engine
             {
                 c[i] = (char)buf[i]; // System.BitConverter.ToChar(buf, start+i*2);
             }
+
             var s = new string(c, 0, i);
             return s;
         }
@@ -1782,7 +1789,7 @@ namespace Isles.Engine
                         {
                             s.Seek(i - n, System.IO.SeekOrigin.Current);
                             var sig = ReadSignature(s);
-                            success = (sig == SignatureToFind);
+                            success = sig == SignatureToFind;
                             if (!success)
                             {
                                 s.Seek(-3, System.IO.SeekOrigin.Current);
@@ -1809,10 +1816,11 @@ namespace Isles.Engine
             }
 
             // subtract 4 for the signature.
-            var bytesRead = (s.Position - startingPosition) - 4;
+            var bytesRead = s.Position - startingPosition - 4;
             // number of bytes read, should be the same as compressed size of file
             return bytesRead;
         }
+
         protected internal static DateTime PackedToDateTime(int packedDateTime)
         {
             var packedTime = (short)(packedDateTime & 0x0000ffff);
@@ -1849,5 +1857,4 @@ namespace Isles.Engine
             return (int)(((uint)(packedDate << 16)) | packedTime);
         }
     }
-
 }

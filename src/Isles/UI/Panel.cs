@@ -1,35 +1,30 @@
-﻿//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+﻿// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Graphics;
-using Isles.Graphics;
 using Isles.Engine;
+using Isles.Graphics;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Isles.UI
 {
-
     /// <summary>
-    /// Basic Panel
+    /// Basic Panel.
     /// </summary>
     public class Panel : UIElement
     {
-
         /// <summary>
-        /// All UI elements in this panel
+        /// All UI elements in this panel.
         /// </summary>
         /// FIXME: This is not a good design practise...
         protected BroadcastList<IUIElement, List<IUIElement>> elements = new
 ();
 
         /// <summary>
-        /// Gets all ui elements contained in this panel
+        /// Gets all ui elements contained in this panel.
         /// </summary>
         public IEnumerable<IUIElement> Elements => elements;
 
@@ -46,6 +41,7 @@ namespace Isles.UI
         }
 
         private Rectangle actualEffectiveRegion;
+
         public Rectangle ActualEffectiveRegion
         {
             get
@@ -54,6 +50,7 @@ namespace Isles.UI
                 {
                     actualEffectiveRegion = GetRelativeRectangle(effectiveRegion);
                 }
+
                 return actualEffectiveRegion;
             }
         }
@@ -66,6 +63,7 @@ namespace Isles.UI
                 {
                     ResetDestinationRectangle();
                 }
+
                 return base.DestinationRectangle;
             }
         }
@@ -77,7 +75,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Create a panel
+        /// Create a panel.
         /// </summary>
         /// <param name="area"></param>
         public Panel(Rectangle area)
@@ -87,7 +85,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Adds an UI element to the panel
+        /// Adds an UI element to the panel.
         /// </summary>
         /// <param name="element"></param>
         public virtual void Add(IUIElement element)
@@ -97,7 +95,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Removes an UI elment from the panel
+        /// Removes an UI elment from the panel.
         /// </summary>
         /// <param name="element"></param>
         public virtual void Remove(IUIElement element)
@@ -125,7 +123,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Update all UI elements
+        /// Update all UI elements.
         /// </summary>
         /// <param name="gameTime"></param>
         public override void Update(GameTime gameTime)
@@ -139,7 +137,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Draw all UI elements
+        /// Draw all UI elements.
         /// </summary>
         /// <param name="gameTime"></param>
         public override void Draw(GameTime gameTime, SpriteBatch sprite)
@@ -187,20 +185,22 @@ namespace Isles.UI
     }
 
     /// <summary>
-    /// Game scroll panel
+    /// Game scroll panel.
     /// </summary>
     public class ScrollPanel : Panel
     {
         /// <summary>
-        /// Index of the left most UIElement shown currently
+        /// Index of the left most UIElement shown currently.
         /// </summary>
         private int current;
 
         /// <summary>
-        /// Max number of UIElement visible
+        /// Max number of UIElement visible.
         /// </summary>
         private int max;
-        private readonly int buttonWidth, scrollButtonWidth, buttonHeight;
+        private readonly int buttonWidth;
+        private readonly int scrollButtonWidth;
+        private readonly int buttonHeight;
 
         public Button Left;
         public Button Right;
@@ -373,7 +373,7 @@ namespace Isles.UI
         private string text;
 
         /// <summary>
-        /// Gets or sets the text to be displayed
+        /// Gets or sets the text to be displayed.
         /// </summary>
         public string Text
         {
@@ -403,14 +403,15 @@ namespace Isles.UI
         private string formatedText;
 
         /// <summary>
-        /// Gets the formatted text
+        /// Gets the formatted text.
         /// </summary>
         public string FormatedText => formatedText;
 
         /// <summary>
-        /// Color of the text
+        /// Color of the text.
         /// </summary>
         private Color color;
+
         public Color Color
         {
             get => color;
@@ -418,8 +419,9 @@ namespace Isles.UI
         }
 
         private bool centered;
+
         /// <summary>
-        /// Gets or sets whether the text is centered
+        /// Gets or sets whether the text is centered.
         /// </summary>
         public bool Centered
         {
@@ -439,13 +441,12 @@ namespace Isles.UI
         private float fontSize = 13f / 23;
 
         /// <summary>
-        /// Gets or sets the font size
+        /// Gets or sets the font size.
         /// </summary>
         public float FontSize
         {
             get => fontSize;
             set => fontSize = value;
-
         }
 
         public int RealHeight => (int)(Graphics2D.Font.MeasureString(formatedText).Y * fontSize);
@@ -460,7 +461,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Color for shadow
+        /// Color for shadow.
         /// </summary>
         private Color shadowColor = Color.Black;
 
@@ -471,7 +472,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Constructors
+        /// Constructors.
         /// </summary>
         /// <param name="text"></param>
         /// <param name="area"></param>
@@ -485,7 +486,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Constructors
+        /// Constructors.
         /// </summary>
         /// <param name="text"></param>
         /// <param name="area"></param>
@@ -501,7 +502,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Ignore event
+        /// Ignore event.
         /// </summary>
         public override EventResult HandleEvent(EventType type, object sender, object tag)
         {
@@ -521,12 +522,13 @@ namespace Isles.UI
                                     base.DestinationRectangle.Height, fontSize,
                                     Graphics2D.Font);
                 }
+
                 return base.DestinationRectangle;
             }
         }
 
         /// <summary>
-        /// Draw
+        /// Draw.
         /// </summary>
         public override void Draw(GameTime gameTime, SpriteBatch sprite)
         {
@@ -575,6 +577,7 @@ namespace Isles.UI
                                         SpriteEffects.None, 0);
                 }
             }
+
             base.Draw(gameTime, sprite);
         }
     }
@@ -633,7 +636,7 @@ namespace Isles.UI
                 }
 
                 // New charactor
-                var upperCase = input.Keyboard.IsKeyDown(Keys.CapsLock);//input.IsShiftPressed;
+                var upperCase = input.Keyboard.IsKeyDown(Keys.CapsLock);// input.IsShiftPressed;
 
                 var inputChar = Input.KeyToChar(key, upperCase);
 
@@ -649,5 +652,4 @@ namespace Isles.UI
             return EventResult.Unhandled;
         }
     }
-
 }

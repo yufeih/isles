@@ -1,18 +1,14 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Engine
 {
-
     /// <summary>
     /// Log will create automatically a log file and write
     /// log/error/debug info for simple runtime error checking, very useful
@@ -23,23 +19,22 @@ namespace Isles.Engine
     /// Note: I don't use this class anymore for big projects, but its small
     /// and handy for smaller projects and nice to log non-debugable stuff.
     ///
-    /// Orignally grabbed from Racing game
+    /// Orignally grabbed from Racing game.
     /// </summary>
     public static class Log
     {
-
         /// <summary>
-        /// Writer
+        /// Writer.
         /// </summary>
         private static StreamWriter writer;
 
         /// <summary>
-        /// Log filename
+        /// Log filename.
         /// </summary>
         private const string LogFilename = "Log.txt";
 
         /// <summary>
-        /// Static constructor
+        /// Static constructor.
         /// </summary>
         public static void Initialize()
         {
@@ -59,6 +54,7 @@ namespace Isles.Engine
                         LogFilename, FileMode.Create,
                         FileAccess.Write, FileShare.ReadWrite);
                 }
+
                 // Associate writer with that, when writing to a new file,
                 // make sure UTF-8 sign is written, else don't write it again!
                 writer = file.Length == 0
@@ -90,7 +86,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Writes a LogType and info/error message string to the Log file with time info
+        /// Writes a LogType and info/error message string to the Log file with time info.
         /// </summary>
         /// <param name="message"></param>
         static public void Write(string message)
@@ -99,7 +95,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Writes a LogType and info/error message string to the Log file
+        /// Writes a LogType and info/error message string to the Log file.
         /// </summary>
         static public void Write(string message, bool writeTime)
         {
@@ -143,7 +139,6 @@ namespace Isles.Engine
                 // createable (e.g. on a CD-Rom) it doesn't matter.
             }
         }
-
     }
 
     public static class Timer
@@ -153,9 +148,9 @@ namespace Isles.Engine
         private static readonly List<float> times = new();
 
         /// <summary>
-        /// Adds a new timer alert
+        /// Adds a new timer alert.
         /// </summary>
-        /// <param name="interval">Time interval measured in seconds</param>
+        /// <param name="interval">Time interval measured in seconds.</param>
         public static void Add(IEventListener handler, float interval)
         {
             if (handler == null || interval <= 0)
@@ -174,11 +169,11 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Removes a timer alert
+        /// Removes a timer alert.
         /// </summary>
         public static void Remove(IEventListener handler)
         {
-            var i = handlers.FindIndex(delegate (IEventListener item)
+            var i = handlers.FindIndex(delegate(IEventListener item)
             {
                 return item == handler;
             });
@@ -192,7 +187,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Update the timer and triggers all timer events
+        /// Update the timer and triggers all timer events.
         /// </summary>
         /// <param name="gameTime"></param>
         public static void Update(GameTime gameTime)
@@ -211,7 +206,7 @@ namespace Isles.Engine
     }
 
     /// <summary>
-    /// Frame rate profiler
+    /// Frame rate profiler.
     /// </summary>
     public class Profiler : DrawableGameComponent
     {
@@ -225,22 +220,22 @@ namespace Isles.Engine
         private float overallFps;
 
         /// <summary>
-        /// Time needed to calculate FPS, Measured in milliseconds
+        /// Time needed to calculate FPS, Measured in milliseconds.
         /// </summary>
         public const float UpdateFrequency = 1000;
 
         /// <summary>
-        /// Gets the total number of frames since profiler started
+        /// Gets the total number of frames since profiler started.
         /// </summary>
         public int CurrentFrame => currentFrame;
 
         /// <summary>
-        /// Gets the average frame rate up until now
+        /// Gets the average frame rate up until now.
         /// </summary>
         public float OverallFPS => overallFps;
 
         /// <summary>
-        /// Gets the current Frame Per Second for the game
+        /// Gets the current Frame Per Second for the game.
         /// </summary>
         public float FramesPerSecond => fpsInterpolated;
 
@@ -322,14 +317,14 @@ namespace Isles.Engine
     }
 
     /// <summary>
-    /// Screenshot capturer grabbed from Racing game
+    /// Screenshot capturer grabbed from Racing game.
     /// </summary>
     public partial class ScreenshotCapturer : GameComponent
     {
         private const string ScreenshotsDirectory = "Screenshots";
 
         /// <summary>
-        /// Internal screenshot number (will increase by one each screenshot)
+        /// Internal screenshot number (will increase by one each screenshot).
         /// </summary>
         private int screenshotNum;
 
@@ -340,7 +335,7 @@ namespace Isles.Engine
         private readonly BaseGame game;
 
         /// <summary>
-        /// If it's true, the game should call TakeScreenshot at the end of the frame
+        /// If it's true, the game should call TakeScreenshot at the end of the frame.
         /// </summary>
         private bool shouldCapture;
 
@@ -379,10 +374,10 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Screenshot name builder
+        /// Screenshot name builder.
         /// </summary>
-        /// <param name="num">Num</param>
-        /// <returns>String</returns>
+        /// <param name="num">Num.</param>
+        /// <returns>String.</returns>
         private string ScreenshotNameBuilder(int num)
         {
             return ScreenshotsDirectory + "/" +
@@ -391,9 +386,9 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Get current screenshot num
+        /// Get current screenshot num.
         /// </summary>
-        /// <returns>Int</returns>
+        /// <returns>Int.</returns>
         private int GetCurrentScreenshotNum()
         {
             // We must search for last screenshot we can found in list using own
@@ -468,7 +463,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Make screenshot
+        /// Make screenshot.
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage(
             "Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
@@ -478,9 +473,8 @@ namespace Isles.Engine
         {
             try
             {
-                //NOTE: This doesn't always work on all cards, especially if
+                // NOTE: This doesn't always work on all cards, especially if
                 // desktop mode switches in fullscreen mode!
-
                 if (photographer == null)
                 {
                     screenshotNum++;
@@ -536,19 +530,17 @@ namespace Isles.Engine
         {
             if (screenshot != null)
             {
-                //screenshot.Dispose();
+                // screenshot.Dispose();
                 screenshot = null;
             }
 
-            //if (Input.KeyboardKeyJustPressed(Keys.PrintScreen))
-            //{
+            // if (Input.KeyboardKeyJustPressed(Keys.PrintScreen))
+            // {
             //    shouldCapture = true;
             //    //TakeScreenshot();
-            //}
-
+            // }
             base.Update(gameTime);
         }
-
     }
 
     public class PathGraphVisualizer : DrawableGameComponent
@@ -643,5 +635,4 @@ namespace Isles.Engine
             }
         }
     }
-
 }

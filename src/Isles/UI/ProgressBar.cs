@@ -1,20 +1,15 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Isles.Engine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Isles.Engine;
 
 namespace Isles.UI
 {
     public class ProgressBar : UIElement
     {
-
-        //About time control
-
+        // About time control
         public bool HighLightOn = true;
 
         public double HightLightCycle { get; set; } = 2.5;
@@ -22,7 +17,7 @@ namespace Isles.UI
         public double StartingTime { get; set; }
 
         /// <summary>
-        /// Pixels per second
+        /// Pixels per second.
         /// </summary>
         public double HighLightRollingSpeed { get; set; }
 
@@ -31,7 +26,6 @@ namespace Isles.UI
         public int HighLightLength { get; set; } = 20;
 
         // About Textures: 5 in total including the Frame of the bar
-
         private Rectangle sourceRectangleLeftEnd;
 
         public Rectangle SourceRectangleLeftEnd
@@ -108,9 +102,9 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Set the progress
+        /// Set the progress.
         /// </summary>
-        /// <param name="persentage">integer between 0 - 100</param>
+        /// <param name="persentage">integer between 0 - 100.</param>
         public void SetProgress(int persentage)
         {
             Persentage = persentage;
@@ -135,6 +129,7 @@ namespace Isles.UI
                 sprite.Draw(Texture, new Rectangle(FillingRectangle.X + FillingRectangle.Width / 2, FillingRectangle.Y,
                             FillingRectangle.Width / 2, FillingRectangle.Height), sourceRectangleRightEnd, Color.White);
             }
+
             /*
             // Draw the rolling highlight
             int highLightFront = (int)((gameTime.TotalGameTime.TotalSeconds - StartingTime)
@@ -177,7 +172,6 @@ namespace Isles.UI
                 }
             }
             */
-
         }
 
         public override void Update(GameTime gameTime)

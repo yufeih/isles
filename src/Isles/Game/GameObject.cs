@@ -1,35 +1,31 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Graphics;
-using Isles.Graphics;
 using Isles.Engine;
+using Isles.Graphics;
 using Isles.UI;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Isles
 {
-
     /// <summary>
-    /// Game replay and network game uses this interface
+    /// Game replay and network game uses this interface.
     /// </summary>
     public interface IGameObject
     {
         /// <summary>
-        /// Serialize any change of this recordable
+        /// Serialize any change of this recordable.
         /// </summary>
         void Serialize(Stream output);
 
         /// <summary>
-        /// Deserialize this recordable from input bytes
+        /// Deserialize this recordable from input bytes.
         /// </summary>
         void Deserialize(Stream input);
     }
@@ -41,7 +37,7 @@ namespace Isles
     public abstract class GameObject : Entity, ISelectable, IGameObject
     {
         /// <summary>
-        /// Gets or sets the owner of this charactor
+        /// Gets or sets the owner of this charactor.
         /// </summary>
         public Player Owner
         {
@@ -53,7 +49,7 @@ namespace Isles
         private Player owner;
 
         /// <summary>
-        /// Gets or sets the priority of the game object
+        /// Gets or sets the priority of the game object.
         /// </summary>
         public float Priority
         {
@@ -64,21 +60,21 @@ namespace Isles
         private float priority;
 
         /// <summary>
-        /// Gets or sets the icon for this game object
+        /// Gets or sets the icon for this game object.
         /// </summary>
         public Icon Icon => icon;
 
         private Icon icon;
 
         /// <summary>
-        /// Gets or sets the snap for this game object
+        /// Gets or sets the snap for this game object.
         /// </summary>
         public Icon Snapshot => snapshot;
 
         private Icon snapshot;
 
         /// <summary>
-        /// Gets snapshot texture
+        /// Gets snapshot texture.
         /// </summary>
         public static Texture2D SnapshotTexture
         {
@@ -98,7 +94,7 @@ namespace Isles
         private SpellButton profileButton;
 
         /// <summary>
-        /// Gets or sets the profile button
+        /// Gets or sets the profile button.
         /// </summary>
         public SpellButton ProfileButton
         {
@@ -109,7 +105,7 @@ namespace Isles
         private TipBox tip;
 
         /// <summary>
-        /// Gets or sets the tip for the object
+        /// Gets or sets the tip for the object.
         /// </summary>
         public TipBox Tip
         {
@@ -118,32 +114,32 @@ namespace Isles
         }
 
         /// <summary>
-        /// Gets or sets the view distance of this game object
+        /// Gets or sets the view distance of this game object.
         /// </summary>
         public float ViewDistance = 100;
 
         /// <summary>
-        /// Gets or sets the radius of selection circle
+        /// Gets or sets the radius of selection circle.
         /// </summary>
         public float SelectionAreaRadius = 10;
 
         /// <summary>
-        /// Gets or sets the sound effect associated with this game object
+        /// Gets or sets the sound effect associated with this game object.
         /// </summary>
         public string Sound;
 
         /// <summary>
-        /// Gets or sets the sound effect for combat
+        /// Gets or sets the sound effect for combat.
         /// </summary>
         public string SoundCombat;
 
         /// <summary>
-        /// Gets or sets the sound effect for die
+        /// Gets or sets the sound effect for die.
         /// </summary>
         public string SoundDie;
 
         /// <summary>
-        /// Gets or sets the health of this game object
+        /// Gets or sets the health of this game object.
         /// </summary>
         public float Health
         {
@@ -205,7 +201,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Gets or sets the maximum health of this charactor
+        /// Gets or sets the maximum health of this charactor.
         /// </summary>
         public float MaximumHealth
         {
@@ -228,7 +224,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Gets whether the game object is alive
+        /// Gets whether the game object is alive.
         /// </summary>
         public bool IsAlive => health > 0 || (health <= 0 && maximumHealth <= 0);
 
@@ -236,12 +232,12 @@ namespace Isles
         private float health;
 
         /// <summary>
-        /// Gets or sets game object spells
+        /// Gets or sets game object spells.
         /// </summary>
         public List<Spell> Spells = new();
 
         /// <summary>
-        /// Gets or sets if the game object is selected
+        /// Gets or sets if the game object is selected.
         /// </summary>
         public bool Selected
         {
@@ -265,7 +261,7 @@ namespace Isles
         private bool selected;
 
         /// <summary>
-        /// Gets of sets if the game object is highlighted
+        /// Gets of sets if the game object is highlighted.
         /// </summary>
         public bool Highlighted
         {
@@ -299,7 +295,7 @@ namespace Isles
         private bool highlighted;
 
         /// <summary>
-        /// Gets of sets if the game object is currently focused
+        /// Gets of sets if the game object is currently focused.
         /// </summary>
         public bool Focused
         {
@@ -319,7 +315,7 @@ namespace Isles
         private bool focused;
 
         /// <summary>
-        /// Gets the top center position of the game object
+        /// Gets the top center position of the game object.
         /// </summary>
         public Vector3 TopCenter
         {
@@ -332,33 +328,33 @@ namespace Isles
         }
 
         /// <summary>
-        /// Min/Max attack point
+        /// Min/Max attack point.
         /// </summary>
         public Vector2 AttackPoint;
 
         /// <summary>
-        /// Min/Max defense point
+        /// Min/Max defense point.
         /// </summary>
         public Vector2 DefensePoint;
 
         /// <summary>
-        /// Gets or sets the min/max attack range of this charactor
+        /// Gets or sets the min/max attack range of this charactor.
         /// </summary>
         public Vector2 AttackRange;
 
         /// <summary>
-        /// Gets or sets the duration of each individual attack
+        /// Gets or sets the duration of each individual attack.
         /// </summary>
         public float AttackDuration;
 
         /// <summary>
-        /// Flash related stuff
+        /// Flash related stuff.
         /// </summary>
         private const float FlashDuration = 0.5f;
         private float flashElapsedTime = FlashDuration + 0.1f;
 
         /// <summary>
-        /// Get or sets the attachment of the game model
+        /// Get or sets the attachment of the game model.
         /// </summary>
         public List<KeyValuePair<GameModel, int>> Attachment = new();
 
@@ -368,7 +364,6 @@ namespace Isles
         public GameObject(GameWorld world, string classID)
             : base(world)
         {
-
             if (GameDefault.Singleton.WorldObjectDefaults.TryGetValue(classID, out XmlElement xml))
             {
                 Deserialize(xml);
@@ -376,7 +371,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Make the game object flash
+        /// Make the game object flash.
         /// </summary>
         public void Flash()
         {
@@ -384,22 +379,21 @@ namespace Isles
         }
 
         /// <summary>
-        /// Serialize any changes made to the game object
+        /// Serialize any changes made to the game object.
         /// </summary>
         public virtual void Serialize(Stream stream)
         {
-
         }
 
         /// <summary>
-        /// Deserialize any changes made to the game object
+        /// Deserialize any changes made to the game object.
         /// </summary>
         public virtual void Deserialize(Stream stream)
         {
         }
 
         /// <summary>
-        /// Deserialize the game object from an xml element
+        /// Deserialize the game object from an xml element.
         /// </summary>
         public override void Deserialize(XmlElement xml)
         {
@@ -505,15 +499,15 @@ namespace Isles
                     Hovered = Icon.RectangeFromIndex(iconIndex + 1),
                     Pressed = Icon.RectangeFromIndex(iconIndex + 2),
                     Anchor = Anchor.BottomLeft,
-                    ScaleMode = ScaleMode.ScaleY
+                    ScaleMode = ScaleMode.ScaleY,
                 };
 
-                profileButton.Click += new EventHandler(delegate (object sender, EventArgs e)
+                profileButton.Click += new EventHandler(delegate(object sender, EventArgs e)
                 {
                     Player.LocalPlayer.Focus(this);
                 });
 
-                profileButton.DoubleClick += new EventHandler(delegate (object sender, EventArgs e)
+                profileButton.DoubleClick += new EventHandler(delegate(object sender, EventArgs e)
                 {
                     Player.LocalPlayer.SelectGroup(this);
                 });
@@ -556,7 +550,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Add a new spell for the game object
+        /// Add a new spell for the game object.
         /// </summary>
         /// <param name="spell"></param>
         public void AddSpell(string name)
@@ -586,7 +580,9 @@ namespace Isles
         }
 
         protected virtual void OnCreateSpell(Spell spell) { }
+
         public virtual void PerformAction(Vector3 position, bool queueAction) { }
+
         public virtual void PerformAction(Entity entity, bool queueAction) { }
 
         public override void OnCreate()
@@ -595,8 +591,7 @@ namespace Isles
 
             if (owner != null)
             {
-                //Model.Tint = owner.TeamColor.ToVector3();
-
+                // Model.Tint = owner.TeamColor.ToVector3();
                 if (AttackPoint.X > 0)
                 {
                     AttackPoint.X += owner.AttackPoint;
@@ -622,7 +617,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Gets the relationship with another game object
+        /// Gets the relationship with another game object.
         /// </summary>
         public PlayerRelation GetRelation(GameObject gameObject)
         {
@@ -723,24 +718,24 @@ namespace Isles
         public bool ShowStatus = true;
 
         /// <summary>
-        /// Gets or sets whether this game object is currently in the fog of war
+        /// Gets or sets whether this game object is currently in the fog of war.
         /// </summary>
         public bool InFogOfWar;
 
         /// <summary>
-        /// Gets or sets whether this game object will be shown in the fog of war
+        /// Gets or sets whether this game object will be shown in the fog of war.
         /// </summary>
         public bool VisibleInFogOfWar = true;
 
         /// <summary>
-        /// Colors
+        /// Colors.
         /// </summary>
         private static readonly Vector3 Green = Color.Green.ToVector3();
         private static readonly Vector3 Yellow = Color.Yellow.ToVector3();
         private static readonly Vector3 Red = Color.Red.ToVector3();
 
         /// <summary>
-        /// Gets whether models should be drawed
+        /// Gets whether models should be drawed.
         /// </summary>
         public bool ShouldDrawModel => !InFogOfWar && Visible && WithinViewFrustum;
 
@@ -752,7 +747,7 @@ namespace Isles
                 var glow = (float)Math.Sin(MathHelper.Pi * flashElapsedTime / FlashDuration);
                 Model.Glow = new Vector4(MathHelper.Clamp(glow, 0, 1));
 
-                flashElapsedTime += (float)(gameTime.ElapsedGameTime.TotalSeconds);
+                flashElapsedTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
                 if (flashElapsedTime > FlashDuration)
                 {
                     Model.Glow = Vector4.UnitW;
@@ -831,16 +826,17 @@ namespace Isles
             var title = new TextField(Name, 16f / 23, Color.Gold,
                                             new Rectangle(0, 6, 150, 20))
             {
-                Centered = true
+                Centered = true,
             };
             if (Owner.Name != null && Owner.Name != "")
             {
                 content = new TextField(Owner.Name, 15f / 23, Color.White,
                                         new Rectangle(0, 25, 150, 20))
                 {
-                    Centered = true
+                    Centered = true,
                 };
             }
+
             var tip = new TipBox(150, title.RealHeight +
                                         (content != null ? content.RealHeight : 0) + 20);
 
@@ -905,12 +901,12 @@ namespace Isles
         }
 
         /// <summary>
-        /// Whether this game object has been spotted by local player
+        /// Whether this game object has been spotted by local player.
         /// </summary>
         public bool Spotted;
 
         /// <summary>
-        /// Copyed model for drawing in the fog of war
+        /// Copyed model for drawing in the fog of war.
         /// </summary>
         private GameModel modelShadow;
 
@@ -931,7 +927,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Gets the game model attached to the specified bone
+        /// Gets the game model attached to the specified bone.
         /// </summary>
         public GameModel GetAttachment(string boneName)
         {
@@ -956,7 +952,6 @@ namespace Isles
         public static float ComputeHit(GameObject from, GameObject to)
         {
             // A * (  K + clamp(1 - D / A) * (1 - K) ) * 10
-
             const float Scaler = 1.0f;
             const float MaxWeakeness = 0.4f;
             const float BuildingWeakeness = 0.5f;
@@ -981,7 +976,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Virtual methods
+        /// Virtual methods.
         /// </summary>
         /// <param name="ui"></param>
         protected virtual void OnSelect(GameUI ui)
@@ -991,7 +986,6 @@ namespace Isles
 
         protected virtual void OnDeselect(GameUI ui)
         {
-
         }
 
         protected virtual void ShowSpells(GameUI ui)
@@ -1010,12 +1004,12 @@ namespace Isles
         protected virtual void OnDie() { }
 
         /// <summary>
-        /// Called after gameworld/UI are initialized
+        /// Called after gameworld/UI are initialized.
         /// </summary>
         public virtual void Start(GameWorld world) { }
 
         /// <summary>
-        /// Press the attack
+        /// Press the attack.
         /// </summary>
         public virtual void TriggerAttack(Entity target) { }
     }
@@ -1023,12 +1017,12 @@ namespace Isles
     public class Tree : GameObject
     {
         /// <summary>
-        /// Whether trees are pickable
+        /// Whether trees are pickable.
         /// </summary>
         public static bool Pickable;
 
         /// <summary>
-        /// Gets or sets how many wood the tree can provide
+        /// Gets or sets how many wood the tree can provide.
         /// </summary>
         public int Lumber
         {
@@ -1048,7 +1042,7 @@ namespace Isles
         private int lumber = 50;
 
         /// <summary>
-        /// Gets or sets whether this tree is ever green
+        /// Gets or sets whether this tree is ever green.
         /// </summary>
         public bool EverGreen
         {
@@ -1065,7 +1059,7 @@ namespace Isles
         private bool everGreen;
 
         /// <summary>
-        /// Gets or sets how many peons are harvesting this tree
+        /// Gets or sets how many peons are harvesting this tree.
         /// </summary>
         public int HarvesterCount
         {
@@ -1202,11 +1196,10 @@ namespace Isles
                 Rotation = treeRotation * Quaternion.CreateFromAxisAngle(rotationAxis, shakeAmount);
             }
 
-            //BaseGame game = BaseGame.Singleton;
-            //Point p = game.Project(Position);
-            //game.Graphics2D.DrawString(harvesterCount.ToString() + ", " + lumber,
+            // BaseGame game = BaseGame.Singleton;
+            // Point p = game.Project(Position);
+            // game.Graphics2D.DrawString(harvesterCount.ToString() + ", " + lumber,
             //    15, new Vector2(p.X, p.Y), Color.Blue);
-
             base.Update(gameTime);
         }
     }
@@ -1214,7 +1207,7 @@ namespace Isles
     public class Goldmine : GameObject
     {
         /// <summary>
-        /// Gets or sets how many peons are harvesting this tree
+        /// Gets or sets how many peons are harvesting this tree.
         /// </summary>
         public int HarvesterCount
         {
@@ -1231,7 +1224,7 @@ namespace Isles
         private int harvesterCount;
 
         /// <summary>
-        /// Gets or sets how much gold the goldmine have
+        /// Gets or sets how much gold the goldmine have.
         /// </summary>
         public int Gold
         {
@@ -1258,7 +1251,7 @@ namespace Isles
         public float RotationZ;
 
         /// <summary>
-        /// Gets or sets the spawn point for the goldmine
+        /// Gets or sets the spawn point for the goldmine.
         /// </summary>
         public Vector3 SpawnPoint;
 
@@ -1455,12 +1448,12 @@ namespace Isles
         private readonly List<Region> ruinedAreas = new();
 
         /// <summary>
-        /// Overlapped points
+        /// Overlapped points.
         /// </summary>
         private readonly bool[] overlapped;
 
         /// <summary>
-        /// Gets the whether the specified point is in the fog of war
+        /// Gets the whether the specified point is in the fog of war.
         /// </summary>
         public bool Contains(float x, float y)
         {
@@ -1469,7 +1462,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// There's only one ruinedland right now
+        /// There's only one ruinedland right now.
         /// </summary>
         public static RuinedLand Create(BaseGame game, GameWorld world, FogMask fogOfWar)
         {
@@ -1490,7 +1483,7 @@ namespace Isles
         private static RuinedLand land;
 
         /// <summary>
-        /// Creates a new ruined land
+        /// Creates a new ruined land.
         /// </summary>
         private RuinedLand(BaseGame game, GameWorld world, FogMask fogOfWar)
         {
@@ -1537,7 +1530,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Adds a new ruined region
+        /// Adds a new ruined region.
         /// </summary>
         public void AddRuinedRegion(float radius, float x, float y)
         {
@@ -1558,7 +1551,7 @@ namespace Isles
                 layer = new BaseLandscape.Layer
                 {
                     ColorTexture = ruinedTexture,
-                    AlphaTexture = finalTexture
+                    AlphaTexture = finalTexture,
                 };
                 world.Landscape.Layers.Add(layer);
             }
@@ -1624,7 +1617,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Draw the landscape
+        /// Draw the landscape.
         /// </summary>
         public void Draw(GameTime gameTime)
         {
@@ -1755,7 +1748,7 @@ namespace Isles
         public float Mass = 0.5f;
 
         /// <summary>
-        /// Creates a new missile
+        /// Creates a new missile.
         /// </summary>
         public Missile(GameWorld world, GameModel ammo, IWorldObject target)
             : base(world)
@@ -1778,8 +1771,8 @@ namespace Isles
             scaling = unitY.Length();
 
             // Compute speed
-            //velocity = Vector3.Normalize(unitY);
-            //velocity *= MaxSpeed;
+            // velocity = Vector3.Normalize(unitY);
+            // velocity *= MaxSpeed;
             velocity = GetTargetPosition() - Position;
             velocity.Z = 0;
             velocity.Z = (float)(velocity.Length() * Math.Tan(MathHelper.ToRadians(30)));
@@ -1883,5 +1876,4 @@ namespace Isles
             }
         }
     }
-
 }

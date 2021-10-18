@@ -1,8 +1,5 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using Microsoft.Xna.Framework;
@@ -10,7 +7,6 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Graphics
 {
-
     /// <summary>
     /// Tangent vertex format for shader vertex format used all over the place.
     /// It contains: Position, Normal vector, texture coords, tangent vector.
@@ -20,19 +16,22 @@ namespace Isles.Graphics
         // Grabbed from racing game :)
 
         /// <summary>
-        /// Position
+        /// Position.
         /// </summary>
         public Vector3 Position;
+
         /// <summary>
-        /// Texture coordinates
+        /// Texture coordinates.
         /// </summary>
         public Vector2 TextureCoordinate;
+
         /// <summary>
-        /// Normal
+        /// Normal.
         /// </summary>
         public Vector3 Normal;
+
         /// <summary>
-        /// Tangent
+        /// Tangent.
         /// </summary>
         public Vector3 Tangent;
 
@@ -42,25 +41,25 @@ namespace Isles.Graphics
         public static int SizeInBytes => 4 * (3 + 2 + 3 + 3);
 
         /// <summary>
-        /// U texture coordinate
+        /// U texture coordinate.
         /// </summary>
-        /// <returns>Float</returns>
+        /// <returns>Float.</returns>
         public float U => TextureCoordinate.X;
 
         /// <summary>
-        /// V texture coordinate
+        /// V texture coordinate.
         /// </summary>
-        /// <returns>Float</returns>
+        /// <returns>Float.</returns>
         public float V => TextureCoordinate.Y;
 
         /// <summary>
-        /// Create tangent vertex
+        /// Create tangent vertex.
         /// </summary>
-        /// <param name="setPos">Set position</param>
-        /// <param name="setU">Set u texture coordinate</param>
-        /// <param name="setV">Set v texture coordinate</param>
-        /// <param name="setNormal">Set normal</param>
-        /// <param name="setTangent">Set tangent</param>
+        /// <param name="setPos">Set position.</param>
+        /// <param name="setU">Set u texture coordinate.</param>
+        /// <param name="setV">Set v texture coordinate.</param>
+        /// <param name="setNormal">Set normal.</param>
+        /// <param name="setTangent">Set tangent.</param>
         public VertexTangent(
             Vector3 setPos,
             float setU, float setV,
@@ -74,12 +73,12 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Create tangent vertex
+        /// Create tangent vertex.
         /// </summary>
-        /// <param name="setPos">Set position</param>
-        /// <param name="setUv">Set uv texture coordinates</param>
-        /// <param name="setNormal">Set normal</param>
-        /// <param name="setTangent">Set tangent</param>
+        /// <param name="setPos">Set position.</param>
+        /// <param name="setUv">Set uv texture coordinates.</param>
+        /// <param name="setNormal">Set normal.</param>
+        /// <param name="setTangent">Set tangent.</param>
         public VertexTangent(
             Vector3 setPos,
             Vector2 setUv,
@@ -93,13 +92,13 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Vertex elements for Mesh.Clone
+        /// Vertex elements for Mesh.Clone.
         /// </summary>
         public static readonly VertexElement[] VertexElements =
             GenerateVertexElements();
 
         /// <summary>
-        /// Generate vertex declaration
+        /// Generate vertex declaration.
         /// </summary>
         private static VertexElement[] GenerateVertexElements()
         {
@@ -136,30 +135,31 @@ namespace Isles.Graphics
                 declaration[2].VertexElementUsage == VertexElementUsage.Normal &&
                 declaration[3].VertexElementUsage == VertexElementUsage.Tangent;
         }
-
     }
 
     /// <summary>
     /// Vertex format for shader vertex format used all over the place.
-    /// It contains: Position, Normal vector, 2 texture coords
+    /// It contains: Position, Normal vector, 2 texture coords.
     /// </summary>
     public struct VertexPositionNormalDuoTexture
     {
-
         /// <summary>
-        /// Position
+        /// Position.
         /// </summary>
         public Vector3 Position;
+
         /// <summary>
-        /// Normal
+        /// Normal.
         /// </summary>
         public Vector3 Normal;
+
         /// <summary>
-        /// Texture coordinates
+        /// Texture coordinates.
         /// </summary>
         public Vector2 TextureCoordinate0;
+
         /// <summary>
-        /// Tangent
+        /// Tangent.
         /// </summary>
         public Vector2 TextureCoordinate1;
 
@@ -169,12 +169,12 @@ namespace Isles.Graphics
         public static int SizeInBytes => 4 * (3 + 4 + 3);
 
         /// <summary>
-        /// Create tangent vertex
+        /// Create tangent vertex.
         /// </summary>
-        /// <param name="setPos">Set position</param>
-        /// <param name="setUv">Set uv texture coordinates</param>
-        /// <param name="setNormal">Set normal</param>
-        /// <param name="setTangent">Set tangent</param>
+        /// <param name="setPos">Set position.</param>
+        /// <param name="setUv">Set uv texture coordinates.</param>
+        /// <param name="setNormal">Set normal.</param>
+        /// <param name="setTangent">Set tangent.</param>
         public VertexPositionNormalDuoTexture(
             Vector3 position,
             Vector3 normal,
@@ -188,13 +188,13 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Vertex elements for Mesh.Clone
+        /// Vertex elements for Mesh.Clone.
         /// </summary>
         public static readonly VertexElement[] VertexElements =
             GenerateVertexElements();
 
         /// <summary>
-        /// Generate vertex declaration
+        /// Generate vertex declaration.
         /// </summary>
         private static VertexElement[] GenerateVertexElements()
         {
@@ -215,7 +215,5 @@ namespace Isles.Graphics
                 };
             return decl;
         }
-
     }
-
 }

@@ -1,25 +1,21 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
+using Isles.Engine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Isles.Engine;
 
 namespace Isles.Graphics
 {
-
     /// <summary>
-    /// A pointSprite definition
+    /// A pointSprite definition.
     /// </summary>
     public struct PointSprite
     {
         /// <summary>
-        /// Texture used to draw the pointSprite
+        /// Texture used to draw the pointSprite.
         /// </summary>
         public Texture2D Texture;
 
@@ -29,48 +25,48 @@ namespace Isles.Graphics
         public Vector3 Position;
 
         /// <summary>
-        /// Size of the pointSprite
+        /// Size of the pointSprite.
         /// </summary>
         public float Size;
     }
 
     /// <summary>
-    /// Manager class for pointSprite
+    /// Manager class for pointSprite.
     /// </summary>
     public class PointSpriteManager : IDisposable
     {
         /// <summary>
-        /// Max number of quads that can be rendered in one draw call
+        /// Max number of quads that can be rendered in one draw call.
         /// </summary>
         public const int ChunkSize = 1024;
 
         /// <summary>
-        /// PointSprite effect
+        /// PointSprite effect.
         /// </summary>
         private readonly Effect effect;
 
         /// <summary>
-        /// Internal pointSprite list
+        /// Internal pointSprite list.
         /// </summary>
         private readonly List<PointSprite> pointSprites = new();
 
         /// <summary>
-        /// Point sprite vertices
+        /// Point sprite vertices.
         /// </summary>
         private readonly DynamicVertexBuffer vertices;
 
         /// <summary>
-        /// Vertex buffer used to generate vertices
+        /// Vertex buffer used to generate vertices.
         /// </summary>
         private readonly VertexPositionTexture[] workingVertices = new VertexPositionTexture[ChunkSize];
 
         /// <summary>
-        /// Graphics device
+        /// Graphics device.
         /// </summary>
         private readonly BaseGame game;
 
         /// <summary>
-        /// Create a pointSprite manager
+        /// Create a pointSprite manager.
         /// </summary>
         public PointSpriteManager(BaseGame game)
         {
@@ -85,7 +81,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Draw a pointSprite
+        /// Draw a pointSprite.
         /// </summary>
         public void Draw(Texture2D texture, Vector3 position, float size)
         {
@@ -99,7 +95,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Draw a pointSprite
+        /// Draw a pointSprite.
         /// </summary>
         /// <param name="pointSprite"></param>
         public void Draw(PointSprite pointSprite)
@@ -108,7 +104,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Draw all pointSprites in this frame
+        /// Draw all pointSprites in this frame.
         /// </summary>
         /// <param name="gameTime"></param>
         public void Present(GameTime gameTime)
@@ -132,7 +128,7 @@ namespace Isles.Graphics
             for (var i = 0; i <= pointSprites.Count; i++)
             {
                 // We are at the end of the chunk
-                if (i != pointSprites.Count &&    // End of list
+                if (i != pointSprites.Count && // End of list
                    (i - begin) < ChunkSize && texture == pointSprites[i].Texture)
                 {
                     continue;
@@ -179,6 +175,7 @@ namespace Isles.Graphics
 
                     pass.End();
                 }
+
                 effect.End();
 
                 // Increment begin pointer
@@ -198,7 +195,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Dispose
+        /// Dispose.
         /// </summary>
         public void Dispose()
         {
@@ -207,9 +204,9 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Dispose
+        /// Dispose.
         /// </summary>
-        /// <param name="disposing">Disposing</param>
+        /// <param name="disposing">Disposing.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
@@ -225,7 +222,5 @@ namespace Isles.Graphics
                 }
             }
         }
-
     }
-
 }

@@ -1,32 +1,34 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Graphics;
 using Isles.Engine;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Isles
 {
-
     public enum PlayerType
     {
-        Dummy, Local, Computer, Remote
+        Dummy,
+        Local,
+        Computer,
+        Remote,
     }
 
     public enum PlayerRelation
     {
-        Opponent, Ally, Neutral
+        Opponent,
+        Ally,
+        Neutral,
     }
 
     public enum Race
     {
-        Islander, Steamer
+        Islander,
+        Steamer,
     }
 
     public class PlayerInfo
@@ -40,16 +42,15 @@ namespace Isles
     }
 
     /// <summary>
-    /// Represent either human player, computer oppnent
+    /// Represent either human player, computer oppnent.
     /// </summary>
     public abstract class Player : IEventListener
     {
-
         public static List<Player> AllPlayers = new();
         public static LocalPlayer LocalPlayer;
 
         /// <summary>
-        /// Gets player from id
+        /// Gets player from id.
         /// </summary>
         public static Player FromID(int id)
         {
@@ -96,32 +97,32 @@ namespace Isles
         }
 
         /// <summary>
-        /// Gets or sets the name of the player
+        /// Gets or sets the name of the player.
         /// </summary>
         public string Name;
 
         /// <summary>
-        /// Gets or sets which team the player belongs
+        /// Gets or sets which team the player belongs.
         /// </summary>
         public int Team;
 
         /// <summary>
-        /// Gets or sets the color of the team
+        /// Gets or sets the color of the team.
         /// </summary>
         public Color TeamColor;
 
         /// <summary>
-        /// Gets or sets the race of the player
+        /// Gets or sets the race of the player.
         /// </summary>
         public Race Race;
 
         /// <summary>
-        /// Gets or sets the spawnpoint of the player
+        /// Gets or sets the spawnpoint of the player.
         /// </summary>
         public Vector2 SpawnPoint;
 
         /// <summary>
-        /// Gets or sets how much gold the player have
+        /// Gets or sets how much gold the player have.
         /// </summary>
         public float Gold
         {
@@ -140,7 +141,7 @@ namespace Isles
         private float gold;
 
         /// <summary>
-        /// Gets or sets how much lumber the player have
+        /// Gets or sets how much lumber the player have.
         /// </summary>
         public float Lumber
         {
@@ -159,7 +160,7 @@ namespace Isles
         private float lumber;
 
         /// <summary>
-        /// Gets or sets how much food the player have
+        /// Gets or sets how much food the player have.
         /// </summary>
         public float Food
         {
@@ -180,7 +181,7 @@ namespace Isles
         public const float MaxFoodCapacity = 100;
 
         /// <summary>
-        /// Gets or sets current food capacity of this player
+        /// Gets or sets current food capacity of this player.
         /// </summary>
         public float FoodCapacity
         {
@@ -199,7 +200,7 @@ namespace Isles
         private float foodCapacity;
 
         /// <summary>
-        /// Gets or sets how many trees are cutted down by this player
+        /// Gets or sets how many trees are cutted down by this player.
         /// </summary>
         public int TreesCuttedDown
         {
@@ -218,17 +219,17 @@ namespace Isles
         private int treesCuttedDown;
 
         /// <summary>
-        /// Gets or sets the attack point of this player
+        /// Gets or sets the attack point of this player.
         /// </summary>
         public float AttackPoint;
 
         /// <summary>
-        /// Gets or sets the attack point of this player
+        /// Gets or sets the attack point of this player.
         /// </summary>
         public float DefensePoint;
 
         /// <summary>
-        /// Gets or sets how much smoke is produced by this player
+        /// Gets or sets how much smoke is produced by this player.
         /// </summary>
         public float SmokeProduced
         {
@@ -247,7 +248,7 @@ namespace Isles
         private float smokeProduced;
 
         /// <summary>
-        /// Gets the environment condition of the player
+        /// Gets the environment condition of the player.
         /// </summary>
         public float EnvironmentLevel
         {
@@ -271,22 +272,22 @@ namespace Isles
         private readonly Dictionary<string, int> availability = new();
 
         /// <summary>
-        /// Gets object dependency table
+        /// Gets object dependency table.
         /// </summary>
         public List<KeyValuePair<string, string>> Dependencies { get; } = new();
 
         /// <summary>
-        /// Gets objects owned by this player
+        /// Gets objects owned by this player.
         /// </summary>
         public Dictionary<string, LinkedList<GameObject>> Objects { get; } = new();
 
         /// <summary>
-        /// Gets a dictionary storing the number of objects that will be available in the near future
+        /// Gets a dictionary storing the number of objects that will be available in the near future.
         /// </summary>
         public Dictionary<string, int> FutureObjects { get; } = new();
 
         /// <summary>
-        /// Gets all objects with the specified type
+        /// Gets all objects with the specified type.
         /// </summary>
         public LinkedList<GameObject> GetObjects(string type)
         {
@@ -294,7 +295,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Marks a technique as available
+        /// Marks a technique as available.
         /// </summary>
         public void Add(GameObject entity)
         {
@@ -313,7 +314,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Marks a technique as unavailable
+        /// Marks a technique as unavailable.
         /// </summary>
         public void Remove(GameObject entity)
         {
@@ -327,7 +328,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Marks a technique as available
+        /// Marks a technique as available.
         /// </summary>
         public void MarkFutureObject(string type)
         {
@@ -340,7 +341,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Marks a technique as unavailable
+        /// Marks a technique as unavailable.
         /// </summary>
         public void UnmarkFutureObject(string type)
         {
@@ -353,7 +354,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Gets whether the specified type is a hero
+        /// Gets whether the specified type is a hero.
         /// </summary>
         public bool IsUnique(string type)
         {
@@ -361,7 +362,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Gets whether a technique is currently available
+        /// Gets whether a technique is currently available.
         /// </summary>
         public bool IsAvailable(string name)
         {
@@ -376,7 +377,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Marks a dependency to be available
+        /// Marks a dependency to be available.
         /// </summary>
         public void MarkAvailable(string name)
         {
@@ -389,7 +390,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Marks a dependency to be unavailable
+        /// Marks a dependency to be unavailable.
         /// </summary>
         public void MarkUnavailable(string name)
         {
@@ -399,7 +400,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Checks the dependency for given technique
+        /// Checks the dependency for given technique.
         /// </summary>
         public bool CheckDependency(string name)
         {
@@ -418,7 +419,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Adds a new dependency
+        /// Adds a new dependency.
         /// </summary>
         public void AddDependency(string what, string dependsOnWhat)
         {
@@ -426,7 +427,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Removes a new dependency
+        /// Removes a new dependency.
         /// </summary>
         public void RemoveDependency(string what, string dependsOnWhat)
         {
@@ -441,7 +442,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Enumerate all game objects owned by this player
+        /// Enumerate all game objects owned by this player.
         /// </summary>
         /// <returns></returns>
         public IEnumerable<GameObject> EnumerateObjects()
@@ -460,7 +461,6 @@ namespace Isles
         /// </summary>
         public IEnumerable<GameObject> EnumerateObjects(string type)
         {
-
             if (Objects.TryGetValue(type, out LinkedList<GameObject> value))
             {
                 foreach (GameObject o in value)
@@ -471,9 +471,9 @@ namespace Isles
         }
 
         /// <summary>
-        /// Find the nearest object to the specified position of a given type
+        /// Find the nearest object to the specified position of a given type.
         /// </summary>
-        /// <param name="excluded">This object will be excluded</param>
+        /// <param name="excluded">This object will be excluded.</param>
         public Entity FindNearestObject(Vector3 position, string type, Entity excluded)
         {
             if (type == null)
@@ -504,7 +504,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Names
+        /// Names.
         /// </summary>
         public string TownhallName => Race == Race.Islander ? "Townhall" : "SteamFort";
 
@@ -519,7 +519,7 @@ namespace Isles
         public string HeroName => Race == Race.Islander ? "FireSorceress" : "Steambot";
 
         /// <summary>
-        /// Gets the relationship with the target player
+        /// Gets the relationship with the target player.
         /// </summary>
         public PlayerRelation GetRelation(Player player)
         {
@@ -558,10 +558,10 @@ namespace Isles
         }
 
         /// <summary>
-        /// Creates a list of positions around the center
+        /// Creates a list of positions around the center.
         /// </summary>
         /// <returns>
-        /// Target position for the corresponding charactor
+        /// Target position for the corresponding charactor.
         /// </returns>
         public static IEnumerable<KeyValuePair<GameObject, Vector2>> CreateSquardPositions(
                 List<GameObject> members, Vector3 center)
@@ -607,7 +607,7 @@ namespace Isles
             }
 
             // Sort start position by Y value
-            startPositions.Sort(delegate (KeyValuePair<GameObject, Vector2> a,
+            startPositions.Sort(delegate(KeyValuePair<GameObject, Vector2> a,
                                          KeyValuePair<GameObject, Vector2> b)
             {
                 return a.Value.Y.CompareTo(b.Value.Y);
@@ -651,7 +651,7 @@ namespace Isles
             }
 
             // Sort orders by object priority to make sound effect working correctly
-            orders.Sort(delegate (KeyValuePair<GameObject, Vector2> pair1,
+            orders.Sort(delegate(KeyValuePair<GameObject, Vector2> pair1,
                                  KeyValuePair<GameObject, Vector2> pair2)
             {
                 return (int)(pair1.Key.Priority - pair2.Key.Priority);
@@ -663,7 +663,7 @@ namespace Isles
         private class Comparer : IComparer<KeyValuePair<GameObject, Vector2>>
         {
             /// <summary>
-            /// For CreateSquardPositions
+            /// For CreateSquardPositions.
             /// </summary>
             public int Compare(KeyValuePair<GameObject, Vector2> x, KeyValuePair<GameObject, Vector2> y)
             {
@@ -672,33 +672,32 @@ namespace Isles
         }
 
         public abstract void Start(GameWorld world);
-
     }
 
     /// <summary>
-    /// Dummy player will do nothing
+    /// Dummy player will do nothing.
     /// </summary>
     public class DummyPlayer : Player
     {
         public override void Update(GameTime gameTime) { }
+
         public override void Start(GameWorld world) { }
     }
 
     /// <summary>
-    /// The human player on the local machine
+    /// The human player on the local machine.
     /// </summary>
     public class LocalPlayer : Player
     {
-
         /// <summary>
-        /// Standard stuff
+        /// Standard stuff.
         /// </summary>
         private readonly BaseGame game = BaseGame.Singleton;
         private GameCamera camera;
         private GameWorld world;
 
         /// <summary>
-        /// Selected
+        /// Selected.
         /// </summary>
         public List<GameObject> Selected { get; } = new();
 
@@ -707,7 +706,7 @@ namespace Isles
         public List<List<GameObject>> Groups { get; } = new();
 
         /// <summary>
-        /// Gets or sets the index of the current group
+        /// Gets or sets the index of the current group.
         /// </summary>
         public int CurrentGroupIndex { get; private set; }
 
@@ -717,7 +716,7 @@ namespace Isles
         private readonly List<GameObject>[] teams = new List<GameObject>[10];
 
         /// <summary>
-        /// Multiselecting
+        /// Multiselecting.
         /// </summary>
         private bool multiSelecting;
         private Rectangle multiSelectRectangle;
@@ -727,7 +726,7 @@ namespace Isles
         private bool traceCamera;
 
         /// <summary>
-        /// Spells
+        /// Spells.
         /// </summary>
         public SpellAttack Attack;
         public SpellMove Move;
@@ -904,7 +903,7 @@ namespace Isles
             }
 
             // Sorted selected by priority
-            Selected.Sort(delegate (GameObject x, GameObject y)
+            Selected.Sort((x, y) =>
             {
                 var result = x.Priority.CompareTo(y.Priority);
                 return result != 0 ? result : string.Compare(x.ClassID, y.ClassID);
@@ -935,10 +934,11 @@ namespace Isles
                         currentClassID = o.ClassID;
                         group = new List<GameObject>
                         {
-                            o
+                            o,
                         };
                     }
                 }
+
                 Groups.Add(group);
                 Focus(0);
             }
@@ -986,7 +986,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// This method group the input selectable
+        /// This method group the input selectable.
         /// </summary>
         private IEnumerable<GameObject> Filter(IEnumerable<GameObject> selectables)
         {
@@ -1112,6 +1112,7 @@ namespace Isles
                 // Highlight selected entities in realtime
                 HighlightMultiple(Filter(ObjectsFromRectangle(multiSelectRectangle)));
             }
+
             // Highlight etity on mouse hover
             else
             {
@@ -1126,7 +1127,7 @@ namespace Isles
             }
 
             // Remove dead members
-            Selected.RemoveAll(delegate (GameObject o)
+            Selected.RemoveAll(delegate(GameObject o)
             {
                 if (o != null && !o.IsAlive)
                 {
@@ -1134,22 +1135,24 @@ namespace Isles
                     o.Selected = false;
                     return true;
                 }
+
                 return false;
             });
 
-            highlighted.RemoveAll(delegate (GameObject o)
+            highlighted.RemoveAll(delegate(GameObject o)
             {
                 if (o != null && !o.IsAlive)
                 {
                     o.Highlighted = false;
                     return true;
                 }
+
                 return false;
             });
 
             for (var i = 0; i < teams.Length; i++)
             {
-                teams[i].RemoveAll(delegate (GameObject o)
+                teams[i].RemoveAll(delegate(GameObject o)
                 {
                     return o != null && !o.IsAlive;
                 });
@@ -1158,7 +1161,7 @@ namespace Isles
             var hasRemoved = false;
             foreach (List<GameObject> list in Groups)
             {
-                list.RemoveAll(delegate (GameObject o)
+                list.RemoveAll(delegate(GameObject o)
                 {
                     if (o != null && !o.IsAlive)
                     {
@@ -1167,6 +1170,7 @@ namespace Isles
                         o.Selected = false;
                         return true;
                     }
+
                     return false;
                 });
             }
@@ -1223,7 +1227,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Vertex type used to draw 2D shapes
+        /// Vertex type used to draw 2D shapes.
         /// </summary>
         public struct VertexColor2D
         {
@@ -1561,17 +1565,17 @@ namespace Isles
                     o.Focused = true;
                 }
 
-                //if (groups[currentGroup].Count > 0 && groups[currentGroup][0] is Charactor &&
+                // if (groups[currentGroup].Count > 0 && groups[currentGroup][0] is Charactor &&
                 //    groups[currentGroup][0].Owner is LocalPlayer)
-                //{
+                // {
                 //    GameUI.Singleton.SetUIElement(0, false, Attack.Button);
                 //    GameUI.Singleton.SetUIElement(1, false, Move.Button);
-                //}
-                //else
-                //{
+                // }
+                // else
+                // {
                 //    GameUI.Singleton.SetUIElement(0, false, null);
                 //    GameUI.Singleton.SetUIElement(1, false, null);
-                //}
+                // }
             }
         }
 
@@ -1707,7 +1711,6 @@ namespace Isles
                 }
             }
         }
-
     }
 
     public class ComputerPlayer : Player
@@ -1718,12 +1721,12 @@ namespace Isles
         public GoalDefend Defend;
 
         /// <summary>
-        /// A dictionary storing each request and its priority
+        /// A dictionary storing each request and its priority.
         /// </summary>
         public Dictionary<string, float> Requests = new();
 
         /// <summary>
-        /// Gets the first townhall
+        /// Gets the first townhall.
         /// </summary>
         public Building Townhall
         {
@@ -1744,7 +1747,7 @@ namespace Isles
         private Building townhall;
 
         /// <summary>
-        /// Gets the enermy of the player
+        /// Gets the enermy of the player.
         /// </summary>
         public Player Enermy
         {
@@ -1769,14 +1772,14 @@ namespace Isles
         private Player enermy;
 
         /// <summary>
-        /// Gets the default rally point
+        /// Gets the default rally point.
         /// </summary>
         public Vector3 DefaultRallyPoint => defaultRallyPoint;
 
         private Vector3 defaultRallyPoint;
 
         /// <summary>
-        /// Start running the computer player
+        /// Start running the computer player.
         /// </summary>
         public override void Start(GameWorld world)
         {
@@ -1799,7 +1802,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Request to build/train/upgrade with the specified count and priority scaler
+        /// Request to build/train/upgrade with the specified count and priority scaler.
         /// </summary>
         public void Request(string type, int count, float scaler)
         {
@@ -1810,7 +1813,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Request to build/train/upgrade with the specified evaluation
+        /// Request to build/train/upgrade with the specified evaluation.
         /// </summary>
         public void Request(string type, float evaluation)
         {
@@ -1824,8 +1827,8 @@ namespace Isles
             }
 
             // Check dependencis
-            //if (!CheckDependency(type))
-            //{
+            // if (!CheckDependency(type))
+            // {
             //    foreach (KeyValuePair<string, string> pair in Dependencies)
             //    {
             //        if (type == pair.Key && !IsFutureAvailable(pair.Value))
@@ -1837,11 +1840,11 @@ namespace Isles
             //                Request(pair.Value, evaluation * 1.5f);
             //        }
             //    }
-            //}
+            // }
         }
 
         /// <summary>
-        /// Checks if we have enough money to do a certain thing
+        /// Checks if we have enough money to do a certain thing.
         /// </summary>
         public bool HasEnoughMoney(string type)
         {
@@ -1854,14 +1857,13 @@ namespace Isles
         }
 
         /// <summary>
-        /// Construct a building of the specified typ
+        /// Construct a building of the specified typ.
         /// </summary>
         public void Construct(string type)
         {
             Vector3 startPosition = Townhall != null ? Townhall.Position : new Vector3(SpawnPoint, 0);
 
             // Townhall should be treated seperately
-
             if (CheckDependency(type))
             {
                 var queue = false;
@@ -1895,7 +1897,7 @@ namespace Isles
                     {
                         minCost = cost;
                         builder = p;
-                        queue = (p.State is StateConstruct);
+                        queue = p.State is StateConstruct;
                     }
                 }
 
@@ -1943,7 +1945,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Trains a unit of a given type
+        /// Trains a unit of a given type.
         /// </summary>
         public void Train(string type)
         {
@@ -2006,5 +2008,4 @@ namespace Isles
 #endif
         }
     }
-
 }

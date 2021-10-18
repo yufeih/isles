@@ -1,17 +1,14 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//  
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Graphics;
-using Isles.Graphics;
 using Isles.Engine;
+using Isles.Graphics;
 using Isles.UI;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Isles
 {
@@ -35,7 +32,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Gest the Actual Area
+        /// Gest the Actual Area.
         /// </summary>
         public Rectangle ActualArea
         {
@@ -51,12 +48,13 @@ namespace Isles
                     actualArea.Width = (int)(Factor * DestinationRectangle.Width);
                     actualArea.Height = (int)(Factor * DestinationRectangle.Height);
                 }
+
                 return actualArea;
             }
         }
 
         /// <summary>
-        /// Gets button destination rectangle
+        /// Gets button destination rectangle.
         /// </summary>
         public override Rectangle DestinationRectangle
         {
@@ -79,18 +77,18 @@ namespace Isles
         }
 
         /// <summary>
-        /// Gets the center of the actualArea
+        /// Gets the center of the actualArea.
         /// </summary>
         public Point Center => new(DestinationRectangle.Left + DestinationRectangle.Width / 2,
                                  DestinationRectangle.Top + DestinationRectangle.Height / 2);
 
         /// <summary>
-        /// Gets or sets texture for gold mine pointer
+        /// Gets or sets texture for gold mine pointer.
         /// </summary>
         public Texture2D GoldMinePointerTexture { get; set; }
 
         /// <summary>
-        /// Constructor
+        /// Constructor.
         /// </summary>
         /// <param name="game"></param>
         public MiniMap(BaseGame game, GameWorld world)
@@ -103,7 +101,7 @@ namespace Isles
         private static int GoldmineCounter;
 
         /// <summary>
-        /// Add a gold mine
+        /// Add a gold mine.
         /// </summary>
         public int AddGoldmine(Vector3 postion)
         {
@@ -112,7 +110,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Remove a gold mine
+        /// Remove a gold mine.
         /// </summary>
         /// <param name="key"></param>
         public void RemoveGoldmine(int key)
@@ -123,17 +121,16 @@ namespace Isles
         /// <summary>
         /// Gets the corresponding position in the real world.
         /// </summary>
-        /// <param name="mapPoint">Position in the map</param>
+        /// <param name="mapPoint">Position in the map.</param>
         /// <returns></returns>
         public Vector3? MapToWorld(Point mapPoint)
         {
-
             if (ActualArea.Contains(mapPoint))
             {
                 var rtv = new Vector3
                 {
                     X = world.Landscape.Size.X * (mapPoint.X - ActualArea.X) / ActualArea.Width,
-                    Y = world.Landscape.Size.Y * (ActualArea.Bottom - mapPoint.Y) / ActualArea.Height
+                    Y = world.Landscape.Size.Y * (ActualArea.Bottom - mapPoint.Y) / ActualArea.Height,
                 };
                 rtv.Z = world.Landscape.GetHeight(rtv.X, rtv.Y);
                 return rtv;
@@ -147,7 +144,7 @@ namespace Isles
             var rtv = new Vector3
             {
                 X = world.Landscape.Size.X * (mapPoint.X - ActualArea.X) / ActualArea.Width,
-                Y = world.Landscape.Size.Y * (ActualArea.Bottom - mapPoint.Y) / ActualArea.Height
+                Y = world.Landscape.Size.Y * (ActualArea.Bottom - mapPoint.Y) / ActualArea.Height,
             };
             rtv.Z = world.Landscape.GetHeight(rtv.X, rtv.Y);
             return rtv;
@@ -156,7 +153,7 @@ namespace Isles
         /// <summary>
         /// Gets the corresponding point in the map.
         /// </summary>
-        /// <param name="position">Position in real world</param>
+        /// <param name="position">Position in real world.</param>
         /// <returns></returns>
         public Point? WorldToMap(Vector3 position)
         {
@@ -166,7 +163,7 @@ namespace Isles
                 var mp = new Point
                 {
                     X = (int)(position.X / world.Landscape.Size.X * ActualArea.Width + ActualArea.X),
-                    Y = (int)((1 - position.Y / world.Landscape.Size.Y) * ActualArea.Height + ActualArea.Y)
+                    Y = (int)((1 - position.Y / world.Landscape.Size.Y) * ActualArea.Height + ActualArea.Y),
                 };
                 return mp;
             }
@@ -179,13 +176,13 @@ namespace Isles
             var mp = new Point
             {
                 X = (int)(position.X / world.Landscape.Size.X * ActualArea.Width + ActualArea.X),
-                Y = (int)((1 - position.Y / world.Landscape.Size.Y) * ActualArea.Height + ActualArea.Y)
+                Y = (int)((1 - position.Y / world.Landscape.Size.Y) * ActualArea.Height + ActualArea.Y),
             };
             return mp;
         }
 
         /// <summary>
-        /// Draw
+        /// Draw.
         /// </summary>
         public override void Draw(GameTime gameTime, SpriteBatch sprite)
         {
@@ -218,7 +215,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Draw the sight region
+        /// Draw the sight region.
         /// </summary>
         private void DrawSightRegion(GameTime gameTime, SpriteBatch sprite)
         {
@@ -272,7 +269,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Draw a game object on the minimap
+        /// Draw a game object on the minimap.
         /// </summary>
         public void DrawGameObject(Vector3 position, float size, Color color)
         {
@@ -296,7 +293,7 @@ namespace Isles
         private readonly List<EntitySign> entitySigns = new();
 
         /// <summary>
-        /// Draw the entites
+        /// Draw the entites.
         /// </summary>
         /// <param name="gameTime"></param>
         /// <param name="sprite"></param>
@@ -342,7 +339,7 @@ namespace Isles
         private bool draging;
 
         /// <summary>
-        /// Event handler
+        /// Event handler.
         /// </summary>
         public override EventResult HandleEvent(EventType type, object sender, object tag)
         {

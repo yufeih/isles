@@ -1,24 +1,19 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Graphics;
-using MouseButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using Isles.Engine;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using MouseButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 
 namespace Isles.UI
 {
-
     public class Button : UIElement
     {
-
         /// <summary>
-        /// Gets or sets button hot key
+        /// Gets or sets button hot key.
         /// </summary>
         public Keys HotKey
         {
@@ -29,22 +24,24 @@ namespace Isles.UI
         protected Keys hotKey;
 
         /// <summary>
-        /// Button element state
+        /// Button element state.
         /// </summary>
         protected enum ButtonState
         {
-            Normal, Hover, Press,
+            Normal,
+            Hover,
+            Press,
         }
 
         protected ButtonState state = ButtonState.Normal;
 
         /// <summary>
-        /// The source rectangle for pressed-down button
+        /// The source rectangle for pressed-down button.
         /// </summary>
         private Rectangle pressed;
 
         /// <summary>
-        /// Gets or sets the source rectangle for pressed-down button
+        /// Gets or sets the source rectangle for pressed-down button.
         /// </summary>
         public Rectangle Pressed
         {
@@ -55,7 +52,7 @@ namespace Isles.UI
         private Rectangle disabled;
 
         /// <summary>
-        /// Gets or sets the source rectangle for disabled button
+        /// Gets or sets the source rectangle for disabled button.
         /// </summary>
         public Rectangle Disabled
         {
@@ -66,7 +63,7 @@ namespace Isles.UI
         private Rectangle hovered;
 
         /// <summary>
-        /// Gets or sets the source rectangle for hovered button
+        /// Gets or sets the source rectangle for hovered button.
         /// </summary>
         public Rectangle Hovered
         {
@@ -102,12 +99,12 @@ namespace Isles.UI
         public event EventHandler Leave;
 
         /// <summary>
-        /// Used when a group of buttons are set
+        /// Used when a group of buttons are set.
         /// </summary>
         public int Index;
 
         /// <summary>
-        /// A fake button handles no messages
+        /// A fake button handles no messages.
         /// </summary>
         public bool IgnoreMessage { get; set; }
 
@@ -133,7 +130,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// For generating enter & leave events
+        /// For generating enter & leave events.
         /// </summary>
         private bool cursorInButton;
 
@@ -146,7 +143,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Update
+        /// Update.
         /// </summary>
         /// <param name="gameTime"></param>
         public override void Update(GameTime gameTime)
@@ -177,7 +174,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Draw UI element
+        /// Draw UI element.
         /// </summary>
         /// <param name="gameTime"></param>
         public override void Draw(GameTime gameTime, SpriteBatch sprite)
@@ -186,6 +183,7 @@ namespace Isles.UI
             {
                 return;
             }
+
             Rectangle sourRect = SourceRectangle;
             Rectangle destRect = DestinationRectangle;
             if (Enabled)
@@ -207,11 +205,12 @@ namespace Isles.UI
             {
                 sourRect = Disabled;
             }
+
             sprite.Draw(Texture, destRect, sourRect, Color.White);
         }
 
         /// <summary>
-        /// Whether this button overlaps the cursor when left button is down
+        /// Whether this button overlaps the cursor when left button is down.
         /// </summary>
         private bool clickThis;
 
@@ -275,9 +274,9 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Dispose
+        /// Dispose.
         /// </summary>
-        /// <param name="disposing">Disposing</param>
+        /// <param name="disposing">Disposing.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -290,7 +289,6 @@ namespace Isles.UI
 
             base.Dispose(disposing);
         }
-
     }
 
     public class TextButton : Button
@@ -298,7 +296,7 @@ namespace Isles.UI
         private readonly TextField textField;
 
         /// <summary>
-        /// Gets or sets the text for the button
+        /// Gets or sets the text for the button.
         /// </summary>
         public string Text
         {
@@ -310,7 +308,7 @@ namespace Isles.UI
 
         /// <summary>
         /// Gets or sets the color of the text in
-        /// normal state
+        /// normal state.
         /// </summary>
         public Color NormalColor
         {
@@ -322,7 +320,7 @@ namespace Isles.UI
 
         /// <summary>
         /// Gets or sets the color of the text in
-        /// Highlight state
+        /// Highlight state.
         /// </summary>
         public Color HighlightColor
         {
@@ -334,7 +332,7 @@ namespace Isles.UI
 
         /// <summary>
         /// Gets or sets the color of the text in
-        /// pressed-down state
+        /// pressed-down state.
         /// </summary>
         public Color PressDownColor
         {
@@ -343,7 +341,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Constructor
+        /// Constructor.
         /// </summary>
         /// <param name="text"></param>
         public TextButton(string text, float fontSize, Color normalColor, Rectangle area)
@@ -385,7 +383,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Draw
+        /// Draw.
         /// </summary>
         /// <param name="gameTime"></param>
         /// <param name="sprite"></param>
@@ -406,6 +404,5 @@ namespace Isles.UI
             }
         }
     }
-
 }
 

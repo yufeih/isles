@@ -7,37 +7,36 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Graphics
 {
-
     public class TrailEffect
     {
-
         /// <summary>
-        /// The queue
+        /// The queue.
         /// </summary>
         public Queue<VertexPositionTexture> trailQueue;
+
         /// <summary>
-        /// The ealpsed time
+        /// The ealpsed time.
         /// </summary>
         private int elapsedTime;
 
         /// <summary>
-        /// The span to update the blocks
+        /// The span to update the blocks.
         /// </summary>
         private readonly int updateSpan;
 
         /// <summary>
-        /// Leading Position of the trail
+        /// Leading Position of the trail.
         /// </summary>
         private Vector3 position;
 
         /// <summary>
-        /// The leading vertex position
+        /// The leading vertex position.
         /// </summary>
         private VertexPositionTexture leadVertex1;
         private VertexPositionTexture leadVertex2;
 
         /// <summary>
-        /// The Last Position
+        /// The Last Position.
         /// </summary>
         private Vector3 lastPosition;
 
@@ -52,17 +51,17 @@ namespace Isles.Graphics
         private bool animationStarted;
 
         /// <summary>
-        /// ViewMatrix
+        /// ViewMatrix.
         /// </summary>
         private Matrix view;
 
         /// <summary>
-        /// Projection Matrix
+        /// Projection Matrix.
         /// </summary>
         private Matrix projection;
 
         /// <summary>
-        /// The poisiton here means the leading position of the trail
+        /// The poisiton here means the leading position of the trail.
         /// </summary>
         public Vector3 Position
         {
@@ -81,7 +80,7 @@ namespace Isles.Graphics
         public VertexPositionTexture LeadVertex2 => leadVertex2;
 
         /// <summary>
-        /// The width of the trail
+        /// The width of the trail.
         /// </summary>
         public float Width
         {
@@ -90,24 +89,24 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// The number of blocks owned by the trail
+        /// The number of blocks owned by the trail.
         /// </summary>
         public int Length { get; set; }
 
         public Texture2D Texture { get; set; }
 
         /// <summary>
-        /// View Matrix
+        /// View Matrix.
         /// </summary>
         public Matrix View => view;
 
         /// <summary>
-        /// Projection Matrix
+        /// Projection Matrix.
         /// </summary>
         public Matrix Projection => projection;
 
         /// <summary>
-        /// Gets or sets the alpha property of trail
+        /// Gets or sets the alpha property of trail.
         /// </summary>
         public float Alpha { get; set; } = 1;
 
@@ -133,7 +132,7 @@ namespace Isles.Graphics
             Vector3 vec = position - lastPosition;
             if (vec != Vector3.Zero)
             {
-                var dy = halfWidth / (float)Math.Sqrt((vec.Y / vec.X) * (vec.Y / vec.X) + 1);
+                var dy = halfWidth / (float)Math.Sqrt(vec.Y / vec.X * (vec.Y / vec.X) + 1);
                 var dx = dy * vec.Y / vec.X;
 
                 leadVertex1 = new VertexPositionTexture();
@@ -168,10 +167,11 @@ namespace Isles.Graphics
             trailQueue.Enqueue(leadVertex2);
             if (trailQueue.Count > Length * 2)
             {
-                //2 vertex should be quited from queue at a time
+                // 2 vertex should be quited from queue at a time
                 trailQueue.Dequeue();
                 trailQueue.Dequeue();
             }
+
             lastPosition = new Vector3(position.X, position.Y, position.Z);
         }
 
@@ -179,74 +179,72 @@ namespace Isles.Graphics
         {
             if (trailQueue.Count >= 4)
             {
-                //TODO: draw code add here
-                //BaseGame.Singleton.TrailEffect.Draw(this);
+                // TODO: draw code add here
+                // BaseGame.Singleton.TrailEffect.Draw(this);
             }
         }
-
     }
 
     public class TrailEffectManager
     {
         //-----TrailEffectOutline----
-        //1-We'll keep a path of the
-        //arrow going as a queue of a
-        //fix length
-        //2- The new key point was
-        //determined by current position
-        //and last position the last
-        //position will be update with a
-        //span of time
+        // 1-We'll keep a path of the
+        // arrow going as a queue of a
+        // fix length
+        // 2- The new key point was
+        // determined by current position
+        // and last position the last
+        // position will be update with a
+        // span of time
         //
         //
         //
         //---------------------------
-
         private readonly List<TrailEffect> trailList;
 
         /// <summary>
-        /// Vertexes
+        /// Vertexes.
         /// </summary>
         private readonly VertexPositionTexture[] vertexList;
 
         /// <summary>
-        /// Declaration
+        /// Declaration.
         /// </summary>
         private readonly VertexDeclaration vertexDeclaration;
 
         /// <summary>
-        /// VertexBuffer
+        /// VertexBuffer.
         /// </summary>
         private readonly DynamicVertexBuffer vertexBuffer;
 
         /// <summary>
-        /// indexbiffer
+        /// indexbiffer.
         /// </summary>
         private readonly DynamicIndexBuffer indexBuffer;
 
         /// <summary>
-        /// Graphics Device
+        /// Graphics Device.
         /// </summary>
         private readonly GraphicsDevice device;
 
         /// <summary>
-        /// Content
+        /// Content.
         /// </summary>
         private readonly ContentManager content;
 
         /// <summary>
-        /// effect
+        /// effect.
         /// </summary>
         private BasicEffect effect;
         private readonly int chunckSize = 100;
 
         /// <summary>
-        /// Time span to update the blocks
+        /// Time span to update the blocks.
         /// </summary>
         public float UpdateSpan { get; set; }
 
         /// <summary>
-        /// Construction method
+        /// Construction method.
         /// </summary>
         public TrailEffectManager()
         {
@@ -263,7 +261,7 @@ namespace Isles.Graphics
 
         public void LoadContent()
         {
-            //this.device.VertexDeclaration = this.vertexDeclaration;
+            // this.device.VertexDeclaration = this.vertexDeclaration;
             effect = new BasicEffect(device, null);
         }
 
@@ -310,6 +308,7 @@ namespace Isles.Graphics
 
                 effect.End();
             }
+
             trailList.Clear();
         }
 
@@ -346,7 +345,5 @@ namespace Isles.Graphics
                 vertexList[2 + i] = tempList[vertexCount - i - 1];
             }
         }
-
     }
-
 }

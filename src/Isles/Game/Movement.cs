@@ -1,8 +1,5 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
@@ -10,7 +7,6 @@ using Microsoft.Xna.Framework;
 
 namespace Isles.Engine
 {
-
     /// <summary>
     /// Interface for the set of movement states to interact with
     /// moving entities.
@@ -18,38 +14,38 @@ namespace Isles.Engine
     public interface IMovable : IEventListener
     {
         /// <summary>
-        /// Gets or sets the position of the moving entity
+        /// Gets or sets the position of the moving entity.
         /// </summary>
         Vector3 Position { get; set; }
 
         /// <summary>
-        /// Gets the path brush of the moving entity
+        /// Gets the path brush of the moving entity.
         /// </summary>
         PathBrush Brush { get; }
 
         /// <summary>
-        /// Gets or sets the facing of the moving entity
+        /// Gets or sets the facing of the moving entity.
         /// </summary>
         Vector3 Facing { get; set; }
 
         /// <summary>
-        /// Gets the moving speed of the moving entity
+        /// Gets the moving speed of the moving entity.
         /// </summary>
         float Speed { get; }
 
         /// <summary>
-        /// Gets whether dynamic obstacles are ignored when moving
+        /// Gets whether dynamic obstacles are ignored when moving.
         /// </summary>
         bool IgnoreDynamicObstacles { get; }
 
         /// <summary>
-        /// Gets or sets the tag used for movement
+        /// Gets or sets the tag used for movement.
         /// </summary>
         object MovementTag { get; set; }
     }
 
     /// <summary>
-    /// Move the entity to a target moving entity
+    /// Move the entity to a target moving entity.
     /// </summary>
     public class StateMoveToTarget : BaseState
     {
@@ -259,8 +255,7 @@ namespace Isles.Engine
                 return State;
             }
 
-            //pathManager.DrawPath(path);
-
+            // pathManager.DrawPath(path);
             StateResult result = move.Update(gameTime);
 
             if (result == StateResult.Failed)
@@ -357,7 +352,6 @@ namespace Isles.Engine
         public override void Activate()
         {
             // Adjust destination
-
             Vector2 start;
 
             start.X = owner.Position.X;
@@ -374,12 +368,13 @@ namespace Isles.Engine
                 pathQuerying = true;
                 pathManager.QueryPath(this, start, destination, priority, owner);
             }
-            //else
+
+            // else
             {
                 // Seek to destination before the path is found
                 seek = new StateSeekToPosition(destination, owner, pathManager)
                 {
-                    WaitTime = 0.1f * retryCounter
+                    WaitTime = 0.1f * retryCounter,
                 };
             }
 
@@ -395,23 +390,21 @@ namespace Isles.Engine
                 return State;
             }
 
-            //pathManager.DrawPath(path);
-
+            // pathManager.DrawPath(path);
             StateResult result = seek.Update(gameTime);
 
-            //BaseGame game = BaseGame.Singleton;
-            //Point pos = game.Project(owner.Position);
-            //game.Graphics2D.DrawString(retryCounter.ToString(), 14,
+            // BaseGame game = BaseGame.Singleton;
+            // Point pos = game.Project(owner.Position);
+            // game.Graphics2D.DrawString(retryCounter.ToString(), 14,
             //    new Vector2(pos.X, pos.Y), Color.Blue);
 
-            //BaseGame game = BaseGame.Singleton;
-            //Point p = game.Project(owner.Position);
-            //game.Graphics2D.DrawLine(p, game.Project(new Vector3(destination,
+            // BaseGame game = BaseGame.Singleton;
+            // Point p = game.Project(owner.Position);
+            // game.Graphics2D.DrawLine(p, game.Project(new Vector3(destination,
             //    pathManager.Landscape.GetHeight(destination.X, destination.Y))), Color.White);
 
-            //if (owner is Entity)
+            // if (owner is Entity)
             //    (owner as Entity).Model.Tint = (pathQuerying ? new Vector4(0, 0, 0, 1) : Vector4.One);
-
             if (result == StateResult.Failed)
             {
                 seek.Terminate();
@@ -433,7 +426,7 @@ namespace Isles.Engine
 
                     seek = new StateSeekToPosition(currentEdge.Value.Position, owner, pathManager)
                     {
-                        WaitTime = 0.1f * retryCounter
+                        WaitTime = 0.1f * retryCounter,
                     };
 
                     return State = StateResult.Active;
@@ -463,19 +456,18 @@ namespace Isles.Engine
 
                 seek = new StateSeekToPosition(currentEdge.Value.Position, owner, pathManager)
                 {
-                    WaitTime = 0.1f * retryCounter
+                    WaitTime = 0.1f * retryCounter,
                 };
 
-                //LinkedListNode<PathEdge> edge = path.Edges.First;
-                //while (edge != null && edge.Next != null)
-                //{
+                // LinkedListNode<PathEdge> edge = path.Edges.First;
+                // while (edge != null && edge.Next != null)
+                // {
                 //    System.Diagnostics.Debug.Assert(
                 //        pathManager.CanMoveBetween(edge.Value.Position,
                 //                                   edge.Next.Value.Position, owner, true));
 
-                //    edge = edge.Next;
-                //}
-
+                // edge = edge.Next;
+                // }
                 return EventResult.Handled;
             }
             else if (type == EventType.PathNotFound)
@@ -506,12 +498,12 @@ namespace Isles.Engine
 
         public override void Activate()
         {
-            //Event.SendMessage(EventType.BeginMove, owner, this, null);
+            // Event.SendMessage(EventType.BeginMove, owner, this, null);
         }
 
         public override void Terminate()
         {
-            //Event.SendMessage(EventType.EndMove, owner, this, null);
+            // Event.SendMessage(EventType.EndMove, owner, this, null);
         }
 
         public StateSeekToPosition(Vector2 target, IMovable owner, PathManager pathManager)
@@ -581,7 +573,7 @@ namespace Isles.Engine
                 if (elapsedWaitTime == 0)
                 {
                     totalWaitTime = Helper.RandomInRange(MinTotalWaitTime, WaitTime + MaxTotalWaitTime);
-                    //if (totalWaitTime > 0.2f)
+                    // if (totalWaitTime > 0.2f)
                     //    totalWaitTime = 0.2f;
                 }
 
@@ -591,5 +583,4 @@ namespace Isles.Engine
             return State;
         }
     }
-
 }

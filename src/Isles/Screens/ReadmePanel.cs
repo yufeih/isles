@@ -1,39 +1,36 @@
-﻿//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 using Isles.Engine;
 using Isles.UI;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Isles.Screens
 {
     public class ReadmePanel : TipBox
     {
         /// <summary>
-        /// Page titles
+        /// Page titles.
         /// </summary>
         private readonly List<TextField> titles;
 
         /// <summary>
-        /// Page contents
+        /// Page contents.
         /// </summary>
         private readonly List<List<TextField>> contents;
 
         /// <summary>
-        /// Tatol page num
+        /// Tatol page num.
         /// </summary>
         private readonly int pages;
 
         /// <summary>
-        /// Current page index
+        /// Current page index.
         /// </summary>
         private int currentPageIndex;
 
@@ -49,16 +46,17 @@ namespace Isles.Screens
             }
         }
 
-        private readonly Button previousPage, nextPage;
+        private readonly Button previousPage;
+        private readonly Button nextPage;
         private readonly Button ok;
 
         public Button OK => ok;
 
         /// <summary>
-        /// Constructor
+        /// Constructor.
         /// </summary>
-        /// <param name="pageTextures">Textures for pages</param>
-        /// <param name="area">area</param>
+        /// <param name="pageTextures">Textures for pages.</param>
+        /// <param name="area">area.</param>
         public ReadmePanel(Stream readmeText, Rectangle area)
             : base(area)
         {
@@ -70,21 +68,6 @@ namespace Isles.Screens
                                                     area.Width / 7, area.Width / 21);
             var okButtonArea = new Rectangle(area.Width * 3 / 7, area.Height * 6 / 7,
                                                     area.Width / 7, area.Width / 21);
-
-            //previousPage = new MenuButton(  BaseGame.Singleton.Content.Load<Texture2D>("UI/ReadmeButtons"),
-            //                                 preButtonArea, new Rectangle(0, 123, 390, 123),Keys.P, null);
-            //previousPage.Hightlighted = new Rectangle(390, 123, 390, 123);
-            //previousPage.Pressed = new Rectangle(780, 123, 390, 123);
-
-            //nextPage = new MenuButton(  BaseGame.Singleton.Content.Load<Texture2D>("UI/ReadmeButtons"),
-            //                                 nextButtonArea, new Rectangle(0, 246, 390, 123), Keys.N, null);
-            //nextPage.Hightlighted = new Rectangle(390, 246, 390, 123);
-            //nextPage.Pressed = new Rectangle(780, 246, 390, 123);
-
-            //ok = new MenuButton(  BaseGame.Singleton.Content.Load<Texture2D>("UI/ReadmeButtons"),
-            //                                 okButtonArea, new Rectangle(0, 0, 390, 123), Keys.X, null);
-            //ok.Hightlighted = new Rectangle(390, 0, 390, 123);
-            //ok.Pressed = new Rectangle(780, 0, 390, 123);
 
             previousPage = new TextButton("Previous", 21f / 23, Color.Gold, preButtonArea);
             nextPage = new TextButton("Next", 21f / 23, Color.Gold, nextButtonArea);
@@ -98,7 +81,7 @@ namespace Isles.Screens
             Add(nextPage);
             Add(ok);
 
-            previousPage.Click += delegate (object o, EventArgs e)
+            previousPage.Click += (o, e) =>
             {
                 Audios.Play("OK");
 
@@ -110,6 +93,7 @@ namespace Isles.Screens
                         Remove(ui);
                     }
                 }
+
                 Add(titles[CurrentPageIndex]);
                 titles[CurrentPageIndex].ResetDestinationRectangle();
                 foreach (TextField t in contents[currentPageIndex])
@@ -119,7 +103,7 @@ namespace Isles.Screens
                 }
             };
 
-            nextPage.Click += delegate (object o, EventArgs e)
+            nextPage.Click += (o, e) =>
             {
                 Audios.Play("OK");
 
@@ -131,6 +115,7 @@ namespace Isles.Screens
                         Remove(ui);
                     }
                 }
+
                 Add(titles[CurrentPageIndex]);
                 foreach (TextField t in contents[currentPageIndex])
                 {
@@ -141,7 +126,6 @@ namespace Isles.Screens
             Mask = true;
 
             // Set page title and content
-
             titles = new List<TextField>();
             contents = new List<List<TextField>>();
             var title = true;
@@ -184,6 +168,7 @@ namespace Isles.Screens
                             // Ill-formatted color tag, use white as defalut
                             color = Color.White;
                         }
+
                         var r = byte.Parse(colorElements[0]);
                         var g = byte.Parse(colorElements[1]);
                         var b = byte.Parse(colorElements[2]);
@@ -203,12 +188,13 @@ namespace Isles.Screens
                             currentContentList = new List<TextField>();
                             currentContent = null;
                         }
+
                         currentContent = null;
                         currentTitle = new TextField(line.Substring(7), fontSize / 23f, color, titleArea)
                         {
                             Anchor = Anchor.TopLeft,
                             ScaleMode = ScaleMode.ScaleX,
-                            Centered = true
+                            Centered = true,
                         };
                         title = true;
                         heightOffset = 0;
@@ -220,13 +206,14 @@ namespace Isles.Screens
                             heightOffset += currentContent.RealHeight + 10;
                             currentContentList.Add(currentContent);
                         }
+
                         var tempContentRect = new Rectangle(contentArea.X, contentArea.Y + heightOffset,
                                                                     contentArea.Width, contentArea.Height);
 
                         currentContent = new TextField(line.Substring(9), fontSize / 23f, color, tempContentRect)
                         {
                             Anchor = Anchor.TopLeft,
-                            ScaleMode = ScaleMode.ScaleX
+                            ScaleMode = ScaleMode.ScaleX,
                         };
                         title = false;
                     }
@@ -240,6 +227,7 @@ namespace Isles.Screens
                     }
                 }
             }
+
             titles.Add(currentTitle);
             currentContentList.Add(currentContent);
             contents.Add(currentContentList);
@@ -255,7 +243,7 @@ namespace Isles.Screens
         }
 
         /// <summary>
-        /// Draw
+        /// Draw.
         /// </summary>
         public override void Draw(GameTime gameTime, SpriteBatch sprite)
         {
@@ -263,7 +251,7 @@ namespace Isles.Screens
         }
 
         /// <summary>
-        /// Event Handler
+        /// Event Handler.
         /// </summary>
         public override EventResult HandleEvent(EventType type, object sender, object tag)
         {
@@ -273,11 +261,12 @@ namespace Isles.Screens
                 nextPage.HandleEvent(type, sender, tag);
                 ok.HandleEvent(type, sender, tag);
             }
+
             return base.HandleEvent(type, sender, tag);
         }
 
         /// <summary>
-        /// Update
+        /// Update.
         /// </summary>
         /// <param name="gameTime"></param>
         public override void Update(GameTime gameTime)

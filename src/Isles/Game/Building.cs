@@ -1,29 +1,24 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Xml;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Graphics;
-using Isles.Graphics;
+using System.Xml;
 using Isles.Engine;
+using Isles.Graphics;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Isles
 {
-
     /// <summary>
-    /// Respresents a building in the game
+    /// Respresents a building in the game.
     /// </summary>
     public class Building : GameObject, IPlaceable
     {
-
         /// <summary>
-        /// State of the building
+        /// State of the building.
         /// </summary>
         public enum BuildingState
         {
@@ -35,34 +30,39 @@ namespace Isles
         }
 
         /// <summary>
-        /// Gets the building state
+        /// Gets the building state.
         /// </summary>
         public new BuildingState State => state;
 
         protected BuildingState state = BuildingState.Normal;
 
         /// <summary>
-        /// Gets or sets the time to construct this building
+        /// Gets or sets the time to construct this building.
         /// </summary>
-        public float ConstructionTime, ConstructionTimeElapsed;
+        public float ConstructionTime;
 
         /// <summary>
-        /// Gets or sets how much wood needed for the building
+        /// Gets or sets the time to construct this building.
+        /// </summary>
+        public float ConstructionTimeElapsed;
+
+        /// <summary>
+        /// Gets or sets how much wood needed for the building.
         /// </summary>
         public int Lumber;
 
         /// <summary>
-        /// Gets or sets how much gold needed for the building
+        /// Gets or sets how much gold needed for the building.
         /// </summary>
         public int Gold;
 
         /// <summary>
-        /// Gets or sets how much food this building can provide
+        /// Gets or sets how much food this building can provide.
         /// </summary>
         public int Food;
 
         /// <summary>
-        /// Gets or sets the number of builders
+        /// Gets or sets the number of builders.
         /// </summary>
         public int BuilderCount
         {
@@ -79,7 +79,7 @@ namespace Isles
         private int builderCount;
 
         /// <summary>
-        /// Gets or sets the rotation on the xy plane
+        /// Gets or sets the rotation on the xy plane.
         /// </summary>
         public float RotationZ
         {
@@ -90,33 +90,33 @@ namespace Isles
         private float rotationZ;
 
         /// <summary>
-        /// Path brush
+        /// Path brush.
         /// </summary>
         private Vector2 obstructorSize;
         private readonly List<Point> pathGrids = new();
 
         /// <summary>
-        /// Gets the units that can be trained from this building
+        /// Gets the units that can be trained from this building.
         /// </summary>
         public List<string> Units => units;
 
         private List<string> units = new();
 
         /// <summary>
-        /// Gets the pending requests that are going to be handled
+        /// Gets the pending requests that are going to be handled.
         /// </summary>
         public Queue<Spell> QueuedSpells => pendingSpells;
 
         private readonly Queue<Spell> pendingSpells = new();
 
         /// <summary>
-        /// Gets or sets the spawn point of this building
+        /// Gets or sets the spawn point of this building.
         /// </summary>
         public Vector3 SpawnPoint;
         public Worker Builder;
 
         /// <summary>
-        /// Effects
+        /// Effects.
         /// </summary>
         private EffectConstruct construct;
         private List<EffectFire> fire;
@@ -124,7 +124,7 @@ namespace Isles
         private List<Vector3> fireSpawnPointsLeft;
 
         /// <summary>
-        /// Gets the rally point model for all buildings
+        /// Gets the rally point model for all buildings.
         /// </summary>
         public static GameModel RallyPointModel
         {
@@ -142,13 +142,13 @@ namespace Isles
         private static GameModel rallyPointModel;
 
         /// <summary>
-        /// Halo effect
+        /// Halo effect.
         /// </summary>
         private EffectHalo halo;
         private string haloParticle;
 
         /// <summary>
-        /// Create a new building
+        /// Create a new building.
         /// </summary>
         public Building(GameWorld world, string classID)
             : base(world, classID) { }
@@ -176,7 +176,7 @@ namespace Isles
             {
                 units = new List<string>(
                     value.Split(new char[] { ',', ' ', '\n', '\r' }));
-                units.RemoveAll(delegate (string v) { return v.Length <= 0; });
+                units.RemoveAll(delegate(string v) { return v.Length <= 0; });
             }
 
             if ((value = xml.GetAttribute("Halo")) != "")
@@ -319,7 +319,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Gets whether a given type of unit can be trained from this building
+        /// Gets whether a given type of unit can be trained from this building.
         /// </summary>
         public bool CanTrain(string type)
         {
@@ -327,11 +327,12 @@ namespace Isles
             {
                 return !Owner.IsUnique(type) || !Owner.IsFutureAvailable(type);
             }
+
             return false;
         }
 
         /// <summary>
-        /// Trains a given type of unit
+        /// Trains a given type of unit.
         /// </summary>
         public bool TrainUnit(string type)
         {
@@ -346,6 +347,7 @@ namespace Isles
                         Audios.Play("NotEnoughGold", Audios.Channel.Interface, null);
                         GameUI.Singleton.PushMessage("Insufficient Gold!", MessageType.Unavailable, Color.White);
                     }
+
                     return false;
                 }
                 else if ((lumber = GameDefault.Singleton.GetLumber(type)) > Owner.Lumber)
@@ -355,6 +357,7 @@ namespace Isles
                         Audios.Play("NotEnoughLumber", Audios.Channel.Interface, null);
                         GameUI.Singleton.PushMessage("Insufficient Lumber!", MessageType.Unavailable, Color.White);
                     }
+
                     return false;
                 }
                 else if ((food = GameDefault.Singleton.GetFood(type)) > Owner.FoodCapacity - Owner.Food)
@@ -364,6 +367,7 @@ namespace Isles
                         Audios.Play("MoreFarms", Audios.Channel.Interface, null);
                         GameUI.Singleton.PushMessage("Build More Farms!", MessageType.Unavailable, Color.White);
                     }
+
                     return false;
                 }
 
@@ -523,12 +527,12 @@ namespace Isles
         }
 
         /// <summary>
-        /// Update
+        /// Update.
         /// </summary>
         /// <param name="gameTime"></param>
         public override void Update(GameTime gameTime)
         {
-            //if (ClassID == "Townhall")
+            // if (ClassID == "Townhall")
             //    Health -= 2.0f;
 
             // Pre construct
@@ -558,6 +562,7 @@ namespace Isles
                         Audios.Play("CannotBuild", Audios.Channel.Interface, null);
                         GameUI.Singleton.PushMessage("Can't Build There...", MessageType.Unavailable, Color.White);
                     }
+
                     CancelPlace();
                     OnDie();
                 }
@@ -578,7 +583,7 @@ namespace Isles
                     construct.Update(gameTime);
                 }
 
-                var elapsedSeconds = (float)(gameTime.ElapsedGameTime.TotalSeconds);
+                var elapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
                 ConstructionTimeElapsed += elapsedSeconds * (1 + (builderCount - 1) * CorporationTradeoff);
 
                 if (ConstructionTimeElapsed > ConstructionTime)
@@ -660,7 +665,7 @@ namespace Isles
             // Repair building
             if (state == BuildingState.Normal && Health < MaximumHealth && builderCount > 0)
             {
-                var elapsedSeconds = (float)(gameTime.ElapsedGameTime.TotalSeconds);
+                var elapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
                 Health += 0.2f * MaximumHealth / ConstructionTime * elapsedSeconds *
                                 (1 + (builderCount - 1) * CorporationTradeoff);
             }
@@ -746,7 +751,6 @@ namespace Isles
 
         private void UpdateSmoke()
         {
-
         }
 
         public bool BeginPlace()
@@ -930,7 +934,6 @@ namespace Isles
             Owner.Gold += Gold;
             Owner.Lumber += Lumber;
         }
-
     }
 
     public class Tower : Building
@@ -1043,6 +1046,7 @@ namespace Isles
                     tree.EverGreen = false;
                 }
             }
+
             base.OnDestroy();
         }
 
@@ -1060,7 +1064,6 @@ namespace Isles
                 {
                     if (wo is Tree tree)
                     {
-
                         v.X = tree.Position.X - Position.X;
                         v.Y = tree.Position.Y - Position.Y;
 
@@ -1077,5 +1080,4 @@ namespace Isles
 
         private List<Tree> affectedTrees;
     }
-
 }

@@ -1,37 +1,38 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Pipeline
 {
     /// <summary>
-    /// Isles game landscape
+    /// Isles game landscape.
     /// </summary>
-    [Serializable()]
+    [Serializable]
     public partial class Landscape
     {
-
         private string heightmap;
         private string waterTexture;
         private string waterBumpTexture;
         private float earthRadius;
         private string skyBox;
-        private List<Layer> layers = new List<Layer>();
-        private List<Vegetation> vegetations = new List<Vegetation>();
-        private float width, depth, height, baseHeight;
-        private int xPatchCount, yPatchCount;
-        private int heightFieldWidth, heightFieldHeight;
+        private List<Layer> layers = new();
+        private List<Vegetation> vegetations = new();
+        private float width;
+        private float depth;
+        private float height;
+        private float baseHeight;
+        private int xPatchCount;
+        private int yPatchCount;
+        private int heightFieldWidth;
+        private int heightFieldHeight;
         private float[,] heightData;
         private Vector3[,] normalData;
         private Vector3[,] tangentData;
@@ -41,7 +42,7 @@ namespace Isles.Pipeline
         private ExternalReference<TextureContent> waterBumpTextureContent;
         private ExternalReference<TextureCubeContent> skyBoxCubeTexture;
 
-        [NonSerialized()]
+        [NonSerialized]
         public string SourceFilename;
         private string directory;
 
@@ -88,7 +89,7 @@ namespace Isles.Pipeline
         }
 
         /// <summary>
-        /// Size in x axis
+        /// Size in x axis.
         /// </summary>
         public float Width
         {
@@ -97,7 +98,7 @@ namespace Isles.Pipeline
         }
 
         /// <summary>
-        /// Size in y axis
+        /// Size in y axis.
         /// </summary>
         public float Depth
         {
@@ -106,7 +107,7 @@ namespace Isles.Pipeline
         }
 
         /// <summary>
-        /// Size in z axis
+        /// Size in z axis.
         /// </summary>
         public float Height
         {
@@ -121,9 +122,9 @@ namespace Isles.Pipeline
         }
 
         /// <summary>
-        /// Represent a texture layer in the terrain
+        /// Represent a texture layer in the terrain.
         /// </summary>
-        [Serializable()]
+        [Serializable]
         public class Layer
         {
             private string colorTexture = "";
@@ -142,7 +143,7 @@ namespace Isles.Pipeline
             }
 
             /// <summary>
-            /// Effect technqiue
+            /// Effect technqiue.
             /// </summary>
             public string Technique
             {
@@ -151,7 +152,7 @@ namespace Isles.Pipeline
             }
 
             /// <summary>
-            /// Color texture
+            /// Color texture.
             /// </summary>
             public string ColorTexture
             {
@@ -160,7 +161,7 @@ namespace Isles.Pipeline
             }
 
             /// <summary>
-            /// Alpha texture
+            /// Alpha texture.
             /// </summary>
             public string AlphaTexture
             {
@@ -169,7 +170,7 @@ namespace Isles.Pipeline
             }
 
             /// <summary>
-            /// Normal texture
+            /// Normal texture.
             /// </summary>
             public string NormalTexture
             {
@@ -189,7 +190,7 @@ namespace Isles.Pipeline
                     (new ExternalReference<TextureContent>(Path.Combine(directory, alphaTexture)), null);
 
                 // Build normal texture
-                string normalTextureFile = Path.Combine(directory, normalTexture);
+                var normalTextureFile = Path.Combine(directory, normalTexture);
                 if (File.Exists(normalTextureFile))
                 {
                     normalTextureContent = context.BuildAsset<TextureContent, TextureContent>
@@ -197,25 +198,25 @@ namespace Isles.Pipeline
                 }
 
                 // Process alpha texture to get patches that this layer will finally render to
-                Texture2DContent visibility = (Texture2DContent)
+                var visibility = (Texture2DContent)
                     context.BuildAndLoadAsset<TextureContent, TextureContent>
                         (new ExternalReference<TextureContent>(Path.Combine(directory, alphaTexture)),
                         "TextureProcessor");
 
                 // Convert to pixel bitmap, but we only care about alpha channel
                 visibility.ConvertBitmapType(typeof(PixelBitmapContent<Color>));
-                PixelBitmapContent<Color> pixmap = (PixelBitmapContent<Color>)visibility.Mipmaps[0];
+                var pixmap = (PixelBitmapContent<Color>)visibility.Mipmaps[0];
 
                 TargetPatches = new bool[xPatchCount * yPatchCount];
 
-                for (int y = 0; y < yPatchCount; y++)
+                for (var y = 0; y < yPatchCount; y++)
                 {
-                    for (int x = 0; x < xPatchCount; x++)
+                    for (var x = 0; x < xPatchCount; x++)
                     {
-                        bool render = false;
-                        for (int yy = 0; yy < pixmap.Height / yPatchCount; yy++)
+                        var render = false;
+                        for (var yy = 0; yy < pixmap.Height / yPatchCount; yy++)
                         {
-                            for (int xx = 0; xx < pixmap.Width / xPatchCount; xx++)
+                            for (var xx = 0; xx < pixmap.Width / xPatchCount; xx++)
                             {
                                 if (pixmap.GetPixel(
                                     x * pixmap.Width / xPatchCount + xx,
@@ -241,7 +242,6 @@ namespace Isles.Pipeline
                 output.WriteExternalReference<TextureContent>(alphaTextureContent);
                 output.WriteExternalReference<TextureContent>(normalTextureContent);
             }
-
         }
 
         public Landscape()
@@ -253,13 +253,13 @@ namespace Isles.Pipeline
             directory = Path.GetDirectoryName(SourceFilename);
 
             // Heightmap
-            Texture2DContent map = (Texture2DContent)
+            var map = (Texture2DContent)
                 context.BuildAndLoadAsset<TextureContent, TextureContent>(
                 new ExternalReference<TextureContent>(Path.Combine(directory, heightmap)),
                 "TextureProcessor");
 
             map.ConvertBitmapType(typeof(PixelBitmapContent<float>));
-            PixelBitmapContent<float> heightfield = (PixelBitmapContent<float>)map.Mipmaps[0];
+            var heightfield = (PixelBitmapContent<float>)map.Mipmaps[0];
 
             // Validate heightmap
             if ((heightfield.Width != 129 && heightfield.Width != 257 &&
@@ -273,9 +273,9 @@ namespace Isles.Pipeline
             heightFieldWidth = heightfield.Width;
             heightFieldHeight = heightfield.Height;
             heightData = new float[heightFieldWidth, heightFieldHeight];
-            for (int y = 0; y < heightFieldHeight; y++)
+            for (var y = 0; y < heightFieldHeight; y++)
             {
-                for (int x = 0; x < heightFieldWidth; x++)
+                for (var x = 0; x < heightFieldWidth; x++)
                 {
                     // Negate Y value
                     heightData[x, y] = baseHeight + height * heightfield.GetPixel(x, y);
@@ -291,18 +291,18 @@ namespace Isles.Pipeline
             // Generate bounding box for each patch
             float min, max;
             boundingBoxes = new List<Vector3>(2 * xPatchCount * yPatchCount);
-            for (int y = 0; y < yPatchCount; y++)
+            for (var y = 0; y < yPatchCount; y++)
             {
-                for (int x = 0; x < xPatchCount; x++)
+                for (var x = 0; x < xPatchCount; x++)
                 {
                     min = height;
                     max = 0;
 
-                    for (int yy = 0; yy <= 16; yy++)
+                    for (var yy = 0; yy <= 16; yy++)
                     {
-                        for (int xx = 0; xx <= 16; xx++)
+                        for (var xx = 0; xx <= 16; xx++)
                         {
-                            float h = heightData
+                            var h = heightData
                                 [x * 16 + xx, y * 16 + yy];
 
                             if (h < min)
@@ -337,15 +337,15 @@ namespace Isles.Pipeline
             // So first we get all the patches that a layer will render to,
             // find those layers that share the same patches and group them
             // together to form a patch group.
-            int patchGroupCount = 0;
-            int[] unionFindIndex = new int[layers.Count];
-            for (int i = 0; i < unionFindIndex.Length; i++)
+            var patchGroupCount = 0;
+            var unionFindIndex = new int[layers.Count];
+            for (var i = 0; i < unionFindIndex.Length; i++)
             {
                 unionFindIndex[i] = -1; // -1 represents root
-                bool equal = true;
+                var equal = true;
                 if (i > 0)
                 {
-                    for (int k = 0; k < layers[i].TargetPatches.Length; k++)
+                    for (var k = 0; k < layers[i].TargetPatches.Length; k++)
                     {
                         if (layers[i].TargetPatches[k] != layers[i - 1].TargetPatches[k])
                         {
@@ -367,15 +367,15 @@ namespace Isles.Pipeline
             }
 
             // Create patch groups, set index to patch groups on each layer
-            int iPatchGroup = 0;
+            var iPatchGroup = 0;
             patchGroups = new List<int>[patchGroupCount];
-            for (int i = 0; i < unionFindIndex.Length; i++)
+            for (var i = 0; i < unionFindIndex.Length; i++)
             {
                 if (unionFindIndex[i] == -1)
                 {
                     // A a new patch group
                     patchGroups[iPatchGroup] = new List<int>();
-                    for (int k = 0; k < layers[i].TargetPatches.Length; k++)
+                    for (var k = 0; k < layers[i].TargetPatches.Length; k++)
                     {
                         if (layers[i].TargetPatches[k])
                         {
@@ -392,7 +392,7 @@ namespace Isles.Pipeline
                 else
                 {
                     // Find the root
-                    int k = i;
+                    var k = i;
                     while (unionFindIndex[k] != -1)
                     {
                         k = unionFindIndex[k];
@@ -429,27 +429,27 @@ namespace Isles.Pipeline
             // heightfield
             output.Write(heightFieldWidth);
             output.Write(heightFieldHeight);
-            for (int y = 0; y < heightFieldHeight; y++)
+            for (var y = 0; y < heightFieldHeight; y++)
             {
-                for (int x = 0; x < heightFieldWidth; x++)
+                for (var x = 0; x < heightFieldWidth; x++)
                 {
                     output.Write(heightData[x, y]);
                 }
             }
 
             // Normals
-            for (int y = 0; y < heightFieldHeight; y++)
+            for (var y = 0; y < heightFieldHeight; y++)
             {
-                for (int x = 0; x < heightFieldWidth; x++)
+                for (var x = 0; x < heightFieldWidth; x++)
                 {
                     output.Write(normalData[x, y]);
                 }
             }
 
             // Tangents
-            for (int y = 0; y < heightFieldHeight; y++)
+            for (var y = 0; y < heightFieldHeight; y++)
             {
-                for (int x = 0; x < heightFieldWidth; x++)
+                for (var x = 0; x < heightFieldWidth; x++)
                 {
                     output.Write(tangentData[x, y]);
                 }
@@ -458,17 +458,17 @@ namespace Isles.Pipeline
             // bounding boxes
             output.Write(xPatchCount);
             output.Write(yPatchCount);
-            for (int i = 0; i < boundingBoxes.Count; i++)
+            for (var i = 0; i < boundingBoxes.Count; i++)
             {
                 output.Write(boundingBoxes[i]);
             }
 
             // patch groups
             output.Write(patchGroups.Length);
-            for (int i = 0; i < patchGroups.Length; i++)
+            for (var i = 0; i < patchGroups.Length; i++)
             {
                 output.Write(patchGroups[i].Count);
-                for (int k = 0; k < patchGroups[i].Count; k++)
+                for (var k = 0; k < patchGroups[i].Count; k++)
                 {
                     output.Write(patchGroups[i][k]);
                 }
@@ -476,7 +476,7 @@ namespace Isles.Pipeline
 
             // layers
             output.Write(layers.Count);
-            for (int i = 0; i < layers.Count; i++)
+            for (var i = 0; i < layers.Count; i++)
             {
                 layers[i].Write(output);
             }
@@ -494,8 +494,8 @@ namespace Isles.Pipeline
         private Vector3 CalcLandscapePos(int x, int y)
         {
             // Make sure we stay on the valid map data
-            int mapX = x < 0 ? 0 : x >= heightFieldWidth ? heightFieldWidth - 1 : x;
-            int mapY = y < 0 ? 0 : y >= heightFieldHeight ? heightFieldHeight - 1 : y;
+            var mapX = x < 0 ? 0 : x >= heightFieldWidth ? heightFieldWidth - 1 : x;
+            var mapY = y < 0 ? 0 : y >= heightFieldHeight ? heightFieldHeight - 1 : y;
 
             return new Vector3(
                 x * width / (heightFieldWidth - 1),
@@ -503,7 +503,7 @@ namespace Isles.Pipeline
         }
 
         /// <summary>
-        /// Calculate normals from height data
+        /// Calculate normals from height data.
         /// </summary>
         private void CalculateNormalsAndTangents()
         {
@@ -512,12 +512,12 @@ namespace Isles.Pipeline
             tangentData = new Vector3[heightFieldWidth, heightFieldHeight];
 
             // Build our tangent vertices
-            for (int x = 0; x < heightFieldWidth; x++)
+            for (var x = 0; x < heightFieldWidth; x++)
             {
-                for (int y = 0; y < heightFieldHeight; y++)
+                for (var y = 0; y < heightFieldHeight; y++)
                 {
                     // Step 1: Calculate position
-                    Vector3 pos = CalcLandscapePos(x, y);//texData);
+                    Vector3 pos = CalcLandscapePos(x, y);// texData);
 
                     // Step 2: Calculate all edge vectors (for normals and tangents)
                     // This involves quite complicated optimizations and mathematics,
@@ -541,25 +541,25 @@ namespace Isles.Pipeline
             }
 
             // Smooth all normals, first copy them over, then smooth everything
-            Vector3[,] normalsForSmoothing = new Vector3[heightFieldWidth, heightFieldHeight];
-            for (int x = 0; x < heightFieldWidth; x++)
+            var normalsForSmoothing = new Vector3[heightFieldWidth, heightFieldHeight];
+            for (var x = 0; x < heightFieldWidth; x++)
             {
-                for (int y = 0; y < heightFieldHeight; y++)
+                for (var y = 0; y < heightFieldHeight; y++)
                 {
                     normalsForSmoothing[x, y] = normalData[x, y];
                 }
             }
 
             // Time to smooth to normals we just saved
-            for (int x = 1; x < heightFieldWidth - 1; x++)
+            for (var x = 1; x < heightFieldWidth - 1; x++)
             {
-                for (int y = 1; y < heightFieldHeight - 1; y++)
+                for (var y = 1; y < heightFieldHeight - 1; y++)
                 {
                     // Smooth 3x3 normals, but still use old normal to 40% (5 of 13)
                     Vector3 normal = normalData[x, y] * 4;
-                    for (int xAdd = -1; xAdd <= 1; xAdd++)
+                    for (var xAdd = -1; xAdd <= 1; xAdd++)
                     {
-                        for (int yAdd = -1; yAdd <= 1; yAdd++)
+                        for (var yAdd = -1; yAdd <= 1; yAdd++)
                         {
                             normal += normalsForSmoothing[x + xAdd, y + yAdd];
                         }
@@ -568,12 +568,10 @@ namespace Isles.Pipeline
                     normalData[x, y] = Vector3.Normalize(normal);
 
                     // Also recalculate tangent to let it stay 90 degrees on the normal
-                    Vector3 helperVector = Vector3.Cross(normalData[x, y], tangentData[x, y]);
+                    var helperVector = Vector3.Cross(normalData[x, y], tangentData[x, y]);
                     tangentData[x, y] = Vector3.Cross(helperVector, normalData[x, y]);
                 }
             }
-
         }
-
     }
 }

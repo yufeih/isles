@@ -1,21 +1,17 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Xml.Serialization;
+using Isles.Engine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Isles.Engine;
 
 namespace Isles.Graphics
 {
-
     /// <summary>
     /// Settings class describes all the tweakable options used
     /// to control the appearance of a particle system.
@@ -29,13 +25,13 @@ namespace Isles.Graphics
     /// ParticleEffect : IWorldObject
     /// world.Create("Fireball");
     ///
-    /// new ParticleSystem(new ParticleSettings());
+    /// new ParticleSystem(new ParticleSettings()).
     /// </example>
-    [Serializable()]
+    [Serializable]
     public class ParticleSettings
     {
         /// <summary>
-        /// Name used to identify different settings
+        /// Name used to identify different settings.
         /// </summary>
         public string Name;
 
@@ -51,7 +47,7 @@ namespace Isles.Graphics
 
         /// <summary>
         /// How long these particles will last.
-        /// Double is used to represent time for xml serialization
+        /// Double is used to represent time for xml serialization.
         /// </summary>
         public float Duration = 1;
 
@@ -147,7 +143,6 @@ namespace Isles.Graphics
     /// </summary>
     public class ParticleSystem
     {
-
         public string ParticleName
         {
             get => name;
@@ -160,7 +155,7 @@ namespace Isles.Graphics
         private ParticleSettings settings;
 
         /// <summary>
-        /// Gets or sets the settings for this particle system
+        /// Gets or sets the settings for this particle system.
         /// </summary>
         public ParticleSettings Settings
         {
@@ -266,7 +261,6 @@ namespace Isles.Graphics
         // being drawn, but were drawn recently enough that the GPU could still be
         // using them. These need to be kept around for a few more frames before they
         // can be reallocated.
-
         private int firstActiveParticle;
         private int firstNewParticle;
         private int firstFreeParticle;
@@ -287,7 +281,7 @@ namespace Isles.Graphics
         private static readonly List<ParticleSystem> ParticleSystems = new();
 
         /// <summary>
-        /// Initialize particle system
+        /// Initialize particle system.
         /// </summary>
         public static void LoadContent(BaseGame game)
         {
@@ -297,7 +291,7 @@ namespace Isles.Graphics
             using (Stream stream = game.ZipContent.GetFileStream("Content/Settings/ParticleSettings.xml"))
             {
                 ParticleSettings = (List<ParticleSettings>)
-                    (new XmlSerializer(typeof(List<ParticleSettings>))).Deserialize(stream);
+                    new XmlSerializer(typeof(List<ParticleSettings>)).Deserialize(stream);
             }
 
             // Create particle system
@@ -308,15 +302,14 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Unload particle system content
+        /// Unload particle system content.
         /// </summary>
         public static void UnloadContent(BaseGame game)
         {
-
         }
 
         /// <summary>
-        /// Creates a new particle system with the specified type
+        /// Creates a new particle system with the specified type.
         /// </summary>
         public static ParticleSystem Create(string type)
         {
@@ -333,7 +326,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Flush all the particle system effects onto the screen
+        /// Flush all the particle system effects onto the screen.
         /// </summary>
         /// <param name="gameTime"></param>
         public static void Present(GameTime gameTime)
@@ -346,7 +339,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Update all particle systems
+        /// Update all particle systems.
         /// </summary>
         public static void UpdateAll(GameTime gameTime)
         {
@@ -403,7 +396,6 @@ namespace Isles.Graphics
             // the effect with parameters that are specific to this particular
             // particle system. By cloning the effect, we prevent one particle system
             // from stomping over the parameter settings of another.
-
             particleEffect = effect.Clone(game.GraphicsDevice);
 
             EffectParameterCollection parameters = particleEffect.Parameters;
@@ -416,7 +408,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Refresh particle settings
+        /// Refresh particle settings.
         /// </summary>
         public void Refresh()
         {
@@ -478,7 +470,6 @@ namespace Isles.Graphics
             // would render incorrectly. An easy way to prevent this is to notice
             // that the time value doesn't matter when no particles are being drawn,
             // so we can reset it back to zero any time the active queue is empty.
-
             if (firstActiveParticle == firstFreeParticle)
             {
                 currentTime = 0;
@@ -640,7 +631,7 @@ namespace Isles.Graphics
                 // so as not to mess up any other subsequent drawing.
                 device.RenderState.PointSpriteEnable = false;
                 device.RenderState.DepthBufferWriteEnable = true;
-                //if(this.settings.)
+                // if(this.settings.)
                 device.RenderState.DepthBufferFunction = CompareFunction.LessEqual;
             }
 
@@ -710,7 +701,8 @@ namespace Isles.Graphics
             renderState.DepthBias = 0;
         }
 
-        private Matrix view, projection;
+        private Matrix view;
+        private Matrix projection;
 
         public void SetCamera(Matrix view, Matrix projection)
         {
@@ -771,7 +763,6 @@ namespace Isles.Graphics
 
             firstFreeParticle = nextFreeParticle;
         }
-
     }
 
     /// <summary>
@@ -797,7 +788,6 @@ namespace Isles.Graphics
     /// </summary>
     public class ParticleEmitter
     {
-
         private readonly ParticleSystem particleSystem;
         private float timeBetweenParticles;
         private Vector3 previousPosition;
@@ -812,7 +802,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Gets or sets how many particles will be generated per second
+        /// Gets or sets how many particles will be generated per second.
         /// </summary>
         public float ParticlesPerSecond
         {
@@ -953,7 +943,6 @@ namespace Isles.Graphics
     /// </summary>
     public class Projectile
     {
-
         private const float trailParticlesPerSecond = 200;
         private const int numExplosionParticles = 30;
         private const int numExplosionSmokeParticles = 50;
@@ -1028,5 +1017,4 @@ namespace Isles.Graphics
             return true;
         }
     }
-
 }

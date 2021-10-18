@@ -1,37 +1,33 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
 
 namespace Isles.Engine
 {
-
     /// <summary>
-    /// Interface for a graph edge
+    /// Interface for a graph edge.
     /// </summary>
     public struct GraphEdge
     {
         /// <summary>
-        /// Gets an index representing where the edge is from
+        /// Gets an index representing where the edge is from.
         /// </summary>
         public int From;
 
         /// <summary>
-        /// Gets an index representing where the edge leads to
+        /// Gets an index representing where the edge leads to.
         /// </summary>
         public int To;
 
         /// <summary>
-        /// Gets a non-negtive cost associated to the edge
+        /// Gets a non-negtive cost associated to the edge.
         /// </summary>
         public float Cost;
 
         /// <summary>
-        /// Creates a graph edge
+        /// Creates a graph edge.
         /// </summary>
         public GraphEdge(int from, int to, float cost)
         {
@@ -42,57 +38,56 @@ namespace Isles.Engine
     }
 
     /// <summary>
-    /// Interface for a directed graph
+    /// Interface for a directed graph.
     /// </summary>
     public interface IGraph
     {
         /// <summary>
-        /// Gets the total number of nodes in the graph
+        /// Gets the total number of nodes in the graph.
         /// </summary>
         int NodeCount { get; }
 
         /// <summary>
-        /// Gets all the out-going edges of a given node
+        /// Gets all the out-going edges of a given node.
         /// </summary>
         IEnumerable<GraphEdge> GetEdges(int nodeIndex);
 
         /// <summary>
-        /// Gets the heuristic value between two nodes used in A* algorithm
+        /// Gets the heuristic value between two nodes used in A* algorithm.
         /// </summary>
-        /// <param name="currentIndex">Index to the current node</param>
-        /// <param name="endIndex">Index to the end/target node</param>
-        /// <returns>A heuristic value between the two nodes</returns>
+        /// <param name="currentIndex">Index to the current node.</param>
+        /// <param name="endIndex">Index to the end/target node.</param>
+        /// <returns>A heuristic value between the two nodes.</returns>
         float GetHeuristicValue(int currentIndex, int endIndex);
     }
 
     /// <summary>
-    /// Sparse graph using adjacency list representation
+    /// Sparse graph using adjacency list representation.
     /// </summary>
     public class SparseGraph<TNode> : IGraph
     {
-
         /// <summary>
-        /// All graph nodes
+        /// All graph nodes.
         /// </summary>
         private readonly List<TNode> nodes;
 
         /// <summary>
-        /// Graph edge adjacency list
+        /// Graph edge adjacency list.
         /// </summary>
         private readonly List<LinkedList<GraphEdge>> edges;
 
         /// <summary>
-        /// Gets the total number of nodes in the graph
+        /// Gets the total number of nodes in the graph.
         /// </summary>
         public int NodeCount => nodes.Count;
 
         /// <summary>
-        /// Gets all nodes
+        /// Gets all nodes.
         /// </summary>
         public IEnumerable<TNode> Nodes => nodes;
 
         /// <summary>
-        /// Gets a graph node from a given index
+        /// Gets a graph node from a given index.
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
@@ -102,18 +97,18 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Gets the heuristic value between two nodes
+        /// Gets the heuristic value between two nodes.
         /// </summary>
-        /// <param name="currentIndex">Index to the current node</param>
-        /// <param name="endIndex">Index to the end/target node</param>
-        /// <returns>A heuristic value between the two nodes</returns>
+        /// <param name="currentIndex">Index to the current node.</param>
+        /// <param name="endIndex">Index to the end/target node.</param>
+        /// <returns>A heuristic value between the two nodes.</returns>
         public float GetHeuristicValue(int currentIndex, int endIndex)
         {
             return 0;
         }
 
         /// <summary>
-        /// Gets all the out-going edges of a given node
+        /// Gets all the out-going edges of a given node.
         /// </summary>
         public IEnumerable<GraphEdge> GetEdges(int nodeIndex)
         {
@@ -121,7 +116,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Creates new directed sparse graph
+        /// Creates new directed sparse graph.
         /// </summary>
         public SparseGraph()
         {
@@ -130,7 +125,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Creates a new sparse graph with a initial node count
+        /// Creates a new sparse graph with a initial node count.
         /// </summary>
         /// <param name="nodeCount"></param>
         /// <param name="directed"></param>
@@ -146,10 +141,10 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Adds a new node to the graph
+        /// Adds a new node to the graph.
         /// </summary>
         /// <param name="node"></param>
-        /// <returns>The index to the new node</returns>
+        /// <returns>The index to the new node.</returns>
         public int AddNode(TNode node)
         {
             nodes.Add(node);
@@ -159,7 +154,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Adds a new edge to the graph
+        /// Adds a new edge to the graph.
         /// </summary>
         /// <param name="edge"></param>
         public void AddEdge(GraphEdge edge)
@@ -175,7 +170,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Removes a graph node
+        /// Removes a graph node.
         /// </summary>
         /// <param name="nodeIndex"></param>
         public void RemoveNode(int nodeIndex)
@@ -184,7 +179,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Removes a graph edge
+        /// Removes a graph edge.
         /// </summary>
         public void RemoveEdge(int from, int to)
         {
@@ -192,7 +187,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Test cases for graph
+        /// Test cases for graph.
         /// </summary>
         public static void Test()
         {
@@ -219,11 +214,10 @@ namespace Isles.Engine
             var path = new List<int>();
             path.AddRange(search.Path);
         }
-
     }
 
     /// <summary>
-    /// Interface for graph search algorithm
+    /// Interface for graph search algorithm.
     /// </summary>
     public interface IGraphSearch
     {
@@ -233,7 +227,7 @@ namespace Isles.Engine
         /// <param name="graph"></param>
         /// <param name="start"></param>
         /// <param name="end"></param>
-        /// <returns>Whether a path has been found</returns>
+        /// <returns>Whether a path has been found.</returns>
         bool Search(IGraph graph, int start, int end);
 
         /// <summary>
@@ -268,18 +262,22 @@ namespace Isles.Engine
     }
 
     /// <summary>
-    /// Performs an A* graph search on a given graph
+    /// Performs an A* graph search on a given graph.
     /// </summary>
     public class GraphSearchAStar : IGraphSearch
     {
-
         /// <summary>
-        /// Start, end node of the search
+        /// Start, end node of the search.
         /// </summary>
-        private int start, end;
+        private int start;
 
         /// <summary>
-        /// The graph we're currently searching
+        /// Start, end node of the search.
+        /// </summary>
+        private int end;
+
+        /// <summary>
+        /// The graph we're currently searching.
         /// </summary>
         private IGraph graph;
 
@@ -291,12 +289,12 @@ namespace Isles.Engine
         private int[] path;
 
         /// <summary>
-        /// Contains the real accumulative cost to that node
+        /// Contains the real accumulative cost to that node.
         /// </summary>
         private float[] costs;
 
         /// <summary>
-        /// Current length of path or costs (Node count)
+        /// Current length of path or costs (Node count).
         /// </summary>
         private int length;
 
@@ -306,20 +304,19 @@ namespace Isles.Engine
         private IndexedPriorityQueue queue;
 
         /// <summary>
-        /// Gets whether a search query has finished
+        /// Gets whether a search query has finished.
         /// </summary>
         public bool Finished { get; private set; } = true;
 
         /// <summary>
-        /// Creates a graph searcher using Dijkstra's algorithm
+        /// Creates a graph searcher using Dijkstra's algorithm.
         /// </summary>
         public GraphSearchAStar()
         {
-
         }
 
         /// <summary>
-        /// Reset GraphSearch state
+        /// Reset GraphSearch state.
         /// </summary>
         private void Reset(int newLength)
         {
@@ -354,7 +351,7 @@ namespace Isles.Engine
         /// <param name="graph"></param>
         /// <param name="start"></param>
         /// <param name="end"></param>
-        /// <returns>Whether a path has been found</returns>
+        /// <returns>Whether a path has been found.</returns>
         public bool Search(IGraph graph, int start, int end)
         {
             // Simple call our step search using infinite steps
@@ -486,5 +483,4 @@ namespace Isles.Engine
             }
         }
     }
-
 }

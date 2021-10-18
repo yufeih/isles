@@ -1,20 +1,17 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Isles.Engine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Isles.Engine;
 
 namespace Isles.Graphics
 {
     /// <summary>
-    /// Provide 2D graphics drawing functionalities
+    /// Provide 2D graphics drawing functionalities.
     /// </summary>
     public class Graphics2D
     {
@@ -26,7 +23,7 @@ namespace Isles.Graphics
         private const int MaxPrimitiveIndexCount = 2048;
 
         /// <summary>
-        /// Entry type for string drawing
+        /// Entry type for string drawing.
         /// </summary>
         private struct StringValue
         {
@@ -49,22 +46,22 @@ namespace Isles.Graphics
         private readonly DynamicIndexBuffer indices;
 
         /// <summary>
-        /// Gets graphics 2D effect
+        /// Gets graphics 2D effect.
         /// </summary>
         public Effect Effect { get; }
 
         /// <summary>
-        /// Get sprite font
+        /// Get sprite font.
         /// </summary>
         public SpriteFont Font { get; }
 
         /// <summary>
-        /// Gets or Sets sprite batch used to drawing the text
+        /// Gets or Sets sprite batch used to drawing the text.
         /// </summary>
         public SpriteBatch Sprite { get; }
 
         /// <summary>
-        /// Initialize text system
+        /// Initialize text system.
         /// </summary>
         /// <param name="game"></param>
         public Graphics2D(BaseGame setGame)
@@ -81,7 +78,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Default text drawing function
+        /// Default text drawing function.
         /// </summary>
         /// <param name="text"></param>
         /// <param name="position"></param>
@@ -94,7 +91,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Default text drawing function
+        /// Default text drawing function.
         /// </summary>
         public void DrawString(string text, float size, Vector2 position, Color color)
         {
@@ -108,7 +105,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Draws a shadowed string
+        /// Draws a shadowed string.
         /// </summary>
         public void DrawShadowedString(string text, float size, Vector2 position, Color textColor, Color shadow)
         {
@@ -129,13 +126,13 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Draw a 2D line onto the screen
+        /// Draw a 2D line onto the screen.
         /// </summary>
         public void DrawLine(Point start, Point end, Color color)
         {
             if (lineCount >= MaxLineCount)
             {
-                //Log.Write("Warning: Line capacity exceeded...");
+                // Log.Write("Warning: Line capacity exceeded...");
                 return;
             }
 
@@ -155,7 +152,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Transform from screen space to graphics2D effect position space
+        /// Transform from screen space to graphics2D effect position space.
         /// </summary>
         public Vector3 ScreenToEffect(int x, int y)
         {
@@ -190,10 +187,10 @@ namespace Isles.Graphics
         /// Draws a 2D primitive.
         /// </summary>
         /// <param name="vertices">
-        /// Vertex positions are in screen space [0~ScreenWidth, 0~ScreenHeight, 0]
+        /// Vertex positions are in screen space [0~ScreenWidth, 0~ScreenHeight, 0].
         /// </param>
         /// <param name="indices">
-        /// Use triangle list for vertex indexing
+        /// Use triangle list for vertex indexing.
         /// </param>
         public void DrawPrimitive(IEnumerable<VertexPositionColor> vertices, IEnumerable<ushort> indices)
         {
@@ -206,7 +203,7 @@ namespace Isles.Graphics
             {
                 if (primitiveVertexCount >= MaxPrimitiveVertexCount)
                 {
-                    //Log.Write("Warning: 2D primitive vertex capacity exceeded...");
+                    // Log.Write("Warning: 2D primitive vertex capacity exceeded...");
                     return;
                 }
 
@@ -224,7 +221,7 @@ namespace Isles.Graphics
             {
                 if (primitiveIndexCount >= MaxPrimitiveIndexCount)
                 {
-                    //Log.Write("Warning: 2D primitive index capacity exceeded...");
+                    // Log.Write("Warning: 2D primitive index capacity exceeded...");
                     return;
                 }
 
@@ -242,7 +239,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Draw a rectangle
+        /// Draw a rectangle.
         /// </summary>
         /// <param name="rect"></param>
         /// <param name="color"></param>
@@ -253,7 +250,7 @@ namespace Isles.Graphics
                 new VertexPositionColor(new Vector3(rect.Left, rect.Top, 0), color),
                 new VertexPositionColor(new Vector3(rect.Right, rect.Top, 0), color),
                 new VertexPositionColor(new Vector3(rect.Right, rect.Bottom , 0), color),
-                new VertexPositionColor(new Vector3(rect.Left, rect.Bottom, 0), color)
+                new VertexPositionColor(new Vector3(rect.Left, rect.Bottom, 0), color),
             };
 
             var indices = new ushort[6] { 0, 1, 2, 0, 2, 3 };
@@ -263,7 +260,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Call this at the end of the frame to draw all strings
+        /// Call this at the end of the frame to draw all strings.
         /// </summary>
         public void Present()
         {
@@ -323,6 +320,7 @@ namespace Isles.Graphics
                     PrimitiveType.LineList, 0, lineCount / 2);
                 pass.End();
             }
+
             Effect.End();
 
             // Clear all lines in this frame
@@ -359,6 +357,7 @@ namespace Isles.Graphics
                     PrimitiveType.TriangleList, 0, 0, primitiveVertexCount, 0, primitiveIndexCount / 3);
                 pass.End();
             }
+
             Effect.End();
 
             // Clear all primitives after drawing them
@@ -378,30 +377,30 @@ namespace Isles.Graphics
 
         /// <summary>
         /// Format the given text to make it fit in a rectangle area.
-        /// What if we could recognize and split english word?
+        /// What if we could recognize and split english word?.
         /// </summary>
-        /// <returns>The formatted text</returns>
+        /// <returns>The formatted text.</returns>
         /// <example>
         /// FormatString("ABCD", 20): "AB\nCD"
-        /// FormatString("What is your name?", 100): "What is \nyour name?"
+        /// FormatString("What is your name?", 100): "What is \nyour name?".
         /// </example>
         public static string FormatString(string text, float width, float fontSize, SpriteFont font)
         {
             width /= fontSize;
 
-            //Charactors per line
+            // Charactors per line
             float offset = 0;
 
-            //Identify whether the next word is the first word in its line
+            // Identify whether the next word is the first word in its line
             var firstWordInLine = true;
 
-            //Iterate words in the text
+            // Iterate words in the text
             var wi = new WordIterator(text);
 
-            //Return value
+            // Return value
             var rtvSB = new StringBuilder();
 
-            //Store each word in the text
+            // Store each word in the text
             var str = wi.NextWord();
 
             if (str == null)
@@ -409,7 +408,7 @@ namespace Isles.Graphics
                 return "";
             }
 
-            //Arrange each word in the formatted lines
+            // Arrange each word in the formatted lines
             while (str != null)
             {
                 if (firstWordInLine)
@@ -434,6 +433,7 @@ namespace Isles.Graphics
                         {
                             rtvSB.Append('\n');
                         }
+
                         offset = 0;
                         continue;
                     }
@@ -450,8 +450,10 @@ namespace Isles.Graphics
                         }
                     }
                 }
+
                 str = wi.NextWord();
             }
+
             return rtvSB.ToString();
         }
 
@@ -461,27 +463,26 @@ namespace Isles.Graphics
         /// </summary>
         /// <example>
         /// FormatString("ABCDEFGH", 40, 50)    : "ABCD\nEFGH"
-        /// FormatString("ABCDEFGHIJ", 40, 50)  : "ABCD\nE..."
+        /// FormatString("ABCDEFGHIJ", 40, 50)  : "ABCD\nE...".
         /// </example>
         public static string FormatString(string text, float width, float height, float fontSize, SpriteFont font)
         {
-
             width /= fontSize;
 
             height /= fontSize;
 
             float offset = 0;
 
-            //Identify whether the next word is the first word in its line
+            // Identify whether the next word is the first word in its line
             var firstWordInLine = true;
 
-            //Iterate words in the text
+            // Iterate words in the text
             var wi = new WordIterator(text);
 
-            //Return value
+            // Return value
             var rtvSB = new StringBuilder("");
 
-            //Store each word in the text
+            // Store each word in the text
             var str = wi.NextWord();
 
             if (str == null)
@@ -489,7 +490,7 @@ namespace Isles.Graphics
                 return "";
             }
 
-            //Arrange each word in the formatted lines
+            // Arrange each word in the formatted lines
             while (str != null)
             {
                 _ = font.MeasureString(rtvSB.ToString());
@@ -515,6 +516,7 @@ namespace Isles.Graphics
                         {
                             rtvSB.Append('\n');
                         }
+
                         offset = 0;
                         continue;
                     }
@@ -532,13 +534,16 @@ namespace Isles.Graphics
                         }
                     }
                 }
+
                 if (font.MeasureString(rtvSB.ToString()).Y > height)
                 {
                     rtvSB.Append("...");
                     break;
                 }
+
                 str = wi.NextWord();
             }
+
             return rtvSB.ToString();
         }
 
@@ -552,14 +557,14 @@ namespace Isles.Graphics
         private class WordIterator
         {
             /// <summary>
-            /// Hold the text to be processed
+            /// Hold the text to be processed.
             /// </summary>
             private readonly string text;
 
             /// <summary>
-            /// Constructor
+            /// Constructor.
             /// </summary>
-            /// <param name="text">initialize the text</param>
+            /// <param name="text">initialize the text.</param>
             public WordIterator(string text)
             {
                 this.text = text;
@@ -567,9 +572,9 @@ namespace Isles.Graphics
             }
 
             /// <summary>
-            /// Get the next word in the text
+            /// Get the next word in the text.
             /// </summary>
-            /// <returns>next word</returns>
+            /// <returns>next word.</returns>
             public string NextWord()
             {
                 int i;
@@ -578,6 +583,7 @@ namespace Isles.Graphics
                 {
                     return null;
                 }
+
                 for (i = CurrentIndex; i < text.Length; i++)
                 {
                     if (text[i] == ' ' || text[i] == '\n')
@@ -585,13 +591,14 @@ namespace Isles.Graphics
                         break;
                     }
                 }
+
                 rtvStr = i == text.Length ? text.Substring(CurrentIndex) : text.Substring(CurrentIndex, i - CurrentIndex + 1);
                 CurrentIndex = i + 1;
                 return rtvStr;
             }
 
             /// <summary>
-            /// Reset currentIndex to 0
+            /// Reset currentIndex to 0.
             /// </summary>
             public void Reset()
             {
@@ -599,10 +606,9 @@ namespace Isles.Graphics
             }
 
             /// <summary>
-            /// Get or set the currentIndex
+            /// Get or set the currentIndex.
             /// </summary>
             public int CurrentIndex { get; set; }
         }
-
     }
 }

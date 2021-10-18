@@ -1,8 +1,5 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections;
@@ -13,13 +10,11 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Engine
 {
-
     /// <summary>
-    /// A simple helper class
+    /// A simple helper class.
     /// </summary>
     public static class Helper
     {
-
         public static Color StringToColor(string value)
         {
             var split = value.Split(new char[] { ',' }, 3);
@@ -124,12 +119,12 @@ namespace Isles.Engine
         private static readonly Random random = new();
 
         /// <summary>
-        /// Gets the global random number generator
+        /// Gets the global random number generator.
         /// </summary>
         public static Random Random => random;
 
         /// <summary>
-        /// Gets a random number with a range
+        /// Gets a random number with a range.
         /// </summary>
         public static float RandomInRange(float min, float max)
         {
@@ -163,8 +158,9 @@ namespace Isles.Engine
             return obj;
         }
 #endif
+
         /// <summary>
-        /// Convert an object to a byte array
+        /// Convert an object to a byte array.
         /// </summary>
         public static byte[] ObjectToByteArray(object obj)
         {
@@ -183,7 +179,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Convert a byte array to an Object
+        /// Convert a byte array to an Object.
         /// </summary>
         public static object ByteArrayToObject(byte[] rawData, Type type)
         {
@@ -201,7 +197,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Checks if two byte array equals
+        /// Checks if two byte array equals.
         /// </summary>
         public static bool ByteArrayEquals(byte[] raw1, byte[] raw2)
         {
@@ -220,15 +216,14 @@ namespace Isles.Engine
 
             return true;
         }
-
     }
 
     /// <summary>
-    /// A list, allow safe deletion of objects
+    /// A list, allow safe deletion of objects.
     /// </summary>
     /// <typeparam name="TValue"></typeparam>
     /// <remarks>
-    /// Remove objects until update is called
+    /// Remove objects until update is called.
     /// </remarks>
     public class BroadcastList<TValue, TList>
         : IEnumerable<TValue>, ICollection<TValue> where TList : ICollection<TValue>, new()
@@ -239,7 +234,6 @@ namespace Isles.Engine
 
         public void Update()
         {
-
         }
 
         public TList Elements => elements;

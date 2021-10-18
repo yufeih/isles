@@ -1,17 +1,13 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
 using Isles.Engine;
+using Microsoft.Xna.Framework;
 
 namespace Isles
 {
-
     public abstract class Goal : BaseState
     {
         public float ArbitrateInterval = 2;
@@ -20,6 +16,7 @@ namespace Isles
         public abstract void Arbitrate();
 
         public override void Activate() { }
+
         public override void Terminate() { }
 
         public override StateResult Update(GameTime gameTime)
@@ -177,7 +174,7 @@ namespace Isles
 
             // Train peons if we're still short of workers
             owner.Request(owner.WorkerName, HarvesterCount + MineDiggerCount,
-                (2.0f + 1.0f * (HarvesterCount + MineDiggerCount - count) / 5));
+                2.0f + 1.0f * (HarvesterCount + MineDiggerCount - count) / 5);
         }
 
         private void FeedRequests()
@@ -200,7 +197,6 @@ namespace Isles
                 (1.2f + 2.3f * (owner.Food - owner.FoodCapacity + 5) / 5) * FarmFactor);
 
             // Currently requests are fixed :(
-
             owner.FutureObjects.TryGetValue(owner.Race == Race.Islander ? "Militia" : "Swordman", out var militiaCount);
             owner.FutureObjects.TryGetValue(owner.Race == Race.Islander ? "Hunter" : "Rifleman", out var hunterCount);
             owner.FutureObjects.TryGetValue(owner.Race == Race.Islander ? "Barracks" : "TrainingCenter", out var barracksCount);
@@ -228,8 +224,8 @@ namespace Isles
 
             if (owner.Race == Race.Islander)
             {
-                //owner.Request("LiveOfNature", 1, Helper.RandomInRange(1.8f, 2.2f));
-                owner.Request("PunishOfNatureUpgrade", 1, (militiaCount + hunterCount >= 8 ? 2.0f : 0.0f));
+                // owner.Request("LiveOfNature", 1, Helper.RandomInRange(1.8f, 2.2f));
+                owner.Request("PunishOfNatureUpgrade", 1, militiaCount + hunterCount >= 8 ? 2.0f : 0.0f);
             }
 
             owner.Request(owner.TowerName, 1, Helper.RandomInRange(1.0f, 2.0f));
@@ -292,15 +288,14 @@ namespace Isles
             this.world = world;
         }
 
-        //public override StateResult Update(GameTime gameTime)
-        //{
+        // public override StateResult Update(GameTime gameTime)
+        // {
         //    BaseGame.Singleton.Graphics2D.DrawShadowedString(
         //        "Advantage: " + militaryAdvantage + "\nCounter: " + advantageCounter,
         //        20, new Vector2(0, 300), Color.Pink, Color.Black);
 
-        //    return base.Update(gameTime);
-        //}
-
+        // return base.Update(gameTime);
+        // }
         public override void Arbitrate()
         {
             MilitaryAdvantage = MathHelper.Lerp(
@@ -333,13 +328,13 @@ namespace Isles
             foreach (GameObject o in owner.Enermy.EnumerateObjects())
             {
                 var threat = ComputeThreat(o);
-                enermyForce += (o is Worker ? threat / 5 : threat);
+                enermyForce += o is Worker ? threat / 5 : threat;
             }
 
             foreach (GameObject o in owner.EnumerateObjects())
             {
                 var threat = ComputeThreat(o);
-                ourForce += (o is Worker ? threat / 5 : threat);
+                ourForce += o is Worker ? threat / 5 : threat;
             }
 
             // Add a distance factor
@@ -505,5 +500,4 @@ namespace Isles
             return attacker != null ? (Vector3?)attacker.Position : null;
         }
     }
-
 }

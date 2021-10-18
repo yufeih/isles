@@ -1,8 +1,5 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//  
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using Isles.Engine;
@@ -14,7 +11,7 @@ namespace Isles
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-        [STAThread()]
+        [STAThread]
         public static void Main(string[] args)
         {
             using (BaseGame game = new GameIsles())

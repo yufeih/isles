@@ -1,8 +1,5 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.IO;
@@ -11,20 +8,19 @@ using System.Xml.Serialization;
 namespace Isles.Engine
 {
     /// <summary>
-    /// Game settings
+    /// Game settings.
     /// </summary>
-    [Serializable()]
+    [Serializable]
     public class Settings
     {
-
         /// <summary>
-        /// Directory for game assets
+        /// Directory for game assets.
         /// </summary>
         public string ContentDirectory = "Content";
         public string ArchiveFile = "Content.ixa";
 
         /// <summary>
-        /// Default game font
+        /// Default game font.
         /// </summary>
         public string DefaultFont = "Fonts/Default";
         public string Graphics2DEffect = "Effects/Graphics2D";
@@ -65,7 +61,7 @@ namespace Isles.Engine
         public bool VSync = false;
 #endif
 
-        [Serializable()]
+        [Serializable]
         public class BloomEffect
         {
             public bool Enabled;
@@ -76,11 +72,10 @@ namespace Isles.Engine
             public float BaseIntensity = 1;
             public float BloomSaturation = 2;
             public float BaseSaturation;
-
         }
 
         /// <summary>
-        /// Create default game settings
+        /// Create default game settings.
         /// </summary>
         /// <param name="fromFile"></param>
         /// <returns></returns>
@@ -92,12 +87,11 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Save settings
+        /// Save settings.
         /// </summary>
         public void Save(Stream stream)
         {
             new XmlSerializer(typeof(Settings)).Serialize(stream, this);
         }
-
     }
 }

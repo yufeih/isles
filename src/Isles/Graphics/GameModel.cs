@@ -1,30 +1,25 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
+using Isles.Engine;
+using Isles.Pipeline;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Isles.Pipeline;
-using Isles.Engine;
 
 namespace Isles.Graphics
 {
-
     public class GameModel
     {
-
         /// <summary>
-        /// Current game
+        /// Current game.
         /// </summary>
         protected BaseGame game;
 
         /// <summary>
-        /// Gets or sets model world transform
+        /// Gets or sets model world transform.
         /// </summary>
         public Matrix Transform
         {
@@ -51,13 +46,13 @@ namespace Isles.Graphics
         private Matrix transform = Matrix.Identity;
 
         /// <summary>
-        /// Hold all models bone transforms
+        /// Hold all models bone transforms.
         /// </summary>
         private Matrix[] bones;
         private Matrix[] skinTransforms;
 
         /// <summary>
-        /// Gets the axis aligned bounding box of this model
+        /// Gets the axis aligned bounding box of this model.
         /// </summary>
         public BoundingBox BoundingBox
         {
@@ -74,32 +69,32 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Gets the oriented bounding box of this model
+        /// Gets the oriented bounding box of this model.
         /// </summary>
         public BoundingBox OrientedBoundingBox => orientedBoundingBox;
 
         /// <summary>
-        /// Model axis aligned bounding box
+        /// Model axis aligned bounding box.
         /// </summary>
         private BoundingBox boundingBox;
 
         /// <summary>
-        /// Bounding box of the xna model. (Not always axis aligned)
+        /// Bounding box of the xna model. (Not always axis aligned).
         /// </summary>
         private BoundingBox orientedBoundingBox;
 
         /// <summary>
-        /// Whether we should refresh our axis aligned bounding box
+        /// Whether we should refresh our axis aligned bounding box.
         /// </summary>
         private bool isBoundingBoxDirty = true;
 
         /// <summary>
-        /// Gets whether a model contains any animation
+        /// Gets whether a model contains any animation.
         /// </summary>
         public bool IsAnimated => Player != null;
 
         /// <summary>
-        /// Gets whether the model is a skinned model
+        /// Gets whether the model is a skinned model.
         /// </summary>
         public bool IsSkinned => skin != null;
 
@@ -116,52 +111,59 @@ namespace Isles.Graphics
         private AnimationPlayer[] players = new AnimationPlayer[2];
 
         /// <summary>
-        /// Gets the animation player for this game model
+        /// Gets the animation player for this game model.
         /// </summary>
         public AnimationPlayer Player => players[currentPlayer];
 
         private IDictionary<string, AnimationClip> animationClips;
 
         /// <summary>
-        /// Points to the primary player
+        /// Points to the primary player.
         /// </summary>
         private int currentPlayer;
 
         /// <summary>
-        /// Whether we are blending between two animations
+        /// Whether we are blending between two animations.
         /// </summary>
         private bool blending;
 
         /// <summary>
-        /// Time value for animation blending
+        /// Time value for animation blending.
         /// </summary>
-        private double blendStart, blendDuration;
+        private double blendStart;
 
         /// <summary>
-        /// Current animation clip being played
+        /// Time value for animation blending.
+        /// </summary>
+        private double blendDuration;
+
+        /// <summary>
+        /// Current animation clip being played.
         /// </summary>
         private AnimationClip currentClip;
 
         /// <summary>
-        /// Represent the state of current animation
+        /// Represent the state of current animation.
         /// </summary>
         private enum AnimationState
         {
-            Stopped, Playing, Paused
+            Stopped,
+            Playing,
+            Paused,
         }
 
         /// <summary>
-        /// Current animation state
+        /// Current animation state.
         /// </summary>
         private AnimationState animationState = AnimationState.Stopped;
 
         /// <summary>
-        /// For skinned mesh
+        /// For skinned mesh.
         /// </summary>
         private SkinningData skin;
 
         /// <summary>
-        /// Space partition information for this model
+        /// Space partition information for this model.
         /// </summary>
         private ModelSpacePartitionInformation spacePartitionInfo;
 
@@ -181,7 +183,7 @@ namespace Isles.Graphics
         private Model model;
 
         /// <summary>
-        /// Gets or sets the tint color of this game model
+        /// Gets or sets the tint color of this game model.
         /// </summary>
         public Vector3 Tint
         {
@@ -204,7 +206,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Gets or sets the glow of this game model
+        /// Gets or sets the glow of this game model.
         /// </summary>
         public Vector4 Glow
         {
@@ -217,7 +219,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Gets or sets the alpha value of model tint
+        /// Gets or sets the alpha value of model tint.
         /// </summary>
         public float Alpha
         {
@@ -246,27 +248,27 @@ namespace Isles.Graphics
             }
         }
 
-        //Vector4 tint = new Vector4(154.0f / 255, 164.0f / 255, 1.0f, 1.0f);
+        // Vector4 tint = new Vector4(154.0f / 255, 164.0f / 255, 1.0f, 1.0f);
         private Vector4 tint = new(1, 1, 1, 1);
         private Vector4 glow = new(0, 0, 0, 1);
 
         /// <summary>
-        /// Internal list storing all model mesh parts
+        /// Internal list storing all model mesh parts.
         /// </summary>
         private List<ModelMeshPart> meshParts = new();
 
         /// <summary>
-        /// Internal list storing all materials corresponding to each mesh part
+        /// Internal list storing all materials corresponding to each mesh part.
         /// </summary>
         private List<Material> materials = new();
 
         /// <summary>
-        /// Gets game model material
+        /// Gets game model material.
         /// </summary>
         public IList<Material> Materials => materials;
 
         /// <summary>
-        /// Internal list storing all renderables corresponding to each mesh part
+        /// Internal list storing all renderables corresponding to each mesh part.
         /// </summary>
         private List<ModelManager.Renderable> renderables = new();
         private List<ModelManager.Renderable> shadowMapRenderables = new();
@@ -291,7 +293,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Load the game model from XNB model file
+        /// Load the game model from XNB model file.
         /// </summary>
         /// <param name="modelFilename"></param>
         public void Load(string modelAssetname)
@@ -330,7 +332,7 @@ namespace Isles.Graphics
                 skin = skin,
                 spacePartitionInfo = spacePartitionInfo,
                 tint = tint,
-                transform = transform
+                transform = transform,
             };
 
             if (skinTransforms != null)
@@ -379,7 +381,7 @@ namespace Isles.Graphics
                     {
                         BitMap = value as bool[],
 
-                        Box = OBBFromModel(model)
+                        Box = OBBFromModel(model),
                     };
                 }
 
@@ -426,9 +428,8 @@ namespace Isles.Graphics
 
                         var material = new Material(effect)
                         {
-
                             // Read normal texture from mesh part tag
-                            NormalTexture = part.Tag as Texture2D
+                            NormalTexture = part.Tag as Texture2D,
                         };
 
                         materials.Add(material);
@@ -445,7 +446,7 @@ namespace Isles.Graphics
                 }
 
                 SetEffect("Default");
-                //Alpha = 0.15f;
+                // Alpha = 0.15f;
             }
 
             // Compute model bounding box.
@@ -454,7 +455,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Sets the material of the game model
+        /// Sets the material of the game model.
         /// </summary>
         /// <param name="name"></param>
         public void SetEffect(string name)
@@ -473,10 +474,10 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Gets the index of a bone with the specific name
+        /// Gets the index of a bone with the specific name.
         /// </summary>
         /// <returns>
-        /// Negtive if the bone not found
+        /// Negtive if the bone not found.
         /// </returns>
         public int GetBone(string boneName)
         {
@@ -511,9 +512,9 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Ray intersection test
+        /// Ray intersection test.
         /// </summary>
-        /// <param name="ray">Target ray</param>
+        /// <param name="ray">Target ray.</param>
         /// <returns>
         /// Distance from the intersection point to the ray starting position,
         /// Null if there's no intersection.
@@ -524,6 +525,7 @@ namespace Isles.Graphics
             {
                 return BoundingBox.Intersects(ray);
             }
+
             var m = Matrix.Invert(Transform);
             var relarayEnd = Vector3.Transform(ray.Position + ray.Direction, m);
             var relarayPosition = Vector3.Transform(ray.Position, m);
@@ -542,6 +544,7 @@ namespace Isles.Graphics
                     box = spacePartitionInfo.IndexToBoundingBox(index);
                     dist = ray.Intersects(box);
                 }
+
                 return dist;
             }
 
@@ -554,6 +557,7 @@ namespace Isles.Graphics
                     return dist;
                 }
             }
+
             for (var i = 0; i < 8; i++)
             {
                 var son = spacePartitionInfo.SonOf(index, i, level);
@@ -570,12 +574,13 @@ namespace Isles.Graphics
                     }
                 }
             }
+
             dist = minLength != float.PositiveInfinity ? minLength : (float?)null;
             return dist;
         }
 
         /// <summary>
-        /// Gets the default (first) animation clip of this game model
+        /// Gets the default (first) animation clip of this game model.
         /// </summary>
         /// <returns></returns>
         public AnimationClip GetDefaultAnimationClip()
@@ -593,18 +598,17 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Gets the animation clip with the specified name
+        /// Gets the animation clip with the specified name.
         /// </summary>
         public AnimationClip GetAnimationClip(string clipName)
         {
-
             return animationClips.TryGetValue(clipName, out AnimationClip value) ? value : null;
         }
 
         /// <summary>
         /// Play the current (or default) animation.
         /// </summary>
-        /// <returns>Succeeded or not</returns>
+        /// <returns>Succeeded or not.</returns>
         public bool Play()
         {
             if (!IsAnimated)
@@ -632,12 +636,12 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Play an animation clip
+        /// Play an animation clip.
         /// </summary>
         /// <param name="clipName">
         /// Clip name.
         /// </param>
-        /// <returns>Succeeded or not</returns>
+        /// <returns>Succeeded or not.</returns>
         public bool Play(string clipName)
         {
             if (!IsAnimated || clipName == null)
@@ -646,7 +650,6 @@ namespace Isles.Graphics
             }
 
             // Play the animation clip with the specified name
-
             if (animationClips.TryGetValue(clipName, out AnimationClip clip))
             {
                 // Do nothing if it's still the same animation clip
@@ -680,7 +683,7 @@ namespace Isles.Graphics
         /// </summary>
         /// <param name="clipName"></param>
         /// <param name="blendTime"></param>
-        /// <returns>Succeeded or not</returns>
+        /// <returns>Succeeded or not.</returns>
         public bool Play(string clipName, bool loop, float blendTime, EventHandler OnComplete,
                          IEnumerable<KeyValuePair<TimeSpan, EventHandler>> triggers)
         {
@@ -690,7 +693,6 @@ namespace Isles.Graphics
             }
 
             // Play the animation clip with the specified name
-
             if (animationClips.TryGetValue(clipName, out AnimationClip clip))
             {
                 // Do nothing if it's still the same animation clip
@@ -724,7 +726,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Pause the current animation
+        /// Pause the current animation.
         /// </summary>
         public void Pause()
         {
@@ -875,12 +877,11 @@ namespace Isles.Graphics
                 {
                     materials[i].IsDirty = false;
 
-                    renderables[i] =    // Refresh renderable
+                    renderables[i] = // Refresh renderable
                         game.ModelManager.GetRenderable(mesh, part, materials[i]);
                 }
 
                 // Add a new instance to the renderable
-
                 if (IsSkinned)
                 {
                     renderables[i].Add(skinTransforms, tint, glow);
@@ -893,7 +894,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Draw the game model onto a shadow map
+        /// Draw the game model onto a shadow map.
         /// </summary>
         /// <param name="gameTime"></param>
         /// <param name="shadow"></param>
@@ -1003,7 +1004,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Compute the axis aligned bounding box from an oriented bounding box
+        /// Compute the axis aligned bounding box from an oriented bounding box.
         /// </summary>
         public static BoundingBox AABBFromOBB(BoundingBox box, Matrix transform)
         {
@@ -1053,7 +1054,6 @@ namespace Isles.Graphics
 
             return new BoundingBox(min, max);
         }
-
     }
 
     /// <summary>
@@ -1062,7 +1062,6 @@ namespace Isles.Graphics
     /// </summary>
     public class AnimationPlayer
     {
-
         private readonly Model model;
         private TimeSpan currentTimeValue;
         private int currentKeyframe;
@@ -1352,5 +1351,4 @@ namespace Isles.Graphics
             return new Keyframe(bone, time, transform);
         }
     }
-
 }

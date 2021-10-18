@@ -1,19 +1,16 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//  
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Xml;
 using Isles.Engine;
 
 namespace Isles
 {
     /// <summary>
-    /// Default settings for game entities and spells
+    /// Default settings for game entities and spells.
     /// </summary>
     public class GameDefault
     {
@@ -26,17 +23,18 @@ namespace Isles
             WorldObjectDefaults = new();
 
         /// <summary>
-        /// Gets or sets the default attributes for spells
+        /// Gets or sets the default attributes for spells.
         /// </summary>
         public Dictionary<string, XmlElement>
             SpellDefaults = new();
+
         private readonly Dictionary<string, float> lumber = new();
         private readonly Dictionary<string, float> gold = new();
         private readonly Dictionary<string, float> food = new();
         private readonly Dictionary<string, bool> isUnique = new();
 
         /// <summary>
-        /// Gets the lumber property of a given type
+        /// Gets the lumber property of a given type.
         /// </summary>
         public float GetLumber(string type)
         {
@@ -70,7 +68,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Gets the gold property of a given type
+        /// Gets the gold property of a given type.
         /// </summary>
         public float GetGold(string type)
         {
@@ -104,7 +102,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Gets the food property of a given type
+        /// Gets the food property of a given type.
         /// </summary>
         public float GetFood(string type)
         {
@@ -138,7 +136,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Gets whether the given type is a unique
+        /// Gets whether the given type is a unique.
         /// </summary>
         public bool IsUnique(string type)
         {
@@ -162,7 +160,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Sets a type as unique
+        /// Sets a type as unique.
         /// </summary>
         public void SetUnique(string type)
         {
@@ -177,7 +175,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Load the game defaults from a stream
+        /// Load the game defaults from a stream.
         /// </summary>
         /// <param name="stream"></param>
         public void Load(Stream stream)
@@ -191,7 +189,6 @@ namespace Isles
             }
 
             // Gets world object defaults
-
             if (doc.DocumentElement.SelectSingleNode("WorldObject") is XmlElement element)
             {
                 foreach (XmlNode node in element.ChildNodes)
@@ -219,7 +216,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Save the game defaults to a stream
+        /// Save the game defaults to a stream.
         /// </summary>
         /// <param name="stream"></param>
         public void Save(Stream stream)
@@ -285,7 +282,7 @@ namespace Isles
         private static GameDefault gameDefault;
 
         /// <summary>
-        /// Create a game default from file
+        /// Create a game default from file.
         /// </summary>
         /// <returns></returns>
         public static GameDefault Singleton

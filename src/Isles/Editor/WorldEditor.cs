@@ -1,8 +1,8 @@
 using System;
-using System.IO;
-using System.Xml;
 using System.Collections.Generic;
+using System.IO;
 using System.Windows.Forms;
+using System.Xml;
 using Isles.Engine;
 
 namespace Isles.Editor
@@ -63,7 +63,7 @@ namespace Isles.Editor
                 Spell.EndSpell();
                 var construct = new SpellConstruct(screen.World, type)
                 {
-                    AutoReactivate = true
+                    AutoReactivate = true,
                 };
                 Spell.Cast(construct);
             }

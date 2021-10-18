@@ -1,8 +1,5 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
@@ -11,10 +8,10 @@ using Microsoft.Xna.Framework;
 namespace Isles.Engine
 {
     /// <summary>
-    /// Add types of game event here
+    /// Add types of game event here.
     /// </summary>
     /// <remarks>
-    /// This isn't quit a good design to make this extensible
+    /// This isn't quit a good design to make this extensible.
     /// </remarks>
     public enum EventType
     {
@@ -54,7 +51,8 @@ namespace Isles.Engine
     /// </summary>
     public enum EventResult
     {
-        Handled, Unhandled
+        Handled,
+        Unhandled,
     }
 
     /// <summary>
@@ -71,7 +69,7 @@ namespace Isles.Engine
     }
 
     /// <summary>
-    /// Class for dispatching events
+    /// Class for dispatching events.
     /// </summary>
     public static class Event
     {
@@ -103,7 +101,7 @@ namespace Isles.Engine
         private static readonly LinkedList<Message> queue = new();
 
         /// <summary>
-        /// Send a message to the receiver immediately
+        /// Send a message to the receiver immediately.
         /// </summary>
         public static EventResult SendMessage(EventType type,
                                               IEventListener receiver,
@@ -114,7 +112,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Send a delayed message to the receiver
+        /// Send a delayed message to the receiver.
         /// </summary>
         public static void SendMessage(EventType type,
                                        IEventListener receiver,
@@ -152,7 +150,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Send a message to a remote receiver through the network
+        /// Send a message to a remote receiver through the network.
         /// </summary>
         public static void SendRemoteMessage(EventType type,
                                              IEventListener receiver,
@@ -164,7 +162,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Update the event dispatcher
+        /// Update the event dispatcher.
         /// </summary>
         public static void Update(GameTime gameTime)
         {

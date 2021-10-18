@@ -1,34 +1,30 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Isles.Engine
 {
-
     /// <summary>
-    /// Interface for game camera
+    /// Interface for game camera.
     /// </summary>
     public interface ICamera : IEventListener
     {
         /// <summary>
-        /// Gets the camera view matrix
+        /// Gets the camera view matrix.
         /// </summary>
         Matrix View { get; }
 
         /// <summary>
-        /// Gets the camera projection matrix
+        /// Gets the camera projection matrix.
         /// </summary>
         Matrix Projection { get; }
 
         /// <summary>
-        /// Update camera parameters
+        /// Update camera parameters.
         /// </summary>
         /// <param name="gameTime"></param>
         void Update(GameTime gameTime);
@@ -37,7 +33,7 @@ namespace Isles.Engine
     /// <summary>
     /// Game camera class.
     /// Coordinate system in Xna is right-handed!
-    /// Z axis is up by default, since we are using a bird-eye view
+    /// Z axis is up by default, since we are using a bird-eye view.
     /// </summary>
     public class Camera : ICamera
     {
@@ -55,7 +51,7 @@ namespace Isles.Engine
         protected float fieldOfView = MathHelper.PiOver4;
 
         /// <summary>
-        /// Gets camera view matrix. Can't be set due to consistency
+        /// Gets camera view matrix. Can't be set due to consistency.
         /// </summary>
         public Matrix View => view;
 
@@ -99,23 +95,23 @@ namespace Isles.Engine
     }
 
     /// <summary>
-    /// Settings for game camera
+    /// Settings for game camera.
     /// </summary>
-    [Serializable()]
+    [Serializable]
     public class GameCameraSettings
     {
         /// <summary>
-        /// Minmun camera height above ground
+        /// Minmun camera height above ground.
         /// </summary>
         public float MinHeightAboveGround = 10.0f;
 
         /// <summary>
-        /// Max camera arcball radius
+        /// Max camera arcball radius.
         /// </summary>
         public float MaxRadius = 1000.0f;
 
         /// <summary>
-        /// Default camera arcball radius
+        /// Default camera arcball radius.
         /// </summary>
         public float DefaultRadius = 100.0f;
 
@@ -126,17 +122,17 @@ namespace Isles.Engine
         public float ScrollAreaSize = 10;
 
         /// <summary>
-        /// Global camera sensitivity scaler
+        /// Global camera sensitivity scaler.
         /// </summary>
         public float Sensitivity = 1.0f;
 
         /// <summary>
-        /// Controls how mouse wheel value affects view distance
+        /// Controls how mouse wheel value affects view distance.
         /// </summary>
         public float WheelFactor = 0.1f;
 
         /// <summary>
-        /// Controls the global smoothness of camera transitions
+        /// Controls the global smoothness of camera transitions.
         /// </summary>
         public float Smoothness = 1.0f;
 
@@ -149,17 +145,17 @@ namespace Isles.Engine
     }
 
     /// <summary>
-    /// Game camera
+    /// Game camera.
     /// </summary>
     public class GameCamera : Camera
     {
         /// <summary>
-        /// Game camera settings
+        /// Game camera settings.
         /// </summary>
         public GameCameraSettings Settings { get; set; }
 
         /// <summary>
-        /// Landscape for the game camera
+        /// Landscape for the game camera.
         /// </summary>
         public ILandscape Landscape => world.Landscape;
 
@@ -174,7 +170,7 @@ namespace Isles.Engine
         private readonly BaseGame game = BaseGame.Singleton;
 
         /// <summary>
-        /// Radius of the camera arcball
+        /// Radius of the camera arcball.
         /// </summary>
         private float radius = 100.0f;
         private float radiusScaler = 100.0f;
@@ -182,21 +178,21 @@ namespace Isles.Engine
         private const float DefaultRadius = 180.0f;
 
         /// <summary>
-        /// Roll of the camera arcball. (Rotate around x in view space)
+        /// Roll of the camera arcball. (Rotate around x in view space).
         /// </summary>
         private float roll = DefaultRoll;
         private float rollTarget = DefaultRoll;
         private const float DefaultRoll = 1.02173047639f;
 
         /// <summary>
-        /// Pitch of the camera arcball. (Rotate around z in world space)
+        /// Pitch of the camera arcball. (Rotate around z in world space).
         /// </summary>
         private float pitch = -MathHelper.PiOver2;
         private float pitchTarget = -MathHelper.PiOver2;
         private const float DefaultPitch = -MathHelper.PiOver2;
 
         /// <summary>
-        /// Height of the camera
+        /// Height of the camera.
         /// </summary>
         private float eyeZ;
         private float eyeZTarget;
@@ -206,19 +202,20 @@ namespace Isles.Engine
         private Vector3 direction = Vector3.Zero;
 
         /// <summary>
-        /// Variables to adjust orientation
+        /// Variables to adjust orientation.
         /// </summary>
         private bool dragging;
-        private float startRoll, startPitch;
+        private float startRoll;
+        private float startPitch;
         private Point startMousePosition;
 
         /// <summary>
-        /// Gets or sets whether this camera is freezed
+        /// Gets or sets whether this camera is freezed.
         /// </summary>
         public bool Freezed { get; set; }
 
         /// <summary>
-        /// Gets or sets whether this camera is been moved by user
+        /// Gets or sets whether this camera is been moved by user.
         /// </summary>
         public bool MovedByUser { get; set; }
 
@@ -226,8 +223,11 @@ namespace Isles.Engine
         /// Events
         /// </summary>
         public event EventHandler BeginRotate;
+
         public event EventHandler EndRotate;
+
         public event EventHandler BeginMove;
+
         public event EventHandler EndMove;
 
         private bool moving;
@@ -235,7 +235,7 @@ namespace Isles.Engine
         private float orbitSpeed;
 
         /// <summary>
-        /// Creates a game camera
+        /// Creates a game camera.
         /// </summary>
         /// <param name="game"></param>
         /// <param name="world.Landscape"></param>
@@ -244,7 +244,7 @@ namespace Isles.Engine
         {
             this.world = world;
 
-            //float r = Math.Max(
+            // float r = Math.Max(
             //    world.Landscape.Size.X, world.Landscape.Size.Y) / 2;
             var r = (float)Math.Sqrt(world.Landscape.Size.X * world.Landscape.Size.X +
                                        world.Landscape.Size.Y * world.Landscape.Size.Y) / 2;
@@ -264,7 +264,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Fly the camera to a given location
+        /// Fly the camera to a given location.
         /// </summary>
         /// <param name="position"></param>
         /// <param name="teleport"></param>
@@ -298,7 +298,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Make the game camera orbit around a specified point on the ground
+        /// Make the game camera orbit around a specified point on the ground.
         /// </summary>
         public void Orbit(Vector3? point, float speed, float radius, float roll)
         {
@@ -332,7 +332,7 @@ namespace Isles.Engine
         {
             // Apply global camera sensitivity
             var elapsedTime = Settings.Sensitivity *
-                (float)(gameTime.ElapsedGameTime.TotalMilliseconds);
+                (float)gameTime.ElapsedGameTime.TotalMilliseconds;
             var smoother = elapsedTime * 0.005f * Settings.Smoothness;
             if (smoother > 1)
             {
@@ -367,7 +367,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Adjust view distance (radius) using mouse wheel or 'PgUp', 'PgDown' button
+        /// Adjust view distance (radius) using mouse wheel or 'PgUp', 'PgDown' button.
         /// </summary>
         /// <param name="elapsedTime"></param>
         private void UpdateViewDistance(float elapsedTime, float smoother)
@@ -401,7 +401,7 @@ namespace Isles.Engine
 
         /// <summary>
         /// Update the position of camera lookat when the cursor enters the
-        /// borders of the screen
+        /// borders of the screen.
         /// </summary>
         /// <param name="elapsedTime"></param>
         /// <param name="heightFactor"></param>
@@ -624,6 +624,5 @@ namespace Isles.Engine
             return EventResult.Unhandled;
         }
     }
-
 }
 

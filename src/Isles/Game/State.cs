@@ -1,40 +1,39 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
+using Isles.Engine;
+using Isles.Pipeline;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Isles.Pipeline;
-using Isles.Engine;
 
 namespace Isles
 {
-
     public class StateHarvestGold : BaseState
     {
         /// <summary>
-        /// For now, MaxPeonsPerGoldmine should always be set to 1
+        /// For now, MaxPeonsPerGoldmine should always be set to 1.
         /// </summary>
         public const int MaxPeonsPerGoldmine = 1;
         public const int GoldHarvestedPerTime = 10;
         public const double WorkTime = 1.0f;
 
         /// <summary>
-        /// State transitions
+        /// State transitions.
         /// </summary>
         private enum StateType
         {
-            MoveToGoldmine, Wait, Harvest, BackToDeposit
+            MoveToGoldmine,
+            Wait,
+            Harvest,
+            BackToDeposit,
         }
 
         private StateType state;
 
         /// <summary>
-        /// Common stuff
+        /// Common stuff.
         /// </summary>
         private readonly Worker owner;
         private readonly GameWorld world;
@@ -334,23 +333,25 @@ namespace Isles
     public class StateHarvestLumber : BaseState
     {
         /// <summary>
-        /// Constants or properties
+        /// Constants or properties.
         /// </summary>
         public const int MaxPeonsPerTree = 2;
         public const int LumberHarvestedPerHit = 1;
 
         /// <summary>
-        /// State transitions
+        /// State transitions.
         /// </summary>
         private enum StateType
         {
-            MoveToTree, Harvest, BackToDeposit
+            MoveToTree,
+            Harvest,
+            BackToDeposit,
         }
 
         private StateType state;
 
         /// <summary>
-        /// Common stuff
+        /// Common stuff.
         /// </summary>
         private readonly Worker owner;
         private readonly GameWorld world;
@@ -533,6 +534,7 @@ namespace Isles
                     move = null;
                 }
             }
+
             // The logic of harvesting will be handled in animation callback
             // instead of this update.
             else if (state == StateType.BackToDeposit)
@@ -605,18 +607,18 @@ namespace Isles
 
         private void OnComplete(object sender, EventArgs e)
         {
-            //string anim = owner.AttackAnimation;
+            // string anim = owner.AttackAnimation;
 
-            //AnimationClip clip = owner.Model.GetAnimationClip(anim);
+            // AnimationClip clip = owner.Model.GetAnimationClip(anim);
 
-            //TimeSpan time = new TimeSpan((long)(clip.Duration.Ticks * 13.0f / 20));
+            // TimeSpan time = new TimeSpan((long)(clip.Duration.Ticks * 13.0f / 20));
 
-            //trigger = new KeyValuePair<TimeSpan, EventHandler>[]
-            //{
+            // trigger = new KeyValuePair<TimeSpan, EventHandler>[]
+            // {
             //    new KeyValuePair<TimeSpan, EventHandler>(time, HarvestOnce),
-            //};
+            // };
 
-            //owner.Model.Play(owner.AttackAnimation, true, 0.2f, OnComplete, trigger);
+            // owner.Model.Play(owner.AttackAnimation, true, 0.2f, OnComplete, trigger);
         }
 
         private void HarvestOnce(object sender, EventArgs e)
@@ -703,17 +705,18 @@ namespace Isles
     public class StateConstruct : BaseState
     {
         /// <summary>
-        /// State transitions
+        /// State transitions.
         /// </summary>
         private enum StateType
         {
-            MoveToBuilding, Build
+            MoveToBuilding,
+            Build,
         }
 
         private StateType state;
 
         /// <summary>
-        /// Common stuff
+        /// Common stuff.
         /// </summary>
         private readonly Charactor owner;
         private readonly Building building;
@@ -828,17 +831,18 @@ namespace Isles
     public class StateRepair : BaseState
     {
         /// <summary>
-        /// State transitions
+        /// State transitions.
         /// </summary>
         private enum StateType
         {
-            MoveToBuilding, Repair
+            MoveToBuilding,
+            Repair,
         }
 
         private StateType state;
 
         /// <summary>
-        /// Common stuff
+        /// Common stuff.
         /// </summary>
         private readonly Charactor owner;
         private readonly Building building;
@@ -964,6 +968,7 @@ namespace Isles
         }
 
         public override void Activate() { }
+
         public override void Terminate() { }
 
         public override StateResult Update(GameTime gameTime)
@@ -1041,7 +1046,7 @@ namespace Isles
 
             if (sink)
             {
-                height -= (float)(gameTime.ElapsedGameTime.TotalSeconds);
+                height -= (float)gameTime.ElapsedGameTime.TotalSeconds;
                 owner.Position = new Vector3(owner.Position.X, owner.Position.Y, baseHeight + height);
 
                 if (height <= 0)
@@ -1058,17 +1063,19 @@ namespace Isles
     public class StateAttack : BaseState
     {
         /// <summary>
-        /// State transitions
+        /// State transitions.
         /// </summary>
         private enum StateType
         {
-            MoveToTarget, MoveToPosition, Attack
+            MoveToTarget,
+            MoveToPosition,
+            Attack,
         }
 
         private StateType state;
 
         /// <summary>
-        /// Common stuff
+        /// Common stuff.
         /// </summary>
         private readonly Charactor owner;
         private readonly GameWorld world;
@@ -1200,7 +1207,7 @@ namespace Isles
                     moveToTarget = new StateMoveToTarget(owner, target,
                                                          owner.Priority, world.PathManager)
                     {
-                        FollowDistance = 0
+                        FollowDistance = 0,
                     };
                 }
 
@@ -1256,11 +1263,10 @@ namespace Isles
                 }
             }
 
-            //if (target != null)
+            // if (target != null)
             //    BaseGame.Singleton.Graphics2D.DrawLine(target.Position, owner.Position, Color.Wheat);
-            //if (targetPosition.HasValue)
+            // if (targetPosition.HasValue)
             //    BaseGame.Singleton.Graphics2D.DrawLine(owner.Position, targetPosition.Value, Color.Green);
-
             return StateResult.Active;
         }
 
@@ -1296,5 +1302,4 @@ namespace Isles
             return minTarget;
         }
     }
-
 }

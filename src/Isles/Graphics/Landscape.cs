@@ -1,27 +1,22 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
+using Isles.Engine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Isles.Engine;
 
 namespace Isles.Graphics
 {
-
     /// <summary>
-    /// Landscape without terrain
+    /// Landscape without terrain.
     /// </summary>
     public abstract class Landscape : BaseLandscape
     {
-
         /// <summary>
-        /// Initialize landscape from XNB file
+        /// Initialize landscape from XNB file.
         /// </summary>
         /// <param name="input"></param>
         public override void ReadContent(ContentReader input)
@@ -45,7 +40,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Call this everytime a landscape is loaded
+        /// Call this everytime a landscape is loaded.
         /// </summary>
         public override void Initialize(BaseGame game)
         {
@@ -64,14 +59,15 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Draw the terrain for water reflection and refraction
+        /// Draw the terrain for water reflection and refraction.
         /// </summary>
-        /// <param name="upper">Only draw upper part or underwater part</param>
+        /// <param name="upper">Only draw upper part or underwater part.</param>
         public abstract void DrawTerrain(Matrix view, Matrix projection, bool upper);
+
         public abstract void DrawTerrain(GameTime gameTime, ShadowEffect shadowEffect);
 
         /// <summary>
-        /// Draw landscape
+        /// Draw landscape.
         /// </summary>
         /// <param name="gameTime"></param>
         public override void Draw(GameTime gameTime)
@@ -81,8 +77,8 @@ namespace Isles.Graphics
             DrawTerrain(gameTime, null);
 
             // FIXME but this grass is soo ugly...
-            //DrawVegetation(gameTime);
-            //DrawGridStates();
+            // DrawVegetation(gameTime);
+            // DrawGridStates();
         }
 
         private struct TexturedSurface
@@ -185,6 +181,7 @@ namespace Isles.Graphics
 
                 pass.End();
             }
+
             surfaceEffect.End();
 
             texturedSurfaces.Clear();
@@ -303,7 +300,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Dispose
+        /// Dispose.
         /// </summary>
         private void DisposeSky()
         {
@@ -351,7 +348,6 @@ namespace Isles.Graphics
 
         private void InitializeVegetation()
         {
-
         }
 
         private void DrawVegetation(GameTime gameTime)
@@ -367,7 +363,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Gets or sets the fog texture used to draw the landscape
+        /// Gets or sets the fog texture used to draw the landscape.
         /// </summary>
         public Texture2D FogTexture { get; set; }
 
@@ -375,37 +371,37 @@ namespace Isles.Graphics
         /// The water is part of a spherical surface to make it look vast.
         /// But during rendering, e.g., for computing reflection and refraction,
         /// the water is treated as a flat plane with the height of zero.
-        /// This value determines the shape of the surface
+        /// This value determines the shape of the surface.
         /// </summary>
         private float earthRadius;
 
         /// <summary>
-        /// A static texture applied to the water surface
+        /// A static texture applied to the water surface.
         /// </summary>
         private Texture waterTexture;
 
         /// <summary>
-        /// This texture is used as a bump map to simulate water
+        /// This texture is used as a bump map to simulate water.
         /// </summary>
         private Texture waterDstortion;
 
         /// <summary>
-        /// Render target used to draw the reflection & refraction texture
+        /// Render target used to draw the reflection & refraction texture.
         /// </summary>
         private RenderTarget2D reflectionRenderTarget;
 
         /// <summary>
-        /// Depth stencil buffer used when drawing reflection and refraction
+        /// Depth stencil buffer used when drawing reflection and refraction.
         /// </summary>
         private DepthStencilBuffer waterDepthStencil;
 
         /// <summary>
-        /// This texture is generated each frame for water reflection color sampling
+        /// This texture is generated each frame for water reflection color sampling.
         /// </summary>
         private Texture2D waterReflection;
 
         /// <summary>
-        /// Water mesh
+        /// Water mesh.
         /// </summary>
         private int waterVertexCount;
         private int waterPrimitiveCount;
@@ -507,6 +503,7 @@ namespace Isles.Graphics
         }
 
         public event DrawDelegate DrawWaterReflection;
+
         public delegate void DrawDelegate(GameTime gameTime, Matrix view, Matrix projection);
 
         /// <summary>
@@ -599,6 +596,7 @@ namespace Isles.Graphics
                     PrimitiveType.TriangleList, 0, 0, waterVertexCount, 0, waterPrimitiveCount);
                 pass.End();
             }
+
             WaterEffect.End();
 
             graphics.RenderState.DepthBufferWriteEnable = true;
@@ -618,9 +616,9 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Dispose
+        /// Dispose.
         /// </summary>
-        /// <param name="disposing">Disposing</param>
+        /// <param name="disposing">Disposing.</param>
         private void DisposeWater()
         {
             if (waterVertices != null)
@@ -633,19 +631,17 @@ namespace Isles.Graphics
                 waterIndices.Dispose();
             }
         }
-
     }
 
     /// <summary>
-    /// Game fog of war
+    /// Game fog of war.
     /// </summary>
     public class FogMask
     {
-
         private const int Size = 128;
 
         /// <summary>
-        /// Gets the default glow texture for each unit
+        /// Gets the default glow texture for each unit.
         /// </summary>
         public static Texture2D Glow
         {
@@ -663,29 +659,29 @@ namespace Isles.Graphics
         private static Texture2D glow;
 
         /// <summary>
-        /// Gets the width of the mask
+        /// Gets the width of the mask.
         /// </summary>
         public float Width { get; }
 
         /// <summary>
-        /// Gets the height of the mask
+        /// Gets the height of the mask.
         /// </summary>
         public float Height { get; }
 
         /// <summary>
-        /// Objects are invisible when the intensity is below this value
+        /// Objects are invisible when the intensity is below this value.
         /// </summary>
         public const float VisibleIntensity = 0.5f;
 
         /// <summary>
-        /// Common stuff
+        /// Common stuff.
         /// </summary>
         private readonly GraphicsDevice graphics;
         private readonly SpriteBatch sprite;
         private Rectangle textureRectangle;
 
         /// <summary>
-        /// Gets the result mask texture (Fog of war)
+        /// Gets the result mask texture (Fog of war).
         /// </summary>
         public Texture2D Mask { get; private set; }
 
@@ -700,12 +696,12 @@ namespace Isles.Graphics
         private readonly DepthStencilBuffer depthBuffer;
 
         /// <summary>
-        /// Fog intensities
+        /// Fog intensities.
         /// </summary>
         private readonly bool[] visibility;
 
         /// <summary>
-        /// Visible areas
+        /// Visible areas.
         /// </summary>
         private struct Entry
         {
@@ -716,7 +712,7 @@ namespace Isles.Graphics
         private readonly List<Entry> visibleAreas = new();
 
         /// <summary>
-        /// Creates a new fog of war mask
+        /// Creates a new fog of war mask.
         /// </summary>
         public FogMask(GraphicsDevice graphics, float width, float height)
         {
@@ -738,7 +734,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Gets the whether the specified point is in the fog of war
+        /// Gets the whether the specified point is in the fog of war.
         /// </summary>
         public bool Contains(float x, float y)
         {
@@ -746,10 +742,10 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Call this each frame to mark an area as visible
+        /// Call this each frame to mark an area as visible.
         /// </summary>
         /// <remarks>
-        /// TODO: Custom glow texture
+        /// TODO: Custom glow texture.
         /// </remarks>
         public void DrawVisibleArea(float radius, float x, float y)
         {
@@ -763,7 +759,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Call this to refresh the fog of war texture
+        /// Call this to refresh the fog of war texture.
         /// </summary>
         public void Refresh(GameTime gameTime)
         {
@@ -833,7 +829,7 @@ namespace Isles.Graphics
             Mask = maskCanvas.GetTexture();
 
             // Update intensity map
-            //mask.GetData<float>(intensity);
+            // mask.GetData<float>(intensity);
 
             // Manually update intensity map
             UpdateIntensity();
@@ -896,7 +892,5 @@ namespace Isles.Graphics
                 }
             }
         }
-
     }
-
 }

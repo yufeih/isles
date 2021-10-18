@@ -1,15 +1,12 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//  
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Microsoft.Xna.Framework;
 
 namespace Isles.Graphics
 {
     /// <summary>
-    /// Graphics Atmosphere Settings
+    /// Graphics Atmosphere Settings.
     /// </summary>
     public class Atmosphere
     {
@@ -19,12 +16,12 @@ namespace Isles.Graphics
         public Vector4 AmbientColor;
 
         /// <summary>
-        /// Creates a new environment
+        /// Creates a new environment.
         /// </summary>
         public Atmosphere() { }
 
         /// <summary>
-        /// Creates a new environment with some initial values
+        /// Creates a new environment with some initial values.
         /// </summary>
         public Atmosphere(
             Vector3 lightPosition,
@@ -61,7 +58,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Pre-defined environments
+        /// Pre-defined environments.
         /// </summary>
         public static Atmosphere Day => new();
 

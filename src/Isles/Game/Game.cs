@@ -1,31 +1,27 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.IO;
+using Isles.Engine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
-using Isles.Engine;
 
 namespace Isles
 {
-
     /// <summary>
-    /// Game Isles
+    /// Game Isles.
     /// </summary>
     public class GameIsles : BaseGame
     {
         private const string ConfigFile = "Settings.xml";
 
         /// <summary>
-        /// Gets game screen
+        /// Gets game screen.
         /// </summary>
         public GameScreen GameScreen { get; private set; }
 
         /// <summary>
-        /// Gets settins stream
+        /// Gets settins stream.
         /// </summary>
         private static Stream SettingsStream => File.Exists(ConfigFile) ? new FileStream(ConfigFile, FileMode.Open) : null;
 
@@ -35,7 +31,7 @@ namespace Isles
         private TitleScreen titleScreen;
 
         /// <summary>
-        /// Initialize everything here
+        /// Initialize everything here.
         /// </summary>
         protected override void FirstTimeInitialize()
         {
@@ -47,12 +43,12 @@ namespace Isles
             AddScreen("TitleScreen", titleScreen = new TitleScreen(GameScreen));
 
             // Start new level
-            //using (Stream stream = new FileStream("Content/Levels/World.xml", FileMode.Open))
-            //{
+            // using (Stream stream = new FileStream("Content/Levels/World.xml", FileMode.Open))
+            // {
             //    gameScreen.StartLevel(stream);
-            //}
+            // }
 
-            //StartScreen(gameScreen);
+            // StartScreen(gameScreen);
             if (Settings.DirectEnter)
             {
                 GameScreen.StartLevel("Content/Levels/World.xml");
@@ -65,12 +61,12 @@ namespace Isles
             }
 
             // Start game screen
-            //StartScreen(new TestScreen());
+            // StartScreen(new TestScreen());
 
             // Handle editors
-            //StartEditor(new ShadowEditor(gameScreen.World));
-            //StartEditor(new BloomEditor(Bloom));
-            //StartEditor(new WorldEditor(gameScreen));
+            // StartEditor(new ShadowEditor(gameScreen.World));
+            // StartEditor(new BloomEditor(Bloom));
+            // StartEditor(new WorldEditor(gameScreen));
         }
 
         protected override void Update(GameTime gameTime)
@@ -83,7 +79,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Starts a new editor control
+        /// Starts a new editor control.
         /// </summary>
         public void StartEditor(System.Windows.Forms.Form editorForm)
         {
@@ -97,25 +93,25 @@ namespace Isles
         private void Register()
         {
             // Register world object creators
-            GameWorld.RegisterCreator("Decoration", delegate (GameWorld world) { return new Decoration(world); });
-            GameWorld.RegisterCreator("Tree", delegate (GameWorld world) { return new Tree(world); });
-            GameWorld.RegisterCreator("Goldmine", delegate (GameWorld world) { return new Goldmine(world); });
-            GameWorld.RegisterCreator("BoxOfPandora", delegate (GameWorld world) { return new BoxOfPandora(world); });
+            GameWorld.RegisterCreator("Decoration", world => { return new Decoration(world); });
+            GameWorld.RegisterCreator("Tree", world => { return new Tree(world); });
+            GameWorld.RegisterCreator("Goldmine", world => { return new Goldmine(world); });
+            GameWorld.RegisterCreator("BoxOfPandora", world => { return new BoxOfPandora(world); });
 
             // Islander architectures
-            GameWorld.RegisterCreator("Townhall", delegate (GameWorld world) { return new Building(world, "Townhall"); });
-            GameWorld.RegisterCreator("Farmhouse", delegate (GameWorld world) { return new Building(world, "Farmhouse"); });
-            GameWorld.RegisterCreator("Lumbermill", delegate (GameWorld world) { return new Lumbermill(world, "Lumbermill"); });
-            GameWorld.RegisterCreator("Tower", delegate (GameWorld world) { return new Tower(world, "Tower"); });
-            GameWorld.RegisterCreator("Barracks", delegate (GameWorld world) { return new Building(world, "Barracks"); });
-            GameWorld.RegisterCreator("Altar", delegate (GameWorld world) { return new Building(world, "Altar"); });
+            GameWorld.RegisterCreator("Townhall", world => { return new Building(world, "Townhall"); });
+            GameWorld.RegisterCreator("Farmhouse", world => { return new Building(world, "Farmhouse"); });
+            GameWorld.RegisterCreator("Lumbermill", world => { return new Lumbermill(world, "Lumbermill"); });
+            GameWorld.RegisterCreator("Tower", world => { return new Tower(world, "Tower"); });
+            GameWorld.RegisterCreator("Barracks", world => { return new Building(world, "Barracks"); });
+            GameWorld.RegisterCreator("Altar", world => { return new Building(world, "Altar"); });
 
-            Spell.RegisterCreator("Townhall", delegate (GameWorld world) { return new SpellConstruct(world, "Townhall"); });
-            Spell.RegisterCreator("Farmhouse", delegate (GameWorld world) { return new SpellConstruct(world, "Farmhouse"); });
-            Spell.RegisterCreator("Lumbermill", delegate (GameWorld world) { return new SpellConstruct(world, "Lumbermill"); });
-            Spell.RegisterCreator("Tower", delegate (GameWorld world) { return new SpellConstruct(world, "Tower"); });
-            Spell.RegisterCreator("Barracks", delegate (GameWorld world) { return new SpellConstruct(world, "Barracks"); });
-            Spell.RegisterCreator("Altar", delegate (GameWorld world) { return new SpellConstruct(world, "Altar"); });
+            Spell.RegisterCreator("Townhall", world => { return new SpellConstruct(world, "Townhall"); });
+            Spell.RegisterCreator("Farmhouse", world => { return new SpellConstruct(world, "Farmhouse"); });
+            Spell.RegisterCreator("Lumbermill", world => { return new SpellConstruct(world, "Lumbermill"); });
+            Spell.RegisterCreator("Tower", world => { return new SpellConstruct(world, "Tower"); });
+            Spell.RegisterCreator("Barracks", world => { return new SpellConstruct(world, "Barracks"); });
+            Spell.RegisterCreator("Altar", world => { return new SpellConstruct(world, "Altar"); });
 
             Player.RegisterBuilding("Townhall");
             Player.RegisterBuilding("Farmhouse");
@@ -125,17 +121,17 @@ namespace Isles
             Player.RegisterBuilding("Altar");
 
             // Islander units
-            GameWorld.RegisterCreator("Follower", delegate (GameWorld world) { return new Worker(world, "Follower"); });
-            GameWorld.RegisterCreator("Militia", delegate (GameWorld world) { return new Charactor(world, "Militia"); });
-            GameWorld.RegisterCreator("Hunter", delegate (GameWorld world) { return new Hunter(world, "Hunter"); });
-            GameWorld.RegisterCreator("FireSorceress", delegate (GameWorld world) { return new FireSorceress(world, "FireSorceress"); });
-            GameWorld.RegisterCreator("Hellfire", delegate (GameWorld world) { return new Hellfire(world, "Hellfire"); });
+            GameWorld.RegisterCreator("Follower", world => { return new Worker(world, "Follower"); });
+            GameWorld.RegisterCreator("Militia", world => { return new Charactor(world, "Militia"); });
+            GameWorld.RegisterCreator("Hunter", world => { return new Hunter(world, "Hunter"); });
+            GameWorld.RegisterCreator("FireSorceress", world => { return new FireSorceress(world, "FireSorceress"); });
+            GameWorld.RegisterCreator("Hellfire", world => { return new Hellfire(world, "Hellfire"); });
 
-            Spell.RegisterCreator("Follower", delegate (GameWorld world) { return new SpellTraining(world, "Follower", null); });
-            Spell.RegisterCreator("Militia", delegate (GameWorld world) { return new SpellTraining(world, "Militia", null); });
-            Spell.RegisterCreator("Hunter", delegate (GameWorld world) { return new SpellTraining(world, "Hunter", null); });
-            Spell.RegisterCreator("FireSorceress", delegate (GameWorld world) { return new SpellTraining(world, "FireSorceress", null); });
-            Spell.RegisterCreator("Hellfire", delegate (GameWorld world) { return new SpellTraining(world, "Hellfire", null); });
+            Spell.RegisterCreator("Follower", world => { return new SpellTraining(world, "Follower", null); });
+            Spell.RegisterCreator("Militia", world => { return new SpellTraining(world, "Militia", null); });
+            Spell.RegisterCreator("Hunter", world => { return new SpellTraining(world, "Hunter", null); });
+            Spell.RegisterCreator("FireSorceress", world => { return new SpellTraining(world, "FireSorceress", null); });
+            Spell.RegisterCreator("Hellfire", world => { return new SpellTraining(world, "Hellfire", null); });
 
             Player.RegisterCharactor("Follower");
             Player.RegisterCharactor("Militia");
@@ -144,19 +140,19 @@ namespace Isles
             Player.RegisterCharactor("Hellfire");
 
             // Steamer architectures
-            GameWorld.RegisterCreator("SteamFort", delegate (GameWorld world) { return new Building(world, "SteamFort"); });
-            GameWorld.RegisterCreator("Steamhouse", delegate (GameWorld world) { return new Building(world, "Steamhouse"); });
-            GameWorld.RegisterCreator("Regenerator", delegate (GameWorld world) { return new Lumbermill(world, "Regenerator"); });
-            GameWorld.RegisterCreator("SteamCannon", delegate (GameWorld world) { return new Tower(world, "SteamCannon"); });
-            GameWorld.RegisterCreator("TrainingCenter", delegate (GameWorld world) { return new Building(world, "TrainingCenter"); });
-            GameWorld.RegisterCreator("SteamFactory", delegate (GameWorld world) { return new Building(world, "SteamFactory"); });
+            GameWorld.RegisterCreator("SteamFort", world => { return new Building(world, "SteamFort"); });
+            GameWorld.RegisterCreator("Steamhouse", world => { return new Building(world, "Steamhouse"); });
+            GameWorld.RegisterCreator("Regenerator", world => { return new Lumbermill(world, "Regenerator"); });
+            GameWorld.RegisterCreator("SteamCannon", world => { return new Tower(world, "SteamCannon"); });
+            GameWorld.RegisterCreator("TrainingCenter", world => { return new Building(world, "TrainingCenter"); });
+            GameWorld.RegisterCreator("SteamFactory", world => { return new Building(world, "SteamFactory"); });
 
-            Spell.RegisterCreator("SteamFort", delegate (GameWorld world) { return new SpellConstruct(world, "SteamFort"); });
-            Spell.RegisterCreator("Steamhouse", delegate (GameWorld world) { return new SpellConstruct(world, "Steamhouse"); });
-            Spell.RegisterCreator("Regenerator", delegate (GameWorld world) { return new SpellConstruct(world, "Regenerator"); });
-            Spell.RegisterCreator("SteamCannon", delegate (GameWorld world) { return new SpellConstruct(world, "SteamCannon"); });
-            Spell.RegisterCreator("TrainingCenter", delegate (GameWorld world) { return new SpellConstruct(world, "TrainingCenter"); });
-            Spell.RegisterCreator("SteamFactory", delegate (GameWorld world) { return new SpellConstruct(world, "SteamFactory"); });
+            Spell.RegisterCreator("SteamFort", world => { return new SpellConstruct(world, "SteamFort"); });
+            Spell.RegisterCreator("Steamhouse", world => { return new SpellConstruct(world, "Steamhouse"); });
+            Spell.RegisterCreator("Regenerator", world => { return new SpellConstruct(world, "Regenerator"); });
+            Spell.RegisterCreator("SteamCannon", world => { return new SpellConstruct(world, "SteamCannon"); });
+            Spell.RegisterCreator("TrainingCenter", world => { return new SpellConstruct(world, "TrainingCenter"); });
+            Spell.RegisterCreator("SteamFactory", world => { return new SpellConstruct(world, "SteamFactory"); });
 
             Player.RegisterBuilding("SteamFort");
             Player.RegisterBuilding("Steamhouse");
@@ -166,30 +162,30 @@ namespace Isles
             Player.RegisterBuilding("SteamFactory");
 
             // Steamer units
-            GameWorld.RegisterCreator("Miner", delegate (GameWorld world) { return new Worker(world, "Miner"); });
-            GameWorld.RegisterCreator("Swordman", delegate (GameWorld world) { return new Charactor(world, "Swordman"); });
-            GameWorld.RegisterCreator("Rifleman", delegate (GameWorld world) { return new Charactor(world, "Rifleman"); });
-            GameWorld.RegisterCreator("Steambot", delegate (GameWorld world) { return new FireSorceress(world, "Steambot"); });
+            GameWorld.RegisterCreator("Miner", world => { return new Worker(world, "Miner"); });
+            GameWorld.RegisterCreator("Swordman", world => { return new Charactor(world, "Swordman"); });
+            GameWorld.RegisterCreator("Rifleman", world => { return new Charactor(world, "Rifleman"); });
+            GameWorld.RegisterCreator("Steambot", world => { return new FireSorceress(world, "Steambot"); });
 
-            Spell.RegisterCreator("Miner", delegate (GameWorld world) { return new SpellTraining(world, "Miner", null); });
-            Spell.RegisterCreator("Swordman", delegate (GameWorld world) { return new SpellTraining(world, "Swordman", null); });
-            Spell.RegisterCreator("Rifleman", delegate (GameWorld world) { return new SpellTraining(world, "Rifleman", null); });
-            Spell.RegisterCreator("Steambot", delegate (GameWorld world) { return new SpellTraining(world, "Steambot", null); });
+            Spell.RegisterCreator("Miner", world => { return new SpellTraining(world, "Miner", null); });
+            Spell.RegisterCreator("Swordman", world => { return new SpellTraining(world, "Swordman", null); });
+            Spell.RegisterCreator("Rifleman", world => { return new SpellTraining(world, "Rifleman", null); });
+            Spell.RegisterCreator("Steambot", world => { return new SpellTraining(world, "Steambot", null); });
 
             Player.RegisterCharactor("Miner");
             Player.RegisterCharactor("Swordman");
             Player.RegisterCharactor("Rifleman");
             Player.RegisterCharactor("Steambot");
 
-            GameWorld.RegisterCreator("Arrow", delegate (GameWorld world) { return new Arrow(world); });
+            GameWorld.RegisterCreator("Arrow", world => { return new Arrow(world); });
 
             // Register spells
-            Spell.RegisterCreator("LiveOfNature", delegate (GameWorld world) { return new SpellUpgrade(world, "LiveOfNature", Upgrades.LiveOfNature); });
-            Spell.RegisterCreator("PunishOfNatureUpgrade", delegate (GameWorld world) { return new SpellUpgrade(world, "PunishOfNatureUpgrade", Upgrades.PunishOfNature); });
-            Spell.RegisterCreator("AttackUpgrade", delegate (GameWorld world) { return new SpellUpgrade(world, "AttackUpgrade", Upgrades.Attack); });
-            Spell.RegisterCreator("DefenseUpgrade", delegate (GameWorld world) { return new SpellUpgrade(world, "DefenseUpgrade", Upgrades.Defense); });
-            Spell.RegisterCreator("PunishOfNature", delegate (GameWorld world) { return new SpellPunishOfNature(world); });
-            Spell.RegisterCreator("SummonHellfire", delegate (GameWorld world) { return new SpellSummon(world, "Hellfire"); });
+            Spell.RegisterCreator("LiveOfNature", world => { return new SpellUpgrade(world, "LiveOfNature", Upgrades.LiveOfNature); });
+            Spell.RegisterCreator("PunishOfNatureUpgrade", world => { return new SpellUpgrade(world, "PunishOfNatureUpgrade", Upgrades.PunishOfNature); });
+            Spell.RegisterCreator("AttackUpgrade", world => { return new SpellUpgrade(world, "AttackUpgrade", Upgrades.Attack); });
+            Spell.RegisterCreator("DefenseUpgrade", world => { return new SpellUpgrade(world, "DefenseUpgrade", Upgrades.Defense); });
+            Spell.RegisterCreator("PunishOfNature", world => { return new SpellPunishOfNature(world); });
+            Spell.RegisterCreator("SummonHellfire", world => { return new SpellSummon(world, "Hellfire"); });
         }
     }
 
@@ -197,7 +193,10 @@ namespace Isles
     {
         public enum Channel
         {
-            Building, Unit, Interface, UnderAttack
+            Building,
+            Unit,
+            Interface,
+            UnderAttack,
         }
 
         public static AudioManager Audio
@@ -222,9 +221,9 @@ namespace Isles
 
         // There seems to be some bugs with XACT, so we have to
         // use fixed time intervals.
-        //static float buildingTimer = BuildingDuration;
-        //static float unitTimer = UnitDuration;
-        //static float uiTimer = UIDuration;
+        // static float buildingTimer = BuildingDuration;
+        // static float unitTimer = UnitDuration;
+        // static float uiTimer = UIDuration;
         private static float underAttackTimer = UnderAttackDuration;
         private const float BuildingDuration = 1.5f;
         private const float UnitDuration = 1.5f;
@@ -258,11 +257,11 @@ namespace Isles
                 {
                     if (building != null && !building.IsDisposed)
                     {
-                        //building.Dispose();
+                        // building.Dispose();
                         building = null;
                     }
 
-                    //buildingTimer = 0;
+                    // buildingTimer = 0;
                     building = Audio.Play(name, emitter);
                 }
                 else if (channel == Channel.Unit &&
@@ -270,11 +269,11 @@ namespace Isles
                 {
                     if (unit != null && !unit.IsDisposed)
                     {
-                        //unit.Dispose();
+                        // unit.Dispose();
                         unit = null;
                     }
 
-                    //unitTimer = 0;
+                    // unitTimer = 0;
                     unit = Audio.Play(name, emitter);
                 }
                 else if (channel == Channel.Interface &&
@@ -282,11 +281,11 @@ namespace Isles
                 {
                     if (ui != null && !ui.IsDisposed)
                     {
-                        //ui.Dispose();
+                        // ui.Dispose();
                         ui = null;
                     }
 
-                    //uiTimer = 0;
+                    // uiTimer = 0;
                     ui = Audio.Play(name);
                 }
                 else if (channel == Channel.UnderAttack &&
@@ -297,7 +296,7 @@ namespace Isles
                 {
                     if (underAttack != null && !underAttack.IsDisposed)
                     {
-                        //underAttack.Dispose();
+                        // underAttack.Dispose();
                         underAttack = null;
                     }
 
@@ -347,7 +346,7 @@ namespace Isles
                     if (postTimer >= postValue)
                     {
                         // Choose a random background music
-                        musicName = (Helper.Random.Next(2) == 0 ? "Steamer" : "Islander");
+                        musicName = Helper.Random.Next(2) == 0 ? "Steamer" : "Islander";
                         musicState = 0;
                     }
                 }
@@ -357,20 +356,18 @@ namespace Isles
                 }
             }
 
-            //if (building != null && buildingTimer < BuildingDuration)
+            // if (building != null && buildingTimer < BuildingDuration)
             //    buildingTimer += elapsed;
 
-            //if (unit != null && unitTimer < UnitDuration)
+            // if (unit != null && unitTimer < UnitDuration)
             //    unitTimer += elapsed;
 
-            //if (ui != null && uiTimer < UIDuration)
+            // if (ui != null && uiTimer < UIDuration)
             //    uiTimer += elapsed;
-
             if (underAttack != null && underAttackTimer < UnderAttackDuration)
             {
                 underAttackTimer += elapsed;
             }
         }
     }
-
 }

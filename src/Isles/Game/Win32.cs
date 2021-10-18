@@ -5,10 +5,8 @@ using Microsoft.Xna.Framework;
 // Contains managed wrappers and implementations of Win32
 // structures, delegates, constants and platform invokes
 // used by the GradientFill and Subclassing samples.
-
 namespace Isles.Engine
 {
-
     public sealed class Win32
     {
         // WM_NOTIFY notificaiton message header.
@@ -54,6 +52,7 @@ namespace Isles.Engine
         [DllImport("user32.dll")]
         public extern static IntPtr SetWindowLong(
             IntPtr hwnd, int nIndex, IntPtr dwNewLong);
+
         public const int GWL_WNDPROC = -4;
 
         [DllImport("user32.dll")]
@@ -117,7 +116,7 @@ namespace Isles.Engine
         public const uint TVHT_NOWHERE = 0x0001;
         public const uint TVHT_ONITEMICON = 0x0002;
         public const uint TVHT_ONITEMLABEL = 0x0004;
-        public const uint TVHT_ONITEM = (TVHT_ONITEMICON | TVHT_ONITEMLABEL | TVHT_ONITEMSTATEICON);
+        public const uint TVHT_ONITEM = TVHT_ONITEMICON | TVHT_ONITEMLABEL | TVHT_ONITEMSTATEICON;
         public const uint TVHT_ONITEMINDENT = 0x0008;
         public const uint TVHT_ONITEMBUTTON = 0x0010;
         public const uint TVHT_ONITEMRIGHT = 0x0020;
@@ -127,7 +126,7 @@ namespace Isles.Engine
         public const uint TVHT_TORIGHT = 0x0400;
         public const uint TVHT_TOLEFT = 0x0800;
 
-        public const uint TVM_GETITEM = TV_FIRST + 62;  //TVM_GETITEMW
+        public const uint TVM_GETITEM = TV_FIRST + 62;  // TVM_GETITEMW
 
         public const uint TVIF_TEXT = 0x0001;
         public const uint TVIF_IMAGE = 0x0002;

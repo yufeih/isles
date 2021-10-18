@@ -1,32 +1,28 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
+using Isles.Engine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Isles.Engine;
 
 namespace Isles.Graphics
 {
     public class MipmappedLandscape : Landscape
     {
-
         /// <summary>
-        /// Effect for drawing surface
+        /// Effect for drawing surface.
         /// </summary>
         private BasicEffect surfaceEffect;
         private VertexDeclaration surfaceDeclaraction;
 
         /// <summary>
-        /// Draw a texture on the landscape surface
+        /// Draw a texture on the landscape surface.
         /// </summary>
-        /// <param name="texture">Texture to be drawed</param>
-        /// <param name="position">Center position of the texture</param>
-        /// <param name="Size">Texture Size</param>
+        /// <param name="texture">Texture to be drawed.</param>
+        /// <param name="position">Center position of the texture.</param>
+        /// <param name="Size">Texture Size.</param>
         public void DrawSurface(Texture2D texture, Vector2 position, Vector2 Size)
         {
             // Generate a mesh for drawing the texture at a given position
@@ -96,7 +92,7 @@ namespace Isles.Graphics
             // Enable alpha blending :)
             graphics.RenderState.AlphaBlendEnable = true;
             graphics.RenderState.DepthBufferWriteEnable = false;
-            //graphics.RenderState.DepthBufferFunction = CompareFunction.Always;
+            // graphics.RenderState.DepthBufferFunction = CompareFunction.Always;
             graphics.RenderState.CullMode = CullMode.None;
             graphics.SamplerStates[0].AddressU = TextureAddressMode.Border;
             graphics.SamplerStates[0].AddressV = TextureAddressMode.Border;
@@ -116,28 +112,29 @@ namespace Isles.Graphics
 
                 pass.End();
             }
+
             surfaceEffect.End();
 
             // Restore settings
             graphics.RenderState.AlphaBlendEnable = false;
             graphics.RenderState.DepthBufferWriteEnable = true;
-            //graphics.RenderState.DepthBufferFunction = CompareFunction.LessEqual;
+            // graphics.RenderState.DepthBufferFunction = CompareFunction.LessEqual;
             graphics.SamplerStates[0].AddressU = TextureAddressMode.Wrap;
             graphics.SamplerStates[0].AddressV = TextureAddressMode.Wrap;
         }
 
         /// <summary>
-        /// Effect used to render the terrain
+        /// Effect used to render the terrain.
         /// </summary>
         private Effect terrainEffect;
 
         /// <summary>
-        /// Terrain vertices
+        /// Terrain vertices.
         /// </summary>
         private TerrainVertex[,] terrainVertices;
 
         /// <summary>
-        /// Terrain vertex buffer
+        /// Terrain vertex buffer.
         /// </summary>
         private VertexBuffer terrainVertexBuffer;
 
@@ -148,17 +145,17 @@ namespace Isles.Graphics
         private readonly List<IndexBuffer> terrainIndexBufferSet = new();
 
         /// <summary>
-        /// Terrain vertex declaration
+        /// Terrain vertex declaration.
         /// </summary>
         private VertexDeclaration terrainVertexDeclaration;
 
         /// <summary>
-        /// Gets or sets the error ratio when computing terrain LOD
+        /// Gets or sets the error ratio when computing terrain LOD.
         /// </summary>
         public float TerrainErrorRatio { get; set; } = 0.0012f;
 
         /// <summary>
-        /// This drawing method is used for generating water reflection
+        /// This drawing method is used for generating water reflection.
         /// </summary>
         public override void DrawTerrain(Matrix view, Matrix projection, bool upper)
         {
@@ -192,13 +189,15 @@ namespace Isles.Graphics
                         0, 0, (int)terrainVertexCount,
                         0, (int)terrainIndexCount[0] / 3);
                 }
+
                 pass.End();
             }
+
             terrainEffect.End();
         }
 
         /// <summary>
-        /// This method draws the terrain with a higher precision
+        /// This method draws the terrain with a higher precision.
         /// </summary>
         public override void DrawTerrain(GameTime gameTime, ShadowEffect shadow)
         {
@@ -241,7 +240,7 @@ namespace Isles.Graphics
                 for (var i = 0; i < Layers.Count; i++)
                 {
                     // Disable alpha blending when drawing our first layer
-                    graphics.RenderState.AlphaBlendEnable = true;//(i != 0);
+                    graphics.RenderState.AlphaBlendEnable = true;// (i != 0);
 
                     // It turns out that set indices are soo expensive when drawing
                     // the terrain with simple shaders. But for complex shaders, such
@@ -263,8 +262,10 @@ namespace Isles.Graphics
                             0, (int)terrainIndexCount[Layers[i].PatchGroup] / 3);
                     }
                 }
+
                 pass.End();
             }
+
             terrainEffect.End();
 
             graphics.RenderState.DepthBufferEnable = true;
@@ -313,7 +314,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Gets a terrain vertex at a given position
+        /// Gets a terrain vertex at a given position.
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
@@ -352,7 +353,7 @@ namespace Isles.Graphics
         {
             if (workingVertices == null)
             {
-                //workingVertices = new TerrainVertex[
+                // workingVertices = new TerrainVertex[
                 //    6 * PatchCountOnXAxis * PatchCountOnYAxis *
                 //    Patch.MaxPatchResolution * Patch.MaxPatchResolution];
                 workingVertices = new TerrainVertex[GridCountOnXAxis * GridCountOnYAxis];
@@ -431,7 +432,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Dispose
+        /// Dispose.
         /// </summary>
         protected virtual void DisposeTerrain()
         {
@@ -457,7 +458,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Update landscape every frame
+        /// Update landscape every frame.
         /// </summary>
         /// <param name="gameTime"></param>
         public override void Update(GameTime gameTime)
@@ -514,7 +515,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Call this when device is reset
+        /// Call this when device is reset.
         /// </summary>
         private void LoadManualContent()
         {
@@ -552,7 +553,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Call this when device is lost
+        /// Call this when device is lost.
         /// </summary>
         private void UnloadManualContent()
         {
@@ -583,19 +584,22 @@ namespace Isles.Graphics
             // Grabbed from racing game :)
 
             /// <summary>
-            /// Position
+            /// Position.
             /// </summary>
             public Vector3 Position;
+
             /// <summary>
-            /// Texture coordinates
+            /// Texture coordinates.
             /// </summary>
             public Vector2 TextureCoordinate;
+
             /// <summary>
-            /// Normal
+            /// Normal.
             /// </summary>
             public Vector3 Normal;
+
             /// <summary>
-            /// Tangent
+            /// Tangent.
             /// </summary>
             public Vector3 Tangent;
 
@@ -605,25 +609,25 @@ namespace Isles.Graphics
             public static int SizeInBytes => 4 * (3 + 2 + 3 + 3);
 
             /// <summary>
-            /// U texture coordinate
+            /// U texture coordinate.
             /// </summary>
-            /// <returns>Float</returns>
+            /// <returns>Float.</returns>
             public float U => TextureCoordinate.X;
 
             /// <summary>
-            /// V texture coordinate
+            /// V texture coordinate.
             /// </summary>
-            /// <returns>Float</returns>
+            /// <returns>Float.</returns>
             public float V => TextureCoordinate.Y;
 
             /// <summary>
-            /// Create tangent vertex
+            /// Create tangent vertex.
             /// </summary>
-            /// <param name="setPos">Set position</param>
-            /// <param name="setU">Set u texture coordinate</param>
-            /// <param name="setV">Set v texture coordinate</param>
-            /// <param name="setNormal">Set normal</param>
-            /// <param name="setTangent">Set tangent</param>
+            /// <param name="setPos">Set position.</param>
+            /// <param name="setU">Set u texture coordinate.</param>
+            /// <param name="setV">Set v texture coordinate.</param>
+            /// <param name="setNormal">Set normal.</param>
+            /// <param name="setTangent">Set tangent.</param>
             public TerrainVertex(
                 Vector3 setPos,
                 float setU, float setV,
@@ -637,12 +641,12 @@ namespace Isles.Graphics
             }
 
             /// <summary>
-            /// Create tangent vertex
+            /// Create tangent vertex.
             /// </summary>
-            /// <param name="setPos">Set position</param>
-            /// <param name="setUv">Set uv texture coordinates</param>
-            /// <param name="setNormal">Set normal</param>
-            /// <param name="setTangent">Set tangent</param>
+            /// <param name="setPos">Set position.</param>
+            /// <param name="setUv">Set uv texture coordinates.</param>
+            /// <param name="setNormal">Set normal.</param>
+            /// <param name="setTangent">Set tangent.</param>
             public TerrainVertex(
                 Vector3 setPos,
                 Vector2 setUv,
@@ -656,13 +660,13 @@ namespace Isles.Graphics
             }
 
             /// <summary>
-            /// Vertex elements for Mesh.Clone
+            /// Vertex elements for Mesh.Clone.
             /// </summary>
             public static readonly VertexElement[] VertexElements =
                 GenerateVertexElements();
 
             /// <summary>
-            /// Generate vertex declaration
+            /// Generate vertex declaration.
             /// </summary>
             private static VertexElement[] GenerateVertexElements()
             {
@@ -699,8 +703,6 @@ namespace Isles.Graphics
                     declaration[2].VertexElementUsage == VertexElementUsage.Normal &&
                     declaration[3].VertexElementUsage == VertexElementUsage.Tangent;
             }
-
         }
-
     }
 }

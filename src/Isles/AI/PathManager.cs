@@ -1,8 +1,5 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
@@ -24,7 +21,7 @@ namespace Isles.Engine
     //-------------------------------------------------------------------------
 
     /// <summary>
-    /// Represents a sequence of nodes to follow
+    /// Represents a sequence of nodes to follow.
     /// </summary>
     public struct PathEdge
     {
@@ -37,7 +34,7 @@ namespace Isles.Engine
     }
 
     /// <summary>
-    /// Represents a sequence of path edge to follow
+    /// Represents a sequence of path edge to follow.
     /// </summary>
     public class Path : IEnumerable<PathEdge>
     {
@@ -55,18 +52,18 @@ namespace Isles.Engine
     }
 
     /// <summary>
-    /// A brush describing the shape of the obstacle
+    /// A brush describing the shape of the obstacle.
     /// </summary>
     public class PathBrush
     {
         /// <summary>
-        /// X, Y determines the relative xy position of each marked point
+        /// X, Y determines the relative xy position of each marked point.
         /// </summary>
         public int[] X;
         public int[] Y;
 
         /// <summary>
-        /// Size of the brush
+        /// Size of the brush.
         /// </summary>
         public int SizeX;
         public int SizeY;
@@ -110,7 +107,6 @@ namespace Isles.Engine
             y.CopyTo(Y, 0);
 
             // Compute size
-
             var minX = int.MaxValue;
             var minY = int.MaxValue;
             var maxX = int.MinValue;
@@ -160,16 +156,14 @@ namespace Isles.Engine
             // Compute the mask value for 8 directions.
             // Which node we should check for connectivity if we move one step
             // ahead along that direction.
-
             var dx = new List<int>();
             var dy = new List<int>();
 
             //// Append a border
-            //x.Add(SizeX); y.Add(SizeY);
-            //x.Add(SizeX); y.Add(-1);
-            //x.Add(-1); y.Add(SizeX);
-            //x.Add(-1); y.Add(-1);
-
+            // x.Add(SizeX); y.Add(SizeY);
+            // x.Add(SizeX); y.Add(-1);
+            // x.Add(-1); y.Add(SizeX);
+            // x.Add(-1); y.Add(-1);
             for (var k = 0; k < 8; k++)
             {
                 dx.Clear();
@@ -214,12 +208,12 @@ namespace Isles.Engine
     }
 
     /// <summary>
-    /// Graph representing the path graph of Isles landscape
+    /// Graph representing the path graph of Isles landscape.
     /// </summary>
     public class PathGraph : IGraph
     {
         /// <summary>
-        /// Reference to the landscape
+        /// Reference to the landscape.
         /// </summary>
         public ILandscape Landscape
         {
@@ -241,26 +235,46 @@ namespace Isles.Engine
         private byte[,] dynamicData;
 
         /// <summary>
-        /// Size of the grid bitmap
+        /// Size of the grid bitmap.
         /// </summary>
-        private readonly int entryWidth, entryHeight, nodeCount;
+        private readonly int entryWidth;
+
+        /// <summary>
+        /// Size of the grid bitmap.
+        /// </summary>
+        private readonly int entryHeight;
+
+        /// <summary>
+        /// Size of the grid bitmap.
+        /// </summary>
+        private readonly int nodeCount;
 
         public int EntryWidth => entryWidth;
 
         public int EntryHeight => entryHeight;
 
         /// <summary>
-        /// Size of each entry cell
+        /// Size of each entry cell.
         /// </summary>
-        private readonly float cellSize, halfCellSize;
+        private readonly float cellSize;
 
         /// <summary>
-        /// Size of the map
+        /// Size of each entry cell.
         /// </summary>
-        private readonly float mapWidth, mapHeight;
+        private readonly float halfCellSize;
 
         /// <summary>
-        /// Gets the size of each cell
+        /// Size of the map.
+        /// </summary>
+        private readonly float mapWidth;
+
+        /// <summary>
+        /// Size of the map.
+        /// </summary>
+        private readonly float mapHeight;
+
+        /// <summary>
+        /// Gets the size of each cell.
         /// </summary>
         public float CellSize => cellSize;
 
@@ -293,7 +307,7 @@ namespace Isles.Engine
         private Rectangle? boundary;
 
         /// <summary>
-        /// Gets or sets whether dynamic obstacles are ignored when searching
+        /// Gets or sets whether dynamic obstacles are ignored when searching.
         /// </summary>
         public bool IgnoreDynamicObstacles
         {
@@ -304,7 +318,7 @@ namespace Isles.Engine
         private bool ignoreDynamicObstacles;
 
         /// <summary>
-        /// Construct a landscape graph
+        /// Construct a landscape graph.
         /// </summary>
         public PathGraph(ILandscape landscape, float resolution, IEnumerable<Point> occluders)
         {
@@ -359,7 +373,7 @@ namespace Isles.Engine
         public static readonly int[] DY4 = new int[4] { 0, -1, 0, 1 };
 
         /// <summary>
-        /// Initialize grid entries
+        /// Initialize grid entries.
         /// </summary>
         private void InitializeEntry(float resolution, IEnumerable<Point> occluders)
         {
@@ -425,8 +439,7 @@ namespace Isles.Engine
         /// </summary>
         public void Mark(int x, int y)
         {
-            //System.Diagnostics.Debug.Assert(data[x, y] == 0);
-
+            // System.Diagnostics.Debug.Assert(data[x, y] == 0);
             data[x, y]++;
         }
 
@@ -435,8 +448,7 @@ namespace Isles.Engine
         /// </summary>
         public void Unmark(int x, int y)
         {
-            //System.Diagnostics.Debug.Assert(data[x, y] > 0);
-
+            // System.Diagnostics.Debug.Assert(data[x, y] > 0);
             data[x, y]--;
         }
 
@@ -448,8 +460,7 @@ namespace Isles.Engine
             // Note agents can ignore dynamic obstacles when they're
             // moving, so this assertion does not hold.
 
-            //System.Diagnostics.Debug.Assert(dynamicData[x, y] == 0);
-
+            // System.Diagnostics.Debug.Assert(dynamicData[x, y] == 0);
             dynamicData[x, y]++;
         }
 
@@ -458,8 +469,7 @@ namespace Isles.Engine
         /// </summary>
         public void UnmarkDynamic(int x, int y)
         {
-            //System.Diagnostics.Debug.Assert(dynamicData[x, y] > 0);
-
+            // System.Diagnostics.Debug.Assert(dynamicData[x, y] > 0);
             dynamicData[x, y]--;
         }
 
@@ -526,7 +536,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Get graph index from position
+        /// Get graph index from position.
         /// </summary>
         public int PositionToIndex(Vector2 position)
         {
@@ -540,7 +550,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Get position from graph index
+        /// Get position from graph index.
         /// </summary>
         public Vector2 IndexToPosition(int index)
         {
@@ -554,7 +564,7 @@ namespace Isles.Engine
         public int NodeCount => nodeCount;
 
         /// <summary>
-        /// Checks whether a position is obstructed on the path graph
+        /// Checks whether a position is obstructed on the path graph.
         /// </summary>
         public bool IsPositionObstructed(float x, float y, bool includeDynamic)
         {
@@ -570,7 +580,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Gets whether a brush is been obstruected on the path graph
+        /// Gets whether a brush is been obstruected on the path graph.
         /// </summary>
         public bool IsBrushObstructed(float x, float y, PathBrush brush, bool includeDynamic)
         {
@@ -592,7 +602,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Gets whether a grid is been obstructed on the path graph
+        /// Gets whether a grid is been obstructed on the path graph.
         /// </summary>
         public bool IsGridObstructed(int x, int y, bool includeDynamic)
         {
@@ -622,7 +632,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Gets all the out-coming edges of a given node
+        /// Gets all the out-coming edges of a given node.
         /// </summary>
         public IEnumerable<GraphEdge> GetEdges(int nodeIndex)
         {
@@ -651,6 +661,7 @@ namespace Isles.Engine
                         }
                     }
                 }
+
                 if (connected)
                 {
                     edge.From = nodeIndex;
@@ -678,14 +689,13 @@ namespace Isles.Engine
     /// </summary>
     public class PathManager
     {
-
         /// <summary>
-        /// Resolution for small graph
+        /// Resolution for small graph.
         /// </summary>
         public const float Resolution = 4;
 
         /// <summary>
-        /// Current landscape
+        /// Current landscape.
         /// </summary>
         public ILandscape Landscape
         {
@@ -701,18 +711,18 @@ namespace Isles.Engine
         private ILandscape landscape;
 
         /// <summary>
-        /// Graph search
+        /// Graph search.
         /// </summary>
         private readonly GraphSearchAStar search;
         private readonly GraphSearchAStar largeSearch;
 
         /// <summary>
-        /// Gets the detailed path graph used for searching
+        /// Gets the detailed path graph used for searching.
         /// </summary>
         public PathGraph Graph => graph;
 
         /// <summary>
-        /// Gets the large path graph for path searching on the landscape
+        /// Gets the large path graph for path searching on the landscape.
         /// </summary>
         public PathGraph LargeGraph => largeGraph;
 
@@ -720,12 +730,12 @@ namespace Isles.Engine
         private readonly PathGraph largeGraph;
 
         /// <summary>
-        /// Dynamic entities
+        /// Dynamic entities.
         /// </summary>
         private readonly List<IMovable> dynamicObstacles = new();
 
         /// <summary>
-        /// Gets or sets the maximun number of search steps per update
+        /// Gets or sets the maximun number of search steps per update.
         /// </summary>
         public int MaxSearchStepsPerUpdate
         {
@@ -745,7 +755,7 @@ namespace Isles.Engine
         private int maxSearchStepsPerUpdate = 2000;
 
         /// <summary>
-        /// Gets whether the path manager is busy at the moment
+        /// Gets whether the path manager is busy at the moment.
         /// </summary>
         public bool Busy => pendingRequestsCount > 0;
 
@@ -761,42 +771,47 @@ namespace Isles.Engine
         private int pendingRequestsCount;
 
         /// <summary>
-        /// The query current active
+        /// The query current active.
         /// </summary>
         private PathQuery currentQuery;
 
         /// <summary>
-        /// Internal representation for a given path query
+        /// Internal representation for a given path query.
         /// </summary>
         private class PathQuery : IComparable<PathQuery>
         {
             /// <summary>
-            /// Start, end node
+            /// Start, end node.
             /// </summary>
-            public int Start, End;
+            public int Start;
 
             /// <summary>
-            /// Destination position
+            /// Start, end node.
+            /// </summary>
+            public int End;
+
+            /// <summary>
+            /// Destination position.
             /// </summary>
             public Vector2 Destination;
 
             /// <summary>
-            /// Priority of this query
+            /// Priority of this query.
             /// </summary>
             public float Priority;
 
             /// <summary>
-            /// Handler for this query
+            /// Handler for this query.
             /// </summary>
             public IEventListener Subscriber;
 
             /// <summary>
-            /// The grids owned by the dynamic obstacle are removed before path finding
+            /// The grids owned by the dynamic obstacle are removed before path finding.
             /// </summary>
             public IMovable Obstacle;
 
             /// <summary>
-            /// Bounds of the path graph
+            /// Bounds of the path graph.
             /// </summary>
             public Rectangle Boundary;
 
@@ -809,7 +824,7 @@ namespace Isles.Engine
             }
 
             /// <summary>
-            /// For the ease of constructing a path query
+            /// For the ease of constructing a path query.
             /// </summary>
             public PathQuery(int start, int end, Vector2 destination, float priority,
                              Rectangle boundary, IEventListener subscriber, IMovable obstacle)
@@ -825,23 +840,23 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Info attached to each dynamic obstacle
+        /// Info attached to each dynamic obstacle.
         /// </summary>
         private class Tag
         {
             /// <summary>
-            /// List of marks that the obstacle currently overlaps
+            /// List of marks that the obstacle currently overlaps.
             /// </summary>
             public List<Point> Marks;
 
             /// <summary>
-            /// Stored obstacle position
+            /// Stored obstacle position.
             /// </summary>
             public Vector3 Position = Vector3.Zero;
         }
 
         /// <summary>
-        /// Create a circular path brush
+        /// Create a circular path brush.
         /// </summary>
         public PathBrush CreateBrush(float radius)
         {
@@ -870,7 +885,6 @@ namespace Isles.Engine
             if (size % 2 == 0)
             {
                 // If we have even number of grids
-
                 for (var x = -halfSize; x < halfSize; x++)
                 {
                     for (var y = -halfSize; y < halfSize; y++)
@@ -889,7 +903,6 @@ namespace Isles.Engine
             else
             {
                 // If we have odd number of grids
-
                 for (var x = -halfSize; x <= halfSize; x++)
                 {
                     for (var y = -halfSize; y <= halfSize; y++)
@@ -910,7 +923,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Adds an entity as a dynamic obstacle
+        /// Adds an entity as a dynamic obstacle.
         /// </summary>
         public void AddMovable(IMovable obstacle)
         {
@@ -928,7 +941,7 @@ namespace Isles.Engine
             var tag = new Tag
             {
                 Position = obstacle.Position,
-                Marks = new List<Point>()
+                Marks = new List<Point>(),
             };
             tag.Marks.AddRange(graph.EnumerateGridsInBrush(new Vector2(obstacle.Position.X,
                                                                        obstacle.Position.Y),
@@ -943,7 +956,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Removes an entity
+        /// Removes an entity.
         /// </summary>
         public void RemoveMovable(IMovable obstacle)
         {
@@ -1087,7 +1100,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Create a new path manager on a given landscape
+        /// Create a new path manager on a given landscape.
         /// </summary>
         /// <param name="landscape"></param>
         public PathManager(ILandscape landscape, IEnumerable<Point> occluders)
@@ -1162,7 +1175,6 @@ namespace Isles.Engine
 
         public void Unmark(IEnumerable<Point> staticMarks)
         {
-
             foreach (Point p in staticMarks)
             {
                 graph.Unmark(p.X, p.Y);
@@ -1201,7 +1213,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Find the next valid position that the agent can be placed at
+        /// Find the next valid position that the agent can be placed at.
         /// </summary>
         public Vector2 FindNextValidPosition(Vector2 target, Vector2? start,
                                              Vector2? lastPosition, IMovable agent, bool includeDynamics)
@@ -1212,6 +1224,7 @@ namespace Isles.Engine
                 Mark(agent);
                 return target;
             }
+
             Vector2 lastPositionValue;
             Vector2 startValue;
             if (lastPosition.HasValue && lastPosition.Value == target)
@@ -1257,13 +1270,15 @@ namespace Isles.Engine
                     Mark(agent);
                     return target + new Vector2(0.2f, 0.2f);
                 }
+
                 lastDirection = target - lastPositionValue;
                 if (lastDirection == Vector2.Zero)
                 {
                     lastDirection = originalDirection;
                     lastDirection.Normalize();
-                    lastDirection *= (distance + 1.2f * graph.CellSize);
+                    lastDirection *= distance + 1.2f * graph.CellSize;
                 }
+
                 distance = lastDirection.Length();
                 prep = new Vector2(-originalDirection.Y, originalDirection.X);
 
@@ -1292,6 +1307,7 @@ namespace Isles.Engine
                         ? Math2D.LocalToWorld(originalDirection, Vector2.Zero, -angle)
                         : Math2D.LocalToWorld(originalDirection, Vector2.Zero, angle);
                 }
+
                 newDirection.Normalize();
                 newDirection *= distance;
                 newTarget = target - newDirection;
@@ -1300,6 +1316,7 @@ namespace Isles.Engine
                     Mark(agent);
                     return newTarget;
                 }
+
                 lastPositionValue = newTarget;
                 count++;
             }
@@ -1365,7 +1382,7 @@ namespace Isles.Engine
 #endif
 
         /// <summary>
-        /// Tests to see if the specified grids can be placed at a given location
+        /// Tests to see if the specified grids can be placed at a given location.
         /// </summary>
         public bool CanBePlacedAt(IEnumerable<Point> grids, bool includingDynamics)
         {
@@ -1381,7 +1398,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Tests to see if the specified brush can be placed at a given location
+        /// Tests to see if the specified brush can be placed at a given location.
         /// </summary>
         public bool CanBePlacedAt(float x, float y, PathBrush brush, bool includingDynamics)
         {
@@ -1402,7 +1419,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Tests to see if the agent can be positioned to the target
+        /// Tests to see if the agent can be positioned to the target.
         /// </summary>
         public bool CanBePlacedAt(float x, float y, IMovable agent)
         {
@@ -1427,7 +1444,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Tests to see if the agent can move between two positions
+        /// Tests to see if the agent can move between two positions.
         /// </summary>
         public bool CanMoveBetween(Vector2 start, Vector2 end, IMovable agent, bool includeDynamic)
         {
@@ -1480,7 +1497,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Querys a path on the large graph
+        /// Querys a path on the large graph.
         /// </summary>
         public Path QueryPath(Vector2 start, Vector2 end)
         {
@@ -1537,10 +1554,10 @@ namespace Isles.Engine
         ///        but we limit the maximum search steps each frame, and the priority
         ///        queue in the AStar algorithm can recognize current search state.
         /// </summary>
-        /// <param name="pathWidth">Width of the path</param>
-        /// <param name="priority">Higher number means lower priority</param>
+        /// <param name="pathWidth">Width of the path.</param>
+        /// <param name="priority">Higher number means lower priority.</param>
         /// <param name="marks">
-        /// Some additional obstacles you may wish to add to the graph
+        /// Some additional obstacles you may wish to add to the graph.
         /// </param>
         public void QueryPath(IEventListener subscriber, Vector2 start, Vector2 end,
                               float priority, IMovable obstacle)
@@ -1592,7 +1609,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Cancel a path query
+        /// Cancel a path query.
         /// </summary>
         public void CancelQuery(IEventListener subscriber)
         {
@@ -1609,7 +1626,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Update path manager
+        /// Update path manager.
         /// </summary>
         public void Update()
         {
@@ -1657,7 +1674,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Manually update the grid info after you changed its position
+        /// Manually update the grid info after you changed its position.
         /// </summary>
         public void UpdateMovable(IMovable obstacle)
         {
@@ -1776,10 +1793,10 @@ namespace Isles.Engine
 
                     System.Diagnostics.Debug.Assert(pendingRequestsCount >= 0);
 
-                    //BaseGame game = BaseGame.Singleton;
-                    //Vector2 s = graph.IndexToPosition(query.Start);
-                    //Vector2 e = graph.IndexToPosition(query.End);
-                    //game.Graphics2D.DrawLine(game.Project(new Vector3(s, landscape.GetHeight(s.X, s.Y))),
+                    // BaseGame game = BaseGame.Singleton;
+                    // Vector2 s = graph.IndexToPosition(query.Start);
+                    // Vector2 e = graph.IndexToPosition(query.End);
+                    // game.Graphics2D.DrawLine(game.Project(new Vector3(s, landscape.GetHeight(s.X, s.Y))),
                     //                         game.Project(new Vector3(e, landscape.GetHeight(e.X, e.Y))),
                     //                         result.Value ? Color.White : Color.Black);
                 }
@@ -1800,13 +1817,13 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Converts from graph path (Accessed by index) to realworld path (Accessed by position)
+        /// Converts from graph path (Accessed by index) to realworld path (Accessed by position).
         /// </summary>
         private Path BuildPath(IEnumerable<int> path, PathGraph graph, IMovable agent, bool simplifyPath)
         {
             var previous = new Point();
             var resultPath = new Path();
-            PathBrush brush = (agent != null ? agent.Brush : null);
+            PathBrush brush = agent != null ? agent.Brush : null;
 
             // Ignore first edge
             var firstEdge = true;
@@ -1927,7 +1944,5 @@ namespace Isles.Engine
                 p = p.Next;
             }
         }
-
     }
-
 }

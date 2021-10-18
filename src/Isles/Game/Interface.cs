@@ -1,41 +1,37 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Xml;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+using System.Xml;
 using Isles.Graphics;
+using Microsoft.Xna.Framework;
 
 namespace Isles.Engine
 {
-
     /// <summary>
-    /// Represents a game screen
+    /// Represents a game screen.
     /// </summary>
     public interface IScreen : IDisposable, IEventListener
     {
         /// <summary>
-        /// Called when this screen is activated
+        /// Called when this screen is activated.
         /// </summary>
         void Enter();
 
         /// <summary>
-        /// Called when this screen is deactivated
+        /// Called when this screen is deactivated.
         /// </summary>
         void Leave();
 
         /// <summary>
-        /// Handle game updates
+        /// Handle game updates.
         /// </summary>
         /// <param name="gameTime"></param>
         void Update(GameTime gameTime);
 
         /// <summary>
-        /// Handle game draw event
+        /// Handle game draw event.
         /// </summary>
         /// <param name="gameTime"></param>
         void Draw(GameTime gameTime);
@@ -66,22 +62,22 @@ namespace Isles.Engine
     public interface IWorldObject
     {
         /// <summary>
-        /// Gets the name of the world object
+        /// Gets the name of the world object.
         /// </summary>
         string Name { get; }
 
         /// <summary>
-        /// Gets the position of the scene object
+        /// Gets the position of the scene object.
         /// </summary>
         Vector3 Position { get; set; }
 
         /// <summary>
-        /// Gets the axis-aligned bounding box of the scene object
+        /// Gets the axis-aligned bounding box of the scene object.
         /// </summary>
         BoundingBox BoundingBox { get; }
 
         /// <summary>
-        /// Gets or sets scene manager data
+        /// Gets or sets scene manager data.
         /// </summary>
         object SceneManagerTag { get; set; }
 
@@ -93,7 +89,7 @@ namespace Isles.Engine
         bool IsDirty { get; set; }
 
         /// <summary>
-        /// Gets or sets whether this world object is active
+        /// Gets or sets whether this world object is active.
         /// </summary>
         /// <remarks>
         /// This property is internally used by ISceneManager.
@@ -110,109 +106,109 @@ namespace Isles.Engine
         string ClassID { get; set; }
 
         /// <summary>
-        /// Update the scene object
+        /// Update the scene object.
         /// </summary>
         /// <param name="gameTime"></param>
         void Update(GameTime gameTime);
 
         /// <summary>
-        /// Draw the scene object
+        /// Draw the scene object.
         /// </summary>
         /// <param name="gameTime"></param>
         void Draw(GameTime gameTime);
 
         /// <summary>
-        /// Draw the scene object to a shadow map
+        /// Draw the scene object to a shadow map.
         /// </summary>
         void DrawShadowMap(GameTime gameTime, ShadowEffect shadow);
 
         /// <summary>
-        /// Draw the scene object to a reflection map
+        /// Draw the scene object to a reflection map.
         /// </summary>
         void DrawReflection(GameTime gameTime, Matrix view, Matrix projection);
 
         /// <summary>
-        /// Write the scene object to an XML element
+        /// Write the scene object to an XML element.
         /// </summary>
         /// <param name="writer"></param>
         void Serialize(XmlElement xml);
 
         /// <summary>
-        /// Read and initialize the scene object from a set of attributes
+        /// Read and initialize the scene object from a set of attributes.
         /// </summary>
         /// <param name="reader"></param>
         void Deserialize(XmlElement xml);
     }
 
     /// <summary>
-    /// Interface to manage IWorldObject instances
+    /// Interface to manage IWorldObject instances.
     /// </summary>
     public interface ISceneManager
     {
         /// <summary>
-        /// Adds a new world object
+        /// Adds a new world object.
         /// </summary>
         /// <param name="needInteraction">
-        /// If false, functions like point scene intersects may ignore this object
+        /// If false, functions like point scene intersects may ignore this object.
         /// </param>
         void Add(IWorldObject worldObject);
 
         /// <summary>
-        /// Destroy a world object
+        /// Destroy a world object.
         /// </summary>
         /// <param name="worldObject"></param>
         void Destroy(IWorldObject worldObject);
 
         /// <summary>
-        /// Clear all world objects
+        /// Clear all world objects.
         /// </summary>
         void Clear();
 
         /// <summary>
-        /// Activate a world object
+        /// Activate a world object.
         /// </summary>
         /// <remarks>
-        /// Thoses intersection functions below only deals with active objects
+        /// Thoses intersection functions below only deals with active objects.
         /// </remarks>
         void Activate(IWorldObject worldObject);
 
         /// <summary>
-        /// Deactivate a world object
+        /// Deactivate a world object.
         /// </summary>
         void Deactivate(IWorldObject worldObject);
 
         /// <summary>
-        /// Test to see if a point intersects a world object
+        /// Test to see if a point intersects a world object.
         /// </summary>
         bool PointSceneIntersects(Vector3 point);
 
         /// <summary>
-        /// Test to see if a ray intersects a world object
+        /// Test to see if a ray intersects a world object.
         /// </summary>
         bool RaySceneIntersects(Ray ray);
 
         /// <summary>
-        /// Test to see if two world object intersects
+        /// Test to see if two world object intersects.
         /// </summary>
         bool ObjectIntersects(IWorldObject object1, IWorldObject object2);
 
         /// <summary>
-        /// Gets all world objects occupying a specific point
+        /// Gets all world objects occupying a specific point.
         /// </summary>
         IEnumerable<IWorldObject> ObjectsFromPoint(Vector3 point);
 
         /// <summary>
-        /// Gets all world objects intersects with a specific ray
+        /// Gets all world objects intersects with a specific ray.
         /// </summary>
         IEnumerable<IWorldObject> ObjectsFromRay(Ray ray);
 
         /// <summary>
-        /// Gets all world objects falling inside a bounding box region
+        /// Gets all world objects falling inside a bounding box region.
         /// </summary>
         IEnumerable<IWorldObject> ObjectsFromRegion(BoundingBox boundingBox);
 
         /// <summary>
-        /// Gets all world objects falling inside a bounding frustum region
+        /// Gets all world objects falling inside a bounding frustum region.
         /// </summary>
         IEnumerable<IWorldObject> ObjectsFromRegion(BoundingFrustum boundingFrustum);
 
@@ -222,7 +218,7 @@ namespace Isles.Engine
         IEnumerable<IWorldObject> GetNearbyObjects(Vector3 position, float radius);
 
         /// <summary>
-        /// Gets a world object from its name
+        /// Gets a world object from its name.
         /// </summary>
         IWorldObject ObjectFromName(string name);
     }
@@ -235,27 +231,27 @@ namespace Isles.Engine
     public interface ILandscape
     {
         /// <summary>
-        /// Gets the size of the landscape
+        /// Gets the size of the landscape.
         /// </summary>
         Vector3 Size { get; }
 
         /// <summary>
-        /// Gets the height (Z value) of a point (x, y) on the landscape
+        /// Gets the height (Z value) of a point (x, y) on the landscape.
         /// </summary>
         float GetHeight(float x, float y);
 
         /// <summary>
-        /// Gets the normal of a point on the landscape
+        /// Gets the normal of a point on the landscape.
         /// </summary>
         Vector3 GetNormal(float x, float y);
 
         /// <summary>
-        /// Gets the number of grids
+        /// Gets the number of grids.
         /// </summary>
         Point GridCount { get; }
 
         /// <summary>
-        /// Gets whether the point is walkable (E.g., above water)
+        /// Gets whether the point is walkable (E.g., above water).
         /// </summary>
         bool IsPointOccluded(float x, float y);
 
@@ -267,5 +263,4 @@ namespace Isles.Engine
         /// <returns></returns>
         Vector3? Intersects(Ray ray);
     }
-
 }

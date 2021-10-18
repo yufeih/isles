@@ -1,13 +1,10 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//  
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.IO;
-using System.Xml.Serialization;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 using Isles.Graphics;
 
 namespace Isles.Editor

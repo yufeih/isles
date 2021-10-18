@@ -1,22 +1,21 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
 using System.Xml;
+using Isles.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Isles.Graphics;
 
 namespace Isles.Engine
 {
-
     public enum StateResult
     {
-        Active, Inactive, Completed, Failed,
+        Active,
+        Inactive,
+        Completed,
+        Failed,
     }
 
     public interface IState : IEventListener
@@ -24,27 +23,28 @@ namespace Isles.Engine
         void Terminate();
 
         /// <summary>
-        /// Perform any updates for this state
+        /// Perform any updates for this state.
         /// </summary>
         /// <returns>
-        /// True indicates keeping the state alive
+        /// True indicates keeping the state alive.
         /// </returns>
         StateResult Update(GameTime gameTime);
 
         /// <summary>
-        /// Perform any drawings for this state
+        /// Perform any drawings for this state.
         /// </summary>
         void Draw(GameTime gameTime);
     }
 
     /// <summary>
-    /// Base state
+    /// Base state.
     /// </summary>
     public abstract class BaseState : IState
     {
         protected StateResult State = StateResult.Inactive;
 
         public abstract void Activate();
+
         public abstract void Terminate();
 
         protected void ActivateIfInactive()
@@ -78,12 +78,13 @@ namespace Isles.Engine
     public class StateComposite : BaseState
     {
         public override void Activate() { }
+
         public override void Terminate() { }
 
         protected LinkedList<IState> SubStates = new();
 
         /// <remarks>
-        /// Should be called before attaching this state to a state machine
+        /// Should be called before attaching this state to a state machine.
         /// </remarks>
         public void Add(IState state)
         {
@@ -91,7 +92,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Clear all sub states
+        /// Clear all sub states.
         /// </summary>
         public void Clear()
         {
@@ -99,7 +100,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Update the composite state
+        /// Update the composite state.
         /// </summary>
         /// <remarks>
         /// If one of the substates failed, the whole composite state failed.
@@ -165,17 +166,18 @@ namespace Isles.Engine
 
     /// <summary>
     /// Represents a sequence of game states.
-    /// Swith to the next state once the current state has completed
+    /// Swith to the next state once the current state has completed.
     /// </summary>
     public class StateSequential : BaseState
     {
         public override void Activate() { }
+
         public override void Terminate() { }
 
         protected LinkedList<IState> SubStates = new();
 
         /// <remarks>
-        /// Should be called before attaching this state to a state machine
+        /// Should be called before attaching this state to a state machine.
         /// </remarks>
         public void Add(IState state)
         {
@@ -239,15 +241,14 @@ namespace Isles.Engine
     }
 
     /// <summary>
-    /// Base world object
+    /// Base world object.
     /// </summary>
     public abstract class BaseEntity : IWorldObject, IAudioEmitter, IEventListener
     {
-
         public static int EntityCount;
 
         /// <summary>
-        /// Game world
+        /// Game world.
         /// </summary>
         public GameWorld World { get; }
 
@@ -302,24 +303,24 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Gets or sets scene manager data
+        /// Gets or sets scene manager data.
         /// </summary>
         public object SceneManagerTag { get; set; }
 
         public virtual BoundingBox BoundingBox => new();
 
         /// <summary>
-        /// Gets or sets entity name
+        /// Gets or sets entity name.
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the class ID of this world object
+        /// Gets or sets the class ID of this world object.
         /// </summary>
         public string ClassID { get; set; }
 
         /// <summary>
-        /// Gets or sets whether this world object is active
+        /// Gets or sets whether this world object is active.
         /// </summary>
         public virtual bool IsActive
         {
@@ -328,38 +329,38 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Constructor
+        /// Constructor.
         /// </summary>
         public BaseEntity(GameWorld world)
         {
             World = world;
-            Name = "Entity " + (EntityCount++);
+            Name = "Entity " + EntityCount++;
         }
 
         /// <summary>
-        /// Update
+        /// Update.
         /// </summary>
         /// <param name="gameTime"></param>
         public abstract void Update(GameTime gameTime);
 
         /// <summary>
-        /// Draw the entity
+        /// Draw the entity.
         /// </summary>
         /// <param name="gameTime"></param>
         public abstract void Draw(GameTime gameTime);
 
         /// <summary>
-        /// Called when this entity is been add to the world
+        /// Called when this entity is been add to the world.
         /// </summary>
         public virtual void OnCreate() { }
 
         /// <summary>
-        /// Called when this entity is been destroyed
+        /// Called when this entity is been destroyed.
         /// </summary>
         public virtual void OnDestroy() { }
 
         /// <summary>
-        /// Draw the scene object to a shadow map
+        /// Draw the scene object to a shadow map.
         /// </summary>
         public virtual void DrawShadowMap(GameTime gameTime, ShadowEffect shadow)
         {
@@ -367,7 +368,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Draw the scene object to a reflection map
+        /// Draw the scene object to a reflection map.
         /// </summary>
         public virtual void DrawReflection(GameTime gameTime, Matrix view, Matrix projection)
         {
@@ -375,7 +376,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Make the entity fall on the ground
+        /// Make the entity fall on the ground.
         /// </summary>
         public void Fall()
         {
@@ -386,7 +387,7 @@ namespace Isles.Engine
 
         /// <summary>
         /// Write the scene object to an output stream
-        /// Serialized attributes: Name, Position, Velocity
+        /// Serialized attributes: Name, Position, Velocity.
         /// </summary>
         /// <param name="writer"></param>
         public virtual void Serialize(XmlElement xml)
@@ -397,7 +398,7 @@ namespace Isles.Engine
 
         /// <summary>
         /// Read and initialize the scene object from an input stream.
-        /// Deserialized attributes: Name, Position, Velocity
+        /// Deserialized attributes: Name, Position, Velocity.
         /// </summary>
         /// <param name="reader"></param>
         public virtual void Deserialize(XmlElement xml)
@@ -417,7 +418,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Handle events
+        /// Handle events.
         /// </summary>
         public virtual EventResult HandleEvent(EventType type, object sender, object tag)
         {
@@ -426,17 +427,17 @@ namespace Isles.Engine
     }
 
     /// <summary>
-    /// Base class for all pickable game entities
+    /// Base class for all pickable game entities.
     /// </summary>
     public abstract class Entity : BaseEntity
     {
         /// <summary>
-        /// This is the max height for any game entity
+        /// This is the max height for any game entity.
         /// </summary>
         public const float MaxHeight = 1000.0f;
 
         /// <summary>
-        /// Gets or sets the state of the agent
+        /// Gets or sets the state of the agent.
         /// </summary>
         public IState State
         {
@@ -463,7 +464,7 @@ namespace Isles.Engine
         protected virtual bool OnStateChanged(IState newState, ref IState resultState) { return true; }
 
         /// <summary>
-        /// Gets the model of the entity
+        /// Gets the model of the entity.
         /// </summary>
         public GameModel Model
         {
@@ -479,12 +480,12 @@ namespace Isles.Engine
         private GameModel model;
 
         /// <summary>
-        /// Gets or sets whether this entity is visible
+        /// Gets or sets whether this entity is visible.
         /// </summary>
         public bool Visible { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets whether the entity is within the view frustum
+        /// Gets or sets whether the entity is within the view frustum.
         /// </summary>
         public bool WithinViewFrustum { get; private set; }
 
@@ -502,7 +503,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Gets or sets entity rotation
+        /// Gets or sets entity rotation.
         /// </summary>
         public Quaternion Rotation
         {
@@ -517,7 +518,7 @@ namespace Isles.Engine
         private Quaternion rotation = Quaternion.Identity;
 
         /// <summary>
-        /// Gets or sets entity scale
+        /// Gets or sets entity scale.
         /// </summary>
         public Vector3 Scale
         {
@@ -532,7 +533,7 @@ namespace Isles.Engine
         private Vector3 scale = Vector3.One;
 
         /// <summary>
-        /// Gets or sets the bias of model transform
+        /// Gets or sets the bias of model transform.
         /// </summary>
         public Matrix TransformBias
         {
@@ -547,7 +548,7 @@ namespace Isles.Engine
         private Matrix transformBias = Matrix.Identity;
 
         /// <summary>
-        /// Gets model transform
+        /// Gets model transform.
         /// </summary>
         public Matrix Transform
         {
@@ -570,7 +571,7 @@ namespace Isles.Engine
         private Matrix transform = Matrix.Identity;
 
         /// <summary>
-        /// Interface member for IWorldObject
+        /// Interface member for IWorldObject.
         /// </summary>
         public override bool IsDirty
         {
@@ -582,7 +583,7 @@ namespace Isles.Engine
         private bool isTransformDirty = true;
 
         /// <summary>
-        /// Mark both bounding box and transform
+        /// Mark both bounding box and transform.
         /// </summary>
         private void MarkDirty()
         {
@@ -591,7 +592,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Returns the axis aligned bounding box of the game model
+        /// Returns the axis aligned bounding box of the game model.
         /// </summary>
         public override BoundingBox BoundingBox
         {
@@ -612,12 +613,12 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Gets the size of the entity
+        /// Gets the size of the entity.
         /// </summary>
         public virtual Vector3 Size => BoundingBox.Max - BoundingBox.Min;
 
         /// <summary>
-        /// Gets entity outline
+        /// Gets entity outline.
         /// </summary>
         public Outline Outline
         {
@@ -645,7 +646,7 @@ namespace Isles.Engine
         private readonly Outline outline = new();
 
         /// <summary>
-        /// Gets or sets whether this world object is active
+        /// Gets or sets whether this world object is active.
         /// </summary>
         /// <remarks>
         /// This property is internally used by ISceneManager.
@@ -662,17 +663,16 @@ namespace Isles.Engine
 
         /// <summary>
         /// Gets whether the entity is interactive. you can make an entity
-        /// interactive by calling GameWorld.Activate();
+        /// interactive by calling GameWorld.Activate().
         /// </summary>
         public virtual bool IsInteractive => true;
 
         /// <summary>
-        /// Constructor
+        /// Constructor.
         /// </summary>
         public Entity(GameWorld world)
             : base(world)
         {
-
         }
 
         public Entity(GameWorld world, GameModel model)
@@ -805,7 +805,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Test to see if this entity is visible from a given view and projection
+        /// Test to see if this entity is visible from a given view and projection.
         /// </summary>
         /// <returns></returns>
         public virtual bool IsVisible(Matrix viewProjection)
@@ -870,7 +870,7 @@ namespace Isles.Engine
 
                 if (model != null && WithinViewFrustum)
                 {
-                    //model.Tint = highlighted ? new Vector4(0, 0, 0, 1) : Vector4.One;
+                    // model.Tint = highlighted ? new Vector4(0, 0, 0, 1) : Vector4.One;
                     model.Draw(gameTime);
                 }
             }
@@ -903,7 +903,7 @@ namespace Isles.Engine
         /// <summary>
         /// Tests whether the object occupies the specified point.
         /// </summary>
-        /// <param name="point">Point to be tested in world space</param>
+        /// <param name="point">Point to be tested in world space.</param>
         /// <returns></returns>
         public virtual bool Intersects(Vector3 point)
         {
@@ -914,7 +914,7 @@ namespace Isles.Engine
         /// <summary>
         /// Tests whether the object intersects the specified ray.
         /// </summary>
-        /// <param name="ray">Ray to be tested in world space</param>
+        /// <param name="ray">Ray to be tested in world space.</param>
         /// <returns></returns>
         public virtual float? Intersects(Ray ray)
         {
@@ -929,7 +929,5 @@ namespace Isles.Engine
         {
             return Visible && frustum.Contains(Position) == ContainmentType.Contains;
         }
-
     }
-
 }

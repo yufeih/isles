@@ -1,65 +1,86 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Isles.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Isles.Graphics;
-using Cursor = System.Windows.Forms.Cursor;
 using Control = System.Windows.Forms.Control;
+using Cursor = System.Windows.Forms.Cursor;
 
 namespace Isles.Engine
 {
     /// <summary>
-    /// This is the main type for your game
+    /// This is the main type for your game.
     /// </summary>
     public class BaseGame : Game, IEventListener
     {
-
         /// <summary>
-        /// Windows cursor
+        /// Windows cursor.
         /// </summary>
         private Cursor cursor;
 
         /// <summary>
-        /// Background color used to clear the scene
+        /// Background color used to clear the scene.
         /// </summary>
         private Color backgroundColor = Color.Black;// new Color(47, 62, 97);
 
         /// <summary>
-        /// Cached matrices of this frame
+        /// Cached matrices of this frame.
         /// </summary>
         private Matrix
-            view,
-            projection,
-            viewProjection,
-            viewInverse,
-            projectionInverse,
-            viewProjectionInverse;
+view;
 
         /// <summary>
-        /// Ray casted from cursor
+        /// Cached matrices of this frame.
+        /// </summary>
+        private Matrix
+projection;
+
+        /// <summary>
+        /// Cached matrices of this frame.
+        /// </summary>
+        private Matrix
+viewProjection;
+
+        /// <summary>
+        /// Cached matrices of this frame.
+        /// </summary>
+        private Matrix
+viewInverse;
+
+        /// <summary>
+        /// Cached matrices of this frame.
+        /// </summary>
+        private Matrix
+projectionInverse;
+
+        /// <summary>
+        /// Cached matrices of this frame.
+        /// </summary>
+        private Matrix
+viewProjectionInverse;
+
+        /// <summary>
+        /// Ray casted from cursor.
         /// </summary>
         private Ray pickRay;
 
         /// <summary>
-        /// Eye position of this frame
+        /// Eye position of this frame.
         /// </summary>
         private Vector3 eye;
 
         /// <summary>
-        /// Facing direction of this frame
+        /// Facing direction of this frame.
         /// </summary>
         private Vector3 facing;
 
         /// <summary>
-        /// Gets or sets windows cursor
+        /// Gets or sets windows cursor.
         /// </summary>
         public Cursor Cursor
         {
@@ -73,97 +94,97 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Gets content manager
+        /// Gets content manager.
         /// </summary>
         public ZipContentManager ZipContent { get; }
 
         /// <summary>
-        /// Gets game input
+        /// Gets game input.
         /// </summary>
         public Input Input { get; private set; }
 
         /// <summary>
-        /// Gets game sound
+        /// Gets game sound.
         /// </summary>
         public AudioManager Audio { get; private set; }
 
         /// <summary>
-        /// Gets game profiler
+        /// Gets game profiler.
         /// </summary>
         public Profiler Profiler { get; private set; } = new();
 
         /// <summary>
-        /// Gets game screenshot capturer
+        /// Gets game screenshot capturer.
         /// </summary>
         public ScreenshotCapturer ScreenshotCapturer { get; private set; }
 
         /// <summary>
-        /// Gets current game screen
+        /// Gets current game screen.
         /// </summary>
         public IScreen CurrentScreen { get; private set; }
 
         /// <summary>
-        /// Gets game frame per second
+        /// Gets game frame per second.
         /// </summary>
         public float FramePerSecond => (float)Profiler.FramesPerSecond;
 
         /// <summary>
-        /// Gets Game camera
+        /// Gets Game camera.
         /// </summary>
         public ICamera Camera { get; set; }
 
         /// <summary>
-        /// Gets view matrix
+        /// Gets view matrix.
         /// </summary>
         public Matrix View => view;
 
         /// <summary>
-        /// Gets projection matrix
+        /// Gets projection matrix.
         /// </summary>
         public Matrix Projection => projection;
 
         /// <summary>
-        /// Gets view projection matrix
+        /// Gets view projection matrix.
         /// </summary>
         public Matrix ViewProjection => viewProjection;
 
         /// <summary>
-        /// Gets view inverse matrix
+        /// Gets view inverse matrix.
         /// </summary>
         public Matrix ViewInverse => viewInverse;
 
         /// <summary>
-        /// Gets projection inverse matrix
+        /// Gets projection inverse matrix.
         /// </summary>
         public Matrix ProjectionInverse => projectionInverse;
 
         /// <summary>
-        /// Gets view projection inverse matrix
+        /// Gets view projection inverse matrix.
         /// </summary>
         public Matrix ViewProjectionInverse => viewProjectionInverse;
 
         /// <summary>
-        /// Gets current view frustum
+        /// Gets current view frustum.
         /// </summary>
         public BoundingFrustum ViewFrustum { get; private set; }
 
         /// <summary>
-        /// Gets the ray casted from current cursor position
+        /// Gets the ray casted from current cursor position.
         /// </summary>
         public Ray PickRay => pickRay;
 
         /// <summary>
-        /// Gets the eye position of this frame
+        /// Gets the eye position of this frame.
         /// </summary>
         public Vector3 Eye => eye;
 
         /// <summary>
-        /// Gets the facing direction of this frame
+        /// Gets the facing direction of this frame.
         /// </summary>
         public Vector3 Facing => facing;
 
         /// <summary>
-        /// Gets or sets Game settings
+        /// Gets or sets Game settings.
         /// </summary>
         public Settings Settings { get; set; }
 
@@ -174,73 +195,73 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Gets Xna graphics device manager
+        /// Gets Xna graphics device manager.
         /// </summary>
         public GraphicsDeviceManager Graphics { get; }
 
         /// <summary>
-        /// Gets screen width
+        /// Gets screen width.
         /// </summary>
         public int ScreenWidth { get; private set; }
 
         /// <summary>
-        /// Gets screen height
+        /// Gets screen height.
         /// </summary>
         public int ScreenHeight { get; private set; }
 
         /// <summary>
-        /// Gets game billboard manager
+        /// Gets game billboard manager.
         /// </summary>
         public BillboardManager Billboard { get; private set; }
 
         /// <summary>
-        /// Gets point sprite manager
+        /// Gets point sprite manager.
         /// </summary>
         public PointSpriteManager PointSprite { get; private set; }
 
         /// <summary>
-        /// Gets game model manager
+        /// Gets game model manager.
         /// </summary>
         public ModelManager ModelManager { get; private set; }
 
         /// <summary>
-        /// Gets game 2D graphics
+        /// Gets game 2D graphics.
         /// </summary>
         public Graphics2D Graphics2D { get; private set; }
 
         /// <summary>
-        /// Gets all game screens
+        /// Gets all game screens.
         /// </summary>
         public Dictionary<string, IScreen> Screens { get; } = new();
 
         /// <summary>
-        /// Gets current game time
+        /// Gets current game time.
         /// </summary>
         public GameTime CurrentGameTime { get; private set; }
 
         /// <summary>
-        /// Gets game shadow effect
+        /// Gets game shadow effect.
         /// </summary>
         public ShadowEffect Shadow { get; private set; }
 
         /// <summary>
-        /// Gets game bloom effect
+        /// Gets game bloom effect.
         /// </summary>
         public BloomEffect Bloom { get; private set; }
 
         /// <summary>
-        /// Gets whether the game is been paused
+        /// Gets whether the game is been paused.
         /// </summary>
         /// TODO: Fixe issues caused by pausing. (E.g., Timer)
         public bool Paused { get; set; }
 
         /// <summary>
-        /// Gets or sets game speed
+        /// Gets or sets game speed.
         /// </summary>
         public double GameSpeed { get; set; } = 1;
 
         /// <summary>
-        /// Starts a game screen and run
+        /// Starts a game screen and run.
         /// </summary>
         /// <param name="gameScreen"></param>
         public void Run(string screenName)
@@ -249,7 +270,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Starts a game screen and run
+        /// Starts a game screen and run.
         /// </summary>
         /// <param name="gameScreen"></param>
         public void Run(IScreen screen)
@@ -262,7 +283,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Starts a game screen
+        /// Starts a game screen.
         /// </summary>
         public void StartScreen(string screenName)
         {
@@ -270,7 +291,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Starts a game screen
+        /// Starts a game screen.
         /// </summary>
         public void StartScreen(IScreen newScreen)
         {
@@ -294,7 +315,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Adds a screen to the game
+        /// Adds a screen to the game.
         /// </summary>
         /// <param name="name"></param>
         /// <param name="screen"></param>
@@ -308,7 +329,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Adds a screen to the game
+        /// Adds a screen to the game.
         /// </summary>
         /// <param name="name"></param>
         /// <param name="screen"></param>
@@ -362,21 +383,21 @@ namespace Isles.Engine
                 PreferredBackBufferHeight = settings.ScreenHeight,
                 SynchronizeWithVerticalRetrace = settings.VSync,
                 MinimumPixelShaderProfile = ShaderProfile.PS_2_0,
-                MinimumVertexShaderProfile = ShaderProfile.VS_2_0
+                MinimumVertexShaderProfile = ShaderProfile.VS_2_0,
             };
 
             // Show cursor
             IsMouseVisible = settings.IsMouseVisible;
-            //#if DEBUG
+            // #if DEBUG
             // Use variant time step to trace frame performance
-            //IsFixedTimeStep = true;
+            // IsFixedTimeStep = true;
             IsFixedTimeStep = settings.IsFixedTimeStep;
-            //TargetElapsedTime = new TimeSpan(5000000);
-            //#endif
+            // TargetElapsedTime = new TimeSpan(5000000);
+            // #endif
         }
 
         /// <summary>
-        /// Gets the singleton instance of base game
+        /// Gets the singleton instance of base game.
         /// </summary>
         /// <returns></returns>
         /// <remarks>
@@ -433,7 +454,7 @@ namespace Isles.Engine
                     Settings.BloomSettings.BloomIntensity,
                     Settings.BloomSettings.BaseIntensity,
                     Settings.BloomSettings.BloomSaturation,
-                    Settings.BloomSettings.BaseSaturation)
+                    Settings.BloomSettings.BaseSaturation),
                 };
 
                 Components.Add(Bloom);
@@ -456,9 +477,8 @@ namespace Isles.Engine
                 Log.Write("Shadow Mapping Effect Initialized...");
             }
 
-            //trailEffect = new TrailEffectManager();
-            //Log.Write("Trail Effect Initialized...");
-
+            // trailEffect = new TrailEffectManager();
+            // Log.Write("Trail Effect Initialized...");
             PointSprite = new PointSpriteManager(this);
             Log.Write("PointSprite Initialized...");
 
@@ -522,12 +542,12 @@ namespace Isles.Engine
                 screen.Value.UnloadContent();
             }
 
-            //Content.Unload();
-
+            // Content.Unload();
             base.UnloadContent();
         }
 
         private bool initialized;
+
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input and playing audio.
@@ -607,6 +627,7 @@ namespace Isles.Engine
                     new TimeSpan((long)(gameTime.TotalGameTime.Ticks * GameSpeed)),
                     new TimeSpan((long)(gameTime.ElapsedGameTime.Ticks * GameSpeed)));
             }
+
             return gameTime;
         }
 
@@ -634,43 +655,42 @@ namespace Isles.Engine
         {
         }
 
-        //private void UpdatePickRay()
-        //{
+        // private void UpdatePickRay()
+        // {
         //    MouseState mouseState = Mouse.GetState();
 
-        //    int mouseX = mouseState.X;
+        // int mouseX = mouseState.X;
         //    int mouseY = mouseState.Y;
 
-        //    Vector3 nearSource = new Vector3((float)mouseX, (float)mouseY, 0.0f);
+        // Vector3 nearSource = new Vector3((float)mouseX, (float)mouseY, 0.0f);
         //    Vector3 farSource = new Vector3((float)mouseX, (float)mouseY, 1.0f);
 
-        //    //Vector3 nearPoint = GraphicsDevice.Viewport.Unproject(
+        // //Vector3 nearPoint = GraphicsDevice.Viewport.Unproject(
         //    //    nearSource, projection, view, Matrix.Identity);
 
-        //    //Vector3 farPoint = GraphicsDevice.Viewport.Unproject(
+        // //Vector3 farPoint = GraphicsDevice.Viewport.Unproject(
         //    //    farSource, projection, view, Matrix.Identity);
 
-        //    Vector3 nearPoint = Unproject(nearSource);
+        // Vector3 nearPoint = Unproject(nearSource);
         //    Vector3 farPoint = Unproject(farSource);
 
-        //    //Log.Write(farPoint.ToString());
+        // //Log.Write(farPoint.ToString());
         //    //Log.Write(view.ToString());
         //    //Log.Write(projection.ToString());
         //    // Create a ray from the near clip plane to the far clip plane.
         //    Vector3 direction = farPoint - nearPoint;
         //    direction.Normalize();
 
-        //    pickRay.Position = nearPoint;
+        // pickRay.Position = nearPoint;
         //    pickRay.Direction = direction;
-        //}
-
+        // }
         private void UpdatePickRay()
         {
             MouseState mouseState = Mouse.GetState();
 
             Vector3 v;
-            v.X = (((2.0f * mouseState.X) / ScreenWidth) - 1);
-            v.Y = -(((2.0f * mouseState.Y) / ScreenHeight) - 1);
+            v.X = (2.0f * mouseState.X / ScreenWidth) - 1;
+            v.Y = -((2.0f * mouseState.Y / ScreenHeight) - 1);
             v.Z = 0.0f;
 
             pickRay.Position.X = viewInverse.M41;
@@ -681,7 +701,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Unproject a point on the screen to a ray in the 3D world
+        /// Unproject a point on the screen to a ray in the 3D world.
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
@@ -691,8 +711,8 @@ namespace Isles.Engine
             Ray ray;
 
             Vector3 v;
-            v.X = (((2.0f * x) / ScreenWidth) - 1);
-            v.Y = -(((2.0f * y) / ScreenHeight) - 1);
+            v.X = (2.0f * x / ScreenWidth) - 1;
+            v.Y = -((2.0f * y / ScreenHeight) - 1);
             v.Z = 0.0f;
 
             ray.Position.X = viewInverse.M41;
@@ -705,7 +725,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Project a point in 3D world space to 2D screen space
+        /// Project a point in 3D world space to 2D screen space.
         /// </summary>
         public Point Project(Vector3 position)
         {
@@ -720,7 +740,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Update view/projection matrices
+        /// Update view/projection matrices.
         /// </summary>
         private void UpdateMatrices()
         {
@@ -731,7 +751,7 @@ namespace Isles.Engine
                 viewProjection = view * projection;
                 viewInverse = Matrix.Invert(view);
                 projectionInverse = Matrix.Invert(projection);
-                //viewProjectionInverse = Matrix.Invert(viewProjection);
+                // viewProjectionInverse = Matrix.Invert(viewProjection);
 
                 // Guess this is more accurate
                 viewProjectionInverse = projectionInverse * ViewInverse;
@@ -854,6 +874,5 @@ namespace Isles.Engine
 
             base.Dispose(disposing);
         }
-
     }
 }

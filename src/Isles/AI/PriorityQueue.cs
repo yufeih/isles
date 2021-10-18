@@ -1,8 +1,5 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections;
@@ -10,9 +7,8 @@ using System.Collections.Generic;
 
 namespace Isles.Engine
 {
-
     /// <summary>
-    /// Use min heap to implement a priority queue
+    /// Use min heap to implement a priority queue.
     /// </summary>
     public class PriorityQueue<T> : IEnumerable<T> where T : IComparable<T>
     {
@@ -24,32 +20,32 @@ namespace Isles.Engine
         private T[] data;
 
         /// <summary>
-        /// Actual data length
+        /// Actual data length.
         /// </summary>
         private int length;
 
         /// <summary>
-        /// Gets priority queue element count
+        /// Gets priority queue element count.
         /// </summary>
         public int Count => length;
 
         /// <summary>
-        /// Gets priority queue capacity
+        /// Gets priority queue capacity.
         /// </summary>
         public int Capacity => data.Length;
 
         /// <summary>
-        /// Gets whether the queue is empty
+        /// Gets whether the queue is empty.
         /// </summary>
         public bool Empty => length == 0;
 
         /// <summary>
-        /// Retrive the minimun (top) element without removing it
+        /// Retrive the minimun (top) element without removing it.
         /// </summary>
         public T Top => data[1];
 
         /// <summary>
-        /// Creates a priority queue
+        /// Creates a priority queue.
         /// </summary>
         public PriorityQueue()
         {
@@ -57,7 +53,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Creates a priority queue to hold n elements
+        /// Creates a priority queue to hold n elements.
         /// </summary>
         /// <param name="capacity"></param>
         public PriorityQueue(int capacity)
@@ -66,7 +62,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Gets each entry through index
+        /// Gets each entry through index.
         /// </summary>
         public T this[int index]
         {
@@ -74,7 +70,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Clear the priority queue
+        /// Clear the priority queue.
         /// </summary>
         public void Clear()
         {
@@ -82,7 +78,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Adds an element to the queue
+        /// Adds an element to the queue.
         /// </summary>
         public void Add(T element)
         {
@@ -125,7 +121,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Remove and retrieve the minimun (top) element
+        /// Remove and retrieve the minimun (top) element.
         /// </summary>
         public T Pop()
         {
@@ -141,7 +137,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Increase the priority of a given node
+        /// Increase the priority of a given node.
         /// </summary>
         public void IncreasePriority(int index, T newValue)
         {
@@ -167,12 +163,12 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Fix the heap
+        /// Fix the heap.
         /// </summary>
-        /// <param name="elements">Array of elements to be fixed</param>
-        /// <param name="i">Root index of the subtree</param>
-        /// <param name="n">Subtree size</param>
-        /// <param name="k">Element to be add as the root</param>
+        /// <param name="elements">Array of elements to be fixed.</param>
+        /// <param name="i">Root index of the subtree.</param>
+        /// <param name="n">Subtree size.</param>
+        /// <param name="k">Element to be add as the root.</param>
         private static void FixHeap(T[] E, int i, int n, T k)
         {
             int x, min;
@@ -203,7 +199,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Get priority queue enumerator
+        /// Get priority queue enumerator.
         /// </summary>
         /// <returns></returns>
         public IEnumerator<T> GetEnumerator()
@@ -215,7 +211,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Get priority queue enumerator, nongeneric version
+        /// Get priority queue enumerator, nongeneric version.
         /// </summary>
         /// <returns></returns>
         IEnumerator IEnumerable.GetEnumerator()
@@ -241,47 +237,47 @@ namespace Isles.Engine
 
         /// <summary>
         /// Keep track of the position of individual item in the heap.
-        /// E.g. index[3] = 5 means that data[5] = 3;
+        /// E.g. index[3] = 5 means that data[5] = 3.
         /// </summary>
         private readonly int[] index;
 
         /// <summary>
-        /// Cost of each item
+        /// Cost of each item.
         /// </summary>
         private readonly float[] costs;
 
         /// <summary>
-        /// Actual data length
+        /// Actual data length.
         /// </summary>
         private int count;
 
         /// <summary>
-        /// Gets element index array
+        /// Gets element index array.
         /// </summary>
         public int[] Index => index;
 
         /// <summary>
-        /// Gets priority queue element count
+        /// Gets priority queue element count.
         /// </summary>
         public int Count => count;
 
         /// <summary>
-        /// Gets priority queue capacity
+        /// Gets priority queue capacity.
         /// </summary>
         public int Capacity => data.Length;
 
         /// <summary>
-        /// Gets whether the queue is empty
+        /// Gets whether the queue is empty.
         /// </summary>
         public bool Empty => count == 0;
 
         /// <summary>
-        /// Retrive the minimun (top) element without removing it
+        /// Retrive the minimun (top) element without removing it.
         /// </summary>
         public int Top => data[1];
 
         /// <summary>
-        /// Creates a priority queue to hold n elements
+        /// Creates a priority queue to hold n elements.
         /// </summary>
         /// <param name="capacity"></param>
         public IndexedPriorityQueue(int capacity)
@@ -299,7 +295,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Clear the priority queue
+        /// Clear the priority queue.
         /// </summary>
         public void Clear()
         {
@@ -313,7 +309,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Adds an element to the queue
+        /// Adds an element to the queue.
         /// </summary>
         public void Add(int element, float cost)
         {
@@ -344,7 +340,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Remove and retrieve the minimun (top) element
+        /// Remove and retrieve the minimun (top) element.
         /// </summary>
         public int Pop()
         {
@@ -362,7 +358,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Increase the priority of a given node
+        /// Increase the priority of a given node.
         /// </summary>
         public void IncreasePriority(int element, float cost)
         {
@@ -399,12 +395,12 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Fix the heap
+        /// Fix the heap.
         /// </summary>
-        /// <param name="elements">Array of elements to be fixed</param>
-        /// <param name="i">Root index of the subtree</param>
-        /// <param name="n">Subtree size</param>
-        /// <param name="k">Element to be add as the root</param>
+        /// <param name="elements">Array of elements to be fixed.</param>
+        /// <param name="i">Root index of the subtree.</param>
+        /// <param name="n">Subtree size.</param>
+        /// <param name="k">Element to be add as the root.</param>
         private void FixHeap(int i, int n, int k, float cost)
         {
             int x, min;
@@ -438,5 +434,4 @@ namespace Isles.Engine
             index[k] = i;
         }
     }
-
 }

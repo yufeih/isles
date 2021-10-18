@@ -1,24 +1,19 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.IO;
-using System.Security.Cryptography;
-using System.Runtime.InteropServices;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
-using Microsoft.Xna.Framework;
 using Isles.Engine;
+using Microsoft.Xna.Framework;
 
 namespace Isles
 {
-
     public class GameRecorder
     {
-
         public struct Keyframe
         {
             public float Time;
@@ -29,7 +24,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Constants
+        /// Constants.
         /// </summary>
         public const string Magic = "Isles Replay";
         public const byte Version = 0;
@@ -42,7 +37,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Record an id and its value
+        /// Record an id and its value.
         /// </summary>
         public void Record(ushort id, float time, byte[] bytes, int offset, int length)
         {
@@ -61,11 +56,11 @@ namespace Isles
             keyframes.Add(frame);
             keyValues.Add(value);
 
-            currentOffset += (uint)(value.Length);
+            currentOffset += (uint)value.Length;
         }
 
         /// <summary>
-        /// Clear all recorded data
+        /// Clear all recorded data.
         /// </summary>
         public void Clear()
         {
@@ -76,7 +71,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Save the recorded data to an output stream
+        /// Save the recorded data to an output stream.
         /// </summary>
         public void Save(Stream output, string worldFilename, Stream worldStream)
         {
@@ -91,7 +86,7 @@ namespace Isles
                 throw new Exception("Filename too long: " + worldFilename);
             }
 
-            output.WriteByte((byte)(worldFilename.Length));
+            output.WriteByte((byte)worldFilename.Length);
             var file = Encoding.Default.GetBytes(worldFilename);
             output.Write(file, 0, file.Length);
 
@@ -133,7 +128,6 @@ namespace Isles
 
     public class GameReplay
     {
-
         public struct Keyframe
         {
             public float Time;
@@ -147,7 +141,7 @@ namespace Isles
         private string worldFilename;
 
         /// <summary>
-        /// Gets the world filename of this replay
+        /// Gets the world filename of this replay.
         /// </summary>
         public string WorldFilename => worldFilename;
 
@@ -157,7 +151,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Loads the game replay from an input stream
+        /// Loads the game replay from an input stream.
         /// </summary>
         public bool Load(Stream input)
         {
@@ -270,7 +264,7 @@ namespace Isles
             // Read each raw data associated with each keyframe
             for (var i = 0; i < keyframeCount; i++)
             {
-                var length = (int)(offsets[i + 1]) - (int)(offsets[i]);
+                var length = (int)offsets[i + 1] - (int)offsets[i];
 
                 if (length <= 0)
                 {
@@ -294,7 +288,7 @@ namespace Isles
             }
 
             // Sort keyframes by time
-            keyframes.Sort(delegate (Keyframe frame1, Keyframe frame2)
+            keyframes.Sort(delegate(Keyframe frame1, Keyframe frame2)
             {
                 return frame1.Time.CompareTo(frame2.Time);
             });
@@ -326,5 +320,4 @@ namespace Isles
             }
         }
     }
-
 }

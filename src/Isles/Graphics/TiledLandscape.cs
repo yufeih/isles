@@ -1,42 +1,43 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Isles.Engine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Isles.Engine;
 
 namespace Isles.Graphics
 {
     public class TiledLandscape : Landscape
     {
-
         /// <summary>
-        /// The effect used to draw the terrain
+        /// The effect used to draw the terrain.
         /// </summary>
         private Effect terrainEffect;
 
         /// <summary>
-        /// Index buffer for all patches
+        /// Index buffer for all patches.
         /// </summary>
         private IndexBuffer indexBuffer;
 
         /// <summary>
-        /// Vertex buffer for each individual patch
+        /// Vertex buffer for each individual patch.
         /// </summary>
         private VertexBuffer[] vertexBuffers;
 
         /// <summary>
-        /// Vertex declaraction for terrain mesh
+        /// Vertex declaraction for terrain mesh.
         /// </summary>
         private VertexDeclaration declaraction;
 
         /// <summary>
-        /// Stuff for drawing primitives
+        /// Stuff for drawing primitives.
         /// </summary>
-        private int vertexCount, primitiveCount;
+        private int vertexCount;
+
+        /// <summary>
+        /// Stuff for drawing primitives.
+        /// </summary>
+        private int primitiveCount;
 
         public override void Initialize(BaseGame game)
         {
@@ -91,17 +92,17 @@ namespace Isles.Graphics
                 {
                     // Fill patch vertices
                     Patches[patchIndex].FillVertices(0,
-                    delegate (int x, int y)
+                    delegate(int x, int y)
                     {
                         return new Vector3(x * Size.X / (GridCountOnXAxis - 1),
                                            y * Size.Y / (GridCountOnYAxis - 1),
                                            HeightField[x, y]);
                     },
-                    delegate (uint index, Vector3 position)
+                    delegate(uint index, Vector3 position)
                     {
                         vertices[index].Position = position;
                     },
-                    delegate (uint index, int x, int y)
+                    delegate(uint index, int x, int y)
                     {
                         vertices[index].Normal = NormalField[x, y];
                         vertices[index].Tangent = TangentField[x, y];
@@ -126,6 +127,7 @@ namespace Isles.Graphics
                                                                  typeof(TerrainVertex),
                                                                  vertexBufferElementCount,
                                                                  BufferUsage.WriteOnly);
+
                     // Set vertex buffer vertices
                     vertexBuffers[patchIndex].SetData(vertices);
 
@@ -154,7 +156,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Internal method to draw the terrain
+        /// Internal method to draw the terrain.
         /// </summary>
         private void DrawTerrain(GameTime gameTime, Matrix view, Matrix projection, EffectTechnique technique)
         {
@@ -209,6 +211,7 @@ namespace Isles.Graphics
 
                 pass.End();
             }
+
             terrainEffect.End();
         }
 
@@ -240,29 +243,34 @@ namespace Isles.Graphics
 
                 pass.End();
             }
+
             terrainEffect.End();
         }
 
         public struct TerrainVertex
         {
             /// <summary>
-            /// Position
+            /// Position.
             /// </summary>
             public Vector3 Position;
+
             /// <summary>
-            /// Texture coordinates
+            /// Texture coordinates.
             /// </summary>
             public Vector2 TextureCoordinate0;
+
             /// <summary>
-            /// Texture coordinates
+            /// Texture coordinates.
             /// </summary>
             public Vector2 TextureCoordinate1;
+
             /// <summary>
-            /// Normal
+            /// Normal.
             /// </summary>
             public Vector3 Normal;
+
             /// <summary>
-            /// Tangent
+            /// Tangent.
             /// </summary>
             public Vector3 Tangent;
 
@@ -272,7 +280,7 @@ namespace Isles.Graphics
             public static int SizeInBytes => 4 * (3 + 4 + 3 + 3);
 
             /// <summary>
-            /// Generate vertex declaration
+            /// Generate vertex declaration.
             /// </summary>
             public static VertexElement[] VertexElements
             {
@@ -292,6 +300,7 @@ namespace Isles.Graphics
                             VertexElementUsage.TextureCoordinate, 1),
                         new VertexElement(0, 28, VertexElementFormat.Vector3,
                             VertexElementMethod.Default, VertexElementUsage.Normal, 0),
+
                         // And now the tangent
                         new VertexElement(0, 40, VertexElementFormat.Vector3,
                             VertexElementMethod.Default, VertexElementUsage.Tangent, 0),
@@ -300,6 +309,5 @@ namespace Isles.Graphics
                 }
             }
         }
-
     }
 }

@@ -1,21 +1,16 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.IO;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+using System.IO;
 using Isles.Engine;
+using Microsoft.Xna.Framework;
 
 namespace Isles
 {
-
     public class GameServer
     {
-
         public static GameServer Singleton => singleton;
 
         private static GameServer singleton;
@@ -24,36 +19,36 @@ namespace Isles
         private readonly Dictionary<IGameObject, ushort> objectToID = new();
 
         /// <summary>
-        /// Make sure every game object has a unique ID
+        /// Make sure every game object has a unique ID.
         /// </summary>
         private ushort currentValidID = MinID;
         private const ushort MinID = 128;
 
         /// <summary>
-        /// Record all game object changes
+        /// Record all game object changes.
         /// </summary>
         private readonly GameRecorder recorder;
         private readonly GameWorld world;
 
         /// <summary>
-        /// Gets or sets game world
+        /// Gets or sets game world.
         /// </summary>
         public GameWorld World => world;
 
         private double time;
 
         /// <summary>
-        /// Gets game elapsed time since server started
+        /// Gets game elapsed time since server started.
         /// </summary>
         public double Time => time;
 
         /// <summary>
-        /// Gets the next valid ID from this game server
+        /// Gets the next valid ID from this game server.
         /// </summary>
         public ushort NextValidID => currentValidID == ushort.MaxValue ? throw new InvalidOperationException() : currentValidID++;
 
         /// <summary>
-        /// Creates a new game server
+        /// Creates a new game server.
         /// </summary>
         public GameServer(GameWorld world, GameRecorder recorder)
         {
@@ -64,20 +59,18 @@ namespace Isles
         }
 
         /// <summary>
-        /// Gets a game object from the specified id
+        /// Gets a game object from the specified id.
         /// </summary>
         public IGameObject ObjectFromID(ushort id)
         {
-
             return idToObject.TryGetValue(id, out IGameObject value) ? value : null;
         }
 
         /// <summary>
-        /// Gets the id of a game object
+        /// Gets the id of a game object.
         /// </summary>
         public ushort IDFromObject(IGameObject o)
         {
-
             return objectToID.TryGetValue(o, out var id) ? id : (ushort)0;
         }
 
@@ -90,7 +83,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Adds a new game object to the game server with the specified id
+        /// Adds a new game object to the game server with the specified id.
         /// </summary>
         public virtual IWorldObject Create(string type, ushort id)
         {
@@ -141,10 +134,10 @@ namespace Isles
         }
 
         /// <summary>
-        /// Destroy an existing game object from the server
+        /// Destroy an existing game object from the server.
         /// </summary>
         /// <returns>
-        /// Whether the server contains the existing object
+        /// Whether the server contains the existing object.
         /// </returns>
         public virtual void Destroy(IWorldObject o)
         {
@@ -175,7 +168,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Dispatch the input to the replay recorder & game clients
+        /// Dispatch the input to the replay recorder & game clients.
         /// </summary>
         public void Dispatch(ushort id, byte[] bytes, int offset, int length)
         {
@@ -194,7 +187,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Execute the received package
+        /// Execute the received package.
         /// </summary>
         public virtual void Execute(ushort id, byte[] bytes, int offset, int length)
         {
@@ -254,5 +247,4 @@ namespace Isles
             }
         }
     }
-
 }

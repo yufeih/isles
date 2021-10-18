@@ -1,73 +1,67 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
+using Isles.Engine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Isles.Engine;
 
 namespace Isles.Graphics
 {
-
     /// <summary>
-    /// Type of a billboard
+    /// Type of a billboard.
     /// </summary>
     [Flags]
     public enum BillboardType
     {
         /// <summary>
-        /// Uses a two pass rendering technique for vegetation rendering
+        /// Uses a two pass rendering technique for vegetation rendering.
         /// </summary>
         Vegetation = 1,
 
         /// <summary>
-        /// Rotate around the center
+        /// Rotate around the center.
         /// </summary>
-        CenterOriented = (1 << 2),
+        CenterOriented = 1 << 2,
 
         /// <summary>
-        /// Rotate around a normal vector
+        /// Rotate around a normal vector.
         /// </summary>
-        NormalOriented = (1 << 3),
+        NormalOriented = 1 << 3,
 
         /// <summary>
-        /// Whether depth buffer is enabled when rendering the billboard
+        /// Whether depth buffer is enabled when rendering the billboard.
         /// </summary>
-        DepthBufferEnable = (1 << 4),
+        DepthBufferEnable = 1 << 4,
     }
 
     public enum AnchorType
     {
         /// <summary>
-        /// Position anchor on top
+        /// Position anchor on top.
         /// </summary>
         Top = 0,
 
         /// <summary>
-        /// Position anchor on Center
+        /// Position anchor on Center.
         /// </summary>
         Center = 1,
 
         /// <summary>
-        /// Position anchor on bottom
+        /// Position anchor on bottom.
         /// </summary>
-        Bottom = 2
-
+        Bottom = 2,
     }
 
     /// <summary>
-    /// A billboard definition
+    /// A billboard definition.
     /// </summary>
     public class Billboard
     {
-
         /// <summary>
         /// Texture used to draw the billboard
-        /// TODO: Implement animated texture
+        /// TODO: Implement animated texture.
         /// </summary>
         public string TextureName
         {
@@ -84,6 +78,7 @@ namespace Isles.Graphics
             get => texture;
             set => texture = value;
         }
+
         private string textureName;
         private Texture2D texture;
 
@@ -91,6 +86,7 @@ namespace Isles.Graphics
         /// Position of the billboard. Bottom center in the texture.
         /// </summary>
         private Vector3 position;
+
         public Vector3 Position
         {
             get => position;
@@ -99,42 +95,44 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Type of the billboard
+        /// Type of the billboard.
         /// </summary>
         public BillboardType Type
         {
             get => type;
             set => type = value;
         }
+
         private BillboardType type;
 
         /// <summary>
-        /// Type of position anchor
+        /// Type of position anchor.
         /// </summary>
         public AnchorType AchorType
         {
             get => achorType;
             set => achorType = value;
         }
+
         private AnchorType achorType;
 
         /// <summary>
-        /// Normalized vector around which the billboard is rotating
+        /// Normalized vector around which the billboard is rotating.
         /// </summary>
         public Vector3 Normal;
 
         /// <summary>
-        /// Size of the billboard
+        /// Size of the billboard.
         /// </summary>
         public Vector2 Size;
 
         /// <summary>
-        /// Source rectangle (min, max). Measured in float [0 ~ 1]
+        /// Source rectangle (min, max). Measured in float [0 ~ 1].
         /// </summary>
         public Vector4 SourceRectangle;
 
         /// <summary>
-        /// Default source rectangle
+        /// Default source rectangle.
         /// </summary>
         public static readonly Vector4 DefaultSourceRectangle = new(0, 0, 1, 1);
         public static readonly Vector4 DefaultSourceRectangleXInversed = new(1, 0, 0, 1);
@@ -151,7 +149,7 @@ namespace Isles.Graphics
     }
 
     /// <summary>
-    /// Manager class for billboard
+    /// Manager class for billboard.
     /// </summary>
     public class BillboardManager : IDisposable
     {
@@ -168,55 +166,55 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Max number of quads that can be rendered in one draw call
+        /// Max number of quads that can be rendered in one draw call.
         /// </summary>
         public const int ChunkSize = 1024;
 
         /// <summary>
-        /// Billboard effect
+        /// Billboard effect.
         /// </summary>
         private readonly Effect effect;
 
         /// <summary>
-        /// Billboard effect techniques
+        /// Billboard effect techniques.
         /// </summary>
         private readonly EffectTechnique techniqueVegetation;
         private readonly EffectTechnique techniqueNormal;
         private readonly EffectTechnique techniqueCenter;
 
         /// <summary>
-        /// Internal billboard list
+        /// Internal billboard list.
         /// </summary>
         private readonly List<Billboard> billboards = new();
 
         /// <summary>
-        /// Quad vertices
+        /// Quad vertices.
         /// </summary>
         private readonly DynamicVertexBuffer vertices;
 
         /// <summary>
-        /// Quad indices
+        /// Quad indices.
         /// </summary>
         private readonly DynamicIndexBuffer indices;
 
         /// <summary>
-        /// Vertex buffer used to generate vertices
+        /// Vertex buffer used to generate vertices.
         /// </summary>
         private VertexPositionNormalDuoTexture[] workingVertices =
             new VertexPositionNormalDuoTexture[ChunkSize * 4];
 
         /// <summary>
-        /// Index buffer used to generate indices
+        /// Index buffer used to generate indices.
         /// </summary>
         private short[] workingIndices = new short[ChunkSize * 6];
 
         /// <summary>
-        /// Graphics device
+        /// Graphics device.
         /// </summary>
         private readonly BaseGame game;
 
         /// <summary>
-        /// Create a billboard manager
+        /// Create a billboard manager.
         /// </summary>
         public BillboardManager(BaseGame game)
         {
@@ -238,7 +236,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Draw a billboard
+        /// Draw a billboard.
         /// </summary>
         public void Draw(Texture2D texture, Vector3 position, Vector2 size, AnchorType achorType)
         {
@@ -250,7 +248,7 @@ namespace Isles.Graphics
                 Normal = Vector3.UnitZ,
                 Size = size,
                 Type = BillboardType.CenterOriented,
-                SourceRectangle = Billboard.DefaultSourceRectangle
+                SourceRectangle = Billboard.DefaultSourceRectangle,
             };
 
             Draw(billboard);
@@ -267,14 +265,14 @@ namespace Isles.Graphics
                 Normal = normal,
                 Size = size,
                 SourceRectangle = sourceRectangle,
-                Type = BillboardType.NormalOriented
+                Type = BillboardType.NormalOriented,
             };
 
             Draw(billboard);
         }
 
         /// <summary>
-        /// Draw a billboard
+        /// Draw a billboard.
         /// </summary>
         /// <param name="billboard"></param>
         public void Draw(Billboard billboard)
@@ -283,7 +281,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Draw all billboards in this frame
+        /// Draw all billboards in this frame.
         /// </summary>
         /// <param name="gameTime"></param>
         public void Present(GameTime gameTime)
@@ -313,7 +311,6 @@ namespace Isles.Graphics
             // size reaches MaxChunkSize or when the texture is changed.
             // After the division, we setup effect paramters and render each chunk
             // in one draw call
-
             Texture2D texture = billboards[0].Texture;
 
             int baseIndex = 0, baseVertex = 0;
@@ -321,7 +318,7 @@ namespace Isles.Graphics
             for (var i = 1; i <= billboards.Count; i++)
             {
                 // We are at the end of the chunk
-                if (i != billboards.Count &&    // End of list
+                if (i != billboards.Count && // End of list
                    (i - begin) < ChunkSize && texture == billboards[i].Texture)
                 {
                     continue;
@@ -380,8 +377,8 @@ namespace Isles.Graphics
                         effect.CurrentTechnique = techniqueNormal;
                     }
 
-                    game.GraphicsDevice.RenderState.DepthBufferEnable = (
-                        (currentType & BillboardType.DepthBufferEnable) == BillboardType.DepthBufferEnable);
+                    game.GraphicsDevice.RenderState.DepthBufferEnable = 
+                        (currentType & BillboardType.DepthBufferEnable) == BillboardType.DepthBufferEnable;
                 }
 
                 // Draw the chunk
@@ -395,6 +392,7 @@ namespace Isles.Graphics
 
                     pass.End();
                 }
+
                 effect.End();
 
                 // Increment begin pointer
@@ -425,7 +423,6 @@ namespace Isles.Graphics
             // |  \  |
             // |   \ |
             // 3 --- 2
-
             for (var i = 0; i < 4; i++)
             {
                 vertices[baseVertex + i].Position = GetCenterPosition(billboard);
@@ -483,7 +480,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Dispose
+        /// Dispose.
         /// </summary>
         public void Dispose()
         {
@@ -492,9 +489,9 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Dispose
+        /// Dispose.
         /// </summary>
-        /// <param name="disposing">Disposing</param>
+        /// <param name="disposing">Disposing.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
@@ -515,7 +512,5 @@ namespace Isles.Graphics
                 }
             }
         }
-
     }
-
 }

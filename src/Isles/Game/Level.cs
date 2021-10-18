@@ -1,19 +1,15 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
 using System.Xml;
-using Microsoft.Xna.Framework;
 using Isles.Engine;
 using Isles.Graphics;
+using Microsoft.Xna.Framework;
 
 namespace Isles
 {
-
     public class Level : IEventListener
     {
         private RuinedLand ruinedLand;
@@ -28,7 +24,7 @@ namespace Isles
             {
                 var info = new PlayerInfo
                 {
-                    Name = child.GetAttribute("Name")
+                    Name = child.GetAttribute("Name"),
                 };
                 if (child.HasAttribute("Team"))
                 {
@@ -164,7 +160,7 @@ namespace Isles
     }
 
     /// <summary>
-    /// Respresents a level in the game
+    /// Respresents a level in the game.
     /// </summary>
     public class Skirmish : Level
     {
@@ -172,7 +168,7 @@ namespace Isles
         private readonly List<PlayerInfo> playerInfos;
 
         /// <summary>
-        /// Create a new stone
+        /// Create a new stone.
         /// </summary>
         public Skirmish(GameScreen screen, IEnumerable<PlayerInfo> info)
         {
@@ -186,7 +182,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Load a game level
+        /// Load a game level.
         /// </summary>
         protected override void CreatePlayers(List<PlayerInfo> playerInfoFromMap)
         {
@@ -201,7 +197,7 @@ namespace Isles
             for (var i = 0; i < playerInfos.Count; i++)
             {
                 var index = random.Next(playerInfoFromMap.Count);
-                //int index = i;
+                // int index = i;
                 playerInfos[i].SpawnPoint = playerInfoFromMap[index].SpawnPoint;
                 playerInfoFromMap.RemoveAt(index);
             }
@@ -289,8 +285,8 @@ namespace Isles
 
         public void CreateStartup(GameWorld world, Player player, Vector3 position)
         {
-            var townhall = (player.Race == Race.Islander ? "Townhall" : "SteamFort");
-            var worker = (player.Race == Race.Islander ? "Follower" : "Miner");
+            var townhall = player.Race == Race.Islander ? "Townhall" : "SteamFort";
+            var worker = player.Race == Race.Islander ? "Follower" : "Miner";
 
             // Create a townhall and 4 followers if this player is not used for quest
             var building = GameServer.Singleton.Create(townhall) as Building;
@@ -364,5 +360,4 @@ namespace Isles
             return true;
         }
     }
-
 }

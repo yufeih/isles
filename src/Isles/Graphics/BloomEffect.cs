@@ -1,10 +1,5 @@
-
-//-----------------------------------------------------------------------------
-// BloomComponent.cs
-//
-// Microsoft XNA Community Game Platform
-// Copyright (C) Microsoft Corporation. All rights reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using Microsoft.Xna.Framework;
@@ -13,15 +8,13 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Graphics
 {
-
     /// <summary>
     /// Class holds all the settings used to tweak the bloom effect.
-    /// Code grabbed from XNA creators club samples :)
+    /// Code grabbed from XNA creators club samples :).
     /// </summary>
-    [Serializable()]
+    [Serializable]
     public class BloomSettings
     {
-
         // Name of a preset bloom setting, for display to the user.
         public string Name;
 
@@ -74,7 +67,7 @@ namespace Isles.Graphics
                 BloomIntensity = MathHelper.Lerp(settings1.BloomIntensity, settings2.BloomIntensity, amount),
                 BloomSaturation = MathHelper.Lerp(settings1.BloomSaturation, settings2.BloomSaturation, amount),
                 BloomThreshold = MathHelper.Lerp(settings1.BloomThreshold, settings2.BloomThreshold, amount),
-                BlurAmount = MathHelper.Lerp(settings1.BlurAmount, settings2.BlurAmount, amount)
+                BlurAmount = MathHelper.Lerp(settings1.BlurAmount, settings2.BlurAmount, amount),
             };
 
             return settings;
@@ -85,7 +78,7 @@ namespace Isles.Graphics
         /// </summary>
         public static BloomSettings[] PresetSettings =
         {
-            //                Name           Thresh  Blur Bloom  Base  BloomSat BaseSat
+            // Name           Thresh  Blur Bloom  Base  BloomSat BaseSat
             new BloomSettings("Saturated",   0.25f,  4,   2,     1,    2,       0),
             new BloomSettings("Soft",        0,      3,   1,     1,    1,       1),
             new BloomSettings("Default",     0.25f,  0.02f,   1.25f, 1,    1,       1),
@@ -97,7 +90,6 @@ namespace Isles.Graphics
 
     public class BloomEffect : DrawableGameComponent
     {
-
         private readonly ContentManager content;
         private SpriteBatch spriteBatch;
         private Effect bloomExtractEffect;
@@ -360,10 +352,8 @@ namespace Isles.Graphics
         {
             var theta = Settings.BlurAmount;
 
-            return (float)((1.0 / Math.Sqrt(2 * Math.PI * theta)) *
+            return (float)(1.0 / Math.Sqrt(2 * Math.PI * theta) *
                            Math.Exp(-(n * n) / (2 * theta * theta)));
         }
-
     }
-
 }

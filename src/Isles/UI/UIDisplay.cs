@@ -1,78 +1,75 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
+using Isles.Engine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Isles.Engine;
 
 namespace Isles.UI
 {
     /// <summary>
-    /// Manages all UI elements
+    /// Manages all UI elements.
     /// </summary>
     public sealed class UIDisplay : IUIElement
     {
         /// <summary>
         /// Standard screen width and height, all UI elements
-        /// are scaled relative to this resolution
+        /// are scaled relative to this resolution.
         /// </summary>
         public const int ReferenceScreenWidth = 800;
         public const int ReferenceScreenHeight = 600;
 
         /// <summary>
-        /// UI content manager
+        /// UI content manager.
         /// </summary>
         private readonly BaseGame game;
 
         /// <summary>
-        /// Sprite batch used to draw all UI elements
+        /// Sprite batch used to draw all UI elements.
         /// </summary>
         private SpriteBatch sprite;
 
         /// <summary>
-        /// Default UI font
+        /// Default UI font.
         /// </summary>
         private SpriteFont font;
 
         /// <summary>
-        /// UI effect
+        /// UI effect.
         /// </summary>
         private Effect effect;
 
         /// <summary>
-        /// Area of the UI dialog
+        /// Area of the UI dialog.
         /// </summary>
         private Rectangle area;
 
         /// <summary>
-        /// UI Elements
+        /// UI Elements.
         /// </summary>
         private readonly BroadcastList<IUIElement, List<IUIElement>> elements = new
 ();
 
         /// <summary>
-        /// Visible
+        /// Visible.
         /// </summary>
         private bool visible = true;
 
         /// <summary>
-        /// Enable
+        /// Enable.
         /// </summary>
         private bool enabled = true;
 
         /// <summary>
-        /// Reference area
+        /// Reference area.
         /// </summary>
         private readonly Rectangle referenceArea =
             new(0, 0, ReferenceScreenWidth, ReferenceScreenHeight);
 
         /// <summary>
-        /// Gets or sets the sprite batch used to draw all UI elements
+        /// Gets or sets the sprite batch used to draw all UI elements.
         /// </summary>
         public SpriteBatch Sprite
         {
@@ -81,7 +78,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Gets or sets the default UI font
+        /// Gets or sets the default UI font.
         /// </summary>
         public SpriteFont Font
         {
@@ -90,7 +87,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Gets or sets the default effect to render UI elements
+        /// Gets or sets the default effect to render UI elements.
         /// </summary>
         public Effect Effect
         {
@@ -99,7 +96,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Gets or sets the area of the dialog
+        /// Gets or sets the area of the dialog.
         /// </summary>
         public Rectangle Area
         {
@@ -114,7 +111,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Gets or sets the parent of an UI element
+        /// Gets or sets the parent of an UI element.
         /// </summary>
         public IUIElement Parent
         {
@@ -123,8 +120,9 @@ namespace Isles.UI
             // Can't set the parent of a display
             set { }
         }
+
         /// <summary>
-        /// Gets or sets UI element anchor
+        /// Gets or sets UI element anchor.
         /// </summary>
         public Anchor Anchor
         {
@@ -133,7 +131,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Gets or sets UI element scale mode
+        /// Gets or sets UI element scale mode.
         /// </summary>
         public ScaleMode ScaleMode
         {
@@ -142,7 +140,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Gets or sets UI element visibility
+        /// Gets or sets UI element visibility.
         /// </summary>
         public bool Visible
         {
@@ -151,7 +149,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Enable/Disable an UI element
+        /// Enable/Disable an UI element.
         /// </summary>
         public bool Enabled
         {
@@ -186,7 +184,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Adds an UI element to the dialog
+        /// Adds an UI element to the dialog.
         /// </summary>
         /// <param name="element"></param>
         public void Add(IUIElement element)
@@ -196,7 +194,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Removes an UI elment from the dialog
+        /// Removes an UI elment from the dialog.
         /// </summary>
         /// <param name="element"></param>
         public void Remove(IUIElement element)
@@ -206,7 +204,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Clear all UI elements
+        /// Clear all UI elements.
         /// </summary>
         public void Clear()
         {
@@ -221,7 +219,7 @@ namespace Isles.UI
         public IEnumerable<IUIElement> Elements => elements;
 
         /// <summary>
-        /// Update all UI elements
+        /// Update all UI elements.
         /// </summary>
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
@@ -238,7 +236,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Draw all UI elements
+        /// Draw all UI elements.
         /// </summary>
         /// <param name="gameTime"></param>
         public void Draw(GameTime gameTime)
@@ -247,7 +245,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Draw all UI elements
+        /// Draw all UI elements.
         /// </summary>
         /// <param name="gameTime"></param>
         public void Draw(GameTime gameTime, SpriteBatch sprite)
@@ -271,7 +269,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Handle UI input
+        /// Handle UI input.
         /// </summary>
         public EventResult HandleEvent(EventType type, object sender, object tag)
         {
@@ -288,7 +286,7 @@ namespace Isles.UI
         }
 
         /// <summary>
-        /// Dispose
+        /// Dispose.
         /// </summary>
         public void Dispose()
         {
@@ -311,6 +309,5 @@ namespace Isles.UI
 
             GC.SuppressFinalize(this);
         }
-
     }
 }

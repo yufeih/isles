@@ -1,48 +1,44 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Graphics;
 using Isles.Engine;
 using Isles.Graphics;
-using Isles.UI;
 using Isles.Screens;
+using Isles.UI;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Isles
 {
     /// <summary>
-    /// Represents a game screen
+    /// Represents a game screen.
     /// </summary>
     public class GameScreen : IScreen, IEventListener
     {
-
         private const string ReplayDirectory = "Replays";
         private const string DefaultReplayName = "LastReplay";
         private const string ReplayExtension = "ixr";
 
         /// <summary>
-        /// Graphcis device
+        /// Graphcis device.
         /// </summary>
         private readonly GraphicsDeviceManager graphics;
 
         /// <summary>
-        /// Game screen UI
+        /// Game screen UI.
         /// </summary>
         public GameUI UI { get; private set; }
 
         private TipBox pausePanel;
 
         /// <summary>
-        /// Gets basic game instance
+        /// Gets basic game instance.
         /// </summary>
         public BaseGame Game { get; }
 
@@ -64,37 +60,37 @@ namespace Isles
         }
 
         /// <summary>
-        /// Gets game world
+        /// Gets game world.
         /// </summary>
         public GameWorld World { get; private set; }
 
         /// <summary>
-        /// The read me panel
+        /// The read me panel.
         /// </summary>
         private ReadmePanel readme;
 
         /// <summary>
-        /// Gets or sets game level
+        /// Gets or sets game level.
         /// </summary>
         public Level Level { get; set; }
 
         /// <summary>
-        /// Level filename
+        /// Level filename.
         /// </summary>
         private string levelFilename;
 
         /// <summary>
-        /// Gets game recorder
+        /// Gets game recorder.
         /// </summary>
         public GameRecorder Recorder { get; private set; }
 
         /// <summary>
-        /// Gets game replay
+        /// Gets game replay.
         /// </summary>
         public GameReplay Replay { get; private set; }
 
         /// <summary>
-        /// Gets game server interface
+        /// Gets game server interface.
         /// </summary>
         public GameServer Server { get; private set; }
 
@@ -115,7 +111,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Starts a new editor control
+        /// Starts a new editor control.
         /// </summary>
         public void StartEditor(System.Windows.Forms.Form editorForm)
         {
@@ -128,7 +124,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Starts a new replay
+        /// Starts a new replay.
         /// </summary>
         public void StartReplay(string replayFilename)
         {
@@ -143,7 +139,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Starts a new level
+        /// Starts a new level.
         /// </summary>
         /// <param name="newLevel"></param>
         public void StartLevel(string levelFilename)
@@ -152,11 +148,10 @@ namespace Isles
         }
 
         /// <summary>
-        /// Internal load world method
+        /// Internal load world method.
         /// </summary>
         private void LoadWorld(string levelFilename, Level level)
         {
-
             // Creates a default level if no input specified
             if (level == null)
             {
@@ -234,9 +229,9 @@ namespace Isles
                                         new Rectangle(65, 70, 530, 460))
                 {
                     ScaleMode = ScaleMode.ScaleY,
-                    Anchor = Anchor.Center
+                    Anchor = Anchor.Center,
                 };
-                readme.OK.Click += delegate (object o, EventArgs e)
+                readme.OK.Click += (o, e) =>
                 {
                     readme.Visible = false;
                     Audios.Play("OK");
@@ -264,7 +259,7 @@ namespace Isles
                                                           Game.ScreenWidth / 7,
                                                           Game.ScreenHeight * 2 / 35));
             ok.HotKey = Keys.Space;
-            ok.Click += delegate (object o, EventArgs e)
+            ok.Click += (o, e) =>
             {
                 pausePanel.Visible = false;
                 Resume();
@@ -272,7 +267,7 @@ namespace Isles
             };
 
             cancel.HotKey = Keys.Escape;
-            cancel.Click += delegate (object o, EventArgs e)
+            cancel.Click += (o, e) =>
             {
                 pausePanel.Visible = false;
                 Resume();
@@ -296,23 +291,23 @@ namespace Isles
             camera.FlyTo(new Vector3(Player.LocalPlayer.SpawnPoint, 0), true);
             Game.Camera = camera;
 
-            camera.BeginMove += new EventHandler(delegate (object sender, EventArgs e)
+            camera.BeginMove += new EventHandler(delegate(object sender, EventArgs e)
             {
                 Cursors.StoredCursor = Game.Cursor;
                 Game.Cursor = Cursors.Move;
                 scrollingCamera = true;
             });
-            camera.EndMove += new EventHandler(delegate (object sender, EventArgs e)
+            camera.EndMove += new EventHandler(delegate(object sender, EventArgs e)
             {
                 scrollingCamera = false;
                 Game.Cursor = Cursors.StoredCursor;
             });
-            camera.BeginRotate += new EventHandler(delegate (object sender, EventArgs e)
+            camera.BeginRotate += new EventHandler(delegate(object sender, EventArgs e)
             {
                 Cursors.StoredCursor = Game.Cursor;
                 Game.Cursor = Cursors.Rotate;
             });
-            camera.EndRotate += new EventHandler(delegate (object sender, EventArgs e)
+            camera.EndRotate += new EventHandler(delegate(object sender, EventArgs e)
             {
                 Game.Cursor = Cursors.StoredCursor;
             });
@@ -323,10 +318,10 @@ namespace Isles
             var info1 = new PlayerInfo
             {
                 Name = Game.Settings.PlayerName,
-                Race = (Race.Islander),
+                Race = Race.Islander,
                 Team = 1,
                 TeamColor = Color.Wheat,
-                Type = PlayerType.Local
+                Type = PlayerType.Local,
             };
 
             yield return info1;
@@ -334,11 +329,11 @@ namespace Isles
             var info2 = new PlayerInfo
             {
                 Name = "Computer",
-                Race = (Race.Islander),
+                Race = Race.Islander,
                 Team = 2,
                 TeamColor = Color.Green,
                 Type = PlayerType.Computer,
-                SpawnPoint = Vector2.Zero
+                SpawnPoint = Vector2.Zero,
             };
 
             yield return info2;
@@ -362,19 +357,17 @@ namespace Isles
         public void UnloadContent() { }
 
         /// <summary>
-        /// Called when this screen is activated
+        /// Called when this screen is activated.
         /// </summary>
         public void Enter()
         {
-
         }
 
         /// <summary>
-        /// Called when this screen is deactivated
+        /// Called when this screen is deactivated.
         /// </summary>
         public void Leave()
         {
-
         }
 
         private bool postScreen;
@@ -472,7 +465,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Handle game updates
+        /// Handle game updates.
         /// </summary>
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
@@ -537,7 +530,7 @@ namespace Isles
             if (scrollingCamera)
             {
                 Point mouse = Game.Input.MousePosition;
-                var border = (int)(Game.Settings.CameraSettings.ScrollAreaSize);
+                var border = (int)Game.Settings.CameraSettings.ScrollAreaSize;
 
                 if (mouse.Y <= border)
                 {
@@ -559,7 +552,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Handle game draw event
+        /// Handle game draw event.
         /// </summary>
         /// <param name="gameTime"></param>
         public void Draw(GameTime gameTime)
@@ -611,7 +604,7 @@ namespace Isles
                 {
                     const float BloomLerpTime = 3;
 
-                    bloomLerpElapsedTime += (float)(gameTime.ElapsedGameTime.TotalSeconds);
+                    bloomLerpElapsedTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
                     Game.Bloom.Settings = bloomLerpElapsedTime < BloomLerpTime
                         ? BloomSettings.Lerp(defaultSettings, targetSettings,
@@ -619,6 +612,7 @@ namespace Isles
                         : targetSettings;
                 }
             }
+
             // Draw UI at last
             else if (UI != null)
             {
@@ -644,6 +638,7 @@ namespace Isles
 
                 return EventResult.Handled;
             }
+
             // Prevent any event if we've in the post screen state
             if (postScreen)
             {
@@ -670,6 +665,7 @@ namespace Isles
             {
                 return EventResult.Handled;
             }
+
             // Let player handle event
             foreach (Player player in Player.AllPlayers)
             {
@@ -747,6 +743,7 @@ namespace Isles
                     }
                 }
             }
+
             // We don't wanna cause any exceptions when creating the replay file,
             // so just ignore all exceptions.
             catch (Exception e)
@@ -761,7 +758,7 @@ namespace Isles
         public static string DefaultReplayFilename => ReplayDirectory + "/" + DefaultReplayName + "." + ReplayExtension;
 
         /// <summary>
-        /// Dispose
+        /// Dispose.
         /// </summary>
         public void Dispose()
         {
@@ -770,16 +767,14 @@ namespace Isles
         }
 
         /// <summary>
-        /// Dispose
+        /// Dispose.
         /// </summary>
-        /// <param name="disposing">Disposing</param>
+        /// <param name="disposing">Disposing.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
             {
-
             }
         }
-
     }
 }

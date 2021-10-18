@@ -1,18 +1,14 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
+using Isles.Engine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Isles.Engine;
 
 namespace Isles.Graphics
 {
-
     /// <summary>
     /// Material for every game model.
     /// </summary>
@@ -24,7 +20,7 @@ namespace Isles.Graphics
     public class Material
     {
         /// <summary>
-        /// Gets or sets whether the material has changed
+        /// Gets or sets whether the material has changed.
         /// </summary>
         public bool IsDirty
         {
@@ -35,7 +31,7 @@ namespace Isles.Graphics
         private bool isDirty = true;
 
         /// <summary>
-        /// The effect technique for the material
+        /// The effect technique for the material.
         /// </summary>
         public EffectTechnique Technique
         {
@@ -50,7 +46,7 @@ namespace Isles.Graphics
         private EffectTechnique technique;
 
         /// <summary>
-        /// Base model texture
+        /// Base model texture.
         /// </summary>
         public Texture2D Texture
         {
@@ -65,7 +61,7 @@ namespace Isles.Graphics
         private Texture2D texture;
 
         /// <summary>
-        /// Model normal texture
+        /// Model normal texture.
         /// </summary>
         public Texture2D NormalTexture
         {
@@ -80,7 +76,7 @@ namespace Isles.Graphics
         private Texture2D normalTexture;
 
         /// <summary>
-        /// Ambient color
+        /// Ambient color.
         /// </summary>
         public Vector4 AmbientColor
         {
@@ -95,7 +91,7 @@ namespace Isles.Graphics
         private Vector4 ambientColor = new(0.2f, 0.2f, 0.25f, 1.0f);
 
         /// <summary>
-        /// Diffuse color
+        /// Diffuse color.
         /// </summary>
         public Vector4 EmissiveColor
         {
@@ -110,7 +106,7 @@ namespace Isles.Graphics
         private Vector4 emissiveColor = Vector4.One;
 
         /// <summary>
-        /// Specular color
+        /// Specular color.
         /// </summary>
         public Vector4 SpecularColor
         {
@@ -125,7 +121,7 @@ namespace Isles.Graphics
         private Vector4 specularColor = Vector4.One;
 
         /// <summary>
-        /// Specular power
+        /// Specular power.
         /// </summary>
         public float SpecularPower
         {
@@ -148,7 +144,7 @@ namespace Isles.Graphics
         ///
         /// Transparent:
         /// Default Transparent
-        /// Tree Transparent
+        /// Tree Transparent.
         /// </summary>
         public bool IsTransparent
         {
@@ -163,12 +159,12 @@ namespace Isles.Graphics
         private bool isTransparent;
 
         /// <summary>
-        /// Creates a new material
+        /// Creates a new material.
         /// </summary>
         public Material() { }
 
         /// <summary>
-        /// Creates a new material
+        /// Creates a new material.
         /// </summary>
         public Material(string techniqueName)
         {
@@ -176,7 +172,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Creates a new material from basic effect
+        /// Creates a new material from basic effect.
         /// </summary>
         /// <param name="basicEffect"></param>
         public Material(BasicEffect basicEffect)
@@ -194,18 +190,18 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// An empty material
+        /// An empty material.
         /// </summary>
         public static Material Default = new();
 
         /// <summary>
-        /// The shadow map material
+        /// The shadow map material.
         /// </summary>
         public static Material ShadowMap = new("ShadowMapping");
         public static Material ShadowMapSkinned = new("ShadowMappingSkinned");
 
         /// <summary>
-        /// Gets the effect technique with the speicific name
+        /// Gets the effect technique with the speicific name.
         /// </summary>
         public static EffectTechnique GetTechnique(string techniqueName)
         {
@@ -216,7 +212,7 @@ namespace Isles.Graphics
     /// <summary>
     /// Class for managing model rendering
     ///
-    /// Transparency -> Technique -> Texture -> Color & Transform
+    /// Transparency -> Technique -> Texture -> Color & Transform.
     /// </summary>
     public class ModelManager
     {
@@ -271,7 +267,7 @@ namespace Isles.Graphics
             }
 
             /// <summary>
-            /// Add a new static model for drawing this frame
+            /// Add a new static model for drawing this frame.
             /// </summary>
             public void Add(Matrix transform, Vector4 diffuse, Vector4 light)
             {
@@ -281,7 +277,7 @@ namespace Isles.Graphics
             }
 
             /// <summary>
-            /// Add a new skinned model for drawing this frame
+            /// Add a new skinned model for drawing this frame.
             /// </summary>
             public void Add(Matrix[] bones, Vector4 diffuse, Vector4 light)
             {
@@ -400,8 +396,7 @@ namespace Isles.Graphics
                 skinnedLights.Clear();
             }
 
-            //public static bool IsLastRenderableTransparent = false;
-
+            // public static bool IsLastRenderableTransparent = false;
             private void ResolveAlphaIssues(float alpha)
             {
                 const float ReferenceAlpha = 128;
@@ -421,7 +416,7 @@ namespace Isles.Graphics
                 {
                     game.GraphicsDevice.RenderState.AlphaBlendEnable = false;
                     game.GraphicsDevice.RenderState.AlphaTestEnable = true;
-                    game.GraphicsDevice.RenderState.ReferenceAlpha = (int)(ReferenceAlpha);
+                    game.GraphicsDevice.RenderState.ReferenceAlpha = (int)ReferenceAlpha;
                 }
             }
         }
@@ -430,10 +425,10 @@ namespace Isles.Graphics
         {
             private readonly Effect effect = ModelManager.ModelEffect;
 
-            //EffectParameter ambient;
-            //EffectParameter emissive;
-            //EffectParameter specular;
-            //EffectParameter specularPower;
+            // EffectParameter ambient;
+            // EffectParameter emissive;
+            // EffectParameter specular;
+            // EffectParameter specularPower;
             private readonly EffectParameter basicTexture;
             private readonly EffectParameter normalTexture;
             private readonly Material material;
@@ -446,10 +441,10 @@ namespace Isles.Graphics
                 this.material = material;
 
                 // We'll be adjusting these colors in our .fx file
-                //ambient = effect.Parameters["Ambient"];
-                //emissive = effect.Parameters["Emissive"];
-                //specular = effect.Parameters["Specular"];
-                //specularPower = effect.Parameters["SpecularPower"];
+                // ambient = effect.Parameters["Ambient"];
+                // emissive = effect.Parameters["Emissive"];
+                // specular = effect.Parameters["Specular"];
+                // specularPower = effect.Parameters["SpecularPower"];
                 basicTexture = effect.Parameters["BasicTexture"];
                 normalTexture = effect.Parameters["NormalTexture"];
             }
@@ -461,15 +456,14 @@ namespace Isles.Graphics
                     return;
                 }
 
-                //if (ambient != null)
+                // if (ambient != null)
                 //    ambient.SetValue(material.AmbientColor);
-                //if (emissive != null)
+                // if (emissive != null)
                 //    emissive.SetValue(material.EmissiveColor);
-                //if (specular != null)
+                // if (specular != null)
                 //    specular.SetValue(material.SpecularColor);
-                //if (specularPower != null)
+                // if (specularPower != null)
                 //    specularPower.SetValue(material.SpecularPower);
-
                 if (basicTexture != null)
                 {
                     basicTexture.SetValue(material.Texture);
@@ -572,17 +566,17 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Our base game
+        /// Our base game.
         /// </summary>
         private readonly BaseGame game = BaseGame.Singleton;
 
         /// <summary>
-        /// Effect used to draw everything
+        /// Effect used to draw everything.
         /// </summary>
         private static Effect effect;
 
         /// <summary>
-        /// Effect parameters
+        /// Effect parameters.
         /// </summary>
         private EffectParameter view;
         private EffectParameter projection;
@@ -592,7 +586,7 @@ namespace Isles.Graphics
         public Matrix ViewProjectionMatrix;
 
         /// <summary>
-        /// Gets the model effect used by the model manager
+        /// Gets the model effect used by the model manager.
         /// </summary>
         public static Effect ModelEffect => effect;
 
@@ -603,7 +597,7 @@ namespace Isles.Graphics
         private readonly List<RenderablePerTechnique> transparent = new();
 
         /// <summary>
-        /// Creates a new model manager
+        /// Creates a new model manager.
         /// </summary>
         public ModelManager()
         {
@@ -627,7 +621,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Gets the corrensponding renderable from a specific material and model mesh part
+        /// Gets the corrensponding renderable from a specific material and model mesh part.
         /// </summary>
         public Renderable GetRenderable(
             ModelMesh mesh, ModelMeshPart part, Material material)
@@ -685,7 +679,7 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Draw all the models registered this frame onto the screen
+        /// Draw all the models registered this frame onto the screen.
         /// </summary>
         public void Present(GameTime gameTime, Matrix v, Matrix p,
                             ShadowEffect shadow, bool showOpaque, bool showTransparent)
@@ -753,5 +747,4 @@ namespace Isles.Graphics
             game.GraphicsDevice.RenderState.AlphaBlendEnable = false;
         }
     }
-
 }

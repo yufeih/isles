@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Forms;
-using Microsoft.Xna.Framework;
 using Isles.Engine;
+using Microsoft.Xna.Framework;
 
 namespace Isles.Editor
 {
@@ -12,7 +12,9 @@ namespace Isles.Editor
             get => world;
             set => world = value;
         }
+
         private GameWorld world;
+
         public ParticleGenerator(GameWorld world)
         {
             InitializeComponent();
@@ -30,8 +32,7 @@ namespace Isles.Editor
                                     Player.LocalPlayer.TownhallName).First.Value as Building;
         }
 
-        //EffectFireball fireball;
-
+        // EffectFireball fireball;
         public class TestTarget : BaseEntity
         {
             private readonly IWorldObject center;
@@ -63,8 +64,7 @@ namespace Isles.Editor
 
             var fireball = new EffectPunishOfNature(world, townHall.Position);
 
-            //fireball.Projectile.Hit += new EventHandler(Projectile_Hit);
-
+            // fireball.Projectile.Hit += new EventHandler(Projectile_Hit);
             Edit(fireball);
 
             world.Add(target);
@@ -73,17 +73,17 @@ namespace Isles.Editor
 
         private void Projectile_Hit(object sender, EventArgs e)
         {
-            //world.Destroy(fireball);
+            // world.Destroy(fireball);
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            //ParticleEffectMissile missile = this.World.Create("Missile") as ParticleEffectMissile;
-            //Building townHall = GetTestTarget();
-            //missile.Position = townHall.Position - new Vector3(40, 20, -10);
-            //missile.Destination = townHall.Position + new Vector3(40,20,10);
-            //missile.Launch();
-            //this.world.Add(missile);
+            // ParticleEffectMissile missile = this.World.Create("Missile") as ParticleEffectMissile;
+            // Building townHall = GetTestTarget();
+            // missile.Position = townHall.Position - new Vector3(40, 20, -10);
+            // missile.Destination = townHall.Position + new Vector3(40,20,10);
+            // missile.Launch();
+            // this.world.Add(missile);
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -91,7 +91,7 @@ namespace Isles.Editor
             Building townHall = GetTestTarget();
             var fire = new EffectFire(world)
             {
-                Position = townHall.TopCenter
+                Position = townHall.TopCenter,
             };
 
             Edit(fire);
@@ -114,7 +114,6 @@ namespace Isles.Editor
 
         private void button6_Click(object sender, EventArgs e)
         {
-
         }
 
         private void button7_Click(object sender, EventArgs e)
@@ -132,43 +131,42 @@ namespace Isles.Editor
 
         private void button8_Click(object sender, EventArgs e)
         {
-            //Building townHall = GetTestTarget();
-            //Arrow arrow = this.world.Create("Arrow") as Arrow;
+            // Building townHall = GetTestTarget();
+            // Arrow arrow = this.world.Create("Arrow") as Arrow;
 
-            //arrow.Position = townHall.Position - new Vector3(40, 0, 10);
-            //arrow.Destination = townHall.Position + new Vector3(40, 0, 10);
+            // arrow.Position = townHall.Position - new Vector3(40, 0, 10);
+            // arrow.Destination = townHall.Position + new Vector3(40, 0, 10);
 
-            //arrow.Launch();
+            // arrow.Launch();
 
-            //this.world.Add(arrow);
+            // this.world.Add(arrow);
         }
 
         private void button9_Click(object sender, EventArgs e)
         {
-            //Building townHall = GetTestTarget();
-            //RainEffect rain = this.world.Create("Rain") as RainEffect;
+            // Building townHall = GetTestTarget();
+            // RainEffect rain = this.world.Create("Rain") as RainEffect;
 
-            //rain.Position = townHall.Position;
-            //rain.RainOutline = townHall.Outline * 2;
+            // rain.Position = townHall.Position;
+            // rain.RainOutline = townHall.Outline * 2;
 
-            //this.world.Add(rain);
+            // this.world.Add(rain);
         }
 
         private void button10_Click(object sender, EventArgs e)
         {
-            //Building townHall = GetTestTarget();
-            //Tree tree = StateHarvestLumber.FindAnotherTree(null, townHall.Position, world);
-            //EffectGlow fire = new EffectGlow(world, tree);
+            // Building townHall = GetTestTarget();
+            // Tree tree = StateHarvestLumber.FindAnotherTree(null, townHall.Position, world);
+            // EffectGlow fire = new EffectGlow(world, tree);
             //    //world, townHall);
-            //EffectStar star = new EffectStar(world, tree);
+            // EffectStar star = new EffectStar(world, tree);
 
-            //townHall.Model.Alpha = 0.5f;
+            // townHall.Model.Alpha = 0.5f;
 
-            //Edit(fire);
+            // Edit(fire);
 
-            //world.Add(fire);
-            //world.Add(star);   
-
+            // world.Add(fire);
+            // world.Add(star);   
             Building townHall = GetTestTarget();
             var explosion = new EffectExplosion(world, (townHall.TopCenter + townHall.Position) / 2);
 

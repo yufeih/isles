@@ -1,9 +1,9 @@
 using System;
 using System.IO;
-using System.Xml.Serialization;
 using System.Windows.Forms;
-using Microsoft.Xna.Framework.Graphics;
+using System.Xml.Serialization;
 using Isles.Graphics;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Editor
 {
@@ -40,15 +40,15 @@ namespace Isles.Editor
             trackBarDurationRandomness.Value = (int)(particle.Settings.DurationRandomness * 50);
             trackBarEndVelocity.Value = (int)(particle.Settings.EndVelocity * 20);
             trackBarGravity.Value = (int)(-particle.Settings.Gravity.Z * 10);
-            trackBarMaxEndSize.Value = (int)(particle.Settings.MaxEndSize);
+            trackBarMaxEndSize.Value = (int)particle.Settings.MaxEndSize;
             trackBarMaxHVelocity.Value = (int)(particle.Settings.MaxHorizontalVelocity * 5);
             trackBarMaxRotationSpeed.Value = (int)(particle.Settings.MaxRotateSpeed * 100);
-            trackBarMaxStartSize.Value = (int)(particle.Settings.MaxStartSize);
+            trackBarMaxStartSize.Value = (int)particle.Settings.MaxStartSize;
             trackBarMaxVVelocity.Value = (int)(particle.Settings.MaxVerticalVelocity * 5);
-            trackBarMinEndSize.Value = (int)(particle.Settings.MinEndSize);
+            trackBarMinEndSize.Value = (int)particle.Settings.MinEndSize;
             trackBarMinHVelocity.Value = (int)(particle.Settings.MinHorizontalVelocity * 5);
             trackBarMinRotationSpeed.Value = (int)(particle.Settings.MinRotateSpeed * 100);
-            trackBarMinStartSize.Value = (int)(particle.Settings.MinStartSize);
+            trackBarMinStartSize.Value = (int)particle.Settings.MinStartSize;
             trackBarMinVVelocity.Value = (int)(particle.Settings.MinVerticalVelocity * 5);
             trackBarSensitivity.Value = (int)(particle.Settings.EmitterVelocitySensitivity * 20);
         }
@@ -151,14 +151,14 @@ namespace Isles.Editor
 
         private void cmbParticle_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //this.InitializeParticleSettings(this.particles[int.Parse(this.cmbParticle.SelectedValue.ToString())]);
-            //this.particleEffect.Particle = this.particles[int.Parse(this.cmbParticle.SelectedValue.ToString())];
+            // this.InitializeParticleSettings(this.particles[int.Parse(this.cmbParticle.SelectedValue.ToString())]);
+            // this.particleEffect.Particle = this.particles[int.Parse(this.cmbParticle.SelectedValue.ToString())];
         }
 
         private void cmbEmitter_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //this.InitializeEmitterSettings(this.emitters[int.Parse(this.cmbEmitter.SelectedValue.ToString())]);
-            //this.SelectedEmitter = this.emitters[int.Parse(this.cmbEmitter.SelectedValue.ToString())];
+            // this.InitializeEmitterSettings(this.emitters[int.Parse(this.cmbEmitter.SelectedValue.ToString())]);
+            // this.SelectedEmitter = this.emitters[int.Parse(this.cmbEmitter.SelectedValue.ToString())];
         }
 
         private void buttonSave_Click(object sender, EventArgs e)

@@ -1,43 +1,47 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Graphics;
 using Isles.Engine;
 using Isles.UI;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+
 namespace Isles
 {
-
     public enum MessageType
     {
-        None, Warning, Hint, Unavailable
+        None,
+        Warning,
+        Hint,
+        Unavailable,
     }
 
     public enum MessageStyle
     {
-        None, BubbleUp, FlyAway,
+        None,
+        BubbleUp,
+        FlyAway,
     }
 
     public enum ProgressStyle
     {
-        Untextured, Textured
+        Untextured,
+        Textured,
     }
 
     public interface ISelectable : IEventListener
     {
         bool Highlighted { get; set; }
+
         bool Selected { get; set; }
     }
 
     /// <summary>
-    /// This is the in-game UI
+    /// This is the in-game UI.
     /// </summary>
     /// <remarks>
     /// Guess we are about to implement a configurable game UI,
@@ -46,7 +50,6 @@ namespace Isles
     /// </remarks>
     public class GameUI : IEventListener
     {
-
         public const int ButtonWidth = 80;
         public const int ButtonHeight = 40;
         public const int ScrollButtonWidth = 40;
@@ -66,39 +69,41 @@ namespace Isles
 
         public static GameUI Singleton { get; private set; }
 
-        private UI.Panel snapShot, profilePanel;
+        private UI.Panel snapShot;
+        private UI.Panel profilePanel;
 
         /// <summary>
-        /// Gets the control panel in the game
+        /// Gets the control panel in the game.
         /// </summary>
         public UI.Panel ControlPanel { get; private set; }
 
         /// <summary>
-        /// Gets the resource panel
+        /// Gets the resource panel.
         /// </summary>
         public UI.Panel ResourcePanel { get; private set; }
 
         /// <summary>
-        /// Gets the tip box container
+        /// Gets the tip box container.
         /// </summary>
         public UI.Panel TipBoxContainer { get; private set; }
 
         public MiniMap Minimap { get; private set; }
 
-        private Texture2D dialogTexture, panelsTexture;
+        private Texture2D dialogTexture;
+        private Texture2D panelsTexture;
 
         /// <summary>
-        /// Screen border fadeout texture
+        /// Screen border fadeout texture.
         /// </summary>
         private Texture2D borderFadeout;
 
         /// <summary>
-        /// Distortion pic
+        /// Distortion pic.
         /// </summary>
         private Texture2D distortion;
 
         /// <summary>
-        /// For the disappearing effect
+        /// For the disappearing effect.
         /// </summary>
         private readonly Texture2D LoadingDisplayFinished;
         private TextField snapShotName;
@@ -106,7 +111,9 @@ namespace Isles
         private Vector3 focusPosition;
         private Color focusColor = Color.Green;
         private double focusElapsedTime;
-        private TextField lumberTextField, goldTextField, foodTextField;
+        private TextField lumberTextField;
+        private TextField goldTextField;
+        private TextField foodTextField;
         private readonly float[] StatisticsTextX = { 4.6f / 24.25f, 11.6f / 24.25f, 18.3f / 24.25f };
         private readonly Rectangle StatisticsDestination = new(400, 2, 400, 36);
         private readonly Rectangle StatisticsSource = new(0, 0, 690, 64);
@@ -137,6 +144,7 @@ namespace Isles
             new Rectangle(664, 528, 64, 32), new Rectangle(732, 528, 64, 32),
             new Rectangle(664, 564, 64, 32), new Rectangle(732, 564, 64, 32),
         };
+
         private readonly Color TextColor = Color.White;
         private readonly Color TextColorDark = Color.Black;
         private const double DisappearingTime = 3;
@@ -144,7 +152,7 @@ namespace Isles
         private Effect disappearEffect;
 
         /// <summary>
-        /// Creates a new game user interface
+        /// Creates a new game user interface.
         /// </summary>
         public GameUI(BaseGame game, Texture2D loadingFinished, GameWorld world)
         {
@@ -176,18 +184,18 @@ namespace Isles
             }
 
             Rectangle relativeRect = UIElement.GetRelativeRectangle(new Rectangle
-                                            ((int)(StartLineForMessage.X), (int)(StartLineForMessage.Y), 0, 0),
+                                            ((int)StartLineForMessage.X, (int)StartLineForMessage.Y, 0, 0),
                                             Display, ScaleMode.ScaleX, Anchor.TopLeft);
             TipBoxContainer = new UI.Panel(Display.Area)
             {
                 ScaleMode = ScaleMode.Stretch,
-                EffectiveRegion = Rectangle.Empty
+                EffectiveRegion = Rectangle.Empty,
             };
 
             profilePanel = new UI.Panel(Display.Area)
             {
                 ScaleMode = ScaleMode.Stretch,
-                EffectiveRegion = Rectangle.Empty
+                EffectiveRegion = Rectangle.Empty,
             };
 
             RelativeMessageStartLine.X = relativeRect.X;
@@ -200,19 +208,19 @@ namespace Isles
                 Anchor = Anchor.BottomLeft,
                 SourceRectangle = ControlPanelSourceRectangle,
                 Texture = panelsTexture,
-                EffectiveRegion = ControlPanelEffectiveRegion
+                EffectiveRegion = ControlPanelEffectiveRegion,
             };
 
             snapShot = new UI.Panel(SnapshotDestinationRectangle)
             {
                 Anchor = Anchor.BottomLeft,
-                EffectiveRegion = Rectangle.Empty
+                EffectiveRegion = Rectangle.Empty,
             };
 
             snapShotName = new TextField("Name", 17f / 23, Color.Gold, SnapShotNameDestination, Color.Black)
             {
-                Centered = true
-            };//NameDestination);
+                Centered = true,
+            };// NameDestination);
 
             snapShot.Add(snapShotName);
 
@@ -222,7 +230,7 @@ namespace Isles
             {
                 Anchor = Anchor.TopRight,
                 SourceRectangle = ResourcePanelSourceRectangle,
-                Texture = panelsTexture
+                Texture = panelsTexture,
             };
 
             Color color = Color.White;
@@ -247,7 +255,7 @@ namespace Isles
                 GoldMineSourceRectangle = GoldMineSourceRectangle,
                 Area = MapDestinationRectangle,
                 ScaleMode = ScaleMode.ScaleY,
-                Anchor = Anchor.BottomRight
+                Anchor = Anchor.BottomRight,
             };
 
             Display.Add(profilePanel);
@@ -269,7 +277,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Adds a new spell to the scroll panel
+        /// Adds a new spell to the scroll panel.
         /// </summary>
         public void SetUIElement(int x, bool specialItem, IUIElement element)
         {
@@ -289,6 +297,7 @@ namespace Isles
                 y = x / 5 + 1;
                 x %= 5;
             }
+
             if (elements[y, x] != null)
             {
                 ControlPanel.Remove(elements[y, x]);
@@ -297,7 +306,6 @@ namespace Isles
             // Remove old one
             if (element != null)
             {
-
                 var area = new Rectangle(SpellButtonBaseX + x * (SpellButtonWidth + SpellButtonWidthSpace),
                                                 SpellButtonBaseY + y * SpellButtonFullHeight,
                                                 SpellButtonWidth, SpellButtonShorterHeight);
@@ -310,6 +318,7 @@ namespace Isles
                 {
                     area.Y--;
                 }
+
                 // Adjust element position
                 element.Area = area;
 
@@ -328,7 +337,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Remove a UI element
+        /// Remove a UI element.
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
@@ -343,7 +352,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Clear all ui elements
+        /// Clear all ui elements.
         /// </summary>
         public void ClearUIElement()
         {
@@ -354,12 +363,12 @@ namespace Isles
                     ControlPanel.Remove(e);
                 }
             }
-            TipBoxContainer.Clear();
 
+            TipBoxContainer.Clear();
         }
 
         /// <summary>
-        /// Present Messages in the message queue
+        /// Present Messages in the message queue.
         /// </summary>
         /// <param name="gameTime"></param>
         private void PresentSideBarMessages(GameTime gameTime)
@@ -369,6 +378,7 @@ namespace Isles
             {
                 messageQueue.Dequeue();
             }
+
             var count = messageQueue.Count;
             double remainingTime;
             Vector2 actualBaseLine = RelativeMessageStartLine;
@@ -388,7 +398,6 @@ namespace Isles
                     var transparentShadowColor = new Color(0, 0, 0,
                         (byte)(message.Color.A * ((gameTime.TotalGameTime.TotalSeconds - lastPushTime) / MessageEmergingPeriodLength)));
                     game.Graphics2D.DrawShadowedString(message.Message, MessageFontSize, RelativeMessageStartLine, transparentColor, transparentShadowColor);
-
                 }
                 else if (gameTime.TotalGameTime.TotalSeconds < message.PushTime + MessageEmergingPeriodLength + MessagePresentingPeriodLength)
                 {
@@ -403,13 +412,14 @@ namespace Isles
                         (byte)(message.Color.A * (1 + remainingTime / MessageDisappearingPeriodLength)));
                     game.Graphics2D.DrawShadowedString(message.Message, MessageFontSize, RelativeMessageStartLine, transparentColor, transparentShadowColor);
                 }
+
                 return;
             }
 
             foreach (GameMessage message in messageQueue)
             {
                 // Length of time PeriodLength remain for this message to be presented
-                remainingTime = (message.PushTime + MessagePresentingPeriodLength) - gameTime.TotalGameTime.TotalSeconds;
+                remainingTime = message.PushTime + MessagePresentingPeriodLength - gameTime.TotalGameTime.TotalSeconds;
 
                 // Last line
                 if (count == 1)
@@ -427,9 +437,11 @@ namespace Isles
                                 (byte)(message.Color.A * ((gameTime.TotalGameTime.TotalSeconds - pushFinishedTime) / MessageEmergingPeriodLength)));
                             game.Graphics2D.DrawShadowedString(message.Message, MessageFontSize, RelativeMessageStartLine + RelativeMessageStep * (count - 1), transparentColor, transparentShadowColor);
                         }
+
                         return;
                     }
                 }
+
                 if (remainingTime < 0)
                 {
                     if (-remainingTime < MessageDisappearingPeriodLength)
@@ -445,6 +457,7 @@ namespace Isles
                 {
                     game.Graphics2D.DrawShadowedString(message.Message, MessageFontSize, actualBaseLine + RelativeMessageStep * (count - 1), message.Color, Color.Black);
                 }
+
                 count--;
             }
         }
@@ -490,7 +503,7 @@ namespace Isles
         private double lastPushTime;
 
         /// <summary>
-        ///  Represent a message in the game
+        ///  Represent a message in the game.
         /// </summary>
         private struct GameMessage
         {
@@ -499,6 +512,7 @@ namespace Isles
             public Color Color;
             public double PushTime;
             public Vector3 Position;
+
             public GameMessage(string message, MessageType type, Color color, double pushTime)
             {
                 Message = message;
@@ -519,7 +533,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Present messages that may appear anywhere
+        /// Present messages that may appear anywhere.
         /// </summary>
         /// <param name="gameTime"></param>
         private void PresentWhereverMessages(GameTime gameTime)
@@ -541,7 +555,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Present Bubble-up Message
+        /// Present Bubble-up Message.
         /// </summary>
         /// <param name="gameTime"></param>
         private void PresentBubbleUpMessage(GameTime gameTime)
@@ -551,11 +565,13 @@ namespace Isles
             {
                 BubbleUpMessageQueue.Dequeue();
             }
+
             double passedTime;
             Vector2 position;
             foreach (GameMessage message in BubbleUpMessageQueue)
             {
                 passedTime = gameTime.TotalGameTime.TotalSeconds - message.PushTime;
+
                 // Bubbling up and disappearing
                 if (passedTime > BubbleUpSustainingPeriodLength)
                 {
@@ -568,6 +584,7 @@ namespace Isles
                                     (byte)(255 * (1 - passedTime / BubbleUpPeriodLength)));
                     game.Graphics2D.DrawShadowedString(message.Message, BubbleUpMessageFontSize, position, textColor, shadowColor);
                 }
+
                 // Bubbling up and remaining stable
                 else
                 {
@@ -579,7 +596,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Present Flay-away message
+        /// Present Flay-away message.
         /// </summary>
         /// <param name="gameTime"></param>
         private void PresentFlyAwayMessage(GameTime gameTime)
@@ -592,7 +609,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Present None-style Message
+        /// Present None-style Message.
         /// </summary>
         /// <param name="gameTime"></param>
         private void PresentNoneStyleMessage(GameTime gameTime)
@@ -609,7 +626,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Present all kinds of messages
+        /// Present all kinds of messages.
         /// </summary>
         /// <param name="gameTime"></param>
         private void PresentMessages(GameTime gameTime)
@@ -623,13 +640,12 @@ namespace Isles
         }
 
         /// <summary>
-        /// Shows a message at specific position
+        /// Shows a message at specific position.
         /// </summary>
         public void ShowMessage(string message, Vector3 position, MessageType type,
                                                                   MessageStyle style,
                                                                   Color color)
         {
-
             switch (style)
             {
                 case MessageStyle.BubbleUp:
@@ -648,7 +664,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Push a message into the side-bar message queue
+        /// Push a message into the side-bar message queue.
         /// </summary>
         public void PushMessage(string message, MessageType type, Color color)
         {
@@ -668,11 +684,11 @@ namespace Isles
         private readonly Point progressFullSize = new(80, 5);
 
         /// <summary>
-        /// Draw a progress bar for either style
+        /// Draw a progress bar for either style.
         /// </summary>
         /// <param name="style"></param>
-        /// <param name="percentage">A float point number show the percentage between 0 and 100</param>
-        /// <param name="color">The color of the rectangle</param>
+        /// <param name="percentage">A float point number show the percentage between 0 and 100.</param>
+        /// <param name="color">The color of the rectangle.</param>
         public void DrawProgress(Vector3 position, int yOffset, int length, float percentage, Color color)
         {
             Point position2D = game.Project(position);
@@ -738,16 +754,8 @@ namespace Isles
                 {
                     snapShot.Texture = null;
                 }
-
-                //if (player.CurrentGroup != null &&
-                //    player.CurrentGroup.Count > 0)
-                //{
-                //    name.Text = player.CurrentGroup[0].Name;
-
-                //    if (player.CurrentGroup[0].Owner != null)
-                //        playerName.Text = player.CurrentGroup[0].Owner.Name;
-                //}
             }
+
             Display.Update(gameTime);
 
             Player currentPlayer = Player.LocalPlayer;
@@ -773,8 +781,8 @@ namespace Isles
             foodTextField.Color = color;
         }
 
-        //private void ResetProfileButtonArea()
-        //{
+        // private void ResetProfileButtonArea()
+        // {
         //    int currentProfileIndex = Player.LocalPlayer.CurrentGroupIndex;
         //    Rectangle rect = new Rectangle(ProfileBaseX, 550, ProfileWidth, ProfileWidth);
         //    for (int i = 0; i < profileButtons.Count; i++)
@@ -789,12 +797,11 @@ namespace Isles
         //        {
         //            profileButtons[i].Area = rect;
 
-        //        }
+        // }
         //        rect.X += ProfileWidth + ProfileSpace;
         //        profileButtons[i].ResetDestinationRectangle();
         //    }
-        //}
-
+        // }
         public void Draw(GameTime gameTime)
         {
             PresentMessages(gameTime);
@@ -846,13 +853,6 @@ namespace Isles
                 EnvironmentIndicatorSource, GameObject.ColorFromPercentage(1 - player.EnvironmentLevel));
 
             DrawCursorFocus(gameTime, Display.Sprite);
-
-            //if (world.FogOfWar != null)
-            //{
-            //    ui.Sprite.Draw(world.FogOfWar.Current, new Rectangle(0, 100, 128, 128), Color.White);
-            //    ui.Sprite.Draw(world.FogOfWar.Discovered, new Rectangle(0, 230, 128, 128), Color.White);
-            //    ui.Sprite.Draw(world.FogOfWar.Mask, new Rectangle(0, 360, 128, 128), Color.White);
-            //}
 
             Display.Sprite.End();
 
@@ -944,7 +944,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Set the profile button when character is selected
+        /// Set the profile button when character is selected.
         /// </summary>
         /// <param name="element"></param>
         public void SetProfile(SpellButton[] buttons)
@@ -954,7 +954,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Add profile buttons
+        /// Add profile buttons.
         /// </summary>
         /// <param name="buttons"></param>
         public void AddProfile(SpellButton[] buttons)
@@ -966,7 +966,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Add one profile button
+        /// Add one profile button.
         /// </summary>
         /// <param name="button"></param>
         public void AddProfile(SpellButton button, bool enlarge)
@@ -977,15 +977,15 @@ namespace Isles
             button.ScaleMode = ScaleMode.ScaleY;
             profilePanel.Add(button);
             profileButtons.Add(button);
-            profileNextX += (ProfileSpace + size);
-            button.Click += delegate (object o, EventArgs e)
+            profileNextX += ProfileSpace + size;
+            button.Click += (o, e) =>
             {
                 Player.LocalPlayer.SelectionDirty = true;
             };
         }
 
         /// <summary>
-        /// Remove profile buttons
+        /// Remove profile buttons.
         /// </summary>
         /// <param name="buttons"></param>
         public void RemoveProfile(SpellButton[] buttons)
@@ -998,7 +998,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Clear profile buttons
+        /// Clear profile buttons.
         /// </summary>
         public void ClearProfile()
         {
@@ -1006,6 +1006,7 @@ namespace Isles
             {
                 profilePanel.Remove(button);
             }
+
             profileButtons.Clear();
             profileNextX = ProfileBaseX;
         }
@@ -1019,6 +1020,7 @@ namespace Isles
             {
                 startTime = gameTime.TotalGameTime.TotalSeconds;
             }
+
             if (gameTime.TotalGameTime.TotalSeconds > startTime + DisappearingTime)
             {
                 return;
@@ -1039,7 +1041,6 @@ namespace Isles
 
             // Set an effect parameter to make our overlay
             // texture scroll in a giant circle.
-
             disappearEffect.Parameters["OverlayScroll"].SetValue(MoveInCircle(gameTime, 1));
 
             disappearEffect.Parameters["Offset"].SetValue(MoveInCircle(gameTime, 0.2) + randomOffset);
@@ -1055,7 +1056,7 @@ namespace Isles
             var fade = (byte)Pulsate(gameTime);
             spriteBatch.Draw(LoadingDisplayFinished, Display.DestinationRectangle,
                                 new Rectangle(0, 0, LoadingDisplayFinished.Width, LoadingDisplayFinished.Height),
-                             //MoveInCircle(gameTime, LoadingDisplayFinished, 1),
+                             // MoveInCircle(gameTime, LoadingDisplayFinished, 1),
                              new Color(255, 255, 255, (byte)(255 - fade)));
 
             // End the sprite batch, then end our custom effect.
@@ -1066,7 +1067,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Gets whether the UI overlaps the specified point on the screen
+        /// Gets whether the UI overlaps the specified point on the screen.
         /// </summary>
         public bool Overlaps(Point p)
         {
@@ -1075,13 +1076,11 @@ namespace Isles
 
         public EventResult HandleEvent(EventType type, object sender, object tag)
         {
-
             return Display != null &&
                 Display.HandleEvent(type, sender, tag) == EventResult.Handled
                 ? EventResult.Handled
                 : EventResult.Unhandled;
         }
-
     }
 
     public static class Cursors
@@ -1100,6 +1099,7 @@ namespace Isles
                 return menuDefaultCursor;
             }
         }
+
         public static Cursor MenuHighlight
         {
             get
@@ -1112,6 +1112,7 @@ namespace Isles
                 return menuHighlightCursor;
             }
         }
+
         public static Cursor Default
         {
             get
@@ -1297,5 +1298,4 @@ namespace Isles
         private static Cursor move;
         private static Cursor rotate;
     }
-
 }

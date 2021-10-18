@@ -1,8 +1,5 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -13,12 +10,16 @@ namespace Isles.Engine
 {
     public class Input
     {
-
         /// <summary>
         /// Mouse state, set every frame in the Update method.
         /// </summary>
         private MouseState mouseState =
-            Microsoft.Xna.Framework.Input.Mouse.GetState(), mouseStateLastFrame;
+            Microsoft.Xna.Framework.Input.Mouse.GetState();
+
+        /// <summary>
+        /// Mouse state, set every frame in the Update method.
+        /// </summary>
+        private MouseState mouseStateLastFrame;
 
         /// <summary>
         /// Keyboard state, set every frame in the Update method.
@@ -40,26 +41,26 @@ namespace Isles.Engine
         private int mouseWheelValue;
 
         /// <summary>
-        /// Mouse position
+        /// Mouse position.
         /// </summary>
         public Point MousePosition => new(mouseState.X, mouseState.Y);
 
         /// <summary>
-        /// Gets current mouse state
+        /// Gets current mouse state.
         /// </summary>
         public MouseState Mouse => mouseState;
 
         /// <summary>
-        /// Mouse wheel delta
+        /// Mouse wheel delta.
         /// </summary>
-        /// <returns>Int</returns>
+        /// <returns>Int.</returns>
         public int MouseWheelDelta { get; private set; }
 
         /// <summary>
-        /// Mouse in box
+        /// Mouse in box.
         /// </summary>
-        /// <param name="rect">Rectangle</param>
-        /// <returns>Bool</returns>
+        /// <param name="rect">Rectangle.</param>
+        /// <returns>Bool.</returns>
         public bool MouseInBox(Rectangle rect)
         {
             return mouseState.X >= rect.X &&
@@ -69,23 +70,23 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Keyboard
+        /// Keyboard.
         /// </summary>
-        /// <returns>Keyboard state</returns>
+        /// <returns>Keyboard state.</returns>
         public KeyboardState Keyboard => keyboardState;
 
         /// <summary>
-        /// Gets whether left ALT or right ALT key is pressed
+        /// Gets whether left ALT or right ALT key is pressed.
         /// </summary>
         public bool IsAltPressed => keyboardState.IsKeyDown(Keys.LeftAlt) || keyboardState.IsKeyDown(Keys.RightAlt);
 
         /// <summary>
-        /// Gets whether left shift or right shift key is pressed
+        /// Gets whether left shift or right shift key is pressed.
         /// </summary>
         public bool IsShiftPressed => keyboardState.IsKeyDown(Keys.LeftShift) || keyboardState.IsKeyDown(Keys.RightShift);
 
         /// <summary>
-        /// Gets whether left ctrl or right ctrl key is pressed
+        /// Gets whether left ctrl or right ctrl key is pressed.
         /// </summary>
         public bool IsCtrlPressed => keyboardState.IsKeyDown(Keys.LeftControl) || keyboardState.IsKeyDown(Keys.RightControl);
 
@@ -121,8 +122,8 @@ namespace Isles.Engine
         /// will return the same for A-Z and 0-9, but the special keys
         /// might be different.
         /// </summary>
-        /// <param name="key">Key</param>
-        /// <returns>Char</returns>
+        /// <param name="key">Key.</param>
+        /// <returns>Char.</returns>
         public static char KeyToChar(Keys key, bool shiftPressed)
         {
             // If key will not be found, just return space
@@ -230,7 +231,7 @@ namespace Isles.Engine
         /// Handle keyboard input helper method to catch keyboard input
         /// for an input text. Only used to enter the player name in the game.
         /// </summary>
-        /// <param name="inputText">Input text</param>
+        /// <param name="inputText">Input text.</param>
         public void HandleKeyboardInput(ref string inputText)
         {
             // Is a shift key pressed (we have to check both, left and right)
@@ -278,11 +279,11 @@ namespace Isles.Engine
         private readonly LinkedList<Entry> handlers = new();
 
         /// <summary>
-        /// Registers a new input event handler
+        /// Registers a new input event handler.
         /// </summary>
         /// <param name="handler"></param>
         /// <param name="order">
-        /// Handlers with lower order will be notified first
+        /// Handlers with lower order will be notified first.
         /// </param>
         public void Register(IEventListener handler, float order)
         {
@@ -323,7 +324,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Removes an input event handler
+        /// Removes an input event handler.
         /// </summary>
         /// <param name="handler"></param>
         public void Unregister(IEventListener handler)
@@ -348,7 +349,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Clear all handler registries
+        /// Clear all handler registries.
         /// </summary>
         public void Clear()
         {
@@ -372,7 +373,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Release the capture of input events
+        /// Release the capture of input events.
         /// </summary>
         public void Uncapture()
         {
@@ -380,12 +381,12 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Time interval for double click, measured in seconds
+        /// Time interval for double click, measured in seconds.
         /// </summary>
         public const float DoubleClickInterval = 0.25f;
 
         /// <summary>
-        /// Flag for simulating double click
+        /// Flag for simulating double click.
         /// </summary>
         private int doubleClickFlag;
         private double doubleClickTime;
@@ -517,6 +518,5 @@ namespace Isles.Engine
                 }
             }
         }
-
     }
 }

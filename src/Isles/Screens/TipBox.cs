@@ -1,18 +1,14 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Graphics;
 using Isles.Engine;
 using Isles.UI;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Isles
 {
-
     public class TipBox : Panel
     {
         private static readonly Texture2D white = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/Panels");
@@ -35,18 +31,17 @@ namespace Isles
         public bool TrackCursor { get; }
 
         /// <summary>
-        /// Construct a fixed-location tipbox
+        /// Construct a fixed-location tipbox.
         /// </summary>
         public TipBox(Rectangle area)
             : base(area)
         {
             TrackCursor = false;
             ScaleMode = ScaleMode.Fixed;
-
         }
 
         /// <summary>
-        /// Construct a tipbox that follows the cursor
+        /// Construct a tipbox that follows the cursor.
         /// </summary>
         /// <param name="trackCursor"></param>
         /// <param name="text"></param>
@@ -61,7 +56,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Draw a dialog
+        /// Draw a dialog.
         /// </summary>
         public void DrawDialog(Rectangle rectangle, SpriteBatch sprite)
         {
@@ -72,6 +67,7 @@ namespace Isles
             {
                 width = rectangle.Width / 2;
             }
+
             if (rectangle.Height < 2 * height)
             {
                 height = rectangle.Height / 2;
@@ -122,6 +118,7 @@ namespace Isles
                 sprite.Draw(white, new Rectangle(0, 0, BaseGame.Singleton.ScreenWidth, BaseGame.Singleton.ScreenHeight),
                              whiteTextureSource, new Color(0, 0, 0, 180));
             }
+
             DrawDialog(DestinationRectangle, sprite);
             base.Draw(gameTime, sprite);
         }
@@ -150,11 +147,11 @@ namespace Isles
             {
                 Y = Mouse.GetState().Y;
             }
+
             if (Mouse.GetState().X + 15 + DestinationRectangle.Width > BaseGame.Singleton.ScreenWidth)
             {
                 X = Mouse.GetState().X - DestinationRectangle.Width;
             }
         }
     }
-
 }

@@ -1,13 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <LangVersion>Latest</LangVersion>
-    <TargetFramework>net472</TargetFramework>
-    <Platforms>x86</Platforms>
-    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <EnableNETAnalyzers>true</EnableNETAnalyzers>
-  </PropertyGroup>
-
   <ItemGroup>
     <Reference Include="Microsoft.Xna.Framework">
       <HintPath>..\..\xna-3.0-win-x86\Microsoft.Xna.Framework.dll</HintPath>

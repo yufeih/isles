@@ -17,7 +17,6 @@ namespace Isles.Editor
 
         private void IntensityEditor_Load(object sender, EventArgs e)
         {
-
         }
 
         private void TrackBar_Scroll(object sender, EventArgs e)

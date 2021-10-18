@@ -1,33 +1,28 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
 using System.Xml;
-using Microsoft.Xna.Framework;
-using Isles.Pipeline;
-using Isles.Graphics;
 using Isles.Engine;
+using Isles.Graphics;
+using Isles.Pipeline;
+using Microsoft.Xna.Framework;
 
 namespace Isles
 {
-
     /// <summary>
-    /// Base class for all game charactors
+    /// Base class for all game charactors.
     /// </summary>
     public class Charactor : GameObject, IMovable
     {
-
         public EffectGlow Glow;
         public bool ShowGlow;
         public bool IsHero;
         public int Food;
 
         /// <summary>
-        /// Gets or sets the speed of this charactor
+        /// Gets or sets the speed of this charactor.
         /// </summary>
         public virtual float Speed
         {
@@ -38,34 +33,34 @@ namespace Isles
         private float speed;
 
         /// <summary>
-        /// Used by the movement system
+        /// Used by the movement system.
         /// </summary>
         public object MovementTag { get; set; }
 
         /// <summary>
-        /// Gets or sets the radius of the charactor
+        /// Gets or sets the radius of the charactor.
         /// </summary>
         public float PathObstructorRadius { get; set; } = 5;
 
         /// <summary>
-        /// Gets or sets the facing of the charactor
+        /// Gets or sets the facing of the charactor.
         /// </summary>
         public Vector3 Facing
         {
             get => new((float)Math.Cos(rotation), (float)Math.Sin(rotation), 0);
-            set => targetRotation = (float)(Math.Atan2(value.Y, value.X));
+            set => targetRotation = (float)Math.Atan2(value.Y, value.X);
         }
 
         private float rotation;
         private float targetRotation;
 
         /// <summary>
-        /// Gets or sets the path brush of the charactor
+        /// Gets or sets the path brush of the charactor.
         /// </summary>
         public PathBrush Brush { get; set; }
 
         /// <summary>
-        /// Whether dynamic obstacles (E.g. units) are ignored when moving
+        /// Whether dynamic obstacles (E.g. units) are ignored when moving.
         /// </summary>
         public bool IgnoreDynamicObstacles
         {
@@ -92,22 +87,22 @@ namespace Isles
         private bool ignoreDynamicObstacles;
 
         /// <summary>
-        /// Gets or sets the combat spell for this charactor
+        /// Gets or sets the combat spell for this charactor.
         /// </summary>
         public SpellCombat Combat;
 
         /// <summary>
-        /// Gets or sets the default idle for this charactor
+        /// Gets or sets the default idle for this charactor.
         /// </summary>
         public IState Idle;
 
         /// <summary>
-        /// Stores those commands that are queued
+        /// Stores those commands that are queued.
         /// </summary>
         public Queue<IState> QueuedStates = new();
 
         /// <summary>
-        /// Animation names
+        /// Animation names.
         /// </summary>
         public virtual string IdleAnimation => "Idle";
 
@@ -150,7 +145,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Stop moving
+        /// Stop moving.
         /// </summary>
         public void Stop()
         {
@@ -290,7 +285,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Gets whether the target point is reached
+        /// Gets whether the target point is reached.
         /// </summary>
         public virtual bool TargetPointReached(Vector3 point)
         {
@@ -298,7 +293,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Gets whether target entity is reached
+        /// Gets whether target entity is reached.
         /// </summary>
         public virtual bool TargetReached(Entity entity)
         {
@@ -306,7 +301,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Make the charactor visible and active in the world. Should be called after Unspawn
+        /// Make the charactor visible and active in the world. Should be called after Unspawn.
         /// </summary>
         public void Spawn(Vector3 position)
         {
@@ -539,7 +534,6 @@ namespace Isles
                 AttackTarget.Health -= ComputeHit(this, AttackTarget);
             }
         }
-
     }
 
     public class Worker : Charactor
@@ -555,11 +549,10 @@ namespace Isles
 
         public override string RunAnimation => LumberCarried > 0 ? "Carry" : "Run";
 
-        //public override string AttackAnimation
-        //{
+        // public override string AttackAnimation
+        // {
         //    get { return Helper.Random.Next(2) == 0 ? "Attack" : "Chop"; }
-        //}
-
+        // }
         public override float Speed
         {
             get => LumberCarried > 0 || GoldCarried > 0 ? base.Speed * 0.75f : base.Speed;
@@ -646,11 +639,13 @@ namespace Isles
                 {
                     state = new StateHarvestLumber(World, this, entity as Tree);
                 }
+
                 // Harvest gold
                 else if (entity is Goldmine && (entity as Goldmine).Gold > 0)
                 {
                     state = new StateHarvestGold(World, this, entity as Goldmine);
                 }
+
                 // Action on buildings
                 else if (entity is Building)
                 {
@@ -867,7 +862,6 @@ namespace Isles
                 }
                 else
                 {
-
                     AnimationClip clip = Model.GetAnimationClip(AttackAnimation);
                     if (clip == null)
                     {
@@ -928,5 +922,4 @@ namespace Isles
 
         public override string AttackAnimation => Helper.Random.Next(2) == 0 ? "Attack" : "Attack_2";
     }
-
 }

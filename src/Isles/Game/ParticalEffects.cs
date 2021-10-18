@@ -6,9 +6,8 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles
 {
-
     /// <summary>
-    /// Base class for all particle system effect
+    /// Base class for all particle system effect.
     /// </summary>
     public abstract class ParticleEffect : BaseEntity
     {
@@ -16,9 +15,11 @@ namespace Isles
             : base(world) { }
 
         public abstract ParticleSystem Particle { get; }
+
         public abstract float Emission { get; set; }
 
         public override void Update(GameTime gameTime) { }
+
         public override void Draw(GameTime gameTime) { }
     }
 
@@ -27,12 +28,11 @@ namespace Isles
         Waiting = 0,
         Flying = 1,
         Fading = 2,
-        End = 3
+        End = 3,
     }
 
     public class Arrow : BaseEntity
     {
-
         private Vector3 destination;
 
         private Vector3 source;
@@ -52,7 +52,7 @@ namespace Isles
         private float fadingAge;
 
         /// <summary>
-        /// The target the arrow aims
+        /// The target the arrow aims.
         /// </summary>
         public Vector3 Destination
         {
@@ -61,7 +61,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// The source position of arrow
+        /// The source position of arrow.
         /// </summary>
         public Vector3 Source
         {
@@ -93,9 +93,8 @@ namespace Isles
             {
                 Length = 5,
                 Width = 2,
-                Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("Textures/ray2")
+                Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("Textures/ray2"),
             };
-
         }
 
         public void Launch()
@@ -122,11 +121,12 @@ namespace Isles
                 UpdatePosition(gameTime);
                 trail.Position = Position;
                 trail.Update(gameTime);
-                if ((Position - destination).Length() <= 4f || Vector3.Dot((Position - destination), ((destination - source))) > 0)
+                if ((Position - destination).Length() <= 4f || Vector3.Dot(Position - destination, destination - source) > 0)
                 {
                     state = ArrowState.Fading;
                 }
             }
+
             if (state == ArrowState.Fading)
             {
                 UpdatePosition(gameTime);
@@ -182,16 +182,15 @@ namespace Isles
         {
             GameServer.Singleton.Destroy(this);
         }
-
     }
 
     /// <summary>
-    /// Generate particles randomly within the specified area
+    /// Generate particles randomly within the specified area.
     /// </summary>
     public class AreaEmitter : ParticleEmitter
     {
         /// <summary>
-        /// Gets or sets the destination area
+        /// Gets or sets the destination area.
         /// </summary>
         public Outline Area;
 
@@ -199,7 +198,7 @@ namespace Isles
         public float MaximumHeight;
 
         /// <summary>
-        /// Creates a new area emitter
+        /// Creates a new area emitter.
         /// </summary>
         public AreaEmitter(ParticleSystem particleSystem, float particlesPerSecond,
                            Outline area, float minHeight, float maxHeight)
@@ -247,13 +246,13 @@ namespace Isles
     public class CircularEmitter : ParticleEmitter
     {
         /// <summary>
-        /// Gets or sets the destination area
+        /// Gets or sets the destination area.
         /// </summary>
         public Vector3 Position;
         public float Radius;
 
         /// <summary>
-        /// Creates a new area emitter
+        /// Creates a new area emitter.
         /// </summary>
         public CircularEmitter(ParticleSystem particleSystem, float particlesPerSecond)
             : base(particleSystem, particlesPerSecond, Vector3.Zero) { }
@@ -319,7 +318,7 @@ namespace Isles
         public float Mass = 0.4f;
 
         /// <summary>
-        /// Create a new projectile emitter
+        /// Create a new projectile emitter.
         /// </summary>
         public ProjectileEmitter(ParticleSystem particleSystem, float particlesPerSecond,
                                  Vector3 initialPosition, Vector3 initialVelocity, IWorldObject target)
@@ -495,7 +494,7 @@ namespace Isles
             fire = ParticleSystem.Create(fireballParticle);
             explosion = ParticleSystem.Create(explosionParticle);
             fireEmitter = new ProjectileEmitter(fire, 150, position, velocity, target);
-            fireEmitter.Hit += new EventHandler(delegate (object sender, EventArgs e)
+            fireEmitter.Hit += new EventHandler(delegate(object sender, EventArgs e)
             {
                 // Fill up the particle system
                 var n = (int)Helper.RandomInRange(20, 30);
@@ -571,8 +570,8 @@ namespace Isles
                 counter = 0;
             }
 
-            //fireEmitter.Update(gameTime, Position, Vector3.Zero, true);
-            //smokeEmitter.Update(gameTime, Position + Vector3.UnitZ * 4, Vector3.Zero);
+            // fireEmitter.Update(gameTime, Position, Vector3.Zero, true);
+            // smokeEmitter.Update(gameTime, Position + Vector3.UnitZ * 4, Vector3.Zero);
         }
     }
 
@@ -769,7 +768,7 @@ namespace Isles
 
         public override void Update(GameTime gameTime)
         {
-            angle += Speed * (float)(gameTime.ElapsedGameTime.TotalSeconds);
+            angle += Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             spawn.X = Position.X + (float)(Radius * Math.Cos(angle));
             spawn.Y = Position.Y + (float)(Radius * Math.Sin(angle));
@@ -814,7 +813,7 @@ namespace Isles
 
         public override void Update(GameTime gameTime)
         {
-            var elapsedSeconds = (float)(gameTime.ElapsedGameTime.TotalSeconds);
+            var elapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
             angle += Speed * elapsedSeconds;
             spawn.Z += 18.0f * elapsedSeconds;
 
@@ -834,5 +833,4 @@ namespace Isles
             }
         }
     }
-
 }

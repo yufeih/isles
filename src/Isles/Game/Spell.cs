@@ -1,23 +1,19 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Xml;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Graphics;
-using Isles.UI;
 using Isles.Engine;
 using Isles.Graphics;
+using Isles.UI;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Isles
 {
-
     /// <summary>
     /// A rectangle on a texture.
     /// Currently all icons are placed in the same texture for simplicity.
@@ -25,17 +21,17 @@ namespace Isles
     public struct Icon
     {
         /// <summary>
-        /// Gets or sets the rectangle region on the texture
+        /// Gets or sets the rectangle region on the texture.
         /// </summary>
         public Rectangle Region;
 
         /// <summary>
-        /// Gets or sets the icon texture
+        /// Gets or sets the icon texture.
         /// </summary>
         public Texture2D Texture;
 
         /// <summary>
-        /// For easy creation of icons
+        /// For easy creation of icons.
         /// </summary>
         public Icon(Texture2D texture)
         {
@@ -50,7 +46,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Static stuff
+        /// Static stuff.
         /// </summary>
         public static Texture2D DefaultTexture
         {
@@ -102,23 +98,22 @@ namespace Isles
 
     /// <summary>
     /// Base class for all game spells.
-    /// A new spell instance is created whenever a spell is been casted
+    /// A new spell instance is created whenever a spell is been casted.
     /// </summary>
     public abstract class Spell : IEventListener
     {
-
         /// <summary>
-        /// Delegation used to create a spell
+        /// Delegation used to create a spell.
         /// </summary>
         public delegate Spell Creator(GameWorld world);
 
         /// <summary>
-        /// Spell creators
+        /// Spell creators.
         /// </summary>
         private static readonly Dictionary<string, Creator> creators = new();
 
         /// <summary>
-        /// Register a new spell
+        /// Register a new spell.
         /// </summary>
         /// <param name="spellType"></param>
         /// <param name="creator"></param>
@@ -128,7 +123,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Register a new spell creator
+        /// Register a new spell creator.
         /// </summary>
         public static void RegisterCreator(string spellName, Creator creator)
         {
@@ -141,21 +136,20 @@ namespace Isles
         }
 
         /// <summary>
-        /// Create a new game spell
+        /// Create a new game spell.
         /// </summary>
         /// <param name="spellTypeName"></param>
         /// <param name="world"></param>
         /// <returns></returns>
         public static Spell Create(string spellTypeName, GameWorld world)
         {
-
             return !creators.TryGetValue(spellTypeName, out Creator creator)
                 ? throw new Exception("Failed to create spell, unknown spell type: " + spellTypeName)
                 : creator(world);
         }
 
         /// <summary>
-        /// Cast a spell
+        /// Cast a spell.
         /// </summary>
         public static void Cast(Spell spell)
         {
@@ -166,7 +160,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Stops casting the spell
+        /// Stops casting the spell.
         /// </summary>
         public static void EndSpell()
         {
@@ -174,7 +168,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Gets the active spell
+        /// Gets the active spell.
         /// </summary>
         public static Spell CurrentSpell => currentSpell;
 
@@ -263,12 +257,12 @@ namespace Isles
         }
 
         /// <summary>
-        /// Gets or sets the name of the spell
+        /// Gets or sets the name of the spell.
         /// </summary>
         public string Name;
 
         /// <summary>
-        /// Gets or sets the description of the spell
+        /// Gets or sets the description of the spell.
         /// </summary>
         public string Description;
 
@@ -278,17 +272,17 @@ namespace Isles
         public Icon Icon = Icon.FromTiledTexture(0);
 
         /// <summary>
-        /// Gets or sets the hot key for the spell
+        /// Gets or sets the hot key for the spell.
         /// </summary>
         public Keys Hotkey;
 
         /// <summary>
-        /// Gets whether the spell is ready for cast
+        /// Gets whether the spell is ready for cast.
         /// </summary>
         public virtual bool Ready => CoolDownElapsed >= CoolDown;
 
         /// <summary>
-        /// Gets the cool down time after the spell has been casted
+        /// Gets the cool down time after the spell has been casted.
         /// </summary>
         public virtual float CoolDown
         {
@@ -309,7 +303,7 @@ namespace Isles
         private float coolDown;
 
         /// <summary>
-        /// Gets how many seconds elapsed after the spell has been casted
+        /// Gets how many seconds elapsed after the spell has been casted.
         /// </summary>
         public virtual float CoolDownElapsed
         {
@@ -320,7 +314,7 @@ namespace Isles
         private float coolDownElapsed;
 
         /// <summary>
-        /// Gets or sets whether auto cast is enable for this spell
+        /// Gets or sets whether auto cast is enable for this spell.
         /// </summary>
         public virtual bool AutoCast
         {
@@ -331,7 +325,7 @@ namespace Isles
         private bool autoCast;
 
         /// <summary>
-        /// Gets the button for this spell
+        /// Gets the button for this spell.
         /// </summary>
         public virtual IUIElement Button
         {
@@ -352,7 +346,7 @@ namespace Isles
         private TipBox spellTip;
 
         /// <summary>
-        /// Creates an UIElement for the spell
+        /// Creates an UIElement for the spell.
         /// </summary>
         protected virtual SpellButton CreateUIElement(GameUI ui)
         {
@@ -369,10 +363,10 @@ namespace Isles
                 Pressed = Icon.RectangeFromIndex(baseIcon + 1),
                 Hovered = Icon.RectangeFromIndex(baseIcon + 2),
                 HotKey = Hotkey,
-                Tag = this
+                Tag = this,
             };
 
-            spellButton.Click += new EventHandler(delegate (object sender, EventArgs e)
+            spellButton.Click += new EventHandler(delegate(object sender, EventArgs e)
             {
                 if ((sender as Button).Tag is not Spell spell)
                 {
@@ -383,7 +377,7 @@ namespace Isles
                 Spell.Cast(spell);
             });
 
-            spellButton.Enter += new EventHandler(delegate (object sender, EventArgs e)
+            spellButton.Enter += new EventHandler(delegate(object sender, EventArgs e)
             {
                 GameDefault gameDefault = GameDefault.Singleton;
 
@@ -392,7 +386,7 @@ namespace Isles
                 GameUI.Singleton.TipBoxContainer.Add(spellTip);
             });
 
-            spellButton.Leave += new EventHandler(delegate (object sender, EventArgs e)
+            spellButton.Leave += new EventHandler(delegate(object sender, EventArgs e)
             {
                 if (spellTip != null)
                 {
@@ -445,19 +439,19 @@ namespace Isles
         }
 
         /// <summary>
-        /// Called every frame when this spell have become the active spell
+        /// Called every frame when this spell have become the active spell.
         /// </summary>
         /// <param name="gameTime"></param>
         public virtual void UpdateCast(GameTime gameTime) { }
 
         /// <summary>
-        /// Draw the spell
+        /// Draw the spell.
         /// </summary>
         /// <param name="gameTime"></param>
         public virtual void Draw(GameTime gameTime) { }
 
         /// <summary>
-        /// IEventListener
+        /// IEventListener.
         /// </summary>
         public virtual EventResult HandleEvent(EventType type, object sender, object tag)
         {
@@ -469,7 +463,7 @@ namespace Isles
         /// (or pressed the spell hot key).
         /// </summary>
         /// <returns>
-        /// Whether the spell wants to receive BeginCast event
+        /// Whether the spell wants to receive BeginCast event.
         /// </returns>
         public virtual bool Trigger()
         {
@@ -477,7 +471,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Perform the actual cast
+        /// Perform the actual cast.
         /// </summary>
         public virtual void Cast()
         {
@@ -488,7 +482,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Cast the spell to a specified position
+        /// Cast the spell to a specified position.
         /// </summary>
         public virtual void Cast(Vector3 position)
         {
@@ -496,7 +490,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Cast the spell to the target
+        /// Cast the spell to the target.
         /// </summary>
         public virtual void Cast(Entity target)
         {
@@ -506,9 +500,8 @@ namespace Isles
 
     public class SpellButton : Button
     {
-
         /// <summary>
-        /// Gets or sets the number in the top left corner
+        /// Gets or sets the number in the top left corner.
         /// </summary>
         public int Count
         {
@@ -519,7 +512,7 @@ namespace Isles
         private int count;
 
         /// <summary>
-        /// Gets or sets the percentage drawed over the button
+        /// Gets or sets the percentage drawed over the button.
         /// </summary>
         public float Percentage
         {
@@ -534,7 +527,7 @@ namespace Isles
         private bool autoCast;
 
         /// <summary>
-        /// Gets or sets whether the spell is autoReleasable
+        /// Gets or sets whether the spell is autoReleasable.
         /// </summary>
         public bool AutoCast
         {
@@ -543,7 +536,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// The fade mask is divided into 5 parts to draw
+        /// The fade mask is divided into 5 parts to draw.
         /// </summary>
         /// <param name="sprite"></param>
         private void DrawFade()
@@ -654,7 +647,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Draw
+        /// Draw.
         /// </summary>
         /// <param name="gameTime"></param>
         /// <param name="sprite"></param>
@@ -680,14 +673,16 @@ namespace Isles
     public class SpellTraining : Spell
     {
         /// <summary>
-        /// Gets the type of unit that's going to be trained
+        /// Gets the type of unit that's going to be trained.
         /// </summary>
         public string Type => type;
 
         private readonly string type;
         private Building ownerBuilding;
         public bool ShowCount = true;
+
         public delegate void UpgradeEventHandler(Spell spell, Building owner);
+
         public event UpgradeEventHandler Complete;
 
         protected override void OnOwnerChanged()
@@ -701,7 +696,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Gets or sets the number of units that going to be trained
+        /// Gets or sets the number of units that going to be trained.
         /// </summary>
         public int Count
         {
@@ -737,7 +732,7 @@ namespace Isles
             SpellButton button = base.CreateUIElement(ui);
 
             // Add right click event handler
-            button.RightClick += new EventHandler(delegate (object sender, EventArgs e)
+            button.RightClick += new EventHandler(delegate(object sender, EventArgs e)
             {
                 if (ownerBuilding != null)
                 {
@@ -805,6 +800,7 @@ namespace Isles
                                             new Rectangle(6, height, 210, 29));
                 height += gold.RealHeight;
             }
+
             if (def.GetLumber(Type) != 0)
             {
                 lumber = new TextField("Lumber:      " + def.GetLumber(Type).ToString(),
@@ -812,6 +808,7 @@ namespace Isles
                                             new Rectangle(6, height, 210, 29));
                 height += lumber.RealHeight;
             }
+
             if (def.GetFood(Type) != 0)
             {
                 food = new TextField("Food:         " + def.GetFood(Type).ToString(),
@@ -819,6 +816,7 @@ namespace Isles
                                             new Rectangle(6, height, 210, 19));
                 height += food.RealHeight;
             }
+
             var spellTip = new TipBox(220, height + 10);
             spellTip.Add(title);
             spellTip.Add(content);
@@ -968,7 +966,7 @@ namespace Isles
     }
 
     /// <summary>
-    /// Handler for all upgrades
+    /// Handler for all upgrades.
     /// </summary>
     public static class Upgrades
     {
@@ -1040,33 +1038,33 @@ namespace Isles
 
     /// <summary>
     /// An interface for the construct spell to interact with other entities.
-    /// A placeable must also be a derived class of Entity
+    /// A placeable must also be a derived class of Entity.
     /// </summary>
     public interface IPlaceable
     {
         /// <summary>
-        /// Called before the user chooses where to place the object
+        /// Called before the user chooses where to place the object.
         /// </summary>
         bool BeginPlace();
 
         /// <summary>
-        /// Gets whether the current position if placable
+        /// Gets whether the current position if placable.
         /// </summary>
         bool IsLocationPlacable();
 
         /// <summary>
-        /// Place the entity
+        /// Place the entity.
         /// </summary>
         void Place();
 
         /// <summary>
-        /// Called when the construct request was canceled
+        /// Called when the construct request was canceled.
         /// </summary>
         void CancelPlace();
     }
 
     /// <summary>
-    /// A spell encapsulating the behavior of constructing a building
+    /// A spell encapsulating the behavior of constructing a building.
     /// </summary>
     public class SpellConstruct : Spell
     {
@@ -1147,12 +1145,14 @@ namespace Isles
                                             15f / 23, Color.Gold, new Rectangle(6, height, 210, 29));
                 height += gold.RealHeight;
             }
+
             if (def.GetLumber(entityType) != 0)
             {
                 lumber = new TextField("Lumber:      " + def.GetLumber(entityType).ToString(),
                                             15f / 23, Color.Green, new Rectangle(6, height, 210, 29));
                 height += lumber.RealHeight;
             }
+
             var spellTip = new TipBox(220, height + 10);
             spellTip.Add(title);
             spellTip.Add(content);
@@ -1179,6 +1179,7 @@ namespace Isles
                     baseEntity.Position = world.TargetPosition.Value;
                 }
             }
+
             // Adjusting entity rotation
             else if (step == 1 && input.Mouse.LeftButton == ButtonState.Pressed && entity != null)
             {
@@ -1209,13 +1210,14 @@ namespace Isles
         private Point beginDropPosition;
         private float beginDropRotation;
         private bool hasCasted;
+
         public override EventResult HandleEvent(EventType type, object sender, object tag)
         {
             // Cancel build if right clicked for Esc is pressed
             Keys key = (tag is Keys?) ? (tag as Keys?).Value : Keys.None;
             if ((type == EventType.KeyUp && key == Keys.Escape) ||
                  type == EventType.RightButtonUp || type == EventType.RightButtonDown ||
-                (hasCasted && type == EventType.KeyUp && (key == Keys.LeftShift) || key == Keys.RightShift))
+                hasCasted && type == EventType.KeyUp && (key == Keys.LeftShift) || key == Keys.RightShift)
             {
                 if (placeable != null)
                 {
@@ -1295,7 +1297,8 @@ namespace Isles
                     if (builder == null)
                     {
                         builder = firstBuilder;
-                    } (baseEntity as Building).Builder = builder;
+                    }
+(baseEntity as Building).Builder = builder;
                 }
 
                 if (placeable != null)
@@ -1328,7 +1331,7 @@ namespace Isles
     public class SpellAttack : Spell
     {
         /// <summary>
-        /// Creates a new team attack
+        /// Creates a new team attack.
         /// </summary>
         public SpellAttack(GameWorld world)
             : base(world)
@@ -1387,7 +1390,7 @@ namespace Isles
                 if (picked != null)
                 {
                     if (picked.IsAlive)
-                    //Player.LocalPlayer.GetRelation(picked.Owner) == PlayerRelation.Opponent)
+                    // Player.LocalPlayer.GetRelation(picked.Owner) == PlayerRelation.Opponent)
                     {
                         Player.LocalPlayer.AttackTo(picked);
                         world.Game.Cursor = Cursors.Default;
@@ -1524,22 +1527,22 @@ namespace Isles
     public class SpellCombat : Spell
     {
         /// <summary>
-        /// Common stuff
+        /// Common stuff.
         /// </summary>
         public GameObject Target;
 
         /// <summary>
-        /// Gets or sets the minimum value of the attack range
+        /// Gets or sets the minimum value of the attack range.
         /// </summary>
         public float MinimumRange;
 
         /// <summary>
-        /// Gets or sets the maximum value of the attack range
+        /// Gets or sets the maximum value of the attack range.
         /// </summary>
         public float MaximumRange = 8;
 
         /// <summary>
-        /// Creates a new combat spell
+        /// Creates a new combat spell.
         /// </summary>
         public SpellCombat(GameWorld world, GameObject owner)
             : base(world)
@@ -1560,7 +1563,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Gets whether the target is within the attack range
+        /// Gets whether the target is within the attack range.
         /// </summary>
         public virtual bool TargetWithinRange(Entity target)
         {
@@ -1579,7 +1582,7 @@ namespace Isles
         }
 
         /// <summary>
-        /// Gets whether the target can be attacked by this spell
+        /// Gets whether the target can be attacked by this spell.
         /// </summary>
         public virtual bool CanAttakTarget(GameObject target)
         {
@@ -1664,6 +1667,7 @@ namespace Isles
 
                 Audios.Play("Hellfire");
             }
+
             base.Cast();
         }
     }
@@ -1883,44 +1887,44 @@ namespace Isles
     }
 
     /// <summary>
-    /// Fireball entity
+    /// Fireball entity.
     /// </summary>
     public class Fireball : BaseEntity
     {
         /// <summary>
-        /// Gets or sets the velocity of the fireball
+        /// Gets or sets the velocity of the fireball.
         /// </summary>
         public override Vector3 Velocity => velocity;
 
         private Vector3 velocity;
 
         /// <summary>
-        /// Whether the fireball is exploding
+        /// Whether the fireball is exploding.
         /// </summary>
         private bool explode;
 
         /// <summary>
-        /// Fire ball animation texture
+        /// Fire ball animation texture.
         /// </summary>
         private readonly Texture2D[] texture;
 
         /// <summary>
-        /// Number of texture frames
+        /// Number of texture frames.
         /// </summary>
         private const int FireBallTextureFrames = 23;
 
         /// <summary>
-        /// Animation speed
+        /// Animation speed.
         /// </summary>
         private const double FrameRate = 30;
 
         /// <summary>
-        /// Current frame
+        /// Current frame.
         /// </summary>
         private double frame;
 
         /// <summary>
-        /// Create a fireball entity
+        /// Create a fireball entity.
         /// </summary>
         /// <param name="screen"></param>
         public Fireball(GameWorld world, Vector3 initialVelocity)
@@ -1950,9 +1954,8 @@ namespace Isles
             {
                 // Add a little gravity, since this is fire ball, we
                 // reduce the effect of gravity.
-                //velocity += World.GameLogic.Gravity * 0.08f *
+                // velocity += World.GameLogic.Gravity * 0.08f *
                 //    (float)gameTime.ElapsedGameTime.TotalSeconds;
-
                 Position += velocity;
 
                 // Destroy anyway if we're too far away
@@ -1966,7 +1969,7 @@ namespace Isles
             var height = World.Landscape.GetHeight(Position.X, Position.Y);
             if (height > Position.Z)
             {
-                //Position.Z = height;
+                // Position.Z = height;
                 explode = true;
             }
 
@@ -1983,25 +1986,25 @@ namespace Isles
             // When exploding, perform an ray test with the terrain,
             // if we can't see the fireball, then nothing will be drawed since
             // we turned off depth buffer
-            //if (explode)
-            //{
+            // if (explode)
+            // {
             //    Ray ray;
 
-            //    ray.Position = screen.Game.Eye;
+            // ray.Position = screen.Game.Eye;
             //    Vector3 v = Position - ray.Position;
             //    ray.Direction = Vector3.Normalize(v);
 
-            //    Vector3? result = screen.Landscape.Pick();
+            // Vector3? result = screen.Landscape.Pick();
 
-            //    // The billboard won't be drawed if we can't see it
+            // // The billboard won't be drawed if we can't see it
             //    if (result.HasValue &&
             //        result.Value.LengthSquared() < v.LengthSquared())
             //    {
             //        return;
             //    }
-            //}
+            // }
 
-            //screen.Game.PointSprite.Draw(texture[(int)frame], Position, 128);
+            // screen.Game.PointSprite.Draw(texture[(int)frame], Position, 128);
 
             // It's not accurate to use point sprite to draw the fireball,
             // so use center oriented billboard instead.
@@ -2009,7 +2012,7 @@ namespace Isles
             {
                 Texture = texture[(int)frame],
                 Normal = Vector3.Zero,
-                Position = Position
+                Position = Position,
             };
             billboard.Size.X = billboard.Size.Y = explode ? 64 : 128;
             billboard.SourceRectangle = Billboard.DefaultSourceRectangle;
@@ -2024,5 +2027,4 @@ namespace Isles
             billboard.Draw();
         }
     }
-
 }

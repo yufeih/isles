@@ -1,35 +1,31 @@
-//-----------------------------------------------------------------------------
-//  Isles v1.0
-//
-//  Copyright 2008 (c) Nightin Games. All Rights Reserved.
-//-----------------------------------------------------------------------------
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
+using Isles.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Isles.Graphics;
 
 namespace Isles.Engine
 {
     /// <summary>
-    /// Represents the game world
+    /// Represents the game world.
     /// </summary>
     public class GameWorld : ISceneManager
     {
-
         /// <summary>
-        /// Version of the game world
+        /// Version of the game world.
         /// </summary>
         public const int Version = 1;
 
         private sealed class InternalList<T> : BroadcastList<T, LinkedList<T>> { }
 
         /// <summary>
-        /// Enumerates all world objects
+        /// Enumerates all world objects.
         /// </summary>
         public IEnumerable<IWorldObject> WorldObjects => worldObjects;
 
@@ -37,19 +33,19 @@ namespace Isles.Engine
         private readonly Dictionary<string, IWorldObject> nameToWorldObject = new();
 
         /// <summary>
-        /// Gets main game instance
+        /// Gets main game instance.
         /// </summary>
         public BaseGame Game { get; } = BaseGame.Singleton;
 
         /// <summary>
-        /// Landscape of the game world
+        /// Landscape of the game world.
         /// </summary>
         public Landscape Landscape { get; private set; }
 
         private string landscapeFilename;
 
         /// <summary>
-        /// Gets the path manager of the game world
+        /// Gets the path manager of the game world.
         /// </summary>
         public PathManager PathManager { get; private set; }
 
@@ -61,17 +57,17 @@ namespace Isles.Engine
         public ContentManager Content { get; }
 
         /// <summary>
-        /// Gets game the fog of war
+        /// Gets game the fog of war.
         /// </summary>
         public FogMask FogOfWar { get; private set; }
 
         /// <summary>
-        /// Gets or sets whether fog of war is enable
+        /// Gets or sets whether fog of war is enable.
         /// </summary>
         public bool EnableFogOfWar { get; } = true;
 
         /// <summary>
-        /// Gets the smoothed target position
+        /// Gets the smoothed target position.
         /// </summary>
         public Vector3? TargetPosition => isTargetPositionOnLandscape ? (Vector3?)targetPosition : null;
 
@@ -87,15 +83,14 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Reset the game world
+        /// Reset the game world.
         /// </summary>
         public void Reset()
         {
-
         }
 
         /// <summary>
-        /// Update the game world and all the world objects
+        /// Update the game world and all the world objects.
         /// </summary>
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
@@ -146,7 +141,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Draw all world objects
+        /// Draw all world objects.
         /// </summary>
         /// <param name="gameTime"></param>
         public void Draw(GameTime gameTime)
@@ -237,7 +232,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Draw each world object
+        /// Draw each world object.
         /// </summary>
         /// <param name="gameTime"></param>
         /// <param name="view"></param>
@@ -251,7 +246,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Constant values use for shadow matrix calculation
+        /// Constant values use for shadow matrix calculation.
         /// </summary>
         private readonly float[] ShadowMatrixDistance = new float[] { 245.0f, 734.0f, 1225.0f };
         private readonly float[] ShadowMatrixNear = new float[] { 10.0f, 10.0f, 10.0f };
@@ -344,7 +339,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Load the game world from a file
+        /// Load the game world from a file.
         /// </summary>
         /// <param name="inStream"></param>
         public virtual void Load(XmlElement node, ILoading context)
@@ -398,7 +393,7 @@ namespace Isles.Engine
                 try
                 {
                     // Ignore comments and other stuff...
-                    var element = (child as XmlElement);
+                    var element = child as XmlElement;
 
                     if (element != null)
                     {
@@ -411,6 +406,7 @@ namespace Isles.Engine
 
                     context.Refresh(10 + (int)(100 * nObjects / node.ChildNodes.Count));
                 }
+
                 // Catch all exceptions and write them to log
                 catch (Exception e)
                 {
@@ -458,11 +454,12 @@ namespace Isles.Engine
                     Log.Write("Path Occluder Loaded [" + occluders.Count + "]...");
                 }
             }
+
             return occluders;
         }
 
         /// <summary>
-        /// Save the world to a file
+        /// Save the world to a file.
         /// </summary>
         /// <param name="outStream"></param>
         public virtual void Save(XmlNode node, ILoading context)
@@ -506,7 +503,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Delegate to realize factory method
+        /// Delegate to realize factory method.
         /// </summary>
         public delegate IWorldObject Creator(GameWorld world);
 
@@ -516,12 +513,12 @@ namespace Isles.Engine
         /// which is responsible for performing the actual creation stuff.
         ///
         /// I haven't figure out a better way to do this.
-        /// If you know how, let me know it ASAP :)
+        /// If you know how, let me know it ASAP :).
         /// </summary>
         public static Dictionary<string, Creator> Creators = new();
 
         /// <summary>
-        /// Conversion between string representation and index representation
+        /// Conversion between string representation and index representation.
         /// </summary>
         private static readonly Dictionary<int, string> IndexToType = new();
         private static readonly Dictionary<string, int> TypeToIndex = new();
@@ -541,25 +538,23 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Gets the index representation of the specified type
+        /// Gets the index representation of the specified type.
         /// </summary>
         public static int CreatorIndexFromType(string typeName)
         {
-
             return TypeToIndex.TryGetValue(typeName, out var index) ? index : -1;
         }
 
         /// <summary>
-        /// Gets the string representation of the specified type
+        /// Gets the string representation of the specified type.
         /// </summary>
         public static string CreatorTypeFromIndex(int index)
         {
-
             return IndexToType.TryGetValue(index, out var type) ? type : null;
         }
 
         /// <summary>
-        /// Creates a new world object from a given type
+        /// Creates a new world object from a given type.
         /// </summary>
         /// <param name="typeName"></param>
         /// <returns></returns>
@@ -580,10 +575,10 @@ namespace Isles.Engine
 
         /// <summary>
         /// Creates a new world object of a given type.
-        /// Call Add explicitly to make the object shown in the world
+        /// Call Add explicitly to make the object shown in the world.
         /// </summary>
-        /// <param name="typeName">Type of the object</param>
-        /// <param name="xml">A xml element describes the object</param>
+        /// <param name="typeName">Type of the object.</param>
+        /// <param name="xml">A xml element describes the object.</param>
         /// <returns></returns>
         public IWorldObject Create(string typeName, XmlElement xml)
         {
@@ -615,12 +610,12 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Entity picked this frame
+        /// Entity picked this frame.
         /// </summary>
         private Entity pickedEntity;
 
         /// <summary>
-        /// Pick an entity from the cursor
+        /// Pick an entity from the cursor.
         /// </summary>
         /// <returns></returns>
         public Entity Pick()
@@ -635,7 +630,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Pick grid offset
+        /// Pick grid offset.
         /// </summary>
         private readonly Point[] PickGridOffset = new Point[9]
         {
@@ -645,7 +640,7 @@ namespace Isles.Engine
         };
 
         /// <summary>
-        /// Pick a game entity from the given gay
+        /// Pick a game entity from the given gay.
         /// </summary>
         /// <returns></returns>
         public Entity Pick(Ray ray)
@@ -677,7 +672,7 @@ namespace Isles.Engine
             // avoid checking the same grid.
             var previousGrid = new Point(-1, -1);
 
-            while ( // Stop probing if we're outside the box
+            while (// Stop probing if we're outside the box
                 boundingBox.Contains(sampler) == ContainmentType.Contains)
             {
                 // Project to XY plane and get which grid we're in
@@ -697,7 +692,6 @@ namespace Isles.Engine
                     // small at the bottom).
                     // Also find the minimum distance from the entity to the
                     // pick ray position to make the pick correct
-
                     Point pt;
                     float shortest = 10000;
                     Entity pickEntity = null;
@@ -740,7 +734,7 @@ namespace Isles.Engine
         private int ObjectCounter;
 
         /// <summary>
-        /// Adds a new world object
+        /// Adds a new world object.
         /// </summary>
         public void Add(IWorldObject worldObject)
         {
@@ -759,15 +753,15 @@ namespace Isles.Engine
             var key = worldObject.Name;
             if (nameToWorldObject.ContainsKey(worldObject.Name))
             {
-                //Log.Write("[Warning] WorldObject name conflict: " + worldObject.Name);
-                key = worldObject.Name + "_" + (ObjectCounter++);
+                // Log.Write("[Warning] WorldObject name conflict: " + worldObject.Name);
+                key = worldObject.Name + "_" + ObjectCounter++;
             }
 
             nameToWorldObject.Add(key, worldObject);
         }
 
         /// <summary>
-        /// Destroy a scene object
+        /// Destroy a scene object.
         /// </summary>
         /// <param name="worldObject"></param>
         public void Destroy(IWorldObject worldObject)
@@ -784,7 +778,6 @@ namespace Isles.Engine
             }
 
             // Remove it from selected and highlighed
-
             if (worldObject is Entity e)
             {
                 e.OnDestroy();
@@ -803,7 +796,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Activate a world object
+        /// Activate a world object.
         /// </summary>
         public void Activate(IWorldObject worldObject)
         {
@@ -841,7 +834,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Deactivate a world object
+        /// Deactivate a world object.
         /// </summary>
         public void Deactivate(IWorldObject worldObject)
         {
@@ -890,7 +883,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Test to see if a point intersects a world object
+        /// Test to see if a point intersects a world object.
         /// </summary>
         public bool PointSceneIntersects(Vector3 point)
         {
@@ -898,7 +891,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Test to see if a ray intersects a world object
+        /// Test to see if a ray intersects a world object.
         /// </summary>
         public bool RaySceneIntersects(Ray ray)
         {
@@ -1003,38 +996,38 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// The data to hold on each grid
+        /// The data to hold on each grid.
         /// </summary>
         public struct Grid
         {
             /// <summary>
-            /// Owners of this grid, allow overlapping
+            /// Owners of this grid, allow overlapping.
             /// </summary>
             public List<IWorldObject> Owners;
         }
 
         /// <summary>
-        /// Get grid data
+        /// Get grid data.
         /// </summary>
         public Grid[,] Data;
 
         /// <summary>
-        /// Gets the width of grid
+        /// Gets the width of grid.
         /// </summary>
         public int GridCountOnXAxis { get; private set; }
 
         /// <summary>
-        /// Gets the height of grid
+        /// Gets the height of grid.
         /// </summary>
         public int GridCountOnYAxis { get; private set; }
 
         /// <summary>
-        /// Gets the size.X of grid
+        /// Gets the size.X of grid.
         /// </summary>
         public float GridSizeOnXAxis { get; private set; }
 
         /// <summary>
-        /// Gets the height of grid
+        /// Gets the height of grid.
         /// </summary>
         public float GridSizeOnYAxis { get; private set; }
 
@@ -1043,7 +1036,7 @@ namespace Isles.Engine
         public Point GridCount => new(GridCountOnXAxis, GridCountOnYAxis);
 
         /// <summary>
-        /// Checks if a grid is within the boundery of the terrain
+        /// Checks if a grid is within the boundery of the terrain.
         /// </summary>
         /// <param name="grid"></param>
         /// <returns></returns>
@@ -1054,7 +1047,7 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Initialize all grid data
+        /// Initialize all grid data.
         /// </summary>
         private void InitializeGrid()
         {
@@ -1151,17 +1144,19 @@ namespace Isles.Engine
         private class GridEnumerator : IEnumerable<Point>
         {
             private Matrix inverse;
-            private Point pMin, pMax;
-            private Vector2 vMin, vMax;
+            private Point pMin;
+            private Point pMax;
+            private Vector2 vMin;
+            private Vector2 vMax;
             private Vector2 min, max;
             private readonly Landscape landscape;
 
             /// <summary>
-            /// Create the rectangle from 2 points and a transform matrix
+            /// Create the rectangle from 2 points and a transform matrix.
             /// </summary>
-            /// <param name="landscape">The landscape on which to enumerate</param>
-            /// <param name="min">The minimum point of the bounding box, Z value is ignored</param>
-            /// <param name="max">The maximum point of the bounding box, Z value is ignored</param>
+            /// <param name="landscape">The landscape on which to enumerate.</param>
+            /// <param name="min">The minimum point of the bounding box, Z value is ignored.</param>
+            /// <param name="max">The maximum point of the bounding box, Z value is ignored.</param>
             public GridEnumerator(Landscape landscape, Vector3 min, Vector3 max, Vector3 position, float rotationZ)
                 : this(landscape, new Vector2(min.X, min.Y), new Vector2(max.X, max.Y),
                 Matrix.CreateRotationZ(rotationZ) * Matrix.CreateTranslation(position))
@@ -1169,19 +1164,19 @@ namespace Isles.Engine
             }
 
             /// <summary>
-            /// Create the rectangle from 2 points and a transform matrix
+            /// Create the rectangle from 2 points and a transform matrix.
             /// </summary>
-            /// <param name="landscape">The landscape on which to enumerate</param>
-            /// <param name="min">The minimum point of the bounding box, Z value is ignored</param>
-            /// <param name="max">The maximum point of the bounding box, Z value is ignored</param>
-            /// <param name="transform">The matrix used to transform the bounding box</param>
+            /// <param name="landscape">The landscape on which to enumerate.</param>
+            /// <param name="min">The minimum point of the bounding box, Z value is ignored.</param>
+            /// <param name="max">The maximum point of the bounding box, Z value is ignored.</param>
+            /// <param name="transform">The matrix used to transform the bounding box.</param>
             public GridEnumerator(Landscape landscape, Vector3 min, Vector3 max, Matrix transform)
                 : this(landscape, new Vector2(min.X, min.Y), new Vector2(max.X, max.Y), transform)
             {
             }
 
             /// <summary>
-            /// Create the rectangle from size, position and rotation
+            /// Create the rectangle from size, position and rotation.
             /// </summary>
             /// <param name="landscape"></param>
             /// <param name="size"></param>
@@ -1194,12 +1189,12 @@ namespace Isles.Engine
             }
 
             /// <summary>
-            /// Create the rectangle from 2 points and a transform matrix
+            /// Create the rectangle from 2 points and a transform matrix.
             /// </summary>
-            /// <param name="landscape">The landscape on which to enumerate</param>
-            /// <param name="min">The minimum point of the bounding box</param>
-            /// <param name="max">The maximum point of the bounding box</param>
-            /// <param name="transform">The matrix used to transform the bounding box</param>
+            /// <param name="landscape">The landscape on which to enumerate.</param>
+            /// <param name="min">The minimum point of the bounding box.</param>
+            /// <param name="max">The maximum point of the bounding box.</param>
+            /// <param name="transform">The matrix used to transform the bounding box.</param>
             public GridEnumerator(Landscape landscape, Vector2 min, Vector2 max, Matrix transform)
             {
                 this.min = min;
@@ -1213,7 +1208,6 @@ namespace Isles.Engine
                 //
                 // 2. For each grid point in the AABB, transform it
                 //    to object space, test it with the rectangle
-
                 var points = new Vector2[4];
 
                 points[0] = new Vector2(min.X, min.Y);
@@ -1322,6 +1316,5 @@ namespace Isles.Engine
                 return GetEnumerator();
             }
         }
-
     }
 }
