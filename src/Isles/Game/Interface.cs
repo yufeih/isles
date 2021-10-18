@@ -260,7 +260,6 @@ namespace Isles.Engine
         /// is returned.
         /// </summary>
         /// <param name="ray"></param>
-        /// <returns></returns>
         Vector3? Intersects(Ray ray);
     }
 }

@@ -444,7 +444,6 @@ namespace Isles
         /// <summary>
         /// Enumerate all game objects owned by this player.
         /// </summary>
-        /// <returns></returns>
         public IEnumerable<GameObject> EnumerateObjects()
         {
             foreach (KeyValuePair<string, LinkedList<GameObject>> list in Objects)

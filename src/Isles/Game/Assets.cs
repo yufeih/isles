@@ -484,20 +484,18 @@ namespace Isles.Engine
                         Directory.CreateDirectory(ScreenshotsDirectory);
                     }
 
-                    using (var dstTexture = new ResolveTexture2D(
+                    using var dstTexture = new ResolveTexture2D(
                         game.GraphicsDevice,
                         game.ScreenWidth, game.ScreenHeight, 1,
-                        SurfaceFormat.Color))
-                    {
-                        // Get data with help of the resolve method
-                        game.GraphicsDevice.ResolveBackBuffer(dstTexture);
+                        SurfaceFormat.Color);
+                    // Get data with help of the resolve method
+                    game.GraphicsDevice.ResolveBackBuffer(dstTexture);
 
-                        dstTexture.Save(
-                            ScreenshotNameBuilder(screenshotNum),
-                            ImageFileFormat.Bmp);
+                    dstTexture.Save(
+                        ScreenshotNameBuilder(screenshotNum),
+                        ImageFileFormat.Bmp);
 
-                        Log.Write("Screen shot captured: " + ScreenshotNameBuilder(screenshotNum));
-                    }
+                    Log.Write("Screen shot captured: " + ScreenshotNameBuilder(screenshotNum));
                 }
                 else
                 {

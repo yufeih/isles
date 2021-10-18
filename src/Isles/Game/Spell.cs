@@ -140,7 +140,6 @@ namespace Isles
         /// </summary>
         /// <param name="spellTypeName"></param>
         /// <param name="world"></param>
-        /// <returns></returns>
         public static Spell Create(string spellTypeName, GameWorld world)
         {
             return !creators.TryGetValue(spellTypeName, out Creator creator)

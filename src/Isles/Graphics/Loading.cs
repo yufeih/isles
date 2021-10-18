@@ -30,7 +30,6 @@ namespace Isles.Graphics
         /// </summary>
         /// <param name="progress"></param>
         /// <param name="message"></param>
-        /// <returns></returns>
         void Refresh(float newProgress, string newMessage);
 
         /// <summary>
@@ -76,7 +75,6 @@ namespace Isles.Graphics
         /// </summary>
         /// <param name="progress"></param>
         /// <param name="message"></param>
-        /// <returns></returns>
         public void Refresh(float newProgress, string newMessage)
         {
             Message = newMessage;

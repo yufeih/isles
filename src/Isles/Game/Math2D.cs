@@ -37,7 +37,6 @@ namespace Isles.Engine
         /// <summary>
         /// Transform a world point p to local space specified by position and rotation.
         /// </summary>
-        /// <returns></returns>
         public static Vector2 WorldToLocal(Vector2 p, Vector2 translation, float rotation)
         {
             Vector2 v;
@@ -58,7 +57,6 @@ namespace Isles.Engine
         /// <summary>
         /// Transform a local point p to world space specified by position and rotation.
         /// </summary>
-        /// <returns></returns>
         public static Vector2 LocalToWorld(Vector2 p, Vector2 translation, float rotation)
         {
             Vector2 v;
@@ -181,7 +179,6 @@ namespace Isles.Engine
         /// given a line segment AB and a point P, this function returns the
         /// shortest distance between a point on AB and P.
         /// </summary>
-        /// <returns></returns>
         public static float DistanceToLineSegment(Vector2 a, Vector2 b, Vector2 p)
         {
             // if the angle is obtuse between PA and AB is obtuse then the closest
@@ -213,7 +210,6 @@ namespace Isles.Engine
         /// given a line segment AB and a point P, this function returns the
         /// shortest distance squared between a point on AB and P.
         /// </summary>
-        /// <returns></returns>
         public static float DistanceToLineSegmentSquared(Vector2 a, Vector2 b, Vector2 p)
         {
             // if the angle is obtuse between PA and AB is obtuse then the closest
@@ -452,7 +448,6 @@ namespace Isles.Engine
         /// <summary>
         /// Tests to see if two circle overlaps.
         /// </summary>
-        /// <returns></returns>
         public static ContainmentType CircleIntersects(
             Vector2 c1, float r1, Vector2 c2, float r2)
         {
@@ -472,7 +467,6 @@ namespace Isles.Engine
         ///
         /// see http://astronomy.swin.edu.au/~pbourke/geometry/2circle/.
         /// </summary>
-        /// <returns></returns>
         public static void CircleIntersectionPoints(
             Vector2 v1, float r1, Vector2 v2, float r2, out Vector2 p1, out Vector2 p2)
         {
@@ -518,7 +512,6 @@ namespace Isles.Engine
         /// Returns true if the line segemnt AB intersects with a circle at
         /// position P with radius r.
         /// </summary>
-        /// <returns></returns>
         public static ContainmentType LineSegmentCircleIntersects(
             Vector2 a, Vector2 b, Vector2 c, float r)
         {
@@ -544,7 +537,6 @@ namespace Isles.Engine
         ///
         /// returns null if no intersection point is found.
         /// </summary>
-        /// <returns></returns>
         public static Vector2? LineSegmentCircleClosestIntersectionPoint(
             Vector2 a, Vector2 b, Vector2 c, float r)
         {
@@ -555,7 +547,6 @@ namespace Isles.Engine
         /// Tests to see if a rectangle contains a point.
         /// Note that min should be smaller than max.
         /// </summary>
-        /// <returns></returns>
         public static bool PointInRectangle(
             Vector2 p, Vector2 min, Vector2 max)
         {
@@ -566,7 +557,6 @@ namespace Isles.Engine
         /// Tests to see if a rectangle contains a point.
         /// v1 and v2 are in local space relative to position and rotation.
         /// </summary>
-        /// <returns></returns>
         public static bool PointInRectangle(
             Vector2 p, Vector2 min, Vector2 max, Vector2 position, float rotation)
         {
@@ -579,7 +569,6 @@ namespace Isles.Engine
         /// <summary>
         /// Tests to see if a rectangle and a line segment intersects.
         /// </summary>
-        /// <returns></returns>
         public static ContainmentType LineSegmentRectangleIntersects(
             Vector2 a, Vector2 b, Vector2 min, Vector2 max)
         {
@@ -626,7 +615,6 @@ namespace Isles.Engine
         /// Returns true if two rectangles intersect.
         /// This algorithm does not check for enclosure.
         /// </summary>
-        /// <returns></returns>
         public static ContainmentType RectangleIntersects(
             Vector2 min1, Vector2 max1, Vector2 position1, float rotation1,
             Vector2 min2, Vector2 max2, Vector2 position2, float rotation2)
@@ -931,7 +919,6 @@ namespace Isles.Engine
         /// To override the operator "*". Enlarge the outline by scaler n.
         /// </summary>
         /// <param name="n"></param>
-        /// <returns></returns>
         public static Outline operator *(Outline t, float n)
         {
             Outline outlineRet;

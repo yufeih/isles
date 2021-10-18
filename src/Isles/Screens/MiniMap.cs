@@ -122,7 +122,6 @@ namespace Isles
         /// Gets the corresponding position in the real world.
         /// </summary>
         /// <param name="mapPoint">Position in the map.</param>
-        /// <returns></returns>
         public Vector3? MapToWorld(Point mapPoint)
         {
             if (ActualArea.Contains(mapPoint))
@@ -154,7 +153,6 @@ namespace Isles
         /// Gets the corresponding point in the map.
         /// </summary>
         /// <param name="position">Position in real world.</param>
-        /// <returns></returns>
         public Point? WorldToMap(Vector3 position)
         {
             if (position.X >= 0 && position.X <= world.Landscape.Size.X &&
@@ -189,7 +187,7 @@ namespace Isles
             sprite.Draw(Texture, DestinationRectangle, SourceRectangle, Color.White);
             sprite.Draw(Texture, DestinationRectangle, FogOfWarSourceRectangle, new Color(new Vector4(1, 1, 1, 0.6f)));
 
-            // Draw the gold 
+            // Draw the gold
             Rectangle goldMineDest;
             goldMineDest.Width = (int)(GoldMinePointerFactor * DestinationRectangle.Width);
             goldMineDest.Height = goldMineDest.Width;

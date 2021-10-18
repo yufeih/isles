@@ -229,7 +229,7 @@ namespace Isles
         /// </summary>
         /// <remarks>
         /// If there is an default XML element describing an avator like this:
-        /// 
+        ///
         /// <Avator Model="models/avator">
         ///     <Spells>
         ///         <Fireball Level="1" />
@@ -240,23 +240,23 @@ namespace Isles
         ///         <HealthPotion Power="300" />
         ///     </Items>
         /// </Avator>
-        /// 
+        ///
         /// The game world file only need to store its position, all other attributes
         /// are appended using MergeAttributes automatically.
-        /// 
+        ///
         /// <Avator Position="1024, 512, 0" />
-        /// 
+        ///
         /// However for world object containing the child nodes, it's up to the client
         /// to determine whether to keep the default settings or not. So in the XML
         /// element below, the avator has only 1 item, the health potions and spells
         /// are ignored.
-        /// 
+        ///
         /// <Avator Position="1024, 512, 0">
         ///     <Items>
         ///         <ManaPotion Power="500" />
         ///     </Items>
         /// </Avator>
-        /// 
+        ///
         /// This method only append default attributes that the target xml do not have.
         /// </remarks>
         public void MergeAttributes(string type, XmlElement xml)
@@ -284,7 +284,6 @@ namespace Isles
         /// <summary>
         /// Create a game default from file.
         /// </summary>
-        /// <returns></returns>
         public static GameDefault Singleton
         {
             get
@@ -294,14 +293,12 @@ namespace Isles
                     return gameDefault;
                 }
 
-                using (Stream stream =
-                       BaseGame.Singleton.ZipContent.GetFileStream("Content/Settings/Defaults.xml"))
-                {
-                    gameDefault = new GameDefault();
-                    gameDefault.Load(stream);
+                using Stream stream =
+                       BaseGame.Singleton.ZipContent.GetFileStream("Content/Settings/Defaults.xml");
+                gameDefault = new GameDefault();
+                gameDefault.Load(stream);
 
-                    return gameDefault;
-                }
+                return gameDefault;
             }
         }
     }

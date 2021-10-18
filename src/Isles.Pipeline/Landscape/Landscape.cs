@@ -48,44 +48,44 @@ namespace Isles.Pipeline
 
         public string Heightmap
         {
-            get { return heightmap; }
-            set { heightmap = value; }
+            get => heightmap;
+            set => heightmap = value;
         }
 
         public string WaterTexture
         {
-            get { return waterTexture; }
-            set { waterTexture = value; }
+            get => waterTexture;
+            set => waterTexture = value;
         }
 
         public string WaterBumpTexture
         {
-            get { return waterBumpTexture; }
-            set { waterBumpTexture = value; }
+            get => waterBumpTexture;
+            set => waterBumpTexture = value;
         }
 
         public float EarthRadius
         {
-            get { return earthRadius; }
-            set { earthRadius = value; }
+            get => earthRadius;
+            set => earthRadius = value;
         }
 
         public string SkyBox
         {
-            get { return skyBox; }
-            set { skyBox = value; }
+            get => skyBox;
+            set => skyBox = value;
         }
 
         public List<Layer> LayerCollection
         {
-            get { return layers; }
-            set { layers = value; }
+            get => layers;
+            set => layers = value;
         }
 
         public List<Vegetation> VegetationCollection
         {
-            get { return vegetations; }
-            set { vegetations = value; }
+            get => vegetations;
+            set => vegetations = value;
         }
 
         /// <summary>
@@ -93,8 +93,8 @@ namespace Isles.Pipeline
         /// </summary>
         public float Width
         {
-            get { return width; }
-            set { width = value; }
+            get => width;
+            set => width = value;
         }
 
         /// <summary>
@@ -102,8 +102,8 @@ namespace Isles.Pipeline
         /// </summary>
         public float Depth
         {
-            get { return depth; }
-            set { depth = value; }
+            get => depth;
+            set => depth = value;
         }
 
         /// <summary>
@@ -111,14 +111,14 @@ namespace Isles.Pipeline
         /// </summary>
         public float Height
         {
-            get { return height; }
-            set { height = value; }
+            get => height;
+            set => height = value;
         }
 
         public float BaseHeight
         {
-            get { return BaseHeight; }
-            set { baseHeight = value; }
+            get => baseHeight;
+            set => baseHeight = value;
         }
 
         /// <summary>
@@ -147,8 +147,8 @@ namespace Isles.Pipeline
             /// </summary>
             public string Technique
             {
-                get { return technique; }
-                set { technique = value; }
+                get => technique;
+                set => technique = value;
             }
 
             /// <summary>
@@ -156,8 +156,8 @@ namespace Isles.Pipeline
             /// </summary>
             public string ColorTexture
             {
-                get { return colorTexture; }
-                set { colorTexture = value; }
+                get => colorTexture;
+                set => colorTexture = value;
             }
 
             /// <summary>
@@ -165,8 +165,8 @@ namespace Isles.Pipeline
             /// </summary>
             public string AlphaTexture
             {
-                get { return alphaTexture; }
-                set { alphaTexture = value; }
+                get => alphaTexture;
+                set => alphaTexture = value;
             }
 
             /// <summary>
@@ -174,8 +174,8 @@ namespace Isles.Pipeline
             /// </summary>
             public string NormalTexture
             {
-                get { return normalTexture; }
-                set { normalTexture = value; }
+                get => normalTexture;
+                set => normalTexture = value;
             }
 
             public void Process(ContentProcessorContext context,

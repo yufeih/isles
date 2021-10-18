@@ -165,58 +165,56 @@ namespace Isles
             Recorder = new GameRecorder();
 
             // Load game world
-            using (Stream levelFile = Game.ZipContent.GetFileStream(levelFilename))
+            using Stream levelFile = Game.ZipContent.GetFileStream(levelFilename);
+            // Hide cursor
+            Game.IsMouseVisible = false;
+
+            // Reset loading context
+            ILoading loadContext = new Loading(graphics.GraphicsDevice, Game.Graphics2D);
+
+            loadContext.Refresh(0, "Loading...");
+
+            // Reset players
+            Player.Reset();
+
+            // Read XML scene content
+            var doc = new XmlDocument();
+            doc.Load(levelFile);
+
+            if (level != null)
             {
-                // Hide cursor
-                Game.IsMouseVisible = false;
-
-                // Reset loading context
-                ILoading loadContext = new Loading(graphics.GraphicsDevice, Game.Graphics2D);
-
-                loadContext.Refresh(0, "Loading...");
-
-                // Reset players
-                Player.Reset();
-
-                // Read XML scene content
-                var doc = new XmlDocument();
-                doc.Load(levelFile);
-
-                if (level != null)
-                {
-                    level.Load(doc.DocumentElement, loadContext);
-                }
-
-                // Load game world
-                World = new GameWorld();
-                World.Load(doc.DocumentElement, loadContext);
-
-                // Set world
-                Server = new GameServer(World, Recorder);
-
-                loadContext.Refresh(100);
-
-                // Initialize camera
-                ResetCamera();
-
-                // Initialize game players & UI
-                ResetUI(loadContext);
-
-                // Start level
-                if (level != null)
-                {
-                    level.Start(World);
-                }
-
-                // Load complete
-                loadContext.Refresh(100);
-
-                // Restore cursor
-                BaseGame.Singleton.Cursor = Cursors.Default;
-                Game.IsMouseVisible = true;
-
-                Event.SendMessage(EventType.Unknown, this, this, 1, 0.2f);
+                level.Load(doc.DocumentElement, loadContext);
             }
+
+            // Load game world
+            World = new GameWorld();
+            World.Load(doc.DocumentElement, loadContext);
+
+            // Set world
+            Server = new GameServer(World, Recorder);
+
+            loadContext.Refresh(100);
+
+            // Initialize camera
+            ResetCamera();
+
+            // Initialize game players & UI
+            ResetUI(loadContext);
+
+            // Start level
+            if (level != null)
+            {
+                level.Start(World);
+            }
+
+            // Load complete
+            loadContext.Refresh(100);
+
+            // Restore cursor
+            BaseGame.Singleton.Cursor = Cursors.Default;
+            Game.IsMouseVisible = true;
+
+            Event.SendMessage(EventType.Unknown, this, this, 1, 0.2f);
         }
 
         private void ResetUI(ILoading loadContext)
@@ -733,14 +731,10 @@ namespace Isles
                         Directory.CreateDirectory(ReplayDirectory);
                     }
 
-                    using (Stream replay = new FileStream(
-                        ReplayDirectory + "/" + name + "." + ReplayExtension, FileMode.Create))
-                    {
-                        using (Stream world = Game.ZipContent.GetFileStream(levelFilename))
-                        {
-                            Recorder.Save(replay, levelFilename, world);
-                        }
-                    }
+                    using Stream replay = new FileStream(
+                        ReplayDirectory + "/" + name + "." + ReplayExtension, FileMode.Create);
+                    using Stream world = Game.ZipContent.GetFileStream(levelFilename);
+                    Recorder.Save(replay, levelFilename, world);
                 }
             }
 

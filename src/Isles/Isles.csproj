@@ -16,7 +16,6 @@
       <HintPath>..\..\xna-3.0-win-x86\Microsoft.Xna.Framework.Game.dll</HintPath>
     </Reference>
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.XML" />
   </ItemGroup>
 
   <ItemGroup>

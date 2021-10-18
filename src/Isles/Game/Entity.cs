@@ -807,7 +807,6 @@ namespace Isles.Engine
         /// <summary>
         /// Test to see if this entity is visible from a given view and projection.
         /// </summary>
-        /// <returns></returns>
         public virtual bool IsVisible(Matrix viewProjection)
         {
             // Transform position to projection space
@@ -904,7 +903,6 @@ namespace Isles.Engine
         /// Tests whether the object occupies the specified point.
         /// </summary>
         /// <param name="point">Point to be tested in world space.</param>
-        /// <returns></returns>
         public virtual bool Intersects(Vector3 point)
         {
             // Performs an axis aligned bounding box intersection test
@@ -915,7 +913,6 @@ namespace Isles.Engine
         /// Tests whether the object intersects the specified ray.
         /// </summary>
         /// <param name="ray">Ray to be tested in world space.</param>
-        /// <returns></returns>
         public virtual float? Intersects(Ray ray)
         {
             // Performs an axis aligned bounding box intersection test

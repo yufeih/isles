@@ -14,14 +14,12 @@ namespace Isles
         [STAThread]
         public static void Main(string[] args)
         {
-            using (BaseGame game = new GameIsles())
-            {
-                game.Run();
+            using BaseGame game = new GameIsles();
+            game.Run();
 
-                // Sucessfully exit the game
-                Log.NewLine();
-                Log.Write("Program Terminated. Overall FPS: " + game.Profiler.OverallFPS);
-            }
+            // Sucessfully exit the game
+            Log.NewLine();
+            Log.Write("Program Terminated. Overall FPS: " + game.Profiler.OverallFPS);
         }
     }
 }

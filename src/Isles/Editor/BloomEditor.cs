@@ -62,11 +62,9 @@ namespace Isles.Editor
             // Open
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                using (var file = new FileStream(openFileDialog.FileName, FileMode.Open))
-                {
-                    bloom.Settings = (BloomSettings)
-                        new XmlSerializer(typeof(BloomSettings)).Deserialize(file);
-                }
+                using var file = new FileStream(openFileDialog.FileName, FileMode.Open);
+                bloom.Settings = (BloomSettings)
+                    new XmlSerializer(typeof(BloomSettings)).Deserialize(file);
             }
         }
 
@@ -75,10 +73,8 @@ namespace Isles.Editor
             // Save
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                using (var file = new FileStream(saveFileDialog.FileName, FileMode.OpenOrCreate))
-                {
-                    new XmlSerializer(typeof(BloomSettings)).Serialize(file, bloom.Settings);
-                }
+                using var file = new FileStream(saveFileDialog.FileName, FileMode.OpenOrCreate);
+                new XmlSerializer(typeof(BloomSettings)).Serialize(file, bloom.Settings);
             }
         }
     }

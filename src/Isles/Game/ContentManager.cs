@@ -717,170 +717,168 @@ namespace Isles.Engine
                 throw new Exception("Invalid input.");
             }
 
-            using (var memstream = new MemoryStream(_FileData))
+            using var memstream = new MemoryStream(_FileData);
+            Stream input = null;
+            try
             {
-                Stream input = null;
+                if (CompressedSize == UncompressedSize)
+                {
+                    // the System.IO.Compression.DeflateStream class does not handle uncompressed data.
+                    // so if an entry is not compressed, then we just translate the bytes directly.
+                    input = memstream;
+                }
+                else
+                {
+                    input = new System.IO.Compression.DeflateStream(memstream, System.IO.Compression.CompressionMode.Decompress);
+                }
+
+                if (TargetFile != null)
+                {
+                    // ensure the target path exists
+                    if (!System.IO.Directory.Exists(System.IO.Path.GetDirectoryName(TargetFile)))
+                    {
+                        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(TargetFile));
+                    }
+                }
+
+                Stream output = null;
                 try
                 {
-                    if (CompressedSize == UncompressedSize)
-                    {
-                        // the System.IO.Compression.DeflateStream class does not handle uncompressed data.
-                        // so if an entry is not compressed, then we just translate the bytes directly.
-                        input = memstream;
-                    }
-                    else
-                    {
-                        input = new System.IO.Compression.DeflateStream(memstream, System.IO.Compression.CompressionMode.Decompress);
-                    }
+                    output = TargetFile != null ? new FileStream(TargetFile, System.IO.FileMode.CreateNew) : s;
 
-                    if (TargetFile != null)
+                    var bytes = new byte[4096];
+                    int n;
+
+                    if (_Debug)
                     {
-                        // ensure the target path exists
-                        if (!System.IO.Directory.Exists(System.IO.Path.GetDirectoryName(TargetFile)))
+                        Console.WriteLine("{0}: _FileData.Length= {1}", TargetFile, _FileData.Length);
+                        Console.WriteLine("{0}: memstream.Position: {1}", TargetFile, memstream.Position);
+                        n = _FileData.Length;
+                        if (n > 1000)
                         {
-                            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(TargetFile));
+                            n = 500;
+                            Console.WriteLine("{0}: truncating dump from {1} to {2} bytes...", TargetFile, _FileData.Length, n);
                         }
+
+                        for (var j = 0; j < n; j += 2)
+                        {
+                            if ((j > 0) && (j % 40 == 0))
+                            {
+                                System.Console.WriteLine();
+                            }
+
+                            System.Console.Write(" {0:X2}", _FileData[j]);
+                            if (j + 1 < n)
+                            {
+                                System.Console.Write("{0:X2}", _FileData[j + 1]);
+                            }
+                        }
+
+                        System.Console.WriteLine("\n");
                     }
 
-                    Stream output = null;
-                    try
+                    n = 1; // anything non-zero
+                    while (n != 0)
                     {
-                        output = TargetFile != null ? new FileStream(TargetFile, System.IO.FileMode.CreateNew) : s;
-
-                        var bytes = new byte[4096];
-                        int n;
-
                         if (_Debug)
                         {
-                            Console.WriteLine("{0}: _FileData.Length= {1}", TargetFile, _FileData.Length);
-                            Console.WriteLine("{0}: memstream.Position: {1}", TargetFile, memstream.Position);
-                            n = _FileData.Length;
-                            if (n > 1000)
-                            {
-                                n = 500;
-                                Console.WriteLine("{0}: truncating dump from {1} to {2} bytes...", TargetFile, _FileData.Length, n);
-                            }
-
-                            for (var j = 0; j < n; j += 2)
-                            {
-                                if ((j > 0) && (j % 40 == 0))
-                                {
-                                    System.Console.WriteLine();
-                                }
-
-                                System.Console.Write(" {0:X2}", _FileData[j]);
-                                if (j + 1 < n)
-                                {
-                                    System.Console.Write("{0:X2}", _FileData[j + 1]);
-                                }
-                            }
-
-                            System.Console.WriteLine("\n");
+                            Console.WriteLine("{0}: about to read...", TargetFile);
                         }
 
-                        n = 1; // anything non-zero
-                        while (n != 0)
+                        n = input.Read(bytes, 0, bytes.Length);
+                        if (_Debug)
+                        {
+                            Console.WriteLine("{0}: got {1} bytes", TargetFile, n);
+                        }
+
+                        if (n > 0)
                         {
                             if (_Debug)
                             {
-                                Console.WriteLine("{0}: about to read...", TargetFile);
+                                Console.WriteLine("{0}: about to write...", TargetFile);
                             }
 
-                            n = input.Read(bytes, 0, bytes.Length);
-                            if (_Debug)
-                            {
-                                Console.WriteLine("{0}: got {1} bytes", TargetFile, n);
-                            }
-
-                            if (n > 0)
-                            {
-                                if (_Debug)
-                                {
-                                    Console.WriteLine("{0}: about to write...", TargetFile);
-                                }
-
-                                output.Write(bytes, 0, n);
-                            }
+                            output.Write(bytes, 0, n);
                         }
-                    }
-                    finally
-                    {
-                        // we only close the output stream if we opened it.
-                        if ((output != null) && (TargetFile != null))
-                        {
-                            output.Close();
-                            output.Dispose();
-                        }
-                    }
-
-                    if (TargetFile != null)
-                    {
-                        // We may have to adjust the last modified time to compensate
-                        // for differences in how the .NET Base Class Library deals
-                        // with daylight saving time (DST) versus how the Windows
-                        // filesystem deals with daylight saving time. See
-                        // http://blogs.msdn.com/oldnewthing/archive/2003/10/24/55413.aspx for some context.
-
-                        // in a nutshell: Daylight savings time rules change regularly.  In
-                        // 2007, for example, the inception week of DST changed.  In 1977,
-                        // DST was in place all year round. in 1945, likewise.  And so on.
-                        // Win32 does not attempt to guess which time zone rules were in
-                        // effect at the time in question.  It will render a time as
-                        // "standard time" and allow the app to change to DST as necessary.
-                        //  .NET makes a different choice.
-
-                        // -------------------------------------------------------
-                        // Compare the output of FileInfo.LastWriteTime.ToString("f") with
-                        // what you see in the property sheet for a file that was last
-                        // written to on the other side of the DST transition. For example,
-                        // suppose the file was last modified on October 17, during DST but
-                        // DST is not currently in effect. Explorer's file properties
-                        // reports Thursday, October 17, 2003, 8:45:38 AM, but .NETs
-                        // FileInfo reports Thursday, October 17, 2003, 9:45 AM.
-
-                        // Win32 says, "Thursday, October 17, 2002 8:45:38 AM PST". Note:
-                        // Pacific STANDARD Time. Even though October 17 of that year
-                        // occurred during Pacific Daylight Time, Win32 displays the time as
-                        // standard time because that's what time it is NOW.
-
-                        // .NET BCL assumes that the current DST rules were in place at the
-                        // time in question.  So, .NET says, "Well, if the rules in effect
-                        // now were also in effect on October 17, 2003, then that would be
-                        // daylight time" so it displays "Thursday, October 17, 2003, 9:45
-                        // AM PDT" - daylight time.
-
-                        // So .NET gives a value which is more intuitively correct, but is
-                        // also potentially incorrect, and which is not invertible. Win32
-                        // gives a value which is intuitively incorrect, but is strictly
-                        // correct.
-                        // -------------------------------------------------------
-
-                        // With this adjustment, I add one hour to the tweaked .NET time, if
-                        // necessary.  That is to say, if the time in question had occurred
-                        // in what the .NET BCL assumed to be DST (an assumption that may be
-                        // wrong given the constantly changing DST rules).
-#if !XBOX
-                        if (LastModified.IsDaylightSavingTime())
-                        {
-                            DateTime AdjustedLastModified = LastModified + new TimeSpan(1, 0, 0);
-                            System.IO.File.SetLastWriteTime(TargetFile, AdjustedLastModified);
-                        }
-                        else
-                        {
-                            System.IO.File.SetLastWriteTime(TargetFile, LastModified);
-                        }
-#endif
                     }
                 }
                 finally
                 {
                     // we only close the output stream if we opened it.
-                    // we cannot use using() here because in some cases we do not want to Dispose the stream!
-                    if ((input != null) && (input != memstream))
+                    if ((output != null) && (TargetFile != null))
                     {
-                        input.Close();
-                        input.Dispose();
+                        output.Close();
+                        output.Dispose();
                     }
+                }
+
+                if (TargetFile != null)
+                {
+                    // We may have to adjust the last modified time to compensate
+                    // for differences in how the .NET Base Class Library deals
+                    // with daylight saving time (DST) versus how the Windows
+                    // filesystem deals with daylight saving time. See
+                    // http://blogs.msdn.com/oldnewthing/archive/2003/10/24/55413.aspx for some context.
+
+                    // in a nutshell: Daylight savings time rules change regularly.  In
+                    // 2007, for example, the inception week of DST changed.  In 1977,
+                    // DST was in place all year round. in 1945, likewise.  And so on.
+                    // Win32 does not attempt to guess which time zone rules were in
+                    // effect at the time in question.  It will render a time as
+                    // "standard time" and allow the app to change to DST as necessary.
+                    //  .NET makes a different choice.
+
+                    // -------------------------------------------------------
+                    // Compare the output of FileInfo.LastWriteTime.ToString("f") with
+                    // what you see in the property sheet for a file that was last
+                    // written to on the other side of the DST transition. For example,
+                    // suppose the file was last modified on October 17, during DST but
+                    // DST is not currently in effect. Explorer's file properties
+                    // reports Thursday, October 17, 2003, 8:45:38 AM, but .NETs
+                    // FileInfo reports Thursday, October 17, 2003, 9:45 AM.
+
+                    // Win32 says, "Thursday, October 17, 2002 8:45:38 AM PST". Note:
+                    // Pacific STANDARD Time. Even though October 17 of that year
+                    // occurred during Pacific Daylight Time, Win32 displays the time as
+                    // standard time because that's what time it is NOW.
+
+                    // .NET BCL assumes that the current DST rules were in place at the
+                    // time in question.  So, .NET says, "Well, if the rules in effect
+                    // now were also in effect on October 17, 2003, then that would be
+                    // daylight time" so it displays "Thursday, October 17, 2003, 9:45
+                    // AM PDT" - daylight time.
+
+                    // So .NET gives a value which is more intuitively correct, but is
+                    // also potentially incorrect, and which is not invertible. Win32
+                    // gives a value which is intuitively incorrect, but is strictly
+                    // correct.
+                    // -------------------------------------------------------
+
+                    // With this adjustment, I add one hour to the tweaked .NET time, if
+                    // necessary.  That is to say, if the time in question had occurred
+                    // in what the .NET BCL assumed to be DST (an assumption that may be
+                    // wrong given the constantly changing DST rules).
+#if !XBOX
+                    if (LastModified.IsDaylightSavingTime())
+                    {
+                        DateTime AdjustedLastModified = LastModified + new TimeSpan(1, 0, 0);
+                        System.IO.File.SetLastWriteTime(TargetFile, AdjustedLastModified);
+                    }
+                    else
+                    {
+                        System.IO.File.SetLastWriteTime(TargetFile, LastModified);
+                    }
+#endif
+                }
+            }
+            finally
+            {
+                // we only close the output stream if we opened it.
+                // we cannot use using() here because in some cases we do not want to Dispose the stream!
+                if ((input != null) && (input != memstream))
+                {
+                    input.Close();
+                    input.Dispose();
                 }
             }
         }

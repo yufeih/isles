@@ -78,7 +78,6 @@ namespace Isles.Engine
         /// Create default game settings.
         /// </summary>
         /// <param name="fromFile"></param>
-        /// <returns></returns>
         public static Settings CreateDefaultSettings(Stream stream)
         {
             var settings = new Settings();

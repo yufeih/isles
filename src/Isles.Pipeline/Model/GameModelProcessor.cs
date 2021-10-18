@@ -501,7 +501,6 @@ namespace Isles.Pipeline
         /// Test if that position is occupied.
         /// </summary>
         /// <param name="position"></param>
-        /// <returns></returns>
         public bool Occupied(Vector3 position)
         {
             var x = (int)((position.X - Box.Min.X) / ((Box.Max.X - Box.Min.X) / 8));
@@ -580,7 +579,6 @@ namespace Isles.Pipeline
         /// </summary>
         /// <param name="position"></param>
         /// <param name="level"></param>
-        /// <returns></returns>
         public void Set(Vector3 position)
         {
             var x = (int)((position.X - Box.Min.X) / ((Box.Max.X - Box.Min.X) / 8));
@@ -623,7 +621,6 @@ namespace Isles.Pipeline
         /// <param name="parent"></param>
         /// <param name="m"></param>
         /// <param name="parLevel"></param>
-        /// <returns></returns>
         public int SonOf(int parent, int m, int parLevel)
         {
             return (parent - spliter[parLevel]) * 8 + spliter[parLevel + 1] + m;
@@ -715,7 +712,6 @@ namespace Isles.Pipeline
         /// </summary>
         /// <param name="input"></param>
         /// <param name="context"></param>
-        /// <returns></returns>
         public override TextureContent Process(TextureContent input,
             ContentProcessorContext context)
         {

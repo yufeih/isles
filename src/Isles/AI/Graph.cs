@@ -90,7 +90,6 @@ namespace Isles.Engine
         /// Gets a graph node from a given index.
         /// </summary>
         /// <param name="index"></param>
-        /// <returns></returns>
         public TNode GetNode(int index)
         {
             return nodes[index];

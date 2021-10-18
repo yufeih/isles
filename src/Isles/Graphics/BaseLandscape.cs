@@ -682,7 +682,6 @@ namespace Isles.Graphics
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        /// <returns></returns>
         public Patch GetPatch(int x, int y)
         {
             return Patches[y * PatchCountOnXAxis + x];
@@ -693,7 +692,6 @@ namespace Isles.Graphics
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        /// <returns></returns>
         public Vector2 GridToPosition(int x, int y)
         {
             return new Vector2(
@@ -715,7 +713,6 @@ namespace Isles.Graphics
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        /// <returns></returns>
         public float GetGridHeight(int x, int y)
         {
             return HeightField[x, y];
@@ -734,7 +731,6 @@ namespace Isles.Graphics
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        /// <returns></returns>
         public float GetHeight(float x, float y)
         {
             // Grabbed and modified from racing game
@@ -811,7 +807,6 @@ namespace Isles.Graphics
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        /// <returns></returns>
         public Vector3 GetNormal(int x, int y)
         {
             return NormalField[x, y];
@@ -822,7 +817,6 @@ namespace Isles.Graphics
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        /// <returns></returns>
         public Vector3 GetNormal(float x, float y)
         {
             // We don't want to cause any exception here

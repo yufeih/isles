@@ -28,12 +28,10 @@ namespace Isles.Editor
         {
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                using (Stream stream = new FileStream(saveFileDialog.FileName, FileMode.Create))
-                {
-                    var doc = new XmlDocument();
-                    screen.World.Save(doc, null);
-                    doc.Save(stream);
-                }
+                using Stream stream = new FileStream(saveFileDialog.FileName, FileMode.Create);
+                var doc = new XmlDocument();
+                screen.World.Save(doc, null);
+                doc.Save(stream);
             }
         }
 
@@ -87,10 +85,8 @@ namespace Isles.Editor
         {
             if (drawPathOccluders != null && saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                using (Stream stream = new FileStream(saveFileDialog.FileName, FileMode.Create))
-                {
-                    drawPathOccluders.Save(stream);
-                }
+                using Stream stream = new FileStream(saveFileDialog.FileName, FileMode.Create);
+                drawPathOccluders.Save(stream);
             }
         }
 

@@ -557,7 +557,6 @@ namespace Isles.Engine
         /// Creates a new world object from a given type.
         /// </summary>
         /// <param name="typeName"></param>
-        /// <returns></returns>
         public IWorldObject Create(string typeName)
         {
             return Create(typeName, null);
@@ -579,7 +578,6 @@ namespace Isles.Engine
         /// </summary>
         /// <param name="typeName">Type of the object.</param>
         /// <param name="xml">A xml element describes the object.</param>
-        /// <returns></returns>
         public IWorldObject Create(string typeName, XmlElement xml)
         {
             // Lookup the creators table to find a suitable creator
@@ -617,7 +615,6 @@ namespace Isles.Engine
         /// <summary>
         /// Pick an entity from the cursor.
         /// </summary>
-        /// <returns></returns>
         public Entity Pick()
         {
             if (pickedEntity != null)
@@ -642,7 +639,6 @@ namespace Isles.Engine
         /// <summary>
         /// Pick a game entity from the given gay.
         /// </summary>
-        /// <returns></returns>
         public Entity Pick(Ray ray)
         {
             // This value affects how accurate this algorithm works.
@@ -1039,7 +1035,6 @@ namespace Isles.Engine
         /// Checks if a grid is within the boundery of the terrain.
         /// </summary>
         /// <param name="grid"></param>
-        /// <returns></returns>
         public bool IsValidGrid(Point grid)
         {
             return grid.X >= 0 && grid.X < GridCountOnXAxis &&
@@ -1263,7 +1258,6 @@ namespace Isles.Engine
             /// <summary>
             /// Returns an enumerator that iterates through the collection.
             /// </summary>
-            /// <returns></returns>
             public IEnumerator<Point> GetEnumerator()
             {
                 var grids = new bool[
@@ -1310,7 +1304,6 @@ namespace Isles.Engine
             /// <summary>
             /// Returns an enumerator that iterates through the collection.
             /// </summary>
-            /// <returns></returns>
             IEnumerator IEnumerable.GetEnumerator()
             {
                 return GetEnumerator();

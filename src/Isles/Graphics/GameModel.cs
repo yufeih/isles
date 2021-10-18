@@ -582,7 +582,6 @@ namespace Isles.Graphics
         /// <summary>
         /// Gets the default (first) animation clip of this game model.
         /// </summary>
-        /// <returns></returns>
         public AnimationClip GetDefaultAnimationClip()
         {
             if (!IsAnimated)

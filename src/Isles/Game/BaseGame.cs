@@ -399,7 +399,6 @@ viewProjectionInverse;
         /// <summary>
         /// Gets the singleton instance of base game.
         /// </summary>
-        /// <returns></returns>
         /// <remarks>
         /// This is not a strict implementation of 'Singleton'. The constructor is not private.
         /// since we want to allow real games to derive from this class, so the singleton is
@@ -655,35 +654,6 @@ viewProjectionInverse;
         {
         }
 
-        // private void UpdatePickRay()
-        // {
-        //    MouseState mouseState = Mouse.GetState();
-
-        // int mouseX = mouseState.X;
-        //    int mouseY = mouseState.Y;
-
-        // Vector3 nearSource = new Vector3((float)mouseX, (float)mouseY, 0.0f);
-        //    Vector3 farSource = new Vector3((float)mouseX, (float)mouseY, 1.0f);
-
-        // //Vector3 nearPoint = GraphicsDevice.Viewport.Unproject(
-        //    //    nearSource, projection, view, Matrix.Identity);
-
-        // //Vector3 farPoint = GraphicsDevice.Viewport.Unproject(
-        //    //    farSource, projection, view, Matrix.Identity);
-
-        // Vector3 nearPoint = Unproject(nearSource);
-        //    Vector3 farPoint = Unproject(farSource);
-
-        // //Log.Write(farPoint.ToString());
-        //    //Log.Write(view.ToString());
-        //    //Log.Write(projection.ToString());
-        //    // Create a ray from the near clip plane to the far clip plane.
-        //    Vector3 direction = farPoint - nearPoint;
-        //    direction.Normalize();
-
-        // pickRay.Position = nearPoint;
-        //    pickRay.Direction = direction;
-        // }
         private void UpdatePickRay()
         {
             MouseState mouseState = Mouse.GetState();
@@ -705,7 +675,6 @@ viewProjectionInverse;
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        /// <returns></returns>
         public Ray Unproject(int x, int y)
         {
             Ray ray;

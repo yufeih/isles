@@ -157,7 +157,6 @@ namespace Isles.Engine
         /// Triggers a new sound.
         /// </summary>
         /// <param name="cueName"></param>
-        /// <returns></returns>
         public Cue Play(string cueName)
         {
             Cue cue = Sound.GetCue(cueName);

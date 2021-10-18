@@ -42,12 +42,10 @@ namespace Isles.Pipeline
         {
             // Debugger.Launch();
             File.SetAttributes(filename, FileAttributes.Normal);
-            using (var file = new FileStream(filename, FileMode.Open))
-            {
-                var landscape = (Landscape)new XmlSerializer(typeof(Landscape)).Deserialize(file);
-                landscape.SourceFilename = filename;
-                return landscape;
-            }
+            using var file = new FileStream(filename, FileMode.Open);
+            var landscape = (Landscape)new XmlSerializer(typeof(Landscape)).Deserialize(file);
+            landscape.SourceFilename = filename;
+            return landscape;
         }
     }
 

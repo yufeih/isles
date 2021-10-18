@@ -201,7 +201,6 @@ namespace Isles.Engine
         /// <summary>
         /// Get priority queue enumerator.
         /// </summary>
-        /// <returns></returns>
         public IEnumerator<T> GetEnumerator()
         {
             for (var i = 1; i <= length; i++)
@@ -213,7 +212,6 @@ namespace Isles.Engine
         /// <summary>
         /// Get priority queue enumerator, nongeneric version.
         /// </summary>
-        /// <returns></returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
             return data.GetEnumerator();
