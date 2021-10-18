@@ -171,11 +171,6 @@
     </NestedContentProject>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Diagrams\Overview.cd" />
-    <None Include="Diagrams\SceneManagement.cd" />
-    <None Include="Diagrams\UI.cd" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Isles.Pipeline\Isles.Pipeline.csproj">
       <Project>{77E31563-2EED-400D-8591-1ACED921E11F}</Project>
       <Name>Isles.Pipeline</Name>
