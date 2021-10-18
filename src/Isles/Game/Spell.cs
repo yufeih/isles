@@ -1960,7 +1960,7 @@ namespace Isles
                 // Destroy anyway if we're too far away
                 if (Position.LengthSquared() > 1e8)
                 {
-                    GameServer.Singleton.Destroy(this);
+                    World.Destroy(this);
                 }
             }
 
@@ -1976,7 +1976,7 @@ namespace Isles
             if (explode && (int)frame >= FireBallTextureFrames)
             {
                 frame = 0;
-                GameServer.Singleton.Destroy(this);
+                World.Destroy(this);
             }
         }
 

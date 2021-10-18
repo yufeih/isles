@@ -350,13 +350,6 @@ namespace Isles.Engine
                 throw new Exception("Invalid world format.");
             }
 
-            // Validate version
-            var version = -1;
-            if (!(int.TryParse(node.GetAttribute("Version"), out version) && version == Version))
-            {
-                throw new Exception("Invalid world version");
-            }
-
             context.Refresh(2);
 
             // Load landscape
@@ -390,28 +383,17 @@ namespace Isles.Engine
             IWorldObject worldObject;
             foreach (XmlNode child in node.ChildNodes)
             {
-                try
+                // Ignore comments and other stuff...
+                if (child is XmlElement element)
                 {
-                    // Ignore comments and other stuff...
-                    var element = child as XmlElement;
-
-                    if (element != null)
+                    if ((worldObject = Create(child.Name, element)) != null)
                     {
-                        if ((worldObject = Create(child.Name, element)) != null)
-                        {
-                            Add(worldObject);
-                            nObjects++;
-                        }
+                        Add(worldObject);
+                        nObjects++;
                     }
-
-                    context.Refresh(10 + (int)(100 * nObjects / node.ChildNodes.Count));
                 }
 
-                // Catch all exceptions and write them to log
-                catch (Exception e)
-                {
-                    Log.Write(e.Message);
-                }
+                context.Refresh(10 + (int)(100 * nObjects / node.ChildNodes.Count));
             }
 
             Log.Write("Game world loaded [" + Name + "], " + nObjects + " objects...");
@@ -518,39 +500,13 @@ namespace Isles.Engine
         public static Dictionary<string, Creator> Creators = new();
 
         /// <summary>
-        /// Conversion between string representation and index representation.
-        /// </summary>
-        private static readonly Dictionary<int, string> IndexToType = new();
-        private static readonly Dictionary<string, int> TypeToIndex = new();
-
-        /// <summary>
         /// Register a world object creator.
         /// If a new type of world object is implemented, to allow creating the object using
         /// GameWorld.Create, create an object creator and register it here.
         /// </summary>
         public static void RegisterCreator(string typeName, Creator creator)
         {
-            var index = Creators.Count;
-
             Creators.Add(typeName, creator);
-            IndexToType.Add(index, typeName);
-            TypeToIndex.Add(typeName, index);
-        }
-
-        /// <summary>
-        /// Gets the index representation of the specified type.
-        /// </summary>
-        public static int CreatorIndexFromType(string typeName)
-        {
-            return TypeToIndex.TryGetValue(typeName, out var index) ? index : -1;
-        }
-
-        /// <summary>
-        /// Gets the string representation of the specified type.
-        /// </summary>
-        public static string CreatorTypeFromIndex(int index)
-        {
-            return IndexToType.TryGetValue(index, out var type) ? type : null;
         }
 
         /// <summary>
@@ -560,16 +516,6 @@ namespace Isles.Engine
         public IWorldObject Create(string typeName)
         {
             return Create(typeName, null);
-        }
-
-        public IWorldObject Create(int type)
-        {
-            return Create(CreatorTypeFromIndex(type));
-        }
-
-        public IWorldObject Create(int type, XmlElement xml)
-        {
-            return Create(CreatorTypeFromIndex(type), xml);
         }
 
         /// <summary>

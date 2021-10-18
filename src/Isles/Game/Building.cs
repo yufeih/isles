@@ -315,7 +315,7 @@ namespace Isles
 
             state = BuildingState.Destroyed;
 
-            GameServer.Singleton.Destroy(this);
+            World.Destroy(this);
         }
 
         /// <summary>

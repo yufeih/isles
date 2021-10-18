@@ -77,11 +77,6 @@ namespace Isles
         private string levelFilename;
 
         /// <summary>
-        /// Gets game server interface.
-        /// </summary>
-        public GameServer Server { get; private set; }
-
-        /// <summary>
         /// Creates a new game screen.
         /// NOTE: You can only create a game screen after graphics device
         /// is created and initialized.
@@ -156,9 +151,6 @@ namespace Isles
             // Load game world
             World = new GameWorld();
             World.Load(doc.DocumentElement, loadContext);
-
-            // Set world
-            Server = new GameServer(World);
 
             loadContext.Refresh(100);
 
@@ -453,12 +445,6 @@ namespace Isles
             if (Level != null)
             {
                 Level.Update(gameTime);
-            }
-
-            // Update game server
-            if (Server != null)
-            {
-                Server.Update(gameTime);
             }
         }
 

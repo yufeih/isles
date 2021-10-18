@@ -180,7 +180,7 @@ namespace Isles
 
         private void NotifyEnd()
         {
-            GameServer.Singleton.Destroy(this);
+            World.Destroy(this);
         }
     }
 
@@ -503,7 +503,7 @@ namespace Isles
                     explosion.AddParticle(fireEmitter.Position, fireEmitter.Velocity);
                 }
 
-                GameServer.Singleton.Destroy(this);
+                World.Destroy(this);
             });
         }
 
@@ -829,7 +829,7 @@ namespace Isles
 
             if (spawn.Z - Position.Z > 15)
             {
-                GameServer.Singleton.Destroy(this);
+                World.Destroy(this);
             }
         }
     }

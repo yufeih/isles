@@ -1190,7 +1190,7 @@ namespace Isles
 
                 if (shakeAmount > MathHelper.ToRadians(160))
                 {
-                    GameServer.Singleton.Destroy(this);
+                    World.Destroy(this);
                 }
 
                 Rotation = treeRotation * Quaternion.CreateFromAxisAngle(rotationAxis, shakeAmount);
@@ -1237,7 +1237,7 @@ namespace Isles
                     value = 0;
 
                     // Collapse
-                    GameServer.Singleton.Destroy(this);
+                    World.Destroy(this);
                 }
 
                 gold = value;
@@ -1408,7 +1408,7 @@ namespace Isles
                         }
                     }
 
-                    GameServer.Singleton.Destroy(this);
+                    World.Destroy(this);
                     return;
                 }
             }
@@ -1817,7 +1817,7 @@ namespace Isles
             {
                 Hit?.Invoke(this, null);
 
-                GameServer.Singleton.Destroy(this);
+                World.Destroy(this);
             }
 
             // Update ammo transform

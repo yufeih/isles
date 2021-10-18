@@ -1051,7 +1051,7 @@ namespace Isles
 
                 if (height <= 0)
                 {
-                    GameServer.Singleton.Destroy(owner);
+                    owner.World.Destroy(owner);
                     return StateResult.Completed;
                 }
             }

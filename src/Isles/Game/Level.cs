@@ -228,7 +228,7 @@ namespace Isles
             // Create box of pandora
             for (var i = 0; i < 12; i++)
             {
-                IWorldObject box = GameServer.Singleton.Create("BoxOfPandora");
+                IWorldObject box = world.Create("BoxOfPandora");
 
                 Vector3 position;
 
@@ -289,7 +289,7 @@ namespace Isles
             var worker = player.Race == Race.Islander ? "Follower" : "Miner";
 
             // Create a townhall and 4 followers if this player is not used for quest
-            var building = GameServer.Singleton.Create(townhall) as Building;
+            var building = world.Create(townhall) as Building;
 
             if (building != null)
             {
@@ -301,7 +301,7 @@ namespace Isles
 
             for (var i = 0; i < 5; i++)
             {
-                if (GameServer.Singleton.Create(worker) is Worker peon)
+                if (world.Create(worker) is Worker peon)
                 {
                     peon.Position = building.Position + building.SpawnPoint;
                     peon.Owner = player;
