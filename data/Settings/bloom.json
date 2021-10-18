@@ -1,0 +1,18 @@
+﻿{
+  "Victory": {
+    "BloomThreshold": 0.55,
+    "BlurAmount": 5,
+    "BloomIntensity": 1.5,
+    "BaseIntensity": 1.15,
+    "BloomSaturation": 1.04,
+    "BaseSaturation": 0.979999959
+  },
+  "Failed": {
+    "BloomThreshold": 0.45,
+    "BlurAmount": 1.5,
+    "BloomIntensity": 1.5,
+    "BaseIntensity": 0.75,
+    "BloomSaturation": 0.35,
+    "BaseSaturation": 0.64
+  }
+}

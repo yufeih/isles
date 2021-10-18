@@ -4,8 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 using System.Xml;
-using System.Xml.Serialization;
 using Isles.Engine;
 using Isles.Graphics;
 using Isles.Screens;
@@ -25,14 +25,8 @@ namespace Isles
         private const string DefaultReplayName = "LastReplay";
         private const string ReplayExtension = "ixr";
 
-        /// <summary>
-        /// Graphcis device.
-        /// </summary>
         private readonly GraphicsDeviceManager graphics;
 
-        /// <summary>
-        /// Game screen UI.
-        /// </summary>
         public GameUI UI { get; private set; }
 
         private TipBox pausePanel;
@@ -44,6 +38,9 @@ namespace Isles
 
         private bool paused;
         private IEventListener activeObject;
+
+        private readonly Dictionary<string, BloomSettings> _bloomSettings = JsonSerializer.Deserialize<Dictionary<string, BloomSettings>>(
+            File.ReadAllText("data/settings/bloom.json"));
 
         public void Pause(IEventListener activeObject)
         {
@@ -388,7 +385,7 @@ namespace Isles
                 // Load bloom
                 if (Game.Bloom != null)
                 {
-                    targetSettings = LoadBloomSettings("Victory");
+                    targetSettings = _bloomSettings["Victory"];
                     bloomLerpElapsedTime = 0;
                     defaultSettings = Game.Bloom.Settings;
                 }
@@ -409,7 +406,7 @@ namespace Isles
 
                 if (Game.Bloom != null)
                 {
-                    targetSettings = LoadBloomSettings("Failed");
+                    targetSettings = _bloomSettings["Failed"];
                     bloomLerpElapsedTime = 0;
                     defaultSettings = Game.Bloom.Settings;
                 }
@@ -417,25 +414,6 @@ namespace Isles
                 Audios.PlayMusic("Lose", false, 0, 0);
                 EnterPostScreen(failureTexture);
             }
-        }
-
-        private BloomSettings LoadBloomSettings(string type)
-        {
-            using (Stream stream = Game.ZipContent.GetFileStream("Content/Settings/Bloom.xml"))
-            {
-                var settings = (List<BloomSettings>)
-                    new XmlSerializer(typeof(List<BloomSettings>)).Deserialize(stream);
-
-                foreach (BloomSettings bloom in settings)
-                {
-                    if (bloom.Name.Equals(type))
-                    {
-                        return bloom;
-                    }
-                }
-            }
-
-            return null;
         }
 
         private void EnterPostScreen(Texture2D texture)

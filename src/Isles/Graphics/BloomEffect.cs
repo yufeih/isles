@@ -12,31 +12,30 @@ namespace Isles.Graphics
     /// Class holds all the settings used to tweak the bloom effect.
     /// Code grabbed from XNA creators club samples :).
     /// </summary>
-    [Serializable]
     public class BloomSettings
     {
         // Name of a preset bloom setting, for display to the user.
-        public string Name;
+        public string Name { get; set; }
 
         // Controls how bright a pixel needs to be before it will bloom.
         // Zero makes everything bloom equally, while higher values select
         // only brighter colors. Somewhere between 0.25 and 0.5 is good.
-        public float BloomThreshold;
+        public float BloomThreshold { get; set; }
 
         // Controls how much blurring is applied to the bloom image.
         // The typical range is from 1 up to 10 or so.
-        public float BlurAmount;
+        public float BlurAmount { get; set; }
 
         // Controls the amount of the bloom and base images that
         // will be mixed into the final scene. Range 0 to 1.
-        public float BloomIntensity;
-        public float BaseIntensity;
+        public float BloomIntensity { get; set; }
+        public float BaseIntensity { get; set; }
 
         // Independently control the color saturation of the bloom and
         // base images. Zero is totally desaturated, 1.0 leaves saturation
         // unchanged, while higher values increase the saturation level.
-        public float BloomSaturation;
-        public float BaseSaturation;
+        public float BloomSaturation { get; set; }
+        public float BaseSaturation { get; set; }
 
         public BloomSettings()
         {
