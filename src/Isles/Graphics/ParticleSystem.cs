@@ -10,6 +10,7 @@ using Isles.Engine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Graphics.PackedVector;
 
 namespace Isles.Graphics
 {
@@ -160,14 +161,14 @@ namespace Isles.Graphics
         private readonly Game game;
         private readonly ContentManager content;
 
-        // Custom effect for drawing point sprite particles. This computes the particle
+        // Custom effect for drawing particles. This computes the particle
         // animation entirely in the vertex shader: no per-particle CPU work required!
         private Effect particleEffect;
 
         // Shortcuts for accessing frequently changed effect parameters.
         private EffectParameter effectViewParameter;
         private EffectParameter effectProjectionParameter;
-        private EffectParameter effectViewportHeightParameter;
+        private EffectParameter effectViewportScaleParameter;
         private EffectParameter effectTimeParameter;
 
         // An array of particles, treated as a circular queue.
@@ -179,6 +180,9 @@ namespace Isles.Graphics
 
         // Vertex declaration describes the format of our ParticleVertex structure.
         private VertexDeclaration vertexDeclaration;
+
+        // Index buffer turns sets of four vertices into particle quads (pairs of triangles).
+        IndexBuffer indexBuffer;
 
         // The particles array and vertex buffer are treated as a circular queue.
         // Initially, the entire contents of the array are free, because no particles
@@ -338,12 +342,41 @@ namespace Isles.Graphics
             vertexDeclaration = new VertexDeclaration(game.GraphicsDevice,
                                                       ParticleVertex.VertexElements);
 
+            // Allocate the particle array, and fill in the corner fields (which never change).
+            particles = new ParticleVertex[settings.MaxParticles * 4];
+
+            for (var i = 0; i < settings.MaxParticles; i++)
+            {
+                particles[i * 4 + 0].Corner = new Short2(-1, -1);
+                particles[i * 4 + 1].Corner = new Short2(1, -1);
+                particles[i * 4 + 2].Corner = new Short2(1, 1);
+                particles[i * 4 + 3].Corner = new Short2(-1, 1);
+            }
+
             // Create a dynamic vertex buffer.
-            vertexBuffer = new DynamicVertexBuffer(game.GraphicsDevice, typeof(ParticleVertex), particles.Length, BufferUsage.WriteOnly | BufferUsage.Points);
+            vertexBuffer = new DynamicVertexBuffer(game.GraphicsDevice, typeof(ParticleVertex), particles.Length * 4, BufferUsage.WriteOnly);
 
             // Initialize the vertex buffer contents. This is necessary in order
             // to correctly restore any existing particles after a lost device.
             vertexBuffer.SetData(particles);
+
+            // Create and populate the index buffer.
+            var indices = new ushort[settings.MaxParticles * 6];
+
+            for (var i = 0; i < settings.MaxParticles; i++)
+            {
+                indices[i * 6 + 0] = (ushort)(i * 4 + 0);
+                indices[i * 6 + 1] = (ushort)(i * 4 + 1);
+                indices[i * 6 + 2] = (ushort)(i * 4 + 2);
+
+                indices[i * 6 + 3] = (ushort)(i * 4 + 0);
+                indices[i * 6 + 4] = (ushort)(i * 4 + 2);
+                indices[i * 6 + 5] = (ushort)(i * 4 + 3);
+            }
+
+            indexBuffer = new IndexBuffer(game.GraphicsDevice, typeof(ushort), indices.Length, BufferUsage.WriteOnly);
+
+            indexBuffer.SetData(indices);
         }
 
         /// <summary>
@@ -365,7 +398,7 @@ namespace Isles.Graphics
             // Look up shortcuts for parameters that change every frame.
             effectViewParameter = parameters["View"];
             effectProjectionParameter = parameters["Projection"];
-            effectViewportHeightParameter = parameters["ViewportHeight"];
+            effectViewportScaleParameter = parameters["ViewportScale"];
             effectTimeParameter = parameters["CurrentTime"];
         }
 
@@ -374,12 +407,6 @@ namespace Isles.Graphics
         /// </summary>
         public void Refresh()
         {
-            // Enlarge our buffer
-            if (particles == null || particles.Length < settings.MaxParticles)
-            {
-                particles = new ParticleVertex[settings.MaxParticles];
-            }
-
             EffectParameterCollection parameters = particleEffect.Parameters;
 
             // Set the values of parameters that do not change.
@@ -403,11 +430,6 @@ namespace Isles.Graphics
             Texture2D texture = content.Load<Texture2D>(settings.TextureName);
 
             parameters["Texture"].SetValue(texture);
-
-            // Choose the appropriate effect technique. If these particles will never
-            // rotate, we can use a simpler pixel shader that requires less GPU power.
-            var techniqueName = (settings.MinRotateSpeed == 0) && (settings.MaxRotateSpeed == 0) ? "NonRotatingParticles" : "RotatingParticles";
-            particleEffect.CurrentTechnique = particleEffect.Techniques[techniqueName];
         }
 
         private bool presented;
@@ -457,7 +479,9 @@ namespace Isles.Graphics
             while (firstActiveParticle != firstNewParticle)
             {
                 // Is this particle old enough to retire?
-                var particleAge = currentTime - particles[firstActiveParticle].Time;
+                // We multiply the active particle index by four, because each
+                // particle consists of a quad that is made up of four vertices.
+                var particleAge = currentTime - particles[firstActiveParticle * 4].Time;
 
                 if (particleAge < particleDuration)
                 {
@@ -465,12 +489,12 @@ namespace Isles.Graphics
                 }
 
                 // Remember the time at which we retired this particle.
-                particles[firstActiveParticle].Time = drawCounter;
+                particles[firstActiveParticle * 4].Time = drawCounter;
 
                 // Move the particle from the active to the retired queue.
                 firstActiveParticle++;
 
-                if (firstActiveParticle >= particles.Length)
+                if (firstActiveParticle >= settings.MaxParticles)
                 {
                     firstActiveParticle = 0;
                 }
@@ -488,7 +512,9 @@ namespace Isles.Graphics
             {
                 // Has this particle been unused long enough that
                 // the GPU is sure to be finished with it?
-                var age = drawCounter - (int)particles[firstRetiredParticle].Time;
+                // We multiply the retired particle index by four, because each
+                // particle consists of a quad that is made up of four vertices.
+                var age = drawCounter - (int)particles[firstRetiredParticle * 4].Time;
 
                 // The GPU is never supposed to get more than 2 frames behind the CPU.
                 // We add 1 to that, just to be safe in case of buggy drivers that
@@ -501,7 +527,7 @@ namespace Isles.Graphics
                 // Move the particle from the retired to the free queue.
                 firstRetiredParticle++;
 
-                if (firstRetiredParticle >= particles.Length)
+                if (firstRetiredParticle >= settings.MaxParticles)
                 {
                     firstRetiredParticle = 0;
                 }
@@ -539,9 +565,9 @@ namespace Isles.Graphics
 
                 SetParticleRenderStates(device.RenderState);
 
-                // Set an effect parameter describing the viewport size. This is needed
-                // to convert particle sizes into screen space point sprite sizes.
-                effectViewportHeightParameter.SetValue(device.Viewport.Height);
+                // Set an effect parameter describing the viewport size. This is
+                // needed to convert particle sizes into screen space point sizes.
+                effectViewportScaleParameter.SetValue(new Vector2(0.5f / device.Viewport.AspectRatio, -0.5f));
 
                 // Set an effect parameter describing the current time. All the vertex
                 // shader particle animation is keyed off this value.
@@ -552,6 +578,8 @@ namespace Isles.Graphics
                                              ParticleVertex.SizeInBytes);
 
                 device.VertexDeclaration = vertexDeclaration;
+
+                device.Indices = indexBuffer;
 
                 // Activate the particle effect.
                 particleEffect.Begin();
@@ -564,23 +592,23 @@ namespace Isles.Graphics
                     {
                         // If the active particles are all in one consecutive range,
                         // we can draw them all in a single call.
-                        device.DrawPrimitives(PrimitiveType.PointList,
-                                              firstActiveParticle,
-                                              firstFreeParticle - firstActiveParticle);
+                        device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0,
+                            firstActiveParticle * 4, (firstFreeParticle - firstActiveParticle) * 4,
+                            firstActiveParticle * 6, (firstFreeParticle - firstActiveParticle) * 2);
                     }
                     else
                     {
                         // If the active particle range wraps past the end of the queue
                         // back to the start, we must split them over two draw calls.
-                        device.DrawPrimitives(PrimitiveType.PointList,
-                                              firstActiveParticle,
-                                              particles.Length - firstActiveParticle);
+                        device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0,
+                            firstActiveParticle * 4, (settings.MaxParticles - firstActiveParticle) * 4,
+                            firstActiveParticle * 6, (settings.MaxParticles - firstActiveParticle) * 2);
 
                         if (firstFreeParticle > 0)
                         {
-                            device.DrawPrimitives(PrimitiveType.PointList,
-                                                  0,
-                                                  firstFreeParticle);
+                            device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0,
+                                0, firstFreeParticle * 4,
+                                0, firstFreeParticle * 2);
                         }
                     }
 
@@ -589,11 +617,9 @@ namespace Isles.Graphics
 
                 particleEffect.End();
 
-                // Reset a couple of the more unusual renderstates that we changed,
+                // Reset some of the renderstates that we changed,
                 // so as not to mess up any other subsequent drawing.
-                device.RenderState.PointSpriteEnable = false;
                 device.RenderState.DepthBufferWriteEnable = true;
-                // if(this.settings.)
                 device.RenderState.DepthBufferFunction = CompareFunction.LessEqual;
             }
 
@@ -612,22 +638,21 @@ namespace Isles.Graphics
             {
                 // If the new particles are all in one consecutive range,
                 // we can upload them all in a single call.
-                vertexBuffer.SetData(firstNewParticle * stride, particles,
-                                     firstNewParticle,
-                                     firstFreeParticle - firstNewParticle, stride);
+                vertexBuffer.SetData(firstNewParticle * stride * 4, particles,
+                                     firstNewParticle * 4,
+                                     (firstFreeParticle - firstNewParticle) * 4, stride);
             }
             else
             {
                 // If the new particle range wraps past the end of the queue
                 // back to the start, we must split them over two upload calls.
-                vertexBuffer.SetData(firstNewParticle * stride, particles,
-                                     firstNewParticle,
-                                     particles.Length - firstNewParticle, stride);
+                vertexBuffer.SetData(firstNewParticle * stride * 4, particles,
+                                     firstNewParticle * 4,
+                                     (settings.MaxParticles - firstNewParticle) * 4, stride);
 
                 if (firstFreeParticle > 0)
                 {
-                    vertexBuffer.SetData(0, particles,
-                                         0, firstFreeParticle, stride);
+                    vertexBuffer.SetData(0, particles, 0, firstFreeParticle * 4, stride);
                 }
             }
 
@@ -640,10 +665,6 @@ namespace Isles.Graphics
         /// </summary>
         private void SetParticleRenderStates(RenderState renderState)
         {
-            // Enable point sprites.
-            renderState.PointSpriteEnable = true;
-            renderState.PointSizeMax = 256;
-
             // Set the alpha blend mode.
             renderState.AlphaBlendEnable = true;
             renderState.AlphaBlendOperation = BlendFunction.Add;
@@ -680,7 +701,7 @@ namespace Isles.Graphics
             // Figure out where in the circular queue to allocate the new particle.
             var nextFreeParticle = firstFreeParticle + 1;
 
-            if (nextFreeParticle >= particles.Length)
+            if (nextFreeParticle >= settings.MaxParticles)
             {
                 nextFreeParticle = 0;
             }
@@ -718,10 +739,13 @@ namespace Isles.Graphics
                                            (byte)random.Next(255));
 
             // Fill in the particle vertex structure.
-            particles[firstFreeParticle].Position = position;
-            particles[firstFreeParticle].Velocity = velocity;
-            particles[firstFreeParticle].Random = randomValues;
-            particles[firstFreeParticle].Time = currentTime;
+            for (var i = 0; i < 4; i++)
+            {
+                particles[firstFreeParticle * 4 + i].Position = position;
+                particles[firstFreeParticle * 4 + i].Velocity = velocity;
+                particles[firstFreeParticle * 4 + i].Random = randomValues;
+                particles[firstFreeParticle * 4 + i].Time = currentTime;
+            }
 
             firstFreeParticle = nextFreeParticle;
         }
@@ -860,6 +884,9 @@ namespace Isles.Graphics
     /// </summary>
     public struct ParticleVertex
     {
+        // Stores which corner of the particle quad this vertex represents.
+        public Short2 Corner;
+
         // Stores the starting position of the particle.
         public Vector3 Position;
 
@@ -875,25 +902,29 @@ namespace Isles.Graphics
         // Describe the layout of this vertex structure.
         public static readonly VertexElement[] VertexElements =
         {
-            new VertexElement(0, 0, VertexElementFormat.Vector3,
+            new VertexElement (0, 0, VertexElementFormat.Short2,
                                     VertexElementMethod.Default,
                                     VertexElementUsage.Position, 0),
 
-            new VertexElement(0, 12, VertexElementFormat.Vector3,
+            new VertexElement(0, 4, VertexElementFormat.Vector3,
+                                    VertexElementMethod.Default,
+                                    VertexElementUsage.Position, 1),
+
+            new VertexElement(0, 16, VertexElementFormat.Vector3,
                                      VertexElementMethod.Default,
                                      VertexElementUsage.Normal, 0),
 
-            new VertexElement(0, 24, VertexElementFormat.Color,
+            new VertexElement(0, 28, VertexElementFormat.Color,
                                      VertexElementMethod.Default,
                                      VertexElementUsage.Color, 0),
 
-            new VertexElement(0, 28, VertexElementFormat.Single,
+            new VertexElement(0, 32, VertexElementFormat.Single,
                                      VertexElementMethod.Default,
                                      VertexElementUsage.TextureCoordinate, 0),
         };
 
         // Describe the size of this vertex structure.
-        public const int SizeInBytes = 32;
+        public const int SizeInBytes = 36;
     }
 
     /// <summary>
