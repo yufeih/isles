@@ -1982,29 +1982,6 @@ namespace Isles
 
         public override void Draw(GameTime gameTime)
         {
-            // When exploding, perform an ray test with the terrain,
-            // if we can't see the fireball, then nothing will be drawed since
-            // we turned off depth buffer
-            // if (explode)
-            // {
-            //    Ray ray;
-
-            // ray.Position = screen.Game.Eye;
-            //    Vector3 v = Position - ray.Position;
-            //    ray.Direction = Vector3.Normalize(v);
-
-            // Vector3? result = screen.Landscape.Pick();
-
-            // // The billboard won't be drawed if we can't see it
-            //    if (result.HasValue &&
-            //        result.Value.LengthSquared() < v.LengthSquared())
-            //    {
-            //        return;
-            //    }
-            // }
-
-            // screen.Game.PointSprite.Draw(texture[(int)frame], Position, 128);
-
             // It's not accurate to use point sprite to draw the fireball,
             // so use center oriented billboard instead.
             var billboard = new Billboard

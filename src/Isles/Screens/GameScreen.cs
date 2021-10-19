@@ -511,15 +511,13 @@ namespace Isles
             Game.ModelManager.Present(gameTime);
             Game.Billboard.Present(gameTime);
             Game.Graphics2D.Present();
-            Game.PointSprite.Present(gameTime);
             ParticleSystem.Present(gameTime);
 
             if (postScreen)
             {
                 // Draw post screen texture
                 Game.Graphics2D.Sprite.Begin();
-                Game.Graphics2D.Sprite.Draw(victoryTexture != null ? victoryTexture : failureTexture,
-                                            postScreenRectangle, Color.White);
+                Game.Graphics2D.Sprite.Draw(victoryTexture ?? failureTexture, postScreenRectangle, Color.White);
                 Game.Graphics2D.Sprite.End();
 
                 // Lerp bloom settings

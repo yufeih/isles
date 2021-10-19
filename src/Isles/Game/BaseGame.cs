@@ -217,11 +217,6 @@ viewProjectionInverse;
         public BillboardManager Billboard { get; private set; }
 
         /// <summary>
-        /// Gets point sprite manager.
-        /// </summary>
-        public PointSpriteManager PointSprite { get; private set; }
-
-        /// <summary>
         /// Gets game model manager.
         /// </summary>
         public ModelManager ModelManager { get; private set; }
@@ -466,11 +461,6 @@ viewProjectionInverse;
                 Shadow = new ShadowEffect(this);
                 Log.Write("Shadow Mapping Effect Initialized...");
             }
-
-            // trailEffect = new TrailEffectManager();
-            // Log.Write("Trail Effect Initialized...");
-            PointSprite = new PointSpriteManager(this);
-            Log.Write("PointSprite Initialized...");
 
             // Notify all screens to load contents
             foreach (KeyValuePair<string, IScreen> screen in Screens)
@@ -764,11 +754,6 @@ viewProjectionInverse;
             }
 
             ParticleSystem.Present(gameTime);
-
-            if (PointSprite != null)
-            {
-                PointSprite.Present(gameTime);
-            }
 
             Graphics2D.Present();
 
