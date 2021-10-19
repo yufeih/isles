@@ -141,25 +141,15 @@ namespace Isles.Graphics
     {
         public string ParticleName { get; set; }
 
-        // Settings class controls the appearance and animation of this particle system.
-        private ParticleSettings settings;
-
         /// <summary>
         /// Gets or sets the settings for this particle system.
         /// </summary>
-        public ParticleSettings Settings
-        {
-            get => settings;
-            set
-            {
-                settings = value;
-                Refresh();
-            }
-        }
+        public ParticleSettings Settings { get; }
 
         // For accessing view projection matrix
         private readonly Game game;
-        private readonly ContentManager content;
+
+        private Texture2D texture;
 
         // Custom effect for drawing particles. This computes the particle
         // animation entirely in the vertex shader: no per-particle CPU work required!
@@ -322,15 +312,9 @@ namespace Isles.Graphics
         {
             this.game = game;
 
-            if (game is BaseGame)
-            {
-                content = (game as BaseGame).Content;
-            }
-
-            LoadParticleEffect();
-
             Settings = settings;
 
+            LoadParticleEffect();
             LoadContent();
         }
 
@@ -343,9 +327,9 @@ namespace Isles.Graphics
                                                       ParticleVertex.VertexElements);
 
             // Allocate the particle array, and fill in the corner fields (which never change).
-            particles = new ParticleVertex[settings.MaxParticles * 4];
+            particles = new ParticleVertex[Settings.MaxParticles * 4];
 
-            for (var i = 0; i < settings.MaxParticles; i++)
+            for (var i = 0; i < Settings.MaxParticles; i++)
             {
                 particles[i * 4 + 0].Corner = new Short2(-1, -1);
                 particles[i * 4 + 1].Corner = new Short2(1, -1);
@@ -361,9 +345,9 @@ namespace Isles.Graphics
             vertexBuffer.SetData(particles);
 
             // Create and populate the index buffer.
-            var indices = new ushort[settings.MaxParticles * 6];
+            var indices = new ushort[Settings.MaxParticles * 6];
 
-            for (var i = 0; i < settings.MaxParticles; i++)
+            for (var i = 0; i < Settings.MaxParticles; i++)
             {
                 indices[i * 6 + 0] = (ushort)(i * 4 + 0);
                 indices[i * 6 + 1] = (ushort)(i * 4 + 1);
@@ -384,50 +368,40 @@ namespace Isles.Graphics
         /// </summary>
         private void LoadParticleEffect()
         {
-            Effect effect = content.Load<Effect>("Effects/ParticleEffect");
+            particleEffect = game.Content.Load<Effect>("Effects/ParticleEffect");
 
-            // If we have several particle systems, the content manager will return
-            // a single shared effect instance to them all. But we want to preconfigure
-            // the effect with parameters that are specific to this particular
-            // particle system. By cloning the effect, we prevent one particle system
-            // from stomping over the parameter settings of another.
-            particleEffect = effect.Clone(game.GraphicsDevice);
-
-            EffectParameterCollection parameters = particleEffect.Parameters;
+            var parameters = particleEffect.Parameters;
 
             // Look up shortcuts for parameters that change every frame.
             effectViewParameter = parameters["View"];
             effectProjectionParameter = parameters["Projection"];
             effectViewportScaleParameter = parameters["ViewportScale"];
             effectTimeParameter = parameters["CurrentTime"];
-        }
-
-        /// <summary>
-        /// Refresh particle settings.
-        /// </summary>
-        public void Refresh()
-        {
-            EffectParameterCollection parameters = particleEffect.Parameters;
-
-            // Set the values of parameters that do not change.
-            parameters["Duration"].SetValue((float)settings.Duration);
-            parameters["DurationRandomness"].SetValue(settings.DurationRandomness);
-            parameters["Gravity"].SetValue(settings.Gravity);
-            parameters["EndVelocity"].SetValue(settings.EndVelocity);
-            parameters["MinColor"].SetValue(settings.MinColor.ToVector4());
-            parameters["MaxColor"].SetValue(settings.MaxColor.ToVector4());
-
-            parameters["RotateSpeed"].SetValue(
-                new Vector2(settings.MinRotateSpeed, settings.MaxRotateSpeed));
-
-            parameters["StartSize"].SetValue(
-                new Vector2(settings.MinStartSize, settings.MaxStartSize));
-
-            parameters["EndSize"].SetValue(
-                new Vector2(settings.MinEndSize, settings.MaxEndSize));
 
             // Load the particle texture, and set it onto the effect.
-            Texture2D texture = content.Load<Texture2D>(settings.TextureName);
+            texture = game.Content.Load<Texture2D>(Settings.TextureName);
+        }
+
+        private void SetParameters()
+        {
+            var parameters = particleEffect.Parameters;
+
+            // Set the values of parameters that do not change.
+            parameters["Duration"].SetValue((float)Settings.Duration);
+            parameters["DurationRandomness"].SetValue(Settings.DurationRandomness);
+            parameters["Gravity"].SetValue(Settings.Gravity);
+            parameters["EndVelocity"].SetValue(Settings.EndVelocity);
+            parameters["MinColor"].SetValue(Settings.MinColor.ToVector4());
+            parameters["MaxColor"].SetValue(Settings.MaxColor.ToVector4());
+
+            parameters["RotateSpeed"].SetValue(
+                new Vector2(Settings.MinRotateSpeed, Settings.MaxRotateSpeed));
+
+            parameters["StartSize"].SetValue(
+                new Vector2(Settings.MinStartSize, Settings.MaxStartSize));
+
+            parameters["EndSize"].SetValue(
+                new Vector2(Settings.MinEndSize, Settings.MaxEndSize));
 
             parameters["Texture"].SetValue(texture);
         }
@@ -439,11 +413,6 @@ namespace Isles.Graphics
         /// </summary>
         public void Update(GameTime gameTime)
         {
-            if (gameTime == null)
-            {
-                throw new ArgumentNullException("gameTime");
-            }
-
             currentTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             RetireActiveParticles();
@@ -474,7 +443,7 @@ namespace Isles.Graphics
         /// </summary>
         private void RetireActiveParticles()
         {
-            var particleDuration = (float)settings.Duration;
+            var particleDuration = (float)Settings.Duration;
 
             while (firstActiveParticle != firstNewParticle)
             {
@@ -494,7 +463,7 @@ namespace Isles.Graphics
                 // Move the particle from the active to the retired queue.
                 firstActiveParticle++;
 
-                if (firstActiveParticle >= settings.MaxParticles)
+                if (firstActiveParticle >= Settings.MaxParticles)
                 {
                     firstActiveParticle = 0;
                 }
@@ -527,7 +496,7 @@ namespace Isles.Graphics
                 // Move the particle from the retired to the free queue.
                 firstRetiredParticle++;
 
-                if (firstRetiredParticle >= settings.MaxParticles)
+                if (firstRetiredParticle >= Settings.MaxParticles)
                 {
                     firstRetiredParticle = 0;
                 }
@@ -562,6 +531,8 @@ namespace Isles.Graphics
                 // Setup view projection matrix
                 effectViewParameter.SetValue(view);
                 effectProjectionParameter.SetValue(projection);
+
+                SetParameters();
 
                 SetParticleRenderStates(device.RenderState);
 
@@ -601,8 +572,8 @@ namespace Isles.Graphics
                         // If the active particle range wraps past the end of the queue
                         // back to the start, we must split them over two draw calls.
                         device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0,
-                            firstActiveParticle * 4, (settings.MaxParticles - firstActiveParticle) * 4,
-                            firstActiveParticle * 6, (settings.MaxParticles - firstActiveParticle) * 2);
+                            firstActiveParticle * 4, (Settings.MaxParticles - firstActiveParticle) * 4,
+                            firstActiveParticle * 6, (Settings.MaxParticles - firstActiveParticle) * 2);
 
                         if (firstFreeParticle > 0)
                         {
@@ -648,7 +619,7 @@ namespace Isles.Graphics
                 // back to the start, we must split them over two upload calls.
                 vertexBuffer.SetData(firstNewParticle * stride * 4, particles,
                                      firstNewParticle * 4,
-                                     (settings.MaxParticles - firstNewParticle) * 4, stride);
+                                     (Settings.MaxParticles - firstNewParticle) * 4, stride);
 
                 if (firstFreeParticle > 0)
                 {
@@ -668,8 +639,8 @@ namespace Isles.Graphics
             // Set the alpha blend mode.
             renderState.AlphaBlendEnable = true;
             renderState.AlphaBlendOperation = BlendFunction.Add;
-            renderState.SourceBlend = settings.SourceBlend;
-            renderState.DestinationBlend = settings.DestinationBlend;
+            renderState.SourceBlend = Settings.SourceBlend;
+            renderState.DestinationBlend = Settings.DestinationBlend;
 
             // Set the alpha test mode.
             renderState.AlphaTestEnable = true;
@@ -701,7 +672,7 @@ namespace Isles.Graphics
             // Figure out where in the circular queue to allocate the new particle.
             var nextFreeParticle = firstFreeParticle + 1;
 
-            if (nextFreeParticle >= settings.MaxParticles)
+            if (nextFreeParticle >= Settings.MaxParticles)
             {
                 nextFreeParticle = 0;
             }
@@ -714,11 +685,11 @@ namespace Isles.Graphics
 
             // Adjust the input velocity based on how much
             // this particle system wants to be affected by it.
-            velocity *= settings.EmitterVelocitySensitivity;
+            velocity *= Settings.EmitterVelocitySensitivity;
 
             // Add in some random amount of horizontal velocity.
-            var horizontalVelocity = MathHelper.Lerp(settings.MinHorizontalVelocity,
-                                                       settings.MaxHorizontalVelocity,
+            var horizontalVelocity = MathHelper.Lerp(Settings.MinHorizontalVelocity,
+                                                       Settings.MaxHorizontalVelocity,
                                                        (float)random.NextDouble());
 
             var horizontalAngle = random.NextDouble() * MathHelper.TwoPi;
@@ -727,8 +698,8 @@ namespace Isles.Graphics
             velocity.Y += horizontalVelocity * (float)Math.Sin(horizontalAngle);
 
             // Add in some random amount of vertical velocity.
-            velocity.Z += MathHelper.Lerp(settings.MinVerticalVelocity,
-                                          settings.MaxVerticalVelocity,
+            velocity.Z += MathHelper.Lerp(Settings.MinVerticalVelocity,
+                                          Settings.MaxVerticalVelocity,
                                           (float)random.NextDouble());
 
             // Choose four random control values. These will be used by the vertex
