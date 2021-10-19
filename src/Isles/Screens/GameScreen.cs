@@ -337,7 +337,7 @@ namespace Isles
             {
                 if (victoryTexture == null)
                 {
-                    victoryTexture = Game.ZipContent.Load<Texture2D>("Textures/Victory");
+                    victoryTexture = Game.Content.Load<Texture2D>("Textures/Victory");
                 }
 
                 // Load bloom
@@ -359,7 +359,7 @@ namespace Isles
             {
                 if (failureTexture == null)
                 {
-                    failureTexture = Game.ZipContent.Load<Texture2D>("Textures/Failure");
+                    failureTexture = Game.Content.Load<Texture2D>("Textures/Failure");
                 }
 
                 if (Game.Bloom != null)

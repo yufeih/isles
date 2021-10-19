@@ -79,7 +79,7 @@ namespace Isles.Engine
 
         public GameWorld()
         {
-            Content = Game.ZipContent;
+            Content = Game.Content;
         }
 
         /// <summary>

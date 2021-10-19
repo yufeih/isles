@@ -49,7 +49,7 @@ namespace Isles.Graphics
             InitializeWater();
             InitializeSky();
 
-            surfaceEffect = game.ZipContent.Load<Effect>("Effects/Surface");
+            surfaceEffect = game.Content.Load<Effect>("Effects/Surface");
             surfaceDeclaration = new VertexDeclaration(game.GraphicsDevice,
                                      VertexPositionColorTexture.VertexElements);
             surfaceVertexBuffer = new DynamicVertexBuffer(game.GraphicsDevice,
@@ -649,7 +649,7 @@ namespace Isles.Graphics
             {
                 if (glow == null || glow.IsDisposed)
                 {
-                    glow = BaseGame.Singleton.ZipContent.Load<Texture2D>("Textures/Glow");
+                    glow = BaseGame.Singleton.Content.Load<Texture2D>("Textures/Glow");
                 }
 
                 return glow;

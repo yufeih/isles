@@ -93,7 +93,7 @@ namespace Isles
             {
                 Length = 5,
                 Width = 2,
-                Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("Textures/ray2"),
+                Texture = BaseGame.Singleton.Content.Load<Texture2D>("Textures/ray2"),
             };
         }
 

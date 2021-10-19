@@ -95,11 +95,11 @@ namespace Isles
             this.gameScreen = gameScreen;
             ui = new UIDisplay(BaseGame.Singleton);
 
-            titleTexture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/MainEntry");
-            buttonsTexture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/Buttons");
-            loadingDisplayTexture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/LoadingDisplay");
-            distortion = BaseGame.Singleton.ZipContent.Load<Texture2D>("Textures/Distortion");
-            disappearEffect = BaseGame.Singleton.ZipContent.Load<Effect>("Effects/Disappear");
+            titleTexture = BaseGame.Singleton.Content.Load<Texture2D>("UI/MainEntry");
+            buttonsTexture = BaseGame.Singleton.Content.Load<Texture2D>("UI/Buttons");
+            loadingDisplayTexture = BaseGame.Singleton.Content.Load<Texture2D>("UI/LoadingDisplay");
+            distortion = BaseGame.Singleton.Content.Load<Texture2D>("Textures/Distortion");
+            disappearEffect = BaseGame.Singleton.Content.Load<Effect>("Effects/Disappear");
 
             ui.ScaleMode = ScaleMode.Stretch;
             ui.Anchor = Anchor.TopLeft;
@@ -155,7 +155,7 @@ namespace Isles
             // I'll just hard code the size :(
             leftMaskPanel = new Panel(Rectangle.Empty)
             {
-                Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/LeftMask"),
+                Texture = BaseGame.Singleton.Content.Load<Texture2D>("UI/LeftMask"),
             };
             leftMaskPanel.SourceRectangle = new Rectangle(0, 0, leftMaskPanel.Texture.Width, leftMaskPanel.Texture.Height);
             leftMaskPanel.ScaleMode = ScaleMode.Fixed;
@@ -166,7 +166,7 @@ namespace Isles
 
             rightMaskPanel = new Panel(Rectangle.Empty)
             {
-                Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/RightMask"),
+                Texture = BaseGame.Singleton.Content.Load<Texture2D>("UI/RightMask"),
             };
             rightMaskPanel.SourceRectangle = new Rectangle(0, 0, rightMaskPanel.Texture.Width, rightMaskPanel.Texture.Height);
             rightMaskPanel.ScaleMode = ScaleMode.Fixed;

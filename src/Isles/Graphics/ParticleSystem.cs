@@ -320,7 +320,7 @@ namespace Isles.Graphics
 
             if (game is BaseGame)
             {
-                content = (game as BaseGame).ZipContent;
+                content = (game as BaseGame).Content;
             }
 
             LoadParticleEffect();

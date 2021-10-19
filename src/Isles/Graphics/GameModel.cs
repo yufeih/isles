@@ -289,7 +289,7 @@ namespace Isles.Graphics
             : this()
         {
             // Make sure this is the upper case Model
-            Model = game.ZipContent.Load<Model>(modelAssetname);
+            Model = game.Content.Load<Model>(modelAssetname);
         }
 
         /// <summary>
@@ -299,7 +299,7 @@ namespace Isles.Graphics
         public void Load(string modelAssetname)
         {
             // Make sure this is the upper case Model
-            Model = game.ZipContent.Load<Model>(modelAssetname);
+            Model = game.Content.Load<Model>(modelAssetname);
         }
 
         /// <summary>

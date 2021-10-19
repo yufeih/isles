@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text.Json;
 using Isles.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Control = System.Windows.Forms.Control;
@@ -94,11 +95,6 @@ viewProjectionInverse;
                 cursor = value;
             }
         }
-
-        /// <summary>
-        /// Gets content manager.
-        /// </summary>
-        public ZipContentManager ZipContent { get; }
 
         /// <summary>
         /// Gets game input.
@@ -357,9 +353,7 @@ viewProjectionInverse;
             Settings = JsonSerializer.Deserialize<Settings>(File.ReadAllText("data/settings/settings.json"));
             GameSpeed = Settings.GameSpeed;
 
-            ZipContent = new ZipContentManager(Services, Settings.ArchiveFile, Settings.ContentDirectory);
-            Content.RootDirectory = Settings.ContentDirectory;
-            Log.Write("Archive File:" + Settings.ArchiveFile + "...");
+            Content = new ContentManager(Services, Settings.ContentDirectory);
             Log.Write("Content Directory:" + Settings.ContentDirectory + "...");
 
             Graphics = new GraphicsDeviceManager(this)
@@ -411,7 +405,7 @@ viewProjectionInverse;
 
             if (Settings.EnableSound)
             {
-                Components.Add(Audio = new AudioManager(this, ZipContent));
+                Components.Add(Audio = new AudioManager(this, Content));
                 Log.Write("Sound Initialized...");
             }
 
@@ -430,7 +424,7 @@ viewProjectionInverse;
             if (Settings.BloomSettings != null &&
                 Settings.BloomSettings.Enabled)
             {
-                Bloom = new BloomEffect(this, ZipContent)
+                Bloom = new BloomEffect(this, Content)
                 {
                     Settings = new BloomSettings(
                     Settings.BloomSettings.Type,

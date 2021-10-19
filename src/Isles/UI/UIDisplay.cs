@@ -177,7 +177,7 @@ namespace Isles.UI
         {
             sprite = new SpriteBatch(game.GraphicsDevice);
             effect = new BasicEffect(game.GraphicsDevice, null);
-            font = game.ZipContent.Load<SpriteFont>("Fonts/Default");
+            font = game.Content.Load<SpriteFont>("Fonts/Default");
 
             GraphicsDevice_DeviceReset(game.GraphicsDevice, null);
             game.GraphicsDevice.DeviceReset += new EventHandler(GraphicsDevice_DeviceReset);

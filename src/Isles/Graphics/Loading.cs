@@ -108,7 +108,7 @@ namespace Isles.Graphics
             uiDisplay = new UIDisplay(BaseGame.Singleton);
             progressBar = new ProgressBar
             {
-                Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/ProgressBar"),
+                Texture = BaseGame.Singleton.Content.Load<Texture2D>("UI/ProgressBar"),
                 SourceRectangleLeftEnd = new Rectangle(0, 0, 64, 63),
                 SourceRectangleHightLight = new Rectangle(0, 126, 85, 63),
                 SourceRectangleRightEnd = new Rectangle(165, 0, 64, 63),
@@ -126,7 +126,7 @@ namespace Isles.Graphics
             var backgroundPanel = new Panel(new Rectangle(0, (int)((uiDisplay.Area.Height - height) / 2),
                                     uiDisplay.Area.Width, (int)height))
             {
-                Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/LoadingDisplay"),
+                Texture = BaseGame.Singleton.Content.Load<Texture2D>("UI/LoadingDisplay"),
             };
             backgroundPanel.SourceRectangle = new Rectangle(0, 0, backgroundPanel.Texture.Width, backgroundPanel.Texture.Height);
             backgroundPanel.Anchor = Anchor.Center;
@@ -135,7 +135,7 @@ namespace Isles.Graphics
             var panel = new Panel(new Rectangle(0, (int)((uiDisplay.Area.Height - height) / 2),
                                     uiDisplay.Area.Width, (int)height))
             {
-                Texture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/LoadingDisplay"),
+                Texture = BaseGame.Singleton.Content.Load<Texture2D>("UI/LoadingDisplay"),
             };
             panel.SourceRectangle = new Rectangle(0, 0, panel.Texture.Width, panel.Texture.Height);
             panel.Anchor = Anchor.Center;

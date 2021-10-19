@@ -83,7 +83,7 @@ namespace Isles.Graphics
             this.game = game;
 
             // Init effect
-            Effect = game.ZipContent.Load<Effect>("Effects/ShadowMap");
+            Effect = game.Content.Load<Effect>("Effects/ShadowMap");
 
             CreateRenderTarget();
         }

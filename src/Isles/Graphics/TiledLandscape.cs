@@ -44,7 +44,7 @@ namespace Isles.Graphics
             base.Initialize(game);
 
             // Load terrain effect
-            terrainEffect = game.ZipContent.Load<Effect>("Effects/TiledTerrain");
+            terrainEffect = game.Content.Load<Effect>("Effects/TiledTerrain");
 
             // Create vertex declaraction
             declaraction = new VertexDeclaration(game.GraphicsDevice, TerrainVertex.VertexElements);

@@ -172,15 +172,15 @@ namespace Isles
             Display = new UIDisplay(BaseGame.Singleton);
 
             // Load UI textures
-            borderFadeout = game.ZipContent.Load<Texture2D>("Textures/Fadeout");
-            disappearEffect = game.ZipContent.Load<Effect>("Effects/DisortionDisappear");
-            distortion = game.ZipContent.Load<Texture2D>("Textures/Distortion");
-            panelsTexture = game.ZipContent.Load<Texture2D>("UI/Panels");
-            dialogTexture = game.ZipContent.Load<Texture2D>("UI/Tipbox");
+            borderFadeout = game.Content.Load<Texture2D>("Textures/Fadeout");
+            disappearEffect = game.Content.Load<Effect>("Effects/DisortionDisappear");
+            distortion = game.Content.Load<Texture2D>("Textures/Distortion");
+            panelsTexture = game.Content.Load<Texture2D>("UI/Panels");
+            dialogTexture = game.Content.Load<Texture2D>("UI/Tipbox");
 
             for (var i = 0; i < focusAnimation.Length; i++)
             {
-                focusAnimation[i] = game.ZipContent.Load<Texture2D>("UI/Focus/" + (i + 1));
+                focusAnimation[i] = game.Content.Load<Texture2D>("UI/Focus/" + (i + 1));
             }
 
             Rectangle relativeRect = UIElement.GetRelativeRectangle(new Rectangle

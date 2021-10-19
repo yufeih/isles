@@ -82,7 +82,7 @@ namespace Isles
             {
                 if (snapshotTexture == null)
                 {
-                    snapshotTexture = BaseGame.Singleton.ZipContent.Load<Texture2D>("UI/Snapshots");
+                    snapshotTexture = BaseGame.Singleton.Content.Load<Texture2D>("UI/Snapshots");
                 }
 
                 return snapshotTexture;
@@ -691,7 +691,7 @@ namespace Isles
             {
                 if (selectionAreaTexture == null || selectionAreaTexture.IsDisposed)
                 {
-                    selectionAreaTexture = BaseGame.Singleton.ZipContent.Load<Texture2D>("Textures/SelectionArea");
+                    selectionAreaTexture = BaseGame.Singleton.Content.Load<Texture2D>("Textures/SelectionArea");
                 }
 
                 return selectionAreaTexture;
@@ -706,7 +706,7 @@ namespace Isles
             {
                 if (selectionAreaTextureLarge == null || selectionAreaTexture.IsDisposed)
                 {
-                    selectionAreaTextureLarge = BaseGame.Singleton.ZipContent.Load<Texture2D>("Textures/SelectionAreaLarge");
+                    selectionAreaTextureLarge = BaseGame.Singleton.Content.Load<Texture2D>("Textures/SelectionAreaLarge");
                 }
 
                 return selectionAreaTextureLarge;
@@ -1506,8 +1506,8 @@ namespace Isles
             textureRectangle = new Rectangle(0, 0, TextureSize, TextureSize);
 
             // Create textures & render targets
-            ruinedTexture = game.ZipContent.Load<Texture2D>("Landscapes/Ruined");
-            glowTexture = game.ZipContent.Load<Texture2D>("Textures/Glow");
+            ruinedTexture = game.Content.Load<Texture2D>("Landscapes/Ruined");
+            glowTexture = game.Content.Load<Texture2D>("Textures/Glow");
             currentCanvas = new RenderTarget2D(game.GraphicsDevice, TextureSize, TextureSize, 0, SurfaceFormat.Color);
             finalCanvas = new RenderTarget2D(game.GraphicsDevice, TextureSize, TextureSize, 0, SurfaceFormat.Color);
             depthBuffer = new DepthStencilBuffer(game.GraphicsDevice, TextureSize, TextureSize,

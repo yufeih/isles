@@ -613,7 +613,7 @@ namespace Isles.Graphics
 
         private void CreateEffect()
         {
-            effect = game.ZipContent.Load<Effect>("Effects/Model");
+            effect = game.Content.Load<Effect>("Effects/Model");
             view = effect.Parameters["View"];
             viewInverse = effect.Parameters["ViewInverse"];
             projection = effect.Parameters["Projection"];

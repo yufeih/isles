@@ -249,7 +249,7 @@ namespace Isles.Graphics
         public TrailEffectManager()
         {
             device = BaseGame.Singleton.GraphicsDevice;
-            content = BaseGame.Singleton.ZipContent;
+            content = BaseGame.Singleton.Content;
             trailList = new List<TrailEffect>();
             vertexDeclaration = new VertexDeclaration(device, VertexPositionTexture.VertexElements);
             vertexBuffer = new DynamicVertexBuffer(device, typeof(VertexPositionTexture), (chunckSize + 1) * 2, BufferUsage.WriteOnly);

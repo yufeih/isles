@@ -286,7 +286,7 @@ namespace Isles.Graphics
                 graphics, TerrainVertex.VertexElements);
 
             // Load effect
-            terrainEffect = game.ZipContent.Load<Effect>("Effects/MipmappedTerrain");
+            terrainEffect = game.Content.Load<Effect>("Effects/MipmappedTerrain");
 
             // Initialize terrain vertices
             terrainVertices =

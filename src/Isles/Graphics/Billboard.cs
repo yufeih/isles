@@ -68,7 +68,7 @@ namespace Isles.Graphics
             get => textureName;
             set
             {
-                texture = BaseGame.Singleton.ZipContent.Load<Texture2D>(value);
+                texture = BaseGame.Singleton.Content.Load<Texture2D>(value);
                 textureName = value;
             }
         }
@@ -221,7 +221,7 @@ namespace Isles.Graphics
             this.game = game;
 
             // Initialize billboard effect
-            effect = game.ZipContent.Load<Effect>("Effects/Billboard");
+            effect = game.Content.Load<Effect>("Effects/Billboard");
 
             techniqueVegetation = effect.Techniques["Vegetation"];
             techniqueNormal = effect.Techniques["Normal"];

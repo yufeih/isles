@@ -6,7 +6,6 @@ namespace Isles.Engine
     public class Settings
     {
         public string ContentDirectory { get; set; } = "Content";
-        public string ArchiveFile { get; set; } = "Content.ixa";
 
         public string DefaultFont { get; set; } = "Fonts/Default";
         public string Graphics2DEffect { get; set; } = "Effects/Graphics2D";
