@@ -93,19 +93,6 @@ namespace Isles
         }
 
         /// <summary>
-        /// Starts a new editor control.
-        /// </summary>
-        public void StartEditor(System.Windows.Forms.Form editorForm)
-        {
-            GameWindow Window = Game.Window;
-            editorForm.Show(System.Windows.Forms.Control.FromHandle(Window.Handle));
-            editorForm.Location = new System.Drawing.Point(
-                Window.ClientBounds.X + Window.ClientBounds.Width / 2,
-                Window.ClientBounds.Y + Window.ClientBounds.Height / 2);
-            Log.Write("Editor Started: " + editorForm.Text);
-        }
-
-        /// <summary>
         /// Starts a new level.
         /// </summary>
         /// <param name="newLevel"></param>

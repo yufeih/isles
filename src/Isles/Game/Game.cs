@@ -32,11 +32,6 @@ namespace Isles
             AddScreen("TitleScreen", titleScreen = new TitleScreen(GameScreen));
 
             StartScreen(titleScreen);
-
-            // Handle editors
-            // StartEditor(new ShadowEditor(gameScreen.World));
-            // StartEditor(new BloomEditor(Bloom));
-            // StartEditor(new WorldEditor(gameScreen));
         }
 
         protected override void Update(GameTime gameTime)
@@ -46,18 +41,6 @@ namespace Isles
 
             // Update audios
             Audios.Update(gameTime);
-        }
-
-        /// <summary>
-        /// Starts a new editor control.
-        /// </summary>
-        public void StartEditor(System.Windows.Forms.Form editorForm)
-        {
-            editorForm.Show(System.Windows.Forms.Control.FromHandle(Window.Handle));
-            editorForm.Location = new System.Drawing.Point(
-                Window.ClientBounds.X + Window.ClientBounds.Width / 2,
-                Window.ClientBounds.Y + Window.ClientBounds.Height / 2);
-            Log.Write("Editor Started: " + editorForm.Text);
         }
 
         private void Register()
