@@ -1518,8 +1518,8 @@ namespace Isles
             {
                 new VertexPositionTexture(new Vector3(-1, -1, 0), new Vector2(0, 1)),
                 new VertexPositionTexture(new Vector3(-1, 1, 0), new Vector2(0, 0)),
-                new VertexPositionTexture(new Vector3(1, 1, 0), new Vector2(1, 0)),
                 new VertexPositionTexture(new Vector3(1, -1, 0), new Vector2(1, 1)),
+                new VertexPositionTexture(new Vector3(1, 1, 0), new Vector2(1, 0)),
             };
 
             // Refresh
@@ -1653,8 +1653,7 @@ namespace Isles
             effect.CurrentTechnique.Passes[0].Begin();
 
             graphics.VertexDeclaration = declaration;
-            graphics.DrawUserPrimitives(PrimitiveType.TriangleFan,
-                                                                         vertices, 0, 2);
+            graphics.DrawUserPrimitives(PrimitiveType.TriangleStrip, vertices, 0, 2);
 
             effect.CurrentTechnique.Passes[0].End();
             effect.End();

@@ -462,13 +462,6 @@ namespace Isles.Engine
             shouldCapture = true;
         }
 
-        /// <summary>
-        /// Make screenshot.
-        /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage(
-            "Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
-            Justification = "App should not crash from making a screenshot, " +
-            "but exceptions are often thrown by this code, see inside.")]
         public void TakeScreenshot()
         {
             try

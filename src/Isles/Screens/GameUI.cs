@@ -271,8 +271,8 @@ namespace Isles
             {
                 new VertexPositionTexture(Vector3.Zero, new Vector2(0, 0)),
                 new VertexPositionTexture(Vector3.Zero, new Vector2(0, 1)),
-                new VertexPositionTexture(Vector3.Zero, new Vector2(1, 1)),
                 new VertexPositionTexture(Vector3.Zero, new Vector2(1, 0)),
+                new VertexPositionTexture(Vector3.Zero, new Vector2(1, 1)),
             };
         }
 
@@ -898,8 +898,8 @@ namespace Isles
 
                 fogOfWarVertices[0].Position = game.Graphics2D.ScreenToEffect(destination.Left, destination.Bottom);
                 fogOfWarVertices[1].Position = game.Graphics2D.ScreenToEffect(destination.Left, destination.Top);
-                fogOfWarVertices[2].Position = game.Graphics2D.ScreenToEffect(destination.Right, destination.Top);
-                fogOfWarVertices[3].Position = game.Graphics2D.ScreenToEffect(destination.Right, destination.Bottom);
+                fogOfWarVertices[2].Position = game.Graphics2D.ScreenToEffect(destination.Right, destination.Bottom);
+                fogOfWarVertices[3].Position = game.Graphics2D.ScreenToEffect(destination.Right, destination.Top);
 
                 // Draw
                 Effect effect = game.Graphics2D.Effect;
@@ -910,8 +910,7 @@ namespace Isles
                 effect.CurrentTechnique.Passes[0].Begin();
 
                 game.GraphicsDevice.VertexDeclaration = fogOfWarDeclaration;
-                game.GraphicsDevice.DrawUserPrimitives
-                    (PrimitiveType.TriangleFan, fogOfWarVertices, 0, 2);
+                game.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, fogOfWarVertices, 0, 2);
 
                 effect.CurrentTechnique.Passes[0].End();
                 effect.End();
