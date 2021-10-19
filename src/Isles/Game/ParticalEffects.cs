@@ -14,10 +14,6 @@ namespace Isles
         public ParticleEffect(GameWorld world)
             : base(world) { }
 
-        public abstract ParticleSystem Particle { get; }
-
-        public abstract float Emission { get; set; }
-
         public override void Update(GameTime gameTime) { }
 
         public override void Draw(GameTime gameTime) { }
@@ -386,14 +382,6 @@ namespace Isles
         private readonly ProjectileEmitter emitter;
         private readonly ParticleSystem particle;
 
-        public override ParticleSystem Particle => particle;
-
-        public override float Emission
-        {
-            get => emitter.ParticlesPerSecond;
-            set => emitter.ParticlesPerSecond = value;
-        }
-
         public EffectTest(GameWorld world, IWorldObject target, Vector3 position)
             : base(world)
         {
@@ -411,14 +399,6 @@ namespace Isles
     {
         private readonly AreaEmitter emitter;
         private readonly ParticleSystem particle;
-
-        public override ParticleSystem Particle => particle;
-
-        public override float Emission
-        {
-            get => emitter.ParticlesPerSecond;
-            set => emitter.ParticlesPerSecond = value;
-        }
 
         public EffectConstruct(GameWorld world, Outline outline, float minHeight, float maxHeight)
             : base(world)
@@ -439,14 +419,6 @@ namespace Isles
         private readonly ParticleSystem smoke;
         private readonly ParticleEmitter fireEmitter;
         private readonly ParticleEmitter smokeEmitter;
-
-        public override ParticleSystem Particle => smoke;
-
-        public override float Emission
-        {
-            get => smokeEmitter.ParticlesPerSecond;
-            set => smokeEmitter.ParticlesPerSecond = value;
-        }
 
         public EffectFire(GameWorld world)
             : this(world, Vector3.Zero) { }
@@ -475,14 +447,6 @@ namespace Isles
         private readonly ProjectileEmitter fireEmitter;
 
         public IProjectile Projectile => fireEmitter;
-
-        public override ParticleSystem Particle => explosion;
-
-        public override float Emission
-        {
-            get => fireEmitter.ParticlesPerSecond;
-            set => fireEmitter.ParticlesPerSecond = value;
-        }
 
         public EffectFireball(GameWorld world, Vector3 position, Vector3 velocity, IWorldObject target)
             : this(world, position, velocity, target, "Fireball", "FireballExplosion") { }
@@ -518,15 +482,6 @@ namespace Isles
         private readonly ParticleSystem fire;
         private readonly ParticleSystem smoke;
         private readonly ParticleSystem spark;
-        private int ParticleCount = 50;
-
-        public override ParticleSystem Particle => spark;
-
-        public override float Emission
-        {
-            get => ParticleCount;
-            set => ParticleCount = (int)value;
-        }
 
         public EffectExplosion(GameWorld world)
             : this(world, Vector3.Zero) { }
@@ -581,14 +536,6 @@ namespace Isles
         private readonly ParticleSystem particle;
         private readonly CircularEmitter emitter;
 
-        public override ParticleSystem Particle => particle;
-
-        public override float Emission
-        {
-            get => emitter.ParticlesPerSecond;
-            set => emitter.ParticlesPerSecond = value;
-        }
-
         public EffectStar(GameWorld world)
             : this(world, null) { }
 
@@ -622,14 +569,6 @@ namespace Isles
         private readonly GameObject target;
         private readonly ParticleSystem particle;
         private readonly ParticleEmitter emitter;
-
-        public override ParticleSystem Particle => particle;
-
-        public override float Emission
-        {
-            get => emitter.ParticlesPerSecond;
-            set => emitter.ParticlesPerSecond = value;
-        }
 
         public EffectGlow(GameWorld world)
             : this(world, null) { }
@@ -669,14 +608,6 @@ namespace Isles
         private readonly ParticleSystem rain;
         private readonly ParticleEmitter[] rainEmitters = new ParticleEmitter[MaxRainDrops];
         private readonly float[] sleepTimes = new float[MaxRainDrops];
-
-        public override ParticleSystem Particle => rain;
-
-        public override float Emission
-        {
-            get => 0;
-            set { }
-        }
 
         public EffectPunishOfNature(GameWorld world, Vector3 position)
             : base(world)
@@ -747,14 +678,6 @@ namespace Isles
         private readonly ParticleEmitter emitter;
         private readonly ParticleSystem particle;
 
-        public override ParticleSystem Particle => particle;
-
-        public override float Emission
-        {
-            get => emitter.ParticlesPerSecond;
-            set => emitter.ParticlesPerSecond = value;
-        }
-
         public EffectHalo(GameWorld world, Vector3 position, float radius, string particleSystem)
             : base(world)
         {
@@ -786,14 +709,6 @@ namespace Isles
         private const int Count = 5;
         private readonly ParticleEmitter[] emitters;
         private readonly ParticleSystem particle;
-
-        public override ParticleSystem Particle => particle;
-
-        public override float Emission
-        {
-            get => 0;
-            set { }
-        }
 
         public EffectSpawn(GameWorld world, Vector3 position, float radius, string particleSystem)
             : base(world)
