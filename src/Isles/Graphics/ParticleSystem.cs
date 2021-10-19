@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using System.Xml.Serialization;
 using Isles.Engine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -29,7 +28,6 @@ namespace Isles.Graphics
     ///
     /// new ParticleSystem(new ParticleSettings()).
     /// </example>
-    [Serializable]
     public class ParticleSettings
     {
         /// <summary>
@@ -140,13 +138,7 @@ namespace Isles.Graphics
     /// </summary>
     public class ParticleSystem
     {
-        public string ParticleName
-        {
-            get => name;
-            set => name = value;
-        }
-
-        private string name;
+        public string ParticleName { get; set; }
 
         // Settings class controls the appearance and animation of this particle system.
         private ParticleSettings settings;
@@ -347,10 +339,7 @@ namespace Isles.Graphics
                                                       ParticleVertex.VertexElements);
 
             // Create a dynamic vertex buffer.
-            var size = ParticleVertex.SizeInBytes * particles.Length;
-
-            vertexBuffer = new DynamicVertexBuffer(game.GraphicsDevice, size,
-                                                   BufferUsage.WriteOnly | BufferUsage.Points);
+            vertexBuffer = new DynamicVertexBuffer(game.GraphicsDevice, typeof(ParticleVertex), particles.Length, BufferUsage.WriteOnly | BufferUsage.Points);
 
             // Initialize the vertex buffer contents. This is necessary in order
             // to correctly restore any existing particles after a lost device.
