@@ -1029,9 +1029,7 @@ namespace Isles
             SpriteBatch spriteBatch = Display.Sprite;
 
             // Begin the sprite batch.
-            spriteBatch.Begin(SpriteBlendMode.AlphaBlend,
-                              SpriteSortMode.Immediate,
-                              SaveStateMode.SaveState);
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
 
             game.GraphicsDevice.SamplerStates[0].AddressU = TextureAddressMode.Mirror;
             game.GraphicsDevice.SamplerStates[0].AddressV = TextureAddressMode.Mirror;

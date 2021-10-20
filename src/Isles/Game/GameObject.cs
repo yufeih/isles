@@ -1585,11 +1585,11 @@ namespace Isles
             graphics.DepthStencilBuffer = depthBuffer;
 
             // Draw all ruined regions
-            graphics.SetRenderTarget(0, currentCanvas);
+            graphics.SetRenderTarget(currentCanvas);
             graphics.Clear(Color.Black);
 
             // Draw glows
-            sprite.Begin(SpriteBlendMode.Additive);
+            sprite.Begin(SpriteSortMode.Immediate, BlendState.Additive);
 
             Rectangle destination;
             foreach (Region entry in ruinedAreas)
@@ -1606,7 +1606,7 @@ namespace Isles
             sprite.End();
 
             // Draw discovered area texture without clearing it
-            graphics.SetRenderTarget(0, null);
+            graphics.SetRenderTarget(null);
             graphics.DepthStencilBuffer = prevDepth;
 
             // Retrieve new alpha texture
@@ -1631,12 +1631,12 @@ namespace Isles
             graphics.DepthStencilBuffer = depthBuffer;
 
             // Draw all ruined regions
-            graphics.SetRenderTarget(0, finalCanvas);
+            graphics.SetRenderTarget(finalCanvas);
             graphics.Clear(Color.Black);
 
             if (finalTexture != null)
             {
-                sprite.Begin(SpriteBlendMode.None);
+                sprite.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
                 sprite.Draw(finalTexture, textureRectangle, Color.White);
                 sprite.End();
             }
@@ -1660,7 +1660,7 @@ namespace Isles
 
             graphics.RenderState.AlphaBlendEnable = false;
 
-            graphics.SetRenderTarget(0, null);
+            graphics.SetRenderTarget(null);
             graphics.DepthStencilBuffer = prevDepth;
 
             // Retrieve new alpha texture

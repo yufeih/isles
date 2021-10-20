@@ -92,17 +92,17 @@ namespace Isles.Graphics
                 {
                     // Fill patch vertices
                     Patches[patchIndex].FillVertices(0,
-                    delegate(int x, int y)
+                    delegate (int x, int y)
                     {
                         return new Vector3(x * Size.X / (GridCountOnXAxis - 1),
                                            y * Size.Y / (GridCountOnYAxis - 1),
                                            HeightField[x, y]);
                     },
-                    delegate(uint index, Vector3 position)
+                    delegate (uint index, Vector3 position)
                     {
                         vertices[index].Position = position;
                     },
-                    delegate(uint index, int x, int y)
+                    delegate (uint index, int x, int y)
                     {
                         vertices[index].Normal = NormalField[x, y];
                         vertices[index].Tangent = TangentField[x, y];

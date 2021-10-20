@@ -396,9 +396,7 @@ namespace Isles
                 {
                     SpriteBatch spriteBatch = ui.Sprite;
                     // Begin the sprite batch.
-                    spriteBatch.Begin(SpriteBlendMode.AlphaBlend,
-                                      SpriteSortMode.Immediate,
-                                      SaveStateMode.SaveState);
+                    spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
 
                     BaseGame.Singleton.GraphicsDevice.Textures[1] = distortion;
 

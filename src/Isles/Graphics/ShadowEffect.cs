@@ -138,7 +138,7 @@ namespace Isles.Graphics
             storedDepthStencil = game.GraphicsDevice.DepthStencilBuffer;
 
             // Set shadow mapping targets
-            game.GraphicsDevice.SetRenderTarget(0, renderTarget);
+            game.GraphicsDevice.SetRenderTarget(renderTarget);
             game.GraphicsDevice.DepthStencilBuffer = depthStencil;
 
             game.GraphicsDevice.RenderState.DepthBufferEnable = true;
@@ -159,7 +159,7 @@ namespace Isles.Graphics
             if (storedDepthStencil != null)
             {
                 // Restore everything
-                game.GraphicsDevice.SetRenderTarget(0, null);
+                game.GraphicsDevice.SetRenderTarget(null);
                 game.GraphicsDevice.DepthStencilBuffer = storedDepthStencil;
                 storedDepthStencil = null;
 

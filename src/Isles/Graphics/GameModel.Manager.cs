@@ -425,10 +425,6 @@ namespace Isles.Graphics
         {
             private readonly Effect effect = ModelManager.ModelEffect;
 
-            // EffectParameter ambient;
-            // EffectParameter emissive;
-            // EffectParameter specular;
-            // EffectParameter specularPower;
             private readonly EffectParameter basicTexture;
             private readonly EffectParameter normalTexture;
             private readonly Material material;
@@ -456,14 +452,6 @@ namespace Isles.Graphics
                     return;
                 }
 
-                // if (ambient != null)
-                //    ambient.SetValue(material.AmbientColor);
-                // if (emissive != null)
-                //    emissive.SetValue(material.EmissiveColor);
-                // if (specular != null)
-                //    specular.SetValue(material.SpecularColor);
-                // if (specularPower != null)
-                //    specularPower.SetValue(material.SpecularPower);
                 if (basicTexture != null)
                 {
                     basicTexture.SetValue(material.Texture);
@@ -495,14 +483,12 @@ namespace Isles.Graphics
                     if (r.MeshPart == part &&
                         r.IsTransparent == material.IsTransparent)
                     {
-                        System.Diagnostics.Debug.Assert(mesh == r.Mesh);
                         return r;
                     }
                 }
 
                 // If it is a new model mesh part, create a new renderable
-                var newRenderable = new Renderable(manager, mesh,
-                                                          part, material.IsTransparent);
+                var newRenderable = new Renderable(manager, mesh, part, material.IsTransparent);
                 renderables.Add(newRenderable);
                 return newRenderable;
             }

@@ -520,7 +520,7 @@ namespace Isles.Graphics
 
             DepthStencilBuffer prevDepth = graphics.DepthStencilBuffer;
             graphics.DepthStencilBuffer = waterDepthStencil;
-            graphics.SetRenderTarget(0, reflectionRenderTarget);
+            graphics.SetRenderTarget(reflectionRenderTarget);
 
             graphics.Clear(Color.Black);
 
@@ -550,7 +550,7 @@ namespace Isles.Graphics
                 DrawTerrain(game.View, game.Projection, false);
             }
 
-            graphics.SetRenderTarget(0, null);
+            graphics.SetRenderTarget(null);
             graphics.DepthStencilBuffer = prevDepth;
 
             // Retrieve refraction texture
@@ -773,11 +773,11 @@ namespace Isles.Graphics
             graphics.DepthStencilBuffer = depthBuffer;
 
             // Draw current glows
-            graphics.SetRenderTarget(0, currentCanvas);
+            graphics.SetRenderTarget(currentCanvas);
             graphics.Clear(Color.Black);
 
             // Draw glows
-            sprite.Begin(SpriteBlendMode.Additive);
+            sprite.Begin(SpriteSortMode.Immediate, BlendState.Additive);
 
             Rectangle destination;
             foreach (Entry entry in visibleAreas)
@@ -794,13 +794,13 @@ namespace Isles.Graphics
             sprite.End();
 
             // Draw discovered area texture without clearing it
-            graphics.SetRenderTarget(0, discoveredCanvas);
+            graphics.SetRenderTarget(discoveredCanvas);
             graphics.Clear(Color.Black);
 
             // Retrieve current glow texture
             current = currentCanvas.GetTexture();
 
-            sprite.Begin(SpriteBlendMode.Additive);
+            sprite.Begin(SpriteSortMode.Immediate, BlendState.Additive);
             if (Discovered != null)
             {
                 sprite.Draw(Discovered, textureRectangle, Color.White);
@@ -810,19 +810,19 @@ namespace Isles.Graphics
             sprite.End();
 
             // Draw final mask texture
-            graphics.SetRenderTarget(0, maskCanvas);
+            graphics.SetRenderTarget(maskCanvas);
             graphics.Clear(Color.Black);
 
             // Retrieve discovered area
             Discovered = discoveredCanvas.GetTexture();
 
-            sprite.Begin(SpriteBlendMode.Additive);
+            sprite.Begin(SpriteSortMode.Immediate, BlendState.Additive);
             sprite.Draw(Discovered, textureRectangle, new Color(128, 128, 128, 128));
             sprite.Draw(current, textureRectangle, Color.White);
             sprite.End();
 
             // Restore states
-            graphics.SetRenderTarget(0, null);
+            graphics.SetRenderTarget(null);
             graphics.DepthStencilBuffer = prevDepth;
 
             // Retrieve final mask texture

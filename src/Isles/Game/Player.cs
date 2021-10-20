@@ -1490,13 +1490,6 @@ namespace Isles
 
             // For Debugging
 #if DEBUG
-            if (type == EventType.KeyDown && (tag as Keys?).Value == Keys.F11)
-            {
-                game.GraphicsDevice.RenderState.FillMode = game.GraphicsDevice.RenderState.FillMode == FillMode.WireFrame ? FillMode.Solid : FillMode.WireFrame;
-
-                return EventResult.Handled;
-            }
-
             if (type == EventType.KeyDown && (tag as Keys?).Value == Keys.F9)
             {
                 game.Settings.ShowPathGraph = !game.Settings.ShowPathGraph;

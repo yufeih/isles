@@ -209,7 +209,7 @@ namespace Isles.Graphics
             // Pass 4: draw both rendertarget 1 and the original scene
             // image back into the main backbuffer, using a shader that
             // combines them to produce the final bloomed result.
-            GraphicsDevice.SetRenderTarget(0, null);
+            GraphicsDevice.SetRenderTarget(null);
 
             EffectParameterCollection parameters = bloomCombineEffect.Parameters;
 
@@ -235,13 +235,13 @@ namespace Isles.Graphics
         private void DrawFullscreenQuad(Texture2D texture, RenderTarget2D renderTarget,
                                 Effect effect, IntermediateBuffer currentBuffer)
         {
-            GraphicsDevice.SetRenderTarget(0, renderTarget);
+            GraphicsDevice.SetRenderTarget(renderTarget);
 
             DrawFullscreenQuad(texture,
                                renderTarget.Width, renderTarget.Height,
                                effect, currentBuffer);
 
-            GraphicsDevice.SetRenderTarget(0, null);
+            GraphicsDevice.SetRenderTarget(null);
         }
 
         /// <summary>
@@ -251,9 +251,7 @@ namespace Isles.Graphics
         private void DrawFullscreenQuad(Texture2D texture, int width, int height,
                                 Effect effect, IntermediateBuffer currentBuffer)
         {
-            spriteBatch.Begin(SpriteBlendMode.None,
-                              SpriteSortMode.Immediate,
-                              SaveStateMode.None);
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Opaque);
 
             // Begin the custom effect, if it is currently enabled. If the user
             // has selected one of the show intermediate buffer options, we still
