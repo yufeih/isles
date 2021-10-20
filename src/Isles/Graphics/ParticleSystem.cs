@@ -8,7 +8,6 @@ using System.Linq;
 using System.Text.Json;
 using Isles.Engine;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 

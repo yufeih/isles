@@ -8,7 +8,6 @@ using Isles.Engine;
 using Isles.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace Isles
 {
@@ -489,7 +488,6 @@ namespace Isles
 
         // Message Font Sizes
         private const float BubbleUpMessageFontSize = 15f / 23;
-        private const float FlyAwayMessageFontSize = 15f / 23;
         private const float NoneStyleMessageFontSize = 17f / 23;
         private const float MessageFontSize = 18f / 23;
 
@@ -760,15 +758,6 @@ namespace Isles
 
             Player currentPlayer = Player.LocalPlayer;
 
-#if DEBUG
-            if (Player.LocalPlayer.CurrentGroup != null &&
-                Player.LocalPlayer.CurrentGroup.Count > 0 &&
-                Player.LocalPlayer.CurrentGroup[0].Owner != null)
-            {
-                currentPlayer = Player.LocalPlayer.CurrentGroup[0].Owner;
-            }
-#endif
-
             lumberTextField.Text = currentPlayer.Lumber.ToString();
             goldTextField.Text = currentPlayer.Gold.ToString();
             Color color = Color.White;
@@ -812,11 +801,6 @@ namespace Isles
             Display.Sprite.Draw(borderFadeout,
                 new Rectangle(0, 0, game.ScreenWidth, game.ScreenHeight), Color.White);
 
-#if DEBUG
-            game.Graphics2D.DrawString(Mouse.GetState().X.ToString() + "," + Mouse.GetState().Y.ToString(),
-                                    15f / 23, new Vector2(10, 30), Color.White);
-#endif
-
             Display.Sprite.End();
 
             var currentProfileIndex = Player.LocalPlayer.CurrentGroupIndex;
@@ -836,15 +820,6 @@ namespace Isles
             Display.Sprite.Begin();
 
             Player player = Player.LocalPlayer;
-
-#if DEBUG
-            if (Player.LocalPlayer.CurrentGroup != null &&
-                Player.LocalPlayer.CurrentGroup.Count > 0 &&
-                Player.LocalPlayer.CurrentGroup[0].Owner != null)
-            {
-                player = Player.LocalPlayer.CurrentGroup[0].Owner;
-            }
-#endif
 
             // Draw environment indicator
             Display.Sprite.Draw(panelsTexture,

@@ -77,8 +77,6 @@ namespace Isles
         private const int buttonDestinationHeight = 16;
         private readonly int buttonBias = 150;
         private const int hightLightDestinationHeight = 25;
-        private const int hightLightButtonBaseY = 230;
-
         private readonly Panel highLight;
         private readonly Panel loadingPanel;
         private readonly Panel titlePanel;
@@ -424,24 +422,12 @@ namespace Isles
                 return;
             }
 
-#if DEBUG
-            BaseGame.Singleton.Graphics2D.DrawString(highLightMoveTo.ToString() + ", " + highLight.X.ToString(),
-                                    15f / 23, new Vector2(2, 30), Color.White);
-#endif
-
             if (modeChange)
             {
                 titleDisplayShotTexture = BaseGame.Singleton.ScreenshotCapturer.Screenshot;
                 ui.Remove(titlePanel);
                 Draw(gameTime);
             }
-
-            // ui.Sprite.Begin();
-
-            // ui.Sprite.Draw(buttonsTexture, new Rectangle((int)highLightPosition, 508,
-            //                buttonDestinationWidth, hightLightDestinationHeight),
-            //                new Rectangle(0, 5 * buttonSourceHeight, buttonSourceWidth, 66), Color.White);
-            // ui.Sprite.End();
         }
 
         /// <summary>
@@ -501,10 +487,6 @@ namespace Isles
         }
 
         public void Dispose()
-        {
-        }
-
-        private void StartLANGame()
         {
         }
     }

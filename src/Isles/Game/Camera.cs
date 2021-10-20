@@ -318,15 +318,6 @@ namespace Isles.Engine
             orbit = false;
         }
 
-        private static Vector2 XYZToSphere(Vector3 v)
-        {
-            var xy = new Vector2(v.X, v.Y);
-
-            return new Vector2(
-                (float)Math.Atan2((float)xy.Y, (float)xy.X),
-                (float)Math.Atan2((float)v.Z, (float)xy.Length()));
-        }
-
         public override void Update(GameTime gameTime)
         {
             // Apply global camera sensitivity

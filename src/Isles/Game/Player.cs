@@ -1488,13 +1488,6 @@ namespace Isles
                 }
             }
 
-            // For Debugging
-#if DEBUG
-            if (type == EventType.KeyDown && (tag as Keys?).Value == Keys.F9)
-            {
-                game.Settings.ShowPathGraph = !game.Settings.ShowPathGraph;
-            }
-#endif
             return EventResult.Unhandled;
         }
 
@@ -1975,29 +1968,6 @@ namespace Isles
             {
                 Defend.Update(gameTime);
             }
-
-#if DEBUG
-            if (World.Game.Input.Keyboard.IsKeyDown(Keys.F8))
-            {
-                // Show debug info
-                Vector2 position;
-
-                position.X = 0;
-                position.Y = 100;
-
-                foreach (KeyValuePair<string, float> pair in Requests)
-                {
-                    FutureObjects.TryGetValue(pair.Key, out var existing);
-
-                    World.Game.Graphics2D.DrawShadowedString(
-                        pair.Key + ": " + pair.Value + "   " + existing, 0.85f, position,
-                        (CheckDependency(pair.Key) && HasEnoughMoney(pair.Key)) ?
-                        Color.White : Color.Red, Color.Black);
-
-                    position.Y += 25;
-                }
-            }
-#endif
         }
     }
 }

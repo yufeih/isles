@@ -224,11 +224,6 @@ namespace Isles.Engine
             Game.GraphicsDevice.RenderState.DepthBufferFunction = CompareFunction.Always;
             Landscape.PresentSurface(gameTime);
             Game.GraphicsDevice.RenderState.DepthBufferFunction = CompareFunction.LessEqual;
-
-            if (Game.Settings.ShowPathGraph)
-            {
-                DrawPathGraph();
-            }
         }
 
         /// <summary>
@@ -305,37 +300,6 @@ namespace Isles.Engine
                 MathHelper.PiOver4, 1, near, far);
 
             shadow.ViewProjection = view * projection;
-        }
-
-        private void DrawPathGraph()
-        {
-            PathGraph graph = PathManager.Graph;
-
-            for (var y = 0; y < graph.EntryHeight; y++)
-            {
-                for (var x = 0; x < graph.EntryWidth; x++)
-                {
-                    if (graph.IsGridObstructed(x, y, true))
-                    {
-                        Vector2 p = graph.IndexToPosition(y * graph.EntryWidth + x);
-
-                        if (Landscape.GetHeight(p.X, p.Y) <= 0)
-                        {
-                            continue;
-                        }
-
-                        Vector3 v = Game.GraphicsDevice.Viewport.Project(
-                                                             new Vector3(p.X, p.Y,
-                                                             Landscape.GetHeight(p.X, p.Y)),
-                                                             Game.Projection,
-                                                             Game.View,
-                                                             Matrix.Identity);
-
-                        Game.Graphics2D.DrawString("*",
-                                                   15f / 23, new Vector2(v.X, v.Y), Color.White);
-                    }
-                }
-            }
         }
 
         /// <summary>

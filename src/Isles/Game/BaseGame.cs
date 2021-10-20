@@ -362,12 +362,7 @@ viewProjectionInverse;
 
             // Show cursor
             IsMouseVisible = Settings.IsMouseVisible;
-            // #if DEBUG
-            // Use variant time step to trace frame performance
-            // IsFixedTimeStep = true;
             IsFixedTimeStep = Settings.IsFixedTimeStep;
-            // TargetElapsedTime = new TimeSpan(5000000);
-            // #endif
         }
 
         /// <summary>

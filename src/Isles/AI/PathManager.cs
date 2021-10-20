@@ -364,8 +364,6 @@ namespace Isles.Engine
             this.landscape = landscape;
         }
 
-        private const int OutDegree = 8;
-
         public static readonly int[] DX8 = new int[8] { 1, 1, 1, 0, -1, -1, -1, 0 };
         public static readonly int[] DY8 = new int[8] { 1, 0, -1, -1, -1, 0, 1, 1 };
 
@@ -1120,25 +1118,6 @@ namespace Isles.Engine
                                                              .MaxPathSearchStepsPerUpdate;
         }
 
-        private void Test()
-        {
-            var random = new Random();
-
-            var queryCount = 1000;
-            _ = graph.NodeCount;
-
-            DateTime start = DateTime.Now;
-            for (var i = 0; i < queryCount; i++)
-            {
-                search.Search(graph, random.Next(graph.NodeCount),
-                                     random.Next(graph.NodeCount));
-            }
-
-            TimeSpan elapsed = DateTime.Now - start;
-            Log.Write("Path query per frame (60 FPS): " +
-                1000 / 60 / (elapsed.TotalMilliseconds / queryCount));
-        }
-
         public void Mark(IMovable agent)
         {
             if (agent != null && agent.MovementTag is Tag)
@@ -1806,14 +1785,6 @@ namespace Isles.Engine
 
             // Set graph bounds to null whether we're not searching
             graph.Boundary = null;
-
-#if DEBUG
-            if (totalSteps > 0)
-            {
-                BaseGame.Singleton.Graphics2D.DrawString(
-                    "Finding Path...", 15f / 23, new Vector2(0, 100), Color.White);
-            }
-#endif
         }
 
         /// <summary>

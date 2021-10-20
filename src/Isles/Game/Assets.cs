@@ -123,10 +123,6 @@ namespace Isles.Engine
                 }
 
                 writer.WriteLine(s);
-#if DEBUG
-                // In debug mode write that message to the console as well!
-                System.Console.WriteLine(s);
-#endif
             }
             catch (IOException)
             {

@@ -299,23 +299,6 @@ namespace Isles.Graphics
             graphics.RenderState.DepthBufferWriteEnable = true;
         }
 
-        /// <summary>
-        /// Dispose.
-        /// </summary>
-        private void DisposeSky()
-        {
-            if (skyTexture != null)
-            {
-                skyTexture.Dispose();
-            }
-
-            if (skyEffect != null)
-            {
-                skyEffect.Dispose();
-            }
-        }
-
-        private readonly float grassViewDistanceSquared = 400000;
         private readonly List<Billboard> vegetations = new(512);
 
         private void ReadVegetationContent(ContentReader input)
@@ -342,22 +325,6 @@ namespace Isles.Graphics
                     billboard.SourceRectangle = Billboard.DefaultSourceRectangle;
 
                     vegetations.Add(billboard);
-                }
-            }
-        }
-
-        private void InitializeVegetation()
-        {
-        }
-
-        private void DrawVegetation(GameTime gameTime)
-        {
-            foreach (Billboard billboard in vegetations)
-            {
-                if (grassViewDistanceSquared >=
-                    Vector3.DistanceSquared(billboard.Position, game.Eye))
-                {
-                    game.Billboard.Draw(billboard);
                 }
             }
         }
@@ -613,23 +580,6 @@ namespace Isles.Graphics
             var y = (float)Math.Sin(time);
 
             return new Vector2(x, y);
-        }
-
-        /// <summary>
-        /// Dispose.
-        /// </summary>
-        /// <param name="disposing">Disposing.</param>
-        private void DisposeWater()
-        {
-            if (waterVertices != null)
-            {
-                waterVertices.Dispose();
-            }
-
-            if (waterIndices != null)
-            {
-                waterIndices.Dispose();
-            }
         }
     }
 

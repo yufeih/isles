@@ -178,9 +178,6 @@ namespace Isles
         // static float unitTimer = UnitDuration;
         // static float uiTimer = UIDuration;
         private static float underAttackTimer = UnderAttackDuration;
-        private const float BuildingDuration = 1.5f;
-        private const float UnitDuration = 1.5f;
-        private const float UIDuration = 2;
         private const float UnderAttackDuration = 30;
         private static float preValue;
         private static float postValue;

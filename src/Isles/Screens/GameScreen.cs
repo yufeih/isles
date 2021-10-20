@@ -21,10 +21,6 @@ namespace Isles
     /// </summary>
     public class GameScreen : IScreen, IEventListener
     {
-        private const string ReplayDirectory = "Replays";
-        private const string DefaultReplayName = "LastReplay";
-        private const string ReplayExtension = "ixr";
-
         private readonly GraphicsDeviceManager graphics;
 
         public GameUI UI { get; private set; }

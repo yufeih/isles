@@ -492,7 +492,6 @@ namespace Isles.Engine
         private Vector2 destination;
         private float elapsedWaitTime;
         private float totalWaitTime = MaxTotalWaitTime;
-        private const float MaxSeperation = 0.2f;
         private const float MaxTotalWaitTime = 0.2f;
         private const float MinTotalWaitTime = 0.05f;
 

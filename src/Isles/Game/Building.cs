@@ -749,10 +749,6 @@ namespace Isles
             }
         }
 
-        private void UpdateSmoke()
-        {
-        }
-
         public bool BeginPlace()
         {
             if (Owner != null)
