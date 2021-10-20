@@ -27,11 +27,9 @@
   "ClipCursor": true,
   "EnableSound": true,
   "MaxSearchStepsPerUpdate": 5000,
-  "DirectEnter": false,
   "TraceUnits": false,
   "Cheat": false,
   "RevealMap": false,
-  "GameSpeed": 1,
   "CameraSettings": {
     "MinHeightAboveGround": 50,
     "ScrollAreaSize": 2,

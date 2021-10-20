@@ -249,11 +249,6 @@ viewProjectionInverse;
         public bool Paused { get; set; }
 
         /// <summary>
-        /// Gets or sets game speed.
-        /// </summary>
-        public double GameSpeed { get; set; } = 1;
-
-        /// <summary>
         /// Starts a game screen and run.
         /// </summary>
         /// <param name="gameScreen"></param>
@@ -351,7 +346,6 @@ viewProjectionInverse;
             Log.NewLine();
 
             Settings = JsonSerializer.Deserialize<Settings>(File.ReadAllText("data/settings/settings.json"));
-            GameSpeed = Settings.GameSpeed;
 
             Content = new ContentManager(Services, Settings.ContentDirectory);
             Log.Write("Content Directory:" + Settings.ContentDirectory + "...");
@@ -529,9 +523,6 @@ viewProjectionInverse;
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            // Adjust speed
-            gameTime = AdjustGameSpeed(gameTime);
-
             // Store game time
             CurrentGameTime = gameTime;
 
@@ -589,20 +580,6 @@ viewProjectionInverse;
             Cursor = cursor;
 
             base.Update(gameTime);
-        }
-
-        private GameTime AdjustGameSpeed(GameTime gameTime)
-        {
-            if (GameSpeed != 1)
-            {
-                // Note we only update game time
-                gameTime = new GameTime(
-                    gameTime.TotalRealTime, gameTime.ElapsedRealTime,
-                    new TimeSpan((long)(gameTime.TotalGameTime.Ticks * GameSpeed)),
-                    new TimeSpan((long)(gameTime.ElapsedGameTime.Ticks * GameSpeed)));
-            }
-
-            return gameTime;
         }
 
         private void UpdateFrustum()
@@ -726,8 +703,6 @@ viewProjectionInverse;
                 // Delay one frame
                 return;
             }
-
-            gameTime = AdjustGameSpeed(gameTime);
 
             Graphics.GraphicsDevice.Clear(backgroundColor);
 

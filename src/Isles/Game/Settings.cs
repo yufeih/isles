@@ -21,7 +21,6 @@ namespace Isles.Engine
         public int MaxPathSearchStepsPerUpdate { get; set; } = 2000;
         public bool TraceUnits { get; set; }
         public bool Cheat { get; set; }
-        public double GameSpeed { get; set; } = 1;
         public GameCameraSettings CameraSettings { get; set; } = new();
 
         public int ScreenWidth { get; set; } = 960;
