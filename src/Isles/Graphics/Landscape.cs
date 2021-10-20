@@ -47,7 +47,6 @@ namespace Isles.Graphics
             base.Initialize(game);
 
             InitializeWater();
-            InitializeSky();
 
             surfaceEffect = game.Content.Load<Effect>("Effects/Surface");
             surfaceDeclaration = new VertexDeclaration(game.GraphicsDevice,
@@ -72,13 +71,9 @@ namespace Isles.Graphics
         /// <param name="gameTime"></param>
         public override void Draw(GameTime gameTime)
         {
-            DrawSky(gameTime, game.View, game.Projection);
+            DrawSky(game.View, game.Projection);
             DrawWater(gameTime);
             DrawTerrain(gameTime, null);
-
-            // FIXME but this grass is soo ugly...
-            // DrawVegetation(gameTime);
-            // DrawGridStates();
         }
 
         private struct TexturedSurface
@@ -141,7 +136,7 @@ namespace Isles.Graphics
             }
         }
 
-        public void PresentSurface(GameTime gameTime)
+        public void PresentSurface()
         {
             if (texturedSurfaces.Count <= 0)
             {
@@ -263,16 +258,12 @@ namespace Isles.Graphics
             skyTexture = input.ReadExternalReference<TextureCube>();
         }
 
-        private void InitializeSky()
+        public void DrawSky()
         {
+            DrawSky(game.View, game.Projection);
         }
 
-        public void DrawSky(GameTime gameTime)
-        {
-            DrawSky(gameTime, game.View, game.Projection);
-        }
-
-        private void DrawSky(GameTime gameTime, Matrix view, Matrix projection)
+        private void DrawSky(Matrix view, Matrix projection)
         {
             // We have to retrieve the new graphics device every frame,
             // since graphics device will be changed when resetting.
@@ -415,7 +406,6 @@ namespace Isles.Graphics
             var cellSize = waterSize / CellCount;
 
             var i = 0;
-            float len = 0;
             Vector2 pos;
             var center = new Vector2(Size.X / 2, Size.Y / 2);
 
@@ -426,7 +416,7 @@ namespace Isles.Graphics
                     pos.X = (Size.X - waterSize) / 2 + cellSize * x;
                     pos.Y = (Size.Y - waterSize) / 2 + cellSize * y;
 
-                    len = Vector2.Subtract(pos, center).Length();
+                    var len = Vector2.Subtract(pos, center).Length();
 
                     vertexData[i].Position.X = pos.X;
                     vertexData[i].Position.Y = pos.Y;
@@ -495,7 +485,7 @@ namespace Isles.Graphics
             var viewReflect = Matrix.Multiply(
                 Matrix.CreateReflection(new Plane(Vector3.UnitZ, 0)), game.View);
 
-            DrawSky(gameTime, viewReflect, game.Projection);
+            DrawSky(viewReflect, game.Projection);
 
             if (game.Settings.ShowLandscape)
             {
@@ -509,7 +499,7 @@ namespace Isles.Graphics
             }
 
             // Present the model manager to draw those models
-            game.ModelManager.Present(gameTime, viewReflect, game.Projection);
+            game.ModelManager.Present(viewReflect, game.Projection);
 
             // Draw refraction onto the reflection texture
             if (game.Settings.ShowLandscape)
@@ -711,7 +701,7 @@ namespace Isles.Graphics
         /// <summary>
         /// Call this to refresh the fog of war texture.
         /// </summary>
-        public void Refresh(GameTime gameTime)
+        public void Refresh()
         {
             if (Mask != null && visibleAreas.Count <= 0)
             {

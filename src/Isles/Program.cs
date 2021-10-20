@@ -8,11 +8,8 @@ namespace Isles
 {
     public static class Program
     {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
         [STAThread]
-        public static void Main(string[] args)
+        public static void Main()
         {
             using BaseGame game = new GameIsles();
             game.Run();

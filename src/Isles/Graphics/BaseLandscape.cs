@@ -514,7 +514,6 @@ namespace Isles.Graphics
             // Vertices & Indices
             private static readonly uint[][] MagicVertices = new uint[][] { Vertices0, Vertices1, Vertices2, Vertices3, Vertices4 };
             private static readonly uint[][] MagicIndices = new uint[][] { Indices0, Indices1, Indices2, Indices3, Indices4 };
-            private static readonly int[] MagicBase = new int[] { 1, 2, 4, 8, 16 };
             private static readonly int[] MagicLength = new int[] { 16, 8, 4, 2, 1 };
         }
 

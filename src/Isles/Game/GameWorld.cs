@@ -116,7 +116,7 @@ namespace Isles.Engine
             // Refresh fog of war
             if (EnableFogOfWar && FogOfWar != null)
             {
-                FogOfWar.Refresh(gameTime);
+                FogOfWar.Refresh();
             }
 
             // Update path manager
@@ -168,13 +168,13 @@ namespace Isles.Engine
                     o.DrawShadowMap(gameTime, Game.Shadow);
                 }
 
-                Game.ModelManager.Present(gameTime, Game.Shadow);
+                Game.ModelManager.Present(Game.Shadow);
 
                 // Resolve shadow map
                 shadowMap = Game.Shadow.End();
             }
 
-            Landscape.DrawSky(gameTime);
+            Landscape.DrawSky();
 
             // Draw world objects before landscape
             foreach (IWorldObject o in worldObjects)
@@ -209,20 +209,20 @@ namespace Isles.Engine
             }
 
             // Present surface
-            Landscape.PresentSurface(gameTime);
+            Landscape.PresentSurface();
 
             // FIXME: There are some weired things when models are drawed after
             // drawing the terrain... Annoying...
-            Game.ModelManager.Present(gameTime, Game.View, Game.Projection, null, true, false);
+            Game.ModelManager.Present(Game.View, Game.Projection, null, true, false);
 
             // TODO: Draw particles with ZEnable = true, ZWriteEnable = false
-            ParticleSystem.Present(gameTime);
+            ParticleSystem.Present();
 
-            Game.ModelManager.Present(gameTime, Game.View, Game.Projection, null, false, true);
+            Game.ModelManager.Present(Game.View, Game.Projection, null, false, true);
 
             // Present surface that are on top of everything :)
             Game.GraphicsDevice.RenderState.DepthBufferFunction = CompareFunction.Always;
-            Landscape.PresentSurface(gameTime);
+            Landscape.PresentSurface();
             Game.GraphicsDevice.RenderState.DepthBufferFunction = CompareFunction.LessEqual;
         }
 

@@ -33,8 +33,6 @@ namespace Isles
 
         private Vector3 source;
 
-        private readonly TrailEffect trail;
-
         private Vector3 acceleration;
 
         private Vector3 velocity;
@@ -85,19 +83,12 @@ namespace Isles
             : base(world)
         {
             RestoreDefault();
-            trail = new TrailEffect
-            {
-                Length = 5,
-                Width = 2,
-                Texture = BaseGame.Singleton.Content.Load<Texture2D>("Textures/ray2"),
-            };
         }
 
         public void Launch()
         {
             source = Position;
             state = ArrowState.Flying;
-            trail.Launch();
             velocity = Vector3.Normalize(destination - Position) * maxSpeed / 12;
             velocity.Z += maxSpeed / 1.5f;
         }
@@ -115,8 +106,6 @@ namespace Isles
             {
                 UpdateVelocity(gameTime);
                 UpdatePosition(gameTime);
-                trail.Position = Position;
-                trail.Update(gameTime);
                 if ((Position - destination).Length() <= 4f || Vector3.Dot(Position - destination, destination - source) > 0)
                 {
                     state = ArrowState.Fading;
@@ -127,7 +116,6 @@ namespace Isles
             {
                 UpdatePosition(gameTime);
                 fadingAge += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-                trail.Alpha = 1 - fadingAge / 300;
                 if (fadingAge >= 300)
                 {
                     state = ArrowState.End;
@@ -167,11 +155,6 @@ namespace Isles
 
         public override void Draw(GameTime gameTime)
         {
-            if (trail != null)
-            {
-                trail.SetCamera(BaseGame.Singleton.View, BaseGame.Singleton.Projection);
-                trail.Draw(gameTime);
-            }
         }
 
         private void NotifyEnd()

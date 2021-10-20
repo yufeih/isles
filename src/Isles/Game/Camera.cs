@@ -159,7 +159,6 @@ namespace Isles.Engine
         public ILandscape Landscape => world.Landscape;
 
         private readonly GameWorld world;
-        private readonly float landscapeRadiusSquared;
         private const float BorderSize = 100;
 
         /// <summary>
@@ -243,13 +242,6 @@ namespace Isles.Engine
         {
             this.world = world;
 
-            // float r = Math.Max(
-            //    world.Landscape.Size.X, world.Landscape.Size.Y) / 2;
-            var r = (float)Math.Sqrt(world.Landscape.Size.X * world.Landscape.Size.X +
-                                       world.Landscape.Size.Y * world.Landscape.Size.Y) / 2;
-
-            landscapeRadiusSquared = r * r;
-
             Settings = settings;
 
             radius = radiusScaler = radiusTarget = settings.DefaultRadius;
@@ -332,12 +324,12 @@ namespace Isles.Engine
             UpdateLookAt(elapsedTime, smoother);
             UpdateViewDistance(elapsedTime, smoother);
             UpdateOrientation(elapsedTime, smoother);
-            UpdateEye(elapsedTime, smoother);
+            UpdateEye(smoother);
 
             base.Update(gameTime);
         }
 
-        private void UpdateEye(float elapsedTime, float smoother)
+        private void UpdateEye(float smoother)
         {
             // Compute eye position
             var r = (float)(radius * Math.Cos(roll));

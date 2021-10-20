@@ -57,7 +57,6 @@ namespace Isles.Engine
         private StateMoveToPosition move;
         private Vector2 lastPosition;
         private readonly float priority;
-        private readonly Random random = new();
         private double reactivateTimer;
 
         public StateMoveToTarget(IMovable owner, IWorldObject target,
@@ -358,8 +357,7 @@ namespace Isles.Engine
             start.Y = owner.Position.Y;
 
             // Ignore dynamic obstacles on the first try
-            destination = pathManager.FindNextValidPosition(originalDestination,
-                                    start, destination, owner, !owner.IgnoreDynamicObstacles);
+            destination = pathManager.FindNextValidPosition(originalDestination, start, destination, owner);
 
             // Query a path if we can't directly walk through
             if (!pathQuerying && !pathManager.CanMoveBetween(start, destination,

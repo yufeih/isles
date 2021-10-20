@@ -228,7 +228,6 @@ namespace Isles.Graphics
             private readonly EffectParameter worldInverseTranspose;
             private readonly ModelMesh mesh;
             private readonly ModelMeshPart part;
-            private readonly ModelManager manager;
             private readonly bool isTransparent;
 
             public bool IsTransparent => isTransparent;
@@ -251,9 +250,8 @@ namespace Isles.Graphics
             public static VertexBuffer CachedVertexBuffer;
             public static IndexBuffer CachedIndexBuffer;
 
-            public Renderable(ModelManager manager, ModelMesh mesh, ModelMeshPart part, bool isTransparent)
+            public Renderable(ModelMesh mesh, ModelMeshPart part, bool isTransparent)
             {
-                this.manager = manager;
                 this.mesh = mesh;
                 this.part = part;
                 this.isTransparent = isTransparent;
@@ -291,7 +289,7 @@ namespace Isles.Graphics
                 skinnedLights.Add(new Vector4(0.5f, 0.5f, 0.5f, 1.0f) + light / 0.5f);
             }
 
-            public void Draw(GameTime gameTime)
+            public void Draw()
             {
                 if (worldTransforms.Count <= 0 && skinTransforms.Count <= 0)
                 {
@@ -445,7 +443,7 @@ namespace Isles.Graphics
                 normalTexture = effect.Parameters["NormalTexture"];
             }
 
-            public void Draw(GameTime gameTime)
+            public void Draw()
             {
                 if (renderables.Count <= 0)
                 {
@@ -470,12 +468,11 @@ namespace Isles.Graphics
 
                 foreach (Renderable r in renderables)
                 {
-                    r.Draw(gameTime);
+                    r.Draw();
                 }
             }
 
-            public Renderable GetRenderable(
-                ModelManager manager, ModelMesh mesh, ModelMeshPart part, Material material)
+            public Renderable GetRenderable(ModelMesh mesh, ModelMeshPart part, Material material)
             {
                 // Search for all renderables
                 foreach (Renderable r in renderables)
@@ -488,7 +485,7 @@ namespace Isles.Graphics
                 }
 
                 // If it is a new model mesh part, create a new renderable
-                var newRenderable = new Renderable(manager, mesh, part, material.IsTransparent);
+                var newRenderable = new Renderable(mesh, part, material.IsTransparent);
                 renderables.Add(newRenderable);
                 return newRenderable;
             }
@@ -506,25 +503,24 @@ namespace Isles.Graphics
                 this.technique = technique;
             }
 
-            public Renderable GetRenderable(
-                ModelManager manager, ModelMesh mesh, ModelMeshPart part, Material material)
+            public Renderable GetRenderable(ModelMesh mesh, ModelMeshPart part, Material material)
             {
                 foreach (RenderablePerMaterial r in renderables)
                 {
                     // FIXME: Only test texture...
                     if (r.Material.Texture == material.Texture)
                     {
-                        return r.GetRenderable(manager, mesh, part, material);
+                        return r.GetRenderable(mesh, part, material);
                     }
                 }
 
                 // Add a new material
                 var newRenderable = new RenderablePerMaterial(material);
                 renderables.Add(newRenderable);
-                return newRenderable.GetRenderable(manager, mesh, part, material);
+                return newRenderable.GetRenderable(mesh, part, material);
             }
 
-            public void Draw(Effect effect, GameTime gameTime)
+            public void Draw(Effect effect)
             {
                 if (renderables.Count <= 0)
                 {
@@ -541,7 +537,7 @@ namespace Isles.Graphics
 
                     foreach (RenderablePerMaterial r in renderables)
                     {
-                        r.Draw(gameTime);
+                        r.Draw();
                     }
 
                     pass.End();
@@ -624,7 +620,7 @@ namespace Isles.Graphics
                 {
                     if (r.Technique == material.Technique)
                     {
-                        return r.GetRenderable(this, mesh, part, material);
+                        return r.GetRenderable(mesh, part, material);
                     }
                 }
             }
@@ -634,7 +630,7 @@ namespace Isles.Graphics
                 {
                     if (r.Technique == material.Technique)
                     {
-                        return r.GetRenderable(this, mesh, part, material);
+                        return r.GetRenderable(mesh, part, material);
                     }
                 }
             }
@@ -644,31 +640,30 @@ namespace Isles.Graphics
 
         public Matrix LightProjection;
 
-        public void Present(GameTime gameTime)
+        public void Present()
         {
-            Present(gameTime, game.View, game.Projection, null);
+            Present(game.View, game.Projection, null);
         }
 
-        public void Present(GameTime gameTime, ShadowEffect shadow)
+        public void Present(ShadowEffect shadow)
         {
-            Present(gameTime, game.View, game.Projection, shadow);
+            Present(game.View, game.Projection, shadow);
         }
 
-        public void Present(GameTime gameTime, Matrix view, Matrix projection)
+        public void Present(Matrix view, Matrix projection)
         {
-            Present(gameTime, view, projection, null);
+            Present(view, projection, null);
         }
 
-        public void Present(GameTime gameTime, Matrix v, Matrix p, ShadowEffect shadow)
+        public void Present(Matrix v, Matrix p, ShadowEffect shadow)
         {
-            Present(gameTime, v, p, shadow, true, true);
+            Present(v, p, shadow, true, true);
         }
 
         /// <summary>
         /// Draw all the models registered this frame onto the screen.
         /// </summary>
-        public void Present(GameTime gameTime, Matrix v, Matrix p,
-                            ShadowEffect shadow, bool showOpaque, bool showTransparent)
+        public void Present(Matrix v, Matrix p, ShadowEffect shadow, bool showOpaque, bool showTransparent)
         {
             if (opaque.Count <= 0 || (!showOpaque && !showTransparent))
             {
@@ -716,7 +711,7 @@ namespace Isles.Graphics
             {
                 foreach (RenderablePerTechnique r in opaque)
                 {
-                    r.Draw(effect, gameTime);
+                    r.Draw(effect);
                 }
             }
 
@@ -726,7 +721,7 @@ namespace Isles.Graphics
             {
                 foreach (RenderablePerTechnique r in transparent)
                 {
-                    r.Draw(effect, gameTime);
+                    r.Draw(effect);
                 }
             }
 

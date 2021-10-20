@@ -61,10 +61,9 @@ namespace Isles
 
             // Create actual player instances
             Player.LocalPlayer = null;
-            Player player = null;
-
             for (var i = 0; i < playerInfoFromMap.Count; i++)
             {
+                Player player;
                 if (playerInfoFromMap[i].Type == PlayerType.Local)
                 {
                     if (Player.LocalPlayer != null)
@@ -147,10 +146,7 @@ namespace Isles
 
         public virtual void Draw(GameTime gameTime)
         {
-            if (ruinedLand != null)
-            {
-                ruinedLand.Draw(gameTime);
-            }
+            ruinedLand?.Draw();
         }
 
         public virtual EventResult HandleEvent(EventType type, object sender, object tag)

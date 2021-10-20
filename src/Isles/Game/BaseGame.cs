@@ -366,7 +366,7 @@ namespace Isles.Engine
 
             if (Settings.EnableSound)
             {
-                Components.Add(Audio = new AudioManager(this, Content));
+                Components.Add(Audio = new AudioManager(this));
                 Log.Write("Sound Initialized...");
             }
 
@@ -673,23 +673,11 @@ namespace Isles.Engine
 
             Graphics.GraphicsDevice.Clear(backgroundColor);
 
-            // Draw current screen
-            if (CurrentScreen != null)
-            {
-                CurrentScreen.Draw(gameTime);
-            }
+            CurrentScreen?.Draw(gameTime);
+            ModelManager?.Present();
+            Billboard?.Present();
 
-            if (ModelManager != null)
-            {
-                ModelManager.Present(gameTime);
-            }
-
-            if (Billboard != null)
-            {
-                Billboard.Present(gameTime);
-            }
-
-            ParticleSystem.Present(gameTime);
+            ParticleSystem.Present();
 
             Graphics2D.Present();
 

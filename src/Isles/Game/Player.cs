@@ -1222,7 +1222,7 @@ namespace Isles
         public override void Draw(GameTime gameTime)
         {
             // Draw selection rectangle
-            DrawSelectionRectangle(gameTime);
+            DrawSelectionRectangle();
         }
 
         /// <summary>
@@ -1242,7 +1242,7 @@ namespace Isles
             };
         }
 
-        private void DrawSelectionRectangle(GameTime gameTime)
+        private void DrawSelectionRectangle()
         {
             if (multiSelecting)
             {

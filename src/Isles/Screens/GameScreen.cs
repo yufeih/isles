@@ -68,11 +68,6 @@ namespace Isles
         public Level Level { get; set; }
 
         /// <summary>
-        /// Level filename.
-        /// </summary>
-        private string levelFilename;
-
-        /// <summary>
         /// Creates a new game screen.
         /// NOTE: You can only create a game screen after graphics device
         /// is created and initialized.
@@ -108,14 +103,13 @@ namespace Isles
                 level = new Level();
             }
 
-            this.levelFilename = levelFilename ?? throw new ArgumentNullException();
             Level = level;
 
             // Hide cursor
             Game.IsMouseVisible = false;
 
             // Reset loading context
-            ILoading loadContext = new Loading(graphics.GraphicsDevice, Game.Graphics2D);
+            ILoading loadContext = new Loading(graphics.GraphicsDevice);
 
             loadContext.Refresh(0, "Loading...");
 
@@ -488,10 +482,10 @@ namespace Isles
             }
 
             // Force everything to be presented before UI is rendered
-            Game.ModelManager.Present(gameTime);
-            Game.Billboard.Present(gameTime);
+            Game.ModelManager.Present();
+            Game.Billboard.Present();
             Game.Graphics2D.Present();
-            ParticleSystem.Present(gameTime);
+            ParticleSystem.Present();
 
             if (postScreen)
             {

@@ -142,23 +142,23 @@ namespace Isles.Graphics
             EffectTechnique technique = upper ?
                 terrainEffect.Techniques["FastUpper"] : terrainEffect.Techniques["FastLower"];
 
-            DrawTerrain(null, view, projection, technique);
+            DrawTerrain(view, projection, technique);
         }
 
         public override void DrawTerrain(GameTime gameTime, ShadowEffect shadowEffect)
         {
-            DrawTerrain(gameTime, game.View, game.Projection, terrainEffect.Techniques["Default"]);
+            DrawTerrain(game.View, game.Projection, terrainEffect.Techniques["Default"]);
 
             if (shadowEffect != null)
             {
-                DrawTerrainShadow(gameTime, shadowEffect);
+                DrawTerrainShadow(shadowEffect);
             }
         }
 
         /// <summary>
         /// Internal method to draw the terrain.
         /// </summary>
-        private void DrawTerrain(GameTime gameTime, Matrix view, Matrix projection, EffectTechnique technique)
+        private void DrawTerrain(Matrix view, Matrix projection, EffectTechnique technique)
         {
             // Set parameters
             Matrix viewProjection = view * projection;
@@ -215,7 +215,7 @@ namespace Isles.Graphics
             terrainEffect.End();
         }
 
-        private void DrawTerrainShadow(GameTime gameTime, ShadowEffect shadowEffect)
+        private void DrawTerrainShadow(ShadowEffect shadowEffect)
         {
             terrainEffect.Parameters["ShadowMap"].SetValue(shadowEffect.ShadowMap);
             terrainEffect.Parameters["LightViewProjection"].SetValue(shadowEffect.ViewProjection);

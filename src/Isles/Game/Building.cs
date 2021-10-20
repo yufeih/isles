@@ -610,8 +610,7 @@ namespace Isles
                     fireSpawnPointsLeft = new List<Vector3>();
 
                     var index = 1;
-                    var bone = 0;
-
+                    int bone;
                     while ((bone = Model.GetBone("fire" + index)) >= 0)
                     {
                         index++;

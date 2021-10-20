@@ -287,12 +287,12 @@ namespace Isles.Graphics
         /// Flush all the particle system effects onto the screen.
         /// </summary>
         /// <param name="gameTime"></param>
-        public static void Present(GameTime gameTime)
+        public static void Present()
         {
             foreach (ParticleSystem ps in ParticleSystems.Values)
             {
                 ps.SetCamera(baseGame.View, baseGame.Projection);
-                ps.Draw(gameTime);
+                ps.Draw();
             }
         }
 
@@ -505,7 +505,7 @@ namespace Isles.Graphics
         /// <summary>
         /// Draws the particle system.
         /// </summary>
-        public void Draw(GameTime gameTime)
+        public void Draw()
         {
             if (presented)
             {

@@ -1194,8 +1194,7 @@ namespace Isles.Engine
         /// <summary>
         /// Find the next valid position that the agent can be placed at.
         /// </summary>
-        public Vector2 FindNextValidPosition(Vector2 target, Vector2? start,
-                                             Vector2? lastPosition, IMovable agent, bool includeDynamics)
+        public Vector2 FindNextValidPosition(Vector2 target, Vector2? start, Vector2? lastPosition, IMovable agent)
         {
             Unmark(agent);
             if (CanBePlacedAt(target.X, target.Y, agent))
@@ -1211,7 +1210,7 @@ namespace Isles.Engine
                 lastPosition = null;
             }
 
-            startValue = start.HasValue ? start.Value : Vector2.Zero;
+            startValue = start ?? Vector2.Zero;
 
             if (target == startValue)
             {
@@ -1304,61 +1303,10 @@ namespace Isles.Engine
         /// <summary>
         /// Gets the unobstructed grid that are nearest to the specified point.
         /// </summary>
-        public Vector2 FindValidPosition(Vector2 position,
-                                      Vector2? start, IMovable agent, bool includingDynamics)
+        public Vector2 FindValidPosition(Vector2 position, Vector2? start, IMovable agent)
         {
-            return FindNextValidPosition(position, start, start, agent, includingDynamics);
+            return FindNextValidPosition(position, start, start, agent);
         }
-
-#if FALSE
-        /// <summary>
-        /// Gets the unobstructed grid that are nearest to the specified point.
-        /// </summary>
-        public Vector2 FindValidPosition(Vector2 position,
-                                      Vector2? start, IMovable agent, bool includingDynamics)
-        {
-            int x = (int)(position.X / graph.CellSize);
-            int y = (int)(position.Y / graph.CellSize);
-
-            PathBrush brush = agent.Brush;
-
-            // First check the input grid
-            if (!graph.IsBrushObstructed(position.X, position.Y, brush, true))
-                return position;
-
-            if (start != null)
-            {
-                Vector2 direction = position - start.Value;
-                direction.Normalize();
-                position -= direction * graph.CellSize * 1.2f;
-                x = (int)(position.X / graph.CellSize);
-                y = (int)(position.Y / graph.CellSize);
-            }
-
-            Unmark(agent);
-
-            // look up its adjancent grids
-            foreach (Point p in EnumerateGridsInnerOut(x, y, 512))
-            {
-                if (p.X >= 0 && p.X < graph.EntryWidth &&
-                    p.Y >= 0 && p.Y < graph.EntryHeight)
-                {
-                    position = graph.GridToPosition(p.X, p.Y);
-                    if (!graph.IsBrushObstructed(position.X, position.Y, brush, includingDynamics))
-                    {
-                        // Sample 12 points and find the min
-                        Mark(agent);
-                        return position;
-                    }
-                }
-            }
-
-            // No grid found, just return null
-            Mark(agent);
-
-            return position;
-        }
-#endif
 
         /// <summary>
         /// Tests to see if the specified grids can be placed at a given location.
@@ -1682,7 +1630,6 @@ namespace Isles.Engine
 
         private void UpdateSearch()
         {
-            var steps = 0;
             var totalSteps = 0;
 
             // Do nothing if there's no pending requests
@@ -1732,7 +1679,7 @@ namespace Isles.Engine
 
                 // Handle current query
                 var result = search.Search(
-                    graph, query.Start, query.End, maxSearchStepsPerUpdate, out steps);
+                    graph, query.Start, query.End, maxSearchStepsPerUpdate, out var steps);
 
                 Mark(query.Obstacle);
 

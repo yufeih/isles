@@ -897,7 +897,7 @@ namespace Isles.Graphics
         /// </summary>
         /// <param name="gameTime"></param>
         /// <param name="shadow"></param>
-        public void DrawShadowMap(GameTime gameTime, ShadowEffect shadow)
+        public void DrawShadowMap()
         {
             if (model == null || meshParts.Count <= 0)
             {

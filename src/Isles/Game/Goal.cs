@@ -37,7 +37,6 @@ namespace Isles
     {
         private readonly GameWorld world;
         private readonly ComputerPlayer owner;
-        private float WorkerFactor = 1.0f;
         private float FarmFactor = 1.0f;
         private float HeroFactor = 1.0f;
         private float TownhallFactor = 1.0f;
@@ -64,7 +63,6 @@ namespace Isles
 
         private void RandomizeFactors()
         {
-            WorkerFactor = Helper.RandomInRange(0.9f, 1.1f);
             HeroFactor = Helper.RandomInRange(0.9f, 1.1f);
             FarmFactor = Helper.RandomInRange(0.9f, 1.1f);
             TownhallFactor = Helper.RandomInRange(0.9f, 1.1f);
@@ -272,7 +270,6 @@ namespace Isles
 
     public class GoalAttack : Goal
     {
-        private readonly GameWorld world;
         private readonly ComputerPlayer owner;
         public float MilitaryAdvantage;
         private int advantageCounter;
@@ -285,17 +282,8 @@ namespace Isles
             }
 
             owner = player;
-            this.world = world;
         }
 
-        // public override StateResult Update(GameTime gameTime)
-        // {
-        //    BaseGame.Singleton.Graphics2D.DrawShadowedString(
-        //        "Advantage: " + militaryAdvantage + "\nCounter: " + advantageCounter,
-        //        20, new Vector2(0, 300), Color.Pink, Color.Black);
-
-        // return base.Update(gameTime);
-        // }
         public override void Arbitrate()
         {
             MilitaryAdvantage = MathHelper.Lerp(

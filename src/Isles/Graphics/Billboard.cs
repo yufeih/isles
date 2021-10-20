@@ -280,11 +280,7 @@ namespace Isles.Graphics
             billboards.Add(billboard);
         }
 
-        /// <summary>
-        /// Draw all billboards in this frame.
-        /// </summary>
-        /// <param name="gameTime"></param>
-        public void Present(GameTime gameTime)
+        public void Present()
         {
             if (billboards.Count <= 0)
             {
@@ -314,7 +310,7 @@ namespace Isles.Graphics
             Texture2D texture = billboards[0].Texture;
 
             int baseIndex = 0, baseVertex = 0;
-            int begin = 0, end = 0;
+            int begin = 0;
             for (var i = 1; i <= billboards.Count; i++)
             {
                 // We are at the end of the chunk
@@ -324,7 +320,7 @@ namespace Isles.Graphics
                     continue;
                 }
 
-                end = i;
+                var end = i;
                 if (i != billboards.Count)
                 {
                     texture = billboards[i].Texture;

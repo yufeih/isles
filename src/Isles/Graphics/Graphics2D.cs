@@ -34,7 +34,6 @@ namespace Isles.Graphics
         }
 
         private readonly BaseGame game;
-        private readonly BasicEffect basicEffect;
         private readonly List<StringValue> strings = new();
         private readonly VertexPositionColor[] lines = new VertexPositionColor[MaxLineCount];
         private readonly VertexPositionColor[] primitives = new VertexPositionColor[MaxPrimitiveVertexCount];
@@ -70,7 +69,6 @@ namespace Isles.Graphics
             Font = game.Content.Load<SpriteFont>(game.Settings.DefaultFont);
             Effect = game.Content.Load<Effect>(game.Settings.Graphics2DEffect);
             Sprite = new SpriteBatch(game.GraphicsDevice);
-            basicEffect = new BasicEffect(game.GraphicsDevice, null);
             vertices = new DynamicVertexBuffer(
                 game.GraphicsDevice, typeof(VertexPositionColor), MaxPrimitiveVertexCount, BufferUsage.WriteOnly);
             indices = new DynamicIndexBuffer(

@@ -31,8 +31,6 @@ namespace Isles.Engine
     /// </summary>
     public class AudioManager : GameComponent
     {
-        private readonly ContentManager content;
-
         public AudioEngine Audio { get; private set; }
 
         public WaveBank Wave { get; private set; }
@@ -54,10 +52,10 @@ namespace Isles.Engine
         // a sound was played, which would create unnecessary garbage.
         private readonly Stack<Cue3D> cuePool = new();
 
-        public AudioManager(Game game, ContentManager content)
+        public AudioManager(Game game)
             : base(game)
         {
-            this.content = content ?? throw new ArgumentException();
+
         }
 
         /// <summary>

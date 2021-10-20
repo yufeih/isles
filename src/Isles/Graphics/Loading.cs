@@ -44,11 +44,6 @@ namespace Isles.Graphics
     public class Loading : ILoading
     {
         /// <summary>
-        /// 2D drawing functions.
-        /// </summary>
-        private readonly Graphics2D graphics2D;
-
-        /// <summary>
         /// Game graphics.
         /// </summary>
         private readonly GraphicsDevice graphics;
@@ -101,9 +96,8 @@ namespace Isles.Graphics
         /// Create a loading screen for a given graphics device.
         /// </summary>
         /// <param name="graphics"></param>
-        public Loading(GraphicsDevice graphics, Graphics2D gfx2D)
+        public Loading(GraphicsDevice graphics)
         {
-            graphics2D = gfx2D;
             this.graphics = graphics;
             uiDisplay = new UIDisplay(BaseGame.Singleton);
             progressBar = new ProgressBar

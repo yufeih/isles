@@ -682,7 +682,7 @@ namespace Isles.Engine
             // Make entity fall on the ground
             Fall();
 
-            var value = "";
+            string value;
 
             // Treat game model as level content
             if ((value = xml.GetAttribute("Model")) != "")
@@ -872,7 +872,7 @@ namespace Isles.Engine
         {
             if (Visible && model != null && IsVisible(shadow.ViewProjection))
             {
-                model.DrawShadowMap(gameTime, shadow);
+                model.DrawShadowMap();
             }
         }
 

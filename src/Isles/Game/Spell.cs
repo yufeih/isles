@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Xml;
 using Isles.Engine;
@@ -964,9 +965,7 @@ namespace Isles
         }
     }
 
-    /// <summary>
-    /// Handler for all upgrades.
-    /// </summary>
+    [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Uniform delegate")]
     public static class Upgrades
     {
         public static void LiveOfNature(Spell spell, Building owner)

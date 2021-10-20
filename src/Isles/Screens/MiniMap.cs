@@ -206,16 +206,16 @@ namespace Isles
             }
 
             // Draw the entities
-            DrawEntitySign(gameTime, sprite);
+            DrawEntitySign();
 
             // Draw the sight region rectangle
-            DrawSightRegion(gameTime, sprite);
+            DrawSightRegion();
         }
 
         /// <summary>
         /// Draw the sight region.
         /// </summary>
-        private void DrawSightRegion(GameTime gameTime, SpriteBatch sprite)
+        private void DrawSightRegion()
         {
             var sightRegion = new Point[4];
 
@@ -295,7 +295,7 @@ namespace Isles
         /// </summary>
         /// <param name="gameTime"></param>
         /// <param name="sprite"></param>
-        private void DrawEntitySign(GameTime gameTime, SpriteBatch sprite)
+        private void DrawEntitySign()
         {
             foreach (EntitySign sign in entitySigns)
             {
@@ -344,7 +344,6 @@ namespace Isles
             if (Enabled && Visible)
             {
                 var input = sender as Input;
-                var key = tag as Keys?;
                 var dist = new Vector2(input.MousePosition.X - Center.X,
                                             input.MousePosition.Y - Center.Y);
                 if (type == EventType.LeftButtonDown &&

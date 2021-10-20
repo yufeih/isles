@@ -882,7 +882,7 @@ namespace Isles
             }
             else if (modelShadow != null && IsVisible(shadow.ViewProjection))
             {
-                modelShadow.DrawShadowMap(gameTime, shadow);
+                modelShadow.DrawShadowMap();
             }
         }
 
@@ -1520,7 +1520,7 @@ namespace Isles
             Refresh();
 
             // Draw the current texture on to the final texture
-            Draw(new GameTime());
+            Draw();
         }
 
         /// <summary>
@@ -1613,7 +1613,7 @@ namespace Isles
         /// <summary>
         /// Draw the landscape.
         /// </summary>
-        public void Draw(GameTime gameTime)
+        public void Draw()
         {
             if (fogOfWar == null || fogOfWar.Current == null)
             {

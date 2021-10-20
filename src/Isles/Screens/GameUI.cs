@@ -88,7 +88,6 @@ namespace Isles
 
         public MiniMap Minimap { get; private set; }
 
-        private Texture2D dialogTexture;
         private Texture2D panelsTexture;
 
         /// <summary>
@@ -113,13 +112,6 @@ namespace Isles
         private TextField lumberTextField;
         private TextField goldTextField;
         private TextField foodTextField;
-        private readonly float[] StatisticsTextX = { 4.6f / 24.25f, 11.6f / 24.25f, 18.3f / 24.25f };
-        private readonly Rectangle StatisticsDestination = new(400, 2, 400, 36);
-        private readonly Rectangle StatisticsSource = new(0, 0, 690, 64);
-        private readonly Rectangle StatusDestination = new(5, 495, 150, 120);
-        private readonly Rectangle StatusSource = new(0, 62, 256, 256);
-        private readonly Rectangle SignSource = new(246, 80, 236, 226);
-        private readonly Rectangle StatusRectangle = new(5, 400, 400, 100);
         private readonly Rectangle ResourcePanelSourceRectangle = new(0, 0, 885, 70);
         private readonly Rectangle ControlPanelSourceRectangle = new(0, 70, 1718, 622);
         private readonly Rectangle GoldMineSourceRectangle = new(885, 0, 41, 41);
@@ -138,14 +130,6 @@ namespace Isles
         private const int SpellButtonShorterHeight = 22;
         private const int SpellButtonFullHeight = 34;
         private const int SpellButtonWidthSpace = 1;
-        private readonly Rectangle[] ElementAreas = new Rectangle[]
-        {
-            new Rectangle(664, 528, 64, 32), new Rectangle(732, 528, 64, 32),
-            new Rectangle(664, 564, 64, 32), new Rectangle(732, 564, 64, 32),
-        };
-
-        private readonly Color TextColor = Color.White;
-        private readonly Color TextColorDark = Color.Black;
         private const double DisappearingTime = 3;
         private double startTime;
         private Effect disappearEffect;
@@ -175,7 +159,6 @@ namespace Isles
             disappearEffect = game.Content.Load<Effect>("Effects/DisortionDisappear");
             distortion = game.Content.Load<Texture2D>("Textures/Distortion");
             panelsTexture = game.Content.Load<Texture2D>("UI/Panels");
-            dialogTexture = game.Content.Load<Texture2D>("UI/Tipbox");
 
             for (var i = 0; i < focusAnimation.Length; i++)
             {
@@ -803,20 +786,11 @@ namespace Isles
 
             Display.Sprite.End();
 
-            var currentProfileIndex = Player.LocalPlayer.CurrentGroupIndex;
-
             Display.Draw(gameTime);
 
             DrawFogOfWar();
 
             // Draw statistics
-            Rectangle dest = UIElement.GetRelativeRectangle(
-                ResourcePanelDestinationRectangle, Display, ScaleMode.ScaleX, Anchor.TopRight);
-            float y = dest.Y + dest.Height / 2 - 10;
-
-            Rectangle status = UIElement.GetRelativeRectangle(
-                StatusDestination, Display, ScaleMode.ScaleX, Anchor.BottomLeft);
-
             Display.Sprite.Begin();
 
             Player player = Player.LocalPlayer;
