@@ -782,7 +782,7 @@ namespace Isles
         {
             var missile = new Missile(World, weapon, AttackTarget);
 
-            missile.Hit += new EventHandler(Hit);
+            missile.Hit += Hit;
             World.Add(missile);
 
             weaponVisible = false;
@@ -890,7 +890,7 @@ namespace Isles
 
             var fireball = new EffectFireball(
                 World, spawn, Vector3.UnitZ * 50, AttackTarget);
-            fireball.Projectile.Hit += new EventHandler(Hit);
+            fireball.Projectile.Hit += Hit;
             World.Add(fireball);
 
             if (ShouldDrawModel)

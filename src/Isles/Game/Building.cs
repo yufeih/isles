@@ -955,7 +955,7 @@ namespace Isles
             var fireball = new EffectFireball(
                 World, TopCenter - Vector3.UnitZ * 5, velocity, target,
                 "Frost", "FrostExplosion");
-            fireball.Projectile.Hit += new EventHandler(Hit);
+            fireball.Projectile.Hit += Hit;
             World.Add(fireball);
 
             if (ShouldDrawModel)

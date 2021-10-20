@@ -502,15 +502,9 @@ namespace Isles
                     ScaleMode = ScaleMode.ScaleY,
                 };
 
-                profileButton.Click += new EventHandler(delegate(object sender, EventArgs e)
-                {
-                    Player.LocalPlayer.Focus(this);
-                });
+                profileButton.Click += (sender, e) => Player.LocalPlayer.Focus(this);
 
-                profileButton.DoubleClick += new EventHandler(delegate(object sender, EventArgs e)
-                {
-                    Player.LocalPlayer.SelectGroup(this);
-                });
+                profileButton.DoubleClick += (sender, e) => Player.LocalPlayer.SelectGroup(this);
             }
 
             if (xml.HasAttribute("Snapshot") &&

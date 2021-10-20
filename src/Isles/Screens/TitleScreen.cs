@@ -200,7 +200,7 @@ namespace Isles
                 buttons[i].Anchor = Anchor.TopLeft;
                 buttons[i].ScaleMode = ScaleMode.ScaleY;
                 buttons[i].Index = i;
-                buttons[i].Enter += (o, e) => { HighLightMoveTo((o as MenuButton).Index); };
+                buttons[i].Enter += (o, e) => HighLightMoveTo((o as MenuButton).Index);
                 titlePanel.Add(buttons[i]);
             }
 
@@ -235,7 +235,7 @@ namespace Isles
             };
 
             // Click even for Exit button
-            buttons[4].Click += (o, e) => { BaseGame.Singleton.Exit(); };
+            buttons[4].Click += (o, e) => BaseGame.Singleton.Exit();
 
             highLightMoveTo = buttons[0].Area.X;
             expectedHighlightPos = highLightMoveTo;

@@ -227,26 +227,23 @@ namespace Isles
             camera.FlyTo(new Vector3(Player.LocalPlayer.SpawnPoint, 0), true);
             Game.Camera = camera;
 
-            camera.BeginMove += new EventHandler(delegate(object sender, EventArgs e)
+            camera.BeginMove += (sender, e) =>
             {
                 Cursors.StoredCursor = Game.Cursor;
                 Game.Cursor = Cursors.Move;
                 scrollingCamera = true;
-            });
-            camera.EndMove += new EventHandler(delegate(object sender, EventArgs e)
+            };
+            camera.EndMove += (sender, e) =>
             {
                 scrollingCamera = false;
                 Game.Cursor = Cursors.StoredCursor;
-            });
-            camera.BeginRotate += new EventHandler(delegate(object sender, EventArgs e)
+            };
+            camera.BeginRotate += (sender, e) =>
             {
                 Cursors.StoredCursor = Game.Cursor;
                 Game.Cursor = Cursors.Rotate;
-            });
-            camera.EndRotate += new EventHandler(delegate(object sender, EventArgs e)
-            {
-                Game.Cursor = Cursors.StoredCursor;
-            });
+            };
+            camera.EndRotate += (sender, e) => Game.Cursor = Cursors.StoredCursor;
         }
 
         private IEnumerable<PlayerInfo> CreateTestPlayerInfo()

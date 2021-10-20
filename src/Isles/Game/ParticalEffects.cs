@@ -458,7 +458,7 @@ namespace Isles
             fire = ParticleSystem.Create(fireballParticle);
             explosion = ParticleSystem.Create(explosionParticle);
             fireEmitter = new ProjectileEmitter(fire, 150, position, velocity, target);
-            fireEmitter.Hit += new EventHandler(delegate(object sender, EventArgs e)
+            fireEmitter.Hit += (sender, e) =>
             {
                 // Fill up the particle system
                 var n = (int)Helper.RandomInRange(20, 30);
@@ -468,7 +468,7 @@ namespace Isles
                 }
 
                 World.Destroy(this);
-            });
+            };
         }
 
         public override void Update(GameTime gameTime)

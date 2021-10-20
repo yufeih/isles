@@ -365,7 +365,7 @@ namespace Isles
                 Tag = this,
             };
 
-            spellButton.Click += new EventHandler(delegate(object sender, EventArgs e)
+            spellButton.Click += (sender, e) =>
             {
                 if ((sender as Button).Tag is not Spell spell)
                 {
@@ -374,24 +374,24 @@ namespace Isles
 
                 // Cast the spell
                 Spell.Cast(spell);
-            });
+            };
 
-            spellButton.Enter += new EventHandler(delegate(object sender, EventArgs e)
+            spellButton.Enter += (sender, e) =>
             {
                 GameDefault gameDefault = GameDefault.Singleton;
 
                 spellTip = CreateTipBox();
 
                 GameUI.Singleton.TipBoxContainer.Add(spellTip);
-            });
+            };
 
-            spellButton.Leave += new EventHandler(delegate(object sender, EventArgs e)
+            spellButton.Leave += (sender, e) =>
             {
                 if (spellTip != null)
                 {
                     GameUI.Singleton.TipBoxContainer.Remove(spellTip);
                 }
-            });
+            };
 
             return spellButton;
         }
@@ -731,14 +731,14 @@ namespace Isles
             SpellButton button = base.CreateUIElement(ui);
 
             // Add right click event handler
-            button.RightClick += new EventHandler(delegate(object sender, EventArgs e)
+            button.RightClick += (sender, e) =>
             {
                 if (ownerBuilding != null)
                 {
                     ownerBuilding.CancelTraining(this);
                     Audios.Play("OK");
                 }
-            });
+            };
 
             return button;
         }

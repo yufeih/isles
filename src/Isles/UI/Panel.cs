@@ -228,8 +228,8 @@ namespace Isles.UI
             Left.Anchor = Right.Anchor = Anchor.BottomLeft;
             Left.ScaleMode = Right.ScaleMode = ScaleMode.ScaleY;
 
-            Left.Click += new EventHandler(LeftScroll_Click);
-            Right.Click += new EventHandler(RightScroll_Click);
+            Left.Click += LeftScroll_Click;
+            Right.Click += RightScroll_Click;
         }
 
         private void RightScroll_Click(object sender, EventArgs e)

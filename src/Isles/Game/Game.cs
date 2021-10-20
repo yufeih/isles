@@ -46,25 +46,25 @@ namespace Isles
         private void Register()
         {
             // Register world object creators
-            GameWorld.RegisterCreator("Decoration", world => { return new Decoration(world); });
-            GameWorld.RegisterCreator("Tree", world => { return new Tree(world); });
-            GameWorld.RegisterCreator("Goldmine", world => { return new Goldmine(world); });
-            GameWorld.RegisterCreator("BoxOfPandora", world => { return new BoxOfPandora(world); });
+            GameWorld.RegisterCreator("Decoration", world => new Decoration(world));
+            GameWorld.RegisterCreator("Tree", world => new Tree(world));
+            GameWorld.RegisterCreator("Goldmine", world => new Goldmine(world));
+            GameWorld.RegisterCreator("BoxOfPandora", world => new BoxOfPandora(world));
 
             // Islander architectures
-            GameWorld.RegisterCreator("Townhall", world => { return new Building(world, "Townhall"); });
-            GameWorld.RegisterCreator("Farmhouse", world => { return new Building(world, "Farmhouse"); });
-            GameWorld.RegisterCreator("Lumbermill", world => { return new Lumbermill(world, "Lumbermill"); });
-            GameWorld.RegisterCreator("Tower", world => { return new Tower(world, "Tower"); });
-            GameWorld.RegisterCreator("Barracks", world => { return new Building(world, "Barracks"); });
-            GameWorld.RegisterCreator("Altar", world => { return new Building(world, "Altar"); });
+            GameWorld.RegisterCreator("Townhall", world => new Building(world, "Townhall"));
+            GameWorld.RegisterCreator("Farmhouse", world => new Building(world, "Farmhouse"));
+            GameWorld.RegisterCreator("Lumbermill", world => new Lumbermill(world, "Lumbermill"));
+            GameWorld.RegisterCreator("Tower", world => new Tower(world, "Tower"));
+            GameWorld.RegisterCreator("Barracks", world => new Building(world, "Barracks"));
+            GameWorld.RegisterCreator("Altar", world => new Building(world, "Altar"));
 
-            Spell.RegisterCreator("Townhall", world => { return new SpellConstruct(world, "Townhall"); });
-            Spell.RegisterCreator("Farmhouse", world => { return new SpellConstruct(world, "Farmhouse"); });
-            Spell.RegisterCreator("Lumbermill", world => { return new SpellConstruct(world, "Lumbermill"); });
-            Spell.RegisterCreator("Tower", world => { return new SpellConstruct(world, "Tower"); });
-            Spell.RegisterCreator("Barracks", world => { return new SpellConstruct(world, "Barracks"); });
-            Spell.RegisterCreator("Altar", world => { return new SpellConstruct(world, "Altar"); });
+            Spell.RegisterCreator("Townhall", world => new SpellConstruct(world, "Townhall"));
+            Spell.RegisterCreator("Farmhouse", world => new SpellConstruct(world, "Farmhouse"));
+            Spell.RegisterCreator("Lumbermill", world => new SpellConstruct(world, "Lumbermill"));
+            Spell.RegisterCreator("Tower", world => new SpellConstruct(world, "Tower"));
+            Spell.RegisterCreator("Barracks", world => new SpellConstruct(world, "Barracks"));
+            Spell.RegisterCreator("Altar", world => new SpellConstruct(world, "Altar"));
 
             Player.RegisterBuilding("Townhall");
             Player.RegisterBuilding("Farmhouse");
@@ -74,17 +74,17 @@ namespace Isles
             Player.RegisterBuilding("Altar");
 
             // Islander units
-            GameWorld.RegisterCreator("Follower", world => { return new Worker(world, "Follower"); });
-            GameWorld.RegisterCreator("Militia", world => { return new Charactor(world, "Militia"); });
-            GameWorld.RegisterCreator("Hunter", world => { return new Hunter(world, "Hunter"); });
-            GameWorld.RegisterCreator("FireSorceress", world => { return new FireSorceress(world, "FireSorceress"); });
-            GameWorld.RegisterCreator("Hellfire", world => { return new Hellfire(world, "Hellfire"); });
+            GameWorld.RegisterCreator("Follower", world => new Worker(world, "Follower"));
+            GameWorld.RegisterCreator("Militia", world => new Charactor(world, "Militia"));
+            GameWorld.RegisterCreator("Hunter", world => new Hunter(world, "Hunter"));
+            GameWorld.RegisterCreator("FireSorceress", world => new FireSorceress(world, "FireSorceress"));
+            GameWorld.RegisterCreator("Hellfire", world => new Hellfire(world, "Hellfire"));
 
-            Spell.RegisterCreator("Follower", world => { return new SpellTraining(world, "Follower", null); });
-            Spell.RegisterCreator("Militia", world => { return new SpellTraining(world, "Militia", null); });
-            Spell.RegisterCreator("Hunter", world => { return new SpellTraining(world, "Hunter", null); });
-            Spell.RegisterCreator("FireSorceress", world => { return new SpellTraining(world, "FireSorceress", null); });
-            Spell.RegisterCreator("Hellfire", world => { return new SpellTraining(world, "Hellfire", null); });
+            Spell.RegisterCreator("Follower", world => new SpellTraining(world, "Follower", null));
+            Spell.RegisterCreator("Militia", world => new SpellTraining(world, "Militia", null));
+            Spell.RegisterCreator("Hunter", world => new SpellTraining(world, "Hunter", null));
+            Spell.RegisterCreator("FireSorceress", world => new SpellTraining(world, "FireSorceress", null));
+            Spell.RegisterCreator("Hellfire", world => new SpellTraining(world, "Hellfire", null));
 
             Player.RegisterCharactor("Follower");
             Player.RegisterCharactor("Militia");
@@ -93,19 +93,19 @@ namespace Isles
             Player.RegisterCharactor("Hellfire");
 
             // Steamer architectures
-            GameWorld.RegisterCreator("SteamFort", world => { return new Building(world, "SteamFort"); });
-            GameWorld.RegisterCreator("Steamhouse", world => { return new Building(world, "Steamhouse"); });
-            GameWorld.RegisterCreator("Regenerator", world => { return new Lumbermill(world, "Regenerator"); });
-            GameWorld.RegisterCreator("SteamCannon", world => { return new Tower(world, "SteamCannon"); });
-            GameWorld.RegisterCreator("TrainingCenter", world => { return new Building(world, "TrainingCenter"); });
-            GameWorld.RegisterCreator("SteamFactory", world => { return new Building(world, "SteamFactory"); });
+            GameWorld.RegisterCreator("SteamFort", world => new Building(world, "SteamFort"));
+            GameWorld.RegisterCreator("Steamhouse", world => new Building(world, "Steamhouse"));
+            GameWorld.RegisterCreator("Regenerator", world => new Lumbermill(world, "Regenerator"));
+            GameWorld.RegisterCreator("SteamCannon", world => new Tower(world, "SteamCannon"));
+            GameWorld.RegisterCreator("TrainingCenter", world => new Building(world, "TrainingCenter"));
+            GameWorld.RegisterCreator("SteamFactory", world => new Building(world, "SteamFactory"));
 
-            Spell.RegisterCreator("SteamFort", world => { return new SpellConstruct(world, "SteamFort"); });
-            Spell.RegisterCreator("Steamhouse", world => { return new SpellConstruct(world, "Steamhouse"); });
-            Spell.RegisterCreator("Regenerator", world => { return new SpellConstruct(world, "Regenerator"); });
-            Spell.RegisterCreator("SteamCannon", world => { return new SpellConstruct(world, "SteamCannon"); });
-            Spell.RegisterCreator("TrainingCenter", world => { return new SpellConstruct(world, "TrainingCenter"); });
-            Spell.RegisterCreator("SteamFactory", world => { return new SpellConstruct(world, "SteamFactory"); });
+            Spell.RegisterCreator("SteamFort", world => new SpellConstruct(world, "SteamFort"));
+            Spell.RegisterCreator("Steamhouse", world => new SpellConstruct(world, "Steamhouse"));
+            Spell.RegisterCreator("Regenerator", world => new SpellConstruct(world, "Regenerator"));
+            Spell.RegisterCreator("SteamCannon", world => new SpellConstruct(world, "SteamCannon"));
+            Spell.RegisterCreator("TrainingCenter", world => new SpellConstruct(world, "TrainingCenter"));
+            Spell.RegisterCreator("SteamFactory", world => new SpellConstruct(world, "SteamFactory"));
 
             Player.RegisterBuilding("SteamFort");
             Player.RegisterBuilding("Steamhouse");
@@ -115,30 +115,30 @@ namespace Isles
             Player.RegisterBuilding("SteamFactory");
 
             // Steamer units
-            GameWorld.RegisterCreator("Miner", world => { return new Worker(world, "Miner"); });
-            GameWorld.RegisterCreator("Swordman", world => { return new Charactor(world, "Swordman"); });
-            GameWorld.RegisterCreator("Rifleman", world => { return new Charactor(world, "Rifleman"); });
-            GameWorld.RegisterCreator("Steambot", world => { return new FireSorceress(world, "Steambot"); });
+            GameWorld.RegisterCreator("Miner", world => new Worker(world, "Miner"));
+            GameWorld.RegisterCreator("Swordman", world => new Charactor(world, "Swordman"));
+            GameWorld.RegisterCreator("Rifleman", world => new Charactor(world, "Rifleman"));
+            GameWorld.RegisterCreator("Steambot", world => new FireSorceress(world, "Steambot"));
 
-            Spell.RegisterCreator("Miner", world => { return new SpellTraining(world, "Miner", null); });
-            Spell.RegisterCreator("Swordman", world => { return new SpellTraining(world, "Swordman", null); });
-            Spell.RegisterCreator("Rifleman", world => { return new SpellTraining(world, "Rifleman", null); });
-            Spell.RegisterCreator("Steambot", world => { return new SpellTraining(world, "Steambot", null); });
+            Spell.RegisterCreator("Miner", world => new SpellTraining(world, "Miner", null));
+            Spell.RegisterCreator("Swordman", world => new SpellTraining(world, "Swordman", null));
+            Spell.RegisterCreator("Rifleman", world => new SpellTraining(world, "Rifleman", null));
+            Spell.RegisterCreator("Steambot", world => new SpellTraining(world, "Steambot", null));
 
             Player.RegisterCharactor("Miner");
             Player.RegisterCharactor("Swordman");
             Player.RegisterCharactor("Rifleman");
             Player.RegisterCharactor("Steambot");
 
-            GameWorld.RegisterCreator("Arrow", world => { return new Arrow(world); });
+            GameWorld.RegisterCreator("Arrow", world => new Arrow(world));
 
             // Register spells
-            Spell.RegisterCreator("LiveOfNature", world => { return new SpellUpgrade(world, "LiveOfNature", Upgrades.LiveOfNature); });
-            Spell.RegisterCreator("PunishOfNatureUpgrade", world => { return new SpellUpgrade(world, "PunishOfNatureUpgrade", Upgrades.PunishOfNature); });
-            Spell.RegisterCreator("AttackUpgrade", world => { return new SpellUpgrade(world, "AttackUpgrade", Upgrades.Attack); });
-            Spell.RegisterCreator("DefenseUpgrade", world => { return new SpellUpgrade(world, "DefenseUpgrade", Upgrades.Defense); });
-            Spell.RegisterCreator("PunishOfNature", world => { return new SpellPunishOfNature(world); });
-            Spell.RegisterCreator("SummonHellfire", world => { return new SpellSummon(world, "Hellfire"); });
+            Spell.RegisterCreator("LiveOfNature", world => new SpellUpgrade(world, "LiveOfNature", Upgrades.LiveOfNature));
+            Spell.RegisterCreator("PunishOfNatureUpgrade", world => new SpellUpgrade(world, "PunishOfNatureUpgrade", Upgrades.PunishOfNature));
+            Spell.RegisterCreator("AttackUpgrade", world => new SpellUpgrade(world, "AttackUpgrade", Upgrades.Attack));
+            Spell.RegisterCreator("DefenseUpgrade", world => new SpellUpgrade(world, "DefenseUpgrade", Upgrades.Defense));
+            Spell.RegisterCreator("PunishOfNature", world => new SpellPunishOfNature(world));
+            Spell.RegisterCreator("SummonHellfire", world => new SpellSummon(world, "Hellfire"));
         }
     }
 

@@ -63,7 +63,7 @@ namespace Isles.Engine
         public Camera(GraphicsDevice graphics)
         {
             device = graphics;
-            graphics.DeviceReset += new EventHandler(ResetProjection);
+            graphics.DeviceReset += ResetProjection;
             view = Matrix.CreateLookAt(eye, lookAt, up);
             ResetProjection(null, EventArgs.Empty);
 

@@ -180,7 +180,7 @@ namespace Isles.UI
             font = game.Content.Load<SpriteFont>("Fonts/Default");
 
             GraphicsDevice_DeviceReset(game.GraphicsDevice, null);
-            game.GraphicsDevice.DeviceReset += new EventHandler(GraphicsDevice_DeviceReset);
+            game.GraphicsDevice.DeviceReset += GraphicsDevice_DeviceReset;
         }
 
         /// <summary>

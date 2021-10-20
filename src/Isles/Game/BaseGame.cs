@@ -34,38 +34,12 @@ namespace Isles.Engine
         /// <summary>
         /// Cached matrices of this frame.
         /// </summary>
-        private Matrix
-view;
-
-        /// <summary>
-        /// Cached matrices of this frame.
-        /// </summary>
-        private Matrix
-projection;
-
-        /// <summary>
-        /// Cached matrices of this frame.
-        /// </summary>
-        private Matrix
-viewProjection;
-
-        /// <summary>
-        /// Cached matrices of this frame.
-        /// </summary>
-        private Matrix
-viewInverse;
-
-        /// <summary>
-        /// Cached matrices of this frame.
-        /// </summary>
-        private Matrix
-projectionInverse;
-
-        /// <summary>
-        /// Cached matrices of this frame.
-        /// </summary>
-        private Matrix
-viewProjectionInverse;
+        private Matrix view;
+        private Matrix projection;
+        private Matrix viewProjection;
+        private Matrix viewInverse;
+        private Matrix projectionInverse;
+        private Matrix viewProjectionInverse;
 
         /// <summary>
         /// Ray casted from cursor.
@@ -356,8 +330,6 @@ viewProjectionInverse;
                 PreferredBackBufferWidth = Settings.ScreenWidth,
                 PreferredBackBufferHeight = Settings.ScreenHeight,
                 SynchronizeWithVerticalRetrace = Settings.VSync,
-                MinimumPixelShaderProfile = ShaderProfile.PS_2_0,
-                MinimumVertexShaderProfile = ShaderProfile.VS_2_0,
             };
 
             // Show cursor
@@ -384,7 +356,7 @@ viewProjectionInverse;
         /// </summary>
         protected override void Initialize()
         {
-            Graphics.DeviceReset += new EventHandler(graphics_DeviceReset);
+            Graphics.DeviceReset += graphics_DeviceReset;
             graphics_DeviceReset(null, EventArgs.Empty);
 
             // Initialize sound

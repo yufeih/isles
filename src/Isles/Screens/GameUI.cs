@@ -952,10 +952,7 @@ namespace Isles
             profilePanel.Add(button);
             profileButtons.Add(button);
             profileNextX += ProfileSpace + size;
-            button.Click += (o, e) =>
-            {
-                Player.LocalPlayer.SelectionDirty = true;
-            };
+            button.Click += (o, e) => Player.LocalPlayer.SelectionDirty = true;
         }
 
         /// <summary>
