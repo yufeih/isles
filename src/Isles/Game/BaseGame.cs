@@ -362,24 +362,13 @@ namespace Isles.Engine
             // Initialize sound
             Input = new Input();
             Input.Register(this, 0);
-            Log.Write("Input Initialized...");
 
-            if (Settings.EnableSound)
-            {
-                Components.Add(Audio = new AudioManager(this));
-                Log.Write("Sound Initialized...");
-            }
-
-            if (Settings.EnableScreenshot)
-            {
-                Components.Add(ScreenshotCapturer = new ScreenshotCapturer(this));
-                Log.Write("Screenshot Capturer Initialized...");
-            }
+            Components.Add(Audio = new AudioManager(this));
+            Components.Add(ScreenshotCapturer = new ScreenshotCapturer(this));
 
             if (Settings.EnableProfile)
             {
                 Components.Add(Profiler = new Profiler(this));
-                Log.Write("Profiler Initialized...");
             }
 
             if (Settings.BloomSettings != null &&

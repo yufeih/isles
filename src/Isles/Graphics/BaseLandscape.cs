@@ -1030,7 +1030,5 @@ namespace Isles.Graphics
             // Set picked to null
             picked = null;
         }
-
-        public abstract void Draw(GameTime gameTime);
     }
 }

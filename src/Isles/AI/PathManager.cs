@@ -1114,8 +1114,7 @@ namespace Isles.Engine
             largeSearch = new GraphSearchAStar();
 
             // Read in settings value
-            MaxSearchStepsPerUpdate = BaseGame.Singleton.Settings
-                                                             .MaxPathSearchStepsPerUpdate;
+            MaxSearchStepsPerUpdate = BaseGame.Singleton.Settings.MaxPathSearchStepsPerUpdate;
         }
 
         public void Mark(IMovable agent)

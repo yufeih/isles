@@ -65,17 +65,6 @@ namespace Isles.Graphics
 
         public abstract void DrawTerrain(GameTime gameTime, ShadowEffect shadowEffect);
 
-        /// <summary>
-        /// Draw landscape.
-        /// </summary>
-        /// <param name="gameTime"></param>
-        public override void Draw(GameTime gameTime)
-        {
-            DrawSky(game.View, game.Projection);
-            DrawWater(gameTime);
-            DrawTerrain(gameTime, null);
-        }
-
         private struct TexturedSurface
         {
             public Texture2D Texture;
@@ -465,11 +454,6 @@ namespace Isles.Graphics
         /// <param name="gameTime"></param>
         public void UpdateWaterReflectionAndRefraction(GameTime gameTime)
         {
-            if (!game.Settings.RealisticWater)
-            {
-                return;
-            }
-
             DepthStencilBuffer prevDepth = graphics.DepthStencilBuffer;
             graphics.DepthStencilBuffer = waterDepthStencil;
             graphics.SetRenderTarget(reflectionRenderTarget);
@@ -482,10 +466,7 @@ namespace Isles.Graphics
 
             DrawSky(viewReflect, game.Projection);
 
-            if (game.Settings.ShowLandscape)
-            {
-                DrawTerrain(viewReflect, game.Projection, true);
-            }
+            DrawTerrain(viewReflect, game.Projection, true);
 
             // Draw other reflections
             if (game.Settings.ReflectionEnabled)
@@ -497,10 +478,7 @@ namespace Isles.Graphics
             game.ModelManager.Present(viewReflect, game.Projection);
 
             // Draw refraction onto the reflection texture
-            if (game.Settings.ShowLandscape)
-            {
-                DrawTerrain(game.View, game.Projection, false);
-            }
+            DrawTerrain(game.View, game.Projection, false);
 
             graphics.SetRenderTarget(null);
             graphics.DepthStencilBuffer = prevDepth;
@@ -521,7 +499,7 @@ namespace Isles.Graphics
                 WaterEffect.Parameters["FogTexture"].SetValue(FogTexture);
             }
 
-            if (game.Settings.RealisticWater)
+            if (game.Settings.ReflectionEnabled)
             {
                 WaterEffect.CurrentTechnique = WaterEffect.Techniques["Realisic"];
                 WaterEffect.Parameters["ReflectionTexture"].SetValue(waterReflection);
