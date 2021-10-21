@@ -248,7 +248,6 @@ namespace Isles
             randomOffset = Vector2.Normalize(new Vector2((float)rand.NextDouble(), (float)rand.NextDouble()));
 
             // Init rendering of fog of war
-            fogOfWarDeclaration = new VertexDeclaration(game.GraphicsDevice, VertexPositionTexture.VertexElements);
             fogOfWarVertices = new VertexPositionTexture[4]
             {
                 new VertexPositionTexture(Vector3.Zero, new Vector2(0, 0)),
@@ -836,7 +835,6 @@ namespace Isles
         }
 
         private VertexPositionTexture[] fogOfWarVertices;
-        private VertexDeclaration fogOfWarDeclaration;
 
         private void DrawFogOfWar()
         {
@@ -855,14 +853,9 @@ namespace Isles
 
                 effect.CurrentTechnique = effect.Techniques["FogOfWar"];
                 effect.Parameters["BasicTexture"].SetValue(world.FogOfWar.Current);
-                effect.Begin();
-                effect.CurrentTechnique.Passes[0].Begin();
+                effect.CurrentTechnique.Passes[0].Apply();
 
-                game.GraphicsDevice.VertexDeclaration = fogOfWarDeclaration;
                 game.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, fogOfWarVertices, 0, 2);
-
-                effect.CurrentTechnique.Passes[0].End();
-                effect.End();
 
                 // This will be drawed next frame...
                 world.Landscape.FogTexture = world.FogOfWar.Mask;
@@ -988,8 +981,7 @@ namespace Isles
             disappearEffect.Parameters["Intensity"].SetValue(MoveInCircle(gameTime, 0.6).Y);
 
             // Begin the custom effect.
-            disappearEffect.Begin();
-            disappearEffect.CurrentTechnique.Passes[0].Begin();
+            disappearEffect.CurrentTechnique.Passes[0].Apply();
 
             // Draw the sprite, passing the fade amount as the
             // alpha of the SpriteBatch.Draw color parameter.
@@ -1001,9 +993,6 @@ namespace Isles
 
             // End the sprite batch, then end our custom effect.
             spriteBatch.End();
-
-            disappearEffect.CurrentTechnique.Passes[0].End();
-            disappearEffect.End();
         }
 
         /// <summary>

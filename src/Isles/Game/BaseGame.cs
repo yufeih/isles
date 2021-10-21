@@ -675,7 +675,7 @@ namespace Isles.Engine
                 ScreenshotCapturer.TakeScreenshot();
             }
 
-            GraphicsDevice.Vertices[0].SetSource(null, 0, 0);
+            GraphicsDevice.SetVertexBuffer(null);
             GraphicsDevice.Indices = null;
 
             base.Draw(gameTime);

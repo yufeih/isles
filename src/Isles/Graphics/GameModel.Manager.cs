@@ -287,22 +287,18 @@ namespace Isles.Graphics
                 game.GraphicsDevice.SetRasterizerStateState(RasterizerState.CullNone);
 
                 // Set index buffer
-                if (Mesh.IndexBuffer != CachedIndexBuffer)
+                if (MeshPart.IndexBuffer != CachedIndexBuffer)
                 {
-                    CachedIndexBuffer = Mesh.IndexBuffer;
+                    CachedIndexBuffer = MeshPart.IndexBuffer;
                     game.GraphicsDevice.Indices = CachedIndexBuffer;
                 }
 
                 // Set vertex buffer
-                if (Mesh.VertexBuffer != CachedVertexBuffer)
+                if (MeshPart.VertexBuffer != CachedVertexBuffer)
                 {
-                    CachedVertexBuffer = Mesh.VertexBuffer;
-                    game.GraphicsDevice.Vertices[0].SetSource(
-                        CachedVertexBuffer, MeshPart.StreamOffset, MeshPart.VertexStride);
+                    CachedVertexBuffer = MeshPart.VertexBuffer;
+                    game.GraphicsDevice.SetVertexBuffer(CachedVertexBuffer);
                 }
-
-                // Set vertex declaraction
-                game.GraphicsDevice.VertexDeclaration = MeshPart.VertexDeclaration;
 
                 // Draw static renderables
                 for (var i = 0; i < worldTransforms.Count; i++)
@@ -334,10 +330,10 @@ namespace Isles.Graphics
                         worldInverseTranspose.SetValue(Matrix.Transpose(worldInvert));
                     }
 
-                    effect.CommitChanges();
+                    effect.CurrentTechnique.Passes[0].Apply();
 
                     game.GraphicsDevice.DrawIndexedPrimitives(
-                        PrimitiveType.TriangleList, MeshPart.BaseVertex, 0,
+                        PrimitiveType.TriangleList, 0, 0,
                         MeshPart.NumVertices, MeshPart.StartIndex, MeshPart.PrimitiveCount);
                 }
 
@@ -359,10 +355,10 @@ namespace Isles.Graphics
                         light.SetValue(skinnedLights[i]);
                     }
 
-                    effect.CommitChanges();
+                    effect.CurrentTechnique.Passes[0].Apply();
 
                     game.GraphicsDevice.DrawIndexedPrimitives(
-                        PrimitiveType.TriangleList, MeshPart.BaseVertex, 0,
+                        PrimitiveType.TriangleList, 0, 0,
                         MeshPart.NumVertices, MeshPart.StartIndex, MeshPart.PrimitiveCount);
                 }
 
@@ -476,23 +472,12 @@ namespace Isles.Graphics
                     return;
                 }
 
-                effect.CurrentTechnique = Technique;
+                effect.CurrentTechnique.Passes[0].Apply();
 
-                effect.Begin();
-
-                foreach (EffectPass pass in Technique.Passes)
+                foreach (RenderablePerMaterial r in renderables)
                 {
-                    pass.Begin();
-
-                    foreach (RenderablePerMaterial r in renderables)
-                    {
-                        r.Draw();
-                    }
-
-                    pass.End();
+                    r.Draw();
                 }
-
-                effect.End();
             }
         }
 

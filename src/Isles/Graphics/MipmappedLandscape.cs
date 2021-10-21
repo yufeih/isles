@@ -15,7 +15,6 @@ namespace Isles.Graphics
         /// Effect for drawing surface.
         /// </summary>
         private BasicEffect surfaceEffect;
-        private VertexDeclaration surfaceDeclaraction;
 
         /// <summary>
         /// Draw a texture on the landscape surface.
@@ -94,23 +93,15 @@ namespace Isles.Graphics
             graphics.SetDepthStencilState(DepthStencilState.DepthRead);
             graphics.SetRasterizerStateState(RasterizerState.CullCounterClockwise);
 
-            graphics.VertexDeclaration = surfaceDeclaraction;
+            surfaceEffect.CurrentTechnique.Passes[0].Apply();
 
-            surfaceEffect.Begin();
+            graphics.DrawUserIndexedPrimitives(
+                PrimitiveType.TriangleList,
+                vertices, 0, vertexCount,
+                indices, 0, indexCount / 3);
 
-            foreach (EffectPass pass in surfaceEffect.CurrentTechnique.Passes)
-            {
-                pass.Begin();
-
-                graphics.DrawUserIndexedPrimitives(
-                    PrimitiveType.TriangleList,
-                    vertices, 0, vertexCount,
-                    indices, 0, indexCount / 3);
-
-                pass.End();
-            }
-
-            surfaceEffect.End();
+            graphics.SamplerStates[0].AddressU = TextureAddressMode.Wrap;
+            graphics.SamplerStates[0].AddressV = TextureAddressMode.Wrap;
         }
 
         /// <summary>
@@ -135,11 +126,6 @@ namespace Isles.Graphics
         private readonly List<IndexBuffer> terrainIndexBufferSet = new();
 
         /// <summary>
-        /// Terrain vertex declaration.
-        /// </summary>
-        private VertexDeclaration terrainVertexDeclaration;
-
-        /// <summary>
         /// Gets or sets the error ratio when computing terrain LOD.
         /// </summary>
         public float TerrainErrorRatio { get; set; } = 0.0012f;
@@ -154,9 +140,7 @@ namespace Isles.Graphics
                 return;
             }
 
-            graphics.VertexDeclaration = terrainVertexDeclaration;
-            graphics.Vertices[0].SetSource(
-                terrainVertexBuffer, 0, TerrainVertex.SizeInBytes);
+            graphics.SetVertexBuffer(terrainVertexBuffer);
 
             // FIXME: There's a conflict here, originally, terrain rendering
             // uses several tiled textures called Layers. But now, there is
@@ -167,23 +151,14 @@ namespace Isles.Graphics
             terrainEffect.CurrentTechnique = terrainEffect.Techniques["Fast"];
             terrainEffect.Parameters["ColorTexture"].SetValue(Layers[0].ColorTexture);
 
-            terrainEffect.Begin();
-            foreach (EffectPass pass in terrainEffect.CurrentTechnique.Passes)
+            terrainEffect.CurrentTechnique.Passes[0].Apply();
+            for (var i = 0; i < Layers.Count; i++)
             {
-                pass.Begin();
-
-                for (var i = 0; i < Layers.Count; i++)
-                {
-                    graphics.DrawIndexedPrimitives(
-                        PrimitiveType.TriangleList,
-                        0, 0, (int)terrainVertexCount,
-                        0, (int)terrainIndexCount[0] / 3);
-                }
-
-                pass.End();
+                graphics.DrawIndexedPrimitives(
+                    PrimitiveType.TriangleList,
+                    0, 0, (int)terrainVertexCount,
+                    0, (int)terrainIndexCount[0] / 3);
             }
-
-            terrainEffect.End();
         }
 
         /// <summary>
@@ -202,9 +177,7 @@ namespace Isles.Graphics
 
             // This code would go between a device
             // BeginScene-EndScene block.
-            graphics.Vertices[0].SetSource(
-                terrainVertexBuffer, 0, TerrainVertex.SizeInBytes);
-            graphics.VertexDeclaration = terrainVertexDeclaration;
+            graphics.SetVertexBuffer(terrainVertexBuffer);
 
             var viewInv = Matrix.Invert(game.View);
             terrainEffect.Parameters["ViewInverse"].SetValue(viewInv);
@@ -226,50 +199,37 @@ namespace Isles.Graphics
             var layerCount = 0;
             var patchCount = 0;
 
-            terrainEffect.Begin();
-            foreach (EffectPass pass in terrainEffect.CurrentTechnique.Passes)
+            terrainEffect.CurrentTechnique.Passes[0].Apply();
+
+            for (var i = 0; i < Layers.Count; i++)
             {
-                pass.Begin();
+                // It turns out that set indices are soo expensive when drawing
+                // the terrain with simple shaders. But for complex shaders, such
+                // as normal mapping, it's better to use the patch group :)
+                graphics.Indices = terrainIndexBufferSet[Layers[i].PatchGroup];
 
-                for (var i = 0; i < Layers.Count; i++)
+                terrainEffect.Parameters["ColorTexture"].SetValue(Layers[i].ColorTexture);
+                terrainEffect.Parameters["AlphaTexture"].SetValue(Layers[i].AlphaTexture);
+                terrainEffect.Parameters["NormalTexture"].SetValue(Layers[i].NormalTexture);
+                terrainEffect.CurrentTechnique.Passes[0].Apply();
+
+                if (terrainIndexCount[Layers[i].PatchGroup] != 0)
                 {
-                    // It turns out that set indices are soo expensive when drawing
-                    // the terrain with simple shaders. But for complex shaders, such
-                    // as normal mapping, it's better to use the patch group :)
-                    graphics.Indices = terrainIndexBufferSet[Layers[i].PatchGroup];
-
-                    terrainEffect.Parameters["ColorTexture"].SetValue(Layers[i].ColorTexture);
-                    terrainEffect.Parameters["AlphaTexture"].SetValue(Layers[i].AlphaTexture);
-                    terrainEffect.Parameters["NormalTexture"].SetValue(Layers[i].NormalTexture);
-                    terrainEffect.CommitChanges();
-
-                    if (terrainIndexCount[Layers[i].PatchGroup] != 0)
-                    {
-                        layerCount++;
-                        patchCount += (int)terrainIndexCount[Layers[i].PatchGroup] / 3;
-                        graphics.DrawIndexedPrimitives(
-                            PrimitiveType.TriangleList,
-                            0, 0, (int)terrainVertexCount,
-                            0, (int)terrainIndexCount[Layers[i].PatchGroup] / 3);
-                    }
+                    layerCount++;
+                    patchCount += (int)terrainIndexCount[Layers[i].PatchGroup] / 3;
+                    graphics.DrawIndexedPrimitives(
+                        PrimitiveType.TriangleList,
+                        0, 0, (int)terrainVertexCount,
+                        0, (int)terrainIndexCount[Layers[i].PatchGroup] / 3);
                 }
-
-                pass.End();
             }
-
-            terrainEffect.End();
         }
 
         public override void Initialize(BaseGame game)
         {
             base.Initialize(game);
 
-            surfaceEffect = new BasicEffect(graphics, null);
-            surfaceDeclaraction = new VertexDeclaration(
-                graphics, VertexPositionTexture.VertexElements);
-
-            terrainVertexDeclaration = new VertexDeclaration(
-                graphics, TerrainVertex.VertexElements);
+            surfaceEffect = new BasicEffect(graphics);
 
             // Load effect
             terrainEffect = game.Content.Load<Effect>("Effects/MipmappedTerrain");
@@ -507,7 +467,7 @@ namespace Isles.Graphics
             // Initialize vertex buffer
             terrainVertexBuffer = new DynamicVertexBuffer(
                 graphics,
-                TerrainVertex.SizeInBytes * PatchCountOnXAxis * PatchCountOnYAxis *
+                typeof(TerrainVertex),
                 Patch.MaxPatchResolution * Patch.MaxPatchResolution,
                 BufferUsage.WriteOnly);
 
@@ -564,7 +524,7 @@ namespace Isles.Graphics
         /// Tangent vertex format for shader vertex format used all over the place.
         /// It contains: Position, Normal vector, texture coords, tangent vector.
         /// </summary>
-        public struct TerrainVertex
+        public struct TerrainVertex : IVertexType
         {
             // Grabbed from racing game :)
 
@@ -604,6 +564,8 @@ namespace Isles.Graphics
             /// </summary>
             /// <returns>Float.</returns>
             public float V => TextureCoordinate.Y;
+
+            VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;
 
             /// <summary>
             /// Create tangent vertex.
@@ -647,31 +609,16 @@ namespace Isles.Graphics
             /// <summary>
             /// Vertex elements for Mesh.Clone.
             /// </summary>
-            public static readonly VertexElement[] VertexElements =
-                GenerateVertexElements();
-
-            /// <summary>
-            /// Generate vertex declaration.
-            /// </summary>
-            private static VertexElement[] GenerateVertexElements()
+            public static readonly VertexDeclaration VertexDeclaration = new(new VertexElement[]
             {
-                var decl = new VertexElement[]
-                {
-                    // Construct new vertex declaration with tangent info
-                    // First the normal stuff (we should already have that)
-                    new VertexElement(0, 0, VertexElementFormat.Vector3,
-                        VertexElementMethod.Default, VertexElementUsage.Position, 0),
-                    new VertexElement(0, 12, VertexElementFormat.Vector2,
-                        VertexElementMethod.Default,
-                        VertexElementUsage.TextureCoordinate, 0),
-                    new VertexElement(0, 20, VertexElementFormat.Vector3,
-                        VertexElementMethod.Default, VertexElementUsage.Normal, 0),
-                    // And now the tangent
-                    new VertexElement(0, 32, VertexElementFormat.Vector3,
-                        VertexElementMethod.Default, VertexElementUsage.Tangent, 0),
-                };
-                return decl;
-            }
+                // Construct new vertex declaration with tangent info
+                // First the normal stuff (we should already have that)
+                new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
+                new VertexElement(12, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0),
+                new VertexElement(20, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0),
+                // And now the tangent
+                new VertexElement(32, VertexElementFormat.Vector3, VertexElementUsage.Tangent, 0),
+            });
 
             /// <summary>
             /// Returns true if declaration is tangent vertex declaration.

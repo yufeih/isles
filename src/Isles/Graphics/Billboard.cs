@@ -287,9 +287,6 @@ namespace Isles.Graphics
                 return;
             }
 
-            game.GraphicsDevice.VertexDeclaration = new VertexDeclaration(
-                game.GraphicsDevice, VertexPositionNormalDuoTexture.VertexElements);
-
             BillboardType currentType = BillboardType.NormalOriented;
 
             // Set effect parameters
@@ -327,7 +324,7 @@ namespace Isles.Graphics
                 }
 
                 // Setup graphics device
-                game.GraphicsDevice.Vertices[0].SetSource(null, 0, 0);
+                game.GraphicsDevice.SetVertexBuffer(null);
                 game.GraphicsDevice.Indices = null;
 
                 // Build the mesh for this chunk of billboards
@@ -348,8 +345,7 @@ namespace Isles.Graphics
                 indices.SetData(workingIndices, 0, baseIndex);
 
                 // Setup graphics device
-                game.GraphicsDevice.Vertices[0].SetSource(
-                    vertices, 0, VertexPositionNormalDuoTexture.SizeInBytes);
+                game.GraphicsDevice.SetVertexBuffer(vertices);
                 game.GraphicsDevice.Indices = indices;
 
                 // Set effect texture
@@ -380,18 +376,8 @@ namespace Isles.Graphics
                 }
 
                 // Draw the chunk
-                effect.Begin(SaveStateMode.SaveState);
-                foreach (EffectPass pass in effect.CurrentTechnique.Passes)
-                {
-                    pass.Begin();
-
-                    game.GraphicsDevice.DrawIndexedPrimitives(
-                        PrimitiveType.TriangleList, 0, 0, baseVertex, 0, baseIndex / 3);
-
-                    pass.End();
-                }
-
-                effect.End();
+                effect.CurrentTechnique.Passes[0].Apply();
+                game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, baseVertex, 0, baseIndex / 3);
 
                 // Increment begin pointer
                 begin = end;

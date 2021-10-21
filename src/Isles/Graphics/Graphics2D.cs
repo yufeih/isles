@@ -299,29 +299,16 @@ namespace Isles.Graphics
                 return;
             }
 
-            game.GraphicsDevice.Vertices[0].SetSource(null, 0, 0);
-
             // Update line vertices
             vertices.SetData(lines, 0, lineCount);
 
             // Draw all lines
-            game.GraphicsDevice.VertexDeclaration = new VertexDeclaration(
-                game.GraphicsDevice, VertexPositionColor.VertexElements);
-
-            game.GraphicsDevice.Vertices[0].SetSource(
-                vertices, 0, VertexPositionColor.SizeInBytes);
+            game.GraphicsDevice.SetVertexBuffer(vertices);
 
             Effect.CurrentTechnique = Effect.Techniques["Graphics2D"];
-            Effect.Begin();
-            foreach (EffectPass pass in Effect.CurrentTechnique.Passes)
-            {
-                pass.Begin();
-                game.GraphicsDevice.DrawPrimitives(
-                    PrimitiveType.LineList, 0, lineCount / 2);
-                pass.End();
-            }
+            Effect.CurrentTechnique.Passes[0].Apply();
 
-            Effect.End();
+            game.GraphicsDevice.DrawPrimitives(PrimitiveType.LineList, 0, lineCount / 2);
 
             // Clear all lines in this frame
             lineCount = 0;
@@ -334,31 +321,17 @@ namespace Isles.Graphics
                 return;
             }
 
-            game.GraphicsDevice.Vertices[0].SetSource(null, 0, 0);
-
             // Update primitive vertices
             vertices.SetData(primitives, 0, primitiveVertexCount);
             indices.SetData(primitiveIndices, 0, primitiveIndexCount);
 
             // Draw all lines
-            game.GraphicsDevice.VertexDeclaration = new VertexDeclaration(
-                game.GraphicsDevice, VertexPositionColor.VertexElements);
-
-            game.GraphicsDevice.Vertices[0].SetSource(
-                vertices, 0, VertexPositionColor.SizeInBytes);
+            game.GraphicsDevice.SetVertexBuffer(vertices);
             game.GraphicsDevice.Indices = indices;
 
             Effect.CurrentTechnique = Effect.Techniques["Graphics2D"];
-            Effect.Begin();
-            foreach (EffectPass pass in Effect.CurrentTechnique.Passes)
-            {
-                pass.Begin();
-                game.GraphicsDevice.DrawIndexedPrimitives(
-                    PrimitiveType.TriangleList, 0, 0, primitiveVertexCount, 0, primitiveIndexCount / 3);
-                pass.End();
-            }
-
-            Effect.End();
+            Effect.CurrentTechnique.Passes[0].Apply();
+            game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, primitiveVertexCount, 0, primitiveIndexCount / 3);
 
             // Clear all primitives after drawing them
             primitiveIndexCount = 0;

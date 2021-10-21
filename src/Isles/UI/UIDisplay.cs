@@ -176,7 +176,7 @@ namespace Isles.UI
         public void LoadContent()
         {
             sprite = new SpriteBatch(game.GraphicsDevice);
-            effect = new BasicEffect(game.GraphicsDevice, null);
+            effect = new BasicEffect(game.GraphicsDevice);
             font = game.Content.Load<SpriteFont>("Fonts/Default");
 
             GraphicsDevice_DeviceReset(game.GraphicsDevice, null);

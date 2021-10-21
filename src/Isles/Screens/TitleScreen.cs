@@ -403,8 +403,7 @@ namespace Isles
                     disappearEffect.Parameters["Offset"].SetValue(randomOffset);
 
                     // Begin the custom effect.
-                    disappearEffect.Begin();
-                    disappearEffect.CurrentTechnique.Passes[0].Begin();
+                    disappearEffect.CurrentTechnique.Passes[0].Apply();
 
                     // Draw the sprite, passing the fade amount as the
                     // alpha of the SpriteBatch.Draw color parameter.
@@ -414,9 +413,6 @@ namespace Isles
 
                     // End the sprite batch, then end our custom effect.
                     spriteBatch.End();
-
-                    disappearEffect.CurrentTechnique.Passes[0].End();
-                    disappearEffect.End();
                 }
 
                 return;

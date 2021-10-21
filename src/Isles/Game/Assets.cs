@@ -347,10 +347,11 @@ namespace Isles.Engine
             {
                 if (screenshot == null)
                 {
-                    screenshot = new ResolveTexture2D(
+                    screenshot = new RenderTarget2D(
                         game.GraphicsDevice,
-                        game.ScreenWidth, game.ScreenHeight, 1,
-                        SurfaceFormat.Color);
+                        game.ScreenWidth, game.ScreenHeight, false,
+                        SurfaceFormat.Color,
+                        game.GraphicsDevice.PresentationParameters.DepthStencilFormat);
 
                     // Get data with help of the resolve method
                     game.GraphicsDevice.ResolveBackBuffer(screenshot);
@@ -360,7 +361,7 @@ namespace Isles.Engine
             }
         }
 
-        private ResolveTexture2D screenshot;
+        private RenderTarget2D screenshot;
 
         public ScreenshotCapturer(BaseGame setGame)
             : base(setGame)
@@ -473,25 +474,27 @@ namespace Isles.Engine
                         Directory.CreateDirectory(ScreenshotsDirectory);
                     }
 
-                    using var dstTexture = new ResolveTexture2D(
+                    using var dstTexture = new RenderTarget2D(
                         game.GraphicsDevice,
-                        game.ScreenWidth, game.ScreenHeight, 1,
-                        SurfaceFormat.Color);
+                        game.ScreenWidth, game.ScreenHeight, false,
+                        SurfaceFormat.Color,
+                        game.GraphicsDevice.PresentationParameters.DepthStencilFormat);
+
                     // Get data with help of the resolve method
                     game.GraphicsDevice.ResolveBackBuffer(dstTexture);
 
-                    dstTexture.Save(
-                        ScreenshotNameBuilder(screenshotNum),
-                        ImageFileFormat.Bmp);
+                    using var stream = File.OpenWrite(ScreenshotNameBuilder(screenshotNum));
+                    dstTexture.SaveAsJpeg(stream, dstTexture.Width, dstTexture.Height);
 
                     Log.Write("Screen shot captured: " + ScreenshotNameBuilder(screenshotNum));
                 }
                 else
                 {
-                    var dstTexture = new ResolveTexture2D(
+                    var dstTexture = new RenderTarget2D(
                         game.GraphicsDevice,
-                        game.ScreenWidth, game.ScreenHeight, 1,
-                        SurfaceFormat.Color);
+                        game.ScreenWidth, game.ScreenHeight, false,
+                        SurfaceFormat.Color,
+                        game.GraphicsDevice.PresentationParameters.DepthStencilFormat);
 
                     // Get data with help of the resolve method
                     game.GraphicsDevice.ResolveBackBuffer(dstTexture);

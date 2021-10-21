@@ -11,7 +11,7 @@ namespace Isles.Graphics
     /// Tangent vertex format for shader vertex format used all over the place.
     /// It contains: Position, Normal vector, texture coords, tangent vector.
     /// </summary>
-    public struct VertexTangent
+    public struct VertexTangent : IVertexType
     {
         // Grabbed from racing game :)
 
@@ -52,6 +52,8 @@ namespace Isles.Graphics
         /// <returns>Float.</returns>
         public float V => TextureCoordinate.Y;
 
+        VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;
+
         /// <summary>
         /// Create tangent vertex.
         /// </summary>
@@ -91,34 +93,16 @@ namespace Isles.Graphics
             Tangent = setTangent;
         }
 
-        /// <summary>
-        /// Vertex elements for Mesh.Clone.
-        /// </summary>
-        public static readonly VertexElement[] VertexElements =
-            GenerateVertexElements();
-
-        /// <summary>
-        /// Generate vertex declaration.
-        /// </summary>
-        private static VertexElement[] GenerateVertexElements()
+        public static readonly VertexDeclaration VertexDeclaration = new(new VertexElement[]
         {
-            var decl = new VertexElement[]
-                {
-                    // Construct new vertex declaration with tangent info
-                    // First the normal stuff (we should already have that)
-                    new VertexElement(0, 0, VertexElementFormat.Vector3,
-                        VertexElementMethod.Default, VertexElementUsage.Position, 0),
-                    new VertexElement(0, 12, VertexElementFormat.Vector2,
-                        VertexElementMethod.Default,
-                        VertexElementUsage.TextureCoordinate, 0),
-                    new VertexElement(0, 20, VertexElementFormat.Vector3,
-                        VertexElementMethod.Default, VertexElementUsage.Normal, 0),
-                    // And now the tangent
-                    new VertexElement(0, 32, VertexElementFormat.Vector3,
-                        VertexElementMethod.Default, VertexElementUsage.Tangent, 0),
-                };
-            return decl;
-        }
+            // Construct new vertex declaration with tangent info
+            // First the normal stuff (we should already have that)
+            new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
+            new VertexElement(12, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0),
+            new VertexElement(20, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0),
+            // And now the tangent
+            new VertexElement(32, VertexElementFormat.Vector3, VertexElementUsage.Tangent, 0),
+        });
 
         /// <summary>
         /// Returns true if declaration is tangent vertex declaration.
@@ -141,7 +125,7 @@ namespace Isles.Graphics
     /// Vertex format for shader vertex format used all over the place.
     /// It contains: Position, Normal vector, 2 texture coords.
     /// </summary>
-    public struct VertexPositionNormalDuoTexture
+    public struct VertexPositionNormalDuoTexture : IVertexType
     {
         /// <summary>
         /// Position.
@@ -168,6 +152,8 @@ namespace Isles.Graphics
         /// </summary>
         public static int SizeInBytes => 4 * (3 + 4 + 3);
 
+        VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;
+
         /// <summary>
         /// Create tangent vertex.
         /// </summary>
@@ -187,33 +173,14 @@ namespace Isles.Graphics
             Normal = normal;
         }
 
-        /// <summary>
-        /// Vertex elements for Mesh.Clone.
-        /// </summary>
-        public static readonly VertexElement[] VertexElements =
-            GenerateVertexElements();
-
-        /// <summary>
-        /// Generate vertex declaration.
-        /// </summary>
-        private static VertexElement[] GenerateVertexElements()
+        public static readonly VertexDeclaration VertexDeclaration = new(new VertexElement[]
         {
-            var decl = new VertexElement[]
-                {
-                    // Construct new vertex declaration with tangent info
-                    // First the normal stuff (we should already have that)
-                    new VertexElement(0, 0, VertexElementFormat.Vector3,
-                        VertexElementMethod.Default, VertexElementUsage.Position, 0),
-                    new VertexElement(0, 12, VertexElementFormat.Vector3,
-                        VertexElementMethod.Default, VertexElementUsage.Normal, 0),
-                    new VertexElement(0, 24, VertexElementFormat.Vector2,
-                        VertexElementMethod.Default,
-                        VertexElementUsage.TextureCoordinate, 0),
-                    new VertexElement(0, 32, VertexElementFormat.Vector2,
-                        VertexElementMethod.Default,
-                        VertexElementUsage.TextureCoordinate, 1),
-                };
-            return decl;
-        }
+            // Construct new vertex declaration with tangent info
+            // First the normal stuff (we should already have that)
+            new(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
+            new(12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0),
+            new(24, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0),
+            new(32, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 1),
+        });
     }
 }

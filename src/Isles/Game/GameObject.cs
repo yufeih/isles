@@ -1399,14 +1399,12 @@ namespace Isles
         private readonly Texture2D glowTexture;
         private readonly RenderTarget2D currentCanvas;
         private readonly RenderTarget2D finalCanvas;
-        private readonly DepthStencilBuffer depthBuffer;
         private BaseLandscape.Layer layer;
         private readonly GraphicsDevice graphics;
         private readonly Graphics2D graphics2D;
         private readonly SpriteBatch sprite;
         private Rectangle textureRectangle;
         private readonly VertexPositionTexture[] vertices;
-        private readonly VertexDeclaration declaration;
 
         private struct Region
         {
@@ -1475,12 +1473,11 @@ namespace Isles
             // Create textures & render targets
             ruinedTexture = game.Content.Load<Texture2D>("Landscapes/Ruined");
             glowTexture = game.Content.Load<Texture2D>("Textures/Glow");
-            currentCanvas = new RenderTarget2D(game.GraphicsDevice, TextureSize, TextureSize, 0, SurfaceFormat.Color);
-            finalCanvas = new RenderTarget2D(game.GraphicsDevice, TextureSize, TextureSize, 0, SurfaceFormat.Color);
-            depthBuffer = new DepthStencilBuffer(game.GraphicsDevice, TextureSize, TextureSize,
-                                                 game.GraphicsDevice.DepthStencilBuffer.Format);
 
-            declaration = new VertexDeclaration(game.GraphicsDevice, VertexPositionTexture.VertexElements);
+            var depthFormat = game.GraphicsDevice.PresentationParameters.DepthStencilFormat;
+            currentCanvas = new RenderTarget2D(game.GraphicsDevice, TextureSize, TextureSize, false, SurfaceFormat.Color, depthFormat);
+            finalCanvas = new RenderTarget2D(game.GraphicsDevice, TextureSize, TextureSize, false, SurfaceFormat.Color, depthFormat);
+
             vertices = new VertexPositionTexture[4]
             {
                 new VertexPositionTexture(new Vector3(-1, -1, 0), new Vector2(0, 1)),
@@ -1547,10 +1544,6 @@ namespace Isles
         /// </summary>
         public void RefreshTexture()
         {
-            DepthStencilBuffer prevDepth = graphics.DepthStencilBuffer;
-
-            graphics.DepthStencilBuffer = depthBuffer;
-
             // Draw all ruined regions
             graphics.SetRenderTarget(currentCanvas);
             graphics.Clear(Color.Black);
@@ -1574,10 +1567,9 @@ namespace Isles
 
             // Draw discovered area texture without clearing it
             graphics.SetRenderTarget(null);
-            graphics.DepthStencilBuffer = prevDepth;
 
             // Retrieve new alpha texture
-            currentTexture = currentCanvas.GetTexture();
+            currentTexture = currentCanvas;
 
             // Clear visible areas
             ruinedAreas.Clear();
@@ -1592,10 +1584,6 @@ namespace Isles
             {
                 return;
             }
-
-            DepthStencilBuffer prevDepth = graphics.DepthStencilBuffer;
-
-            graphics.DepthStencilBuffer = depthBuffer;
 
             // Draw all ruined regions
             graphics.SetRenderTarget(finalCanvas);
@@ -1618,20 +1606,15 @@ namespace Isles
             effect.Parameters["BasicTexture"].SetValue(currentTexture);
             effect.Parameters["OverlayTexture"].SetValue(fogOfWar.Current);
             effect.CurrentTechnique = effect.Techniques["RuinedLand"];
-            effect.Begin();
-            effect.CurrentTechnique.Passes[0].Begin();
 
-            graphics.VertexDeclaration = declaration;
+            effect.CurrentTechnique.Passes[0].Apply();
+
             graphics.DrawUserPrimitives(PrimitiveType.TriangleStrip, vertices, 0, 2);
 
-            effect.CurrentTechnique.Passes[0].End();
-            effect.End();
-
             graphics.SetRenderTarget(null);
-            graphics.DepthStencilBuffer = prevDepth;
 
             // Retrieve new alpha texture
-            finalTexture = finalCanvas.GetTexture();
+            finalTexture = finalCanvas;
             layer.AlphaTexture = finalTexture;
         }
 

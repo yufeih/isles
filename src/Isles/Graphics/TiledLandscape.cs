@@ -25,11 +25,6 @@ namespace Isles.Graphics
         private VertexBuffer[] vertexBuffers;
 
         /// <summary>
-        /// Vertex declaraction for terrain mesh.
-        /// </summary>
-        private VertexDeclaration declaraction;
-
-        /// <summary>
         /// Stuff for drawing primitives.
         /// </summary>
         private int vertexCount;
@@ -45,9 +40,6 @@ namespace Isles.Graphics
 
             // Load terrain effect
             terrainEffect = game.Content.Load<Effect>("Effects/TiledTerrain");
-
-            // Create vertex declaraction
-            declaraction = new VertexDeclaration(game.GraphicsDevice, TerrainVertex.VertexElements);
 
             // Set patch LOD to highest
             foreach (Patch patch in Patches)
@@ -174,44 +166,34 @@ namespace Isles.Graphics
 
             // Set indices and vertices
             game.GraphicsDevice.Indices = indexBuffer;
-            game.GraphicsDevice.VertexDeclaration = declaraction;
 
             terrainEffect.CurrentTechnique = technique;
 
-            terrainEffect.Begin();
-            foreach (EffectPass pass in technique.Passes)
+            terrainEffect.CurrentTechnique.Passes[0].Apply();
+
+            // Draw each patch
+            for (var iPatch = 0; iPatch < Patches.Count; iPatch++)
             {
-                pass.Begin();
-
-                // Draw each patch
-                for (var iPatch = 0; iPatch < Patches.Count; iPatch++)
+                Patches[iPatch].Visible = viewFrustum.Intersects(Patches[iPatch].BoundingBox);
+                if (Patches[iPatch].Visible)
                 {
-                    Patches[iPatch].Visible = viewFrustum.Intersects(Patches[iPatch].BoundingBox);
-                    if (Patches[iPatch].Visible)
+                    // Set patch vertex buffer
+                    game.GraphicsDevice.SetVertexBuffer(vertexBuffers[iPatch]);
+
+                    // Draw each layer
+                    foreach (Layer layer in Layers)
                     {
-                        // Set patch vertex buffer
-                        game.GraphicsDevice.Vertices[0].SetSource(
-                            vertexBuffers[iPatch], 0, TerrainVertex.SizeInBytes);
+                        // Set textures
+                        terrainEffect.Parameters["ColorTexture"].SetValue(layer.ColorTexture);
+                        terrainEffect.Parameters["AlphaTexture"].SetValue(layer.AlphaTexture);
+                        terrainEffect.CurrentTechnique.Passes[0].Apply();
 
-                        // Draw each layer
-                        foreach (Layer layer in Layers)
-                        {
-                            // Set textures
-                            terrainEffect.Parameters["ColorTexture"].SetValue(layer.ColorTexture);
-                            terrainEffect.Parameters["AlphaTexture"].SetValue(layer.AlphaTexture);
-                            terrainEffect.CommitChanges();
-
-                            // Draw patch primitives
-                            game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList,
-                                                                      0, 0, vertexCount, 0, primitiveCount);
-                        }
+                        // Draw patch primitives
+                        game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList,
+                                                                  0, 0, vertexCount, 0, primitiveCount);
                     }
                 }
-
-                pass.End();
             }
-
-            terrainEffect.End();
         }
 
         private void DrawTerrainShadow(ShadowEffect shadowEffect)
@@ -220,33 +202,24 @@ namespace Isles.Graphics
             terrainEffect.Parameters["LightViewProjection"].SetValue(shadowEffect.ViewProjection);
             terrainEffect.CurrentTechnique = terrainEffect.Techniques["ShadowMapping"];
 
-            terrainEffect.Begin();
-            foreach (EffectPass pass in terrainEffect.CurrentTechnique.Passes)
+            terrainEffect.CurrentTechnique.Passes[0].Apply();
+
+            // Draw each patch
+            for (var iPatch = 0; iPatch < Patches.Count; iPatch++)
             {
-                pass.Begin();
-
-                // Draw each patch
-                for (var iPatch = 0; iPatch < Patches.Count; iPatch++)
+                if (Patches[iPatch].Visible)
                 {
-                    if (Patches[iPatch].Visible)
-                    {
-                        // Set patch vertex buffer
-                        game.GraphicsDevice.Vertices[0].SetSource(
-                            vertexBuffers[iPatch], 0, TerrainVertex.SizeInBytes);
+                    // Set patch vertex buffer
+                    game.GraphicsDevice.SetVertexBuffer(vertexBuffers[iPatch]);
 
-                        // Draw patch primitives
-                        game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList,
-                                                                  0, 0, vertexCount, 0, primitiveCount);
-                    }
+                    // Draw patch primitives
+                    game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList,
+                                                              0, 0, vertexCount, 0, primitiveCount);
                 }
-
-                pass.End();
             }
-
-            terrainEffect.End();
         }
 
-        public struct TerrainVertex
+        public struct TerrainVertex : IVertexType
         {
             /// <summary>
             /// Position.
@@ -281,32 +254,19 @@ namespace Isles.Graphics
             /// <summary>
             /// Generate vertex declaration.
             /// </summary>
-            public static VertexElement[] VertexElements
+            public static readonly VertexDeclaration VertexDeclaration = new(new VertexElement[]
             {
-                get
-                {
-                    var decl = new VertexElement[]
-                    {
-                        // Construct new vertex declaration with tangent info
-                        // First the normal stuff (we should already have that)
-                        new VertexElement(0, 0, VertexElementFormat.Vector3,
-                            VertexElementMethod.Default, VertexElementUsage.Position, 0),
-                        new VertexElement(0, 12, VertexElementFormat.Vector2,
-                            VertexElementMethod.Default,
-                            VertexElementUsage.TextureCoordinate, 0),
-                        new VertexElement(0, 20, VertexElementFormat.Vector2,
-                            VertexElementMethod.Default,
-                            VertexElementUsage.TextureCoordinate, 1),
-                        new VertexElement(0, 28, VertexElementFormat.Vector3,
-                            VertexElementMethod.Default, VertexElementUsage.Normal, 0),
+                // Construct new vertex declaration with tangent info
+                // First the normal stuff (we should already have that)
+                new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
+                new VertexElement(12, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0),
+                new VertexElement(20, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 1),
+                new VertexElement(28, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0),
+                // And now the tangent
+                new VertexElement(40, VertexElementFormat.Vector3, VertexElementUsage.Tangent, 0),
+            });
 
-                        // And now the tangent
-                        new VertexElement(0, 40, VertexElementFormat.Vector3,
-                            VertexElementMethod.Default, VertexElementUsage.Tangent, 0),
-                    };
-                    return decl;
-                }
-            }
+            VertexDeclaration IVertexType.VertexDeclaration => throw new System.NotImplementedException();
         }
     }
 }

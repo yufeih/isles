@@ -163,9 +163,6 @@ namespace Isles.Graphics
         // the particles array, but copied across to where the GPU can access it.
         private DynamicVertexBuffer vertexBuffer;
 
-        // Vertex declaration describes the format of our ParticleVertex structure.
-        private VertexDeclaration vertexDeclaration;
-
         // Index buffer turns sets of four vertices into particle quads (pairs of triangles).
         IndexBuffer indexBuffer;
 
@@ -318,8 +315,8 @@ namespace Isles.Graphics
         /// </summary>
         protected void LoadContent()
         {
-            vertexDeclaration = new VertexDeclaration(game.GraphicsDevice,
-                                                      ParticleVertex.VertexElements);
+            // Create a dynamic vertex buffer.
+            vertexBuffer = new DynamicVertexBuffer(game.GraphicsDevice, typeof(ParticleVertex), Settings.MaxParticles * 4, BufferUsage.WriteOnly);
 
             // Allocate the particle array, and fill in the corner fields (which never change).
             particles = new ParticleVertex[Settings.MaxParticles * 4];
@@ -331,9 +328,6 @@ namespace Isles.Graphics
                 particles[i * 4 + 2].Corner = new Short2(1, 1);
                 particles[i * 4 + 3].Corner = new Short2(-1, 1);
             }
-
-            // Create a dynamic vertex buffer.
-            vertexBuffer = new DynamicVertexBuffer(game.GraphicsDevice, typeof(ParticleVertex), particles.Length * 4, BufferUsage.WriteOnly);
 
             // Initialize the vertex buffer contents. This is necessary in order
             // to correctly restore any existing particles after a lost device.
@@ -540,48 +534,36 @@ namespace Isles.Graphics
                 effectTimeParameter.SetValue(currentTime);
 
                 // Set the particle vertex buffer and vertex declaration.
-                device.Vertices[0].SetSource(vertexBuffer, 0,
-                                             ParticleVertex.SizeInBytes);
-
-                device.VertexDeclaration = vertexDeclaration;
+                device.SetVertexBuffer(vertexBuffer);
 
                 device.Indices = indexBuffer;
 
                 // Activate the particle effect.
-                particleEffect.Begin();
+                particleEffect.CurrentTechnique.Passes[0].Apply();
 
-                foreach (EffectPass pass in particleEffect.CurrentTechnique.Passes)
+                if (firstActiveParticle < firstFreeParticle)
                 {
-                    pass.Begin();
-
-                    if (firstActiveParticle < firstFreeParticle)
-                    {
-                        // If the active particles are all in one consecutive range,
-                        // we can draw them all in a single call.
-                        device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0,
-                            firstActiveParticle * 4, (firstFreeParticle - firstActiveParticle) * 4,
-                            firstActiveParticle * 6, (firstFreeParticle - firstActiveParticle) * 2);
-                    }
-                    else
-                    {
-                        // If the active particle range wraps past the end of the queue
-                        // back to the start, we must split them over two draw calls.
-                        device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0,
-                            firstActiveParticle * 4, (Settings.MaxParticles - firstActiveParticle) * 4,
-                            firstActiveParticle * 6, (Settings.MaxParticles - firstActiveParticle) * 2);
-
-                        if (firstFreeParticle > 0)
-                        {
-                            device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0,
-                                0, firstFreeParticle * 4,
-                                0, firstFreeParticle * 2);
-                        }
-                    }
-
-                    pass.End();
+                    // If the active particles are all in one consecutive range,
+                    // we can draw them all in a single call.
+                    device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0,
+                        firstActiveParticle * 4, (firstFreeParticle - firstActiveParticle) * 4,
+                        firstActiveParticle * 6, (firstFreeParticle - firstActiveParticle) * 2);
                 }
+                else
+                {
+                    // If the active particle range wraps past the end of the queue
+                    // back to the start, we must split them over two draw calls.
+                    device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0,
+                        firstActiveParticle * 4, (Settings.MaxParticles - firstActiveParticle) * 4,
+                        firstActiveParticle * 6, (Settings.MaxParticles - firstActiveParticle) * 2);
 
-                particleEffect.End();
+                    if (firstFreeParticle > 0)
+                    {
+                        device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0,
+                            0, firstFreeParticle * 4,
+                            0, firstFreeParticle * 2);
+                    }
+                }
             }
 
             drawCounter++;
@@ -834,7 +816,7 @@ namespace Isles.Graphics
     /// <summary>
     /// Custom vertex structure for drawing point sprite particles.
     /// </summary>
-    public struct ParticleVertex
+    public struct ParticleVertex : IVertexType
     {
         // Stores which corner of the particle quad this vertex represents.
         public Short2 Corner;
@@ -852,31 +834,19 @@ namespace Isles.Graphics
         public float Time;
 
         // Describe the layout of this vertex structure.
-        public static readonly VertexElement[] VertexElements =
+        public static readonly VertexDeclaration VertexDeclaration = new(new VertexElement[]
         {
-            new VertexElement (0, 0, VertexElementFormat.Short2,
-                                    VertexElementMethod.Default,
-                                    VertexElementUsage.Position, 0),
-
-            new VertexElement(0, 4, VertexElementFormat.Vector3,
-                                    VertexElementMethod.Default,
-                                    VertexElementUsage.Position, 1),
-
-            new VertexElement(0, 16, VertexElementFormat.Vector3,
-                                     VertexElementMethod.Default,
-                                     VertexElementUsage.Normal, 0),
-
-            new VertexElement(0, 28, VertexElementFormat.Color,
-                                     VertexElementMethod.Default,
-                                     VertexElementUsage.Color, 0),
-
-            new VertexElement(0, 32, VertexElementFormat.Single,
-                                     VertexElementMethod.Default,
-                                     VertexElementUsage.TextureCoordinate, 0),
-        };
+            new(0, VertexElementFormat.Short2, VertexElementUsage.Position, 0),
+            new(4, VertexElementFormat.Vector3, VertexElementUsage.Position, 1),
+            new(16, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0),
+            new(28, VertexElementFormat.Color, VertexElementUsage.Color, 0),
+            new(32, VertexElementFormat.Single, VertexElementUsage.TextureCoordinate, 0),
+        });
 
         // Describe the size of this vertex structure.
         public const int SizeInBytes = 36;
+
+        VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;
     }
 
     /// <summary>

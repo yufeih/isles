@@ -49,8 +49,6 @@ namespace Isles.Graphics
             InitializeWater();
 
             surfaceEffect = game.Content.Load<Effect>("Effects/Surface");
-            surfaceDeclaration = new VertexDeclaration(game.GraphicsDevice,
-                                     VertexPositionColorTexture.VertexElements);
             surfaceVertexBuffer = new DynamicVertexBuffer(game.GraphicsDevice,
                 typeof(VertexPositionTexture), MaxSurfaceVertices, BufferUsage.WriteOnly);
             surfaceIndexBuffer = new DynamicIndexBuffer(game.GraphicsDevice,
@@ -90,7 +88,6 @@ namespace Isles.Graphics
         private Effect surfaceEffect;
         private DynamicVertexBuffer surfaceVertexBuffer;
         private DynamicIndexBuffer surfaceIndexBuffer;
-        private VertexDeclaration surfaceDeclaration;
         private readonly List<ushort> surfaceIndices = new();
         private readonly List<VertexPositionColorTexture> surfaceVertices = new();
         private readonly LinkedList<TexturedSurface> texturedSurfaces = new();
@@ -143,43 +140,32 @@ namespace Isles.Graphics
                 return;
             }
 
-            graphics.VertexDeclaration = surfaceDeclaration;
-
             game.GraphicsDevice.SetBlendState(BlendState.AlphaBlend);
             game.GraphicsDevice.SetDepthStencilState(DepthStencilState.Default);
             game.GraphicsDevice.SetRasterizerStateState(RasterizerState.CullCounterClockwise);
 
             surfaceEffect.Parameters["WorldViewProjection"].SetValue(game.ViewProjection);
 
-            surfaceEffect.Begin();
-            foreach (EffectPass pass in surfaceEffect.CurrentTechnique.Passes)
+            surfaceEffect.CurrentTechnique.Passes[0].Apply();
+
+            LinkedListNode<TexturedSurface> start = texturedSurfaces.First;
+            LinkedListNode<TexturedSurface> end = texturedSurfaces.First;
+            Texture2D texture = start.Value.Texture;
+
+            while (end != null)
             {
-                pass.Begin();
-
-                LinkedListNode<TexturedSurface> start = texturedSurfaces.First;
-                LinkedListNode<TexturedSurface> end = texturedSurfaces.First;
-                Texture2D texture = start.Value.Texture;
-
-                while (end != null)
+                if (end.Value.Texture != texture && start != end)
                 {
-                    if (end.Value.Texture != texture && start != end)
-                    {
-                        PresentSurface(start, end);
+                    PresentSurface(start, end);
 
-                        start = end;
-                        texture = end.Value.Texture;
-                    }
-
-                    end = end.Next;
+                    start = end;
+                    texture = end.Value.Texture;
                 }
 
-                PresentSurface(start, end);
-
-                pass.End();
+                end = end.Next;
             }
 
-            surfaceEffect.End();
-
+            PresentSurface(start, end);
             texturedSurfaces.Clear();
         }
 
@@ -242,8 +228,7 @@ namespace Isles.Graphics
             surfaceVertexBuffer.SetData(surfaceVertices.ToArray());
 
             game.GraphicsDevice.Indices = surfaceIndexBuffer;
-            game.GraphicsDevice.Vertices[0].SetSource(surfaceVertexBuffer, 0,
-                                                      VertexPositionColorTexture.SizeInBytes);
+            game.GraphicsDevice.SetVertexBuffer(surfaceVertexBuffer);
             game.GraphicsDevice.DrawIndexedPrimitives(
                 PrimitiveType.TriangleList, 0, 0, surfaceVertices.Count, 0, surfaceIndices.Count / 3);
         }
@@ -344,11 +329,6 @@ namespace Isles.Graphics
         private RenderTarget2D reflectionRenderTarget;
 
         /// <summary>
-        /// Depth stencil buffer used when drawing reflection and refraction.
-        /// </summary>
-        private DepthStencilBuffer waterDepthStencil;
-
-        /// <summary>
         /// This texture is generated each frame for water reflection color sampling.
         /// </summary>
         private Texture2D waterReflection;
@@ -360,7 +340,6 @@ namespace Isles.Graphics
         private int waterPrimitiveCount;
         private VertexBuffer waterVertices;
         private IndexBuffer waterIndices;
-        private VertexDeclaration waterVertexDeclaration;
 
         public Effect WaterEffect { get; set; }
 
@@ -375,15 +354,10 @@ namespace Isles.Graphics
         private void InitializeWater()
         {
             // Reflection & Refraction textures
+            var depthFormat = graphics.PresentationParameters.DepthStencilFormat;
+
             reflectionRenderTarget = new RenderTarget2D(
-                graphics, 1024, 1024, 0, SurfaceFormat.Color, RenderTargetUsage.DiscardContents);
-
-            waterDepthStencil = new DepthStencilBuffer(
-                graphics, 1024, 1024, graphics.DepthStencilBuffer.Format);
-
-            // Initialize water mesh
-            waterVertexDeclaration = new VertexDeclaration(
-                graphics, VertexPositionTexture.VertexElements);
+                graphics, 1024, 1024, false, SurfaceFormat.Color, depthFormat, 0, RenderTargetUsage.DiscardContents);
 
             // Create vb / ib
             const int CellCount = 16;
@@ -470,8 +444,6 @@ namespace Isles.Graphics
                 return;
             }
 
-            DepthStencilBuffer prevDepth = graphics.DepthStencilBuffer;
-            graphics.DepthStencilBuffer = waterDepthStencil;
             graphics.SetRenderTarget(reflectionRenderTarget);
 
             graphics.Clear(Color.Black);
@@ -503,18 +475,16 @@ namespace Isles.Graphics
             }
 
             graphics.SetRenderTarget(null);
-            graphics.DepthStencilBuffer = prevDepth;
 
             // Retrieve refraction texture
-            waterReflection = reflectionRenderTarget.GetTexture();
+            waterReflection = reflectionRenderTarget;
         }
 
         public void DrawWater(GameTime gameTime)
         {
             // Draw water mesh
             graphics.Indices = waterIndices;
-            graphics.VertexDeclaration = waterVertexDeclaration;
-            graphics.Vertices[0].SetSource(waterVertices, 0, VertexPositionTexture.SizeInBytes);
+            graphics.SetVertexBuffer(waterVertices);
 
             if (FogTexture != null)
             {
@@ -538,16 +508,9 @@ namespace Isles.Graphics
             WaterEffect.Parameters["WorldView"].SetValue(game.View);
             WaterEffect.Parameters["DisplacementScroll"].SetValue(MoveInCircle(gameTime, 0.01f));
 
-            WaterEffect.Begin();
-            foreach (EffectPass pass in WaterEffect.CurrentTechnique.Passes)
-            {
-                pass.Begin();
-                graphics.DrawIndexedPrimitives(
-                    PrimitiveType.TriangleList, 0, 0, waterVertexCount, 0, waterPrimitiveCount);
-                pass.End();
-            }
+            WaterEffect.CurrentTechnique.Passes[0].Apply();
 
-            WaterEffect.End();
+            graphics.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, waterVertexCount, 0, waterPrimitiveCount);
         }
 
         /// <summary>
@@ -624,7 +587,6 @@ namespace Isles.Graphics
         private readonly RenderTarget2D discoveredCanvas;
         private readonly RenderTarget2D currentCanvas;
         private readonly RenderTarget2D maskCanvas;
-        private readonly DepthStencilBuffer depthBuffer;
 
         /// <summary>
         /// Fog intensities.
@@ -658,10 +620,11 @@ namespace Isles.Graphics
             sprite = new SpriteBatch(graphics);
             visibility = new bool[Size * Size];
             textureRectangle = new Rectangle(0, 0, Size, Size);
-            depthBuffer = new DepthStencilBuffer(graphics, Size, Size, graphics.DepthStencilBuffer.Format);
-            discoveredCanvas = new RenderTarget2D(graphics, Size, Size, 0, SurfaceFormat.Color);
-            currentCanvas = new RenderTarget2D(graphics, Size, Size, 0, SurfaceFormat.Color);
-            maskCanvas = new RenderTarget2D(graphics, Size, Size, 0, SurfaceFormat.Color, RenderTargetUsage.PreserveContents);
+
+            var depthFormat = graphics.PresentationParameters.DepthStencilFormat;
+            discoveredCanvas = new RenderTarget2D(graphics, Size, Size, false, SurfaceFormat.Color, depthFormat);
+            currentCanvas = new RenderTarget2D(graphics, Size, Size, false, SurfaceFormat.Color, depthFormat);
+            maskCanvas = new RenderTarget2D(graphics, Size, Size, false, SurfaceFormat.Color, depthFormat, 0, RenderTargetUsage.PreserveContents);
         }
 
         /// <summary>
@@ -699,10 +662,6 @@ namespace Isles.Graphics
                 return;
             }
 
-            DepthStencilBuffer prevDepth = graphics.DepthStencilBuffer;
-
-            graphics.DepthStencilBuffer = depthBuffer;
-
             // Draw current glows
             graphics.SetRenderTarget(currentCanvas);
             graphics.Clear(Color.Black);
@@ -729,7 +688,7 @@ namespace Isles.Graphics
             graphics.Clear(Color.Black);
 
             // Retrieve current glow texture
-            current = currentCanvas.GetTexture();
+            current = currentCanvas;
 
             sprite.Begin(SpriteSortMode.Immediate, BlendState.Additive);
             if (Discovered != null)
@@ -745,7 +704,7 @@ namespace Isles.Graphics
             graphics.Clear(Color.Black);
 
             // Retrieve discovered area
-            Discovered = discoveredCanvas.GetTexture();
+            Discovered = discoveredCanvas;
 
             sprite.Begin(SpriteSortMode.Immediate, BlendState.Additive);
             sprite.Draw(Discovered, textureRectangle, new Color(128, 128, 128, 128));
@@ -754,10 +713,9 @@ namespace Isles.Graphics
 
             // Restore states
             graphics.SetRenderTarget(null);
-            graphics.DepthStencilBuffer = prevDepth;
 
             // Retrieve final mask texture
-            Mask = maskCanvas.GetTexture();
+            Mask = maskCanvas;
 
             // Update intensity map
             // mask.GetData<float>(intensity);

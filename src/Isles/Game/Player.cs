@@ -1228,18 +1228,18 @@ namespace Isles
         /// <summary>
         /// Vertex type used to draw 2D shapes.
         /// </summary>
-        public struct VertexColor2D
+        public struct VertexColor2D : IVertexType
         {
             public Vector3 Position;
             public int Color;
 
-            public static readonly VertexElement[] VertexElement = new VertexElement[]
+            public static readonly VertexDeclaration VertexDeclaration = new(new VertexElement[]
             {
-                new VertexElement(0, 0, VertexElementFormat.Vector3,
-                    VertexElementMethod.Default, VertexElementUsage.Position, 0),
-                new VertexElement(0, 12, VertexElementFormat.Color,
-                    VertexElementMethod.Default, VertexElementUsage.Color, 0),
-            };
+                new(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
+                new(12, VertexElementFormat.Color, VertexElementUsage.Color, 0),
+            });
+
+            VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;
         }
 
         private void DrawSelectionRectangle()

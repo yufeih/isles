@@ -957,44 +957,47 @@ namespace Isles.Graphics
 
             foreach (ModelMesh mesh in model.Meshes)
             {
-                var stride = mesh.MeshParts[0].VertexStride;
-                var elementCount = mesh.VertexBuffer.SizeInBytes / stride;
-                var vertices = new Vector3[elementCount];
-                mesh.VertexBuffer.GetData(0, vertices, 0, elementCount, stride);
-
-                foreach (Vector3 vertex in vertices)
+                foreach (var part in mesh.MeshParts)
                 {
-                    // Transform vertex
-                    var v = Vector3.Transform(vertex, bones[mesh.ParentBone.Index]);
+                    var stride = part.VertexBuffer.VertexDeclaration.VertexStride;
+                    var elementCount = part.VertexBuffer.VertexCount;
+                    var vertices = new Vector3[elementCount];
+                    part.VertexBuffer.GetData(0, vertices, 0, elementCount, stride);
 
-                    if (v.X < min.X)
+                    foreach (Vector3 vertex in vertices)
                     {
-                        min.X = v.X;
-                    }
+                        // Transform vertex
+                        var v = Vector3.Transform(vertex, bones[mesh.ParentBone.Index]);
 
-                    if (v.X > max.X)
-                    {
-                        max.X = v.X;
-                    }
+                        if (v.X < min.X)
+                        {
+                            min.X = v.X;
+                        }
 
-                    if (v.Y < min.Y)
-                    {
-                        min.Y = v.Y;
-                    }
+                        if (v.X > max.X)
+                        {
+                            max.X = v.X;
+                        }
 
-                    if (v.Y > max.Y)
-                    {
-                        max.Y = v.Y;
-                    }
+                        if (v.Y < min.Y)
+                        {
+                            min.Y = v.Y;
+                        }
 
-                    if (v.Z < min.Z)
-                    {
-                        min.Z = v.Z;
-                    }
+                        if (v.Y > max.Y)
+                        {
+                            max.Y = v.Y;
+                        }
 
-                    if (v.Z > max.Z)
-                    {
-                        max.Z = v.Z;
+                        if (v.Z < min.Z)
+                        {
+                            min.Z = v.Z;
+                        }
+
+                        if (v.Z > max.Z)
+                        {
+                            max.Z = v.Z;
+                        }
                     }
                 }
             }
