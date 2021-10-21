@@ -17,7 +17,6 @@ namespace Isles.Graphics
         /// </summary>
         protected override BaseLandscape Read(ContentReader input, BaseLandscape existingInstance)
         {
-            // Landscape landscape = new MipmappedLandscape();
             BaseLandscape landscape = new TiledLandscape();
 
             landscape.ReadContent(input);
@@ -128,11 +127,7 @@ namespace Isles.Graphics
             /// <summary>
             /// Gets or sets starting vertex index when filling patch indices.
             /// </summary>
-#if SHORTINDEX
-            public UInt16 StartingVertex = 0;
-#else
             public uint StartingVertex;
-#endif
 
             private static int i;
 
