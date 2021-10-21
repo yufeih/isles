@@ -399,7 +399,6 @@ namespace Isles.Graphics
             // alphablending and depth testing the vegetation. We need to
             // put these back to the right settings for the ground geometry.
             game.GraphicsDevice.RenderState.AlphaBlendEnable = false;
-            game.GraphicsDevice.RenderState.AlphaTestEnable = false;
             game.GraphicsDevice.RenderState.DepthBufferEnable = true;
             game.GraphicsDevice.RenderState.DepthBufferWriteEnable = true;
             game.GraphicsDevice.RenderState.CullMode = CullMode.CullCounterClockwiseFace;

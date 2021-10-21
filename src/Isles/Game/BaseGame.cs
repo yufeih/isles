@@ -443,9 +443,6 @@ namespace Isles.Engine
             // Set u/v addressing back to wrap
             GraphicsDevice.SamplerStates[0].AddressU = TextureAddressMode.Wrap;
             GraphicsDevice.SamplerStates[0].AddressV = TextureAddressMode.Wrap;
-            // Set 128 and greate alpha compare for Model.Render
-            GraphicsDevice.RenderState.ReferenceAlpha = 128;
-            GraphicsDevice.RenderState.AlphaFunction = CompareFunction.Greater;
             // Set alpha blending operations
             GraphicsDevice.RenderState.AlphaSourceBlend = Blend.SourceAlpha;
             GraphicsDevice.RenderState.AlphaDestinationBlend = Blend.InverseSourceAlpha;

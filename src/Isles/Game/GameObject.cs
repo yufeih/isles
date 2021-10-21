@@ -39,25 +39,12 @@ namespace Isles
         /// <summary>
         /// Gets or sets the owner of this charactor.
         /// </summary>
-        public Player Owner
-        {
-            get => owner;
-
-            set => owner = value;
-        }
-
-        private Player owner;
+        public Player Owner { get; set; }
 
         /// <summary>
         /// Gets or sets the priority of the game object.
         /// </summary>
-        public float Priority
-        {
-            get => priority;
-            set => priority = value;
-        }
-
-        private float priority;
+        public float Priority { get; set; }
 
         /// <summary>
         /// Gets or sets the icon for this game object.
@@ -91,27 +78,15 @@ namespace Isles
 
         private static Texture2D snapshotTexture;
 
-        private SpellButton profileButton;
-
         /// <summary>
         /// Gets or sets the profile button.
         /// </summary>
-        public SpellButton ProfileButton
-        {
-            get => profileButton;
-            set => profileButton = value;
-        }
-
-        private TipBox tip;
+        public SpellButton ProfileButton { get; set; }
 
         /// <summary>
         /// Gets or sets the tip for the object.
         /// </summary>
-        public TipBox Tip
-        {
-            get => tip;
-            set => tip = value;
-        }
+        public TipBox Tip { get; set; }
 
         /// <summary>
         /// Gets or sets the view distance of this game object.
@@ -186,7 +161,7 @@ namespace Isles
                     OnDie();
                 }
 
-                if (value < health && health > 0 && maximumHealth > 0 && owner is LocalPlayer)
+                if (value < health && health > 0 && maximumHealth > 0 && Owner is LocalPlayer)
                 {
                     Audios.Play("UnderAttack", Audios.Channel.UnderAttack, null);
                 }
@@ -276,18 +251,18 @@ namespace Isles
                     Model.Glow = highlighted ? Vector4.One : Vector4.Zero;
                 }
 
-                if (highlighted && owner != null && ShouldDrawModel)
+                if (highlighted && Owner != null && ShouldDrawModel)
                 {
-                    if (tip == null)
+                    if (Tip == null)
                     {
-                        tip = CreateTipBox();
+                        Tip = CreateTipBox();
                     }
 
-                    GameUI.Singleton.TipBoxContainer.Add(tip);
+                    GameUI.Singleton.TipBoxContainer.Add(Tip);
                 }
-                else if (!highlighted && owner != null)
+                else if (!highlighted && Owner != null)
                 {
-                    GameUI.Singleton.TipBoxContainer.Remove(tip);
+                    GameUI.Singleton.TipBoxContainer.Remove(Tip);
                 }
             }
         }
@@ -416,12 +391,12 @@ namespace Isles
 
             if (xml.HasAttribute("Owner"))
             {
-                owner = Player.FromID(int.Parse(xml.GetAttribute("Owner")));
+                Owner = Player.FromID(int.Parse(xml.GetAttribute("Owner")));
             }
 
             if (xml.HasAttribute("Priority"))
             {
-                priority = float.Parse(xml.GetAttribute("Priority"));
+                Priority = float.Parse(xml.GetAttribute("Priority"));
             }
 
             if (xml.HasAttribute("AreaRadius"))
@@ -492,7 +467,7 @@ namespace Isles
                 iconIndex = int.Parse(xml.GetAttribute("Icon"));
                 icon = Icon.FromTiledTexture(iconIndex);
 
-                profileButton = new SpellButton
+                ProfileButton = new SpellButton
                 {
                     Texture = icon.Texture,
                     SourceRectangle = icon.Region,
@@ -502,9 +477,9 @@ namespace Isles
                     ScaleMode = ScaleMode.ScaleY,
                 };
 
-                profileButton.Click += (sender, e) => Player.LocalPlayer.Focus(this);
+                ProfileButton.Click += (sender, e) => Player.LocalPlayer.Focus(this);
 
-                profileButton.DoubleClick += (sender, e) => Player.LocalPlayer.SelectGroup(this);
+                ProfileButton.DoubleClick += (sender, e) => Player.LocalPlayer.SelectGroup(this);
             }
 
             if (xml.HasAttribute("Snapshot") &&
@@ -583,19 +558,19 @@ namespace Isles
         {
             UpdateFogOfWar();
 
-            if (owner != null)
+            if (Owner != null)
             {
                 // Model.Tint = owner.TeamColor.ToVector3();
                 if (AttackPoint.X > 0)
                 {
-                    AttackPoint.X += owner.AttackPoint;
-                    AttackPoint.Y += owner.AttackPoint;
+                    AttackPoint.X += Owner.AttackPoint;
+                    AttackPoint.Y += Owner.AttackPoint;
                 }
 
                 if (DefensePoint.X > 0)
                 {
-                    DefensePoint.X += owner.DefensePoint;
-                    DefensePoint.Y += owner.DefensePoint;
+                    DefensePoint.X += Owner.DefensePoint;
+                    DefensePoint.Y += Owner.DefensePoint;
                 }
             }
         }
@@ -615,7 +590,7 @@ namespace Isles
         /// </summary>
         public PlayerRelation GetRelation(GameObject gameObject)
         {
-            return owner == null || gameObject == null || gameObject.owner == null ? PlayerRelation.Neutral : owner.GetRelation(gameObject.owner);
+            return Owner == null || gameObject == null || gameObject.Owner == null ? PlayerRelation.Neutral : Owner.GetRelation(gameObject.Owner);
         }
 
         public bool IsAlly(GameObject gameObject)
@@ -651,8 +626,8 @@ namespace Isles
             }
 
             // Draw fog of war
-            if (owner != null && Visible && World.FogOfWar != null &&
-                (owner is LocalPlayer || World.Game.Settings.RevealMap))
+            if (Owner != null && Visible && World.FogOfWar != null &&
+                (Owner is LocalPlayer || World.Game.Settings.RevealMap))
             {
                 DrawFogOfWar();
             }
@@ -660,7 +635,7 @@ namespace Isles
 
         private void UpdateFogOfWar()
         {
-            if (Visible && !(owner is LocalPlayer) && World.FogOfWar != null)
+            if (Visible && !(Owner is LocalPlayer) && World.FogOfWar != null)
             {
                 var nowState = World.FogOfWar.Contains(Position.X, Position.Y);
 
@@ -753,9 +728,9 @@ namespace Isles
             {
                 base.Draw(gameTime);
 
-                if (owner != null)
+                if (Owner != null)
                 {
-                    GameUI.Singleton.Minimap.DrawGameObject(Position, 4, owner.TeamColor);
+                    GameUI.Singleton.Minimap.DrawGameObject(Position, 4, Owner.TeamColor);
                 }
             }
 
@@ -767,9 +742,9 @@ namespace Isles
                     modelShadow.Draw(gameTime);
                 }
 
-                if (owner != null)
+                if (Owner != null)
                 {
-                    GameUI.Singleton.Minimap.DrawGameObject(Position, 4, owner.TeamColor);
+                    GameUI.Singleton.Minimap.DrawGameObject(Position, 4, Owner.TeamColor);
                 }
             }
 
@@ -787,8 +762,8 @@ namespace Isles
                     World.Landscape.DrawSurface(SelectionAreaRadius > 16 ?
                                                 SelectionAreaTextureLarge : SelectionAreaTexture, Position,
                                                 SelectionAreaRadius * 2, SelectionAreaRadius * 2,
-                                                owner == null ? Color.Yellow : (
-                                                owner.GetRelation(Player.LocalPlayer) == PlayerRelation.Opponent ?
+                                                Owner == null ? Color.Yellow : (
+                                                Owner.GetRelation(Player.LocalPlayer) == PlayerRelation.Opponent ?
                                                 Color.Red : Color.GreenYellow));
                 }
 
@@ -986,7 +961,7 @@ namespace Isles
         {
             ui.ClearUIElement();
 
-            if (owner is LocalPlayer)
+            if (Owner is LocalPlayer)
             {
                 for (var i = 0; i < Spells.Count; i++)
                 {
@@ -1460,21 +1435,19 @@ namespace Isles
         /// </summary>
         public static RuinedLand Create(BaseGame game, GameWorld world, FogMask fogOfWar)
         {
-            if (land == null)
+            if (Singleton == null)
             {
-                land = new RuinedLand(game, world, fogOfWar);
+                Singleton = new RuinedLand(game, world, fogOfWar);
             }
-            else if (world != land.world || fogOfWar != land.fogOfWar)
+            else if (world != Singleton.world || fogOfWar != Singleton.fogOfWar)
             {
                 throw new ArgumentException();
             }
 
-            return land;
+            return Singleton;
         }
 
-        public static RuinedLand Singleton => land;
-
-        private static RuinedLand land;
+        public static RuinedLand Singleton { get; private set; }
 
         /// <summary>
         /// Creates a new ruined land.
@@ -1729,9 +1702,8 @@ namespace Isles
     {
         public event EventHandler Hit;
 
-        public IWorldObject Target => target;
+        public IWorldObject Target { get; }
 
-        private readonly IWorldObject target;
         private readonly GameModel ammo;
         private Vector3 velocity;
         private readonly float scaling;
@@ -1752,7 +1724,7 @@ namespace Isles
             }
 
             this.ammo = ammo.ShadowCopy();
-            this.target = target;
+            this.Target = target;
 
             // Compute position
             Position = ammo.Transform.Translation;
@@ -1831,9 +1803,9 @@ namespace Isles
         {
             Vector3 destination;
 
-            destination.X = target.Position.X;
-            destination.Y = target.Position.Y;
-            destination.Z = (target.BoundingBox.Max.Z + target.Position.Z) / 2;
+            destination.X = Target.Position.X;
+            destination.Y = Target.Position.Y;
+            destination.Z = (Target.BoundingBox.Max.Z + Target.Position.Z) / 2;
             return destination;
         }
 

@@ -641,11 +641,6 @@ namespace Isles.Graphics
             renderState.SourceBlend = Settings.SourceBlend;
             renderState.DestinationBlend = Settings.DestinationBlend;
 
-            // Set the alpha test mode.
-            renderState.AlphaTestEnable = true;
-            renderState.AlphaFunction = CompareFunction.Greater;
-            renderState.ReferenceAlpha = 0;
-
             // Enable the depth buffer (so particles will not be visible through
             // solid objects like the ground plane), but disable depth writes
             // (so particles will not obscure other particles).

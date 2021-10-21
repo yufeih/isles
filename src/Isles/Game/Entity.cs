@@ -690,6 +690,11 @@ namespace Isles.Engine
                 Model = new GameModel(World.Content.Load<Model>(value));
             }
 
+            if ((value = xml.GetAttribute("Alpha")) != "")
+            {
+                Model.Alpha = float.Parse(value);
+            }
+
             Vector3 scaleBias = Vector3.One;
             Vector3 translation = Vector3.Zero;
             float rotationX = 0, rotationY = 0, rotationZ = 0;
