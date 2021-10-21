@@ -517,109 +517,10 @@ namespace Isles.Engine
         {
             if (screenshot != null)
             {
-                // screenshot.Dispose();
                 screenshot = null;
             }
 
-            // if (Input.KeyboardKeyJustPressed(Keys.PrintScreen))
-            // {
-            //    shouldCapture = true;
-            //    //TakeScreenshot();
-            // }
             base.Update(gameTime);
-        }
-    }
-
-    public class PathGraphVisualizer : DrawableGameComponent
-    {
-        private readonly BaseGame game;
-        private readonly PathGraph graph;
-        private readonly BasicEffect effect;
-        private readonly GraphicsDevice graphics;
-        private readonly VertexDeclaration declaraction;
-        private readonly List<int> indices = new();
-        private readonly List<VertexPositionColor> vertices = new();
-
-        public PathGraphVisualizer(BaseGame game, PathGraph graph)
-            : base(game)
-        {
-            if (game.GraphicsDevice == null || graph == null)
-            {
-                throw new InvalidOperationException();
-            }
-
-            this.game = game;
-            this.graph = graph;
-            graphics = game.GraphicsDevice;
-            effect = new BasicEffect(graphics, null);
-            declaraction = new VertexDeclaration(graphics, VertexPositionColor.VertexElements);
-        }
-
-        public override void Draw(GameTime gameTime)
-        {
-            graphics.VertexDeclaration = declaraction;
-            graphics.RenderState.DepthBufferFunction = CompareFunction.Always;
-
-            effect.World = Matrix.Identity;
-            effect.View = game.View;
-            effect.Projection = game.Projection;
-
-            effect.Begin();
-            effect.CurrentTechnique.Passes[0].Begin();
-
-            BuildMesh();
-
-            graphics.DrawUserIndexedPrimitives(
-                PrimitiveType.TriangleList, vertices.ToArray(), 0, vertices.Count, indices.ToArray(), 0, indices.Count / 3);
-
-            effect.CurrentTechnique.Passes[0].End();
-            effect.End();
-
-            graphics.RenderState.DepthBufferFunction = CompareFunction.LessEqual;
-        }
-
-        private void BuildMesh()
-        {
-            vertices.Clear();
-            indices.Clear();
-
-            Vector3 v;
-            Color color = Color.RoyalBlue;
-
-            for (var y = 0; y < graph.EntryHeight; y++)
-            {
-                for (var x = 0; x < graph.EntryWidth; x++)
-                {
-                    if (graph.IsGridObstructed(x, y, true))
-                    {
-                        Vector2 p = graph.GridToPosition(x, y);
-                        v.X = p.X;
-                        v.Y = p.Y;
-                        v.Z = graph.Landscape.GetHeight(x, y);
-
-                        if (game.ViewFrustum.Contains(v) == ContainmentType.Contains)
-                        {
-                            var bias = vertices.Count;
-
-                            vertices.Add(new VertexPositionColor(
-                                new Vector3(v.X - graph.HalfCellSize, v.Y - graph.HalfCellSize, v.Z), color));
-                            vertices.Add(new VertexPositionColor(
-                                new Vector3(v.X - graph.HalfCellSize, v.Y + graph.HalfCellSize, v.Z), color));
-                            vertices.Add(new VertexPositionColor(
-                                new Vector3(v.X + graph.HalfCellSize, v.Y + graph.HalfCellSize, v.Z), color));
-                            vertices.Add(new VertexPositionColor(
-                                new Vector3(v.X + graph.HalfCellSize, v.Y - graph.HalfCellSize, v.Z), color));
-
-                            indices.Add(bias + 0);
-                            indices.Add(bias + 1);
-                            indices.Add(bias + 2);
-                            indices.Add(bias + 0);
-                            indices.Add(bias + 2);
-                            indices.Add(bias + 3);
-                        }
-                    }
-                }
-            }
         }
     }
 }
