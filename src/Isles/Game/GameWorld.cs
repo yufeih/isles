@@ -220,10 +220,7 @@ namespace Isles.Engine
 
             Game.ModelManager.Present(Game.View, Game.Projection, null, false, true);
 
-            // Present surface that are on top of everything :)
-            Game.GraphicsDevice.RenderState.DepthBufferFunction = CompareFunction.Always;
             Landscape.PresentSurface();
-            Game.GraphicsDevice.RenderState.DepthBufferFunction = CompareFunction.LessEqual;
         }
 
         /// <summary>

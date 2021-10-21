@@ -633,6 +633,7 @@ namespace Isles.Graphics
             // solid objects like the ground plane), but disable depth writes
             // (so particles will not obscure other particles).
             device.SetDepthStencilState(DepthStencilState.DepthRead);
+            device.SetRasterizerStateState(RasterizerState.CullCounterClockwise);
         }
 
         private Matrix view;

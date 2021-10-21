@@ -282,6 +282,10 @@ namespace Isles.Graphics
                     return;
                 }
 
+                game.GraphicsDevice.SetDepthStencilState(DepthStencilState.Default);
+                game.GraphicsDevice.SetBlendState(isTransparent ? BlendState.AlphaBlend : BlendState.Opaque);
+                game.GraphicsDevice.SetRasterizerStateState(RasterizerState.CullNone);
+
                 // Set index buffer
                 if (Mesh.IndexBuffer != CachedIndexBuffer)
                 {
@@ -332,8 +336,6 @@ namespace Isles.Graphics
 
                     effect.CommitChanges();
 
-                    ResolveAlphaIssues();
-
                     game.GraphicsDevice.DrawIndexedPrimitives(
                         PrimitiveType.TriangleList, MeshPart.BaseVertex, 0,
                         MeshPart.NumVertices, MeshPart.StartIndex, MeshPart.PrimitiveCount);
@@ -359,8 +361,6 @@ namespace Isles.Graphics
 
                     effect.CommitChanges();
 
-                    ResolveAlphaIssues();
-
                     game.GraphicsDevice.DrawIndexedPrimitives(
                         PrimitiveType.TriangleList, MeshPart.BaseVertex, 0,
                         MeshPart.NumVertices, MeshPart.StartIndex, MeshPart.PrimitiveCount);
@@ -379,6 +379,7 @@ namespace Isles.Graphics
             {
                 game.GraphicsDevice.SetDepthStencilState(DepthStencilState.Default);
                 game.GraphicsDevice.SetBlendState(isTransparent ? BlendState.AlphaBlend : BlendState.Opaque);
+                game.GraphicsDevice.SetRasterizerStateState(RasterizerState.CullNone);
             }
         }
 
@@ -621,9 +622,9 @@ namespace Isles.Graphics
             }
 
             // Setup render state
-            game.GraphicsDevice.RenderState.CullMode = CullMode.None;
             game.GraphicsDevice.SetBlendState(BlendState.Opaque);
             game.GraphicsDevice.SetDepthStencilState(DepthStencilState.Default);
+            game.GraphicsDevice.SetRasterizerStateState(RasterizerState.CullNone);
 
             // Clear cached renderable variable each frame
             Renderable.CachedIndexBuffer = null;

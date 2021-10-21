@@ -147,8 +147,7 @@ namespace Isles.Graphics
 
             game.GraphicsDevice.SetBlendState(BlendState.AlphaBlend);
             game.GraphicsDevice.SetDepthStencilState(DepthStencilState.Default);
-
-            game.GraphicsDevice.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
+            game.GraphicsDevice.SetRasterizerStateState(RasterizerState.CullCounterClockwise);
 
             surfaceEffect.Parameters["WorldViewProjection"].SetValue(game.ViewProjection);
 
@@ -275,7 +274,7 @@ namespace Isles.Graphics
             // Also don't use any kind of blending.
             graphics.SetBlendState(BlendState.Opaque);
             graphics.SetDepthStencilState(DepthStencilState.None);
-            graphics.RenderState.CullMode = CullMode.None;
+            graphics.SetRasterizerStateState(RasterizerState.CullCounterClockwise);
 
             skyEffect.Parameters["View"].SetValue(view);
             skyEffect.Parameters["Projection"].SetValue(projection);

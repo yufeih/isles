@@ -175,7 +175,6 @@ namespace Isles.Graphics
             // Set indices and vertices
             game.GraphicsDevice.Indices = indexBuffer;
             game.GraphicsDevice.VertexDeclaration = declaraction;
-            game.GraphicsDevice.RenderState.DepthBufferFunction = CompareFunction.LessEqual;
 
             terrainEffect.CurrentTechnique = technique;
 

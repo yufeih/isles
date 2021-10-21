@@ -17,6 +17,12 @@ namespace Microsoft.Xna.Framework.Graphics
         DepthRead,
     }
 
+    public enum RasterizerState
+    {
+        CullNone,
+        CullCounterClockwise,
+    }
+
     public static class Xna4Extensions
     {
         public static void SetRenderTarget(this GraphicsDevice graphicsDevice, RenderTarget2D renderTarget)
@@ -80,6 +86,20 @@ namespace Microsoft.Xna.Framework.Graphics
                 case DepthStencilState.DepthRead:
                     graphicsDevice.RenderState.DepthBufferEnable = true;
                     graphicsDevice.RenderState.DepthBufferWriteEnable = false;
+                    break;
+            }
+        }
+
+        public static void SetRasterizerStateState(this GraphicsDevice graphicsDevice, RasterizerState rasterizerStateState)
+        {
+            switch (rasterizerStateState)
+            {
+                case RasterizerState.CullNone:
+                    graphicsDevice.RenderState.CullMode = CullMode.None;
+                    break;
+
+                case RasterizerState.CullCounterClockwise:
+                    graphicsDevice.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
                     break;
             }
         }

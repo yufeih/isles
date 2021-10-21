@@ -376,6 +376,7 @@ namespace Isles.Graphics
                     game.GraphicsDevice.SetBlendState(BlendState.AlphaBlend);
                     game.GraphicsDevice.SetDepthStencilState(
                         (currentType & BillboardType.DepthBufferEnable) == BillboardType.DepthBufferEnable ? DepthStencilState.Default : DepthStencilState.None);
+                    game.GraphicsDevice.SetRasterizerStateState(RasterizerState.CullCounterClockwise);
                 }
 
                 // Draw the chunk
@@ -395,8 +396,6 @@ namespace Isles.Graphics
                 // Increment begin pointer
                 begin = end;
             }
-
-            game.GraphicsDevice.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
 
             // Clear internal list after drawing
             billboards.Clear();

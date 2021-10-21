@@ -264,6 +264,7 @@ namespace Isles.Graphics
         {
             game.GraphicsDevice.SetBlendState(BlendState.AlphaBlend);
             game.GraphicsDevice.SetDepthStencilState(DepthStencilState.None);
+            game.GraphicsDevice.SetRasterizerStateState(RasterizerState.CullCounterClockwise);
 
             PresentPrimitives();
             PresentText();

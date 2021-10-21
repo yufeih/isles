@@ -92,8 +92,8 @@ namespace Isles.Graphics
             // Enable alpha blending :)
             graphics.SetBlendState(BlendState.AlphaBlend);
             graphics.SetDepthStencilState(DepthStencilState.DepthRead);
+            graphics.SetRasterizerStateState(RasterizerState.CullCounterClockwise);
 
-            graphics.RenderState.CullMode = CullMode.None;
             graphics.SamplerStates[0].AddressU = TextureAddressMode.Border;
             graphics.SamplerStates[0].AddressV = TextureAddressMode.Border;
 
@@ -204,6 +204,7 @@ namespace Isles.Graphics
 
             graphics.SetBlendState(BlendState.AlphaBlend);
             graphics.SetDepthStencilState(DepthStencilState.Default);
+            graphics.SetRasterizerStateState(RasterizerState.CullCounterClockwise);
 
             // This code would go between a device
             // BeginScene-EndScene block.
@@ -263,8 +264,6 @@ namespace Isles.Graphics
             }
 
             terrainEffect.End();
-
-            graphics.RenderState.CullMode = CullMode.None;
         }
 
         public override void Initialize(BaseGame game)
