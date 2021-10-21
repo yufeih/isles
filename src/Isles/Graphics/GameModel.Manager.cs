@@ -377,19 +377,7 @@ namespace Isles.Graphics
 
             private void ResolveAlphaIssues()
             {
-                if (isTransparent)
-                {
-                    game.GraphicsDevice.RenderState.AlphaBlendEnable = true;
-                    game.GraphicsDevice.RenderState.AlphaSourceBlend = Blend.SourceAlpha;
-
-                    // Setting destination blend here seems not working?
-                    // Probably a bug in XNA. I'll have to change the destination blend in the effect file
-                    game.GraphicsDevice.RenderState.AlphaDestinationBlend = Blend.InverseSourceAlpha;
-                }
-                else
-                {
-                    game.GraphicsDevice.RenderState.AlphaBlendEnable = false;
-                }
+                game.GraphicsDevice.SetBlendState(isTransparent ? BlendState.AlphaBlend : BlendState.Opaque);
             }
         }
 
@@ -635,7 +623,7 @@ namespace Isles.Graphics
             game.GraphicsDevice.RenderState.DepthBufferEnable = true;
             game.GraphicsDevice.RenderState.DepthBufferWriteEnable = true;
             game.GraphicsDevice.RenderState.CullMode = CullMode.None;
-            game.GraphicsDevice.RenderState.AlphaBlendEnable = false;
+            game.GraphicsDevice.SetBlendState(BlendState.Opaque);
 
             // Clear cached renderable variable each frame
             Renderable.CachedIndexBuffer = null;
@@ -676,7 +664,7 @@ namespace Isles.Graphics
                 }
             }
 
-            game.GraphicsDevice.RenderState.AlphaBlendEnable = true;
+            game.GraphicsDevice.SetBlendState(BlendState.AlphaBlend);
 
             if (showTransparent)
             {
@@ -685,8 +673,6 @@ namespace Isles.Graphics
                     r.Draw(ModelEffect);
                 }
             }
-
-            game.GraphicsDevice.RenderState.AlphaBlendEnable = false;
         }
     }
 }

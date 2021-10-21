@@ -145,7 +145,7 @@ namespace Isles.Graphics
 
             graphics.VertexDeclaration = surfaceDeclaration;
 
-            game.GraphicsDevice.RenderState.AlphaBlendEnable = true;
+            game.GraphicsDevice.SetBlendState(BlendState.AlphaBlend);
             game.GraphicsDevice.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
 
             surfaceEffect.Parameters["WorldViewProjection"].SetValue(game.ViewProjection);
@@ -275,7 +275,7 @@ namespace Isles.Graphics
             graphics.RenderState.CullMode = CullMode.None;
 
             // Also don't use any kind of blending.
-            graphics.RenderState.AlphaBlendEnable = false;
+            graphics.SetBlendState(BlendState.Opaque);
 
             skyEffect.Parameters["View"].SetValue(view);
             skyEffect.Parameters["Projection"].SetValue(projection);
@@ -512,8 +512,6 @@ namespace Isles.Graphics
 
             // Retrieve refraction texture
             waterReflection = reflectionRenderTarget.GetTexture();
-
-            graphics.RenderState.AlphaBlendEnable = false;
         }
 
         public void DrawWater(GameTime gameTime)

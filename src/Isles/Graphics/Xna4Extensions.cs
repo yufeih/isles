@@ -28,5 +28,32 @@ namespace Microsoft.Xna.Framework.Graphics
 
             spriteBatch.Begin(blendMode, spriteSortMode, SaveStateMode.None);
         }
+
+        public static void SetBlendState(this GraphicsDevice graphicsDevice, BlendState blendState)
+        {
+            switch (blendState)
+            {
+                case BlendState.AlphaBlend:
+                    graphicsDevice.RenderState.AlphaBlendEnable = true;
+                    graphicsDevice.RenderState.SourceBlend = Blend.SourceColor;
+                    graphicsDevice.RenderState.AlphaSourceBlend = Blend.SourceAlpha;
+                    graphicsDevice.RenderState.AlphaDestinationBlend = Blend.InverseSourceAlpha;
+                    graphicsDevice.RenderState.SourceBlend = Blend.SourceAlpha;
+                    graphicsDevice.RenderState.DestinationBlend = Blend.InverseSourceAlpha;
+                    break;
+
+                case BlendState.Additive:
+                    graphicsDevice.RenderState.AlphaBlendEnable = true;
+                    graphicsDevice.RenderState.AlphaSourceBlend = Blend.SourceAlpha;
+                    graphicsDevice.RenderState.AlphaDestinationBlend = Blend.One;
+                    graphicsDevice.RenderState.SourceBlend = Blend.SourceAlpha;
+                    graphicsDevice.RenderState.DestinationBlend = Blend.One;
+                    break;
+
+                case BlendState.Opaque:
+                    graphicsDevice.RenderState.AlphaBlendEnable = false;
+                    break;
+            }
+        }
     }
 }

@@ -90,7 +90,7 @@ namespace Isles.Graphics
             surfaceEffect.Projection = game.Projection;
 
             // Enable alpha blending :)
-            graphics.RenderState.AlphaBlendEnable = true;
+            graphics.SetBlendState(BlendState.AlphaBlend);
             graphics.RenderState.DepthBufferWriteEnable = false;
             // graphics.RenderState.DepthBufferFunction = CompareFunction.Always;
             graphics.RenderState.CullMode = CullMode.None;
@@ -116,7 +116,6 @@ namespace Isles.Graphics
             surfaceEffect.End();
 
             // Restore settings
-            graphics.RenderState.AlphaBlendEnable = false;
             graphics.RenderState.DepthBufferWriteEnable = true;
             // graphics.RenderState.DepthBufferFunction = CompareFunction.LessEqual;
             graphics.SamplerStates[0].AddressU = TextureAddressMode.Wrap;
@@ -237,11 +236,10 @@ namespace Isles.Graphics
             {
                 pass.Begin();
 
+                graphics.SetBlendState(BlendState.AlphaBlend);
+
                 for (var i = 0; i < Layers.Count; i++)
                 {
-                    // Disable alpha blending when drawing our first layer
-                    graphics.RenderState.AlphaBlendEnable = true;// (i != 0);
-
                     // It turns out that set indices are soo expensive when drawing
                     // the terrain with simple shaders. But for complex shaders, such
                     // as normal mapping, it's better to use the patch group :)
@@ -271,7 +269,6 @@ namespace Isles.Graphics
             graphics.RenderState.DepthBufferEnable = true;
             graphics.RenderState.DepthBufferWriteEnable = true;
             graphics.RenderState.CullMode = CullMode.None;
-            graphics.RenderState.AlphaBlendEnable = false;
         }
 
         public override void Initialize(BaseGame game)

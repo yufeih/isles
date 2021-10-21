@@ -529,7 +529,7 @@ namespace Isles.Graphics
 
                 SetParameters();
 
-                SetParticleRenderStates(device.RenderState);
+                SetParticleRenderStates(device);
 
                 // Set an effect parameter describing the viewport size. This is
                 // needed to convert particle sizes into screen space point sizes.
@@ -629,20 +629,17 @@ namespace Isles.Graphics
         /// <summary>
         /// Helper for setting the renderstates used to draw particles.
         /// </summary>
-        private void SetParticleRenderStates(RenderState renderState)
+        private void SetParticleRenderStates(GraphicsDevice device)
         {
             // Set the alpha blend mode.
-            renderState.AlphaBlendEnable = true;
-            renderState.AlphaBlendOperation = BlendFunction.Add;
-            renderState.SourceBlend = Blend.SourceAlpha;
-            renderState.DestinationBlend = Settings.Additive ? Blend.One : Blend.InverseSourceAlpha;
+            device.SetBlendState(Settings.Additive ? BlendState.Additive : BlendState.AlphaBlend);
 
             // Enable the depth buffer (so particles will not be visible through
             // solid objects like the ground plane), but disable depth writes
             // (so particles will not obscure other particles).
-            renderState.DepthBufferEnable = true;
-            renderState.DepthBufferWriteEnable = false;
-            renderState.DepthBias = 0;
+            device.RenderState.DepthBufferEnable = true;
+            device.RenderState.DepthBufferWriteEnable = false;
+            device.RenderState.DepthBias = 0;
         }
 
         private Matrix view;

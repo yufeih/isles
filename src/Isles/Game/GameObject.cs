@@ -1608,7 +1608,7 @@ namespace Isles
                 sprite.End();
             }
 
-            graphics.RenderState.AlphaBlendEnable = true;
+            graphics.SetBlendState(BlendState.AlphaBlend);
 
             // Draw final textures
             Effect effect = graphics2D.Effect;
@@ -1624,8 +1624,6 @@ namespace Isles
 
             effect.CurrentTechnique.Passes[0].End();
             effect.End();
-
-            graphics.RenderState.AlphaBlendEnable = false;
 
             graphics.SetRenderTarget(null);
             graphics.DepthStencilBuffer = prevDepth;

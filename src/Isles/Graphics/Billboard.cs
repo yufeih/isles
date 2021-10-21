@@ -373,7 +373,7 @@ namespace Isles.Graphics
                         effect.CurrentTechnique = techniqueNormal;
                     }
 
-                    game.GraphicsDevice.RenderState.DepthBufferEnable = 
+                    game.GraphicsDevice.RenderState.DepthBufferEnable =
                         (currentType & BillboardType.DepthBufferEnable) == BillboardType.DepthBufferEnable;
                 }
 
@@ -398,7 +398,7 @@ namespace Isles.Graphics
             // The billboard effect sets some unusual renderstates for
             // alphablending and depth testing the vegetation. We need to
             // put these back to the right settings for the ground geometry.
-            game.GraphicsDevice.RenderState.AlphaBlendEnable = false;
+            game.GraphicsDevice.SetBlendState(BlendState.Opaque);
             game.GraphicsDevice.RenderState.DepthBufferEnable = true;
             game.GraphicsDevice.RenderState.DepthBufferWriteEnable = true;
             game.GraphicsDevice.RenderState.CullMode = CullMode.CullCounterClockwiseFace;

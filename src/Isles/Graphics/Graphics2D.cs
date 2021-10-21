@@ -262,11 +262,11 @@ namespace Isles.Graphics
         /// </summary>
         public void Present()
         {
-            game.GraphicsDevice.RenderState.AlphaBlendEnable = true;
+            game.GraphicsDevice.SetBlendState(BlendState.AlphaBlend);
+
             PresentPrimitives();
             PresentText();
             PresentLine();
-            game.GraphicsDevice.RenderState.AlphaBlendEnable = false;
         }
 
         public void PresentText()
