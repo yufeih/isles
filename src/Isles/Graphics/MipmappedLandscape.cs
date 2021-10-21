@@ -94,9 +94,6 @@ namespace Isles.Graphics
             graphics.SetDepthStencilState(DepthStencilState.DepthRead);
             graphics.SetRasterizerStateState(RasterizerState.CullCounterClockwise);
 
-            graphics.SamplerStates[0].AddressU = TextureAddressMode.Border;
-            graphics.SamplerStates[0].AddressV = TextureAddressMode.Border;
-
             graphics.VertexDeclaration = surfaceDeclaraction;
 
             surfaceEffect.Begin();
@@ -114,9 +111,6 @@ namespace Isles.Graphics
             }
 
             surfaceEffect.End();
-
-            graphics.SamplerStates[0].AddressU = TextureAddressMode.Wrap;
-            graphics.SamplerStates[0].AddressV = TextureAddressMode.Wrap;
         }
 
         /// <summary>

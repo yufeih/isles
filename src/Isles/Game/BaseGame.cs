@@ -435,10 +435,6 @@ namespace Isles.Engine
             ScreenHeight = GraphicsDevice.Viewport.Height;
 
             Log.Write("Device Reset <" + ScreenWidth + ", " + ScreenHeight + ">...");
-
-            // Set u/v addressing back to wrap
-            GraphicsDevice.SamplerStates[0].AddressU = TextureAddressMode.Wrap;
-            GraphicsDevice.SamplerStates[0].AddressV = TextureAddressMode.Wrap;
         }
 
         /// <summary>

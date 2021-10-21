@@ -977,9 +977,6 @@ namespace Isles
             // Begin the sprite batch.
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
 
-            game.GraphicsDevice.SamplerStates[0].AddressU = TextureAddressMode.Mirror;
-            game.GraphicsDevice.SamplerStates[0].AddressV = TextureAddressMode.Mirror;
-
             game.GraphicsDevice.Textures[1] = distortion;
 
             // Set an effect parameter to make our overlay

@@ -374,13 +374,6 @@ namespace Isles.Graphics
                 staticLights.Clear();
                 skinnedLights.Clear();
             }
-
-            private void ResolveAlphaIssues()
-            {
-                game.GraphicsDevice.SetDepthStencilState(DepthStencilState.Default);
-                game.GraphicsDevice.SetBlendState(isTransparent ? BlendState.AlphaBlend : BlendState.Opaque);
-                game.GraphicsDevice.SetRasterizerStateState(RasterizerState.CullNone);
-            }
         }
 
         public class RenderablePerMaterial
