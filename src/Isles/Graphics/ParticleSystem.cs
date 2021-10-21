@@ -126,11 +126,7 @@ namespace Isles.Graphics
         public float MinEndSize { get; set; } = 100;
         public float MaxEndSize { get; set; } = 100;
 
-        /// <summary>
-        /// Alpha blending settings.
-        /// </summary>
-        public Blend SourceBlend { get; set; } = Blend.SourceAlpha;
-        public Blend DestinationBlend { get; set; } = Blend.InverseSourceAlpha;
+        public bool Additive { get; set; } = true;
     }
 
     /// <summary>
@@ -638,8 +634,8 @@ namespace Isles.Graphics
             // Set the alpha blend mode.
             renderState.AlphaBlendEnable = true;
             renderState.AlphaBlendOperation = BlendFunction.Add;
-            renderState.SourceBlend = Settings.SourceBlend;
-            renderState.DestinationBlend = Settings.DestinationBlend;
+            renderState.SourceBlend = Blend.SourceAlpha;
+            renderState.DestinationBlend = Settings.Additive ? Blend.One : Blend.InverseSourceAlpha;
 
             // Enable the depth buffer (so particles will not be visible through
             // solid objects like the ground plane), but disable depth writes

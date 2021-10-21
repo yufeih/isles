@@ -35,9 +35,7 @@
     "MaxStartSize": 35,
     "MinEndSize": 45,
     "MaxEndSize": 35,
-    "SourceBlend": 5,
-    "DestinationBlend": 2,
-    "Name": "Construct"
+    "Additive" : true
   },
   "FireSmoke": {
     "TextureName": "Textures/Smoke",
@@ -75,9 +73,7 @@
     "MaxStartSize": 7,
     "MinEndSize": 25,
     "MaxEndSize": 7,
-    "SourceBlend": 5,
-    "DestinationBlend": 6,
-    "Name": "FireSmoke"
+    "nBlend": 6
   },
   "Smoke": {
     "TextureName": "Textures/Smoke",
@@ -115,9 +111,7 @@
     "MaxStartSize": 10,
     "MinEndSize": 10,
     "MaxEndSize": 40,
-    "SourceBlend": 5,
-    "DestinationBlend": 6,
-    "Name": "Smoke"
+    "nBlend": 6
   },
   "Green": {
     "TextureName": "Textures/Effect/illusion01",
@@ -155,9 +149,7 @@
     "MaxStartSize": 1,
     "MinEndSize": 2,
     "MaxEndSize": 5,
-    "SourceBlend": 5,
-    "DestinationBlend": 2,
-    "Name": "Green"
+    "Additive" : true
   },
   "Yellow": {
     "TextureName": "Textures/fire",
@@ -195,9 +187,7 @@
     "MaxStartSize": 1,
     "MinEndSize": 2,
     "MaxEndSize": 5,
-    "SourceBlend": 5,
-    "DestinationBlend": 2,
-    "Name": "Yellow"
+    "Additive" : true
   },
   "Blue": {
     "TextureName": "Textures/Effect/frostvapors",
@@ -235,9 +225,7 @@
     "MaxStartSize": 1,
     "MinEndSize": 2,
     "MaxEndSize": 5,
-    "SourceBlend": 5,
-    "DestinationBlend": 2,
-    "Name": "Blue"
+    "Additive" : true
   },
   "Red": {
     "TextureName": "Textures/Effect/blooddagak",
@@ -275,9 +263,7 @@
     "MaxStartSize": 1,
     "MinEndSize": 2,
     "MaxEndSize": 5,
-    "SourceBlend": 5,
-    "DestinationBlend": 2,
-    "Name": "Red"
+    "Additive" : true
   },
   "PunishOfNature": {
     "TextureName": "Textures/Effect/greenmist",
@@ -315,9 +301,7 @@
     "MaxStartSize": 1,
     "MinEndSize": 2,
     "MaxEndSize": 4,
-    "SourceBlend": 5,
-    "DestinationBlend": 2,
-    "Name": "PunishOfNature"
+    "Additive" : true
   },
   "Frost": {
     "TextureName": "Textures/Effect/frostvapors",
@@ -355,9 +339,7 @@
     "MaxStartSize": 1,
     "MinEndSize": 11,
     "MaxEndSize": 5,
-    "SourceBlend": 5,
-    "DestinationBlend": 2,
-    "Name": "Frost"
+    "Additive" : true
   },
   "FrostExplosion": {
     "TextureName": "Textures/effect/frostvapors",
@@ -395,9 +377,7 @@
     "MaxStartSize": 6,
     "MinEndSize": 4,
     "MaxEndSize": 5,
-    "SourceBlend": 5,
-    "DestinationBlend": 2,
-    "Name": "FrostExplosion"
+    "Additive" : true
   },
   "Fireball": {
     "TextureName": "Textures/fire",
@@ -435,9 +415,7 @@
     "MaxStartSize": 1,
     "MinEndSize": 5,
     "MaxEndSize": 5,
-    "SourceBlend": 5,
-    "DestinationBlend": 2,
-    "Name": "Fireball"
+    "Additive" : true
   },
   "FireballExplosion": {
     "TextureName": "Textures/fire",
@@ -475,9 +453,7 @@
     "MaxStartSize": 6,
     "MinEndSize": 4,
     "MaxEndSize": 5,
-    "SourceBlend": 5,
-    "DestinationBlend": 2,
-    "Name": "FireballExplosion"
+    "Additive" : true
   },
   "Trail": {
     "TextureName": "Textures/Smoke2",
@@ -515,9 +491,7 @@
     "MaxStartSize": 6,
     "MinEndSize": 2,
     "MaxEndSize": 4,
-    "SourceBlend": 5,
-    "DestinationBlend": 6,
-    "Name": "Trail"
+    "nBlend": 6
   },
   "FireballTrail": {
     "TextureName": "Textures/Smoke",
@@ -555,9 +529,7 @@
     "MaxStartSize": 4,
     "MinEndSize": 8,
     "MaxEndSize": 9,
-    "SourceBlend": 5,
-    "DestinationBlend": 6,
-    "Name": "FireballTrail"
+    "nBlend": 6
   },
   "Summon": {
     "TextureName": "Textures/Fire",
@@ -595,9 +567,7 @@
     "MaxStartSize": 26,
     "MinEndSize": 0,
     "MaxEndSize": 36,
-    "SourceBlend": 5,
-    "DestinationBlend": 2,
-    "Name": "Summon"
+    "Additive" : true
   },
   "ExplosionSmoke": {
     "TextureName": "Textures/smoke",
@@ -635,9 +605,7 @@
     "MaxStartSize": 10,
     "MinEndSize": 36,
     "MaxEndSize": 10,
-    "SourceBlend": 5,
-    "DestinationBlend": 6,
-    "Name": "ExplosionSmoke"
+    "nBlend": 6
   },
   "Spark": {
     "TextureName": "Textures/Effect/spark",
@@ -675,9 +643,7 @@
     "MaxStartSize": 1,
     "MinEndSize": 0,
     "MaxEndSize": 2,
-    "SourceBlend": 5,
-    "DestinationBlend": 2,
-    "Name": "Spark"
+    "Additive" : true
   },
   "Explosion": {
     "TextureName": "Textures/fire",
@@ -715,9 +681,7 @@
     "MaxStartSize": 8,
     "MinEndSize": 16,
     "MaxEndSize": 11,
-    "SourceBlend": 5,
-    "DestinationBlend": 2,
-    "Name": "Explosion"
+    "Additive" : true
   },
   "Glow": {
     "TextureName": "Textures/Effect/light",
@@ -755,9 +719,7 @@
     "MaxStartSize": 19,
     "MinEndSize": 10,
     "MaxEndSize": 16,
-    "SourceBlend": 5,
-    "DestinationBlend": 2,
-    "Name": "Glow"
+    "Additive" : true
   },
   "Star": {
     "TextureName": "Textures/Effect/light",
@@ -795,9 +757,7 @@
     "MaxStartSize": 3,
     "MinEndSize": 2,
     "MaxEndSize": 5,
-    "SourceBlend": 5,
-    "DestinationBlend": 2,
-    "Name": "Star"
+    "Additive" : true
   },
   "Fire": {
     "TextureName": "Textures/Fire",
@@ -835,8 +795,6 @@
     "MaxStartSize": 10,
     "MinEndSize": 0,
     "MaxEndSize": 10,
-    "SourceBlend": 5,
-    "DestinationBlend": 2,
-    "Name": "Fire"
+    "Additive" : true
   }
 }
