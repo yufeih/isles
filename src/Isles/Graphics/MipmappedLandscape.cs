@@ -91,8 +91,8 @@ namespace Isles.Graphics
 
             // Enable alpha blending :)
             graphics.SetBlendState(BlendState.AlphaBlend);
-            graphics.RenderState.DepthBufferWriteEnable = false;
-            // graphics.RenderState.DepthBufferFunction = CompareFunction.Always;
+            graphics.SetDepthStencilState(DepthStencilState.DepthRead);
+
             graphics.RenderState.CullMode = CullMode.None;
             graphics.SamplerStates[0].AddressU = TextureAddressMode.Border;
             graphics.SamplerStates[0].AddressV = TextureAddressMode.Border;
@@ -115,9 +115,6 @@ namespace Isles.Graphics
 
             surfaceEffect.End();
 
-            // Restore settings
-            graphics.RenderState.DepthBufferWriteEnable = true;
-            // graphics.RenderState.DepthBufferFunction = CompareFunction.LessEqual;
             graphics.SamplerStates[0].AddressU = TextureAddressMode.Wrap;
             graphics.SamplerStates[0].AddressV = TextureAddressMode.Wrap;
         }
@@ -205,6 +202,9 @@ namespace Isles.Graphics
                 return;
             }
 
+            graphics.SetBlendState(BlendState.AlphaBlend);
+            graphics.SetDepthStencilState(DepthStencilState.Default);
+
             // This code would go between a device
             // BeginScene-EndScene block.
             graphics.Vertices[0].SetSource(
@@ -236,8 +236,6 @@ namespace Isles.Graphics
             {
                 pass.Begin();
 
-                graphics.SetBlendState(BlendState.AlphaBlend);
-
                 for (var i = 0; i < Layers.Count; i++)
                 {
                     // It turns out that set indices are soo expensive when drawing
@@ -266,8 +264,6 @@ namespace Isles.Graphics
 
             terrainEffect.End();
 
-            graphics.RenderState.DepthBufferEnable = true;
-            graphics.RenderState.DepthBufferWriteEnable = true;
             graphics.RenderState.CullMode = CullMode.None;
         }
 

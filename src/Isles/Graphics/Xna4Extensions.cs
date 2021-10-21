@@ -10,6 +10,13 @@ namespace Microsoft.Xna.Framework.Graphics
         Additive,
     }
 
+    public enum DepthStencilState
+    {
+        None,
+        Default,
+        DepthRead,
+    }
+
     public static class Xna4Extensions
     {
         public static void SetRenderTarget(this GraphicsDevice graphicsDevice, RenderTarget2D renderTarget)
@@ -52,6 +59,27 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 case BlendState.Opaque:
                     graphicsDevice.RenderState.AlphaBlendEnable = false;
+                    break;
+            }
+        }
+
+        public static void SetDepthStencilState(this GraphicsDevice graphicsDevice, DepthStencilState depthStencilState)
+        {
+            switch (depthStencilState)
+            {
+                case DepthStencilState.None:
+                    graphicsDevice.RenderState.DepthBufferEnable = false;
+                    graphicsDevice.RenderState.DepthBufferWriteEnable = false;
+                    break;
+
+                case DepthStencilState.Default:
+                    graphicsDevice.RenderState.DepthBufferEnable = true;
+                    graphicsDevice.RenderState.DepthBufferWriteEnable = true;
+                    break;
+
+                case DepthStencilState.DepthRead:
+                    graphicsDevice.RenderState.DepthBufferEnable = true;
+                    graphicsDevice.RenderState.DepthBufferWriteEnable = false;
                     break;
             }
         }

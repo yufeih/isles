@@ -141,7 +141,6 @@ namespace Isles.Graphics
             game.GraphicsDevice.SetRenderTarget(renderTarget);
             game.GraphicsDevice.DepthStencilBuffer = depthStencil;
 
-            game.GraphicsDevice.RenderState.DepthBufferEnable = true;
             game.GraphicsDevice.Clear(Color.White);
 
             return true;

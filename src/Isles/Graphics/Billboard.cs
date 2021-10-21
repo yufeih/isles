@@ -373,8 +373,9 @@ namespace Isles.Graphics
                         effect.CurrentTechnique = techniqueNormal;
                     }
 
-                    game.GraphicsDevice.RenderState.DepthBufferEnable =
-                        (currentType & BillboardType.DepthBufferEnable) == BillboardType.DepthBufferEnable;
+                    game.GraphicsDevice.SetBlendState(BlendState.AlphaBlend);
+                    game.GraphicsDevice.SetDepthStencilState(
+                        (currentType & BillboardType.DepthBufferEnable) == BillboardType.DepthBufferEnable ? DepthStencilState.Default : DepthStencilState.None);
                 }
 
                 // Draw the chunk
@@ -395,12 +396,6 @@ namespace Isles.Graphics
                 begin = end;
             }
 
-            // The billboard effect sets some unusual renderstates for
-            // alphablending and depth testing the vegetation. We need to
-            // put these back to the right settings for the ground geometry.
-            game.GraphicsDevice.SetBlendState(BlendState.Opaque);
-            game.GraphicsDevice.RenderState.DepthBufferEnable = true;
-            game.GraphicsDevice.RenderState.DepthBufferWriteEnable = true;
             game.GraphicsDevice.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
 
             // Clear internal list after drawing

@@ -377,6 +377,7 @@ namespace Isles.Graphics
 
             private void ResolveAlphaIssues()
             {
+                game.GraphicsDevice.SetDepthStencilState(DepthStencilState.Default);
                 game.GraphicsDevice.SetBlendState(isTransparent ? BlendState.AlphaBlend : BlendState.Opaque);
             }
         }
@@ -620,10 +621,9 @@ namespace Isles.Graphics
             }
 
             // Setup render state
-            game.GraphicsDevice.RenderState.DepthBufferEnable = true;
-            game.GraphicsDevice.RenderState.DepthBufferWriteEnable = true;
             game.GraphicsDevice.RenderState.CullMode = CullMode.None;
             game.GraphicsDevice.SetBlendState(BlendState.Opaque);
+            game.GraphicsDevice.SetDepthStencilState(DepthStencilState.Default);
 
             // Clear cached renderable variable each frame
             Renderable.CachedIndexBuffer = null;

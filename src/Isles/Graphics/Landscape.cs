@@ -146,6 +146,8 @@ namespace Isles.Graphics
             graphics.VertexDeclaration = surfaceDeclaration;
 
             game.GraphicsDevice.SetBlendState(BlendState.AlphaBlend);
+            game.GraphicsDevice.SetDepthStencilState(DepthStencilState.Default);
+
             game.GraphicsDevice.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
 
             surfaceEffect.Parameters["WorldViewProjection"].SetValue(game.ViewProjection);
@@ -270,12 +272,10 @@ namespace Isles.Graphics
             graphics = game.GraphicsDevice;
 
             // Don't use or write to the z buffer
-            graphics.RenderState.DepthBufferEnable = false;
-            graphics.RenderState.DepthBufferWriteEnable = false;
-            graphics.RenderState.CullMode = CullMode.None;
-
             // Also don't use any kind of blending.
             graphics.SetBlendState(BlendState.Opaque);
+            graphics.SetDepthStencilState(DepthStencilState.None);
+            graphics.RenderState.CullMode = CullMode.None;
 
             skyEffect.Parameters["View"].SetValue(view);
             skyEffect.Parameters["Projection"].SetValue(projection);
@@ -284,10 +284,6 @@ namespace Isles.Graphics
             // Override model's effect and render
             skyModel.Meshes[0].MeshParts[0].Effect = skyEffect;
             skyModel.Meshes[0].Draw();
-
-            // Reset previous render states
-            graphics.RenderState.DepthBufferEnable = true;
-            graphics.RenderState.DepthBufferWriteEnable = true;
         }
 
         private readonly List<Billboard> vegetations = new(512);
@@ -553,8 +549,6 @@ namespace Isles.Graphics
             }
 
             WaterEffect.End();
-
-            graphics.RenderState.DepthBufferWriteEnable = true;
         }
 
         /// <summary>

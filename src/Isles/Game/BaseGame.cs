@@ -436,16 +436,9 @@ namespace Isles.Engine
 
             Log.Write("Device Reset <" + ScreenWidth + ", " + ScreenHeight + ">...");
 
-            // Re-Set device
-            // Restore z buffer state
-            GraphicsDevice.RenderState.DepthBufferEnable = true;
-            GraphicsDevice.RenderState.DepthBufferWriteEnable = true;
             // Set u/v addressing back to wrap
             GraphicsDevice.SamplerStates[0].AddressU = TextureAddressMode.Wrap;
             GraphicsDevice.SamplerStates[0].AddressV = TextureAddressMode.Wrap;
-            // Set alpha blending operations
-            GraphicsDevice.RenderState.AlphaSourceBlend = Blend.SourceAlpha;
-            GraphicsDevice.RenderState.AlphaDestinationBlend = Blend.InverseSourceAlpha;
         }
 
         /// <summary>

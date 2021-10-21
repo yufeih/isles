@@ -263,6 +263,7 @@ namespace Isles.Graphics
         public void Present()
         {
             game.GraphicsDevice.SetBlendState(BlendState.AlphaBlend);
+            game.GraphicsDevice.SetDepthStencilState(DepthStencilState.None);
 
             PresentPrimitives();
             PresentText();

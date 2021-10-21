@@ -582,11 +582,6 @@ namespace Isles.Graphics
                 }
 
                 particleEffect.End();
-
-                // Reset some of the renderstates that we changed,
-                // so as not to mess up any other subsequent drawing.
-                device.RenderState.DepthBufferWriteEnable = true;
-                device.RenderState.DepthBufferFunction = CompareFunction.LessEqual;
             }
 
             drawCounter++;
@@ -637,9 +632,7 @@ namespace Isles.Graphics
             // Enable the depth buffer (so particles will not be visible through
             // solid objects like the ground plane), but disable depth writes
             // (so particles will not obscure other particles).
-            device.RenderState.DepthBufferEnable = true;
-            device.RenderState.DepthBufferWriteEnable = false;
-            device.RenderState.DepthBias = 0;
+            device.SetDepthStencilState(DepthStencilState.DepthRead);
         }
 
         private Matrix view;
