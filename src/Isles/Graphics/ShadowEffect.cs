@@ -32,7 +32,6 @@ namespace Isles.Graphics
         public const int ShadowMapSize = 1024;
         private readonly BaseGame game;
         private DepthStencilBuffer depthStencil;
-        private DepthStencilBuffer storedDepthStencil;
         private RenderTarget2D renderTarget;
 
         /// <summary>
@@ -134,12 +133,8 @@ namespace Isles.Graphics
                 CreateRenderTarget();
             }
 
-            // Store current stencil buffer
-            storedDepthStencil = game.GraphicsDevice.DepthStencilBuffer;
-
             // Set shadow mapping targets
-            game.GraphicsDevice.SetRenderTarget(renderTarget);
-            game.GraphicsDevice.DepthStencilBuffer = depthStencil;
+            game.GraphicsDevice.PushRenderTarget(renderTarget, depthStencil);
 
             game.GraphicsDevice.Clear(Color.White);
 
@@ -154,19 +149,9 @@ namespace Isles.Graphics
         /// </returns>
         public Texture2D End()
         {
-            // Begin must be called first
-            if (storedDepthStencil != null)
-            {
-                // Restore everything
-                game.GraphicsDevice.SetRenderTarget(null);
-                game.GraphicsDevice.DepthStencilBuffer = storedDepthStencil;
-                storedDepthStencil = null;
+            game.GraphicsDevice.PopRenderTarget();
 
-                // Resolve render target, retrieve our shadow map
-                return ShadowMap = renderTarget.GetTexture();
-            }
-
-            return null;
+            return ShadowMap = renderTarget.GetTexture();
         }
 
         /// <summary>

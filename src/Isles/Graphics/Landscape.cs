@@ -454,9 +454,7 @@ namespace Isles.Graphics
         /// <param name="gameTime"></param>
         public void UpdateWaterReflectionAndRefraction(GameTime gameTime)
         {
-            DepthStencilBuffer prevDepth = graphics.DepthStencilBuffer;
-            graphics.DepthStencilBuffer = waterDepthStencil;
-            graphics.SetRenderTarget(reflectionRenderTarget);
+            graphics.PushRenderTarget(reflectionRenderTarget, waterDepthStencil);
 
             graphics.Clear(Color.Black);
 
@@ -480,8 +478,7 @@ namespace Isles.Graphics
             // Draw refraction onto the reflection texture
             DrawTerrain(game.View, game.Projection, false);
 
-            graphics.SetRenderTarget(null);
-            graphics.DepthStencilBuffer = prevDepth;
+            graphics.PopRenderTarget();
 
             // Retrieve refraction texture
             waterReflection = reflectionRenderTarget.GetTexture();
@@ -677,12 +674,8 @@ namespace Isles.Graphics
                 return;
             }
 
-            DepthStencilBuffer prevDepth = graphics.DepthStencilBuffer;
-
-            graphics.DepthStencilBuffer = depthBuffer;
-
             // Draw current glows
-            graphics.SetRenderTarget(currentCanvas);
+            graphics.PushRenderTarget(currentCanvas, depthBuffer);
             graphics.Clear(Color.Black);
 
             // Draw glows
@@ -731,14 +724,10 @@ namespace Isles.Graphics
             sprite.End();
 
             // Restore states
-            graphics.SetRenderTarget(null);
-            graphics.DepthStencilBuffer = prevDepth;
+            graphics.PopRenderTarget();
 
             // Retrieve final mask texture
             Mask = maskCanvas.GetTexture();
-
-            // Update intensity map
-            // mask.GetData<float>(intensity);
 
             // Manually update intensity map
             UpdateIntensity();

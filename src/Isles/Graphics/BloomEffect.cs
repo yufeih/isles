@@ -94,7 +94,7 @@ namespace Isles.Graphics
         private Effect bloomExtractEffect;
         private Effect bloomCombineEffect;
         private Effect gaussianBlurEffect;
-        private ResolveTexture2D resolveTarget;
+        private RenderTarget2D resolveTarget;
         private RenderTarget2D renderTarget1;
         private RenderTarget2D renderTarget2;
 
@@ -145,7 +145,7 @@ namespace Isles.Graphics
             SurfaceFormat format = pp.BackBufferFormat;
 
             // Create a texture for reading back the backbuffer contents.
-            resolveTarget = new ResolveTexture2D(GraphicsDevice, width, height, 1,
+            resolveTarget = new RenderTarget2D(GraphicsDevice, width, height, 1,
                 format);
 
             // Create two rendertargets for the bloom processing. These are half the
@@ -171,6 +171,11 @@ namespace Isles.Graphics
             renderTarget2.Dispose();
         }
 
+        public void BeginDraw()
+        {
+            GraphicsDevice.SetRenderTarget(resolveTarget);
+        }
+
         /// <summary>
         /// This is where it all happens. Grabs a scene that has already been rendered,
         /// and uses postprocess magic to add a glowing bloom effect over the top of it.
@@ -179,20 +184,20 @@ namespace Isles.Graphics
         {
             // Resolve the scene into a texture, so we can
             // use it as input data for the bloom processing.
-            GraphicsDevice.ResolveBackBuffer(resolveTarget);
+            GraphicsDevice.SetRenderTarget(null);
 
             // Pass 1: draw the scene into rendertarget 1, using a
             // shader that extracts only the brightest parts of the image.
             bloomExtractEffect.Parameters["BloomThreshold"].SetValue(
                 Settings.BloomThreshold);
 
-            DrawFullscreenQuad(resolveTarget, renderTarget1,
+            DrawFullscreenQuad(resolveTarget.GetTexture(), renderTarget1,
                                bloomExtractEffect,
                                IntermediateBuffer.PreBloom);
 
             // Pass 2: draw from rendertarget 1 into rendertarget 2,
             // using a shader to apply a horizontal gaussian blur filter.
-            SetBlurEffectParameters(1.0f / (float)renderTarget1.Width, 0);
+            SetBlurEffectParameters(1.0f / renderTarget1.Width, 0);
 
             DrawFullscreenQuad(renderTarget1.GetTexture(), renderTarget2,
                                gaussianBlurEffect,
@@ -200,7 +205,7 @@ namespace Isles.Graphics
 
             // Pass 3: draw from rendertarget 2 back into rendertarget 1,
             // using a shader to apply a vertical gaussian blur filter.
-            SetBlurEffectParameters(0, 1.0f / (float)renderTarget1.Height);
+            SetBlurEffectParameters(0, 1.0f / renderTarget1.Height);
 
             DrawFullscreenQuad(renderTarget2.GetTexture(), renderTarget1,
                                gaussianBlurEffect,
@@ -218,7 +223,7 @@ namespace Isles.Graphics
             parameters["BloomSaturation"].SetValue(Settings.BloomSaturation);
             parameters["BaseSaturation"].SetValue(Settings.BaseSaturation);
 
-            GraphicsDevice.Textures[1] = resolveTarget;
+            GraphicsDevice.Textures[1] = resolveTarget.GetTexture();
 
             Viewport viewport = GraphicsDevice.Viewport;
 

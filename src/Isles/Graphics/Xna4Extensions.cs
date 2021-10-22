@@ -1,6 +1,8 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections.Generic;
+
 namespace Microsoft.Xna.Framework.Graphics
 {
     public enum BlendState
@@ -25,9 +27,28 @@ namespace Microsoft.Xna.Framework.Graphics
 
     public static class Xna4Extensions
     {
+        private static readonly Stack<(RenderTarget2D, DepthStencilBuffer)> _renderTargetStack = new();
+
         public static void SetRenderTarget(this GraphicsDevice graphicsDevice, RenderTarget2D renderTarget)
         {
             graphicsDevice.SetRenderTarget(0, renderTarget);
+        }
+
+        public static void PushRenderTarget(this GraphicsDevice graphicsDevice, RenderTarget2D renderTarget, DepthStencilBuffer depthStencilBuffer = null)
+        {
+            _renderTargetStack.Push(((RenderTarget2D)graphicsDevice.GetRenderTarget(0), graphicsDevice.DepthStencilBuffer));
+            graphicsDevice.SetRenderTarget(0, renderTarget);
+            graphicsDevice.DepthStencilBuffer = depthStencilBuffer;
+        }
+
+        public static void PopRenderTarget(this GraphicsDevice graphicsDevice)
+        {
+            if (_renderTargetStack.Count> 0)
+            {
+                var (renderTarget, depthStencilBuffer) = _renderTargetStack.Pop();
+                graphicsDevice.SetRenderTarget(0, renderTarget);
+                graphicsDevice.DepthStencilBuffer = depthStencilBuffer;
+            }
         }
 
         public static void Begin(this SpriteBatch spriteBatch, SpriteSortMode spriteSortMode, BlendState blendState)

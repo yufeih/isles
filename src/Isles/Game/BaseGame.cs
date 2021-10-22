@@ -646,8 +646,8 @@ namespace Isles.Engine
                 return;
             }
 
+            Bloom?.BeginDraw();
             Graphics.GraphicsDevice.Clear(backgroundColor);
-
             CurrentScreen?.Draw(gameTime);
             ModelManager?.Present();
             Billboard?.Present();
@@ -656,16 +656,11 @@ namespace Isles.Engine
 
             Graphics2D.Present();
 
-            base.Draw(gameTime);
-
             // Take screen shot
             if (ScreenshotCapturer != null && ScreenshotCapturer.ShouldCapture)
             {
                 ScreenshotCapturer.TakeScreenshot();
             }
-
-            GraphicsDevice.Vertices[0].SetSource(null, 0, 0);
-            GraphicsDevice.Indices = null;
 
             base.Draw(gameTime);
         }
