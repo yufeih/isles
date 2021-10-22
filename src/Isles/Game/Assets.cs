@@ -208,11 +208,9 @@ namespace Isles.Engine
     {
         private readonly BaseGame game;
         private int updateCount;
-        private int currentFrame;
         private int counter;
         private double storedTime;
         private float fps;
-        private float fpsInterpolated = 60.0f;
         private float overallFps;
 
         /// <summary>
@@ -223,7 +221,7 @@ namespace Isles.Engine
         /// <summary>
         /// Gets the total number of frames since profiler started.
         /// </summary>
-        public int CurrentFrame => currentFrame;
+        public int CurrentFrame { get; private set; }
 
         /// <summary>
         /// Gets the average frame rate up until now.
@@ -233,7 +231,7 @@ namespace Isles.Engine
         /// <summary>
         /// Gets the current Frame Per Second for the game.
         /// </summary>
-        public float FramesPerSecond => fpsInterpolated;
+        public float FramesPerSecond { get; private set; } = 60.0f;
 
         public Profiler()
             : base(null)
@@ -276,7 +274,7 @@ namespace Isles.Engine
             }
 
             counter++;
-            currentFrame++;
+            CurrentFrame++;
 
             var elapsed = (float)(gameTime.TotalGameTime.TotalMilliseconds - storedTime);
 
@@ -286,8 +284,8 @@ namespace Isles.Engine
                 counter = 0;
                 storedTime = gameTime.TotalGameTime.TotalMilliseconds;
 
-                fpsInterpolated =
-                    MathHelper.Lerp(fpsInterpolated, fps, 0.5f);
+                FramesPerSecond =
+                    MathHelper.Lerp(FramesPerSecond, fps, 0.5f);
 
                 overallFps = (overallFps * updateCount + fps) / (updateCount + 1);
                 updateCount++;
@@ -308,7 +306,7 @@ namespace Isles.Engine
             }
 
             // Try if we can do without saving state changes
-            game.Graphics2D.DrawString("FPS: " + fpsInterpolated, 16f / 23, new Vector2(0, 0), Color.White);
+            game.Graphics2D.DrawString("FPS: " + FramesPerSecond, 16f / 23, new Vector2(0, 0), Color.White);
         }
     }
 
@@ -330,37 +328,7 @@ namespace Isles.Engine
         /// </summary>
         private readonly BaseGame game;
 
-        /// <summary>
-        /// If it's true, the game should call TakeScreenshot at the end of the frame.
-        /// </summary>
-        private bool shouldCapture;
-
-        public bool ShouldCapture
-        {
-            get => shouldCapture;
-            set => shouldCapture = value;
-        }
-
-        public Texture2D Screenshot
-        {
-            get
-            {
-                if (screenshot == null)
-                {
-                    screenshot = new ResolveTexture2D(
-                        game.GraphicsDevice,
-                        game.ScreenWidth, game.ScreenHeight, 1,
-                        SurfaceFormat.Color);
-
-                    // Get data with help of the resolve method
-                    game.GraphicsDevice.ResolveBackBuffer(screenshot);
-                }
-
-                return screenshot;
-            }
-        }
-
-        private ResolveTexture2D screenshot;
+        public bool ShouldCapture { get; set; }
 
         public ScreenshotCapturer(BaseGame setGame)
             : base(setGame)
@@ -455,7 +423,7 @@ namespace Isles.Engine
         public void TakeScreenshot(IEventListener photographer)
         {
             this.photographer = photographer;
-            shouldCapture = true;
+            ShouldCapture = true;
         }
 
         public void TakeScreenshot()
@@ -505,22 +473,8 @@ namespace Isles.Engine
             }
             finally
             {
-                shouldCapture = false;
+                ShouldCapture = false;
             }
-        }
-
-        /// <summary>
-        /// Allows the game component to update itself.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        public override void Update(GameTime gameTime)
-        {
-            if (screenshot != null)
-            {
-                screenshot = null;
-            }
-
-            base.Update(gameTime);
         }
     }
 }

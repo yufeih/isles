@@ -26,25 +26,10 @@ namespace Isles
         // Texture for the buttons
         private readonly Texture2D buttonsTexture;
 
-        // Texture used for disappearing effect
-        private Texture2D titleDisplayShotTexture;
-
         // Texture for transition to loading
         private readonly Texture2D loadingDisplayTexture;
 
-        // Disappear effect
-        private readonly Effect disappearEffect;
-
-        // Distortion texture
-        private readonly Texture2D distortion;
-        private Vector2 randomOffset;
         private int highLightMoveTo;
-        private double modeChangeTimeRecord;
-        private bool modeChange;
-
-        // Time for changing into the new screen
-        private const double ChangingTime = 1;
-
         /// <summary>
         /// Use the double variable to describe the expected position
         /// of the high light panel.
@@ -96,8 +81,6 @@ namespace Isles
             titleTexture = BaseGame.Singleton.Content.Load<Texture2D>("UI/MainEntry");
             buttonsTexture = BaseGame.Singleton.Content.Load<Texture2D>("UI/Buttons");
             loadingDisplayTexture = BaseGame.Singleton.Content.Load<Texture2D>("UI/LoadingDisplay");
-            distortion = BaseGame.Singleton.Content.Load<Texture2D>("Textures/Distortion");
-            disappearEffect = BaseGame.Singleton.Content.Load<Effect>("Effects/Disappear");
 
             ui.ScaleMode = ScaleMode.Stretch;
             ui.Anchor = Anchor.TopLeft;
@@ -224,7 +207,7 @@ namespace Isles
             buttons[1].Click += (o, e) =>
             {
                 Audios.Play("OK");
-                modeChange = true;
+                StartLoadingCampaign();
             };
 
             buttons[3].Click += (o, e) =>
@@ -239,9 +222,6 @@ namespace Isles
 
             highLightMoveTo = buttons[0].Area.X;
             expectedHighlightPos = highLightMoveTo;
-            var rand = new Random();
-            randomOffset = new Vector2((float)rand.NextDouble(),
-                                        (float)rand.NextDouble()) * 0.1f;
         }
 
         /// <summary>
@@ -383,51 +363,6 @@ namespace Isles
         public void Draw(GameTime gameTime)
         {
             ui.Draw(gameTime);
-            if (modeChange && titleDisplayShotTexture != null)
-            {
-                modeChangeTimeRecord += gameTime.ElapsedGameTime.TotalSeconds;
-                if (modeChangeTimeRecord > ChangingTime)
-                {
-                    StartLoadingCampaign();
-                }
-                else
-                {
-                    SpriteBatch spriteBatch = ui.Sprite;
-                    // Begin the sprite batch.
-                    spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
-
-                    BaseGame.Singleton.GraphicsDevice.Textures[1] = distortion;
-
-                    // Set an effect parameter to make our overlay
-                    // texture scroll in a giant circle.
-                    disappearEffect.Parameters["Offset"].SetValue(randomOffset);
-
-                    // Begin the custom effect.
-                    disappearEffect.Begin();
-                    disappearEffect.CurrentTechnique.Passes[0].Begin();
-
-                    // Draw the sprite, passing the fade amount as the
-                    // alpha of the SpriteBatch.Draw color parameter.
-                    var fade = (byte)(modeChangeTimeRecord / ChangingTime * 255);
-                    spriteBatch.Draw(titleDisplayShotTexture, ui.DestinationRectangle,
-                                     new Color(255, 255, 255, (byte)(255 - fade)));
-
-                    // End the sprite batch, then end our custom effect.
-                    spriteBatch.End();
-
-                    disappearEffect.CurrentTechnique.Passes[0].End();
-                    disappearEffect.End();
-                }
-
-                return;
-            }
-
-            if (modeChange)
-            {
-                titleDisplayShotTexture = BaseGame.Singleton.ScreenshotCapturer.Screenshot;
-                ui.Remove(titlePanel);
-                Draw(gameTime);
-            }
         }
 
         /// <summary>
