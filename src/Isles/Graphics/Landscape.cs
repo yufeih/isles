@@ -63,17 +63,6 @@ namespace Isles.Graphics
 
         public abstract void DrawTerrain(GameTime gameTime, ShadowEffect shadowEffect);
 
-        /// <summary>
-        /// Draw landscape.
-        /// </summary>
-        /// <param name="gameTime"></param>
-        public override void Draw(GameTime gameTime)
-        {
-            DrawSky(game.View, game.Projection);
-            DrawWater(gameTime);
-            DrawTerrain(gameTime, null);
-        }
-
         private struct TexturedSurface
         {
             public Texture2D Texture;
@@ -439,12 +428,7 @@ namespace Isles.Graphics
         /// <param name="gameTime"></param>
         public void UpdateWaterReflectionAndRefraction(GameTime gameTime)
         {
-            if (!game.Settings.RealisticWater)
-            {
-                return;
-            }
-
-            graphics.SetRenderTarget(reflectionRenderTarget);
+            graphics.PushRenderTarget(reflectionRenderTarget, waterDepthStencil);
 
             graphics.Clear(Color.Black);
 
@@ -454,10 +438,7 @@ namespace Isles.Graphics
 
             DrawSky(viewReflect, game.Projection);
 
-            if (game.Settings.ShowLandscape)
-            {
-                DrawTerrain(viewReflect, game.Projection, true);
-            }
+            DrawTerrain(viewReflect, game.Projection, true);
 
             // Draw other reflections
             if (game.Settings.ReflectionEnabled)
@@ -469,12 +450,9 @@ namespace Isles.Graphics
             game.ModelManager.Present(viewReflect, game.Projection);
 
             // Draw refraction onto the reflection texture
-            if (game.Settings.ShowLandscape)
-            {
-                DrawTerrain(game.View, game.Projection, false);
-            }
+            DrawTerrain(game.View, game.Projection, false);
 
-            graphics.SetRenderTarget(null);
+            graphics.PopRenderTarget();
 
             // Retrieve refraction texture
             waterReflection = reflectionRenderTarget;
@@ -491,7 +469,7 @@ namespace Isles.Graphics
                 WaterEffect.Parameters["FogTexture"].SetValue(FogTexture);
             }
 
-            if (game.Settings.RealisticWater)
+            if (game.Settings.ReflectionEnabled)
             {
                 WaterEffect.CurrentTechnique = WaterEffect.Techniques["Realisic"];
                 WaterEffect.Parameters["ReflectionTexture"].SetValue(waterReflection);
@@ -663,7 +641,7 @@ namespace Isles.Graphics
             }
 
             // Draw current glows
-            graphics.SetRenderTarget(currentCanvas);
+            graphics.PushRenderTarget(currentCanvas, depthBuffer);
             graphics.Clear(Color.Black);
 
             // Draw glows
@@ -712,13 +690,10 @@ namespace Isles.Graphics
             sprite.End();
 
             // Restore states
-            graphics.SetRenderTarget(null);
+            graphics.PopRenderTarget();
 
             // Retrieve final mask texture
             Mask = maskCanvas;
-
-            // Update intensity map
-            // mask.GetData<float>(intensity);
 
             // Manually update intensity map
             UpdateIntensity();

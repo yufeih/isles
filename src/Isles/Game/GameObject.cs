@@ -1545,7 +1545,7 @@ namespace Isles
         public void RefreshTexture()
         {
             // Draw all ruined regions
-            graphics.SetRenderTarget(currentCanvas);
+            graphics.PushRenderTarget(currentCanvas, depthBuffer);
             graphics.Clear(Color.Black);
 
             // Draw glows
@@ -1566,7 +1566,7 @@ namespace Isles
             sprite.End();
 
             // Draw discovered area texture without clearing it
-            graphics.SetRenderTarget(null);
+            graphics.PopRenderTarget();
 
             // Retrieve new alpha texture
             currentTexture = currentCanvas;
@@ -1586,7 +1586,7 @@ namespace Isles
             }
 
             // Draw all ruined regions
-            graphics.SetRenderTarget(finalCanvas);
+            graphics.PushRenderTarget(finalCanvas, depthBuffer);
             graphics.Clear(Color.Black);
 
             if (finalTexture != null)
@@ -1611,7 +1611,7 @@ namespace Isles
 
             graphics.DrawUserPrimitives(PrimitiveType.TriangleStrip, vertices, 0, 2);
 
-            graphics.SetRenderTarget(null);
+            graphics.PopRenderTarget();
 
             // Retrieve new alpha texture
             finalTexture = finalCanvas;

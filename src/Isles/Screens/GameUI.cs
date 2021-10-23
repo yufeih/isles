@@ -95,15 +95,6 @@ namespace Isles
         /// </summary>
         private Texture2D borderFadeout;
 
-        /// <summary>
-        /// Distortion pic.
-        /// </summary>
-        private Texture2D distortion;
-
-        /// <summary>
-        /// For the disappearing effect.
-        /// </summary>
-        private readonly Texture2D LoadingDisplayFinished;
         private TextField snapShotName;
         private readonly Texture2D[] focusAnimation = new Texture2D[8];
         private Vector3 focusPosition;
@@ -130,21 +121,17 @@ namespace Isles
         private const int SpellButtonShorterHeight = 22;
         private const int SpellButtonFullHeight = 34;
         private const int SpellButtonWidthSpace = 1;
-        private const double DisappearingTime = 3;
-        private double startTime;
-        private Effect disappearEffect;
 
         /// <summary>
         /// Creates a new game user interface.
         /// </summary>
-        public GameUI(BaseGame game, Texture2D loadingFinished, GameWorld world)
+        public GameUI(BaseGame game, GameWorld world)
         {
             // Setup singleton
             Singleton = this;
 
             this.game = game;
             this.world = world;
-            LoadingDisplayFinished = loadingFinished;
 
             LoadContent();
         }
@@ -156,8 +143,6 @@ namespace Isles
 
             // Load UI textures
             borderFadeout = game.Content.Load<Texture2D>("Textures/Fadeout");
-            disappearEffect = game.Content.Load<Effect>("Effects/DisortionDisappear");
-            distortion = game.Content.Load<Texture2D>("Textures/Distortion");
             panelsTexture = game.Content.Load<Texture2D>("UI/Panels");
 
             for (var i = 0; i < focusAnimation.Length; i++)
@@ -245,7 +230,6 @@ namespace Isles
             Display.Add(ResourcePanel);
             ControlPanel.Add(Minimap);
             Display.Add(TipBoxContainer);
-            randomOffset = Vector2.Normalize(new Vector2((float)rand.NextDouble(), (float)rand.NextDouble()));
 
             // Init rendering of fog of war
             fogOfWarVertices = new VertexPositionTexture[4]
@@ -805,8 +789,6 @@ namespace Isles
             Display.Sprite.End();
 
             game.Graphics2D.Present();
-
-            DrawDisappear(gameTime);
         }
 
         private void DrawCursorFocus(GameTime gameTime, SpriteBatch sprite)
@@ -860,28 +842,6 @@ namespace Isles
                 // This will be drawed next frame...
                 world.Landscape.FogTexture = world.FogOfWar.Mask;
             }
-        }
-
-        /// <summary>
-        /// Helper for moving a value around in a circle.
-        /// </summary>
-        private Vector2 MoveInCircle(GameTime gameTime, double intensity)
-        {
-            var time = (gameTime.TotalGameTime.TotalSeconds - startTime) * intensity / DisappearingTime * 2 * Math.PI;
-
-            var x = (float)Math.Cos(time);
-            var y = (float)Math.Sin(time);
-
-            return new Vector2(x, y);
-        }
-
-        /// <summary>
-        /// Helper computes a value that oscillates over time.
-        /// </summary>
-        private float Pulsate(GameTime gameTime)
-        {
-            var amount = (gameTime.TotalGameTime.TotalSeconds - startTime) / DisappearingTime * Math.PI;
-            return ((float)Math.Sin(amount - Math.PI / 2) + 1) / 2 * 255;
         }
 
         /// <summary>
@@ -947,52 +907,6 @@ namespace Isles
 
             profileButtons.Clear();
             profileNextX = ProfileBaseX;
-        }
-
-        private readonly Random rand = new();
-        private Vector2 randomOffset;
-
-        private void DrawDisappear(GameTime gameTime)
-        {
-            if (startTime == 0)
-            {
-                startTime = gameTime.TotalGameTime.TotalSeconds;
-            }
-
-            if (gameTime.TotalGameTime.TotalSeconds > startTime + DisappearingTime)
-            {
-                return;
-            }
-
-            // Draw the background image.
-            SpriteBatch spriteBatch = Display.Sprite;
-
-            // Begin the sprite batch.
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
-
-            game.GraphicsDevice.Textures[1] = distortion;
-
-            // Set an effect parameter to make our overlay
-            // texture scroll in a giant circle.
-            disappearEffect.Parameters["OverlayScroll"].SetValue(MoveInCircle(gameTime, 1));
-
-            disappearEffect.Parameters["Offset"].SetValue(MoveInCircle(gameTime, 0.2) + randomOffset);
-
-            disappearEffect.Parameters["Intensity"].SetValue(MoveInCircle(gameTime, 0.6).Y);
-
-            // Begin the custom effect.
-            disappearEffect.CurrentTechnique.Passes[0].Apply();
-
-            // Draw the sprite, passing the fade amount as the
-            // alpha of the SpriteBatch.Draw color parameter.
-            var fade = (byte)Pulsate(gameTime);
-            spriteBatch.Draw(LoadingDisplayFinished, Display.DestinationRectangle,
-                                new Rectangle(0, 0, LoadingDisplayFinished.Width, LoadingDisplayFinished.Height),
-                             // MoveInCircle(gameTime, LoadingDisplayFinished, 1),
-                             new Color(255, 255, 255, (byte)(255 - fade)));
-
-            // End the sprite batch, then end our custom effect.
-            spriteBatch.End();
         }
 
         /// <summary>

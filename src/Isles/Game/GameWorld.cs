@@ -148,7 +148,7 @@ namespace Isles.Engine
         {
             Texture2D shadowMap = null;
 
-            if (Game.Settings.ShowWater)
+            if (Game.Settings.ReflectionEnabled)
             {
                 // Pre-render our landscape, update landscape
                 // reflection and refraction texture.
@@ -156,8 +156,7 @@ namespace Isles.Engine
             }
 
             // Generate shadow map
-            if (Game.Settings.ShowLandscape &&
-                Game.Shadow != null && Game.Shadow.Begin())
+            if (Game.Shadow != null && Game.Shadow.Begin())
             {
                 // Calculate shadow view projection matrix
                 CalculateShadowMatrix(Game.Shadow);
@@ -182,30 +181,17 @@ namespace Isles.Engine
                 o.Draw(gameTime);
             }
 
-            // Draw water before terrain when realistic rendering is turned off
-            if (Game.Settings.ShowWater && !Game.Settings.RealisticWater)
-            {
-                Landscape.DrawWater(gameTime);
-            }
+            Landscape.DrawWater(gameTime);
 
-            if (Game.Settings.ShowLandscape)
+            // Draw shadow receivers with the shadow map
+            if (shadowMap != null)
             {
-                // Draw shadow receivers with the shadow map
-                if (shadowMap != null)
-                {
-                    // Only the landscape receives the shadows
-                    Landscape.DrawTerrain(gameTime, Game.Shadow);
-                }
-                else
-                {
-                    Landscape.DrawTerrain(gameTime, null);
-                }
+                // Only the landscape receives the shadows
+                Landscape.DrawTerrain(gameTime, Game.Shadow);
             }
-
-            // Draw water after terrain when realistic rendering is turned on
-            if (Game.Settings.ShowWater && Game.Settings.RealisticWater)
+            else
             {
-                Landscape.DrawWater(gameTime);
+                Landscape.DrawTerrain(gameTime, null);
             }
 
             // Present surface

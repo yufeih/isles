@@ -10,12 +10,10 @@ namespace Isles.Engine
         public string DefaultFont { get; set; } = "Fonts/Default";
         public string Graphics2DEffect { get; set; } = "Effects/Graphics2D";
         public string PlayerName { get; set; } = "Unnamed";
-        public bool EnableScreenshot { get; set; } = true;
         public bool EnableProfile { get; set; } = true;
         public bool IsMouseVisible { get; set; }
         public bool IsFixedTimeStep { get; set; } = true;
         public bool ClipCursor { get; set; }
-        public bool EnableSound { get; set; } = true;
         public bool RevealMap { get; set; }
         public int MaxPathSearchStepsPerUpdate { get; set; } = 2000;
         public bool TraceUnits { get; set; }
@@ -26,11 +24,8 @@ namespace Isles.Engine
         public int ScreenHeight { get; set; } = 600;
         public bool Fullscreen { get; set; }
         public bool NormalMappedTerrain { get; set; }
-        public bool RealisticWater { get; set; }
         public bool ReflectionEnabled { get; set; }
         public bool ShadowEnabled { get; set; } = true;
-        public bool ShowLandscape { get; set; } = true;
-        public bool ShowWater { get; set; } = true;
         public bool ShowObjectReflection { get; set; } = true;
         public BloomEffect BloomSettings { get; set; } = new();
         public float ViewDistanceSquared { get; set; } = 800;

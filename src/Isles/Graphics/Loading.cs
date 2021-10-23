@@ -158,16 +158,6 @@ namespace Isles.Graphics
             graphics.Clear(Color.Black);
             uiDisplay.Draw(BaseGame.Singleton.CurrentGameTime);
             graphics.Present();
-            if (progressBar.Persentage == 100 && !captured)
-            {
-                LoadingFinished = BaseGame.Singleton.ScreenshotCapturer.Screenshot;
-                captured = true;
-                Draw();
-            }
         }
-
-        private bool captured;
-
-        public Texture2D LoadingFinished;
     }
 }

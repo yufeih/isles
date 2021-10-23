@@ -269,11 +269,7 @@ namespace Isles.Graphics
             return terrainVertices[x, y];
         }
 
-#if SHORTINDEX
-        UInt16[] workingIndices;
-#else
         private uint[] workingIndices;
-#endif
 
         private TerrainVertex[] workingVertices;
         private uint terrainVertexCount;
@@ -310,11 +306,7 @@ namespace Isles.Graphics
                 if (Patches[i].Visible)
                 {
                     // Update patch starting vertex
-#if SHORTINDEX
-                    Patches[i].StartingVertex = (UInt16)terrainVertexCount;
-#else
                     Patches[i].StartingVertex = terrainVertexCount;
-#endif
                     terrainVertexCount += Patches[i].FillVertices(terrainVertexCount,
                                                                   GetVertexPosition,
                                                                   SetVertexPosition,
@@ -333,15 +325,9 @@ namespace Isles.Graphics
         {
             if (workingIndices == null)
             {
-#if SHORTINDEX
-                workingIndices = new UInt16[
-                    6 * PatchCountOnXAxis * PatchCountOnYAxis *
-                    Patch.MaxPatchResolution * Patch.MaxPatchResolution];
-#else
                 workingIndices = new uint[
                     6 * PatchCountOnXAxis * PatchCountOnYAxis *
                     Patch.MaxPatchResolution * Patch.MaxPatchResolution];
-#endif
                 terrainIndexCount = new uint[PatchGroups.Length];
             }
 
@@ -352,26 +338,12 @@ namespace Isles.Graphics
                 {
                     if (Patches[index].Visible)
                         terrainIndexCount[i] += Patches[index].
-#if SHORTINDEX
-                            FillIndices16(ref workingIndices, terrainIndexCount[i]);
-#else
                             FillIndices32(ref workingIndices, terrainIndexCount[i]);
-#endif
                 }
 
                 if (terrainIndexCount[i] > 0)
                 {
-#if SHORTINDEX
-                    // Clamp index count
-                    if (terrainIndexCount[i] > UInt16.MaxValue)
-                        terrainIndexCount[i] = UInt16.MaxValue;
-
-                    terrainIndexBufferSet[i].SetData<UInt16>(
-                        workingIndices, 0, (int)terrainIndexCount[i]);
-#else
-                    terrainIndexBufferSet[i].SetData(
-                        workingIndices, 0, (int)terrainIndexCount[i]);
-#endif
+                    terrainIndexBufferSet[i].SetData(workingIndices, 0, (int)terrainIndexCount[i]);
                 }
             }
         }
@@ -481,16 +453,8 @@ namespace Isles.Graphics
                 var elementCount = 6 * PatchGroups[i].Count *
                     Patch.MaxPatchResolution * Patch.MaxPatchResolution;
 
-#if SHORTINDEX
-                if (elementCount > UInt16.MaxValue)
-                    elementCount = UInt16.MaxValue;
-
-                terrainIndexBufferSet.Add(new IndexBuffer(
-                    graphics,typeof(UInt16), elementCount,BufferUsage.WriteOnly));
-#else
                 terrainIndexBufferSet.Add(new IndexBuffer(
                     graphics, typeof(uint), elementCount, BufferUsage.WriteOnly));
-#endif
             }
 
             UpdateTerrainVertexBuffer();

@@ -135,7 +135,7 @@ namespace Isles
             ResetCamera();
 
             // Initialize game players & UI
-            ResetUI(loadContext);
+            ResetUI();
 
             // Start level
             if (level != null)
@@ -153,9 +153,9 @@ namespace Isles
             Event.SendMessage(EventType.Unknown, this, this, 1, 0.2f);
         }
 
-        private void ResetUI(ILoading loadContext)
+        private void ResetUI()
         {
-            UI = new GameUI(Game, (loadContext as Loading).LoadingFinished, World);
+            UI = new GameUI(Game, World);
 
             readme = new ReadmePanel(new Rectangle(65, 70, 530, 460))
             {

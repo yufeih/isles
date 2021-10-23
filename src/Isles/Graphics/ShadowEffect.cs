@@ -104,7 +104,7 @@ namespace Isles.Graphics
             }
 
             // Set shadow mapping targets
-            game.GraphicsDevice.SetRenderTarget(renderTarget);
+            game.GraphicsDevice.PushRenderTarget(renderTarget);
 
             game.GraphicsDevice.Clear(Color.White);
 
@@ -119,7 +119,8 @@ namespace Isles.Graphics
         /// </returns>
         public Texture2D End()
         {
-            game.GraphicsDevice.SetRenderTarget(null);
+            game.GraphicsDevice.PopRenderTarget();
+
             return ShadowMap = renderTarget;
         }
 
