@@ -4,11 +4,9 @@
 //	Required Game Model Effect:
 //
 //		Default, Highlight, Select, Placing Building, Frozen, Pertrifacted, Invisible
-// 
+//
 // Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
-
-#include "Common.fxh"
 
 //-----------------------------------------------------------------------------
 // Global variables
@@ -86,12 +84,12 @@ float4x4 GetSkinTransform(
 {
     // Blend between the weighted bone matrices.
     float4x4 skinTransform = 0;
-    
+
     skinTransform += Bones[boneIndices.x] * boneWeights.x;
     skinTransform += Bones[boneIndices.y] * boneWeights.y;
     skinTransform += Bones[boneIndices.z] * boneWeights.z;
     skinTransform += Bones[boneIndices.w] * boneWeights.w;
-    
+
     return skinTransform;
 }
 
@@ -111,11 +109,11 @@ void VS(
 	// Transform position
 	float4 worldPosition = mul(position, World);
     oPos = mul(worldPosition, ViewProjection);
-    
+
     // Copy texture coordinates
     oUV = uv;
     oZ = worldPosition.z;
-    
+
     // Compute light and eye vector in world space
     oNormal = mul(normal, World);
 }
@@ -133,15 +131,15 @@ void VSSkinned(
 {
 	// Skin transform
 	float4x4 skinTransform = GetSkinTransform(boneIndices, boneWeights);
-	
+
 	// Output position
 	float4 worldPosition = mul(position, skinTransform);
 	oPos = mul(worldPosition, ViewProjection);
-    
+
     // Copy texture coordinates
     oUV = uv;
     oZ = worldPosition.z;
-    
+
     // Compute light and eye vector in world space
 	oNormal = mul(normal, skinTransform);
 }
@@ -151,15 +149,15 @@ float4 PS(float2 uv		: TEXCOORD0,
 		  float3 normal : TEXCOORD3) : COLOR
 {
 	//clip(z);
-	
+
     float3 Ln = normalize(-LightDirection);
     float3 Nb = normalize(normal);
     float lighting = saturate(dot(Ln,Nb));
-    
+
 	// Compute diffuse and specular intensities. Make our game model look more bright
 	float4 map = tex2D(BasicSampler, uv);
 	float4 diffuse = Diffuse * map * (LightColor * lighting + Ambient);
-	
+
 	return float4(diffuse.xyz, map.a * Diffuse.a);
 }
 
@@ -177,16 +175,16 @@ void VSNormalMapping(
     out float2 oUV		: TEXCOORD0,
     out float3 oEye		: TEXCOORD1,
     out float3 oLight	: TEXCOORD2)
-{    
+{
 	// Transform position
 	float4 worldPosition = mul(position, World);
     oPos = mul(worldPosition, ViewProjection);
-    
+
     // Copy texture coordinates
     oUV = uv;
-    
+
     // Generate tangent, normal and binormal
-	float3x3 tbn;	
+	float3x3 tbn;
 	tbn[0] = mul(tangent, (float3x3)World);
 	tbn[1] = mul(binormal, (float3x3)World);
 	tbn[2] = mul(normal, (float3x3)World);
@@ -211,26 +209,26 @@ void VSNormalMappingSkinned(
 {
 	// Skin transform
 	float4x4 skinTransform = GetSkinTransform(boneIndices, boneWeights);
-	
+
 	// Transform position
 	float4 worldPosition = mul(position, skinTransform);
     oPos = mul(worldPosition, ViewProjection);
-    
+
     // Copy texture coordinates
     oUV = uv;
-    
+
     // Generate tangent, normal and binormal
-	float3x3 tbn;	
+	float3x3 tbn;
 	tbn[0] = mul(tangent, (float3x3)skinTransform);
 	tbn[1] = mul(binormal, (float3x3)skinTransform);
 	tbn[2] = mul(normal, (float3x3)skinTransform);
-    
+
     // Compute light and eye vector in world space
     oEye = mul(tbn, GetEyePosition() - worldPosition);
     oLight = mul(tbn, -LightDirection);
 }
 
-float4 PSNormalMapping( 
+float4 PSNormalMapping(
     float2 uv		: TEXCOORD0,
     float3 eye		: TEXCOORD1,
     float3 light	: TEXCOORD2) : COLOR
@@ -249,7 +247,7 @@ float4 PSNormalMapping(
 	float4 diffuse = Diffuse * map * (LightColor * lighting.y + Ambient);
 	float4 specular = lighting.z * LightColor * Specular;
 	float4 color = diffuse + specular;
-	
+
 	return float4(color.xyz, map.a * Diffuse.a);
 }
 
@@ -265,7 +263,7 @@ void VSShadowMapping(
 	// Transform position
 	float4 worldPosition = mul(position, World);
 	oPos = mul(worldPosition, LightViewProjection);
-    
+
     // Store z value in our texture
     oDepth = 1 - oPos.z / oPos.w;
 }
@@ -279,11 +277,11 @@ void VSShadowMappingSkinned(
 {
 	// Skin the vertex and transform it to world space
 	float4x4 skinTransform = GetSkinTransform(boneIndices, boneWeights);
-		
+
 	// Output position
 	oPos = mul(position, skinTransform);
 	oPos = mul(oPos, LightViewProjection);
-    
+
     // Store z value in our texture
     oDepth = 1 - oPos.z / oPos.w;
 }
