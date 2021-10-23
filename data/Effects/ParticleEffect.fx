@@ -39,13 +39,6 @@ texture Texture;
 sampler Sampler = sampler_state
 {
     Texture = (Texture);
-
-    MinFilter = Linear;
-    MagFilter = Linear;
-    MipFilter = Point;
-
-    AddressU = Clamp;
-    AddressV = Clamp;
 };
 
 

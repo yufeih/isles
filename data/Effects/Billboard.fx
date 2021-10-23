@@ -37,7 +37,7 @@ void VertexShaderNormal(
 
     // Offset to the left or right.
     position += rightVector * size.x;
-    
+
     // Offset upward.
     position += norm * size.y;
 
@@ -61,7 +61,7 @@ void VertexShaderCenter(
 
     // Apply the camera transform.
     oPos = mul(float4(pos, 1), View);
-    
+
     // Offset
     oPos.xy += size.xy;
 
@@ -73,20 +73,12 @@ void VertexShaderCenter(
 sampler TextureSampler = sampler_state
 {
     Texture = (Texture);
-
-    MinFilter = Linear;
-    MagFilter = Linear;
-    MipFilter = Linear;
-    
-    AddressU = Clamp;
-    AddressV = Clamp;
 };
 
 
 float4 PixelShaderF(float2 texCoord : TEXCOORD0, float4 color : COLOR0) : COLOR0
 {
     return tex2D(TextureSampler, texCoord);
-    //return AmbientColor + tex2D(TextureSampler, texCoord) * LightColor;
 }
 
 
@@ -116,7 +108,7 @@ technique Vegetation
     // often looks ok, and is much faster than trying to sort everything 100%
     // correctly. It is particularly effective for organic textures like grass and
     // trees.
-    
+
     pass RenderOpaquePixels
     {
         VertexShader = compile vs_2_0 VertexShaderNormal();
@@ -128,7 +120,7 @@ technique Vegetation
         VertexShader = compile vs_2_0 VertexShaderNormal();
         PixelShader = compile ps_2_0 PixelShaderF();
     }
-    
+
 }
 
 
