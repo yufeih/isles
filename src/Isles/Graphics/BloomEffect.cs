@@ -186,7 +186,7 @@ namespace Isles.Graphics
             bloomExtractEffect.Parameters["BloomThreshold"].SetValue(
                 Settings.BloomThreshold);
 
-            DrawFullscreenQuad(resolveTarget.GetTexture(), renderTarget1,
+            DrawFullscreenQuad(resolveTarget, renderTarget1,
                                bloomExtractEffect,
                                IntermediateBuffer.PreBloom);
 
@@ -218,7 +218,7 @@ namespace Isles.Graphics
             parameters["BloomSaturation"].SetValue(Settings.BloomSaturation);
             parameters["BaseSaturation"].SetValue(Settings.BaseSaturation);
 
-            GraphicsDevice.Textures[1] = resolveTarget.GetTexture();
+            GraphicsDevice.Textures[1] = resolveTarget;
 
             Viewport viewport = GraphicsDevice.Viewport;
 

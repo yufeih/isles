@@ -428,7 +428,7 @@ namespace Isles.Graphics
         /// <param name="gameTime"></param>
         public void UpdateWaterReflectionAndRefraction(GameTime gameTime)
         {
-            graphics.PushRenderTarget(reflectionRenderTarget, waterDepthStencil);
+            graphics.PushRenderTarget(reflectionRenderTarget);
 
             graphics.Clear(Color.Black);
 
@@ -641,7 +641,7 @@ namespace Isles.Graphics
             }
 
             // Draw current glows
-            graphics.PushRenderTarget(currentCanvas, depthBuffer);
+            graphics.PushRenderTarget(currentCanvas);
             graphics.Clear(Color.Black);
 
             // Draw glows

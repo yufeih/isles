@@ -1545,7 +1545,7 @@ namespace Isles
         public void RefreshTexture()
         {
             // Draw all ruined regions
-            graphics.PushRenderTarget(currentCanvas, depthBuffer);
+            graphics.PushRenderTarget(currentCanvas);
             graphics.Clear(Color.Black);
 
             // Draw glows
@@ -1586,7 +1586,7 @@ namespace Isles
             }
 
             // Draw all ruined regions
-            graphics.PushRenderTarget(finalCanvas, depthBuffer);
+            graphics.PushRenderTarget(finalCanvas);
             graphics.Clear(Color.Black);
 
             if (finalTexture != null)
