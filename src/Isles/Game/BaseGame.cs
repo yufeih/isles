@@ -424,6 +424,11 @@ namespace Isles.Engine
             ScreenHeight = GraphicsDevice.Viewport.Height;
 
             Log.Write("Device Reset <" + ScreenWidth + ", " + ScreenHeight + ">...");
+
+            GraphicsDevice.SamplerStates[0] = SamplerState.LinearClamp;
+            GraphicsDevice.SamplerStates[1] = SamplerState.LinearClamp;
+            GraphicsDevice.SamplerStates[2] = SamplerState.LinearClamp;
+            GraphicsDevice.SamplerStates[3] = SamplerState.LinearClamp;
         }
 
         /// <summary>
