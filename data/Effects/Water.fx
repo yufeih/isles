@@ -17,39 +17,21 @@ texture FogTexture;
 sampler2D ColorSampler = sampler_state
 {
 	Texture = <ColorTexture>;
-	MinFilter = Linear;
-	MagFilter = Linear;
-	MipFilter = Linear;
-	AddressU = Wrap;
-	AddressV = Wrap;
 };
 
 sampler2D DistortionSampler = sampler_state
 {
 	Texture = <DistortionTexture>;
-	MinFilter = Linear;
-	MagFilter = Linear;
-	MipFilter = Linear;
-	AddressU = Wrap;
-	AddressV = Wrap;
 };
 
 sampler2D ReflectionSampler = sampler_state
 {
 	Texture = <ReflectionTexture>;
-	MinFilter = Linear;
-	MagFilter = Linear;
-	MipFilter = Linear;
-	AddressU = Mirror;
-	AddressV = Mirror;
 };
 
 sampler2D FogSampler = sampler_state
 {
 	Texture = <FogTexture>;
-	MinFilter = Linear;
-	MagFilter = Linear;
-	MipFilter = Linear;
 };
 
 
@@ -78,10 +60,10 @@ float4 PS(
 {
     // Look up the displacement amount.
     float2 displacement = tex2D(DistortionSampler, DisplacementScroll + UV / 5);
-    
+
     // Offset the main texture coordinates.
     UV += displacement * 0.2 - 0.1;
-    
+
     // Compute final color
     return tex2D(ColorSampler, UV);
 }
@@ -103,21 +85,21 @@ void VSRealisic(
 float4 PSRealisic(
     float2 UV		: TEXCOORD0,
     float4 RPos		: TEXCOORD1) : COLOR
-{        
+{
     // Look up water reflection
     float2 rUV = RPos.xy / RPos.w;
-    
+
     // Look up the displacement amount
     float2 displacement = tex2D(DistortionSampler, DisplacementScroll + UV / 5);
-        
+
     rUV.y = -rUV.y;
     rUV = rUV * 0.5f + 0.5f;
-    
+
     // Offset the main texture coordinates
     rUV += displacement * 0.05 - 0.025;
-        
+
     // Compute final color
-    float4 reflection = tex2D(ReflectionSampler, rUV);    
+    float4 reflection = tex2D(ReflectionSampler, rUV);
     return reflection;
 }
 

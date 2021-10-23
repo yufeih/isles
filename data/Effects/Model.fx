@@ -42,29 +42,16 @@ texture2D ShadowMap;
 sampler2D BasicSampler = sampler_state
 {
 	Texture = <BasicTexture>;
-	MinFilter = Linear;
-	MagFilter = Linear;
-	MipFilter = Linear;
-	AddressU = Wrap;
-	AddressV = Wrap;
 };
 
 sampler2D NormalSampler = sampler_state
 {
 	Texture = <NormalTexture>;
-	MinFilter = Linear;
-	MagFilter = Linear;
-	MipFilter = Linear;
 };
 
 sampler2D ShadowSampler = sampler_state
 {
 	Texture = <ShadowMap>;
-	MinFilter = Linear;
-	MagFilter = Linear;
-	MipFilter = Linear;
-	//AddressU = Border;
-	//AddressV = Border;
 };
 
 

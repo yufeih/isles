@@ -4,11 +4,6 @@ texture BasicTexture;
 sampler2D BasicSampler = sampler_state
 {
 	Texture = <BasicTexture>;
-	MinFilter = Linear;
-	MagFilter = Linear;
-	MipFilter = Linear;
-	AddressU = Wrap;
-	AddressV = Wrap;
 };
 
 texture OverlayTexture;
@@ -16,11 +11,6 @@ texture OverlayTexture;
 sampler2D OverlaySampler = sampler_state
 {
 	Texture = <OverlayTexture>;
-	MinFilter = Linear;
-	MagFilter = Linear;
-	MipFilter = Linear;
-	AddressU = Wrap;
-	AddressV = Wrap;
 };
 
 struct VertexInput
@@ -29,7 +19,7 @@ struct VertexInput
     float4 color : COLOR;
 };
 
-struct VertexOutput 
+struct VertexOutput
 {
    float4 pos   : POSITION;
    float4 color : COLOR;
@@ -38,7 +28,7 @@ struct VertexOutput
 VertexOutput Graphics2DVS(VertexInput In)
 {
     VertexOutput Out;
-    
+
     // Transform position (just pass over)
     Out.pos = float4(In.pos, 1);
     Out.color = In.color;

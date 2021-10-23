@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // Terrain.fx
-// 
+//
 // Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -38,44 +38,26 @@ texture FogTexture;
 sampler2D ColorSampler = sampler_state
 {
 	Texture = <ColorTexture>;
-	MinFilter = Linear;
-	MagFilter = Linear;
-	MipFilter = Linear;
 };
 
 sampler2D AlphaSampler = sampler_state
 {
 	Texture = <AlphaTexture>;
-	MinFilter = Linear;
-	MagFilter = Linear;
-	MipFilter = Linear;
 };
 
 sampler2D NormalSampler = sampler_state
 {
 	Texture = <NormalTexture>;
-	MinFilter = Linear;
-	MagFilter = Linear;
-	MipFilter = Linear;
 };
 
 sampler2D ShadowSampler = sampler_state
 {
 	Texture = <ShadowMap>;
-	MinFilter = Linear;
-	MagFilter = Linear;
-	MipFilter = Linear;
-	AddressU = Border;
-	AddressV = Border;
-	BorderColor = -10.0f;
 };
 
 sampler2D FogSampler = sampler_state
 {
 	Texture = <FogTexture>;
-	MinFilter = Linear;
-	MagFilter = Linear;
-	MipFilter = Linear;
 };
 
 
@@ -105,10 +87,10 @@ void VS(
     out float2 oUV0	: TEXCOORD0,
     out float2 oUV1 : TEXCOORD1,
     out float oZ	: TEXCOORD2)
-{	
+{
     oPos = mul(Pos, WorldViewProjection);
     oUV0 = UV0;
-    oUV1 = UV1;            
+    oUV1 = UV1;
     oZ = Pos.z;
 }
 
@@ -121,19 +103,19 @@ float4 PS(
 	float4 map = tex2D(ColorSampler, UV0);
 	map.a = tex2D(AlphaSampler, UV1).r;
 	map.rgb *= 0.2 + tex2D(FogSampler, UV1).r * 0.8;
-	
+
 	if (z < 0)
 	{
 		float factor = saturate((z - FogStart) / (FogEnd - FogStart));
-		
+
 		map.a *= 1 - factor;
 	}
-	
+
 	if (flag == 1)
 		return z >= 0 ? map : 0;
 	if (flag == 2)
 		return z <= 10 ? map : 0;
-	
+
     return map;
 }
 
@@ -143,38 +125,38 @@ float4 PS(
 //-----------------------------------------------------------------------------
 
 VS_OUTPUT VSNormalMapping(
-    float4 Pos  : POSITION, 
+    float4 Pos  : POSITION,
     float4 Color : COLOR0,
     float3 Normal :NORMAL,
     float2 UV: TEXCOORD0,
     float4 Tangent	: TANGENT0 )
 {
 	VS_OUTPUT Out = (VS_OUTPUT)0;
-	
+
     Out.Position = mul(Pos, WorldViewProjection);
     Out.UV = UV;
-    
+
     // TBN matrix
     Out.WorldNormal = Normal;
     Out.WorldTangent = Tangent;
     Out.WorldBinorm = cross(Normal, Tangent);
-    
+
     Out.LightVec = LightPosition - Pos;
     Out.WorldEyeVec = normalize(ViewInverse[3].xyz - Pos);
-    
+
     return Out;
 }
 
 float4 PSNormalMapping( VS_OUTPUT In ) : COLOR
-{    
+{
     float4 map = tex2D(ColorSampler, In.UV);
     float3 bumps = Bumpy * (tex2D(NormalSampler,In.UV * 2).xyz-(0.5).xxx);
-    
+
     float3 Ln = normalize(In.LightVec);
     float3 Nn = normalize(In.WorldNormal);
     float3 Tn = normalize(In.WorldTangent);
     float3 Bn = normalize(In.WorldBinorm);
-    
+
     float3 Nb = Nn + (bumps.x * Tn + bumps.y * Bn);
     Nb = normalize(Nb);
     float3 Vn = normalize(In.WorldEyeVec);
@@ -182,8 +164,8 @@ float4 PSNormalMapping( VS_OUTPUT In ) : COLOR
     float4 lighting = lit(dot(Ln,Nb),dot(Hn,Nb), SpecExpon);
     float hdn = lighting.z;
     float ldn = lighting.y;
-    float diffComp = ldn;    
-    float4 diffContrib = SurfColor * map * (diffComp*LightColor + AmbiColor);    
+    float diffComp = ldn;
+    float4 diffContrib = SurfColor * map * (diffComp*LightColor + AmbiColor);
     float4 specContrib = hdn * LightColor;
     float4 result = AmbiColor + diffContrib + specContrib * 0.5;
     result.a = tex2D(AlphaSampler, In.UV / 16).a;
@@ -200,9 +182,9 @@ void VSShadowMapping(
     out float4 oPos	: POSITION,
     out float2 oShadow	: TEXCOORD3,
     out float oDepth	: TEXCOORD4 )
-{	
+{
     oPos = mul(Pos, WorldViewProjection);
-    
+
 	float4 shadow = mul(Pos, LightViewProjection);
 	oShadow.xy = shadow.xy / shadow.w;
 	oDepth = 1 - shadow.z / shadow.w;
@@ -233,15 +215,15 @@ float4 PSShadowMapping(
 	shadow = 0.5 * shadow.xy + float2(0.5, 0.5);
 	shadow.y = 1.0 - shadow.y;
 	float caster = tex2D(ShadowSampler, shadow).x;
-	
+
     float resultDepth = 0;
     for (int i=0; i<10; i++)
         resultDepth += (depth > tex2D(ShadowSampler,
             shadow + FilterTaps[i]*shadowMapTexelSize).x - 0.03) ? 1.0f/10.0f : 0.0f;
-            	
+
 	//float shadowColor = (depth < caster - 0.03) ? 0.0 : 0.45;
-	float shadowColor = resultDepth * 0.45;    		
-	
+	float shadowColor = resultDepth * 0.45;
+
 	return float4(0, 0, 0, shadowColor);
 }
 
