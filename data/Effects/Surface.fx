@@ -46,14 +46,8 @@ float4 PSSurface(float2 UV		: TEXCOORD0,
 technique Surface
 {
     pass P0
-    {    
-		AlphaTestEnable = false;
-		AlphaBlendEnable = true;
-        SrcBlend = SrcAlpha;
-        DestBlend = InvSrcAlpha;
-		ZWriteEnable = false;
-    
-        vertexShader = compile vs_1_1 VSSurface();
+    {
+        vertexShader = compile vs_2_0 VSSurface();
         pixelShader = compile ps_2_0 PSSurface();
     }
 }

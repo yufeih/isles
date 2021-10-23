@@ -369,10 +369,7 @@ namespace Isles.Graphics
                         effect.CurrentTechnique = techniqueNormal;
                     }
 
-                    game.GraphicsDevice.SetBlendState(BlendState.AlphaBlend);
-                    game.GraphicsDevice.SetDepthStencilState(
-                        (currentType & BillboardType.DepthBufferEnable) == BillboardType.DepthBufferEnable ? DepthStencilState.Default : DepthStencilState.None);
-                    game.GraphicsDevice.SetRasterizerStateState(RasterizerState.CullCounterClockwise);
+                    game.GraphicsDevice.SetRenderState(depthStencilState: (currentType & BillboardType.DepthBufferEnable) == BillboardType.DepthBufferEnable ? DepthStencilState.Default : DepthStencilState.None);
                 }
 
                 // Draw the chunk

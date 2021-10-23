@@ -80,8 +80,8 @@ technique Graphics2D
 {
     pass PassFor2D
     {
-        VertexShader = compile vs_1_1 Graphics2DVS();
-        PixelShader = compile ps_1_1 Graphics2DPS();
+        VertexShader = compile vs_2_0 Graphics2DVS();
+        PixelShader = compile ps_2_0 Graphics2DPS();
     }
 }
 
@@ -89,11 +89,7 @@ technique FogOfWar
 {
     pass PassFor2D
     {
-		AlphaBlendEnable = true;
-        SrcBlend = SrcAlpha;
-        DestBlend = InvSrcAlpha;
-        
-        VertexShader = compile vs_1_1 FogOfWarVS();
+        VertexShader = compile vs_2_0 FogOfWarVS();
         PixelShader = compile ps_2_0 FogOfWarPS();
     }
 }
@@ -102,7 +98,7 @@ technique RuinedLand
 {
     pass PassFor2D
     {
-        VertexShader = compile vs_1_1 FogOfWarVS();
+        VertexShader = compile vs_2_0 FogOfWarVS();
         PixelShader = compile ps_2_0 RuinedLandPS();
     }
 }

@@ -609,13 +609,10 @@ namespace Isles.Graphics
         private void SetParticleRenderStates(GraphicsDevice device)
         {
             // Set the alpha blend mode.
-            device.SetBlendState(Settings.Additive ? BlendState.Additive : BlendState.AlphaBlend);
-
             // Enable the depth buffer (so particles will not be visible through
             // solid objects like the ground plane), but disable depth writes
             // (so particles will not obscure other particles).
-            device.SetDepthStencilState(DepthStencilState.DepthRead);
-            device.SetRasterizerStateState(RasterizerState.CullCounterClockwise);
+            device.SetRenderState(Settings.Additive ? BlendState.Additive : BlendState.AlphaBlend, DepthStencilState.DepthRead);
         }
 
         private Matrix view;

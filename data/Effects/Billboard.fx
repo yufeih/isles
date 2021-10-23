@@ -37,7 +37,7 @@ void VertexShaderNormal(
 
     // Offset to the left or right.
     position += rightVector * size.x;
-    
+
     // Offset upward.
     position += norm * size.y;
 
@@ -61,7 +61,7 @@ void VertexShaderCenter(
 
     // Apply the camera transform.
     oPos = mul(float4(pos, 1), View);
-    
+
     // Offset
     oPos.xy += size.xy;
 
@@ -73,20 +73,12 @@ void VertexShaderCenter(
 sampler TextureSampler = sampler_state
 {
     Texture = (Texture);
-
-    MinFilter = Linear;
-    MagFilter = Linear;
-    MipFilter = Linear;
-    
-    AddressU = Clamp;
-    AddressV = Clamp;
 };
 
 
-float4 PixelShader(float2 texCoord : TEXCOORD0, float4 color : COLOR0) : COLOR0
+float4 PixelShaderF(float2 texCoord : TEXCOORD0, float4 color : COLOR0) : COLOR0
 {
     return tex2D(TextureSampler, texCoord);
-    //return AmbientColor + tex2D(TextureSampler, texCoord) * LightColor;
 }
 
 
@@ -116,43 +108,19 @@ technique Vegetation
     // often looks ok, and is much faster than trying to sort everything 100%
     // correctly. It is particularly effective for organic textures like grass and
     // trees.
-    
+
     pass RenderOpaquePixels
     {
-        VertexShader = compile vs_1_1 VertexShaderNormal();
-        PixelShader = compile ps_1_1 PixelShader();
-
-        AlphaBlendEnable = false;
-        
-        AlphaTestEnable = true;
-        AlphaFunc = Equal;
-        AlphaRef = 255;
-        
-        ZEnable = true;
-        ZWriteEnable = true;
-
-        CullMode = None;
+        VertexShader = compile vs_2_0 VertexShaderNormal();
+        PixelShader = compile ps_2_0 PixelShaderF();
     }
 
     pass RenderAlphaBlendedFringes
     {
-        VertexShader = compile vs_1_1 VertexShaderNormal();
-        PixelShader = compile ps_1_1 PixelShader();
-        
-        AlphaBlendEnable = true;
-        SrcBlend = SrcAlpha;
-        DestBlend = InvSrcAlpha;
-        
-        AlphaTestEnable = true;
-        AlphaFunc = NotEqual;
-        AlphaRef = 255;
-
-        ZEnable = true;
-        ZWriteEnable = false;
-
-        CullMode = None;
+        VertexShader = compile vs_2_0 VertexShaderNormal();
+        PixelShader = compile ps_2_0 PixelShaderF();
     }
-    
+
 }
 
 
@@ -160,15 +128,8 @@ technique Normal
 {
     pass Render
     {
-        VertexShader = compile vs_1_1 VertexShaderNormal();
-        PixelShader = compile ps_1_1 PixelShader();
-        
-        AlphaBlendEnable = true;
-        SrcBlend = SrcAlpha;
-        DestBlend = InvSrcAlpha;
-        
-        ZWriteEnable = false;
-        CullMode = None;
+        VertexShader = compile vs_2_0 VertexShaderNormal();
+        PixelShader = compile ps_2_0 PixelShaderF();
     }
 }
 
@@ -179,14 +140,7 @@ technique Center
 
     pass Render
     {
-        VertexShader = compile vs_1_1 VertexShaderCenter();
-        PixelShader = compile ps_1_1 PixelShader();
-        
-        AlphaBlendEnable = true;
-        SrcBlend = SrcAlpha;
-        DestBlend = InvSrcAlpha;
-        
-        ZWriteEnable = false;
-        CullMode = None;
+        VertexShader = compile vs_2_0 VertexShaderCenter();
+        PixelShader = compile ps_2_0 PixelShaderF();
     }
 }

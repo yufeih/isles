@@ -254,13 +254,6 @@ technique NormalMapping
 {
     pass P0
     {
-		AlphaBlendEnable = true;
-        SrcBlend = SrcAlpha;
-        DestBlend = InvSrcAlpha;
-        
-		Cullmode = CW;
-		//Fillmode = Wireframe;
-		
         vertexShader = compile vs_2_0 VSNormalMapping();
         pixelShader = compile ps_2_0 PSNormalMapping();
     }
@@ -271,14 +264,7 @@ technique Default
 {
     pass P0
     {
-		AlphaBlendEnable = true;
-        SrcBlend = SrcAlpha;
-        DestBlend = InvSrcAlpha;
-        AlphaTestEnable = false;
-                
-		Cullmode = CW;
-		
-        vertexShader = compile vs_1_1 VS();
+        vertexShader = compile vs_2_0 VS();
         pixelShader = compile ps_2_0 PS(0);
     }
 }
@@ -288,13 +274,6 @@ technique ShadowMapping
 {
 	pass P0
 	{
-		AlphaBlendEnable = true;
-        SrcBlend = SrcAlpha;
-        DestBlend = InvSrcAlpha;
-               
-		Cullmode = CW;
-		//Fillmode = Wireframe;
-		
         vertexShader = compile vs_2_0 VSShadowMapping();
         pixelShader = compile ps_2_0 PSShadowMapping();
 	}
@@ -305,14 +284,7 @@ technique FastUpper
 {
 	pass P0
 	{
-		AlphaBlendEnable = true;
-        SrcBlend = SrcAlpha;
-        DestBlend = InvSrcAlpha;
-        AlphaTestEnable = true;
-        
-		Cullmode = CCW;
-        
-		vertexShader = compile vs_1_1 VS();
+		vertexShader = compile vs_2_0 VS();
 		pixelShader = compile ps_2_0 PS(1);
 	}
 }
@@ -321,14 +293,7 @@ technique FastLower
 {
 	pass P0
 	{
-		AlphaBlendEnable = true;
-        SrcBlend = SrcAlpha;
-        DestBlend = InvSrcAlpha;
-        AlphaTestEnable = false;
-                
-		Cullmode = CW;
-		
-		vertexShader = compile vs_1_1 VS();
+		vertexShader = compile vs_2_0 VS();
 		pixelShader = compile ps_2_0 PS(0);
 	}
 }
