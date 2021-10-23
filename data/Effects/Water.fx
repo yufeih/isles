@@ -126,13 +126,7 @@ technique Default
 {
     pass P0
     {
-		AlphaBlendEnable = false;        
-        ZEnable = true;
-        ZWriteEnable = false;
-        
-		Cullmode = None;
-		
-        vertexShader = compile vs_1_1 VS();
+        vertexShader = compile vs_2_0 VS();
         pixelShader = compile ps_2_0 PS();
     }
 }
@@ -142,16 +136,7 @@ technique Realisic
 {
 	pass P0
 	{
-		AlphaBlendEnable = false;
-        SrcBlend = SrcAlpha;
-        DestBlend = InvSrcAlpha;
-        
-        ZEnable = true;
-        ZWriteEnable = false;
-        
-		Cullmode = None;
-		
-        vertexShader = compile vs_1_1 VSRealisic();
+        vertexShader = compile vs_2_0 VSRealisic();
         pixelShader = compile ps_2_0 PSRealisic();
 	}
 }

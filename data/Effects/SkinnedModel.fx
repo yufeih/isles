@@ -98,7 +98,7 @@ struct PS_INPUT
 
 
 // Pixel shader program.
-float4 PixelShader(PS_INPUT input) : COLOR0
+float4 PixelShaderF(PS_INPUT input) : COLOR0
 {
     float4 color = tex2D(Sampler, input.TexCoord);
 
@@ -113,6 +113,6 @@ technique SkinnedModelTechnique
     pass SkinnedModelPass
     {
         VertexShader = compile vs_2_0 VertexShader();
-        PixelShader = compile ps_2_0 PixelShader();
+        PixelShader = compile ps_2_0 PixelShaderF();
     }
 }

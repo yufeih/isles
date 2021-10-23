@@ -1599,9 +1599,7 @@ namespace Isles
                 sprite.End();
             }
 
-            graphics.SetBlendState(BlendState.AlphaBlend);
-            graphics.SetDepthStencilState(DepthStencilState.Default);
-            graphics.SetRasterizerStateState(RasterizerState.CullCounterClockwise);
+            graphics.SetRenderState();
 
             // Draw final textures
             Effect effect = graphics2D.Effect;

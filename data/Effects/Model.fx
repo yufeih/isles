@@ -301,9 +301,7 @@ technique Default
 {
     pass P0
     {
-        DestBlend = InvSrcAlpha;
-		
-        vertexShader = compile vs_1_1 VS();
+        vertexShader = compile vs_2_0 VS();
         pixelShader = compile ps_2_0 PS();
     }
 }
@@ -321,9 +319,7 @@ technique NormalMapping
 {
 	pass P0
 	{
-        DestBlend = InvSrcAlpha;
-        
-		vertexShader = compile vs_1_1 VSNormalMapping();
+		vertexShader = compile vs_2_0 VSNormalMapping();
 		pixelShader = compile ps_2_0 PSNormalMapping();
 	}
 }
@@ -332,8 +328,6 @@ technique NormalMappingSkinned
 {
 	pass P0
 	{
-        DestBlend = InvSrcAlpha;
-        
 		vertexShader = compile vs_2_0 VSNormalMappingSkinned();
 		pixelShader = compile ps_2_0 PSNormalMapping();
 	}
@@ -343,7 +337,7 @@ technique ShadowMapping
 {
 	pass P0
 	{
-		vertexShader = compile vs_1_1 VSShadowMapping();
+		vertexShader = compile vs_2_0 VSShadowMapping();
 		pixelShader = compile ps_2_0 PSShadowMapping();
 	}
 }

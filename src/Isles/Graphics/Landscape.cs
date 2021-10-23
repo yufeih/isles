@@ -134,9 +134,7 @@ namespace Isles.Graphics
 
             graphics.VertexDeclaration = surfaceDeclaration;
 
-            game.GraphicsDevice.SetBlendState(BlendState.AlphaBlend);
-            game.GraphicsDevice.SetDepthStencilState(DepthStencilState.Default);
-            game.GraphicsDevice.SetRasterizerStateState(RasterizerState.CullCounterClockwise);
+            game.GraphicsDevice.SetRenderState(BlendState.AlphaBlend, DepthStencilState.Default);
 
             surfaceEffect.Parameters["WorldViewProjection"].SetValue(game.ViewProjection);
 
@@ -261,9 +259,7 @@ namespace Isles.Graphics
 
             // Don't use or write to the z buffer
             // Also don't use any kind of blending.
-            graphics.SetBlendState(BlendState.Opaque);
-            graphics.SetDepthStencilState(DepthStencilState.None);
-            graphics.SetRasterizerStateState(RasterizerState.CullCounterClockwise);
+            graphics.SetRenderState(BlendState.Opaque, DepthStencilState.None);
 
             skyEffect.Parameters["View"].SetValue(view);
             skyEffect.Parameters["Projection"].SetValue(projection);
@@ -486,6 +482,8 @@ namespace Isles.Graphics
 
         public void DrawWater(GameTime gameTime)
         {
+            graphics.SetRenderState(BlendState.Opaque, DepthStencilState.DepthRead, RasterizerState.CullNone);
+
             // Draw water mesh
             graphics.Indices = waterIndices;
             graphics.VertexDeclaration = waterVertexDeclaration;

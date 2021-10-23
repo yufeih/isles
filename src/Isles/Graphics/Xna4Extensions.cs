@@ -63,7 +63,18 @@ namespace Microsoft.Xna.Framework.Graphics
             spriteBatch.Begin(blendMode, spriteSortMode, SaveStateMode.None);
         }
 
-        public static void SetBlendState(this GraphicsDevice graphicsDevice, BlendState blendState)
+        public static void SetRenderState(
+            this GraphicsDevice graphicsDevice,
+            BlendState blendState = BlendState.AlphaBlend,
+            DepthStencilState depthStencilState = DepthStencilState.Default,
+            RasterizerState rasterizerState = RasterizerState.CullCounterClockwise)
+        {
+            graphicsDevice.SetBlendState(blendState);
+            graphicsDevice.SetDepthStencilState(depthStencilState);
+            graphicsDevice.SetRasterizerStateState(rasterizerState);
+        }
+
+        private static void SetBlendState(this GraphicsDevice graphicsDevice, BlendState blendState)
         {
             switch (blendState)
             {
@@ -90,7 +101,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        public static void SetDepthStencilState(this GraphicsDevice graphicsDevice, DepthStencilState depthStencilState)
+        private static void SetDepthStencilState(this GraphicsDevice graphicsDevice, DepthStencilState depthStencilState)
         {
             switch (depthStencilState)
             {
@@ -111,7 +122,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        public static void SetRasterizerStateState(this GraphicsDevice graphicsDevice, RasterizerState rasterizerStateState)
+        private static void SetRasterizerStateState(this GraphicsDevice graphicsDevice, RasterizerState rasterizerStateState)
         {
             switch (rasterizerStateState)
             {

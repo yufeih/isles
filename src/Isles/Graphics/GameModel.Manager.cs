@@ -282,9 +282,9 @@ namespace Isles.Graphics
                     return;
                 }
 
-                game.GraphicsDevice.SetDepthStencilState(DepthStencilState.Default);
-                game.GraphicsDevice.SetBlendState(isTransparent ? BlendState.AlphaBlend : BlendState.Opaque);
-                game.GraphicsDevice.SetRasterizerStateState(RasterizerState.CullNone);
+                game.GraphicsDevice.SetRenderState(
+                    isTransparent ? BlendState.AlphaBlend : BlendState.Opaque,
+                    rasterizerState: RasterizerState.CullNone);
 
                 // Set index buffer
                 if (Mesh.IndexBuffer != CachedIndexBuffer)
@@ -615,9 +615,7 @@ namespace Isles.Graphics
             }
 
             // Setup render state
-            game.GraphicsDevice.SetBlendState(BlendState.Opaque);
-            game.GraphicsDevice.SetDepthStencilState(DepthStencilState.Default);
-            game.GraphicsDevice.SetRasterizerStateState(RasterizerState.CullNone);
+            game.GraphicsDevice.SetRenderState(BlendState.Opaque, DepthStencilState.Default, RasterizerState.CullNone);
 
             // Clear cached renderable variable each frame
             Renderable.CachedIndexBuffer = null;
@@ -658,7 +656,7 @@ namespace Isles.Graphics
                 }
             }
 
-            game.GraphicsDevice.SetBlendState(BlendState.AlphaBlend);
+            game.GraphicsDevice.SetRenderState(BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone);
 
             if (showTransparent)
             {

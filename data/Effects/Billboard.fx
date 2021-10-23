@@ -83,7 +83,7 @@ sampler TextureSampler = sampler_state
 };
 
 
-float4 PixelShader(float2 texCoord : TEXCOORD0, float4 color : COLOR0) : COLOR0
+float4 PixelShaderF(float2 texCoord : TEXCOORD0, float4 color : COLOR0) : COLOR0
 {
     return tex2D(TextureSampler, texCoord);
     //return AmbientColor + tex2D(TextureSampler, texCoord) * LightColor;
@@ -119,38 +119,14 @@ technique Vegetation
     
     pass RenderOpaquePixels
     {
-        VertexShader = compile vs_1_1 VertexShaderNormal();
-        PixelShader = compile ps_1_1 PixelShader();
-
-        AlphaBlendEnable = false;
-        
-        AlphaTestEnable = true;
-        AlphaFunc = Equal;
-        AlphaRef = 255;
-        
-        ZEnable = true;
-        ZWriteEnable = true;
-
-        CullMode = None;
+        VertexShader = compile vs_2_0 VertexShaderNormal();
+        PixelShader = compile ps_2_0 PixelShaderF();
     }
 
     pass RenderAlphaBlendedFringes
     {
-        VertexShader = compile vs_1_1 VertexShaderNormal();
-        PixelShader = compile ps_1_1 PixelShader();
-        
-        AlphaBlendEnable = true;
-        SrcBlend = SrcAlpha;
-        DestBlend = InvSrcAlpha;
-        
-        AlphaTestEnable = true;
-        AlphaFunc = NotEqual;
-        AlphaRef = 255;
-
-        ZEnable = true;
-        ZWriteEnable = false;
-
-        CullMode = None;
+        VertexShader = compile vs_2_0 VertexShaderNormal();
+        PixelShader = compile ps_2_0 PixelShaderF();
     }
     
 }
@@ -160,15 +136,8 @@ technique Normal
 {
     pass Render
     {
-        VertexShader = compile vs_1_1 VertexShaderNormal();
-        PixelShader = compile ps_1_1 PixelShader();
-        
-        AlphaBlendEnable = true;
-        SrcBlend = SrcAlpha;
-        DestBlend = InvSrcAlpha;
-        
-        ZWriteEnable = false;
-        CullMode = None;
+        VertexShader = compile vs_2_0 VertexShaderNormal();
+        PixelShader = compile ps_2_0 PixelShaderF();
     }
 }
 
@@ -179,14 +148,7 @@ technique Center
 
     pass Render
     {
-        VertexShader = compile vs_1_1 VertexShaderCenter();
-        PixelShader = compile ps_1_1 PixelShader();
-        
-        AlphaBlendEnable = true;
-        SrcBlend = SrcAlpha;
-        DestBlend = InvSrcAlpha;
-        
-        ZWriteEnable = false;
-        CullMode = None;
+        VertexShader = compile vs_2_0 VertexShaderCenter();
+        PixelShader = compile ps_2_0 PixelShaderF();
     }
 }
