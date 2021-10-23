@@ -23,28 +23,13 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public static void SetRenderState(
             this GraphicsDevice graphicsDevice,
-            BlendState blendState = BlendState.AlphaBlend,
-            DepthStencilState depthStencilState = DepthStencilState.Default,
-            RasterizerState rasterizerState = RasterizerState.CullCounterClockwise)
+            BlendState blendState = null,
+            DepthStencilState depthStencilState = null,
+            RasterizerState rasterizerState = null)
         {
-            graphicsDevice.SetBlendState(blendState);
-            graphicsDevice.SetDepthStencilState(depthStencilState);
-            graphicsDevice.SetRasterizerStateState(rasterizerState);
-        }
-
-        private static void SetBlendState(this GraphicsDevice graphicsDevice, BlendState blendState)
-        {
-            graphicsDevice.BlendState = blendState;
-        }
-
-        private static void SetDepthStencilState(this GraphicsDevice graphicsDevice, DepthStencilState depthStencilState)
-        {
-            graphicsDevice.DepthStencilState = depthStencilState;
-        }
-
-        private static void SetRasterizerState(this GraphicsDevice graphicsDevice, RasterizerState rasterizerState)
-        {
-            graphicsDevice.RasterizerState = rasterizerState;
+            graphicsDevice.BlendState = blendState ?? BlendState.AlphaBlend;
+            graphicsDevice.DepthStencilState = depthStencilState ?? DepthStencilState.Default;
+            graphicsDevice.RasterizerState = rasterizerState ?? RasterizerState.CullCounterClockwise;
         }
     }
 }
