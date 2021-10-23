@@ -255,6 +255,8 @@ namespace Isles.Graphics
             /// </summary>
             public static int SizeInBytes => 4 * (3 + 4 + 3 + 3);
 
+            VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;
+
             /// <summary>
             /// Generate vertex declaration.
             /// </summary>
@@ -269,8 +271,6 @@ namespace Isles.Graphics
                 // And now the tangent
                 new VertexElement(40, VertexElementFormat.Vector3, VertexElementUsage.Tangent, 0),
             });
-
-            VertexDeclaration IVertexType.VertexDeclaration => throw new System.NotImplementedException();
         }
     }
 }

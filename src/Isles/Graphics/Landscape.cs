@@ -50,7 +50,7 @@ namespace Isles.Graphics
 
             surfaceEffect = game.Content.Load<Effect>("Effects/Surface");
             surfaceVertexBuffer = new DynamicVertexBuffer(game.GraphicsDevice,
-                typeof(VertexPositionTexture), MaxSurfaceVertices, BufferUsage.WriteOnly);
+                typeof(VertexPositionColorTexture), MaxSurfaceVertices, BufferUsage.WriteOnly);
             surfaceIndexBuffer = new DynamicIndexBuffer(game.GraphicsDevice,
                 typeof(ushort), MaxSurfaceIndices, BufferUsage.WriteOnly);
         }
@@ -557,9 +557,8 @@ namespace Isles.Graphics
 
         public Texture2D Discovered { get; private set; }
 
-        public Texture2D Current => current;
+        public Texture2D Current { get; private set; }
 
-        private Texture2D current;
         private readonly RenderTarget2D discoveredCanvas;
         private readonly RenderTarget2D currentCanvas;
         private readonly RenderTarget2D maskCanvas;
@@ -661,18 +660,13 @@ namespace Isles.Graphics
 
             // Draw discovered area texture without clearing it
             graphics.SetRenderTarget(discoveredCanvas);
-            graphics.Clear(Color.Black);
 
             // Retrieve current glow texture
-            current = currentCanvas;
+            Current = currentCanvas;
 
             sprite.Begin(SpriteSortMode.Immediate, BlendState.Additive);
-            if (Discovered != null)
-            {
-                sprite.Draw(Discovered, textureRectangle, Color.White);
-            }
 
-            sprite.Draw(current, textureRectangle, Color.White);
+            sprite.Draw(Current, textureRectangle, Color.White);
             sprite.End();
 
             // Draw final mask texture
@@ -684,7 +678,7 @@ namespace Isles.Graphics
 
             sprite.Begin(SpriteSortMode.Immediate, BlendState.Additive);
             sprite.Draw(Discovered, textureRectangle, new Color(128, 128, 128, 128));
-            sprite.Draw(current, textureRectangle, Color.White);
+            sprite.Draw(Current, textureRectangle, Color.White);
             sprite.End();
 
             // Restore states

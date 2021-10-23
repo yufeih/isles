@@ -8,7 +8,7 @@
   "ShowObjectReflection": true,
   "ViewDistanceSquared": 500000000000,
   "BloomSettings": {
-    "Enabled": true,
+    "Enabled": false,
     "Blur": 3,
     "Threshold": 0.86,
     "BloomIntensity": 1.2,
