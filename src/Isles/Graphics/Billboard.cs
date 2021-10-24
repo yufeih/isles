@@ -468,20 +468,9 @@ namespace Isles.Graphics
         {
             if (disposing)
             {
-                if (effect != null)
-                {
-                    effect.Dispose();
-                }
-
-                if (vertices != null)
-                {
-                    vertices.Dispose();
-                }
-
-                if (indices != null)
-                {
-                    indices.Dispose();
-                }
+                effect?.Dispose();
+                vertices?.Dispose();
+                indices?.Dispose();
             }
         }
     }

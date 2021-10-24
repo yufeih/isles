@@ -169,10 +169,7 @@ namespace Isles.Engine
         /// </summary>
         public static void Remove(IEventListener handler)
         {
-            var i = handlers.FindIndex(delegate (IEventListener item)
-            {
-                return item == handler;
-            });
+            var i = handlers.FindIndex(item => item == handler);
 
             if (i >= 0 && i < handlers.Count)
             {
@@ -424,19 +421,19 @@ namespace Isles.Engine
                     Directory.CreateDirectory(ScreenshotsDirectory);
                 }
 
-                using var dstTexture = new RenderTarget2D(
+                using var dstTexture = new ResolveTexture2D(
                     game.GraphicsDevice,
-                    game.ScreenWidth, game.ScreenHeight, false,
-                    SurfaceFormat.Color,
-                    game.GraphicsDevice.PresentationParameters.DepthStencilFormat);
+                    game.ScreenWidth, game.ScreenHeight, 1,
+                    SurfaceFormat.Color);
 
-                // Get data with help of the resolve method
+                // TODO: Get data with help of the resolve method
                 //game.GraphicsDevice.ResolveBackBuffer(dstTexture);
 
-                using var stream = File.OpenWrite(ScreenshotNameBuilder(screenshotNum));
-                dstTexture.SaveAsJpeg(stream, dstTexture.Width, dstTexture.Height);
+                dstTexture.Save(
+                    ScreenshotNameBuilder(screenshotNum),
+                    ImageFileFormat.Bmp);
 
-                Log.Write("Screen shot captured: " + ScreenshotNameBuilder(screenshotNum));
+                Log.Write("Screenshot captured: " + ScreenshotNameBuilder(screenshotNum));
             }
             catch (Exception ex)
             {

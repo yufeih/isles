@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // Surface.fx
-// 
+//
 // Copyright 2008 (c) Nightin Games. All Rights Reserved.
 //-----------------------------------------------------------------------------
 
@@ -19,9 +19,6 @@ texture BasicTexture;
 sampler2D BasicSampler = sampler_state
 {
 	Texture = <BasicTexture>;
-	MinFilter = Linear;
-	MagFilter = Linear;
-	MipFilter = Linear;
 };
 
 void VSSurface(
@@ -31,7 +28,7 @@ void VSSurface(
     out float4 oPos		: POSITION,
     out float2 oUV		: TEXCOORD0,
     out float4 oColor	: COLOR0)
-{	
+{
     oPos = mul(Pos, WorldViewProjection);
     oUV = UV;
     oColor = Color;

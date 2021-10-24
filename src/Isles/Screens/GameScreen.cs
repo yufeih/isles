@@ -454,32 +454,17 @@ namespace Isles
         /// <param name="gameTime"></param>
         public void Draw(GameTime gameTime)
         {
-            // Draw level info
-            if (Level != null)
-            {
-                Level.Draw(gameTime);
-            }
-
             // Draw game world
-            if (World != null)
-            {
-                World.Draw(gameTime);
-            }
+            World?.Draw(gameTime);
 
             // Draw player info
-            foreach (Player player in Player.AllPlayers)
+            foreach (var player in Player.AllPlayers)
             {
-                if (player != null)
-                {
-                    player.Draw(gameTime);
-                }
+                player?.Draw(gameTime);
             }
 
             // Draw spell
-            if (Spell.CurrentSpell != null)
-            {
-                Spell.CurrentSpell.Draw(gameTime);
-            }
+            Spell.CurrentSpell?.Draw(gameTime);
 
             // Force everything to be presented before UI is rendered
             Game.ModelManager.Present();

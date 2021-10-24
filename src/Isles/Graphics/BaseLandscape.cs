@@ -97,20 +97,9 @@ namespace Isles.Graphics
             {
                 if (disposing)
                 {
-                    if (ColorTexture != null)
-                    {
-                        ColorTexture.Dispose();
-                    }
-
-                    if (AlphaTexture != null)
-                    {
-                        AlphaTexture.Dispose();
-                    }
-
-                    if (NormalTexture != null)
-                    {
-                        NormalTexture.Dispose();
-                    }
+                    ColorTexture?.Dispose();
+                    AlphaTexture?.Dispose();
+                    NormalTexture?.Dispose();
                 }
             }
         }

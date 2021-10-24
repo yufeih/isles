@@ -241,12 +241,6 @@ namespace Isles
             {
                 Owner.Add(this);
                 Owner.FoodCapacity += Food;
-
-                // Refresh ruined land if we are steamer
-                if (Owner.Race == Race.Steamer && RuinedLand.Singleton != null)
-                {
-                    RuinedLand.Singleton.Refresh();
-                }
             }
 
             foreach (Spell spell in Spells)
@@ -299,12 +293,6 @@ namespace Isles
                 Owner.Remove(this);
                 Owner.FoodCapacity -= Food;
                 Owner.UnmarkFutureObject(ClassID);
-
-                // Refresh ruined land if we are steamer
-                if (Owner.Race == Race.Steamer && RuinedLand.Singleton != null)
-                {
-                    RuinedLand.Singleton.Refresh();
-                }
             }
 
             // Create explosion
@@ -800,12 +788,6 @@ namespace Isles
             if (Owner is LocalPlayer)
             {
                 if (World.FogOfWar.Contains(Position.X, Position.Y))
-                {
-                    return false;
-                }
-
-                if (Owner.Race == Race.Steamer && ClassID != Owner.TownhallName &&
-                    !RuinedLand.Singleton.Contains(Position.X, Position.Y))
                 {
                     return false;
                 }

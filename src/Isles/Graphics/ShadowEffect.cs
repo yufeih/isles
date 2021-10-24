@@ -141,20 +141,9 @@ namespace Isles.Graphics
         {
             if (disposing)
             {
-                if (renderTarget != null)
-                {
-                    renderTarget.Dispose();
-                }
-
-                if (ShadowMap != null)
-                {
-                    ShadowMap.Dispose();
-                }
-
-                if (Effect != null)
-                {
-                    Effect.Dispose();
-                }
+                renderTarget?.Dispose();
+                ShadowMap?.Dispose();
+                Effect?.Dispose();
             }
         }
     }
