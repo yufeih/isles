@@ -583,11 +583,8 @@ namespace Isles.Graphics
         /// </summary>
         public Texture2D Mask { get; private set; }
 
-        private Texture2D current;
-        private Texture2D discovered;
-
-        private readonly RenderTarget2D discoveredCanvas;
-        private readonly RenderTarget2D currentCanvas;
+        private RenderTarget2D allFramesVisibleArea;
+        private readonly RenderTarget2D thisFrameVisibleArea;
         private readonly RenderTarget2D maskCanvas;
         private readonly DepthStencilBuffer depthBuffer;
 
@@ -624,8 +621,7 @@ namespace Isles.Graphics
             visibility = new bool[Size * Size];
             textureRectangle = new Rectangle(0, 0, Size, Size);
             depthBuffer = new DepthStencilBuffer(graphics, Size, Size, graphics.DepthStencilBuffer.Format);
-            discoveredCanvas = new RenderTarget2D(graphics, Size, Size, 0, SurfaceFormat.Color);
-            currentCanvas = new RenderTarget2D(graphics, Size, Size, 0, SurfaceFormat.Color);
+            thisFrameVisibleArea = new RenderTarget2D(graphics, Size, Size, 0, SurfaceFormat.Color);
             maskCanvas = new RenderTarget2D(graphics, Size, Size, 0, SurfaceFormat.Color, RenderTargetUsage.PreserveContents);
         }
 
@@ -665,7 +661,7 @@ namespace Isles.Graphics
             }
 
             // Draw current glows
-            graphics.PushRenderTarget(currentCanvas, depthBuffer);
+            graphics.PushRenderTarget(thisFrameVisibleArea, depthBuffer);
             graphics.Clear(Color.Black);
 
             // Draw glows
@@ -686,37 +682,33 @@ namespace Isles.Graphics
             sprite.End();
 
             // Draw discovered area texture without clearing it
-            graphics.SetRenderTarget(discoveredCanvas);
-            graphics.Clear(Color.Black);
-
-            // Retrieve current glow texture
-            current = currentCanvas.GetTexture();
-
-            sprite.Begin(SpriteSortMode.Immediate, BlendState.Additive);
-            if (discovered != null)
+            if (allFramesVisibleArea is null)
             {
-                sprite.Draw(discovered, textureRectangle, Color.White);
+                allFramesVisibleArea = new RenderTarget2D(graphics, Size, Size, 0, SurfaceFormat.Color, RenderTargetUsage.PreserveContents);
+                graphics.SetRenderTarget(allFramesVisibleArea);
+                graphics.Clear(Color.Black);
+            }
+            else
+            {
+                graphics.SetRenderTarget(allFramesVisibleArea);
             }
 
-            sprite.Draw(current, textureRectangle, Color.White);
+            sprite.Begin(SpriteSortMode.Immediate, BlendState.Additive);
+            sprite.Draw(thisFrameVisibleArea.GetTexture(), textureRectangle, Color.White);
             sprite.End();
 
             // Draw final mask texture
             graphics.SetRenderTarget(maskCanvas);
             graphics.Clear(Color.Black);
 
-            // Retrieve discovered area
-            discovered = discoveredCanvas.GetTexture();
-
             sprite.Begin(SpriteSortMode.Immediate, BlendState.Additive);
-            sprite.Draw(discovered, textureRectangle, new Color(128, 128, 128, 128));
-            sprite.Draw(current, textureRectangle, Color.White);
+            sprite.Draw(allFramesVisibleArea.GetTexture(), textureRectangle, new Color(Color.Gray, 0.5f));
+            sprite.Draw(thisFrameVisibleArea.GetTexture(), textureRectangle, Color.White);
             sprite.End();
 
             // Restore states
             graphics.PopRenderTarget();
 
-            // Retrieve final mask texture
             Mask = maskCanvas.GetTexture();
 
             // Manually update intensity map
