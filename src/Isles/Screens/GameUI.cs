@@ -836,7 +836,7 @@ namespace Isles
                 Effect effect = game.Graphics2D.Effect;
 
                 effect.CurrentTechnique = effect.Techniques["FogOfWar"];
-                effect.Parameters["BasicTexture"].SetValue(world.FogOfWar.Current);
+                effect.Parameters["BasicTexture"].SetValue(world.FogOfWar.Mask);
                 effect.Begin();
                 effect.CurrentTechnique.Passes[0].Begin();
 

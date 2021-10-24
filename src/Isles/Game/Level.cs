@@ -12,7 +12,6 @@ namespace Isles
 {
     public class Level : IEventListener
     {
-        private RuinedLand ruinedLand;
         private readonly List<PlayerInfo> playerInfoFromMap = new();
 
         public virtual void Load(XmlElement xml, ILoading progress)
@@ -106,29 +105,17 @@ namespace Isles
             world.Game.ResetElapsedTime();
 
             // Initialize local player
-            var hasSteamer = false;
-            foreach (Player player in Player.AllPlayers)
+            foreach (var player in Player.AllPlayers)
             {
-                if (player.Race == Race.Steamer)
-                {
-                    hasSteamer = true;
-                }
-
                 player.Start(world);
             }
 
-            foreach (IWorldObject o in world.WorldObjects)
+            foreach (var o in world.WorldObjects)
             {
                 if (o is GameObject)
                 {
                     (o as GameObject).Start(world);
                 }
-            }
-
-            // Create ruined land
-            if (hasSteamer)
-            {
-                ruinedLand = RuinedLand.Create(BaseGame.Singleton, world, world.FogOfWar);
             }
 
             // Player sound
@@ -143,11 +130,6 @@ namespace Isles
         }
 
         public virtual void Update(GameTime gameTime) { }
-
-        public virtual void Draw(GameTime gameTime)
-        {
-            ruinedLand?.Draw();
-        }
 
         public virtual EventResult HandleEvent(EventType type, object sender, object tag)
         {

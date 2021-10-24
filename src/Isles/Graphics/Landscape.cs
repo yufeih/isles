@@ -583,8 +583,7 @@ namespace Isles.Graphics
         /// </summary>
         public Texture2D Mask { get; private set; }
 
-        public Texture2D Current { get; private set; }
-
+        private Texture2D current;
         private Texture2D discovered;
 
         private readonly RenderTarget2D discoveredCanvas;
@@ -691,7 +690,7 @@ namespace Isles.Graphics
             graphics.Clear(Color.Black);
 
             // Retrieve current glow texture
-            Current = currentCanvas.GetTexture();
+            current = currentCanvas.GetTexture();
 
             sprite.Begin(SpriteSortMode.Immediate, BlendState.Additive);
             if (discovered != null)
@@ -699,7 +698,7 @@ namespace Isles.Graphics
                 sprite.Draw(discovered, textureRectangle, Color.White);
             }
 
-            sprite.Draw(Current, textureRectangle, Color.White);
+            sprite.Draw(current, textureRectangle, Color.White);
             sprite.End();
 
             // Draw final mask texture
@@ -711,7 +710,7 @@ namespace Isles.Graphics
 
             sprite.Begin(SpriteSortMode.Immediate, BlendState.Additive);
             sprite.Draw(discovered, textureRectangle, new Color(128, 128, 128, 128));
-            sprite.Draw(Current, textureRectangle, Color.White);
+            sprite.Draw(current, textureRectangle, Color.White);
             sprite.End();
 
             // Restore states
