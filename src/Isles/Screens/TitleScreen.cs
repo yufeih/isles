@@ -473,13 +473,16 @@ namespace Isles
                     switch (state)
                     {
                         case ButtonState.Normal:
-                            sourRect = SourceRectangle; buttonColor = new Color(255, 255, 255, (byte)(160 * alpha));
+                            sourRect = SourceRectangle;
+                            buttonColor = Color.White * alpha * 0.63f;
                             break;
                         case ButtonState.Hover:
-                            sourRect = Hovered; buttonColor = new Color(255, 255, 255, (byte)(255 * alpha));
+                            sourRect = Hovered;
+                            buttonColor = Color.White * alpha;
                             break;
                         case ButtonState.Press:
-                            sourRect = Pressed; buttonColor = new Color(255, 255, 255, (byte)(255 * alpha));
+                            sourRect = Pressed;
+                            buttonColor = Color.White * alpha;
                             destRect.Y += 2;
                             break;
                     }
@@ -487,7 +490,7 @@ namespace Isles
                 else
                 {
                     sourRect = Disabled;
-                    buttonColor = new Color(128, 128, 128, (byte)(128 * alpha));
+                    buttonColor = Color.Gray * alpha * 0.5f;
                 }
 
                 sprite.Draw(Texture, destRect, sourRect, buttonColor);
