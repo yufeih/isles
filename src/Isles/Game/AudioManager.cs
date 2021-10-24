@@ -79,20 +79,9 @@ namespace Isles.Engine
             {
                 if (disposing)
                 {
-                    if (Sound != null)
-                    {
-                        Sound.Dispose();
-                    }
-
-                    if (Wave != null)
-                    {
-                        Wave.Dispose();
-                    }
-
-                    if (Audio != null)
-                    {
-                        Audio.Dispose();
-                    }
+                    Sound?.Dispose();
+                    Wave?.Dispose();
+                    Audio?.Dispose();
                 }
             }
             finally

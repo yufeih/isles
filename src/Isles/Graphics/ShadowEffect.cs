@@ -171,25 +171,10 @@ namespace Isles.Graphics
         {
             if (disposing)
             {
-                if (depthStencil != null)
-                {
-                    depthStencil.Dispose();
-                }
-
-                if (renderTarget != null)
-                {
-                    renderTarget.Dispose();
-                }
-
-                if (ShadowMap != null)
-                {
-                    ShadowMap.Dispose();
-                }
-
-                if (Effect != null)
-                {
-                    Effect.Dispose();
-                }
+                depthStencil?.Dispose();
+                renderTarget?.Dispose();
+                ShadowMap?.Dispose();
+                Effect?.Dispose();
             }
         }
     }

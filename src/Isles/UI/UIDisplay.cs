@@ -290,15 +290,8 @@ namespace Isles.UI
         /// </summary>
         public void Dispose()
         {
-            if (sprite != null)
-            {
-                sprite.Dispose();
-            }
-
-            if (effect != null)
-            {
-                effect.Dispose();
-            }
+            sprite?.Dispose();
+            effect?.Dispose();
 
             foreach (IUIElement element in elements)
             {

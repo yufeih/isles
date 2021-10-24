@@ -549,38 +549,33 @@ namespace Isles.Graphics
 
                 // Activate the particle effect.
                 particleEffect.Begin();
+                particleEffect.CurrentTechnique.Passes[0].Begin();
 
-                foreach (EffectPass pass in particleEffect.CurrentTechnique.Passes)
+                if (firstActiveParticle < firstFreeParticle)
                 {
-                    pass.Begin();
+                    // If the active particles are all in one consecutive range,
+                    // we can draw them all in a single call.
+                    device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0,
+                        firstActiveParticle * 4, (firstFreeParticle - firstActiveParticle) * 4,
+                        firstActiveParticle * 6, (firstFreeParticle - firstActiveParticle) * 2);
+                }
+                else
+                {
+                    // If the active particle range wraps past the end of the queue
+                    // back to the start, we must split them over two draw calls.
+                    device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0,
+                        firstActiveParticle * 4, (Settings.MaxParticles - firstActiveParticle) * 4,
+                        firstActiveParticle * 6, (Settings.MaxParticles - firstActiveParticle) * 2);
 
-                    if (firstActiveParticle < firstFreeParticle)
+                    if (firstFreeParticle > 0)
                     {
-                        // If the active particles are all in one consecutive range,
-                        // we can draw them all in a single call.
                         device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0,
-                            firstActiveParticle * 4, (firstFreeParticle - firstActiveParticle) * 4,
-                            firstActiveParticle * 6, (firstFreeParticle - firstActiveParticle) * 2);
+                            0, firstFreeParticle * 4,
+                            0, firstFreeParticle * 2);
                     }
-                    else
-                    {
-                        // If the active particle range wraps past the end of the queue
-                        // back to the start, we must split them over two draw calls.
-                        device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0,
-                            firstActiveParticle * 4, (Settings.MaxParticles - firstActiveParticle) * 4,
-                            firstActiveParticle * 6, (Settings.MaxParticles - firstActiveParticle) * 2);
-
-                        if (firstFreeParticle > 0)
-                        {
-                            device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0,
-                                0, firstFreeParticle * 4,
-                                0, firstFreeParticle * 2);
-                        }
-                    }
-
-                    pass.End();
                 }
 
+                particleEffect.CurrentTechnique.Passes[0].End();
                 particleEffect.End();
             }
 

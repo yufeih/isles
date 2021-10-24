@@ -378,16 +378,12 @@ namespace Isles.Graphics
 
                 // Draw the chunk
                 effect.Begin(SaveStateMode.SaveState);
-                foreach (EffectPass pass in effect.CurrentTechnique.Passes)
-                {
-                    pass.Begin();
+                effect.CurrentTechnique.Passes[0].Begin();
 
-                    game.GraphicsDevice.DrawIndexedPrimitives(
-                        PrimitiveType.TriangleList, 0, 0, baseVertex, 0, baseIndex / 3);
+                game.GraphicsDevice.DrawIndexedPrimitives(
+                    PrimitiveType.TriangleList, 0, 0, baseVertex, 0, baseIndex / 3);
 
-                    pass.End();
-                }
-
+                effect.CurrentTechnique.Passes[0].End();
                 effect.End();
 
                 // Increment begin pointer
@@ -482,20 +478,9 @@ namespace Isles.Graphics
         {
             if (disposing)
             {
-                if (effect != null)
-                {
-                    effect.Dispose();
-                }
-
-                if (vertices != null)
-                {
-                    vertices.Dispose();
-                }
-
-                if (indices != null)
-                {
-                    indices.Dispose();
-                }
+                effect?.Dispose();
+                vertices?.Dispose();
+                indices?.Dispose();
             }
         }
     }

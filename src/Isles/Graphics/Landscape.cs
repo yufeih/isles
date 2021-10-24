@@ -52,7 +52,7 @@ namespace Isles.Graphics
             surfaceDeclaration = new VertexDeclaration(game.GraphicsDevice,
                                      VertexPositionColorTexture.VertexElements);
             surfaceVertexBuffer = new DynamicVertexBuffer(game.GraphicsDevice,
-                typeof(VertexPositionTexture), MaxSurfaceVertices, BufferUsage.WriteOnly);
+                typeof(VertexPositionColorTexture), MaxSurfaceVertices, BufferUsage.WriteOnly);
             surfaceIndexBuffer = new DynamicIndexBuffer(game.GraphicsDevice,
                 typeof(ushort), MaxSurfaceIndices, BufferUsage.WriteOnly);
         }
@@ -139,32 +139,28 @@ namespace Isles.Graphics
             surfaceEffect.Parameters["WorldViewProjection"].SetValue(game.ViewProjection);
 
             surfaceEffect.Begin();
-            foreach (EffectPass pass in surfaceEffect.CurrentTechnique.Passes)
+            surfaceEffect.CurrentTechnique.Passes[0].Begin();
+
+            LinkedListNode<TexturedSurface> start = texturedSurfaces.First;
+            LinkedListNode<TexturedSurface> end = texturedSurfaces.First;
+            Texture2D texture = start.Value.Texture;
+
+            while (end != null)
             {
-                pass.Begin();
-
-                LinkedListNode<TexturedSurface> start = texturedSurfaces.First;
-                LinkedListNode<TexturedSurface> end = texturedSurfaces.First;
-                Texture2D texture = start.Value.Texture;
-
-                while (end != null)
+                if (end.Value.Texture != texture && start != end)
                 {
-                    if (end.Value.Texture != texture && start != end)
-                    {
-                        PresentSurface(start, end);
+                    PresentSurface(start, end);
 
-                        start = end;
-                        texture = end.Value.Texture;
-                    }
-
-                    end = end.Next;
+                    start = end;
+                    texture = end.Value.Texture;
                 }
 
-                PresentSurface(start, end);
-
-                pass.End();
+                end = end.Next;
             }
 
+            PresentSurface(start, end);
+
+            surfaceEffect.CurrentTechnique.Passes[0].End();
             surfaceEffect.End();
 
             texturedSurfaces.Clear();
@@ -512,14 +508,12 @@ namespace Isles.Graphics
             WaterEffect.Parameters["DisplacementScroll"].SetValue(MoveInCircle(gameTime, 0.01f));
 
             WaterEffect.Begin();
-            foreach (EffectPass pass in WaterEffect.CurrentTechnique.Passes)
-            {
-                pass.Begin();
-                graphics.DrawIndexedPrimitives(
-                    PrimitiveType.TriangleList, 0, 0, waterVertexCount, 0, waterPrimitiveCount);
-                pass.End();
-            }
+            WaterEffect.CurrentTechnique.Passes[0].Begin();
 
+            graphics.DrawIndexedPrimitives(
+                PrimitiveType.TriangleList, 0, 0, waterVertexCount, 0, waterPrimitiveCount);
+
+            WaterEffect.CurrentTechnique.Passes[0].End();
             WaterEffect.End();
         }
 
@@ -589,11 +583,10 @@ namespace Isles.Graphics
         /// </summary>
         public Texture2D Mask { get; private set; }
 
-        public Texture2D Discovered { get; private set; }
+        public Texture2D Current { get; private set; }
 
-        public Texture2D Current => current;
+        private Texture2D discovered;
 
-        private Texture2D current;
         private readonly RenderTarget2D discoveredCanvas;
         private readonly RenderTarget2D currentCanvas;
         private readonly RenderTarget2D maskCanvas;
@@ -698,15 +691,15 @@ namespace Isles.Graphics
             graphics.Clear(Color.Black);
 
             // Retrieve current glow texture
-            current = currentCanvas.GetTexture();
+            Current = currentCanvas.GetTexture();
 
             sprite.Begin(SpriteSortMode.Immediate, BlendState.Additive);
-            if (Discovered != null)
+            if (discovered != null)
             {
-                sprite.Draw(Discovered, textureRectangle, Color.White);
+                sprite.Draw(discovered, textureRectangle, Color.White);
             }
 
-            sprite.Draw(current, textureRectangle, Color.White);
+            sprite.Draw(Current, textureRectangle, Color.White);
             sprite.End();
 
             // Draw final mask texture
@@ -714,11 +707,11 @@ namespace Isles.Graphics
             graphics.Clear(Color.Black);
 
             // Retrieve discovered area
-            Discovered = discoveredCanvas.GetTexture();
+            discovered = discoveredCanvas.GetTexture();
 
             sprite.Begin(SpriteSortMode.Immediate, BlendState.Additive);
-            sprite.Draw(Discovered, textureRectangle, new Color(128, 128, 128, 128));
-            sprite.Draw(current, textureRectangle, Color.White);
+            sprite.Draw(discovered, textureRectangle, new Color(128, 128, 128, 128));
+            sprite.Draw(Current, textureRectangle, Color.White);
             sprite.End();
 
             // Restore states

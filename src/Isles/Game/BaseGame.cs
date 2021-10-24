@@ -689,23 +689,12 @@ namespace Isles.Engine
         {
             if (disposing)
             {
-                if (Profiler != null)
-                {
-                    Profiler.Dispose();
-                }
-
-                if (Billboard != null)
-                {
-                    Billboard.Dispose();
-                }
-
-                if (Shadow != null)
-                {
-                    Shadow.Dispose();
-                }
+                Profiler?.Dispose();
+                Billboard?.Dispose();
+                Shadow?.Dispose();
 
                 // Notify all screens to unload contents
-                foreach (KeyValuePair<string, IScreen> screen in Screens)
+                foreach (var screen in Screens)
                 {
                     screen.Value.Dispose();
                 }

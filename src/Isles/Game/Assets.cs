@@ -169,10 +169,7 @@ namespace Isles.Engine
         /// </summary>
         public static void Remove(IEventListener handler)
         {
-            var i = handlers.FindIndex(delegate(IEventListener item)
-            {
-                return item == handler;
-            });
+            var i = handlers.FindIndex(item => item == handler);
 
             if (i >= 0 && i < handlers.Count)
             {
@@ -413,59 +410,29 @@ namespace Isles.Engine
             return i * 1000 + j * 100 + k * 10 + l;
         }
 
-        private IEventListener photographer;
-
-        /// <summary>
-        /// Gets the screenshot for this frame.
-        /// The screenshot texture will be given to the photographer in the next frame.
-        /// Only one photographer is allowed.
-        /// </summary>
-        public void TakeScreenshot(IEventListener photographer)
-        {
-            this.photographer = photographer;
-            ShouldCapture = true;
-        }
-
         public void TakeScreenshot()
         {
             try
             {
-                // NOTE: This doesn't always work on all cards, especially if
-                // desktop mode switches in fullscreen mode!
-                if (photographer == null)
+                screenshotNum++;
+                // Make sure screenshots directory exists
+                if (Directory.Exists(ScreenshotsDirectory) == false)
                 {
-                    screenshotNum++;
-                    // Make sure screenshots directory exists
-                    if (Directory.Exists(ScreenshotsDirectory) == false)
-                    {
-                        Directory.CreateDirectory(ScreenshotsDirectory);
-                    }
-
-                    using var dstTexture = new ResolveTexture2D(
-                        game.GraphicsDevice,
-                        game.ScreenWidth, game.ScreenHeight, 1,
-                        SurfaceFormat.Color);
-                    // Get data with help of the resolve method
-                    game.GraphicsDevice.ResolveBackBuffer(dstTexture);
-
-                    dstTexture.Save(
-                        ScreenshotNameBuilder(screenshotNum),
-                        ImageFileFormat.Bmp);
-
-                    Log.Write("Screen shot captured: " + ScreenshotNameBuilder(screenshotNum));
+                    Directory.CreateDirectory(ScreenshotsDirectory);
                 }
-                else
-                {
-                    var dstTexture = new ResolveTexture2D(
-                        game.GraphicsDevice,
-                        game.ScreenWidth, game.ScreenHeight, 1,
-                        SurfaceFormat.Color);
 
-                    // Get data with help of the resolve method
-                    game.GraphicsDevice.ResolveBackBuffer(dstTexture);
+                using var dstTexture = new ResolveTexture2D(
+                    game.GraphicsDevice,
+                    game.ScreenWidth, game.ScreenHeight, 1,
+                    SurfaceFormat.Color);
+                // Get data with help of the resolve method
+                game.GraphicsDevice.ResolveBackBuffer(dstTexture);
 
-                    Event.SendMessage(EventType.ScreenshotTaken, photographer, this, dstTexture);
-                }
+                dstTexture.Save(
+                    ScreenshotNameBuilder(screenshotNum),
+                    ImageFileFormat.Bmp);
+
+                Log.Write("Screenshot captured: " + ScreenshotNameBuilder(screenshotNum));
             }
             catch (Exception ex)
             {

@@ -41,9 +41,6 @@ namespace Isles.Engine
 
         // Game specific events
         Hit,
-
-        // Misc
-        ScreenshotTaken,
     }
 
     /// <summary>

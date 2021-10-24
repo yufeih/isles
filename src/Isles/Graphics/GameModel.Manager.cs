@@ -479,19 +479,14 @@ namespace Isles.Graphics
                 effect.CurrentTechnique = Technique;
 
                 effect.Begin();
+                effect.CurrentTechnique.Passes[0].Begin();
 
-                foreach (EffectPass pass in Technique.Passes)
+                foreach (RenderablePerMaterial r in renderables)
                 {
-                    pass.Begin();
-
-                    foreach (RenderablePerMaterial r in renderables)
-                    {
-                        r.Draw();
-                    }
-
-                    pass.End();
+                    r.Draw();
                 }
 
+                effect.CurrentTechnique.Passes[0].End();
                 effect.End();
             }
         }

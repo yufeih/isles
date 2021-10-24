@@ -181,38 +181,34 @@ namespace Isles.Graphics
             terrainEffect.CurrentTechnique = technique;
 
             terrainEffect.Begin();
-            foreach (EffectPass pass in technique.Passes)
+            terrainEffect.CurrentTechnique.Passes[0].Begin();
+
+            // Draw each patch
+            for (var iPatch = 0; iPatch < Patches.Count; iPatch++)
             {
-                pass.Begin();
-
-                // Draw each patch
-                for (var iPatch = 0; iPatch < Patches.Count; iPatch++)
+                Patches[iPatch].Visible = viewFrustum.Intersects(Patches[iPatch].BoundingBox);
+                if (Patches[iPatch].Visible)
                 {
-                    Patches[iPatch].Visible = viewFrustum.Intersects(Patches[iPatch].BoundingBox);
-                    if (Patches[iPatch].Visible)
+                    // Set patch vertex buffer
+                    game.GraphicsDevice.Vertices[0].SetSource(
+                        vertexBuffers[iPatch], 0, TerrainVertex.SizeInBytes);
+
+                    // Draw each layer
+                    foreach (Layer layer in Layers)
                     {
-                        // Set patch vertex buffer
-                        game.GraphicsDevice.Vertices[0].SetSource(
-                            vertexBuffers[iPatch], 0, TerrainVertex.SizeInBytes);
+                        // Set textures
+                        terrainEffect.Parameters["ColorTexture"].SetValue(layer.ColorTexture);
+                        terrainEffect.Parameters["AlphaTexture"].SetValue(layer.AlphaTexture);
+                        terrainEffect.CommitChanges();
 
-                        // Draw each layer
-                        foreach (Layer layer in Layers)
-                        {
-                            // Set textures
-                            terrainEffect.Parameters["ColorTexture"].SetValue(layer.ColorTexture);
-                            terrainEffect.Parameters["AlphaTexture"].SetValue(layer.AlphaTexture);
-                            terrainEffect.CommitChanges();
-
-                            // Draw patch primitives
-                            game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList,
-                                                                      0, 0, vertexCount, 0, primitiveCount);
-                        }
+                        // Draw patch primitives
+                        game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList,
+                                                                  0, 0, vertexCount, 0, primitiveCount);
                     }
                 }
-
-                pass.End();
             }
 
+            terrainEffect.CurrentTechnique.Passes[0].End();
             terrainEffect.End();
         }
 
@@ -225,28 +221,24 @@ namespace Isles.Graphics
             terrainEffect.CurrentTechnique = terrainEffect.Techniques["ShadowMapping"];
 
             terrainEffect.Begin();
-            foreach (EffectPass pass in terrainEffect.CurrentTechnique.Passes)
+            terrainEffect.CurrentTechnique.Passes[0].Begin();
+
+            // Draw each patch
+            for (var iPatch = 0; iPatch < Patches.Count; iPatch++)
             {
-                pass.Begin();
-
-                // Draw each patch
-                for (var iPatch = 0; iPatch < Patches.Count; iPatch++)
+                if (Patches[iPatch].Visible)
                 {
-                    if (Patches[iPatch].Visible)
-                    {
-                        // Set patch vertex buffer
-                        game.GraphicsDevice.Vertices[0].SetSource(
-                            vertexBuffers[iPatch], 0, TerrainVertex.SizeInBytes);
+                    // Set patch vertex buffer
+                    game.GraphicsDevice.Vertices[0].SetSource(
+                        vertexBuffers[iPatch], 0, TerrainVertex.SizeInBytes);
 
-                        // Draw patch primitives
-                        game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList,
-                                                                  0, 0, vertexCount, 0, primitiveCount);
-                    }
+                    // Draw patch primitives
+                    game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList,
+                                                              0, 0, vertexCount, 0, primitiveCount);
                 }
-
-                pass.End();
             }
 
+            terrainEffect.CurrentTechnique.Passes[0].End();
             terrainEffect.End();
         }
 

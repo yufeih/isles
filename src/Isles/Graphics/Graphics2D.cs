@@ -311,14 +311,12 @@ namespace Isles.Graphics
 
             Effect.CurrentTechnique = Effect.Techniques["Graphics2D"];
             Effect.Begin();
-            foreach (EffectPass pass in Effect.CurrentTechnique.Passes)
-            {
-                pass.Begin();
-                game.GraphicsDevice.DrawPrimitives(
-                    PrimitiveType.LineList, 0, lineCount / 2);
-                pass.End();
-            }
+            Effect.CurrentTechnique.Passes[0].Begin();
 
+            game.GraphicsDevice.DrawPrimitives(
+                PrimitiveType.LineList, 0, lineCount / 2);
+
+            Effect.CurrentTechnique.Passes[0].End();
             Effect.End();
 
             // Clear all lines in this frame
@@ -348,14 +346,12 @@ namespace Isles.Graphics
 
             Effect.CurrentTechnique = Effect.Techniques["Graphics2D"];
             Effect.Begin();
-            foreach (EffectPass pass in Effect.CurrentTechnique.Passes)
-            {
-                pass.Begin();
-                game.GraphicsDevice.DrawIndexedPrimitives(
-                    PrimitiveType.TriangleList, 0, 0, primitiveVertexCount, 0, primitiveIndexCount / 3);
-                pass.End();
-            }
+            Effect.CurrentTechnique.Passes[0].Begin();
 
+            game.GraphicsDevice.DrawIndexedPrimitives(
+                    PrimitiveType.TriangleList, 0, 0, primitiveVertexCount, 0, primitiveIndexCount / 3);
+
+            Effect.CurrentTechnique.Passes[0].End();
             Effect.End();
 
             // Clear all primitives after drawing them
