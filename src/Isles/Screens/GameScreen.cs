@@ -111,7 +111,7 @@ namespace Isles
             // Reset loading context
             ILoading loadContext = new Loading(graphics.GraphicsDevice);
 
-            loadContext.Refresh(0, "Loading...");
+            loadContext.Refresh(0);
 
             // Reset players
             Player.Reset();
