@@ -19,6 +19,7 @@ using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 using Newtonsoft.Json;
+using Microsoft.Xna.Framework.Graphics;
 #endregion
 
 namespace Isles.Pipeline
@@ -124,44 +125,80 @@ namespace Isles.Pipeline
             var binName = baseName + ".bin";
             var meshes = new List<object>();
             var accessors = new List<object>();
+            var bufferViews = new List<object>();
+            var bytes = new List<byte>();
 
-            using (var writer = new BinaryWriter(File.Create(binName)))
+            foreach (var modelMesh in model.Meshes)
             {
-                foreach (var modelMesh in model.Meshes)
+                var primitives = new List<object>();
+                var byteBase = bytes.Count;
+                var buffViewBase = bufferViews.Count;
+
+                bytes.AddRange(modelMesh.VertexBuffer.VertexData);
+
+                var byteStride = VertexDeclaration.GetVertexStrideSize(modelMesh.MeshParts[0].GetVertexDeclaration(), 0);
+
+                bufferViews.Add(new { buffer = 0, byteOffset = byteBase, byteLength = modelMesh.VertexBuffer.VertexData.Length, byteStride, target = 34962 });
+
+                var indices = new int[modelMesh.IndexBuffer.Count];
+                modelMesh.IndexBuffer.CopyTo(indices, 0);
+                foreach (var i in indices)
+                    bytes.AddRange(BitConverter.GetBytes((ushort)i));
+
+                bufferViews.Add(new { buffer = 0, byteOffset = byteBase + modelMesh.VertexBuffer.VertexData.Length, byteLength = indices.Length * 2, target = 34963 });
+
+                foreach (var part in modelMesh.MeshParts)
                 {
-                    var primitives = new List<object>();
+                    var accessorBase = accessors.Count;
 
-                    foreach (var part in modelMesh.MeshParts)
+                    if (byteStride != VertexDeclaration.GetVertexStrideSize(part.GetVertexDeclaration(), 0))
                     {
-                        writer.Write(modelMesh.VertexBuffer.VertexData);
-                        var indices = new int[modelMesh.IndexBuffer.Count];
-                        modelMesh.IndexBuffer.CopyTo(indices, 0);
-                        foreach (var i in indices)
-                            writer.Write(i);
-
-                        accessors.Add(new { bufferView = 0, byteOffset = 0, componentType = 5126, type = "VEC3", count = 0 });
-                        accessors.Add(new { bufferView = 0, byteOffset = 0, componentType = 5126, type = "VEC3", count = 0 });
-                        accessors.Add(new { bufferView = 0, byteOffset = 0, componentType = 5126, type = "VEC2", count = 0 });
-
-                        primitives.Add(new
-                        {
-                            attributes = new { POSITION = 0, NORMAL = 0, TEXCOORD_0 = 0 },
-                            indices = 0,
-                            material = 0,
-                            mode = 4,
-                        });
+                        throw new InvalidOperationException("byteStride" + byteStride);
                     }
 
-                    meshes.Add(new { name = modelMesh.Name, primitives });
+                    var min = new[] { float.MaxValue, float.MaxValue, float.MaxValue };
+                    var max = new[] { float.MinValue, float.MinValue, float.MinValue };
+                    for (var i = 0; i < part.NumVertices; i++)
+                    {
+                        var x = BitConverter.ToSingle(modelMesh.VertexBuffer.VertexData, part.StreamOffset);
+                        var y = BitConverter.ToSingle(modelMesh.VertexBuffer.VertexData, part.StreamOffset + 4);
+                        var z = BitConverter.ToSingle(modelMesh.VertexBuffer.VertexData, part.StreamOffset + 8);
+                        if (x < min[0]) min[0] = x;
+                        if (x > max[0]) max[0] = x;
+                        if (y < min[1]) min[1] = y;
+                        if (y > max[1]) max[1] = y;
+                        if (z < min[2]) min[2] = z;
+                        if (z > max[2]) max[2] = z;
+                    }
+
+                    accessors.Add(new { bufferView = buffViewBase, byteOffset = part.StreamOffset, componentType = 5126, type = "VEC3", count = part.NumVertices, min, max });
+                    accessors.Add(new { bufferView = buffViewBase, byteOffset = part.StreamOffset + 12, componentType = 5126, type = "VEC3", count = part.NumVertices });
+                    accessors.Add(new { bufferView = buffViewBase, byteOffset = part.StreamOffset + 24, componentType = 5126, type = "VEC2", count = part.NumVertices });
+
+                    accessors.Add(new { bufferView = buffViewBase + 1, byteOffset = part.BaseVertex, componentType = 5123, type = "SCALAR", count = part.PrimitiveCount * 3 });
+                    
+                    primitives.Add(new
+                    {
+                        attributes = new { POSITION = accessorBase, NORMAL = accessorBase + 1, TEXCOORD_0 = accessorBase + 2 },
+                        indices = accessorBase + 3,
+                        mode = 4,
+                    });
                 }
+
+                meshes.Add(new { name = modelMesh.Name, primitives });
             }
 
+            File.WriteAllBytes(binName, bytes.ToArray());
             File.WriteAllText(baseName + ".gltf", JsonConvert.SerializeObject(new
             {
                 asset = new { version = "2.0" },
-                buffers = new[] { new { byteLength = File.ReadAllBytes(binName).Length, uri = Path.GetFileName(binName) } },
+                scene = 0,
+                buffers = new[] { new { byteLength = bytes.Count, uri = Path.GetFileName(binName) } },
+                bufferViews,
                 accessors,
                 meshes,
+                scenes = new[] { new { nodes = new[] { 0 } }},
+                nodes = new[] { new { mesh = 0 } }
             }, Formatting.Indented));
         }
 
