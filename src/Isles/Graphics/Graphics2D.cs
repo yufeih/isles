@@ -297,6 +297,8 @@ namespace Isles.Graphics
                 return;
             }
 
+            game.GraphicsDevice.SetVertexBuffer(null);
+
             // Update line vertices
             vertices.SetData(lines, 0, lineCount);
 
@@ -319,6 +321,8 @@ namespace Isles.Graphics
                 return;
             }
 
+            game.GraphicsDevice.SetVertexBuffer(null);
+
             // Update primitive vertices
             vertices.SetData(primitives, 0, primitiveVertexCount);
             indices.SetData(primitiveIndices, 0, primitiveIndexCount);
@@ -334,9 +338,6 @@ namespace Isles.Graphics
             // Clear all primitives after drawing them
             primitiveIndexCount = 0;
             primitiveVertexCount = 0;
-
-            game.GraphicsDevice.SetVertexBuffer(null);
-            game.GraphicsDevice.Indices = null;
         }
 
         /// <summary>
