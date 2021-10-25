@@ -1,12 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Document", "Document", "{4929D1D5-DC02-4C45-B94B-39870D742108}"
-	ProjectSection(SolutionItems) = preProject
-		Document\Changelog.txt = Document\Changelog.txt
-		Document\License.txt = Document\License.txt
-	EndProjectSection
-EndProject
+# Visual C# Express 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isles", "Isles\Isles.csproj", "{23F408E0-D6E0-41C6-94C7-C64A7CB373A3}"
 	ProjectSection(ProjectDependencies) = postProject
 		{BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27} = {BE276EFB-0373-4ABF-BBAD-8CAB11A0BA27}
@@ -48,10 +42,6 @@ Global
 		{3EF57541-D5ED-4B48-A308-5AC5E48E3588}.Debug|Xbox 360.ActiveCfg = Debug|x86
 		{3EF57541-D5ED-4B48-A308-5AC5E48E3588}.Release|x86.ActiveCfg = Release|x86
 		{3EF57541-D5ED-4B48-A308-5AC5E48E3588}.Release|Xbox 360.ActiveCfg = Release|x86
-		{8AB126E6-589E-4C3C-87D2-EC409CAEFF51}.Debug|x86.ActiveCfg = Debug|x86
-		{8AB126E6-589E-4C3C-87D2-EC409CAEFF51}.Debug|Xbox 360.ActiveCfg = Debug|x86
-		{8AB126E6-589E-4C3C-87D2-EC409CAEFF51}.Release|x86.ActiveCfg = Release|x86
-		{8AB126E6-589E-4C3C-87D2-EC409CAEFF51}.Release|Xbox 360.ActiveCfg = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

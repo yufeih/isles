@@ -18,6 +18,7 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
+using Newtonsoft.Json;
 #endregion
 
 namespace Isles.Pipeline
@@ -34,7 +35,7 @@ namespace Isles.Pipeline
         // in a single pass. If you change this, update SkinnedModel.fx to match.
         const int MaxBones = 59;
 
-    
+
         /// <summary>
         /// The main Process method converts an intermediate format content pipeline
         /// NodeContent tree to a ModelContent object with embedded animation data.
@@ -61,6 +62,7 @@ namespace Isles.Pipeline
                 AddSpacePartitionData(dictionary, model);
                 model.Tag = dictionary;
                 AddNormalTextureToTag(model);
+                WriteGLTF(input, model);
                 return model;
             }
 
@@ -109,7 +111,52 @@ namespace Isles.Pipeline
             // Store normal texture
             AddNormalTextureToTag(model);
 
+            WriteGLTF(input, model);
+
             return model;
+        }
+
+        private static void WriteGLTF(NodeContent input, ModelContent model)
+        {
+
+            Directory.CreateDirectory("D:/isles/gltf/");
+            var baseName = Path.Combine("D:/isles/gltf/", Path.GetFileNameWithoutExtension(input.Identity.SourceFilename).ToLowerInvariant());
+            var binName = baseName + ".bin";
+            var meshes = new List<object>();
+
+            using (var writer = new BinaryWriter(File.Create(binName)))
+            {
+                foreach (var modelMesh in model.Meshes)
+                {
+                    var primitives = new List<object>();
+
+                    foreach (var part in modelMesh.MeshParts)
+                    {
+                        writer.Write(modelMesh.VertexBuffer.VertexData);
+                        var indices = new int[modelMesh.IndexBuffer.Count];
+                        modelMesh.IndexBuffer.CopyTo(indices, 0);
+                        foreach (var i in indices)
+                            writer.Write(i);
+
+                        primitives.Add(new
+                        {
+                            attributes = new { POSITION=0, NORMAL=0, TAGENT=0, TEXCOORD_0=0 },
+                            indices = 0,
+                            material = 0,
+                            mode = 4,
+                        });
+                    }
+
+                    meshes.Add(new { name = modelMesh.Name, primitives });
+                }
+            }
+
+            File.WriteAllText(baseName + ".gltf", JsonConvert.SerializeObject(new
+            {
+                asset = new { version = "2.0" },
+                buffers = new[] { new { byteLength = File.ReadAllBytes(binName).Length, uri = Path.GetFileName(binName) } },
+                meshes,
+            }, Formatting.Indented));
         }
 
         private Dictionary<string, AnimationClip> ProcessAnimations(NodeContent input)
@@ -209,11 +256,11 @@ namespace Isles.Pipeline
             position.X = (info.Box.Max.X - info.Box.Min.X) / 16;
             position.Y = (info.Box.Max.Y - info.Box.Min.Y) / 16;
             position.Z = (info.Box.Max.Z - info.Box.Min.Z) / 16;
-            for(int i = 2; i < 6;i++)
-                for(int j = 2; j < 6;j++)
+            for (int i = 2; i < 6; i++)
+                for (int j = 2; j < 6; j++)
                     for (int k = 2; k < 6; k++)
                     {
-                        info.Set( info.Box.Min + 
+                        info.Set(info.Box.Min +
                                   new Vector3(position.X * (2 * i + 1), position.Y * (2 * j + 1), position.Z * (2 * k + 1)));
                     }
 
@@ -490,7 +537,7 @@ namespace Isles.Pipeline
         // 585 = 1 + 8 * 8 + 8 * 8 * 8
         public bool[] BitMap = new bool[585];
 
-        readonly static int[] spliter = new int[5] { 0, 1, 9, 73, 585};
+        readonly static int[] spliter = new int[5] { 0, 1, 9, 73, 585 };
 
         /// <summary>
         /// Test if that position is occupied
@@ -621,7 +668,7 @@ namespace Isles.Pipeline
             parents[level] = index;
 
             // Calculate parents in the tree, and their bias
-            for(int i = level; i> 0; i--)
+            for (int i = level; i > 0; i--)
             {
                 bias[i] = (parents[i] - spliter[i]) % 8;
                 parents[i - 1] = ParentOf(parents[i], i);
@@ -632,7 +679,7 @@ namespace Isles.Pipeline
                 x = (bias[i] > 3);
                 y = (bias[i] % 4 > 1);
                 z = (bias[i] % 2 == 1);
-                if(x)
+                if (x)
                 {
                     rtv.Min.X = (rtv.Max.X + rtv.Min.X) / 2;
                 }
@@ -640,8 +687,8 @@ namespace Isles.Pipeline
                 {
                     rtv.Max.X = (rtv.Max.X + rtv.Min.X) / 2;
                 }
-                
-                if(y)
+
+                if (y)
                 {
                     rtv.Min.Y = (rtv.Max.Y + rtv.Min.Y) / 2;
                 }
@@ -650,7 +697,7 @@ namespace Isles.Pipeline
                     rtv.Max.Y = (rtv.Max.Y + rtv.Min.Y) / 2;
                 }
 
-                if(z)
+                if (z)
                 {
                     rtv.Min.Z = (rtv.Max.Z + rtv.Min.Z) / 2;
                 }
