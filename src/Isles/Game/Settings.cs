@@ -10,7 +10,6 @@ namespace Isles.Engine
         public string DefaultFont { get; set; } = "Fonts/Default";
         public string Graphics2DEffect { get; set; } = "Effects/Graphics2D";
         public string PlayerName { get; set; } = "Unnamed";
-        public bool EnableProfile { get; set; } = true;
         public bool IsMouseVisible { get; set; }
         public bool IsFixedTimeStep { get; set; } = true;
         public bool ClipCursor { get; set; }

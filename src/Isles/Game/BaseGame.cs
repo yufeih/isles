@@ -81,24 +81,9 @@ namespace Isles.Engine
         public AudioManager Audio { get; private set; }
 
         /// <summary>
-        /// Gets game profiler.
-        /// </summary>
-        public Profiler Profiler { get; private set; } = new();
-
-        /// <summary>
-        /// Gets game screenshot capturer.
-        /// </summary>
-        public ScreenshotCapturer ScreenshotCapturer { get; private set; }
-
-        /// <summary>
         /// Gets current game screen.
         /// </summary>
         public IScreen CurrentScreen { get; private set; }
-
-        /// <summary>
-        /// Gets game frame per second.
-        /// </summary>
-        public float FramePerSecond => (float)Profiler.FramesPerSecond;
 
         /// <summary>
         /// Gets Game camera.
@@ -364,12 +349,6 @@ namespace Isles.Engine
             Input.Register(this, 0);
 
             Components.Add(Audio = new AudioManager(this));
-            Components.Add(ScreenshotCapturer = new ScreenshotCapturer(this));
-
-            if (Settings.EnableProfile)
-            {
-                Components.Add(Profiler = new Profiler(this));
-            }
 
             if (Settings.BloomSettings != null &&
                 Settings.BloomSettings.Enabled)
@@ -661,23 +640,11 @@ namespace Isles.Engine
 
             Graphics2D.Present();
 
-            // Take screen shot
-            if (ScreenshotCapturer != null && ScreenshotCapturer.ShouldCapture)
-            {
-                ScreenshotCapturer.TakeScreenshot();
-            }
-
             base.Draw(gameTime);
         }
 
         public EventResult HandleEvent(EventType type, object sender, object tag)
         {
-            // Take screenshot
-            if (type == EventType.KeyDown && (tag as Keys?).Value == Keys.PrintScreen)
-            {
-                ScreenshotCapturer.ShouldCapture = true;
-            }
-
             if (CurrentScreen != null &&
                 CurrentScreen.HandleEvent(type, sender, tag) == EventResult.Handled)
             {
@@ -694,7 +661,6 @@ namespace Isles.Engine
         {
             if (disposing)
             {
-                Profiler?.Dispose();
                 Billboard?.Dispose();
                 Shadow?.Dispose();
 
