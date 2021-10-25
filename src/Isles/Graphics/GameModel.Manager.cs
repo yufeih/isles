@@ -209,9 +209,8 @@ namespace Isles.Graphics
             private readonly EffectParameter light;
             private readonly EffectParameter worldInverse;
             private readonly EffectParameter worldInverseTranspose;
-            private readonly bool isTransparent;
 
-            public bool IsTransparent => isTransparent;
+            public bool IsTransparent { get; }
 
             public ModelMesh Mesh { get; }
 
@@ -224,18 +223,11 @@ namespace Isles.Graphics
             private readonly List<Vector4> staticLights = new();
             private readonly List<Vector4> skinnedLights = new();
 
-            /// <summary>
-            /// Store vertex / index buffers previously set. Set this
-            /// to null each frame.
-            /// </summary>
-            public static VertexBuffer CachedVertexBuffer;
-            public static IndexBuffer CachedIndexBuffer;
-
             public Renderable(ModelMesh mesh, ModelMeshPart part, bool isTransparent)
             {
-                this.Mesh = mesh;
-                this.MeshPart = part;
-                this.isTransparent = isTransparent;
+                Mesh = mesh;
+                MeshPart = part;
+                IsTransparent = isTransparent;
 
                 world = effect.Parameters["World"];
                 bones = effect.Parameters["Bones"];
@@ -283,22 +275,11 @@ namespace Isles.Graphics
                 }
 
                 game.GraphicsDevice.SetRenderState(
-                    isTransparent ? BlendState.AlphaBlend : BlendState.Opaque,
+                    IsTransparent ? BlendState.AlphaBlend : BlendState.Opaque,
                     rasterizerState: RasterizerState.CullNone);
 
-                // Set index buffer
-                if (MeshPart.IndexBuffer != CachedIndexBuffer)
-                {
-                    CachedIndexBuffer = MeshPart.IndexBuffer;
-                    game.GraphicsDevice.Indices = CachedIndexBuffer;
-                }
-
-                // Set vertex buffer
-                if (MeshPart.VertexBuffer != CachedVertexBuffer)
-                {
-                    CachedVertexBuffer = MeshPart.VertexBuffer;
-                    game.GraphicsDevice.SetVertexBuffer(CachedVertexBuffer);
-                }
+                game.GraphicsDevice.SetVertexBuffer(MeshPart.VertexBuffer);
+                game.GraphicsDevice.Indices = MeshPart.IndexBuffer;
 
                 // Draw static renderables
                 for (var i = 0; i < worldTransforms.Count; i++)
@@ -384,7 +365,7 @@ namespace Isles.Graphics
 
             public RenderablePerMaterial(Material material)
             {
-                this.Material = material;
+                Material = material;
 
                 // We'll be adjusting these colors in our .fx file
                 // ambient = effect.Parameters["Ambient"];
@@ -445,7 +426,7 @@ namespace Isles.Graphics
 
             public RenderablePerTechnique(EffectTechnique technique)
             {
-                this.Technique = technique;
+                Technique = technique;
             }
 
             public Renderable GetRenderable(ModelMesh mesh, ModelMeshPart part, Material material)
@@ -602,31 +583,12 @@ namespace Isles.Graphics
             // Setup render state
             game.GraphicsDevice.SetRenderState(BlendState.Opaque, DepthStencilState.Default, RasterizerState.CullNone);
 
-            // Clear cached renderable variable each frame
-            Renderable.CachedIndexBuffer = null;
-            Renderable.CachedVertexBuffer = null;
-
             ViewProjectionMatrix = v * p;
 
-            if (view != null)
-            {
-                view.SetValue(v);
-            }
-
-            if (projection != null)
-            {
-                projection.SetValue(p);
-            }
-
-            if (viewInverse != null)
-            {
-                viewInverse.SetValue(Matrix.Invert(v));
-            }
-
-            if (viewProjection != null)
-            {
-                viewProjection.SetValue(ViewProjectionMatrix);
-            }
+            view?.SetValue(v);
+            projection?.SetValue(p);
+            viewInverse?.SetValue(Matrix.Invert(v));
+            viewProjection?.SetValue(ViewProjectionMatrix);
 
             if (shadow != null)
             {
