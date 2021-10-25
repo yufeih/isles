@@ -38,8 +38,6 @@ namespace Isles.Pipeline
             // Find the skeleton.
             BoneContent skeleton = MeshHelper.FindSkeleton(input);
 
-            // System.Diagnostics.Debugger.Launch();
-
             if (skeleton == null)
             {
                 // Not a skinned mesh
@@ -184,7 +182,6 @@ namespace Isles.Pipeline
 
         private void AddSpacePartitionData(Dictionary<string, object> dictionary, ModelContent model)
         {
-            // System.Diagnostics.Debugger.Launch();
             Vector3 position;
 
             Matrix transform;
@@ -243,10 +240,7 @@ namespace Isles.Pipeline
         protected override MaterialContent ConvertMaterial(MaterialContent material,
                                                         ContentProcessorContext context)
         {
-            // System.Diagnostics.Debugger.Launch();
-            var basicMaterial = material as BasicMaterialContent;
-
-            if (basicMaterial == null)
+            if (material is not BasicMaterialContent basicMaterial)
             {
                 throw new InvalidContentException(string.Format(
                     "GameModelProcessor only supports BasicMaterialContent, " +
@@ -331,7 +325,6 @@ namespace Isles.Pipeline
         private static AnimationClip ProcessAnimation(AnimationContent animation,
                                               Dictionary<string, int> boneMap)
         {
-            // System.Diagnostics.Debugger.Launch();
             var keyframes = new List<Keyframe>();
 
             // For each input animation channel.
@@ -384,9 +377,7 @@ namespace Isles.Pipeline
         private static void ValidateMesh(NodeContent node, ContentProcessorContext context,
                                  string parentBoneName)
         {
-            var mesh = node as MeshContent;
-
-            if (mesh != null)
+            if (node is MeshContent mesh)
             {
                 // Validate the mesh.
                 if (parentBoneName != null)
@@ -442,9 +433,7 @@ namespace Isles.Pipeline
         /// </summary>
         private static bool IsSkinned(NodeContent node)
         {
-            var mesh = node as MeshContent;
-
-            if (mesh != null && MeshHasSkinning(mesh))
+            if (node is MeshContent mesh && MeshHasSkinning(mesh))
             {
                 return true;
             }
@@ -764,16 +753,13 @@ namespace Isles.Pipeline
         public AnimationClip(TimeSpan duration, IList<Keyframe> keyframes)
         {
             durationValue = duration;
-            keyframesValue = keyframes;
+            Keyframes = keyframes;
         }
 
         /// <summary>
         /// Gets the total length of the animation.
         /// </summary>
-        public TimeSpan Duration
-        {
-            get { return durationValue; }
-        }
+        public TimeSpan Duration => durationValue;
 
         private TimeSpan durationValue;
 
@@ -781,12 +767,7 @@ namespace Isles.Pipeline
         /// Gets a combined list containing all the keyframes for all bones,
         /// sorted by time.
         /// </summary>
-        public IList<Keyframe> Keyframes
-        {
-            get { return keyframesValue; }
-        }
-
-        private IList<Keyframe> keyframesValue;
+        public IList<Keyframe> Keyframes { get; }
     }
 
     /// <summary>
@@ -794,7 +775,6 @@ namespace Isles.Pipeline
     /// </summary>
     public class Keyframe
     {
-        private int boneValue;
         private TimeSpan timeValue;
         private Matrix transformValue;
 
@@ -803,7 +783,7 @@ namespace Isles.Pipeline
         /// </summary>
         public Keyframe(int bone, TimeSpan time, Matrix transform)
         {
-            boneValue = bone;
+            Bone = bone;
             timeValue = time;
             transformValue = transform;
         }
@@ -811,26 +791,17 @@ namespace Isles.Pipeline
         /// <summary>
         /// Gets the index of the target bone that is animated by this keyframe.
         /// </summary>
-        public int Bone
-        {
-            get { return boneValue; }
-        }
+        public int Bone { get; }
 
         /// <summary>
         /// Gets the time offset from the start of the animation to this keyframe.
         /// </summary>
-        public TimeSpan Time
-        {
-            get { return timeValue; }
-        }
+        public TimeSpan Time => timeValue;
 
         /// <summary>
         /// Gets the bone transform for this keyframe.
         /// </summary>
-        public Matrix Transform
-        {
-            get { return transformValue; }
-        }
+        public Matrix Transform => transformValue;
     }
 
     /// <summary>
@@ -839,10 +810,6 @@ namespace Isles.Pipeline
     /// </summary>
     public class SkinningData
     {
-        private IList<Matrix> bindPoseValue;
-        private IList<Matrix> inverseBindPoseValue;
-        private IList<int> skeletonHierarchyValue;
-        private IList<string> boneNameValue;
 
         /// <summary>
         /// Constructs a new skinning data object.
@@ -850,44 +817,32 @@ namespace Isles.Pipeline
         public SkinningData(IList<Matrix> bindPose, IList<Matrix> inverseBindPose,
                             IList<int> skeletonHierarchy, IList<string> boneName)
         {
-            bindPoseValue = bindPose;
-            inverseBindPoseValue = inverseBindPose;
-            skeletonHierarchyValue = skeletonHierarchy;
-            boneNameValue = boneName;
+            BindPose = bindPose;
+            InverseBindPose = inverseBindPose;
+            SkeletonHierarchy = skeletonHierarchy;
+            BoneName = boneName;
         }
 
         /// <summary>
         /// Bindpose matrices for each bone in the skeleton,
         /// relative to the parent bone.
         /// </summary>
-        public IList<Matrix> BindPose
-        {
-            get { return bindPoseValue; }
-        }
+        public IList<Matrix> BindPose { get; }
 
         /// <summary>
         /// Vertex to bonespace transforms for each bone in the skeleton.
         /// </summary>
-        public IList<Matrix> InverseBindPose
-        {
-            get { return inverseBindPoseValue; }
-        }
+        public IList<Matrix> InverseBindPose { get; }
 
         /// <summary>
         /// For each bone in the skeleton, stores the index of the parent bone.
         /// </summary>
-        public IList<int> SkeletonHierarchy
-        {
-            get { return skeletonHierarchyValue; }
-        }
+        public IList<int> SkeletonHierarchy { get; }
 
         /// <summary>
         /// Gets the name for each bone.
         /// </summary>
-        public IList<string> BoneName
-        {
-            get { return boneNameValue; }
-        }
+        public IList<string> BoneName { get; }
     }
 
     /// <summary>

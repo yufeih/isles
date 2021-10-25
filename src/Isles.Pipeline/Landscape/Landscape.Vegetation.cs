@@ -43,8 +43,6 @@ namespace Isles.Pipeline
             grassPosition = new List<Vector2>[vegetations.Count];
             grassTexture = new ExternalReference<TextureContent>[vegetations.Count];
 
-            // System.Diagnostics.Debugger.Launch();
-
             for (var i = 0; i < vegetations.Count; i++)
             {
                 grassSize[i] = new List<Vector2>();
