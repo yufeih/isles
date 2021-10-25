@@ -143,11 +143,11 @@ namespace Isles
 
             // Load UI textures
             borderFadeout = game.Content.Load<Texture2D>("Textures/Fadeout");
-            panelsTexture = game.Content.Load<Texture2D>("UI/Panels");
+            panelsTexture = game.TextureLoader.LoadTexture("data/ui/Panels.png");
 
             for (var i = 0; i < focusAnimation.Length; i++)
             {
-                focusAnimation[i] = game.Content.Load<Texture2D>("UI/Focus/" + (i + 1));
+                focusAnimation[i] = game.TextureLoader.LoadTexture($"data/ui/Focus/{i + 1}.png");
             }
 
             Rectangle relativeRect = UIElement.GetRelativeRectangle(new Rectangle

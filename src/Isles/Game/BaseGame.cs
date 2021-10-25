@@ -156,6 +156,8 @@ namespace Isles.Engine
         /// </summary>
         public GraphicsDeviceManager Graphics { get; }
 
+        public TextureLoader TextureLoader { get; private set; }
+
         /// <summary>
         /// Gets screen width.
         /// </summary>
@@ -349,6 +351,8 @@ namespace Isles.Engine
             Input.Register(this, 0);
 
             Components.Add(Audio = new AudioManager(this));
+
+            TextureLoader = new(GraphicsDevice);
 
             if (Settings.BloomSettings != null &&
                 Settings.BloomSettings.Enabled)

@@ -69,7 +69,7 @@ namespace Isles
             {
                 if (snapshotTexture == null)
                 {
-                    snapshotTexture = BaseGame.Singleton.Content.Load<Texture2D>("UI/Snapshots");
+                    snapshotTexture = BaseGame.Singleton.TextureLoader.LoadTexture("data/ui/Snapshots.png");
                 }
 
                 return snapshotTexture;

@@ -1,0 +1,30 @@
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using System.Collections.Concurrent;
+using System.IO;
+using Microsoft.Xna.Framework.Graphics;
+using SkiaSharp;
+
+namespace Isles.Graphics
+{
+    public class TextureLoader
+    {
+        private readonly GraphicsDevice _graphicsDevice;
+        private readonly ConcurrentDictionary<string, Texture2D> _textures = new();
+
+        public TextureLoader(GraphicsDevice graphicsDevice) => _graphicsDevice = graphicsDevice;
+
+        public Texture2D LoadTexture(string path)
+        {
+            return _textures.GetOrAdd(path, path =>
+            {
+                using var stream = File.OpenRead(path);
+                var bitmap = SKBitmap.Decode(stream);
+                var texture = new Texture2D(_graphicsDevice, bitmap.Width, bitmap.Height, 0, TextureUsage.AutoGenerateMipMap, SurfaceFormat.Color);
+                texture.SetData(bitmap.Pixels);
+                return texture;
+            });
+        }
+    }
+}

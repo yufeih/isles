@@ -55,7 +55,7 @@ namespace Isles
             {
                 if (texture == null || texture.IsDisposed)
                 {
-                    texture = BaseGame.Singleton.Content.Load<Texture2D>("UI/Icons");
+                    texture = BaseGame.Singleton.TextureLoader.LoadTexture("data/ui/Icons.png");
                 }
 
                 return texture;

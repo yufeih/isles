@@ -11,7 +11,7 @@ namespace Isles
 {
     public class TipBox : Panel
     {
-        private static readonly Texture2D white = BaseGame.Singleton.Content.Load<Texture2D>("UI/Panels");
+        private static readonly Texture2D white = BaseGame.Singleton.TextureLoader.LoadTexture("data/ui/Panels.png");
         private static readonly Rectangle DialogHigherHorizontalLine = new(50, 0, 50, 50);
         private static readonly Rectangle DialogLowerHorizontalLine = new(50, 380, 50, 50);
         private static readonly Rectangle DialogLeftVerticalLine = new(0, 50, 50, 50);
@@ -22,7 +22,7 @@ namespace Isles
         private static readonly Rectangle DialogRightBottomCorner = new(408, 380, 50, 50);
         private static readonly Rectangle DialogContent = new(50, 50, 50, 50);
         private static readonly Rectangle whiteTextureSource = new(1000, 800, 1, 1);
-        private static readonly Texture2D DialogTexture = BaseGame.Singleton.Content.Load<Texture2D>("UI/TipBox");
+        private static readonly Texture2D DialogTexture = BaseGame.Singleton.TextureLoader.LoadTexture("data/ui/TipBox.png");
 
         public int DialogCornerWidth = 6;
 

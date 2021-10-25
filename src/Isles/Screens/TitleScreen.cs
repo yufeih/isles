@@ -78,9 +78,9 @@ namespace Isles
             this.gameScreen = gameScreen;
             ui = new UIDisplay(BaseGame.Singleton);
 
-            titleTexture = BaseGame.Singleton.Content.Load<Texture2D>("UI/MainEntry");
-            buttonsTexture = BaseGame.Singleton.Content.Load<Texture2D>("UI/Buttons");
-            loadingDisplayTexture = BaseGame.Singleton.Content.Load<Texture2D>("UI/LoadingDisplay");
+            titleTexture = BaseGame.Singleton.TextureLoader.LoadTexture("data/ui/MainEntry.png");
+            buttonsTexture = BaseGame.Singleton.TextureLoader.LoadTexture("data/ui/Buttons.png");
+            loadingDisplayTexture = BaseGame.Singleton.TextureLoader.LoadTexture("data/ui/LoadingDisplay.png");
 
             ui.ScaleMode = ScaleMode.Stretch;
             ui.Anchor = Anchor.TopLeft;
@@ -136,7 +136,7 @@ namespace Isles
             // I'll just hard code the size :(
             leftMaskPanel = new Panel(Rectangle.Empty)
             {
-                Texture = BaseGame.Singleton.Content.Load<Texture2D>("UI/LeftMask"),
+                Texture = BaseGame.Singleton.TextureLoader.LoadTexture("data/ui/LeftMask.png"),
             };
             leftMaskPanel.SourceRectangle = new Rectangle(0, 0, leftMaskPanel.Texture.Width, leftMaskPanel.Texture.Height);
             leftMaskPanel.ScaleMode = ScaleMode.Fixed;
@@ -147,7 +147,7 @@ namespace Isles
 
             rightMaskPanel = new Panel(Rectangle.Empty)
             {
-                Texture = BaseGame.Singleton.Content.Load<Texture2D>("UI/RightMask"),
+                Texture = BaseGame.Singleton.TextureLoader.LoadTexture("data/ui/RightMask.png"),
             };
             rightMaskPanel.SourceRectangle = new Rectangle(0, 0, rightMaskPanel.Texture.Width, rightMaskPanel.Texture.Height);
             rightMaskPanel.ScaleMode = ScaleMode.Fixed;
