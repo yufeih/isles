@@ -332,9 +332,7 @@ namespace Isles.Pipeline
                 animation.Channels)
             {
                 // Look up what bone this channel is controlling.
-                int boneIndex;
-
-                if (!boneMap.TryGetValue(channel.Key, out boneIndex))
+                if (!boneMap.TryGetValue(channel.Key, out var boneIndex))
                 {
                     // throw new InvalidContentException(string.Format(
                     //    "Found animation for bone '{0}', " +

@@ -1,6 +1,7 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using Isles.Engine;
 using Isles.UI;
 using Microsoft.Xna.Framework;
@@ -13,29 +14,7 @@ namespace Isles.Graphics
     /// </summary>
     public interface ILoading
     {
-        /// <summary>
-        /// Gets or sets current message.
-        /// </summary>
-        string Message { get; }
-
-        /// <summary>
-        /// Gets current progress.
-        /// </summary>
-        float Progress { get; }
-
         void Refresh(float newProgress);
-
-        /// <summary>
-        /// Refresh the loading screen with the new progress and message.
-        /// </summary>
-        /// <param name="progress"></param>
-        /// <param name="message"></param>
-        void Refresh(float newProgress, string newMessage);
-
-        /// <summary>
-        /// Begins a new loading procedure.
-        /// </summary>
-        void Reset();
     }
 
     /// <summary>
@@ -50,6 +29,8 @@ namespace Isles.Graphics
         private readonly ProgressBar progressBar;
         private readonly UIDisplay uiDisplay;
 
+        private DateTime _lastRefreshTime = DateTime.UtcNow;
+
         /// <summary>
         /// Gets current progress.
         /// </summary>
@@ -62,17 +43,6 @@ namespace Isles.Graphics
         /// <param name="newMessage"></param>
         public void Refresh(float newProgress)
         {
-            Refresh(newProgress, Message);
-        }
-
-        /// <summary>
-        /// Refresh the loading screen with the new progress and message.
-        /// </summary>
-        /// <param name="progress"></param>
-        /// <param name="message"></param>
-        public void Refresh(float newProgress, string newMessage)
-        {
-            Message = newMessage;
             Progress = newProgress;
             progressBar.SetProgress((int)newProgress);
             if (Progress < 0)
@@ -84,13 +54,13 @@ namespace Isles.Graphics
                 Progress = 100;
             }
 
-            Draw();
+            var now = DateTime.UtcNow;
+            if (now - _lastRefreshTime > TimeSpan.FromSeconds(1))
+            {
+                Draw();
+                _lastRefreshTime = now;
+            }
         }
-
-        /// <summary>
-        /// Gets or sets current message.
-        /// </summary>
-        public string Message { get; set; } = "Loading...";
 
         /// <summary>
         /// Create a loading screen for a given graphics device.
@@ -141,19 +111,7 @@ namespace Isles.Graphics
             uiDisplay.Draw(BaseGame.Singleton.CurrentGameTime);
         }
 
-        /// <summary>
-        /// Begins a new loading procedure.
-        /// </summary>
-        public void Reset()
-        {
-            Progress = 0;
-            Message = "Loading...";
-        }
-
-        /// <summary>
-        /// Draw everything.
-        /// </summary>
-        protected virtual void Draw()
+        private void Draw()
         {
             graphics.Clear(Color.Black);
             uiDisplay.Draw(BaseGame.Singleton.CurrentGameTime);

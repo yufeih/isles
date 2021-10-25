@@ -4,6 +4,7 @@
 using Isles.Engine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
+using System;
 
 namespace Isles
 {
@@ -31,7 +32,15 @@ namespace Isles
             AddScreen("GameScreen", GameScreen = new GameScreen());
             AddScreen("TitleScreen", titleScreen = new TitleScreen(GameScreen));
 
-            StartScreen(titleScreen);
+            if (Environment.GetEnvironmentVariable("ISLES_STARTUP_LEVEL") is string startupLevel)
+            {
+                StartScreen(GameScreen);
+                GameScreen.StartLevel(startupLevel);
+            }
+            else
+            {
+                StartScreen(titleScreen);
+            }
         }
 
         protected override void Update(GameTime gameTime)
