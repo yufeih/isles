@@ -259,6 +259,7 @@
       <Name>cube</Name>
       <Importer>XImporter</Importer>
       <Processor>GameModelProcessor</Processor>
+      <ProcessorParameters_SwapWindingOrder>True</ProcessorParameters_SwapWindingOrder>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -653,6 +654,7 @@
       <Name>Sorceress</Name>
       <Importer>XImporter</Importer>
       <Processor>GameModelProcessor</Processor>
+      <ProcessorParameters_SwapWindingOrder>True</ProcessorParameters_SwapWindingOrder>
     </Compile>
     <None Include="Charactors\Sorceress\tuzhu_huonv.bmp">
       <Name>tuzhu_huonv</Name>
@@ -816,11 +818,13 @@
       <Name>box</Name>
       <Importer>XImporter</Importer>
       <Processor>GameModelProcessor</Processor>
+      <ProcessorParameters_SwapWindingOrder>True</ProcessorParameters_SwapWindingOrder>
     </Compile>
     <Compile Include="Models\Buildings\altar.X">
       <Name>altar</Name>
       <Importer>XImporter</Importer>
       <Processor>GameModelProcessor</Processor>
+      <ProcessorParameters_SwapWindingOrder>True</ProcessorParameters_SwapWindingOrder>
     </Compile>
     <Compile Include="Models\Buildings\barracks.X">
       <Name>barracks</Name>
@@ -836,21 +840,25 @@
       <Name>Goldmine</Name>
       <Importer>XImporter</Importer>
       <Processor>GameModelProcessor</Processor>
+      <ProcessorParameters_SwapWindingOrder>True</ProcessorParameters_SwapWindingOrder>
     </Compile>
     <Compile Include="Models\Buildings\Lumbermill.X">
       <Name>Lumbermill</Name>
       <Importer>XImporter</Importer>
       <Processor>GameModelProcessor</Processor>
+      <ProcessorParameters_SwapWindingOrder>True</ProcessorParameters_SwapWindingOrder>
     </Compile>
     <Compile Include="Models\Buildings\tower.X">
       <Name>tower</Name>
       <Importer>XImporter</Importer>
       <Processor>GameModelProcessor</Processor>
+      <ProcessorParameters_SwapWindingOrder>True</ProcessorParameters_SwapWindingOrder>
     </Compile>
     <Compile Include="Models\Buildings\townhall.X">
       <Name>townhall</Name>
       <Importer>XImporter</Importer>
       <Processor>GameModelProcessor</Processor>
+      <ProcessorParameters_SwapWindingOrder>True</ProcessorParameters_SwapWindingOrder>
     </Compile>
     <None Include="Models\Buildings\tietu_bingying.bmp">
       <Name>tietu_bingying</Name>
@@ -916,16 +924,19 @@
       <Name>gold</Name>
       <Importer>XImporter</Importer>
       <Processor>GameModelProcessor</Processor>
+      <ProcessorParameters_SwapWindingOrder>True</ProcessorParameters_SwapWindingOrder>
     </Compile>
     <Compile Include="Models\hammer.X">
       <Name>hammer</Name>
       <Importer>XImporter</Importer>
       <Processor>GameModelProcessor</Processor>
+      <ProcessorParameters_SwapWindingOrder>True</ProcessorParameters_SwapWindingOrder>
     </Compile>
     <Compile Include="Models\rally.X">
       <Name>rally</Name>
       <Importer>XImporter</Importer>
       <Processor>GameModelProcessor</Processor>
+      <ProcessorParameters_SwapWindingOrder>True</ProcessorParameters_SwapWindingOrder>
     </Compile>
     <Compile Include="Models\ruined.FBX">
       <Name>ruined</Name>
@@ -941,21 +952,25 @@
       <Name>spear</Name>
       <Importer>XImporter</Importer>
       <Processor>GameModelProcessor</Processor>
+      <ProcessorParameters_SwapWindingOrder>True</ProcessorParameters_SwapWindingOrder>
     </Compile>
     <Compile Include="Models\stone.FBX">
       <Name>stone</Name>
       <Importer>FbxImporter</Importer>
       <Processor>GameModelProcessor</Processor>
+      <ProcessorParameters_SwapWindingOrder>True</ProcessorParameters_SwapWindingOrder>
     </Compile>
     <Compile Include="Models\warhammer.X">
       <Name>warhammer</Name>
       <Importer>XImporter</Importer>
       <Processor>GameModelProcessor</Processor>
+      <ProcessorParameters_SwapWindingOrder>True</ProcessorParameters_SwapWindingOrder>
     </Compile>
     <Compile Include="Models\wood.X">
       <Name>wood</Name>
       <Importer>XImporter</Importer>
       <Processor>GameModelProcessor</Processor>
+      <ProcessorParameters_SwapWindingOrder>True</ProcessorParameters_SwapWindingOrder>
     </Compile>
     <Compile Include="Textures\Effect\blooddagak.PNG">
       <Name>blooddagak</Name>

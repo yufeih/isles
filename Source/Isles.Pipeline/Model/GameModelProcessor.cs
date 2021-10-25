@@ -63,7 +63,7 @@ namespace Isles.Pipeline
                 AddSpacePartitionData(dictionary, model);
                 model.Tag = dictionary;
                 AddNormalTextureToTag(model);
-                WriteGLTF(input, model);
+                WriteGLTF(input, model, context);
                 return model;
             }
 
@@ -112,12 +112,12 @@ namespace Isles.Pipeline
             // Store normal texture
             AddNormalTextureToTag(model);
 
-            WriteGLTF(input, model);
+            WriteGLTF(input, model, context);
 
             return model;
         }
 
-        private static void WriteGLTF(NodeContent input, ModelContent model)
+        private static void WriteGLTF(NodeContent input, ModelContent model, ContentProcessorContext context)
         {
 
             Directory.CreateDirectory("D:/isles/gltf/");
@@ -127,9 +127,15 @@ namespace Isles.Pipeline
             var accessors = new List<object>();
             var bufferViews = new List<object>();
             var bytes = new List<byte>();
+            var materials = new List<object>();
+            var images = new List<object>();
+            var textures = new List<object>();
+            var nodes = new List<object>();
+            var sceneNodes = new List<int>();
 
             foreach (var modelMesh in model.Meshes)
             {
+                var imageDict = new Dictionary<string, string>();
                 var primitives = new List<object>();
                 var byteBase = bytes.Count;
                 var buffViewBase = bufferViews.Count;
@@ -160,9 +166,9 @@ namespace Isles.Pipeline
                     var max = new[] { float.MinValue, float.MinValue, float.MinValue };
                     for (var i = 0; i < part.NumVertices; i++)
                     {
-                        var x = BitConverter.ToSingle(modelMesh.VertexBuffer.VertexData, part.StreamOffset);
-                        var y = BitConverter.ToSingle(modelMesh.VertexBuffer.VertexData, part.StreamOffset + 4);
-                        var z = BitConverter.ToSingle(modelMesh.VertexBuffer.VertexData, part.StreamOffset + 8);
+                        var x = BitConverter.ToSingle(modelMesh.VertexBuffer.VertexData, part.StreamOffset + i * byteStride);
+                        var y = BitConverter.ToSingle(modelMesh.VertexBuffer.VertexData, part.StreamOffset + i * byteStride + 4);
+                        var z = BitConverter.ToSingle(modelMesh.VertexBuffer.VertexData, part.StreamOffset + i * byteStride + 8);
                         if (x < min[0]) min[0] = x;
                         if (x > max[0]) max[0] = x;
                         if (y < min[1]) min[1] = y;
@@ -176,16 +182,52 @@ namespace Isles.Pipeline
                     accessors.Add(new { bufferView = buffViewBase, byteOffset = part.StreamOffset + 24, componentType = 5126, type = "VEC2", count = part.NumVertices });
 
                     accessors.Add(new { bufferView = buffViewBase + 1, byteOffset = part.BaseVertex, componentType = 5123, type = "SCALAR", count = part.PrimitiveCount * 3 });
-                    
+
+                    if (part.StartIndex != 0)
+                    {
+                        throw new NotSupportedException();
+                    }
+
                     primitives.Add(new
                     {
                         attributes = new { POSITION = accessorBase, NORMAL = accessorBase + 1, TEXCOORD_0 = accessorBase + 2 },
                         indices = accessorBase + 3,
+                        material = materials.Count,
                         mode = 4,
                     });
+
+                    var e = part.Material.Textures.Values.GetEnumerator();
+                    e.MoveNext();
+                    if (e.Current != null)
+                    {
+                        var src = e.Current.Filename;
+                        var uri = imageDict.Count <= 0 ? baseName + ".png" : baseName + "_" + imageDict.Count + ".png";
+                        if (!imageDict.ContainsKey(src))
+                        {
+                            imageDict.Add(src, uri);
+                            var a = Path.Combine(Path.GetDirectoryName(input.Identity.SourceFilename), Path.GetFileNameWithoutExtension(src).Replace("_0", ".bmp"));
+                            if (!File.Exists(a))
+                                a = Path.ChangeExtension(a, ".jpg"); 
+                            if (!File.Exists(a))
+                                a = Path.ChangeExtension(a, ".png");
+                            if (!File.Exists(a))
+                                a = Path.ChangeExtension(a, ".tga");
+                            if (File.Exists(a))
+                                File.Copy(a, uri, true);
+                            else
+                                context.Logger.LogWarning("a", input.Identity, Path.GetFileNameWithoutExtension(src).Replace("_0", ".*"));
+                        }
+
+                        uri = Path.GetFileName(uri);
+                        materials.Add(new { pbrMetallicRoughness = new { baseColorTexture = new { index = textures.Count } } });
+                        textures.Add(new { source = images.Count });
+                        images.Add(new { uri });
+                    }
                 }
 
-                meshes.Add(new { name = modelMesh.Name, primitives });
+                nodes.Add(new { mesh = meshes.Count });
+                sceneNodes.Add(meshes.Count);
+                meshes.Add(new { primitives });
             }
 
             File.WriteAllBytes(binName, bytes.ToArray());
@@ -197,8 +239,11 @@ namespace Isles.Pipeline
                 bufferViews,
                 accessors,
                 meshes,
-                scenes = new[] { new { nodes = new[] { 0 } }},
-                nodes = new[] { new { mesh = 0 } }
+                images,
+                textures,
+                materials,
+                scenes = new[] { new { nodes = sceneNodes }},
+                nodes,
             }, Formatting.Indented));
         }
 
