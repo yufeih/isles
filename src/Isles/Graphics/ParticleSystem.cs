@@ -315,9 +315,6 @@ namespace Isles.Graphics
         /// </summary>
         protected void LoadContent()
         {
-            // Create a dynamic vertex buffer.
-            vertexBuffer = new DynamicVertexBuffer(game.GraphicsDevice, typeof(ParticleVertex), Settings.MaxParticles * 4, BufferUsage.WriteOnly);
-
             // Allocate the particle array, and fill in the corner fields (which never change).
             particles = new ParticleVertex[Settings.MaxParticles * 4];
 
@@ -328,6 +325,9 @@ namespace Isles.Graphics
                 particles[i * 4 + 2].Corner = new Short2(1, 1);
                 particles[i * 4 + 3].Corner = new Short2(-1, 1);
             }
+
+            // Create a dynamic vertex buffer.
+            vertexBuffer = new DynamicVertexBuffer(game.GraphicsDevice, typeof(ParticleVertex), Settings.MaxParticles * 4, BufferUsage.WriteOnly);
 
             // Initialize the vertex buffer contents. This is necessary in order
             // to correctly restore any existing particles after a lost device.
@@ -770,8 +770,7 @@ namespace Isles.Graphics
             if (elapsedTime > 0)
             {
                 // Work out how fast we are moving.
-                Vector3 velocity = newVelocity.HasValue ? newVelocity.Value :
-                                   (newPosition - previousPosition) / elapsedTime;
+                Vector3 velocity = newVelocity ?? (newPosition - previousPosition) / elapsedTime;
 
                 // If we had any time left over that we didn't use during the
                 // previous update, add that to the current elapsed time.
