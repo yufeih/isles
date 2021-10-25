@@ -834,7 +834,7 @@ namespace Isles
                 Effect effect = game.Graphics2D.Effect;
 
                 effect.CurrentTechnique = effect.Techniques["FogOfWar"];
-                effect.Parameters["BasicTexture"].SetValue(world.FogOfWar.Current);
+                effect.Parameters["BasicTexture"].SetValue(world.FogOfWar.Mask);
                 effect.CurrentTechnique.Passes[0].Apply();
 
                 game.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, fogOfWarVertices, 0, 2);

@@ -334,6 +334,9 @@ namespace Isles.Graphics
             // Clear all primitives after drawing them
             primitiveIndexCount = 0;
             primitiveVertexCount = 0;
+
+            game.GraphicsDevice.SetVertexBuffer(null);
+            game.GraphicsDevice.Indices = null;
         }
 
         /// <summary>

@@ -415,23 +415,24 @@ namespace Isles.Engine
             try
             {
                 screenshotNum++;
+
                 // Make sure screenshots directory exists
                 if (Directory.Exists(ScreenshotsDirectory) == false)
                 {
                     Directory.CreateDirectory(ScreenshotsDirectory);
                 }
 
-                using var dstTexture = new ResolveTexture2D(
-                    game.GraphicsDevice,
-                    game.ScreenWidth, game.ScreenHeight, 1,
-                    SurfaceFormat.Color);
+                var graphics = game.GraphicsDevice;
+                var w = graphics.PresentationParameters.BackBufferWidth;
+                var h = graphics.PresentationParameters.BackBufferHeight;
+                var backBuffer = new int[w * h];
+                graphics.GetBackBufferData(backBuffer);
 
-                // TODO: Get data with help of the resolve method
-                //game.GraphicsDevice.ResolveBackBuffer(dstTexture);
+                var texture = new Texture2D(graphics, w, h, false, graphics.PresentationParameters.BackBufferFormat);
+                texture.SetData(backBuffer);
 
-                dstTexture.Save(
-                    ScreenshotNameBuilder(screenshotNum),
-                    ImageFileFormat.Bmp);
+                using var stream = File.OpenWrite(ScreenshotNameBuilder(screenshotNum));
+                texture.SaveAsJpeg(stream, w, h);
 
                 Log.Write("Screenshot captured: " + ScreenshotNameBuilder(screenshotNum));
             }
