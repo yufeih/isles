@@ -547,7 +547,7 @@ namespace Isles.Graphics
             {
                 if (glow == null || glow.IsDisposed)
                 {
-                    glow = BaseGame.Singleton.Content.Load<Texture2D>("Textures/Glow");
+                    glow = BaseGame.Singleton.TextureLoader.LoadTexture("data/ui/glow.png");
                 }
 
                 return glow;

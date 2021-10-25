@@ -1,6 +1,6 @@
 {
   "Construct": {
-    "TextureName": "Textures/smoke2",
+    "TextureName": "data/particles/smoke2.png",
     "MaxParticles": 2048,
     "Duration": 1.45000005,
     "DurationRandomness": 0.239999995,
@@ -38,7 +38,7 @@
     "Additive" : true
   },
   "FireSmoke": {
-    "TextureName": "Textures/Smoke",
+    "TextureName": "data/particles/Smoke.png",
     "MaxParticles": 25000,
     "Duration": 2.5999999,
     "DurationRandomness": 0,
@@ -76,7 +76,7 @@
     "nBlend": 6
   },
   "Smoke": {
-    "TextureName": "Textures/Smoke",
+    "TextureName": "data/particles/Smoke.png",
     "MaxParticles": 2048,
     "Duration": 2,
     "DurationRandomness": 1,
@@ -114,7 +114,7 @@
     "nBlend": 6
   },
   "Green": {
-    "TextureName": "Textures/Effect/illusion01",
+    "TextureName": "data/particles/illusion01.png",
     "MaxParticles": 800,
     "Duration": 2.20000005,
     "DurationRandomness": 0,
@@ -152,7 +152,7 @@
     "Additive" : true
   },
   "Yellow": {
-    "TextureName": "Textures/fire",
+    "TextureName": "data/particles/fire.png",
     "MaxParticles": 800,
     "Duration": 2.20000005,
     "DurationRandomness": 0,
@@ -190,7 +190,7 @@
     "Additive" : true
   },
   "Blue": {
-    "TextureName": "Textures/Effect/frostvapors",
+    "TextureName": "data/particles/frostvapors.png",
     "MaxParticles": 800,
     "Duration": 2.70000005,
     "DurationRandomness": 0,
@@ -228,7 +228,7 @@
     "Additive" : true
   },
   "Red": {
-    "TextureName": "Textures/Effect/blooddagak",
+    "TextureName": "data/particles/blooddagak.png",
     "MaxParticles": 800,
     "Duration": 2.20000005,
     "DurationRandomness": 0,
@@ -266,7 +266,7 @@
     "Additive" : true
   },
   "PunishOfNature": {
-    "TextureName": "Textures/Effect/greenmist",
+    "TextureName": "data/particles/greenmist.png",
     "MaxParticles": 32768,
     "Duration": 1.60000002,
     "DurationRandomness": 0.200000003,
@@ -304,7 +304,7 @@
     "Additive" : true
   },
   "Frost": {
-    "TextureName": "Textures/Effect/frostvapors",
+    "TextureName": "data/particles/frostvapors.png",
     "MaxParticles": 800,
     "Duration": 0.449999988,
     "DurationRandomness": 0.0599999987,
@@ -342,7 +342,7 @@
     "Additive" : true
   },
   "FrostExplosion": {
-    "TextureName": "Textures/effect/frostvapors",
+    "TextureName": "data/particles/frostvapors.png",
     "MaxParticles": 800,
     "Duration": 1.5,
     "DurationRandomness": 0.600000024,
@@ -380,7 +380,7 @@
     "Additive" : true
   },
   "Fireball": {
-    "TextureName": "Textures/fire",
+    "TextureName": "data/particles/fire.png",
     "MaxParticles": 800,
     "Duration": 0.449999988,
     "DurationRandomness": 0.0599999987,
@@ -418,7 +418,7 @@
     "Additive" : true
   },
   "FireballExplosion": {
-    "TextureName": "Textures/fire",
+    "TextureName": "data/particles/fire.png",
     "MaxParticles": 800,
     "Duration": 1.5,
     "DurationRandomness": 0.600000024,
@@ -456,7 +456,7 @@
     "Additive" : true
   },
   "Trail": {
-    "TextureName": "Textures/Smoke2",
+    "TextureName": "data/particles/Smoke2.png",
     "MaxParticles": 1000,
     "Duration": 1.20000005,
     "DurationRandomness": 0.200000003,
@@ -494,7 +494,7 @@
     "nBlend": 6
   },
   "FireballTrail": {
-    "TextureName": "Textures/Smoke",
+    "TextureName": "data/particles/Smoke.png",
     "MaxParticles": 50,
     "Duration": 1,
     "DurationRandomness": 1.5,
@@ -532,7 +532,7 @@
     "nBlend": 6
   },
   "Summon": {
-    "TextureName": "Textures/Fire",
+    "TextureName": "data/particles/Fire.png",
     "MaxParticles": 2400,
     "Duration": 3.8499999,
     "DurationRandomness": 0.939999998,
@@ -570,7 +570,7 @@
     "Additive" : true
   },
   "ExplosionSmoke": {
-    "TextureName": "Textures/smoke",
+    "TextureName": "data/particles/smoke.png",
     "MaxParticles": 1024,
     "Duration": 3.4000001,
     "DurationRandomness": 0.75999999,
@@ -608,7 +608,7 @@
     "nBlend": 6
   },
   "Spark": {
-    "TextureName": "Textures/Effect/spark",
+    "TextureName": "data/particles/spark.png",
     "MaxParticles": 1024,
     "Duration": 5,
     "DurationRandomness": 0.75999999,
@@ -646,7 +646,7 @@
     "Additive" : true
   },
   "Explosion": {
-    "TextureName": "Textures/fire",
+    "TextureName": "data/particles/fire.png",
     "MaxParticles": 5120,
     "Duration": 2.5999999,
     "DurationRandomness": 1.74000001,
@@ -684,7 +684,7 @@
     "Additive" : true
   },
   "Glow": {
-    "TextureName": "Textures/Effect/light",
+    "TextureName": "data/particles/light.png",
     "MaxParticles": 200,
     "Duration": 2.04999995,
     "DurationRandomness": 0,
@@ -722,7 +722,7 @@
     "Additive" : true
   },
   "Star": {
-    "TextureName": "Textures/Effect/light",
+    "TextureName": "data/particles/light.png",
     "MaxParticles": 200,
     "Duration": 2.3499999,
     "DurationRandomness": 1.01999998,
@@ -760,7 +760,7 @@
     "Additive" : true
   },
   "Fire": {
-    "TextureName": "Textures/Fire",
+    "TextureName": "data/particles/Fire.png",
     "MaxParticles": 2400,
     "Duration": 1.75,
     "DurationRandomness": 0.379999995,

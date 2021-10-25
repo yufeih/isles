@@ -660,7 +660,7 @@ namespace Isles
             {
                 if (selectionAreaTexture == null || selectionAreaTexture.IsDisposed)
                 {
-                    selectionAreaTexture = BaseGame.Singleton.Content.Load<Texture2D>("Textures/SelectionArea");
+                    selectionAreaTexture = BaseGame.Singleton.TextureLoader.LoadTexture("data/ui/SelectionArea.png");
                 }
 
                 return selectionAreaTexture;
@@ -675,7 +675,7 @@ namespace Isles
             {
                 if (selectionAreaTextureLarge == null || selectionAreaTexture.IsDisposed)
                 {
-                    selectionAreaTextureLarge = BaseGame.Singleton.Content.Load<Texture2D>("Textures/SelectionAreaLarge");
+                    selectionAreaTextureLarge = BaseGame.Singleton.TextureLoader.LoadTexture("data/ui/SelectionAreaLarge.png");
                 }
 
                 return selectionAreaTextureLarge;

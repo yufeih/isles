@@ -142,7 +142,7 @@ namespace Isles
             Display = new UIDisplay(BaseGame.Singleton);
 
             // Load UI textures
-            borderFadeout = game.Content.Load<Texture2D>("Textures/Fadeout");
+            borderFadeout = game.TextureLoader.LoadTexture("data/ui/Fadeout.png");
             panelsTexture = game.TextureLoader.LoadTexture("data/ui/Panels.png");
 
             for (var i = 0; i < focusAnimation.Length; i++)
