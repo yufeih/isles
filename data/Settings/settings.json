@@ -17,8 +17,6 @@
     "BaseSaturation": 1
   },
   "PlayerName": "Unnamed",
-  "EnableProfile": true,
-  "EnableScreenshot": true,
   "IsMouseVisible": true,
   "IsFixedTimeStep": true,
   "ClipCursor": true,

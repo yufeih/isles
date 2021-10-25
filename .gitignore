@@ -4,6 +4,8 @@
 bin
 obj
 
+launchSettings.json
+
 *.DS_Store
 
 *.suo
