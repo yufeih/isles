@@ -123,6 +123,7 @@ namespace Isles.Pipeline
             var baseName = Path.Combine("D:/isles/gltf/", Path.GetFileNameWithoutExtension(input.Identity.SourceFilename).ToLowerInvariant());
             var binName = baseName + ".bin";
             var meshes = new List<object>();
+            var accessors = new List<object>();
 
             using (var writer = new BinaryWriter(File.Create(binName)))
             {
@@ -138,9 +139,13 @@ namespace Isles.Pipeline
                         foreach (var i in indices)
                             writer.Write(i);
 
+                        accessors.Add(new { bufferView = 0, byteOffset = 0, componentType = 5126, type = "VEC3", count = 0 });
+                        accessors.Add(new { bufferView = 0, byteOffset = 0, componentType = 5126, type = "VEC3", count = 0 });
+                        accessors.Add(new { bufferView = 0, byteOffset = 0, componentType = 5126, type = "VEC2", count = 0 });
+
                         primitives.Add(new
                         {
-                            attributes = new { POSITION=0, NORMAL=0, TAGENT=0, TEXCOORD_0=0 },
+                            attributes = new { POSITION = 0, NORMAL = 0, TEXCOORD_0 = 0 },
                             indices = 0,
                             material = 0,
                             mode = 4,
@@ -155,6 +160,7 @@ namespace Isles.Pipeline
             {
                 asset = new { version = "2.0" },
                 buffers = new[] { new { byteLength = File.ReadAllBytes(binName).Length, uri = Path.GetFileName(binName) } },
+                accessors,
                 meshes,
             }, Formatting.Indented));
         }
