@@ -13,33 +13,40 @@
     {
       "buffer": 0,
       "byteOffset": 0,
+      "byteLength": 912,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 912,
       "byteLength": 10816,
       "byteStride": 32,
       "target": 34962
     },
     {
       "buffer": 0,
-      "byteOffset": 10816,
-      "byteLength": 912,
+      "byteOffset": 11728,
+      "byteLength": 672,
       "target": 34963
     },
     {
       "buffer": 0,
-      "byteOffset": 11728,
+      "byteOffset": 12400,
       "byteLength": 10400,
       "byteStride": 32,
       "target": 34962
-    },
-    {
-      "buffer": 0,
-      "byteOffset": 22128,
-      "byteLength": 672,
-      "target": 34963
     }
   ],
   "accessors": [
     {
       "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "type": "SCALAR",
+      "count": 456
+    },
+    {
+      "bufferView": 1,
       "byteOffset": 0,
       "componentType": 5126,
       "type": "VEC3",
@@ -56,28 +63,28 @@
       ]
     },
     {
-      "bufferView": 0,
+      "bufferView": 1,
       "byteOffset": 12,
       "componentType": 5126,
       "type": "VEC3",
       "count": 338
     },
     {
-      "bufferView": 0,
+      "bufferView": 1,
       "byteOffset": 24,
       "componentType": 5126,
       "type": "VEC2",
       "count": 338
     },
     {
-      "bufferView": 1,
+      "bufferView": 2,
       "byteOffset": 0,
       "componentType": 5123,
       "type": "SCALAR",
-      "count": 456
+      "count": 336
     },
     {
-      "bufferView": 2,
+      "bufferView": 3,
       "byteOffset": 0,
       "componentType": 5126,
       "type": "VEC3",
@@ -94,25 +101,18 @@
       ]
     },
     {
-      "bufferView": 2,
+      "bufferView": 3,
       "byteOffset": 12,
       "componentType": 5126,
       "type": "VEC3",
       "count": 325
     },
     {
-      "bufferView": 2,
+      "bufferView": 3,
       "byteOffset": 24,
       "componentType": 5126,
       "type": "VEC2",
       "count": 325
-    },
-    {
-      "bufferView": 3,
-      "byteOffset": 0,
-      "componentType": 5123,
-      "type": "SCALAR",
-      "count": 336
     }
   ],
   "meshes": [
@@ -120,11 +120,11 @@
       "primitives": [
         {
           "attributes": {
-            "POSITION": 0,
-            "NORMAL": 1,
-            "TEXCOORD_0": 2
+            "POSITION": 1,
+            "NORMAL": 2,
+            "TEXCOORD_0": 3
           },
-          "indices": 3,
+          "indices": 0,
           "material": 0,
           "mode": 4
         }
@@ -134,11 +134,11 @@
       "primitives": [
         {
           "attributes": {
-            "POSITION": 4,
-            "NORMAL": 5,
-            "TEXCOORD_0": 6
+            "POSITION": 5,
+            "NORMAL": 6,
+            "TEXCOORD_0": 7
           },
-          "indices": 7,
+          "indices": 4,
           "material": 1,
           "mode": 4
         }

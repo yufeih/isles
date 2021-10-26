@@ -130,6 +130,7 @@ namespace Isles.Pipeline
             var images = new List<object>();
             var imageDict = new Dictionary<string, string>();
             var textures = new List<object>();
+            var skins = new List<object>();
 
             foreach (var modelMesh in model.Meshes)
             {
@@ -137,18 +138,18 @@ namespace Isles.Pipeline
                 var byteBase = bytes.Count;
                 var buffViewBase = bufferViews.Count;
 
-                bytes.AddRange(modelMesh.VertexBuffer.VertexData);
-
-                var byteStride = VertexDeclaration.GetVertexStrideSize(modelMesh.MeshParts[0].GetVertexDeclaration(), 0);
-
-                bufferViews.Add(new { buffer = 0, byteOffset = byteBase, byteLength = modelMesh.VertexBuffer.VertexData.Length, byteStride, target = 34962 });
-
                 var indices = new int[modelMesh.IndexBuffer.Count];
                 modelMesh.IndexBuffer.CopyTo(indices, 0);
                 foreach (var i in indices)
                     bytes.AddRange(BitConverter.GetBytes((ushort)i));
 
-                bufferViews.Add(new { buffer = 0, byteOffset = byteBase + modelMesh.VertexBuffer.VertexData.Length, byteLength = indices.Length * 2, target = 34963 });
+                bufferViews.Add(new { buffer = 0, byteOffset = byteBase, byteLength = indices.Length * 2, target = 34963 });
+
+                bytes.AddRange(modelMesh.VertexBuffer.VertexData);
+
+                var byteStride = VertexDeclaration.GetVertexStrideSize(modelMesh.MeshParts[0].GetVertexDeclaration(), 0);
+
+                bufferViews.Add(new { buffer = 0, byteOffset = byteBase + indices.Length * 2, byteLength = modelMesh.VertexBuffer.VertexData.Length, byteStride, target = 34962 });
 
                 foreach (var part in modelMesh.MeshParts)
                 {
@@ -174,11 +175,11 @@ namespace Isles.Pipeline
                         if (z > max[2]) max[2] = z;
                     }
 
-                    accessors.Add(new { bufferView = buffViewBase, byteOffset = part.StreamOffset, componentType = 5126, type = "VEC3", count = part.NumVertices, min, max });
-                    accessors.Add(new { bufferView = buffViewBase, byteOffset = part.StreamOffset + 12, componentType = 5126, type = "VEC3", count = part.NumVertices });
-                    accessors.Add(new { bufferView = buffViewBase, byteOffset = part.StreamOffset + 24, componentType = 5126, type = "VEC2", count = part.NumVertices });
+                    accessors.Add(new { bufferView = buffViewBase, byteOffset = part.BaseVertex, componentType = 5123, type = "SCALAR", count = part.PrimitiveCount * 3 });
 
-                    accessors.Add(new { bufferView = buffViewBase + 1, byteOffset = part.BaseVertex, componentType = 5123, type = "SCALAR", count = part.PrimitiveCount * 3 });
+                    accessors.Add(new { bufferView = buffViewBase + 1, byteOffset = part.StreamOffset, componentType = 5126, type = "VEC3", count = part.NumVertices, min, max });
+                    accessors.Add(new { bufferView = buffViewBase + 1, byteOffset = part.StreamOffset + 12, componentType = 5126, type = "VEC3", count = part.NumVertices });
+                    accessors.Add(new { bufferView = buffViewBase + 1, byteOffset = part.StreamOffset + 24, componentType = 5126, type = "VEC2", count = part.NumVertices });
 
                     if (part.StartIndex != 0)
                     {
@@ -187,17 +188,16 @@ namespace Isles.Pipeline
 
                     primitives.Add(new
                     {
-                        attributes = new { POSITION = accessorBase, NORMAL = accessorBase + 1, TEXCOORD_0 = accessorBase + 2 },
-                        indices = accessorBase + 3,
+                        attributes = new { POSITION = accessorBase + 1, NORMAL = accessorBase + 2, TEXCOORD_0 = accessorBase + 3 },
+                        indices = accessorBase,
                         material = materials.Count,
                         mode = 4,
                     });
 
-                    var e = part.Material.Textures.Values.GetEnumerator();
-                    e.MoveNext();
-                    if (e.Current != null)
+                    var material = (BasicMaterialContent)part.Material;
+                    if (material.Texture != null)
                     {
-                        var src = e.Current.Filename;
+                        var src = material.Texture.Filename;
                         var uri = imageDict.Count <= 0 ? baseName + ".png" : baseName + "_" + imageDict.Count + ".png";
                         if (!imageDict.ContainsKey(src))
                         {
@@ -210,7 +210,16 @@ namespace Isles.Pipeline
                         }
 
                         uri = Path.GetFileName(uri);
-                        materials.Add(new { doubleSided = true, pbrMetallicRoughness = new { baseColorTexture = new { index = textures.Count } } });
+                        materials.Add(new {
+                            doubleSided = true,
+                            pbrMetallicRoughness = new {
+                                baseColorTexture = new { index = textures.Count },
+                                baseColorFactor = material.DiffuseColor == null || material.DiffuseColor == Vector3.One
+                                    ? null : new[] { material.DiffuseColor.Value.X, material.DiffuseColor.Value.Y, material.DiffuseColor.Value.Z, 1.0 }
+                            },
+                            emissiveFactor = material.EmissiveColor == null || material.EmissiveColor == Vector3.Zero
+                                ? null : new[] { material.EmissiveColor.Value.X, material.EmissiveColor.Value.Y, material.EmissiveColor.Value.Z }
+                        });
                         textures.Add(new { source = images.Count });
                         images.Add(new { uri });
                     }
@@ -273,6 +282,7 @@ namespace Isles.Pipeline
                 materials = materials.Count > 0 ? materials : null,
                 scenes = new[] { new { nodes = new[] { model.Root.Index } } },
                 nodes = nodes,
+                skins = skins.Count > 0 ? skins : null,
             }, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }));
         }
 
