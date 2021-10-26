@@ -1,0 +1,176 @@
+{
+  "asset": {
+    "version": "2.0"
+  },
+  "scene": 0,
+  "buffers": [
+    {
+      "byteLength": 596,
+      "uri": "shield.bin"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 84,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 84,
+      "byteLength": 512,
+      "byteStride": 32,
+      "target": 34962
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "type": "SCALAR",
+      "count": 42
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 16,
+      "min": [
+        -10.579155,
+        -163.990509,
+        -45.7192535
+      ],
+      "max": [
+        47.78673,
+        82.72067,
+        106.35601
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 12,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 16
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 24,
+      "componentType": 5126,
+      "type": "VEC2",
+      "count": 16
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 1,
+            "NORMAL": 2,
+            "TEXCOORD_0": 3
+          },
+          "indices": 0,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "images": [
+    {
+      "uri": "shield.png"
+    }
+  ],
+  "textures": [
+    {
+      "source": 0
+    }
+  ],
+  "materials": [
+    {
+      "doubleSided": true,
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        }
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "children": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "name": "Box01",
+      "translation": [
+        -2.731982,
+        46.01812,
+        -23.8830528
+      ],
+      "scale": [
+        0.510770857,
+        0.5107711,
+        0.5107712
+      ],
+      "rotation": [
+        0.417451382,
+        0.5725073,
+        0.415759653,
+        0.570187151
+      ]
+    },
+    {
+      "name": "Box02",
+      "translation": [
+        -5.875692,
+        21.47046,
+        -9.896128
+      ],
+      "scale": [
+        -0.394135,
+        0.394135,
+        0.394135
+      ],
+      "children": [
+        3
+      ]
+    },
+    {
+      "mesh": 0
+    },
+    {
+      "name": "Box03",
+      "translation": [
+        -0.006572,
+        -1.559508,
+        29.625885
+      ],
+      "scale": [
+        0.143852651,
+        0.234204069,
+        0.234201685
+      ],
+      "rotation": [
+        0.0109664882,
+        -0.707322061,
+        0.006741743,
+        0.7067699
+      ]
+    }
+  ]
+}

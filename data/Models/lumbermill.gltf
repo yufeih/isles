@@ -1,0 +1,269 @@
+{
+  "asset": {
+    "version": "2.0"
+  },
+  "scene": 0,
+  "buffers": [
+    {
+      "byteLength": 22800,
+      "uri": "lumbermill.bin"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 912,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 912,
+      "byteLength": 10816,
+      "byteStride": 32,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 11728,
+      "byteLength": 672,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 12400,
+      "byteLength": 10400,
+      "byteStride": 32,
+      "target": 34962
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "type": "SCALAR",
+      "count": 456
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 338,
+      "min": [
+        -50.833065,
+        0.891178,
+        -60.7660866
+      ],
+      "max": [
+        72.75737,
+        57.73374,
+        63.6604424
+      ]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 12,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 338
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 24,
+      "componentType": 5126,
+      "type": "VEC2",
+      "count": 338
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "type": "SCALAR",
+      "count": 336
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 325,
+      "min": [
+        -14.3121862,
+        -2.056427,
+        -18.2955513
+      ],
+      "max": [
+        33.21383,
+        86.86612,
+        25.68004
+      ]
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 12,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 325
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 24,
+      "componentType": 5126,
+      "type": "VEC2",
+      "count": 325
+    }
+  ],
+  "meshes": [
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 1,
+            "NORMAL": 2,
+            "TEXCOORD_0": 3
+          },
+          "indices": 0,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 5,
+            "NORMAL": 6,
+            "TEXCOORD_0": 7
+          },
+          "indices": 4,
+          "material": 1,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "images": [
+    {
+      "uri": "lumbermill.png"
+    },
+    {
+      "uri": "lumbermill_1.png"
+    }
+  ],
+  "textures": [
+    {
+      "source": 0
+    },
+    {
+      "source": 1
+    }
+  ],
+  "materials": [
+    {
+      "doubleSided": true,
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        }
+      }
+    },
+    {
+      "doubleSided": true,
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 1
+        }
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "children": [
+        1,
+        3,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "name": "famu",
+      "children": [
+        2
+      ]
+    },
+    {
+      "mesh": 0
+    },
+    {
+      "name": "shumu",
+      "children": [
+        4
+      ]
+    },
+    {
+      "mesh": 1
+    },
+    {
+      "name": "fire1",
+      "translation": [
+        -39.92254,
+        50.573082,
+        -45.51081
+      ]
+    },
+    {
+      "name": "fire2",
+      "translation": [
+        26.65444,
+        41.73186,
+        -49.216877
+      ]
+    },
+    {
+      "name": "fire3",
+      "translation": [
+        56.8733253,
+        43.3326569,
+        -25.2740726
+      ]
+    },
+    {
+      "name": "fire5",
+      "translation": [
+        33.8560143,
+        41.4974937,
+        50.35962
+      ]
+    },
+    {
+      "name": "fire6",
+      "translation": [
+        -38.4077759,
+        46.53757,
+        17.6864662
+      ]
+    },
+    {
+      "name": "fire4",
+      "translation": [
+        14.3284626,
+        81.35971,
+        -1.198234
+      ]
+    }
+  ]
+}
