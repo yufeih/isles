@@ -376,6 +376,7 @@
   ],
   "materials": [
     {
+      "doubleSided": true,
       "pbrMetallicRoughness": {
         "baseColorTexture": {
           "index": 0
@@ -383,6 +384,7 @@
       }
     },
     {
+      "doubleSided": true,
       "pbrMetallicRoughness": {
         "baseColorTexture": {
           "index": 1
@@ -390,6 +392,7 @@
       }
     },
     {
+      "doubleSided": true,
       "pbrMetallicRoughness": {
         "baseColorTexture": {
           "index": 2
@@ -397,6 +400,7 @@
       }
     },
     {
+      "doubleSided": true,
       "pbrMetallicRoughness": {
         "baseColorTexture": {
           "index": 3
@@ -404,6 +408,7 @@
       }
     },
     {
+      "doubleSided": true,
       "pbrMetallicRoughness": {
         "baseColorTexture": {
           "index": 4
@@ -414,29 +419,120 @@
   "scenes": [
     {
       "nodes": [
-        0,
-        1,
-        2,
-        3,
-        4
+        0
       ]
     }
   ],
   "nodes": [
     {
-      "mesh": 0
+      "name": "RootNode",
+      "children": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
     },
     {
-      "mesh": 1
+      "name": "1",
+      "mesh": 0,
+      "translation": [
+        1433.50842,
+        -105.188774,
+        1565.12683
+      ],
+      "scale": [
+        1.26582193,
+        1.10464537,
+        4.909236
+      ],
+      "rotation": [
+        -0.454081535,
+        0.2610537,
+        -0.05784252,
+        0.849891245
+      ]
     },
     {
-      "mesh": 2
+      "name": "3",
+      "mesh": 1,
+      "translation": [
+        150.947144,
+        154.241791,
+        -202.279312
+      ],
+      "scale": [
+        0.7020807,
+        0.7020807,
+        1.15393829
+      ],
+      "rotation": [
+        -0.707106769,
+        0.0,
+        0.0,
+        0.707106769
+      ]
     },
     {
-      "mesh": 3
+      "name": "5",
+      "mesh": 2,
+      "translation": [
+        -60.1578941,
+        430.471558,
+        26.12922
+      ],
+      "scale": [
+        5.55154848,
+        5.55154848,
+        2.834894
+      ],
+      "rotation": [
+        -0.707106769,
+        0.0,
+        0.0,
+        0.707106769
+      ]
     },
     {
-      "mesh": 4
+      "name": "6",
+      "mesh": 3,
+      "translation": [
+        -484.756378,
+        0.0,
+        1162.37842
+      ],
+      "scale": [
+        2.54,
+        1.90314388,
+        1.0382992
+      ],
+      "rotation": [
+        -0.707106769,
+        0.0,
+        0.0,
+        0.707106769
+      ]
+    },
+    {
+      "name": "2",
+      "mesh": 4,
+      "translation": [
+        455.4966,
+        -3.94430453E-31,
+        45.7918167
+      ],
+      "scale": [
+        2.54,
+        2.54,
+        2.54
+      ],
+      "rotation": [
+        -0.707106769,
+        0.0,
+        0.0,
+        0.707106769
+      ]
     }
   ]
 }

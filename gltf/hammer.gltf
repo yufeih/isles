@@ -92,6 +92,7 @@
   ],
   "materials": [
     {
+      "doubleSided": true,
       "pbrMetallicRoughness": {
         "baseColorTexture": {
           "index": 0
@@ -107,6 +108,28 @@
     }
   ],
   "nodes": [
+    {
+      "name": "Box01",
+      "translation": [
+        2.200301,
+        45.02804,
+        -5.220691
+      ],
+      "scale": [
+        0.647426,
+        0.6474252,
+        0.647425234
+      ],
+      "rotation": [
+        0.70772624,
+        -0.706486642,
+        -0.0002875383,
+        0.0002869927
+      ],
+      "children": [
+        1
+      ]
+    },
     {
       "mesh": 0
     }

@@ -163,6 +163,7 @@
   ],
   "materials": [
     {
+      "doubleSided": true,
       "pbrMetallicRoughness": {
         "baseColorTexture": {
           "index": 0
@@ -170,6 +171,7 @@
       }
     },
     {
+      "doubleSided": true,
       "pbrMetallicRoughness": {
         "baseColorTexture": {
           "index": 1
@@ -180,17 +182,88 @@
   "scenes": [
     {
       "nodes": [
-        0,
-        1
+        0
       ]
     }
   ],
   "nodes": [
     {
+      "children": [
+        1,
+        3,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "name": "famu",
+      "children": [
+        2
+      ]
+    },
+    {
       "mesh": 0
     },
     {
+      "name": "shumu",
+      "children": [
+        4
+      ]
+    },
+    {
       "mesh": 1
+    },
+    {
+      "name": "fire1",
+      "translation": [
+        -39.92254,
+        50.573082,
+        -45.51081
+      ]
+    },
+    {
+      "name": "fire2",
+      "translation": [
+        26.65444,
+        41.73186,
+        -49.216877
+      ]
+    },
+    {
+      "name": "fire3",
+      "translation": [
+        56.8733253,
+        43.3326569,
+        -25.2740726
+      ]
+    },
+    {
+      "name": "fire5",
+      "translation": [
+        33.8560143,
+        41.4974937,
+        50.35962
+      ]
+    },
+    {
+      "name": "fire6",
+      "translation": [
+        -38.4077759,
+        46.53757,
+        17.6864662
+      ]
+    },
+    {
+      "name": "fire4",
+      "translation": [
+        14.3284626,
+        81.35971,
+        -1.198234
+      ]
     }
   ]
 }

@@ -117,9 +117,8 @@ namespace Isles.Pipeline
             return model;
         }
 
-        private static void WriteGLTF(NodeContent input, ModelContent model, ContentProcessorContext context)
+        private void WriteGLTF(NodeContent input, ModelContent model, ContentProcessorContext context)
         {
-
             Directory.CreateDirectory("D:/isles/gltf/");
             var baseName = Path.Combine("D:/isles/gltf/", Path.GetFileNameWithoutExtension(input.Identity.SourceFilename).ToLowerInvariant());
             var binName = baseName + ".bin";
@@ -131,8 +130,6 @@ namespace Isles.Pipeline
             var images = new List<object>();
             var imageDict = new Dictionary<string, string>();
             var textures = new List<object>();
-            var nodes = new List<object>();
-            var sceneNodes = new List<int>();
 
             foreach (var modelMesh in model.Meshes)
             {
@@ -213,15 +210,53 @@ namespace Isles.Pipeline
                         }
 
                         uri = Path.GetFileName(uri);
-                        materials.Add(new { pbrMetallicRoughness = new { baseColorTexture = new { index = textures.Count } } });
+                        materials.Add(new { doubleSided = true, pbrMetallicRoughness = new { baseColorTexture = new { index = textures.Count } } });
                         textures.Add(new { source = images.Count });
                         images.Add(new { uri });
                     }
                 }
 
-                nodes.Add(new { mesh = meshes.Count });
-                sceneNodes.Add(meshes.Count);
                 meshes.Add(new { primitives });
+            }
+
+            var nodes = new List<object>();
+            foreach (var bone in model.Bones)
+            {
+                var children = new List<int>();
+
+                foreach (var child in bone.Children)
+                {
+                    children.Add(child.Index);
+                }
+
+                Vector3 s, t;
+                Quaternion r;
+                if (!bone.Transform.Decompose(out s, out r, out t))
+                {
+                    context.Logger.LogWarning("a", input.Identity, "Matrix not decomposable: {0}", bone.Transform);
+
+                    DecomposeRough(bone.Transform, out s, out r, out t);
+                }
+
+                var mesh = (object)null;
+
+                for (var i = 0; i < model.Meshes.Count; i++)
+                {
+                    if (model.Meshes[i].ParentBone == bone)
+                    {
+                        mesh = i;
+                        break;
+                    }
+                }
+
+                nodes.Add(new {
+                    name = string.IsNullOrEmpty(bone.Name) ? null : bone.Name,
+                    mesh,
+                    translation = t == Vector3.Zero ? null : new[] { t.X, t.Y, t.Z },
+                    scale = s == Vector3.One ? null : new[] { s.X, s.Y, s.Z },
+                    rotation = r == Quaternion.Identity ? null : new[] { r.X, r.Y, r.Z, r.W },
+                    children = children.Count > 0 ? children : null
+                });
             }
 
             File.WriteAllBytes(binName, bytes.ToArray());
@@ -233,12 +268,42 @@ namespace Isles.Pipeline
                 bufferViews,
                 accessors,
                 meshes,
-                images,
-                textures,
-                materials,
-                scenes = new[] { new { nodes = sceneNodes }},
-                nodes,
-            }, Formatting.Indented));
+                images = images.Count > 0 ? images : null,
+                textures = textures.Count > 0 ? textures : null,
+                materials = materials.Count > 0 ? materials : null,
+                scenes = new[] { new { nodes = new[] { model.Root.Index } } },
+                nodes = nodes,
+            }, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }));
+        }
+
+        public static bool DecomposeRough(
+            Matrix m,
+            out Vector3 scale,
+            out Quaternion rotation,
+            out Vector3 translation
+        )
+        {
+            translation.X = m.M41;
+            translation.Y = m.M42;
+            translation.Z = m.M43;
+
+            float xs = (Math.Sign(m.M11 * m.M12 * m.M13 * m.M14) < 0) ? -1 : 1;
+            float ys = (Math.Sign(m.M21 * m.M22 * m.M23 * m.M24) < 0) ? -1 : 1;
+            float zs = (Math.Sign(m.M31 * m.M32 * m.M33 * m.M34) < 0) ? -1 : 1;
+
+            scale.X = xs * (float)Math.Sqrt(m.M11 * m.M11 + m.M12 * m.M12 + m.M13 * m.M13);
+            scale.Y = ys * (float)Math.Sqrt(m.M21 * m.M21 + m.M22 * m.M22 + m.M23 * m.M23);
+            scale.Z = zs * (float)Math.Sqrt(m.M31 * m.M31 + m.M32 * m.M32 + m.M33 * m.M33);
+
+            Matrix m1 = new Matrix(
+                m.M11 / scale.X, m.M12 / scale.X, m.M13 / scale.X, 0,
+                m.M21 / scale.Y, m.M22 / scale.Y, m.M23 / scale.Y, 0,
+                m.M31 / scale.Z, m.M32 / scale.Z, m.M33 / scale.Z, 0,
+                0, 0, 0, 1
+            );
+
+            rotation = Quaternion.Normalize(Quaternion.CreateFromRotationMatrix(m1));
+            return true;
         }
 
         private Dictionary<string, AnimationClip> ProcessAnimations(NodeContent input)

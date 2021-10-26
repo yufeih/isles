@@ -305,6 +305,7 @@
   ],
   "materials": [
     {
+      "doubleSided": true,
       "pbrMetallicRoughness": {
         "baseColorTexture": {
           "index": 0
@@ -312,6 +313,7 @@
       }
     },
     {
+      "doubleSided": true,
       "pbrMetallicRoughness": {
         "baseColorTexture": {
           "index": 1
@@ -319,6 +321,7 @@
       }
     },
     {
+      "doubleSided": true,
       "pbrMetallicRoughness": {
         "baseColorTexture": {
           "index": 2
@@ -326,6 +329,7 @@
       }
     },
     {
+      "doubleSided": true,
       "pbrMetallicRoughness": {
         "baseColorTexture": {
           "index": 3
@@ -336,25 +340,179 @@
   "scenes": [
     {
       "nodes": [
-        0,
-        1,
-        2,
-        3
+        0
       ]
     }
   ],
   "nodes": [
     {
+      "children": [
+        1,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    {
+      "name": "gruop1",
+      "translation": [
+        -0.868132,
+        41.36889,
+        -0.790708
+      ],
+      "children": [
+        2,
+        4,
+        6,
+        8,
+        9
+      ]
+    },
+    {
+      "name": "fangyu4",
+      "translation": [
+        0.289574,
+        19.8942032,
+        -0.003792
+      ],
+      "scale": [
+        0.444763,
+        0.81565,
+        0.444763
+      ],
+      "children": [
+        3
+      ]
+    },
+    {
       "mesh": 0
+    },
+    {
+      "name": "fangyu3",
+      "translation": [
+        -77.7355652,
+        -41.43162,
+        31.3770332
+      ],
+      "scale": [
+        1.0,
+        1.176615,
+        1.0
+      ],
+      "children": [
+        5
+      ]
     },
     {
       "mesh": 1
     },
     {
+      "name": "fangyu2",
+      "translation": [
+        -77.7355652,
+        -41.43162,
+        31.3770332
+      ],
+      "scale": [
+        1.0,
+        1.176615,
+        1.0
+      ],
+      "children": [
+        7
+      ]
+    },
+    {
       "mesh": 2
     },
     {
+      "name": "Prism02",
+      "translation": [
+        32.81143,
+        -3.920082,
+        -23.80122
+      ],
+      "scale": [
+        0.682873368,
+        0.340074,
+        0.682873368
+      ],
+      "rotation": [
+        0.0,
+        0.2503544,
+        0.0,
+        0.968154252
+      ]
+    },
+    {
+      "name": "fangyu1",
+      "translation": [
+        -77.7355652,
+        -41.43162,
+        31.3770332
+      ],
+      "scale": [
+        1.0,
+        1.176615,
+        1.0
+      ],
+      "children": [
+        10
+      ]
+    },
+    {
       "mesh": 3
+    },
+    {
+      "name": "fire1",
+      "translation": [
+        12.2068291,
+        21.4868488,
+        -18.0323811
+      ]
+    },
+    {
+      "name": "fire5",
+      "translation": [
+        -12.6108065,
+        62.191803,
+        -16.22062
+      ]
+    },
+    {
+      "name": "fire2",
+      "translation": [
+        -14.9875183,
+        24.4845753,
+        -1.291504
+      ]
+    },
+    {
+      "name": "fire4",
+      "translation": [
+        -9.295533,
+        50.5150681,
+        13.2314568
+      ]
+    },
+    {
+      "name": "fire3",
+      "translation": [
+        12.8177948,
+        24.1122475,
+        12.859704
+      ]
+    },
+    {
+      "name": "fire6",
+      "translation": [
+        0.077979,
+        81.9518051,
+        -0.799779
+      ]
     }
   ]
 }

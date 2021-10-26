@@ -92,6 +92,7 @@
   ],
   "materials": [
     {
+      "doubleSided": true,
       "pbrMetallicRoughness": {
         "baseColorTexture": {
           "index": 0
@@ -107,6 +108,23 @@
     }
   ],
   "nodes": [
+    {
+      "name": "jinkuang",
+      "translation": [
+        2.071983,
+        0.0,
+        5.992615
+      ],
+      "rotation": [
+        0.0,
+        -0.707106769,
+        0.0,
+        0.707106769
+      ],
+      "children": [
+        1
+      ]
+    },
     {
       "mesh": 0
     }

@@ -163,6 +163,7 @@
   ],
   "materials": [
     {
+      "doubleSided": true,
       "pbrMetallicRoughness": {
         "baseColorTexture": {
           "index": 0
@@ -170,6 +171,7 @@
       }
     },
     {
+      "doubleSided": true,
       "pbrMetallicRoughness": {
         "baseColorTexture": {
           "index": 1
@@ -180,14 +182,72 @@
   "scenes": [
     {
       "nodes": [
-        0,
-        1
+        0
       ]
     }
   ],
   "nodes": [
     {
+      "children": [
+        1,
+        4
+      ]
+    },
+    {
+      "name": "Palm",
+      "translation": [
+        0.001501,
+        -0.029289,
+        0.003141
+      ],
+      "scale": [
+        0.822787,
+        0.822787,
+        0.822787
+      ],
+      "children": [
+        2
+      ]
+    },
+    {
+      "children": [
+        3
+      ]
+    },
+    {
       "mesh": 0
+    },
+    {
+      "name": "Mesh04",
+      "translation": [
+        0.123021,
+        10.7409754,
+        0.26562
+      ],
+      "scale": [
+        0.9999999,
+        0.999999642,
+        1.0
+      ],
+      "rotation": [
+        0.157670364,
+        0.874069,
+        0.0815716758,
+        0.452205181
+      ],
+      "children": [
+        5
+      ]
+    },
+    {
+      "translation": [
+        -7.31467,
+        -1.499184,
+        -5.021118
+      ],
+      "children": [
+        6
+      ]
     },
     {
       "mesh": 1

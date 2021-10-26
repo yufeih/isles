@@ -92,6 +92,7 @@
   ],
   "materials": [
     {
+      "doubleSided": true,
       "pbrMetallicRoughness": {
         "baseColorTexture": {
           "index": 0
@@ -107,6 +108,28 @@
     }
   ],
   "nodes": [
+    {
+      "name": "Cylinder03",
+      "translation": [
+        3.952286,
+        -4.153707,
+        -4.918558
+      ],
+      "scale": [
+        0.49215582,
+        0.7331544,
+        0.4197248
+      ],
+      "rotation": [
+        0.553008735,
+        0.682069063,
+        0.302274168,
+        -0.370935947
+      ],
+      "children": [
+        1
+      ]
+    },
     {
       "mesh": 0
     }

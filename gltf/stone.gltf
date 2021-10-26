@@ -92,6 +92,7 @@
   ],
   "materials": [
     {
+      "doubleSided": true,
       "pbrMetallicRoughness": {
         "baseColorTexture": {
           "index": 0
@@ -108,7 +109,24 @@
   ],
   "nodes": [
     {
-      "mesh": 0
+      "name": "kuangshi",
+      "mesh": 0,
+      "translation": [
+        2.74732137,
+        -0.401866972,
+        0.356546879
+      ],
+      "scale": [
+        0.019486621,
+        0.019486621,
+        0.0156774446
+      ],
+      "rotation": [
+        0.0238773655,
+        0.0,
+        0.0,
+        0.9997149
+      ]
     }
   ]
 }

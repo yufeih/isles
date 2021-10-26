@@ -92,6 +92,7 @@
   ],
   "materials": [
     {
+      "doubleSided": true,
       "pbrMetallicRoughness": {
         "baseColorTexture": {
           "index": 0
@@ -108,7 +109,82 @@
   ],
   "nodes": [
     {
+      "children": [
+        1,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    {
+      "name": "Box01",
+      "translation": [
+        -0.369004,
+        7.796122,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        0.803024,
+        1.0
+      ],
+      "children": [
+        2
+      ]
+    },
+    {
       "mesh": 0
+    },
+    {
+      "name": "fire1",
+      "translation": [
+        -23.3608685,
+        17.2769051,
+        -21.9218464
+      ]
+    },
+    {
+      "name": "fire2",
+      "translation": [
+        -3.065667,
+        20.9262085,
+        -16.3946533
+      ]
+    },
+    {
+      "name": "fire3",
+      "translation": [
+        21.1040726,
+        21.9699078,
+        -5.501184
+      ]
+    },
+    {
+      "name": "fire4",
+      "translation": [
+        -17.8258133,
+        20.9262066,
+        17.0080376
+      ]
+    },
+    {
+      "name": "fire5",
+      "translation": [
+        0.06543,
+        48.8451843,
+        0.939727
+      ]
+    },
+    {
+      "name": "fire6",
+      "translation": [
+        7.819941,
+        18.57789,
+        18.4070549
+      ]
     }
   ]
 }
