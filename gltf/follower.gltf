@@ -5,7 +5,7 @@
   "scene": 0,
   "buffers": [
     {
-      "byteLength": 124092,
+      "byteLength": 127804,
       "uri": "follower.bin"
     }
   ],
@@ -22,6 +22,11 @@
       "byteLength": 119496,
       "byteStride": 52,
       "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 124092,
+      "byteLength": 3712
     }
   ],
   "accessors": [
@@ -76,6 +81,13 @@
       "componentType": 5126,
       "type": "VEC4",
       "count": 2298
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "type": "MAT4",
+      "count": 58
     }
   ],
   "meshes": [
@@ -137,7 +149,8 @@
       ]
     },
     {
-      "mesh": 0
+      "mesh": 0,
+      "skin": 0
     },
     {
       "name": "Bip01",
@@ -1270,6 +1283,72 @@
         0.686348,
         2E-06,
         0.0
+      ]
+    }
+  ],
+  "skins": [
+    {
+      "inverseBindMatrices": 6,
+      "skeleton": 3,
+      "joints": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60
       ]
     }
   ]

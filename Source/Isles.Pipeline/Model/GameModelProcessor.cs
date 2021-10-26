@@ -102,9 +102,9 @@ namespace Isles.Pipeline
             // Chain to the base ModelProcessor class so it can convert the model data.
             model = base.Process(input, context);
 
+            var skinningData = new SkinningData(bindPose, inverseBindPose, skeletonHierarchy, boneNames);
             // Store our custom animation data in the Tag property of the model.
-            dictionary.Add("SkinningData", new SkinningData(bindPose, inverseBindPose,
-                                                            skeletonHierarchy, boneNames));
+            dictionary.Add("SkinningData", skinningData);
             dictionary.Add("AnimationData", animationClips);
             AddSpacePartitionData(dictionary, model);
             model.Tag = dictionary;
@@ -112,12 +112,12 @@ namespace Isles.Pipeline
             // Store normal texture
             AddNormalTextureToTag(model);
 
-            WriteGLTF(input, model, skeleton, context);
+            WriteGLTF(input, model, bones, context);
 
             return model;
         }
 
-        private void WriteGLTF(NodeContent input, ModelContent model, BoneContent skeleton, ContentProcessorContext context)
+        private void WriteGLTF(NodeContent input, ModelContent model, IList<BoneContent> bones, ContentProcessorContext context)
         {
             Directory.CreateDirectory("D:/isles/gltf/");
             var baseName = Path.Combine("D:/isles/gltf/", Path.GetFileNameWithoutExtension(input.Identity.SourceFilename).ToLowerInvariant());
@@ -185,7 +185,7 @@ namespace Isles.Pipeline
                     accessors.Add(new { bufferView = buffViewBase + 1, byteOffset = part.StreamOffset + 12, componentType = 5126, type = "VEC3", count = part.NumVertices });
                     accessors.Add(new { bufferView = buffViewBase + 1, byteOffset = part.StreamOffset + 24, componentType = 5126, type = "VEC2", count = part.NumVertices });
 
-                    if (skeleton != null)
+                    if (bones != null)
                     {
                         foreach (var vd in part.GetVertexDeclaration())
                             context.Logger.LogWarning("a", input.Identity, "{0}", vd);
@@ -202,8 +202,8 @@ namespace Isles.Pipeline
                     {
                         attributes = new {
                             POSITION = accessorBase + 1, NORMAL = accessorBase + 2, TEXCOORD_0 = accessorBase + 3,
-                            JOINTS_0 = skeleton != null ? (int?)accessorBase + 4 : null,
-                            WEIGHTS_0 = skeleton != null ? (int?)accessorBase + 5 : null,
+                            JOINTS_0 = bones != null ? (int?)accessorBase + 4 : null,
+                            WEIGHTS_0 = bones != null ? (int?)accessorBase + 5 : null,
                         },
                         indices = accessorBase,
                         material = materials.Count,
@@ -245,6 +245,7 @@ namespace Isles.Pipeline
             }
 
             var nodes = new List<object>();
+            var nodesByName = new Dictionary<string, int>();
             foreach (var bone in model.Bones)
             {
                 var children = new List<int>();
@@ -264,24 +265,54 @@ namespace Isles.Pipeline
                 }
 
                 var mesh = (object)null;
+                var skin = (object)null;
 
                 for (var i = 0; i < model.Meshes.Count; i++)
                 {
                     if (model.Meshes[i].ParentBone == bone)
                     {
                         mesh = i;
+                        skin = bones != null ? (int?)0 : null;
                         break;
                     }
                 }
 
+                if (!string.IsNullOrEmpty(bone.Name))
+                    nodesByName.Add(bone.Name, nodes.Count);
+
                 nodes.Add(new {
                     name = string.IsNullOrEmpty(bone.Name) ? null : bone.Name,
                     mesh,
+                    skin,
                     translation = t == Vector3.Zero ? null : new[] { t.X, t.Y, t.Z },
                     scale = s == Vector3.One ? null : new[] { s.X, s.Y, s.Z },
                     rotation = r == Quaternion.Identity ? null : new[] { r.X, r.Y, r.Z, r.W },
                     children = children.Count > 0 ? children : null
                 });
+            }
+
+            if (bones != null)
+            {
+                var joints = new List<int>();
+                var inverseBindPose = new List<Matrix>();
+                foreach (var bone in bones)
+                {
+                    joints.Add(nodesByName[bone.Name]);
+                    inverseBindPose.Add(Matrix.Invert(bone.Transform));
+                }
+
+                skins.Add(new { inverseBindMatrices = accessors.Count, skeleton = joints[0], joints });
+
+                accessors.Add(new { bufferView = bufferViews.Count, byteOffset = 0, componentType = 5126, type = "MAT4", count = inverseBindPose.Count });
+
+                bufferViews.Add(new { buffer = 0, byteOffset = bytes.Count, byteLength = inverseBindPose.Count * 16 * 4 });
+                foreach (var m in inverseBindPose)
+                {
+                    bytes.AddRange(BitConverter.GetBytes(m.M11)); bytes.AddRange(BitConverter.GetBytes(m.M21)); bytes.AddRange(BitConverter.GetBytes(m.M31)); bytes.AddRange(BitConverter.GetBytes(m.M41));
+                    bytes.AddRange(BitConverter.GetBytes(m.M12)); bytes.AddRange(BitConverter.GetBytes(m.M22)); bytes.AddRange(BitConverter.GetBytes(m.M32)); bytes.AddRange(BitConverter.GetBytes(m.M42));
+                    bytes.AddRange(BitConverter.GetBytes(m.M13)); bytes.AddRange(BitConverter.GetBytes(m.M23)); bytes.AddRange(BitConverter.GetBytes(m.M33)); bytes.AddRange(BitConverter.GetBytes(m.M43));
+                    bytes.AddRange(BitConverter.GetBytes(m.M14)); bytes.AddRange(BitConverter.GetBytes(m.M24)); bytes.AddRange(BitConverter.GetBytes(m.M34)); bytes.AddRange(BitConverter.GetBytes(m.M44));
+                }
             }
 
             File.WriteAllBytes(binName, bytes.ToArray());
