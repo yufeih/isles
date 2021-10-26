@@ -298,7 +298,7 @@ namespace Isles.Pipeline
                 foreach (var bone in bones)
                 {
                     joints.Add(nodesByName[bone.Name]);
-                    inverseBindPose.Add(Matrix.Invert(bone.Transform));
+                    inverseBindPose.Add(Matrix.Invert(bone.AbsoluteTransform));
                 }
 
                 skins.Add(new { inverseBindMatrices = accessors.Count, skeleton = joints[0], joints });
@@ -308,10 +308,10 @@ namespace Isles.Pipeline
                 bufferViews.Add(new { buffer = 0, byteOffset = bytes.Count, byteLength = inverseBindPose.Count * 16 * 4 });
                 foreach (var m in inverseBindPose)
                 {
-                    bytes.AddRange(BitConverter.GetBytes(m.M11)); bytes.AddRange(BitConverter.GetBytes(m.M21)); bytes.AddRange(BitConverter.GetBytes(m.M31)); bytes.AddRange(BitConverter.GetBytes(m.M41));
-                    bytes.AddRange(BitConverter.GetBytes(m.M12)); bytes.AddRange(BitConverter.GetBytes(m.M22)); bytes.AddRange(BitConverter.GetBytes(m.M32)); bytes.AddRange(BitConverter.GetBytes(m.M42));
-                    bytes.AddRange(BitConverter.GetBytes(m.M13)); bytes.AddRange(BitConverter.GetBytes(m.M23)); bytes.AddRange(BitConverter.GetBytes(m.M33)); bytes.AddRange(BitConverter.GetBytes(m.M43));
-                    bytes.AddRange(BitConverter.GetBytes(m.M14)); bytes.AddRange(BitConverter.GetBytes(m.M24)); bytes.AddRange(BitConverter.GetBytes(m.M34)); bytes.AddRange(BitConverter.GetBytes(m.M44));
+                    bytes.AddRange(BitConverter.GetBytes(m.M11)); bytes.AddRange(BitConverter.GetBytes(m.M12)); bytes.AddRange(BitConverter.GetBytes(m.M13)); bytes.AddRange(BitConverter.GetBytes(m.M14));
+                    bytes.AddRange(BitConverter.GetBytes(m.M21)); bytes.AddRange(BitConverter.GetBytes(m.M22)); bytes.AddRange(BitConverter.GetBytes(m.M23)); bytes.AddRange(BitConverter.GetBytes(m.M24));
+                    bytes.AddRange(BitConverter.GetBytes(m.M31)); bytes.AddRange(BitConverter.GetBytes(m.M32)); bytes.AddRange(BitConverter.GetBytes(m.M33)); bytes.AddRange(BitConverter.GetBytes(m.M34));
+                    bytes.AddRange(BitConverter.GetBytes(m.M41)); bytes.AddRange(BitConverter.GetBytes(m.M42)); bytes.AddRange(BitConverter.GetBytes(m.M43)); bytes.AddRange(BitConverter.GetBytes(1.0f));
                 }
             }
 
