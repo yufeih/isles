@@ -63,7 +63,7 @@ namespace Isles.Pipeline
                 AddSpacePartitionData(dictionary, model);
                 model.Tag = dictionary;
                 AddNormalTextureToTag(model);
-                WriteGLTF(input, model, null, context);
+                WriteGLTF(input, model, null, null, context);
                 return model;
             }
 
@@ -112,12 +112,12 @@ namespace Isles.Pipeline
             // Store normal texture
             AddNormalTextureToTag(model);
 
-            WriteGLTF(input, model, bones, context);
+            WriteGLTF(input, model, bones, skeleton.Animations, context);
 
             return model;
         }
 
-        private void WriteGLTF(NodeContent input, ModelContent model, IList<BoneContent> bones, ContentProcessorContext context)
+        private void WriteGLTF(NodeContent input, ModelContent model, IList<BoneContent> bones, AnimationContentDictionary animation, ContentProcessorContext context)
         {
             Directory.CreateDirectory("D:/isles/gltf/");
             var baseName = Path.Combine("D:/isles/gltf/", Path.GetFileNameWithoutExtension(input.Identity.SourceFilename).ToLowerInvariant());
@@ -315,6 +315,91 @@ namespace Isles.Pipeline
                 }
             }
 
+            var animations = new List<object>();
+
+            if (animation != null)
+            {
+                var byteOffset = bytes.Count;
+                foreach (var anim in animation)
+                {
+                    var samplers = new List<object>();
+                    var channels = new List<object>();
+
+                    foreach (var chan in anim.Value.Channels)
+                    {
+                        var node = nodesByName[chan.Key];
+
+                        var min = float.MaxValue;
+                        var max = float.MinValue;
+
+                        foreach (var frame in chan.Value)
+                        {
+                            var t = (float)frame.Time.TotalSeconds;
+                            bytes.AddRange(BitConverter.GetBytes(t));
+                            if (t < min) min = t;
+                            if (t > max) max = t;
+                        }
+
+                        accessors.Add(new { bufferView = bufferViews.Count, byteOffset = bytes.Count - byteOffset - chan.Value.Count * 4, componentType = 5126, type = "SCALAR", count = chan.Value.Count,
+                            min = new[]{min}, max = new[]{max} });
+
+                        accessors.Add(new { bufferView = bufferViews.Count, byteOffset = bytes.Count - byteOffset, componentType = 5126, type = "VEC3", count = chan.Value.Count });
+
+                        foreach (var frame in chan.Value)
+                        {
+                            Vector3 s, t; Quaternion r;
+                            if (!frame.Transform.Decompose(out s, out r, out t))
+                            {
+                                throw new InvalidOperationException(frame.Transform.ToString());
+                            }
+                            bytes.AddRange(BitConverter.GetBytes(s.X));
+                            bytes.AddRange(BitConverter.GetBytes(s.Y));
+                            bytes.AddRange(BitConverter.GetBytes(s.Z));
+                        }
+
+                        accessors.Add(new { bufferView = bufferViews.Count, byteOffset = bytes.Count - byteOffset, componentType = 5126, type = "VEC4", count = chan.Value.Count });
+
+                        foreach (var frame in chan.Value)
+                        {
+                            Vector3 s, t; Quaternion r;
+                            if (!frame.Transform.Decompose(out s, out r, out t))
+                            {
+                                throw new InvalidOperationException(frame.Transform.ToString());
+                            }
+                            bytes.AddRange(BitConverter.GetBytes(r.X));
+                            bytes.AddRange(BitConverter.GetBytes(r.Y));
+                            bytes.AddRange(BitConverter.GetBytes(r.Z));
+                            bytes.AddRange(BitConverter.GetBytes(r.W));
+                        }
+
+                        accessors.Add(new { bufferView = bufferViews.Count, byteOffset = bytes.Count - byteOffset, componentType = 5126, type = "VEC3", count = chan.Value.Count });
+
+                        foreach (var frame in chan.Value)
+                        {
+                            Vector3 s, t; Quaternion r;
+                            if (!frame.Transform.Decompose(out s, out r, out t))
+                            {
+                                throw new InvalidOperationException(frame.Transform.ToString());
+                            }
+                            bytes.AddRange(BitConverter.GetBytes(t.X));
+                            bytes.AddRange(BitConverter.GetBytes(t.Y));
+                            bytes.AddRange(BitConverter.GetBytes(t.Z));
+                        }
+
+                        channels.Add(new { sampler = samplers.Count, target = new { node, path = "scale" } });
+                        channels.Add(new { sampler = samplers.Count + 1, target = new { node, path = "rotation" } });
+                        channels.Add(new { sampler = samplers.Count + 2, target = new { node, path = "translation" } });
+
+                        samplers.Add(new { input = accessors.Count - 4, output = accessors.Count - 3 });
+                        samplers.Add(new { input = accessors.Count - 4, output = accessors.Count - 2 });
+                        samplers.Add(new { input = accessors.Count - 4, output = accessors.Count - 1 });
+                    }
+
+                    animations.Add(new { name = anim.Key, channels, samplers });
+                }
+                bufferViews.Add(new { buffer = 0, byteOffset, byteLength = bytes.Count - byteOffset });
+            }
+
             File.WriteAllBytes(binName, bytes.ToArray());
             File.WriteAllText(baseName + ".gltf", JsonConvert.SerializeObject(new
             {
@@ -330,6 +415,7 @@ namespace Isles.Pipeline
                 scenes = new[] { new { nodes = new[] { model.Root.Index } } },
                 nodes = nodes,
                 skins = skins.Count > 0 ? skins : null,
+                animations = animations.Count > 0 ? animations : null,
             }, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }));
         }
 
