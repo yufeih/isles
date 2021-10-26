@@ -5,7 +5,7 @@
   "scene": 0,
   "buffers": [
     {
-      "byteLength": 14970,
+      "byteLength": 14972,
       "uri": "goldmine.bin"
     }
   ],
@@ -18,7 +18,7 @@
     },
     {
       "buffer": 0,
-      "byteOffset": 1242,
+      "byteOffset": 1244,
       "byteLength": 13728,
       "byteStride": 32,
       "target": 34962

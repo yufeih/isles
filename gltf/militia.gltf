@@ -62,6 +62,20 @@
       "componentType": 5126,
       "type": "VEC2",
       "count": 5418
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 32,
+      "componentType": 5121,
+      "type": "VEC4",
+      "count": 5418
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 36,
+      "componentType": 5126,
+      "type": "VEC4",
+      "count": 5418
     }
   ],
   "meshes": [
@@ -71,7 +85,9 @@
           "attributes": {
             "POSITION": 1,
             "NORMAL": 2,
-            "TEXCOORD_0": 3
+            "TEXCOORD_0": 3,
+            "JOINTS_0": 4,
+            "WEIGHTS_0": 5
           },
           "indices": 0,
           "material": 0,

@@ -5,7 +5,7 @@
   "scene": 0,
   "buffers": [
     {
-      "byteLength": 130336,
+      "byteLength": 130340,
       "uri": "ruined.bin"
     }
   ],
@@ -31,46 +31,46 @@
     },
     {
       "buffer": 0,
-      "byteOffset": 41810,
+      "byteOffset": 41812,
       "byteLength": 43776,
       "byteStride": 32,
       "target": 34962
     },
     {
       "buffer": 0,
-      "byteOffset": 85586,
+      "byteOffset": 85588,
       "byteLength": 1164,
       "target": 34963
     },
     {
       "buffer": 0,
-      "byteOffset": 86750,
+      "byteOffset": 86752,
       "byteLength": 15872,
       "byteStride": 32,
       "target": 34962
     },
     {
       "buffer": 0,
-      "byteOffset": 102622,
+      "byteOffset": 102624,
       "byteLength": 192,
       "target": 34963
     },
     {
       "buffer": 0,
-      "byteOffset": 102814,
+      "byteOffset": 102816,
       "byteLength": 2304,
       "byteStride": 32,
       "target": 34962
     },
     {
       "buffer": 0,
-      "byteOffset": 105118,
+      "byteOffset": 105120,
       "byteLength": 2082,
       "target": 34963
     },
     {
       "buffer": 0,
-      "byteOffset": 107200,
+      "byteOffset": 107204,
       "byteLength": 23136,
       "byteStride": 32,
       "target": 34962

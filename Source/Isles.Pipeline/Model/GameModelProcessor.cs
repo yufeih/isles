@@ -63,7 +63,7 @@ namespace Isles.Pipeline
                 AddSpacePartitionData(dictionary, model);
                 model.Tag = dictionary;
                 AddNormalTextureToTag(model);
-                WriteGLTF(input, model, context);
+                WriteGLTF(input, model, null, context);
                 return model;
             }
 
@@ -112,12 +112,12 @@ namespace Isles.Pipeline
             // Store normal texture
             AddNormalTextureToTag(model);
 
-            WriteGLTF(input, model, context);
+            WriteGLTF(input, model, skeleton, context);
 
             return model;
         }
 
-        private void WriteGLTF(NodeContent input, ModelContent model, ContentProcessorContext context)
+        private void WriteGLTF(NodeContent input, ModelContent model, BoneContent skeleton, ContentProcessorContext context)
         {
             Directory.CreateDirectory("D:/isles/gltf/");
             var baseName = Path.Combine("D:/isles/gltf/", Path.GetFileNameWithoutExtension(input.Identity.SourceFilename).ToLowerInvariant());
@@ -145,11 +145,15 @@ namespace Isles.Pipeline
 
                 bufferViews.Add(new { buffer = 0, byteOffset = byteBase, byteLength = indices.Length * 2, target = 34963 });
 
+                for (var i = 0; i < indices.Length * 2 % 4; i++)
+                    bytes.Add(0);
+
+                byteBase = bytes.Count;
                 bytes.AddRange(modelMesh.VertexBuffer.VertexData);
 
                 var byteStride = VertexDeclaration.GetVertexStrideSize(modelMesh.MeshParts[0].GetVertexDeclaration(), 0);
 
-                bufferViews.Add(new { buffer = 0, byteOffset = byteBase + indices.Length * 2, byteLength = modelMesh.VertexBuffer.VertexData.Length, byteStride, target = 34962 });
+                bufferViews.Add(new { buffer = 0, byteOffset = byteBase, byteLength = modelMesh.VertexBuffer.VertexData.Length, byteStride, target = 34962 });
 
                 foreach (var part in modelMesh.MeshParts)
                 {
@@ -181,6 +185,14 @@ namespace Isles.Pipeline
                     accessors.Add(new { bufferView = buffViewBase + 1, byteOffset = part.StreamOffset + 12, componentType = 5126, type = "VEC3", count = part.NumVertices });
                     accessors.Add(new { bufferView = buffViewBase + 1, byteOffset = part.StreamOffset + 24, componentType = 5126, type = "VEC2", count = part.NumVertices });
 
+                    if (skeleton != null)
+                    {
+                        foreach (var vd in part.GetVertexDeclaration())
+                            context.Logger.LogWarning("a", input.Identity, "{0}", vd);
+                        accessors.Add(new { bufferView = buffViewBase + 1, byteOffset = part.StreamOffset + 32, componentType = 5121, type = "VEC4", count = part.NumVertices });
+                        accessors.Add(new { bufferView = buffViewBase + 1, byteOffset = part.StreamOffset + 36, componentType = 5126, type = "VEC4", count = part.NumVertices });
+                    }
+
                     if (part.StartIndex != 0)
                     {
                         throw new NotSupportedException();
@@ -188,7 +200,11 @@ namespace Isles.Pipeline
 
                     primitives.Add(new
                     {
-                        attributes = new { POSITION = accessorBase + 1, NORMAL = accessorBase + 2, TEXCOORD_0 = accessorBase + 3 },
+                        attributes = new {
+                            POSITION = accessorBase + 1, NORMAL = accessorBase + 2, TEXCOORD_0 = accessorBase + 3,
+                            JOINTS_0 = skeleton != null ? (int?)accessorBase + 4 : null,
+                            WEIGHTS_0 = skeleton != null ? (int?)accessorBase + 5 : null,
+                        },
                         indices = accessorBase,
                         material = materials.Count,
                         mode = 4,
