@@ -129,13 +129,13 @@ namespace Isles.Pipeline
             var bytes = new List<byte>();
             var materials = new List<object>();
             var images = new List<object>();
+            var imageDict = new Dictionary<string, string>();
             var textures = new List<object>();
             var nodes = new List<object>();
             var sceneNodes = new List<int>();
 
             foreach (var modelMesh in model.Meshes)
             {
-                var imageDict = new Dictionary<string, string>();
                 var primitives = new List<object>();
                 var byteBase = bytes.Count;
                 var buffViewBase = bufferViews.Count;
@@ -205,17 +205,11 @@ namespace Isles.Pipeline
                         if (!imageDict.ContainsKey(src))
                         {
                             imageDict.Add(src, uri);
-                            var a = Path.Combine(Path.GetDirectoryName(input.Identity.SourceFilename), Path.GetFileNameWithoutExtension(src).Replace("_0", ".bmp"));
-                            if (!File.Exists(a))
-                                a = Path.ChangeExtension(a, ".jpg"); 
+                            var a = Path.Combine(Path.GetDirectoryName(input.Identity.SourceFilename), Path.GetFileNameWithoutExtension(src).Replace("_0", ".jpg"));
                             if (!File.Exists(a))
                                 a = Path.ChangeExtension(a, ".png");
-                            if (!File.Exists(a))
-                                a = Path.ChangeExtension(a, ".tga");
                             if (File.Exists(a))
                                 File.Copy(a, uri, true);
-                            else
-                                context.Logger.LogWarning("a", input.Identity, Path.GetFileNameWithoutExtension(src).Replace("_0", ".*"));
                         }
 
                         uri = Path.GetFileName(uri);

@@ -2,28 +2,113 @@
   "asset": {
     "version": "2.0"
   },
+  "scene": 0,
   "buffers": [
     {
-      "byteLength": 303408,
+      "byteLength": 292572,
       "uri": "militia.bin"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 281736,
+      "byteStride": 52,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 281736,
+      "byteLength": 10836,
+      "target": 34963
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 5418,
+      "min": [
+        -72.3934,
+        -0.211526752,
+        -35.5117722
+      ],
+      "max": [
+        72.39339,
+        134.236557,
+        26.2909317
+      ]
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 12,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 5418
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 24,
+      "componentType": 5126,
+      "type": "VEC2",
+      "count": 5418
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "type": "SCALAR",
+      "count": 5418
     }
   ],
   "meshes": [
     {
-      "name": "",
       "primitives": [
         {
           "attributes": {
             "POSITION": 0,
-            "NORMAL": 0,
-            "TAGENT": 0,
-            "TEXCOORD_0": 0
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
           },
-          "indices": 0,
+          "indices": 3,
           "material": 0,
           "mode": 4
         }
       ]
+    }
+  ],
+  "images": [
+    {
+      "uri": "militia.png"
+    }
+  ],
+  "textures": [
+    {
+      "source": 0
+    }
+  ],
+  "materials": [
+    {
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        }
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0
     }
   ]
 }

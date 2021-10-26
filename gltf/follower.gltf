@@ -2,28 +2,113 @@
   "asset": {
     "version": "2.0"
   },
+  "scene": 0,
   "buffers": [
     {
-      "byteLength": 128688,
+      "byteLength": 124092,
       "uri": "follower.bin"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 119496,
+      "byteStride": 52,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 119496,
+      "byteLength": 4596,
+      "target": 34963
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 2298,
+      "min": [
+        -35.5324249,
+        -0.248714224,
+        -16.0599079
+      ],
+      "max": [
+        35.7785645,
+        119.829987,
+        31.8406868
+      ]
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 12,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 2298
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 24,
+      "componentType": 5126,
+      "type": "VEC2",
+      "count": 2298
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "type": "SCALAR",
+      "count": 2298
     }
   ],
   "meshes": [
     {
-      "name": "",
       "primitives": [
         {
           "attributes": {
             "POSITION": 0,
-            "NORMAL": 0,
-            "TAGENT": 0,
-            "TEXCOORD_0": 0
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
           },
-          "indices": 0,
+          "indices": 3,
           "material": 0,
           "mode": 4
         }
       ]
+    }
+  ],
+  "images": [
+    {
+      "uri": "follower.png"
+    }
+  ],
+  "textures": [
+    {
+      "source": 0
+    }
+  ],
+  "materials": [
+    {
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        }
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0
     }
   ]
 }

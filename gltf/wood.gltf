@@ -2,28 +2,113 @@
   "asset": {
     "version": "2.0"
   },
+  "scene": 0,
   "buffers": [
     {
-      "byteLength": 2280,
+      "byteLength": 2100,
       "uri": "wood.bin"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 1920,
+      "byteStride": 32,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1920,
+      "byteLength": 180,
+      "target": 34963
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 60,
+      "min": [
+        -14.059186,
+        -34.35012,
+        -0.017652
+      ],
+      "max": [
+        37.474205,
+        20.1813049,
+        27.9610519
+      ]
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 12,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 60
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 24,
+      "componentType": 5126,
+      "type": "VEC2",
+      "count": 60
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "type": "SCALAR",
+      "count": 90
     }
   ],
   "meshes": [
     {
-      "name": "",
       "primitives": [
         {
           "attributes": {
             "POSITION": 0,
-            "NORMAL": 0,
-            "TAGENT": 0,
-            "TEXCOORD_0": 0
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
           },
-          "indices": 0,
+          "indices": 3,
           "material": 0,
           "mode": 4
         }
       ]
+    }
+  ],
+  "images": [
+    {
+      "uri": "wood.png"
+    }
+  ],
+  "textures": [
+    {
+      "source": 0
+    }
+  ],
+  "materials": [
+    {
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        }
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0
     }
   ]
 }

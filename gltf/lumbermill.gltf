@@ -2,44 +2,195 @@
   "asset": {
     "version": "2.0"
   },
+  "scene": 0,
   "buffers": [
     {
-      "byteLength": 24384,
+      "byteLength": 22800,
       "uri": "lumbermill.bin"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 10816,
+      "byteStride": 32,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 10816,
+      "byteLength": 912,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 11728,
+      "byteLength": 10400,
+      "byteStride": 32,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 22128,
+      "byteLength": 672,
+      "target": 34963
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 338,
+      "min": [
+        -50.833065,
+        0.891178,
+        -60.7660866
+      ],
+      "max": [
+        72.75737,
+        57.73374,
+        63.6604424
+      ]
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 12,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 338
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 24,
+      "componentType": 5126,
+      "type": "VEC2",
+      "count": 338
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "type": "SCALAR",
+      "count": 456
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 325,
+      "min": [
+        -14.3121862,
+        -2.056427,
+        -18.2955513
+      ],
+      "max": [
+        33.21383,
+        86.86612,
+        25.68004
+      ]
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 12,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 325
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 24,
+      "componentType": 5126,
+      "type": "VEC2",
+      "count": 325
+    },
+    {
+      "bufferView": 3,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "type": "SCALAR",
+      "count": 336
     }
   ],
   "meshes": [
     {
-      "name": "",
       "primitives": [
         {
           "attributes": {
             "POSITION": 0,
-            "NORMAL": 0,
-            "TAGENT": 0,
-            "TEXCOORD_0": 0
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
           },
-          "indices": 0,
+          "indices": 3,
           "material": 0,
           "mode": 4
         }
       ]
     },
     {
-      "name": "",
       "primitives": [
         {
           "attributes": {
-            "POSITION": 0,
-            "NORMAL": 0,
-            "TAGENT": 0,
-            "TEXCOORD_0": 0
+            "POSITION": 4,
+            "NORMAL": 5,
+            "TEXCOORD_0": 6
           },
-          "indices": 0,
-          "material": 0,
+          "indices": 7,
+          "material": 1,
           "mode": 4
         }
       ]
+    }
+  ],
+  "images": [
+    {
+      "uri": "lumbermill.png"
+    },
+    {
+      "uri": "lumbermill_1.png"
+    }
+  ],
+  "textures": [
+    {
+      "source": 0
+    },
+    {
+      "source": 1
+    }
+  ],
+  "materials": [
+    {
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        }
+      }
+    },
+    {
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 1
+        }
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "nodes": [
+        0,
+        1
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0
+    },
+    {
+      "mesh": 1
     }
   ]
 }
