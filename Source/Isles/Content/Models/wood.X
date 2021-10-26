@@ -391,7 +391,7 @@ Frame Cylinder03 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "toetu_ mutou.bmp";
+     "toetu_mutou.bmp";
     }
    }
   }
