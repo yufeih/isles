@@ -233,8 +233,6 @@ namespace Isles.Pipeline
                                 baseColorFactor = material.DiffuseColor == null || material.DiffuseColor == Vector3.One
                                     ? null : new[] { material.DiffuseColor.Value.X, material.DiffuseColor.Value.Y, material.DiffuseColor.Value.Z, 1.0 }
                             },
-                            emissiveFactor = material.EmissiveColor == null || material.EmissiveColor == Vector3.Zero
-                                ? null : new[] { material.EmissiveColor.Value.X, material.EmissiveColor.Value.Y, material.EmissiveColor.Value.Z }
                         });
                         textures.Add(new { source = images.Count });
                         images.Add(new { uri });
