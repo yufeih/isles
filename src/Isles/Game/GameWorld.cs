@@ -305,35 +305,13 @@ namespace Isles.Engine
             return occluders;
         }
 
-        /// <summary>
-        /// Delegate to realize factory method.
-        /// </summary>
-        public delegate IWorldObject Creator(GameWorld world);
+        public static Dictionary<string, Func<GameWorld, IWorldObject>> Creators = new();
 
-        /// <summary>
-        /// This dictionary holds all the info to create a world object of a given type.
-        /// For a given type of object, the create funtion calls its corresponding Creator,
-        /// which is responsible for performing the actual creation stuff.
-        ///
-        /// I haven't figure out a better way to do this.
-        /// If you know how, let me know it ASAP :).
-        /// </summary>
-        public static Dictionary<string, Creator> Creators = new();
-
-        /// <summary>
-        /// Register a world object creator.
-        /// If a new type of world object is implemented, to allow creating the object using
-        /// GameWorld.Create, create an object creator and register it here.
-        /// </summary>
-        public static void RegisterCreator(string typeName, Creator creator)
+        public static void RegisterCreator(string typeName, Func<GameWorld, IWorldObject> creator)
         {
             Creators.Add(typeName, creator);
         }
 
-        /// <summary>
-        /// Creates a new world object from a given type.
-        /// </summary>
-        /// <param name="typeName"></param>
         public IWorldObject Create(string typeName)
         {
             return Create(typeName, null);
@@ -353,7 +331,6 @@ namespace Isles.Engine
                 throw new Exception("Unknown object type: " + typeName);
             }
 
-            // Delegate to the creator
             IWorldObject worldObject = Creators[typeName](this);
 
             // Nothing created

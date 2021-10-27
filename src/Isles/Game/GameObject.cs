@@ -46,11 +46,6 @@ namespace Isles
         /// </summary>
         public float Priority { get; set; }
 
-        /// <summary>
-        /// Gets or sets the icon for this game object.
-        /// </summary>
-        public Icon Icon => icon;
-
         private Icon icon;
 
         /// <summary>
@@ -248,7 +243,7 @@ namespace Isles
 
                 if (Model != null)
                 {
-                    Model.Glow = highlighted ? Vector4.One : Vector4.Zero;
+                    Model.Glow = highlighted ? Vector3.One : Vector3.Zero;
                 }
 
                 if (highlighted && Owner != null && ShouldDrawModel)
@@ -714,12 +709,12 @@ namespace Isles
             if (flashElapsedTime <= FlashDuration)
             {
                 var glow = (float)Math.Sin(MathHelper.Pi * flashElapsedTime / FlashDuration);
-                Model.Glow = new Vector4(MathHelper.Clamp(glow, 0, 1));
+                Model.Glow = new Vector3(MathHelper.Clamp(glow, 0, 1));
 
                 flashElapsedTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
                 if (flashElapsedTime > FlashDuration)
                 {
-                    Model.Glow = Vector4.UnitW;
+                    Model.Glow = default;
                 }
             }
 

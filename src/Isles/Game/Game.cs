@@ -101,44 +101,6 @@ namespace Isles
             Player.RegisterCharactor("FireSorceress");
             Player.RegisterCharactor("Hellfire");
 
-            // Steamer architectures
-            GameWorld.RegisterCreator("SteamFort", world => new Building(world, "SteamFort"));
-            GameWorld.RegisterCreator("Steamhouse", world => new Building(world, "Steamhouse"));
-            GameWorld.RegisterCreator("Regenerator", world => new Lumbermill(world, "Regenerator"));
-            GameWorld.RegisterCreator("SteamCannon", world => new Tower(world, "SteamCannon"));
-            GameWorld.RegisterCreator("TrainingCenter", world => new Building(world, "TrainingCenter"));
-            GameWorld.RegisterCreator("SteamFactory", world => new Building(world, "SteamFactory"));
-
-            Spell.RegisterCreator("SteamFort", world => new SpellConstruct(world, "SteamFort"));
-            Spell.RegisterCreator("Steamhouse", world => new SpellConstruct(world, "Steamhouse"));
-            Spell.RegisterCreator("Regenerator", world => new SpellConstruct(world, "Regenerator"));
-            Spell.RegisterCreator("SteamCannon", world => new SpellConstruct(world, "SteamCannon"));
-            Spell.RegisterCreator("TrainingCenter", world => new SpellConstruct(world, "TrainingCenter"));
-            Spell.RegisterCreator("SteamFactory", world => new SpellConstruct(world, "SteamFactory"));
-
-            Player.RegisterBuilding("SteamFort");
-            Player.RegisterBuilding("Steamhouse");
-            Player.RegisterBuilding("Regenerator");
-            Player.RegisterBuilding("SteamCannon");
-            Player.RegisterBuilding("TrainingCenter");
-            Player.RegisterBuilding("SteamFactory");
-
-            // Steamer units
-            GameWorld.RegisterCreator("Miner", world => new Worker(world, "Miner"));
-            GameWorld.RegisterCreator("Swordman", world => new Charactor(world, "Swordman"));
-            GameWorld.RegisterCreator("Rifleman", world => new Charactor(world, "Rifleman"));
-            GameWorld.RegisterCreator("Steambot", world => new FireSorceress(world, "Steambot"));
-
-            Spell.RegisterCreator("Miner", world => new SpellTraining(world, "Miner", null));
-            Spell.RegisterCreator("Swordman", world => new SpellTraining(world, "Swordman", null));
-            Spell.RegisterCreator("Rifleman", world => new SpellTraining(world, "Rifleman", null));
-            Spell.RegisterCreator("Steambot", world => new SpellTraining(world, "Steambot", null));
-
-            Player.RegisterCharactor("Miner");
-            Player.RegisterCharactor("Swordman");
-            Player.RegisterCharactor("Rifleman");
-            Player.RegisterCharactor("Steambot");
-
             GameWorld.RegisterCreator("Arrow", world => new Arrow(world));
 
             // Register spells
@@ -315,14 +277,6 @@ namespace Isles
                 }
             }
 
-            // if (building != null && buildingTimer < BuildingDuration)
-            //    buildingTimer += elapsed;
-
-            // if (unit != null && unitTimer < UnitDuration)
-            //    unitTimer += elapsed;
-
-            // if (ui != null && uiTimer < UIDuration)
-            //    uiTimer += elapsed;
             if (underAttack != null && underAttackTimer < UnderAttackDuration)
             {
                 underAttackTimer += elapsed;

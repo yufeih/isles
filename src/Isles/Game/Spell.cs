@@ -103,29 +103,16 @@ namespace Isles
     public abstract class Spell : IEventListener
     {
         /// <summary>
-        /// Delegation used to create a spell.
-        /// </summary>
-        public delegate Spell Creator(GameWorld world);
-
-        /// <summary>
         /// Spell creators.
         /// </summary>
-        private static readonly Dictionary<string, Creator> creators = new();
+        private static readonly Dictionary<string, Func<GameWorld, Spell>> creators = new();
 
-        /// <summary>
-        /// Register a new spell.
-        /// </summary>
-        /// <param name="spellType"></param>
-        /// <param name="creator"></param>
-        public static void RegisterCreator(Type spellType, Creator creator)
+        public static void RegisterCreator(Type spellType, Func<GameWorld, Spell> creator)
         {
             creators.Add(spellType.Name, creator);
         }
 
-        /// <summary>
-        /// Register a new spell creator.
-        /// </summary>
-        public static void RegisterCreator(string spellName, Creator creator)
+        public static void RegisterCreator(string spellName, Func<GameWorld, Spell> creator)
         {
             creators.Add(spellName, creator);
         }
@@ -142,7 +129,7 @@ namespace Isles
         /// <param name="world"></param>
         public static Spell Create(string spellTypeName, GameWorld world)
         {
-            return !creators.TryGetValue(spellTypeName, out Creator creator)
+            return !creators.TryGetValue(spellTypeName, out var creator)
                 ? throw new Exception("Failed to create spell, unknown spell type: " + spellTypeName)
                 : creator(world);
         }
@@ -152,9 +139,9 @@ namespace Isles
         /// </summary>
         public static void Cast(Spell spell)
         {
-            if (currentSpell == null && spell.Trigger())
+            if (CurrentSpell == null && spell.Trigger())
             {
-                currentSpell = spell;
+                CurrentSpell = spell;
             }
         }
 
@@ -163,15 +150,13 @@ namespace Isles
         /// </summary>
         public static void EndSpell()
         {
-            currentSpell = null;
+            CurrentSpell = null;
         }
 
         /// <summary>
         /// Gets the active spell.
         /// </summary>
-        public static Spell CurrentSpell => currentSpell;
-
-        private static Spell currentSpell;
+        public static Spell CurrentSpell { get; private set; }
 
         protected GameWorld world;
 
@@ -502,37 +487,20 @@ namespace Isles
         /// <summary>
         /// Gets or sets the number in the top left corner.
         /// </summary>
-        public int Count
-        {
-            get => count;
-            set => count = value;
-        }
-
-        private int count;
+        public int Count { get; set; }
 
         /// <summary>
         /// Gets or sets the percentage drawed over the button.
         /// </summary>
-        public float Percentage
-        {
-            get => percentage;
-            set => percentage = value;
-        }
-
-        private float percentage;
+        public float Percentage { get; set; }
 
         public bool ShowCount = true;
         public bool ShowPercentage = true;
-        private bool autoCast;
 
         /// <summary>
         /// Gets or sets whether the spell is autoReleasable.
         /// </summary>
-        public bool AutoCast
-        {
-            get => autoCast;
-            set => autoCast = value;
-        }
+        public bool AutoCast { get; set; }
 
         /// <summary>
         /// The fade mask is divided into 5 parts to draw.
@@ -540,7 +508,7 @@ namespace Isles
         /// <param name="sprite"></param>
         private void DrawFade()
         {
-            if (percentage <= 0)
+            if (Percentage <= 0)
             {
                 return;
             }
@@ -561,7 +529,7 @@ namespace Isles
             };
 
             var indices = new ushort[3] { 0, 1, 2 };
-            var angle = (100 - percentage) / 100 * Math.PI * 2;
+            var angle = (100 - Percentage) / 100 * Math.PI * 2;
 
             // Part one: 0 ~ baseAngle
             if (angle > baseAngle)
@@ -659,9 +627,9 @@ namespace Isles
                 DrawFade();
             }
 
-            if (count > 1 && ShowCount)
+            if (Count > 1 && ShowCount)
             {
-                Graphics2D.DrawShadowedString(count.ToString(), 15f / 23,
+                Graphics2D.DrawShadowedString(Count.ToString(), 15f / 23,
                                                 new Vector2(DestinationRectangle.X + DestinationRectangle.Width / 15,
                                                             DestinationRectangle.Y + DestinationRectangle.Height / 30),
                                                 Color.White, Color.Black);
@@ -674,15 +642,12 @@ namespace Isles
         /// <summary>
         /// Gets the type of unit that's going to be trained.
         /// </summary>
-        public string Type => type;
+        public string Type { get; }
 
-        private readonly string type;
         private Building ownerBuilding;
         public bool ShowCount = true;
 
-        public delegate void UpgradeEventHandler(Spell spell, Building owner);
-
-        public event UpgradeEventHandler Complete;
+        protected Action<Spell, Building> Complete;
 
         protected override void OnOwnerChanged()
         {
@@ -712,7 +677,7 @@ namespace Isles
         public SpellTraining(GameWorld world, string type, Building owner)
             : base(world)
         {
-            this.type = type ?? throw new ArgumentNullException();
+            Type = type ?? throw new ArgumentNullException();
             ownerBuilding = owner;
         }
 
@@ -763,11 +728,11 @@ namespace Isles
                     }
                 }
 
-                if (building != null && building.TrainUnit(type))
+                if (building != null && building.TrainUnit(Type))
                 {
                     Audios.Play("OK");
 
-                    if (Player.LocalPlayer.CurrentGroup.Count > 1 && !building.CanTrain(type))
+                    if (Player.LocalPlayer.CurrentGroup.Count > 1 && !building.CanTrain(Type))
                     {
                         Enable = false;
                     }
@@ -877,8 +842,8 @@ namespace Isles
                 if (ownerBuilding != null)
                 {
                     Enable = multipleBuildings
-                        ? ownerBuilding.CanTrain(type)
-                        : ownerBuilding.CanTrain(type) || !Ready ||
+                        ? ownerBuilding.CanTrain(Type)
+                        : ownerBuilding.CanTrain(Type) || !Ready ||
                                  ownerBuilding.QueuedSpells.Contains(this);
                 }
             }
@@ -907,11 +872,11 @@ namespace Isles
 
         protected virtual void OnComplete()
         {
-            if (world.Create(type) is Charactor c)
+            if (world.Create(Type) is Charactor c)
             {
                 if (ownerBuilding.Owner != null)
                 {
-                    ownerBuilding.Owner.UnmarkFutureObject(type);
+                    ownerBuilding.Owner.UnmarkFutureObject(Type);
                 }
 
                 c.Position = ownerBuilding.Position + ownerBuilding.SpawnPoint;
@@ -948,11 +913,11 @@ namespace Isles
             GameDefault.Singleton.SetUnique(Type);
         }
 
-        public SpellUpgrade(GameWorld world, string type, UpgradeEventHandler onComplete)
+        public SpellUpgrade(GameWorld world, string type, Action<Spell, Building> onComplete)
             : base(world, type, null)
         {
             GameDefault.Singleton.SetUnique(Type);
-            Complete += onComplete;
+            Complete = onComplete;
         }
 
         protected override void OnComplete()

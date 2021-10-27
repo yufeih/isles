@@ -153,53 +153,11 @@ namespace Isles.Graphics
         private Model model;
         private GltfModel gltfModel;
 
-        /// <summary>
-        /// Gets or sets the tint color of this game model.
-        /// </summary>
-        public Vector3 Tint
-        {
-            get
-            {
-                Vector3 v;
-                v.X = tint.X;
-                v.Y = tint.Y;
-                v.Z = tint.Z;
-                return v;
-            }
+        public Vector3 Tint { get; set; } = new(1, 1, 1);
 
-            set
-            {
-                // Update alpha first
-                tint.X = value.X;
-                tint.Y = value.Y;
-                tint.Z = value.Z;
-            }
-        }
+        public Vector3 Glow { get; set; }
 
-        /// <summary>
-        /// Gets or sets the glow of this game model.
-        /// </summary>
-        public Vector4 Glow
-        {
-            get => glow;
-            set
-            {
-                glow = value;
-                glow.W = 1.0f;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the alpha value of model tint.
-        /// </summary>
-        public float Alpha
-        {
-            get => tint.W;
-            set => tint.W = MathHelper.Clamp(value, 0, 1);
-        }
-
-        private Vector4 tint = new(1, 1, 1, 1);
-        private Vector4 glow = new(0, 0, 0, 1);
+        public float Alpha { get; set; } = 1;
 
         private GameModel()
         {
@@ -229,7 +187,9 @@ namespace Isles.Graphics
                 boundingBox = boundingBox,
                 currentClip = currentClip,
                 currentPlayer = currentPlayer,
-                glow = glow,
+                Tint = Tint,
+                Glow = Glow,
+                Alpha = Alpha,
                 isBoundingBoxDirty = isBoundingBoxDirty,
                 model = model,
                 gltfModel = gltfModel,
@@ -237,7 +197,6 @@ namespace Isles.Graphics
                 players = players,
                 skin = skin,
                 spacePartitionInfo = spacePartitionInfo,
-                tint = tint,
                 transform = transform,
             };
 
@@ -262,13 +221,8 @@ namespace Isles.Graphics
         /// </summary>
         private void Refresh()
         {
-            currentClip = null;
-            players[0] = players[1] = null;
-
-            if (model.Tag is Dictionary<string, object>)
+            if (model.Tag is Dictionary<string, object> dictionary)
             {
-                var dictionary = model.Tag as Dictionary<string, object>;
-
                 if (dictionary.TryGetValue("SkinningData", out var value))
                 {
                     skin = value as SkinningData;
@@ -284,7 +238,6 @@ namespace Isles.Graphics
                 spacePartitionInfo = new ModelSpacePartitionInformation
                 {
                     BitMap = value as bool[],
-
                     Box = OBBFromModel(model),
                 };
             }
@@ -703,6 +656,9 @@ namespace Isles.Graphics
 
         public void Draw()
         {
+            var tint = new Vector4(Tint.X, Tint.Y, Tint.Z, MathHelper.Clamp(Alpha, 0, 1));
+            var glow = new Vector4(Glow.X, Glow.Y, Glow.Z, 1);
+
             for (var i = 0; i < gltfModel.Meshes.Length; i++)
             {
                 var mesh = gltfModel.Meshes[i];

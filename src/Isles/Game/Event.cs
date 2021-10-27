@@ -10,9 +10,6 @@ namespace Isles.Engine
     /// <summary>
     /// Add types of game event here.
     /// </summary>
-    /// <remarks>
-    /// This isn't quit a good design to make this extensible.
-    /// </remarks>
     public enum EventType
     {
         Unknown,
@@ -144,18 +141,6 @@ namespace Isles.Engine
             }
 
             queue.AddLast(new Message(type, receiver, sender, tag, delayTime));
-        }
-
-        /// <summary>
-        /// Send a message to a remote receiver through the network.
-        /// </summary>
-        public static void SendRemoteMessage(EventType type,
-                                             IEventListener receiver,
-                                             IEventListener sender,
-                                             object tag,
-                                             float timeout)
-        {
-            throw new NotImplementedException();
         }
 
         /// <summary>
