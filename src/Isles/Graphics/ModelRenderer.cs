@@ -54,7 +54,7 @@ namespace Isles.Graphics
             _shadowSkinnedShader = _effect.Techniques["ShadowMappingSkinned"];
         }
 
-        public void Draw(ModelMesh mesh, Matrix transform, Matrix[] skinTransforms, Vector4 tint, Vector4 glow)
+        public void Draw(GltfModel.Mesh mesh, Matrix transform, Matrix[] skinTransforms, Vector4 tint, Vector4 glow)
         {
             var queue = tint.W < 1
                 ? (skinTransforms != null ? _skinnedTransparent : _defaultTransparent)
@@ -122,16 +122,16 @@ namespace Isles.Graphics
                     _bones?.SetValue(item.SkinTransforms);
                 }
 
-                foreach (var part in item.Mesh.MeshParts)
+                foreach (var part in item.Mesh.Primitives)
                 {
                     _graphics.VertexDeclaration = part.VertexDeclaration;
-                    _graphics.Vertices[0].SetSource(item.Mesh.VertexBuffer, part.StreamOffset, part.VertexStride);
-                    _graphics.Indices = item.Mesh.IndexBuffer;
+                    _graphics.Vertices[0].SetSource(part.VertexBuffer, 0, part.VertexStride);
+                    _graphics.Indices = part.IndexBuffer;
 
-                    _texture?.SetValue(((BasicEffect)part.Effect).Texture);
+                    _texture?.SetValue(part.Texture);
                     _effect.CommitChanges();
 
-                    _graphics.DrawIndexedPrimitives(PrimitiveType.TriangleList, part.BaseVertex, 0, part.NumVertices, part.StartIndex, part.PrimitiveCount);
+                    _graphics.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, part.NumVertices, 0, part.PrimitiveCount);
                 }
             }
 
@@ -141,7 +141,7 @@ namespace Isles.Graphics
 
         private struct DrawItem
         {
-            public ModelMesh Mesh;
+            public GltfModel.Mesh Mesh;
             public Matrix Transform;
             public Matrix[] SkinTransforms;
             public Vector4 Tint;

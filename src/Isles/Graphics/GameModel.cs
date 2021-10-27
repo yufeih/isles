@@ -151,6 +151,7 @@ namespace Isles.Graphics
         private ModelSpacePartitionInformation spacePartitionInfo;
 
         private Model model;
+        private GltfModel gltfModel;
 
         /// <summary>
         /// Gets or sets the tint color of this game model.
@@ -208,6 +209,7 @@ namespace Isles.Graphics
         {
             // Make sure this is the upper case Model
             model = game.Content.Load<Model>(modelName);
+            gltfModel = game.ModelLoader.LoadModel($"data/{modelName}.gltf");
             Refresh();
         }
 
@@ -230,6 +232,7 @@ namespace Isles.Graphics
                 glow = glow,
                 isBoundingBoxDirty = isBoundingBoxDirty,
                 model = model,
+                gltfModel = gltfModel,
                 orientedBoundingBox = orientedBoundingBox,
                 players = players,
                 skin = skin,
@@ -700,15 +703,16 @@ namespace Isles.Graphics
 
         public void Draw()
         {
-            foreach (var mesh in model.Meshes)
+            for (var i = 0; i < gltfModel.Meshes.Length; i++)
             {
+                var mesh = gltfModel.Meshes[i];
                 if (IsSkinned)
                 {
                     game.ModelRenderer.Draw(mesh, Matrix.Identity, skinTransforms, tint, glow);
                 }
                 else
                 {
-                    game.ModelRenderer.Draw(mesh, bones[mesh.ParentBone.Index], null, tint, glow);
+                    game.ModelRenderer.Draw(mesh, bones[model.Meshes[i].ParentBone.Index], null, tint, glow);
                 }
             }
         }
