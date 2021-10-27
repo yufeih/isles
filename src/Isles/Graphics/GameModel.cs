@@ -13,10 +13,7 @@ namespace Isles.Graphics
 {
     public class GameModel
     {
-        /// <summary>
-        /// Current game.
-        /// </summary>
-        protected BaseGame game;
+        private readonly BaseGame game = BaseGame.Singleton;
 
         /// <summary>
         /// Gets or sets model world transform.
@@ -69,11 +66,6 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Gets the oriented bounding box of this model.
-        /// </summary>
-        public BoundingBox OrientedBoundingBox => orientedBoundingBox;
-
-        /// <summary>
         /// Model axis aligned bounding box.
         /// </summary>
         private BoundingBox boundingBox;
@@ -91,18 +83,12 @@ namespace Isles.Graphics
         /// <summary>
         /// Gets whether a model contains any animation.
         /// </summary>
-        public bool IsAnimated => Player != null;
+        private bool IsAnimated => Player != null;
 
         /// <summary>
         /// Gets whether the model is a skinned model.
         /// </summary>
-        public bool IsSkinned => skin != null;
-
-        /// <summary>
-        /// Gets or sets the speed of model animation. 1.0f is the normal
-        /// speed, the higher the value is, the faster the animation goes.
-        /// </summary>
-        public float AnimationSpeed { get; set; } = 1.0f;
+        private bool IsSkinned => skin != null;
 
         /// <summary>
         /// Skinned mesh animation player.
@@ -166,19 +152,6 @@ namespace Isles.Graphics
         /// Space partition information for this model.
         /// </summary>
         private ModelSpacePartitionInformation spacePartitionInfo;
-
-        /// <summary>
-        /// Gets or sets the xna model.
-        /// </summary>
-        public Model Model
-        {
-            get => model;
-            set
-            {
-                model = value;
-                Refresh();
-            }
-        }
 
         private Model model;
 
@@ -248,7 +221,6 @@ namespace Isles.Graphics
             }
         }
 
-        // Vector4 tint = new Vector4(154.0f / 255, 164.0f / 255, 1.0f, 1.0f);
         private Vector4 tint = new(1, 1, 1, 1);
         private Vector4 glow = new(0, 0, 0, 1);
 
@@ -263,43 +235,20 @@ namespace Isles.Graphics
         private List<Material> materials = new();
 
         /// <summary>
-        /// Gets game model material.
-        /// </summary>
-        public IList<Material> Materials => materials;
-
-        /// <summary>
         /// Internal list storing all renderables corresponding to each mesh part.
         /// </summary>
         private List<ModelManager.Renderable> renderables = new();
         private List<ModelManager.Renderable> shadowMapRenderables = new();
 
-        public GameModel()
+        private GameModel()
         {
-            game = BaseGame.Singleton;
         }
 
-        public GameModel(Model model)
-            : this()
+        public GameModel(string modelName)
         {
             // Make sure this is the upper case Model
-            Model = model;
-        }
-
-        public GameModel(string modelAssetname)
-            : this()
-        {
-            // Make sure this is the upper case Model
-            Model = game.Content.Load<Model>(modelAssetname);
-        }
-
-        /// <summary>
-        /// Load the game model from XNB model file.
-        /// </summary>
-        /// <param name="modelFilename"></param>
-        public void Load(string modelAssetname)
-        {
-            // Make sure this is the upper case Model
-            Model = game.Content.Load<Model>(modelAssetname);
+            model = game.Content.Load<Model>(modelName);
+            Refresh();
         }
 
         /// <summary>
@@ -311,7 +260,6 @@ namespace Isles.Graphics
             var copy = new GameModel
             {
                 animationClips = animationClips,
-                AnimationSpeed = AnimationSpeed,
                 animationState = animationState,
                 blendDuration = blendDuration,
                 blending = blending,
@@ -319,7 +267,6 @@ namespace Isles.Graphics
                 boundingBox = boundingBox,
                 currentClip = currentClip,
                 currentPlayer = currentPlayer,
-                game = game,
                 glow = glow,
                 isBoundingBoxDirty = isBoundingBoxDirty,
                 materials = materials,
@@ -354,111 +301,103 @@ namespace Isles.Graphics
         /// Manually refresh the game model.
         /// This method currently re-compute the bounding box of the model.
         /// </summary>
-        public void Refresh()
+        private void Refresh()
         {
-            if (model != null)
+            currentClip = null;
+            players[0] = players[1] = null;
+
+            if (model.Tag is Dictionary<string, object>)
             {
-                currentClip = null;
-                players[0] = players[1] = null;
+                var dictionary = model.Tag as Dictionary<string, object>;
 
-                if (model.Tag is Dictionary<string, object>)
+                if (dictionary.TryGetValue("SkinningData", out var value))
                 {
-                    var dictionary = model.Tag as Dictionary<string, object>;
-
-                    if (dictionary.TryGetValue("SkinningData", out var value))
-                    {
-                        skin = value as SkinningData;
-                    }
-
-                    if (dictionary.TryGetValue("AnimationData", out value))
-                    {
-                        animationClips = value as IDictionary<string, AnimationClip>;
-                    }
-
-                    dictionary.TryGetValue("SpacePartition", out value);
-
-                    spacePartitionInfo = new ModelSpacePartitionInformation
-                    {
-                        BitMap = value as bool[],
-
-                        Box = OBBFromModel(model),
-                    };
+                    skin = value as SkinningData;
                 }
 
-                if (animationClips != null)
+                if (dictionary.TryGetValue("AnimationData", out value))
                 {
-                    if (IsSkinned)
-                    {
-                        players[0] = new AnimationPlayer(skin);
-                        players[1] = new AnimationPlayer(skin);
-
-                        UpdateSkinTransform(new GameTime());
-                    }
-                    else
-                    {
-                        players[0] = new AnimationPlayer(model);
-                        players[1] = new AnimationPlayer(model);
-
-                        UpdateBoneTransform(new GameTime());
-                    }
-
-                    // Play the first animation clip
-                    Player.Loop = true;
-                    Play();
-                }
-                else if (bones == null || bones.Length < model.Bones.Count)
-                {
-                    // Adjust bone array size
-                    bones = new Matrix[model.Bones.Count];
+                    animationClips = value as IDictionary<string, AnimationClip>;
                 }
 
-                // Initialize mesh parts and renderables
-                meshParts.Clear();
-                materials.Clear();
-                renderables.Clear();
+                dictionary.TryGetValue("SpacePartition", out value);
 
-                foreach (ModelMesh mesh in model.Meshes)
+                spacePartitionInfo = new ModelSpacePartitionInformation
                 {
-                    foreach (ModelMeshPart part in mesh.MeshParts)
-                    {
-                        meshParts.Add(part);
+                    BitMap = value as bool[],
 
-                        // TODO: What if the effect cannot be casted to BasicEffect?
-                        var effect = part.Effect as BasicEffect;
-
-                        var material = new Material(effect)
-                        {
-                            // Read normal texture from mesh part tag
-                            NormalTexture = part.Tag as Texture2D,
-                        };
-
-                        materials.Add(material);
-
-                        // Just add a dummy renderable. After setting the effect to
-                        // Default, the materials of the game model are marked dirty,
-                        // the renderable will be refreshed during draw call.
-                        renderables.Add(null);
-                        shadowMapRenderables.Add(null);
-
-                        // Store ModelMesh in the tag of ModelMeshPart
-                        part.Tag = mesh;
-                    }
-                }
-
-                SetEffect("Default");
-                // Alpha = 0.15f;
+                    Box = OBBFromModel(model),
+                };
             }
+
+            if (animationClips != null)
+            {
+                if (IsSkinned)
+                {
+                    players[0] = new AnimationPlayer(skin);
+                    players[1] = new AnimationPlayer(skin);
+
+                    UpdateSkinTransform(new GameTime());
+                }
+                else
+                {
+                    players[0] = new AnimationPlayer(model);
+                    players[1] = new AnimationPlayer(model);
+
+                    UpdateBoneTransform(new GameTime());
+                }
+
+                // Play the first animation clip
+                Player.Loop = true;
+                Play();
+            }
+            else if (bones == null || bones.Length < model.Bones.Count)
+            {
+                // Adjust bone array size
+                bones = new Matrix[model.Bones.Count];
+            }
+
+            // Initialize mesh parts and renderables
+            meshParts.Clear();
+            materials.Clear();
+            renderables.Clear();
+
+            foreach (ModelMesh mesh in model.Meshes)
+            {
+                foreach (ModelMeshPart part in mesh.MeshParts)
+                {
+                    meshParts.Add(part);
+
+                    // TODO: What if the effect cannot be casted to BasicEffect?
+                    var effect = part.Effect as BasicEffect;
+
+                    var material = new Material(effect)
+                    {
+                        // Read normal texture from mesh part tag
+                        NormalTexture = part.Tag as Texture2D,
+                    };
+
+                    materials.Add(material);
+
+                    // Just add a dummy renderable. After setting the effect to
+                    // Default, the materials of the game model are marked dirty,
+                    // the renderable will be refreshed during draw call.
+                    renderables.Add(null);
+                    shadowMapRenderables.Add(null);
+
+                    // Store ModelMesh in the tag of ModelMeshPart
+                    part.Tag = mesh;
+                }
+            }
+
+            SetEffect("Default");
 
             // Compute model bounding box.
             orientedBoundingBox = OBBFromModel(model);
             isBoundingBoxDirty = true;
         }
 
-        /// <summary>
-        /// Sets the material of the game model.
-        /// </summary>
-        /// <param name="name"></param>
-        public void SetEffect(string name)
+        private void SetEffect(string name)
         {
             if (IsSkinned)
             {
@@ -608,7 +547,7 @@ namespace Isles.Graphics
         /// Play the current (or default) animation.
         /// </summary>
         /// <returns>Succeeded or not.</returns>
-        public bool Play()
+        private bool Play()
         {
             if (!IsAnimated)
             {
@@ -761,8 +700,7 @@ namespace Isles.Graphics
             }
 
             // Apply animation speed
-            TimeSpan time = (animationState != AnimationState.Playing) ? TimeSpan.Zero :
-                new TimeSpan((long)(gameTime.ElapsedGameTime.Ticks * AnimationSpeed));
+            TimeSpan time = (animationState != AnimationState.Playing) ? TimeSpan.Zero : gameTime.ElapsedGameTime;
 
             players[currentPlayer].Update(time, true, Transform);
 
@@ -1005,7 +943,7 @@ namespace Isles.Graphics
         /// <summary>
         /// Compute the axis aligned bounding box from an oriented bounding box.
         /// </summary>
-        public static BoundingBox AABBFromOBB(BoundingBox box, Matrix transform)
+        private static BoundingBox AABBFromOBB(BoundingBox box, Matrix transform)
         {
             const float FloatMax = 1000000;
 

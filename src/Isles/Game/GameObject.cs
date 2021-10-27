@@ -855,7 +855,7 @@ namespace Isles
             {
                 base.DrawShadowMap(gameTime, shadow);
             }
-            else if (modelShadow != null && IsVisible(shadow.ViewProjection))
+            else if (modelShadow != null && IsVisible(shadow.LightViewProjection))
             {
                 modelShadow.DrawShadowMap();
             }

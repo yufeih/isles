@@ -146,8 +146,6 @@ namespace Isles.Engine
         /// <param name="gameTime"></param>
         public void Draw(GameTime gameTime)
         {
-            Texture2D shadowMap = null;
-
             if (Game.Settings.ReflectionEnabled)
             {
                 // Pre-render our landscape, update landscape
@@ -156,21 +154,20 @@ namespace Isles.Engine
             }
 
             // Generate shadow map
-            if (Game.Shadow != null && Game.Shadow.Begin())
+            if (Game.Shadow != null)
             {
-                // Calculate shadow view projection matrix
-                CalculateShadowMatrix(Game.Shadow);
+                Game.Shadow.Begin(Game.Eye, Game.Facing);
 
                 // Draw shadow casters. Currently we only draw all world object
-                foreach (IWorldObject o in worldObjects)
+                foreach (var o in worldObjects)
                 {
                     o.DrawShadowMap(gameTime, Game.Shadow);
                 }
 
-                Game.ModelManager.Present(Game.Shadow);
+                Game.ModelManager.Present(Game.View, Game.Projection, Game.Shadow);
 
                 // Resolve shadow map
-                shadowMap = Game.Shadow.End();
+                Game.Shadow.End();
             }
 
             Landscape.DrawSky();
@@ -184,15 +181,7 @@ namespace Isles.Engine
             Landscape.DrawWater(gameTime);
 
             // Draw shadow receivers with the shadow map
-            if (shadowMap != null)
-            {
-                // Only the landscape receives the shadows
-                Landscape.DrawTerrain(gameTime, Game.Shadow);
-            }
-            else
-            {
-                Landscape.DrawTerrain(gameTime, null);
-            }
+            Landscape.DrawTerrain(gameTime, Game.Shadow);
 
             // Present surface
             Landscape.PresentSurface();
@@ -224,68 +213,6 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Constant values use for shadow matrix calculation.
-        /// </summary>
-        private readonly float[] ShadowMatrixDistance = new float[] { 245.0f, 734.0f, 1225.0f };
-        private readonly float[] ShadowMatrixNear = new float[] { 10.0f, 10.0f, 10.0f };
-        private readonly float[] ShadowMatrixFar = new float[] { 500.0f, 1022.0f, 1614.0f };
-
-        private void CalculateShadowMatrix(ShadowEffect shadow)
-        {
-            // This is a little tricky, I never want to look into it again...
-            //
-            // These values are found out through experiments,
-            // they might be the most suitable values for our scene.
-            //
-            // { Distance, Near, Far }
-            // { 245.0f, 50, 500 }
-            // { 734.0f, 300, 1022 }
-            // { 1225.0f, 766, 1614 }
-            //
-            // Adjust light view and projection matrix based on current
-            // camera position.
-            var eyeDistance = -Game.Eye.Z / Game.Facing.Z;
-            Vector3 target = Game.Eye + Game.Facing * eyeDistance;
-
-            // Make it closer to the eye
-            const float ClosenessToEye = 0.1f;
-            target.X = Game.Eye.X * ClosenessToEye + target.X * (1 - ClosenessToEye);
-            target.Y = Game.Eye.Y * ClosenessToEye + target.Y * (1 - ClosenessToEye);
-
-            // Compute shadow area size based on eye distance
-            const float MinDistance = 250.0f;
-            const float MaxDistance = 1200.0f;
-            const float MaxEyeDistance = 2000.0f;
-            var distance = MathHelper.Lerp(MinDistance, MaxDistance, eyeDistance / MaxEyeDistance);
-
-            // We only have two lines to lerp
-            var index = distance > ShadowMatrixDistance[1] ? 1 : 0;
-            var amount = (distance - ShadowMatrixDistance[index]) /
-                           (ShadowMatrixDistance[index + 1] - ShadowMatrixDistance[index]);
-            var near = MathHelper.Lerp(ShadowMatrixNear[index], ShadowMatrixNear[index + 1], amount);
-            var far = MathHelper.Lerp(ShadowMatrixFar[index], ShadowMatrixFar[index + 1], amount);
-
-            if (near < 1)
-            {
-                near = 1;
-            }
-
-            if (far < 1)
-            {
-                far = 1;
-            }
-
-            shadow.LightDirection = Vector3.Normalize(new Vector3(1, 1, -2));
-
-            var view = Matrix.CreateLookAt(
-                target - shadow.LightDirection * (distance + 50), target, Vector3.UnitZ);
-            var projection = Matrix.CreatePerspectiveFieldOfView(
-                MathHelper.PiOver4, 1, near, far);
-
-            shadow.ViewProjection = view * projection;
-        }
-
-        /// <summary>
         /// Load the game world from a file.
         /// </summary>
         /// <param name="inStream"></param>
@@ -312,7 +239,6 @@ namespace Isles.Engine
 
             // Initialize fog of war
             FogOfWar = new FogMask(Game.GraphicsDevice, Landscape.Size.X, Landscape.Size.Y);
-            Log.Write("Fog of War Initialized...");
 
             context.Refresh(5);
 
@@ -342,8 +268,6 @@ namespace Isles.Engine
 
                 context.Refresh(10 + (int)(100 * nObjects / node.ChildNodes.Count));
             }
-
-            Log.Write("Game world loaded [" + Name + "], " + nObjects + " objects...");
         }
 
         private static List<Point> ReadOccluders(XmlElement node)
@@ -377,58 +301,9 @@ namespace Isles.Engine
                 }
 
                 node.RemoveChild(occluderNode);
-
-                if (occluders != null)
-                {
-                    Log.Write("Path Occluder Loaded [" + occluders.Count + "]...");
-                }
             }
 
             return occluders;
-        }
-
-        /// <summary>
-        /// Save the world to a file.
-        /// </summary>
-        /// <param name="outStream"></param>
-        public virtual void Save(XmlNode node, ILoading context)
-        {
-            XmlElement child;
-            XmlElement header;
-            XmlDocument doc = node.OwnerDocument;
-
-            if (doc == null)
-            {
-                doc = node as XmlDocument;
-            }
-
-            // Create a default comment
-            node.AppendChild(doc.CreateComment(
-                "Isles.Engine Generated World: " + DateTime.Now.ToString()));
-
-            // Append a new element as the root node of the world
-            node.AppendChild(header = doc.CreateElement("World"));
-
-            // Setup attributes
-            header.SetAttribute("Version", Version.ToString());
-            header.SetAttribute("Name", Name);
-            header.SetAttribute("Description", Description);
-            header.SetAttribute("Landscape", landscapeFilename);
-
-            // Serialize world objects
-            var nObjects = 0;
-            foreach (IWorldObject worldObject in worldObjects)
-            {
-                if (worldObject.ClassID != null &&
-                   (child = doc.CreateElement(worldObject.ClassID)) != null)
-                {
-                    header.AppendChild(child);
-                    worldObject.Serialize(child);
-                    nObjects++;
-                }
-            }
-
-            Log.Write("Game world saved [" + Name + "], " + nObjects + " objects...");
         }
 
         /// <summary>

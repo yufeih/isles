@@ -687,7 +687,7 @@ namespace Isles.Engine
             // Treat game model as level content
             if ((value = xml.GetAttribute("Model")) != "")
             {
-                Model = new GameModel(World.Content.Load<Model>(value));
+                Model = new GameModel(value);
             }
 
             if ((value = xml.GetAttribute("Alpha")) != "")
@@ -875,7 +875,7 @@ namespace Isles.Engine
 
         public override void DrawShadowMap(GameTime gameTime, ShadowEffect shadow)
         {
-            if (Visible && model != null && IsVisible(shadow.ViewProjection))
+            if (Visible && model != null && IsVisible(shadow.LightViewProjection))
             {
                 model.DrawShadowMap();
             }

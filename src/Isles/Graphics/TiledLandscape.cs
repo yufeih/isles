@@ -217,7 +217,7 @@ namespace Isles.Graphics
             graphics.SetRenderState(BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone);
 
             terrainEffect.Parameters["ShadowMap"].SetValue(shadowEffect.ShadowMap);
-            terrainEffect.Parameters["LightViewProjection"].SetValue(shadowEffect.ViewProjection);
+            terrainEffect.Parameters["LightViewProjection"].SetValue(shadowEffect.LightViewProjection);
             terrainEffect.CurrentTechnique = terrainEffect.Techniques["ShadowMapping"];
 
             terrainEffect.Begin();

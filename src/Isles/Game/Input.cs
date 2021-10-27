@@ -299,7 +299,6 @@ namespace Isles.Engine
             {
                 if (p.Value.Handler == handler)
                 {
-                    Log.Write("Warning: Duplicate Input Handler.");
                     return;
                 }
 

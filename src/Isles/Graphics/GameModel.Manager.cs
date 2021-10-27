@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using Isles.Engine;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Graphics
@@ -188,21 +189,16 @@ namespace Isles.Graphics
         /// </summary>
         public static EffectTechnique GetTechnique(string techniqueName)
         {
-            return ModelManager.ModelEffect == null ? throw new InvalidOperationException() : ModelManager.ModelEffect.Techniques[techniqueName];
+            return ModelManager._effect == null ? throw new InvalidOperationException() : ModelManager._effect.Techniques[techniqueName];
         }
     }
 
-    /// <summary>
-    /// Class for managing model rendering
-    ///
-    /// Transparency -> Technique -> Texture -> Color & Transform.
-    /// </summary>
     public class ModelManager
     {
         public class Renderable
         {
             private readonly BaseGame game = BaseGame.Singleton;
-            private readonly Effect effect = ModelManager.ModelEffect;
+            private readonly Effect effect = ModelManager._effect;
             private readonly EffectParameter world;
             private readonly EffectParameter bones;
             private readonly EffectParameter diffuse;
@@ -233,8 +229,8 @@ namespace Isles.Graphics
 
             public Renderable(ModelMesh mesh, ModelMeshPart part, bool isTransparent)
             {
-                this.Mesh = mesh;
-                this.MeshPart = part;
+                Mesh = mesh;
+                MeshPart = part;
                 this.isTransparent = isTransparent;
 
                 world = effect.Parameters["World"];
@@ -378,7 +374,7 @@ namespace Isles.Graphics
 
         public class RenderablePerMaterial
         {
-            private readonly Effect effect = ModelManager.ModelEffect;
+            private readonly Effect effect = ModelManager._effect;
 
             private readonly EffectParameter basicTexture;
             private readonly EffectParameter normalTexture;
@@ -388,7 +384,7 @@ namespace Isles.Graphics
 
             public RenderablePerMaterial(Material material)
             {
-                this.Material = material;
+                Material = material;
 
                 // We'll be adjusting these colors in our .fx file
                 // ambient = effect.Parameters["Ambient"];
@@ -449,7 +445,7 @@ namespace Isles.Graphics
 
             public RenderablePerTechnique(EffectTechnique technique)
             {
-                this.Technique = technique;
+                Technique = technique;
             }
 
             public Renderable GetRenderable(ModelMesh mesh, ModelMeshPart part, Material material)
@@ -491,71 +487,49 @@ namespace Isles.Graphics
             }
         }
 
-        /// <summary>
-        /// Our base game.
-        /// </summary>
-        private readonly BaseGame game = BaseGame.Singleton;
+        private readonly GraphicsDevice _graphics;
 
-        /// <summary>
-        /// Effect parameters.
-        /// </summary>
-        private EffectParameter view;
-        private EffectParameter projection;
-        private EffectParameter viewProjection;
-        private EffectParameter viewInverse;
+        internal static Effect _effect;
 
-        public Matrix ViewProjectionMatrix;
-
-        /// <summary>
-        /// Gets the model effect used by the model manager.
-        /// </summary>
-        public static Effect ModelEffect { get; private set; }
+        private readonly EffectParameter _view;
+        private readonly EffectParameter _projection;
+        private readonly EffectParameter _viewProjection;
+        private readonly EffectParameter _viewInverse;
 
         /// <summary>
         /// A list storing all opaque renderables, drawed first.
         /// </summary>
-        private readonly List<RenderablePerTechnique> opaque = new();
-        private readonly List<RenderablePerTechnique> transparent = new();
+        private readonly List<RenderablePerTechnique> _opaque = new();
+        private readonly List<RenderablePerTechnique> _transparent = new();
 
-        /// <summary>
-        /// Creates a new model manager.
-        /// </summary>
-        public ModelManager()
+        public ModelManager(GraphicsDevice graphics, ContentManager content)
         {
-            CreateEffect();
+            _graphics = graphics;
+            _effect = content.Load<Effect>("Effects/Model");
+            _view = _effect.Parameters["View"];
+            _viewInverse = _effect.Parameters["ViewInverse"];
+            _projection = _effect.Parameters["Projection"];
+            _viewProjection = _effect.Parameters["ViewProjection"];
 
             // Build an effect technique hierarchy
-            foreach (EffectTechnique technique in ModelEffect.Techniques)
+            foreach (EffectTechnique technique in _effect.Techniques)
             {
-                opaque.Add(new RenderablePerTechnique(technique));
-                transparent.Add(new RenderablePerTechnique(technique));
+                _opaque.Add(new RenderablePerTechnique(technique));
+                _transparent.Add(new RenderablePerTechnique(technique));
             }
         }
 
-        private void CreateEffect()
-        {
-            ModelEffect = game.Content.Load<Effect>("Effects/Model");
-            view = ModelEffect.Parameters["View"];
-            viewInverse = ModelEffect.Parameters["ViewInverse"];
-            projection = ModelEffect.Parameters["Projection"];
-            viewProjection = ModelEffect.Parameters["ViewProjection"];
-        }
-
-        /// <summary>
-        /// Gets the corrensponding renderable from a specific material and model mesh part.
-        /// </summary>
-        public Renderable GetRenderable(
-            ModelMesh mesh, ModelMeshPart part, Material material)
+        public Renderable GetRenderable(ModelMesh mesh, ModelMeshPart part, Material material)
         {
             // Assign a default technique
             if (material.Technique == null)
             {
-                material.Technique = ModelEffect.Techniques[0];
+                material.Technique = _effect.Techniques[0];
             }
 
             if (material.IsTransparent)
             {
-                foreach (RenderablePerTechnique r in transparent)
+                foreach (RenderablePerTechnique r in _transparent)
                 {
                     if (r.Technique == material.Technique)
                     {
@@ -565,7 +539,7 @@ namespace Isles.Graphics
             }
             else
             {
-                foreach (RenderablePerTechnique r in opaque)
+                foreach (RenderablePerTechnique r in _opaque)
                 {
                     if (r.Technique == material.Technique)
                     {
@@ -577,87 +551,45 @@ namespace Isles.Graphics
             return null;
         }
 
-        public Matrix LightProjection;
-
-        public void Present()
+        public void Present(Matrix view, Matrix projection, ShadowEffect shadow = null, bool showOpaque = true, bool showTransparent = true)
         {
-            Present(game.View, game.Projection, null);
-        }
-
-        public void Present(ShadowEffect shadow)
-        {
-            Present(game.View, game.Projection, shadow);
-        }
-
-        public void Present(Matrix view, Matrix projection)
-        {
-            Present(view, projection, null);
-        }
-
-        public void Present(Matrix v, Matrix p, ShadowEffect shadow)
-        {
-            Present(v, p, shadow, true, true);
-        }
-
-        /// <summary>
-        /// Draw all the models registered this frame onto the screen.
-        /// </summary>
-        public void Present(Matrix v, Matrix p, ShadowEffect shadow, bool showOpaque, bool showTransparent)
-        {
-            if (opaque.Count <= 0 || (!showOpaque && !showTransparent))
+            if (_opaque.Count <= 0 || (!showOpaque && !showTransparent))
             {
                 return;
             }
 
             // Setup render state
-            game.GraphicsDevice.SetRenderState(BlendState.Opaque, DepthStencilState.Default, RasterizerState.CullNone);
+            _graphics.SetRenderState(BlendState.Opaque, DepthStencilState.Default, RasterizerState.CullNone);
 
             // Clear cached renderable variable each frame
             Renderable.CachedIndexBuffer = null;
             Renderable.CachedVertexBuffer = null;
 
-            ViewProjectionMatrix = v * p;
-
-            if (view != null)
-            {
-                view.SetValue(v);
-            }
-
-            if (projection != null)
-            {
-                projection.SetValue(p);
-            }
-
-            if (viewInverse != null)
-            {
-                viewInverse.SetValue(Matrix.Invert(v));
-            }
-
-            if (viewProjection != null)
-            {
-                viewProjection.SetValue(ViewProjectionMatrix);
-            }
+            _view?.SetValue(view);
+            _projection?.SetValue(projection);
+            _viewInverse?.SetValue(Matrix.Invert(view));
+            _viewProjection?.SetValue(view * projection);
 
             if (shadow != null)
             {
-                ModelEffect.Parameters["LightViewProjection"].SetValue(shadow.ViewProjection);
+                _effect.Parameters["LightViewProjection"].SetValue(shadow.LightViewProjection);
             }
 
             if (showOpaque)
             {
-                foreach (RenderablePerTechnique r in opaque)
+                foreach (RenderablePerTechnique r in _opaque)
                 {
-                    r.Draw(ModelEffect);
+                    r.Draw(_effect);
                 }
             }
 
-            game.GraphicsDevice.SetRenderState(BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone);
+            _graphics.SetRenderState(BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone);
 
             if (showTransparent)
             {
-                foreach (RenderablePerTechnique r in transparent)
+                foreach (RenderablePerTechnique r in _transparent)
                 {
-                    r.Draw(ModelEffect);
+                    r.Draw(_effect);
                 }
             }
         }

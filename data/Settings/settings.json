@@ -11,7 +11,7 @@
     "Enabled": true,
     "Blur": 3,
     "Threshold": 0.86,
-    "BloomIntensity": 1.2,
+    "BloomIntensity": 1.6,
     "BaseIntensity": 1.1,
     "BloomSaturation": 1,
     "BaseSaturation": 1

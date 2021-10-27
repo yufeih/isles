@@ -145,12 +145,6 @@ namespace Isles.Engine
         /// </summary>
         public Settings Settings { get; set; }
 
-        public Color BackgroundColor
-        {
-            get => backgroundColor;
-            set => backgroundColor = value;
-        }
-
         /// <summary>
         /// Gets Xna graphics device manager.
         /// </summary>
@@ -273,7 +267,6 @@ namespace Isles.Engine
             if (!Screens.ContainsKey(name))
             {
                 Screens.Add(name, screen);
-                Log.Write("Screen Added: " + name);
             }
         }
 
@@ -284,32 +277,14 @@ namespace Isles.Engine
         /// <param name="screen"></param>
         public void RemoveScreen(string name)
         {
-            if (Screens.Remove(name))
-            {
-                Log.Write("Screen Removed: " + name);
-            }
+            Screens.Remove(name);
         }
 
         public BaseGame()
         {
             Singleton = this;
-
-            var assembly = Assembly.GetCallingAssembly();
-
-            // Initialize log
-            Log.Initialize();
-            Log.NewLine();
-            Log.NewLine();
-            Log.Write("Isles", false);
-            Log.Write("Date: " + DateTime.Now, false);
-            Log.Write("Full Name: " + assembly.FullName, false);
-            Log.Write("CLR Runtime Version: " + assembly.ImageRuntimeVersion, false);
-            Log.NewLine();
-
             Settings = JsonSerializer.Deserialize<Settings>(File.ReadAllText("data/settings/settings.json"));
-
             Content = new ContentManager(Services, Settings.ContentDirectory);
-            Log.Write("Content Directory:" + Settings.ContentDirectory + "...");
 
             Graphics = new GraphicsDeviceManager(this)
             {
@@ -370,23 +345,18 @@ namespace Isles.Engine
                 };
 
                 Components.Add(Bloom);
-                Log.Write("Bloom Effect Initialized...");
             }
 
             ParticleSystem.LoadContent(this);
-            Log.Write("Particle System Initialized...");
 
             // Initialize text
             Graphics2D = new Graphics2D(this);
-            Log.Write("2D Graphics Initialized...");
 
             Billboard = new BillboardManager(this);
-            Log.Write("Billboard Initialized...");
 
             if (Settings.ShadowEnabled)
             {
-                Shadow = new ShadowEffect(this);
-                Log.Write("Shadow Mapping Effect Initialized...");
+                Shadow = new ShadowEffect(GraphicsDevice, Content);
             }
 
             // Notify all screens to load contents
@@ -395,8 +365,7 @@ namespace Isles.Engine
                 screen.Value.LoadContent();
             }
 
-            ModelManager = new ModelManager();
-            Log.Write("Model Manager Initialized...");
+            ModelManager = new ModelManager(GraphicsDevice, Content);
 
             base.Initialize();
         }
@@ -405,19 +374,6 @@ namespace Isles.Engine
         {
             ScreenWidth = GraphicsDevice.Viewport.Width;
             ScreenHeight = GraphicsDevice.Viewport.Height;
-
-            Log.Write("Device Reset <" + ScreenWidth + ", " + ScreenHeight + ">...");
-        }
-
-        /// <summary>
-        /// Load your graphics content.  If loadAllContent is true, you should
-        /// load content from both ResourceManagementMode pools.  Otherwise, just
-        /// load ResourceManagementMode.Manual content.
-        /// </summary>
-        /// <param name="loadAllContent">Which type of content to load.</param>
-        protected override void LoadContent()
-        {
-            base.LoadContent();
         }
 
         /// <summary>
@@ -624,15 +580,12 @@ namespace Isles.Engine
             {
                 initialized = true;
                 FirstTimeInitialize();
-
-                // Delay one frame
-                return;
             }
 
             Bloom?.BeginDraw();
             Graphics.GraphicsDevice.Clear(backgroundColor);
             CurrentScreen?.Draw(gameTime);
-            ModelManager?.Present();
+            ModelManager?.Present(View, Projection);
             Billboard?.Present();
 
             ParticleSystem.Present();

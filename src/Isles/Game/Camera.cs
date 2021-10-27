@@ -66,8 +66,6 @@ namespace Isles.Engine
             graphics.DeviceReset += ResetProjection;
             view = Matrix.CreateLookAt(eye, lookAt, up);
             ResetProjection(null, EventArgs.Empty);
-
-            Log.Write("Camera Initialized...");
         }
 
         protected void ResetProjection(object sender, EventArgs e)

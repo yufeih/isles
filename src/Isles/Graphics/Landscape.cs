@@ -34,9 +34,6 @@ namespace Isles.Graphics
 
             // Initialize everything
             Initialize(BaseGame.Singleton);
-
-            // Log landscape info
-            Log.Write("Landscape loaded...");
         }
 
         /// <summary>
