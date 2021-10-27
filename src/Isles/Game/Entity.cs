@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Xml;
 using Isles.Graphics;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Engine
 {
@@ -868,7 +867,7 @@ namespace Isles.Engine
                 if (model != null && WithinViewFrustum)
                 {
                     // model.Tint = highlighted ? new Vector4(0, 0, 0, 1) : Vector4.One;
-                    model.Draw(gameTime);
+                    model.Draw();
                 }
             }
         }
@@ -877,7 +876,7 @@ namespace Isles.Engine
         {
             if (Visible && model != null && IsVisible(shadow.LightViewProjection))
             {
-                model.DrawShadowMap();
+                model.Draw();
             }
         }
 
@@ -885,7 +884,7 @@ namespace Isles.Engine
         {
             if (Visible && model != null && IsVisible(view * projection))
             {
-                model.Draw(gameTime);
+                model.Draw();
             }
         }
 

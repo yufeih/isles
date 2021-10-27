@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Text.Json;
 using Isles.Graphics;
 using Microsoft.Xna.Framework;
@@ -170,7 +169,7 @@ namespace Isles.Engine
         /// <summary>
         /// Gets game model manager.
         /// </summary>
-        public ModelManager ModelManager { get; private set; }
+        public ModelRenderer ModelRenderer { get; private set; }
 
         /// <summary>
         /// Gets game 2D graphics.
@@ -365,7 +364,7 @@ namespace Isles.Engine
                 screen.Value.LoadContent();
             }
 
-            ModelManager = new ModelManager(GraphicsDevice, Content);
+            ModelRenderer = new ModelRenderer(GraphicsDevice, Content);
 
             base.Initialize();
         }
@@ -585,7 +584,7 @@ namespace Isles.Engine
             Bloom?.BeginDraw();
             Graphics.GraphicsDevice.Clear(backgroundColor);
             CurrentScreen?.Draw(gameTime);
-            ModelManager?.Present(View, Projection);
+            ModelRenderer?.Present(View, Projection);
             Billboard?.Present();
 
             ParticleSystem.Present();

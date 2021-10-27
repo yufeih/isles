@@ -695,13 +695,13 @@ namespace Isles
                 {
                     position = (RallyPoints[0] as Entity).Position;
                 }
-                else if (RallyPoints[0] is Vector3)
+                else if (RallyPoints[0] is Vector3 vector)
                 {
-                    position = (Vector3)RallyPoints[0];
+                    position = vector;
                 }
 
                 RallyPointModel.Transform = Matrix.CreateTranslation(position);
-                RallyPointModel.Draw(gameTime);
+                RallyPointModel.Draw();
             }
         }
 

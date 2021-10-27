@@ -42,9 +42,6 @@ namespace Isles.Graphics
 
         private Matrix transform = Matrix.Identity;
 
-        /// <summary>
-        /// Hold all models bone transforms.
-        /// </summary>
         private Matrix[] bones;
         private Matrix[] skinTransforms;
 
@@ -197,48 +194,11 @@ namespace Isles.Graphics
         public float Alpha
         {
             get => tint.W;
-
-            set
-            {
-                value = MathHelper.Clamp(value, 0, 1);
-
-                if (value < 1 && tint.W == 1)
-                {
-                    foreach (Material material in materials)
-                    {
-                        material.IsTransparent = true;
-                    }
-                }
-                else if (value == 1 && tint.W < 1)
-                {
-                    foreach (Material material in materials)
-                    {
-                        material.IsTransparent = false;
-                    }
-                }
-
-                tint.W = value;
-            }
+            set => tint.W = MathHelper.Clamp(value, 0, 1);
         }
 
         private Vector4 tint = new(1, 1, 1, 1);
         private Vector4 glow = new(0, 0, 0, 1);
-
-        /// <summary>
-        /// Internal list storing all model mesh parts.
-        /// </summary>
-        private List<ModelMeshPart> meshParts = new();
-
-        /// <summary>
-        /// Internal list storing all materials corresponding to each mesh part.
-        /// </summary>
-        private List<Material> materials = new();
-
-        /// <summary>
-        /// Internal list storing all renderables corresponding to each mesh part.
-        /// </summary>
-        private List<ModelManager.Renderable> renderables = new();
-        private List<ModelManager.Renderable> shadowMapRenderables = new();
 
         private GameModel()
         {
@@ -269,13 +229,9 @@ namespace Isles.Graphics
                 currentPlayer = currentPlayer,
                 glow = glow,
                 isBoundingBoxDirty = isBoundingBoxDirty,
-                materials = materials,
-                meshParts = meshParts,
                 model = model,
                 orientedBoundingBox = orientedBoundingBox,
                 players = players,
-                renderables = renderables,
-                shadowMapRenderables = shadowMapRenderables,
                 skin = skin,
                 spacePartitionInfo = spacePartitionInfo,
                 tint = tint,
@@ -357,59 +313,9 @@ namespace Isles.Graphics
                 bones = new Matrix[model.Bones.Count];
             }
 
-            // Initialize mesh parts and renderables
-            meshParts.Clear();
-            materials.Clear();
-            renderables.Clear();
-
-            foreach (ModelMesh mesh in model.Meshes)
-            {
-                foreach (ModelMeshPart part in mesh.MeshParts)
-                {
-                    meshParts.Add(part);
-
-                    // TODO: What if the effect cannot be casted to BasicEffect?
-                    var effect = part.Effect as BasicEffect;
-
-                    var material = new Material(effect)
-                    {
-                        // Read normal texture from mesh part tag
-                        NormalTexture = part.Tag as Texture2D,
-                    };
-
-                    materials.Add(material);
-
-                    // Just add a dummy renderable. After setting the effect to
-                    // Default, the materials of the game model are marked dirty,
-                    // the renderable will be refreshed during draw call.
-                    renderables.Add(null);
-                    shadowMapRenderables.Add(null);
-
-                    // Store ModelMesh in the tag of ModelMeshPart
-                    part.Tag = mesh;
-                }
-            }
-
-            SetEffect("Default");
-
             // Compute model bounding box.
             orientedBoundingBox = OBBFromModel(model);
             isBoundingBoxDirty = true;
-        }
-
-        private void SetEffect(string name)
-        {
-            if (IsSkinned)
-            {
-                name += "Skinned";
-            }
-
-            EffectTechnique technique = Material.GetTechnique(name);
-
-            foreach (Material m in materials)
-            {
-                m.Technique = technique;
-            }
         }
 
         /// <summary>
@@ -792,84 +698,17 @@ namespace Isles.Graphics
             }
         }
 
-        public virtual void Draw(GameTime gameTime)
+        public void Draw()
         {
-            if (model == null || meshParts.Count <= 0)
+            foreach (var mesh in model.Meshes)
             {
-                return;
-            }
-
-            // Draw all mesh parts
-            for (var i = 0; i < meshParts.Count; i++)
-            {
-                ModelMeshPart part = meshParts[i];
-
-                if (part.Tag is not ModelMesh mesh)
-                {
-                    throw new Exception("ModelMesh not attached to ModelMeshPart");
-                }
-
-                // Update renderable if the material has changed
-                if (materials[i].IsDirty || renderables[i] == null)
-                {
-                    materials[i].IsDirty = false;
-
-                    renderables[i] = // Refresh renderable
-                        game.ModelManager.GetRenderable(mesh, part, materials[i]);
-                }
-
-                // Add a new instance to the renderable
                 if (IsSkinned)
                 {
-                    renderables[i].Add(skinTransforms, tint, glow);
+                    game.ModelRenderer.Draw(mesh, Matrix.Identity, skinTransforms, tint, glow);
                 }
                 else
                 {
-                    renderables[i].Add(bones[mesh.ParentBone.Index], tint, glow);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Draw the game model onto a shadow map.
-        /// </summary>
-        /// <param name="gameTime"></param>
-        /// <param name="shadow"></param>
-        public void DrawShadowMap()
-        {
-            if (model == null || meshParts.Count <= 0)
-            {
-                return;
-            }
-
-            // Draw all mesh parts
-            for (var i = 0; i < meshParts.Count; i++)
-            {
-                ModelMeshPart part = meshParts[i];
-
-                if (part.Tag is not ModelMesh mesh)
-                {
-                    throw new Exception("ModelMesh not attached to ModelMeshPart");
-                }
-
-                // Don't care about materials.
-                // All game models use the same shadow map effect.
-                if (shadowMapRenderables[i] == null)
-                {
-                    // First time initialize
-                    shadowMapRenderables[i] = IsSkinned
-                        ? game.ModelManager.GetRenderable(mesh, part, Material.ShadowMapSkinned)
-                        : game.ModelManager.GetRenderable(mesh, part, Material.ShadowMap);
-                }
-
-                // Add a new instance to the renderable
-                if (IsSkinned)
-                {
-                    shadowMapRenderables[i].Add(skinTransforms, tint, glow);
-                }
-                else
-                {
-                    shadowMapRenderables[i].Add(bones[mesh.ParentBone.Index], tint, glow);
+                    game.ModelRenderer.Draw(mesh, bones[mesh.ParentBone.Index], null, tint, glow);
                 }
             }
         }

@@ -462,7 +462,7 @@ namespace Isles.Graphics
             }
 
             // Present the model manager to draw those models
-            game.ModelManager.Present(viewReflect, game.Projection);
+            game.ModelRenderer.Present(viewReflect, game.Projection);
 
             // Draw refraction onto the reflection texture
             DrawTerrain(game.View, game.Projection, false);

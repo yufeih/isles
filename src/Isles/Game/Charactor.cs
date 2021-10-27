@@ -606,19 +606,19 @@ namespace Isles
                 {
                     if (LumberCarried > 0)
                     {
-                        pair.Key.Draw(gameTime);
+                        pair.Key.Draw();
                     }
                 }
                 else if (pair.Key == gold)
                 {
                     if (GoldCarried > 0)
                     {
-                        pair.Key.Draw(gameTime);
+                        pair.Key.Draw();
                     }
                 }
                 else
                 {
-                    pair.Key.Draw(gameTime);
+                    pair.Key.Draw();
                 }
             }
         }
@@ -751,7 +751,7 @@ namespace Isles
             {
                 if (pair.Key == weapon && weaponVisible || pair.Key != weapon)
                 {
-                    pair.Key.Draw(gameTime);
+                    pair.Key.Draw();
                 }
             }
         }

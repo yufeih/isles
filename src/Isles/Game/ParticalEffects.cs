@@ -2,7 +2,6 @@ using System;
 using Isles.Engine;
 using Isles.Graphics;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles
 {

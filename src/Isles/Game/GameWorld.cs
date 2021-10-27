@@ -8,7 +8,6 @@ using System.Xml;
 using Isles.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Engine
 {
@@ -164,7 +163,7 @@ namespace Isles.Engine
                     o.DrawShadowMap(gameTime, Game.Shadow);
                 }
 
-                Game.ModelManager.Present(Game.View, Game.Projection, Game.Shadow);
+                Game.ModelRenderer.Present(Game.View, Game.Projection, Game.Shadow);
 
                 // Resolve shadow map
                 Game.Shadow.End();
@@ -188,12 +187,12 @@ namespace Isles.Engine
 
             // FIXME: There are some weired things when models are drawed after
             // drawing the terrain... Annoying...
-            Game.ModelManager.Present(Game.View, Game.Projection, null, true, false);
+            Game.ModelRenderer.Present(Game.View, Game.Projection, null, true, false);
 
             // TODO: Draw particles with ZEnable = true, ZWriteEnable = false
             ParticleSystem.Present();
 
-            Game.ModelManager.Present(Game.View, Game.Projection, null, false, true);
+            Game.ModelRenderer.Present(Game.View, Game.Projection, null, false, true);
 
             Landscape.PresentSurface();
         }

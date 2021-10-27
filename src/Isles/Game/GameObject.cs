@@ -739,7 +739,7 @@ namespace Isles
             {
                 if (WithinViewFrustum)
                 {
-                    modelShadow.Draw(gameTime);
+                    modelShadow.Draw();
                 }
 
                 if (Owner != null)
@@ -785,7 +785,7 @@ namespace Isles
         {
             foreach (KeyValuePair<GameModel, int> attach in Attachment)
             {
-                attach.Key.Draw(gameTime);
+                attach.Key.Draw();
             }
         }
 
@@ -857,7 +857,7 @@ namespace Isles
             }
             else if (modelShadow != null && IsVisible(shadow.LightViewProjection))
             {
-                modelShadow.DrawShadowMap();
+                modelShadow.Draw();
             }
         }
 
@@ -1506,11 +1506,7 @@ namespace Isles
 
         public override void Draw(GameTime gameTime)
         {
-            // FIXME: Consider fog of war...
-            if (ammo != null)
-            {
-                ammo.Draw(gameTime);
-            }
+            ammo?.Draw();
         }
     }
 
