@@ -16,7 +16,7 @@ Be carefull when walk upon it."
         Model="models/box" RotationXBias="90" ScaleBias="0.15, 0.15, 0.15"/>
 
     <Goldmine
-        Name="Goldmine" Model="models/buildings/goldmine" Icon="34"
+        Name="Goldmine" Model="models/goldmine" Icon="34"
         RotationXBias="90" RotationZBias="180" ScaleBias="0.4, 0.4, 0.4"
         ObstructorSize="30, 60" SpawnPoint="0, -30" Snapshot="15"/>
 
@@ -25,7 +25,7 @@ Be carefull when walk upon it."
         Name="Town hall" Description="Base structure of Islander village.
 It provides food and stores gold and lumber.
 You can train followers from this building."
-        Hotkey="T" Icon="16" Snapshot="9" Model="models/buildings/townhall"
+        Hotkey="T" Icon="16" Snapshot="9" Model="models/townhall"
         RotationXBias="90" RotationZBias="90" ScaleBias="0.86, 0.86, 0.86"
         ConstructionTime="20" ObstructorSize="50, 50" AreaRadius="30" Halo="Blue"
         Lumber="350" Gold="425" Priority="100" ViewDistance="150" Defense="60, 80"
@@ -34,7 +34,7 @@ You can train followers from this building."
     <Barracks
         Name="Barracks" Description="Islander military structure.
 It trains militias and hunters. It can also upgrade attack and defense point for all Islander units."
-        Hotkey="B" Icon="19"  Snapshot="10" Model="models/buildings/barracks" ViewDistance="100" Halo="Red"
+        Hotkey="B" Icon="19"  Snapshot="10" Model="models/barracks" ViewDistance="100" Halo="Red"
         RotationXBias="90" RotationZBias="90" ScaleBias="0.075, 0.075, 0.075" ConstructionTime="20"
         ObstructorSize="40, 32" AreaRadius="20" Health="1500" Lumber="175" Gold="225" Defense="60, 80"
         Priority="101" Spells="Militia, Hunter, AttackUpgrade, DefenseUpgrade" Sound="Barracks"/>
@@ -42,7 +42,7 @@ It trains militias and hunters. It can also upgrade attack and defense point for
     <Altar
         Name="Altar of Peace" Description="A place where islanders worshiped their gold and nature.
 Fire sorceress can be summoned here. It can also reveal the ultimate spell 'Punish of Nature'"
-        Hotkey="R" Icon="22" Snapshot="11" Model="models/buildings/altar" ViewDistance="100"
+        Hotkey="R" Icon="22" Snapshot="11" Model="models/altar" ViewDistance="100"
         RotationXBias="90" RotationZBia="90"  ScaleBias="0.7, 0.7, 0.7" Sound="Altar" Halo="Yellow"
         ObstructorSize="40, 40" AreaRadius="26" ConstructionTime="20" Health="1800" Defense="60, 80"
         Lumber="150" Gold="175" Priority="102" Spells="FireSorceress, PunishOfNatureUpgrade"/>
@@ -50,14 +50,14 @@ Fire sorceress can be summoned here. It can also reveal the ultimate spell 'Puni
     <Lumbermill
         Name="Lumbermill" Description="Wood can be stored in the lumbermill.
 'Live of Nature' can be researched here to make nearby trees evergreen." Halo="Green"
-        Hotkey="L" Icon="25" Snapshot="12" Model="models/buildings/lumbermill" Defense="60, 80"
+        Hotkey="L" Icon="25" Snapshot="12" Model="models/lumbermill" Defense="60, 80"
         RotationXBias="90" ScaleBias="0.25, 0.25, 0.25" ConstructionTime="20" Health="750"
         ObstructorSize="30, 30"  AreaRadius="20" Lumber="125" Gold="215" Priority="103"
         Spells="LiveOfNature" Sound="Lumbermill"/>
 
     <Tower
         Name="Defence Tower" Description="Islander defense structure."
-        Hotkey="D" Icon="28" Snapshot="13" Model="models/buildings/tower"
+        Hotkey="D" Icon="28" Snapshot="13" Model="models/tower"
         RotationXBias="90" ScaleBias="0.55, 0.55, 0.55" ConstructionTime="10"
         ObstructorSize="28, 28" AreaRadius="18" Health="800"
         Lumber="115" Gold="150" Priority="104" Sound="Tower" ViewDistance="100"
@@ -65,7 +65,7 @@ Fire sorceress can be summoned here. It can also reveal the ultimate spell 'Puni
 
     <Farmhouse
         Name="Farm house" Description="Provides food for Islander units." ViewDistance="60"
-        Hotkey="F" Icon="31" Snapshot="14" Model="models/buildings/farm" Defense="60, 80"
+        Hotkey="F" Icon="31" Snapshot="14" Model="models/farm" Defense="60, 80"
         Sound="Farm" RotationXBias="90" ScaleBias="0.45, 0.45, 0.45" ConstructionTime="20" Health="500"
         ObstructorSize="28, 28" AreaRadius="18" Lumber="125" Gold="100" Priority="100" Food="8"/>
 
@@ -73,7 +73,7 @@ Fire sorceress can be summoned here. It can also reveal the ultimate spell 'Puni
     <Follower
         Name="Follower" Description="Religious followers of Islander god.
 Can construct buildings, harvest gold and lumber, repair damaged buildings and fight on the battlefield when necessary."
-        Model="charactors/follower/follower" Speed = "25" ObstructorRadius="5"
+        Model="models/follower" Speed = "25" ObstructorRadius="5"
         RotationXBias="90" RotationZBias ="-90"  ScaleBias="0.1, 0.1, 0.1" Health="200"
         Gold="50" Lumber="0" Food="1" Priority="4" AreaRadius="20" Icon="40" Snapshot="0"
         Spells="Townhall, Farmhouse, Lumbermill, Tower, Barracks, Altar"
@@ -84,7 +84,7 @@ Can construct buildings, harvest gold and lumber, repair damaged buildings and f
     <Militia
         Name="Militia" Description="Basic Islander soldiers.
 They are good at combat using their power hammer."
-        Model="charactors/militia/militia" Speed = "30" ObstructorRadius="7"
+        Model="models/militia" Speed = "30" ObstructorRadius="7"
         Attachment="models/warhammer|Weapon|models/shield|Shield"
         RotationXBias="90" RotationZBias ="-90"  ScaleBias="0.13, 0.13, 0.13" Health="425"
         Gold="155" Lumber="50" Food="2" Priority="3" AreaRadius="20" Hotkey="T"
@@ -94,7 +94,7 @@ They are good at combat using their power hammer."
     <Hunter
         Name="Hunter" Description="Islander ranged units.
 Years of hunting life makes them masters of spears."
-        Model="charactors/hunter/hunter" Attachment="models/spear|Weapon"  Speed = "35" ObstructorRadius="7"
+        Model="models/hunter" Attachment="models/spear|Weapon"  Speed = "35" ObstructorRadius="7"
         RotationXBias="90" RotationZBias ="-90"  ScaleBias="0.13, 0.13, 0.13" Health="350"
         Gold="125" Lumber="105" Food="2" Priority="2" AreaRadius="20" Hotkey="H" Icon="46"
         TrainingTime="20" Attack="43, 61" Defense="10, 18" AttackDuration="1.8" AttackRange="0, 75"
@@ -105,7 +105,7 @@ Years of hunting life makes them masters of spears."
 She is the master of all fire magic.
 She can also summon the powerful hellfire to fight on the battlefield.
 When 'Punish of Nature' is researched, she will serve the justice for the nature."
-        Model="charactors/sorceress/sorceress" Speed = "40" ObstructorRadius="8"
+        Model="models/sorceress" Speed = "40" ObstructorRadius="8"
         RotationXBias="90" RotationZBias ="-90"  ScaleBias="0.18, 0.18, 0.18" Health="750"
         Gold="200" Lumber="175" Food="5" Priority="0" AreaRadius="22" Hotkey="F" Icon="49"
         TrainingTime="25" Attack="80, 95" Defense="35, 40" AttackDuration="2" AttackRange="0, 50"
@@ -113,7 +113,7 @@ When 'Punish of Nature' is researched, she will serve the justice for the nature
 
     <Hellfire
         Name="Hellfire" Description="Summon the mighty giant creature that fight with fire sorceress."
-        Model="charactors/hellfire/hellfire" Speed = "35" ObstructorRadius="12"
+        Model="models/hellfire" Speed = "35" ObstructorRadius="12"
         RotationXBias="90" RotationZBias ="-90"  ScaleBias="0.18, 0.18, 0.18" Health="1000"
         Gold="0" Lumber="0" Food="0" Priority="1" AreaRadius="30" Hotkey="F" Icon="52"
         TrainingTime="0" Attack="60, 85" Defense="30, 40" AttackDuration="1.6" IsUnique="true"
@@ -125,7 +125,7 @@ When 'Punish of Nature' is researched, she will serve the justice for the nature
         Name="Steam Fort" Description="Base structure of Steamers.
 It provides food and stores gold and lumber.
 You can train miners from this building."
-        Hotkey="E" Icon="16" Snapshot="9" Model="models/buildings/townhall"
+        Hotkey="E" Icon="16" Snapshot="9" Model="models/townhall"
         RotationXBias="90" RotationZBias="90" ScaleBias="0.86, 0.86, 0.86"
         ConstructionTime="20" ObstructorSize="50, 50" AreaRadius="30"
         Lumber="350" Gold="425" Priority="100" ViewDistance="150" Defense="20, 30"
@@ -134,7 +134,7 @@ You can train miners from this building."
     <TrainingCenter
         Name="Training Center" Description="Steamer military structure.
 It trains swordman and rifleman. It can also upgrade attack and defense point for all Steamer units."
-        Hotkey="T" Icon="19"  Snapshot="10" Model="models/buildings/barracks"
+        Hotkey="T" Icon="19"  Snapshot="10" Model="models/barracks"
         RotationXBias="90" RotationZBias="90" ScaleBias="0.075, 0.075, 0.075" ConstructionTime="20"
         ObstructorSize="40, 32" AreaRadius="20" Health="1500" Lumber="175" Gold="200" Defense="20, 30"
         Priority="101" Spells="Swordman, Rifleman, AttackUpgrade, DefenseUpgrade" Sound="Barracks"/>
@@ -142,7 +142,7 @@ It trains swordman and rifleman. It can also upgrade attack and defense point fo
     <SteamFactory
         Name="Steam Factory" Description="A place where high-tech units are produced.
 The destructive Steambot can be trained here. 'Clone' can also be researched here."
-        Hotkey="F" Icon="22" Snapshot="11" Model="models/buildings/altar"
+        Hotkey="F" Icon="22" Snapshot="11" Model="models/altar"
         RotationXBias="90" RotationZBia="90"  ScaleBias="0.7, 0.7, 0.7" Sound="Altar"
         ObstructorSize="40, 40" AreaRadius="26" ConstructionTime="20" Health="1200" Defense="20, 30"
         Lumber="150" Gold="175" Priority="102" Spells="Steambot"/>
@@ -150,14 +150,14 @@ The destructive Steambot can be trained here. 'Clone' can also be researched her
     <Regenerator
         Name="Regenerator" Description="Regenerate nearby trees.
 'Purge' can be researched here to make nearby buildings free of smoke."
-        Hotkey="R" Icon="25" Snapshot="12" Model="models/buildings/lumbermill" Defense="20, 30"
+        Hotkey="R" Icon="25" Snapshot="12" Model="models/lumbermill" Defense="20, 30"
         RotationXBias="90" ScaleBias="0.25, 0.25, 0.25" ConstructionTime="20" Health="750"
         ObstructorSize="30, 30"  AreaRadius="20" Lumber="125" Gold="215" Priority="103"
         Sound="Lumbermill"/>
 
     <SteamCannon
         Name="Steam Cannon" Description="Powerful Steamer defense structure."
-        Hotkey="C" Icon="28" Snapshot="13" Model="models/buildings/tower"
+        Hotkey="C" Icon="28" Snapshot="13" Model="models/tower"
         RotationXBias="90" ScaleBias="0.55, 0.55, 0.55" ConstructionTime="10"
         ObstructorSize="28, 28" AreaRadius="18" Health="800"
         Lumber="115" Gold="150" Priority="104" Sound="Tower"
@@ -165,7 +165,7 @@ The destructive Steambot can be trained here. 'Clone' can also be researched her
 
     <Steamhouse
         Name="Steam House" Description="Provides food for Steamer units."
-        Hotkey="H" Icon="31" Snapshot="14" Model="models/buildings/farm" Defense="20, 30"
+        Hotkey="H" Icon="31" Snapshot="14" Model="models/farm" Defense="20, 30"
         Sound="Farm" RotationXBias="90" ScaleBias="0.45, 0.45, 0.45" ConstructionTime="20" Health="500"
         ObstructorSize="28, 28" AreaRadius="18" Lumber="125" Gold="100" Priority="100" Food="8"/>
 
@@ -174,7 +174,7 @@ The destructive Steambot can be trained here. 'Clone' can also be researched her
         Name="Miner" Description="Slaves shipped to the island.
 Can construct buildings, harvest gold and lumber, repair damaged buildings
 and fight on the battlefield when necessary."
-        Model="charactors/follower/follower" Attachment="models/arrow|Weapon"  Speed = "25"
+        Model="models/follower" Attachment="models/arrow|Weapon"  Speed = "25"
         RotationXBias="90" RotationZBias ="-90"  ScaleBias="0.1, 0.1, 0.1" Health="200"
         Gold="50" Lumber="0" Food="1" Priority="4" AreaRadius="20" Icon="40" Snapshot="0"
         ObstructorRadius="5" Spells="SteamFort, Steamhouse, Regenerator, SteamCannon, TrainingCenter, SteamFactory"
@@ -184,7 +184,7 @@ and fight on the battlefield when necessary."
     <Swordman
         Name="Swordman" Description="Basic Steamer soldiers.
 Shipped to the island to hunt for resource."
-        Model="charactors/hunter/hunter" Speed = "35" ObstructorRadius="5"
+        Model="models/hunter" Speed = "35" ObstructorRadius="5"
         RotationXBias="90" RotationZBias ="-90"  ScaleBias="0.1, 0.1, 0.1" Health="425"
         Gold="155" Lumber="50" Food="2" Priority="3" AreaRadius="20" Hotkey="S"
         TrainingTime="20" Attack="35, 42" Defense="21, 25" AttackDuration="1.2"
@@ -192,7 +192,7 @@ Shipped to the island to hunt for resource."
 
     <Rifleman
         Name="Rifleman" Description="Steamer ranged units."
-        Model="charactors/hunter/hunter" Attachment="models/spear|Weapon"  Speed = "40" ObstructorRadius="5"
+        Model="models/hunter" Attachment="models/spear|Weapon"  Speed = "40" ObstructorRadius="5"
         RotationXBias="90" RotationZBias ="-90"  ScaleBias="0.1, 0.1, 0.1" Health="350"
         Gold="125" Lumber="105" Food="2" Priority="2" AreaRadius="20" Hotkey="R" Icon="46"
         TrainingTime="20" Attack="43, 61" Defense="10, 18" AttackDuration="1.8" AttackRange="0, 75"
@@ -201,7 +201,7 @@ Shipped to the island to hunt for resource."
     <Steambot
         Name="Steambot" Description="A powerful technology production.
 Equipped with a cannon on its back. It can be upgraded to have the horrible 'Clone' spell."
-        Model="charactors/hunter/hunter" Speed = "40" ObstructorRadius="5"
+        Model="models/hunter" Speed = "40" ObstructorRadius="5"
         RotationXBias="90" RotationZBias ="-90"  ScaleBias="0.15, 0.15, 0.15" Health="750"
         Gold="200" Lumber="175" Food="5" Priority="0" AreaRadius="20" Hotkey="S" Icon="49"
         TrainingTime="25" Attack="80, 95" Defense="35, 40" AttackDuration="1.2" AttackRange="0, 50"
