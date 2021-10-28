@@ -524,7 +524,7 @@ namespace Isles.Graphics
             if (IsAnimated)
             {
                 // Reset current animation
-                players[currentPlayer].Update(TimeSpan.Zero, false, transform);
+                players[currentPlayer].Update(TimeSpan.Zero, false);
 
                 // Change animation state
                 animationState = AnimationState.Stopped;
@@ -544,12 +544,12 @@ namespace Isles.Graphics
             // Apply animation speed
             TimeSpan time = (animationState != AnimationState.Playing) ? TimeSpan.Zero : gameTime.ElapsedGameTime;
 
-            players[currentPlayer].Update(time, true, transform);
+            players[currentPlayer].Update(time, true);
 
             // update both players when we are blending animations
             if (blending)
             {
-                players[1 - currentPlayer].Update(time, true, transform);
+                players[1 - currentPlayer].Update(time, true);
             }
 
             if (IsSkinned)
@@ -640,7 +640,7 @@ namespace Isles.Graphics
             {
                 if (IsSkinned)
                 {
-                    game.ModelRenderer.Draw(mesh, Matrix.Identity, skinTransforms, tint, glow);
+                    game.ModelRenderer.Draw(mesh, transform, skinTransforms, tint, glow);
                 }
                 else
                 {
@@ -832,10 +832,10 @@ namespace Isles.Graphics
         /// <summary>
         /// Advances the current animation position.
         /// </summary>
-        public void Update(TimeSpan time, bool relativeToCurrentTime, Matrix rootTransform)
+        public void Update(TimeSpan time, bool relativeToCurrentTime)
         {
             UpdateBoneTransforms(time, relativeToCurrentTime);
-            UpdateWorldTransforms(rootTransform);
+            UpdateWorldTransforms();
 
             if (skinningDataValue != null)
             {
@@ -940,10 +940,10 @@ namespace Isles.Graphics
         /// <summary>
         /// Helper used by the Update method to refresh the WorldTransforms data.
         /// </summary>
-        public void UpdateWorldTransforms(Matrix rootTransform)
+        public void UpdateWorldTransforms()
         {
             // Root bone.
-            worldTransforms[0] = boneTransforms[0] * rootTransform;
+            worldTransforms[0] = boneTransforms[0];
 
             // Child bones.
             for (var bone = 1; bone < worldTransforms.Length; bone++)

@@ -106,12 +106,13 @@ void VSSkinned(
     float4x4 skinTransform = GetSkinTransform(boneIndices, boneWeights);
 
     // Output position
-    float4 worldPosition = mul(position, skinTransform);
-    oPos = mul(worldPosition, ViewProjection);
+    position = mul(position, skinTransform);
+    position = mul(position, World);
+    oPos = mul(position, ViewProjection);
 
     // Copy texture coordinates
     oUV = uv;
-    oZ = worldPosition.z;
+    oZ = position.z;
 
     // Compute light and eye vector in world space
     oNormal = mul(normal, skinTransform);
@@ -159,8 +160,9 @@ void VSShadowMappingSkinned(
     float4x4 skinTransform = GetSkinTransform(boneIndices, boneWeights);
 
     // Output position
-    oPos = mul(position, skinTransform);
-    oPos = mul(oPos, LightViewProjection);
+    position = mul(position, skinTransform);
+    position = mul(position, World);
+    oPos = mul(position, LightViewProjection);
 
     // Store z value in our texture
     oDepth = 1 - oPos.z / oPos.w;
