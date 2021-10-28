@@ -1,13 +1,15 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Linq;
+using System;
 using System.Collections.Concurrent;
-using System.IO;
-using System.Text.Json;
-using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text.Json;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Graphics
 {
@@ -15,6 +17,7 @@ namespace Isles.Graphics
     {
         public Mesh[] Meshes { get; init; }
         public Node[] Nodes { get; init; }
+        public Dictionary<string, Animation> Animations { get; init; }
 
         public class Mesh
         {
@@ -43,6 +46,25 @@ namespace Isles.Graphics
             public Vector3 Scale { get; init; }
             public Vector3 Translation { get; init; }
             public Quaternion Rotation { get; init; }
+        }
+
+        public class Animation
+        {
+            public float Duration { get; init; }
+            public Dictionary<int, Channel> Channels { get; init; }
+
+            public class Channel
+            {
+                public Keyframes<Vector3> Scale { get; internal set; }
+                public Keyframes<Quaternion> Rotation { get; internal set; }
+                public Keyframes<Vector3> Translation { get; internal set; }
+
+                public struct Keyframes<T>
+                {
+                    public float[] Times { get; set; }
+                    public T[] Values { get; set; }
+                }
+            }
         }
     }
 
@@ -75,6 +97,7 @@ namespace Isles.Graphics
                 textures = new[] { new { source = 0 } },
                 materials = new[] { new { doubleSided = false, pbrMetallicRoughness = new { baseColorTexture = new { index = 0 } } } },
                 nodes = new[] { new { name = "", mesh = (int?)0, skin = (int?)0, children = new[] { 0 }, scale = new[] { 0f }, rotation = new[] { 0f }, translation = new[] { 0f } } },
+                animations = new[] { new { name = "", channels = new[] { new { sampler = 0, target = new { node = 0, path = "" } } }, samplers = new[] { new { input = 0, output = 0 } } } },
             };
 
             var gltf = JsonHelper.DeserializeAnonymousType(File.ReadAllBytes(path), gltfSchema);
@@ -82,6 +105,7 @@ namespace Isles.Graphics
             var buffers = gltf.buffers.Select(buffer => File.ReadAllBytes(Path.Combine(basedir, buffer.uri))).ToArray();
             var meshes = new List<GltfModel.Mesh>();
             var nodes = new List<GltfModel.Node>();
+            var animations = new Dictionary<string, GltfModel.Animation>();
             var nodeParentIndex = new int[gltf.nodes.Length];
             var meshToNode = new GltfModel.Node[gltf.meshes.Length];
 
@@ -181,7 +205,52 @@ namespace Isles.Graphics
                 meshes.Add(new() { Node = meshToNode[meshIndex], Primitives = primitives.ToArray() });
             }
 
-            return new() { Meshes = meshes.ToArray(), Nodes = nodes.ToArray(), };
+            // Animations
+            if (gltf.animations != null)
+            {
+                foreach (var animation in gltf.animations)
+                {
+                    var duration = 0f;
+                    var channels = new Dictionary<int, GltfModel.Animation.Channel>();
+
+                    foreach (var channel in animation.channels)
+                    {
+                        var timeAccessor = gltf.accessors[animation.samplers[channel.sampler].input];
+                        if (timeAccessor.max[0] > duration)
+                        {
+                            duration = timeAccessor.max[0];
+                        }
+
+                        var timeBufferView = gltf.bufferViews[timeAccessor.bufferView];
+                        var times = MemoryMarshal.Cast<byte, float>(buffers[timeBufferView.buffer].AsSpan(timeBufferView.byteOffset, timeBufferView.byteLength)).ToArray();
+                        var valueBufferView = gltf.bufferViews[gltf.accessors[animation.samplers[channel.sampler].output].bufferView];
+                        var values = buffers[timeBufferView.buffer].AsSpan(timeBufferView.byteOffset, timeBufferView.byteLength);
+
+                        var node = channel.target.node;
+                        if (!channels.TryGetValue(node, out var item))
+                        {
+                            item = channels[node] = new();
+                        }
+
+                        switch (channel.target.path)
+                        {
+                            case "scale":
+                                item.Scale = new() { Times = times.ToArray(), Values = MemoryMarshal.Cast<byte, Vector3>(values).ToArray() };
+                                break;
+                            case "rotation":
+                                item.Rotation = new() { Times = times.ToArray(), Values = MemoryMarshal.Cast<byte, Quaternion>(values).ToArray() };
+                                break;
+                            case "translation":
+                                item.Translation = new() { Times = times.ToArray(), Values = MemoryMarshal.Cast<byte, Vector3>(values).ToArray() };
+                                break;
+                        }
+                    }
+
+                    animations.Add(animation.name, new() { Duration = duration, Channels = channels });
+                }
+            }
+
+            return new() { Meshes = meshes.ToArray(), Nodes = nodes.ToArray(), Animations = animations };
         }
     }
 }
