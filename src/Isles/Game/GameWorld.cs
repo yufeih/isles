@@ -166,8 +166,6 @@ namespace Isles.Engine
                 Game.Shadow.End();
             }
 
-            Landscape.DrawSky();
-
             // Draw world objects before landscape
             foreach (IWorldObject o in worldObjects)
             {

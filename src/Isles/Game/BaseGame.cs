@@ -18,7 +18,7 @@ namespace Isles.Engine
     {
         private Cursor cursor;
 
-        private Color backgroundColor = Color.Black;// new Color(47, 62, 97);
+        private Color backgroundColor = Color.Black;
 
         private Matrix view;
         private Matrix projection;
@@ -78,6 +78,8 @@ namespace Isles.Engine
 
         public ModelLoader ModelLoader { get; private set; }
 
+        public ShaderLoader ShaderLoader { get; private set; }
+
         public int ScreenWidth { get; private set; }
 
         public int ScreenHeight { get; private set; }
@@ -118,23 +120,8 @@ namespace Isles.Engine
             IsFixedTimeStep = Settings.IsFixedTimeStep;
         }
 
-        /// <summary>
-        /// Gets the singleton instance of base game.
-        /// </summary>
-        /// <remarks>
-        /// This is not a strict implementation of 'Singleton'. The constructor is not private.
-        /// since we want to allow real games to derive from this class, so the singleton is
-        /// actually the current game. Typically an app only creates 1 game instance, that won't
-        /// be a problem most of the time.
-        /// </remarks>
         public static BaseGame Singleton { get; private set; }
 
-        /// <summary>
-        /// Allows the game to perform any initialization it needs to before starting to run.
-        /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
-        /// and initialize them as well.
-        /// </summary>
         protected override void Initialize()
         {
             Graphics.DeviceReset += graphics_DeviceReset;
@@ -148,11 +135,11 @@ namespace Isles.Engine
 
             TextureLoader = new(GraphicsDevice);
             ModelLoader = new(GraphicsDevice, TextureLoader);
+            ShaderLoader = new(GraphicsDevice);
 
             if (Settings.BloomSettings != null)
             {
-                Bloom = new BloomEffect(this, Content) { Settings = Settings.BloomSettings };
-                Components.Add(Bloom);
+                Bloom = new BloomEffect(GraphicsDevice, ShaderLoader) { Settings = Settings.BloomSettings };
             }
 
             ParticleSystem.LoadContent(this);
@@ -164,10 +151,10 @@ namespace Isles.Engine
 
             if (Settings.ShadowEnabled)
             {
-                Shadow = new ShadowEffect(GraphicsDevice, Content);
+                Shadow = new ShadowEffect(GraphicsDevice, ShaderLoader);
             }
 
-            ModelRenderer = new ModelRenderer(GraphicsDevice, Content);
+            ModelRenderer = new ModelRenderer(GraphicsDevice, ShaderLoader);
 
             base.Initialize();
         }
@@ -341,7 +328,7 @@ namespace Isles.Engine
 
             Graphics2D.Present();
 
-            base.Draw(gameTime);
+            Bloom?.EndDraw();
         }
 
         public EventResult HandleEvent(EventType type, object sender, object tag)

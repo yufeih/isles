@@ -17,7 +17,7 @@ namespace Isles
         {
             Register();
 
-            if (Environment.GetEnvironmentVariable("ISLES_STARTUP_LEVEL") is var startupLevel)
+            if (Environment.GetEnvironmentVariable("ISLES_STARTUP_LEVEL") is var startupLevel && !string.IsNullOrEmpty(startupLevel))
             {
                 StartScreen(new GameScreen(startupLevel));
             }

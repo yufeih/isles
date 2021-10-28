@@ -7,15 +7,15 @@ float4x4 ViewProjection;
 // Vertex Shader: VertShadow
 // Desc: Process vertex for the shadow map
 //-----------------------------------------------------------------------------
-void VertShadow( float4 Pos : POSITION,
-                 out float4 oPos : POSITION,
-                 out float2 Depth : TEXCOORD0 )
+void VertShadow(float4 Pos : POSITION,
+    out float4 oPos : POSITION,
+    out float2 Depth : TEXCOORD0)
 {
     //
     // Compute the projected coordinates
     //
-    oPos = mul( Pos, World );
-    oPos = mul( oPos, ViewProjection );
+    oPos = mul(Pos, World);
+    oPos = mul(oPos, ViewProjection);
 
     //
     // Store z and w in our spare texcoord
@@ -28,8 +28,8 @@ void VertShadow( float4 Pos : POSITION,
 // Pixel Shader: PixShadow
 // Desc: Process pixel for the shadow map
 //-----------------------------------------------------------------------------
-void PixShadow( float2 Depth : TEXCOORD0,
-                out float4 Color : COLOR )
+void PixShadow(float2 Depth : TEXCOORD0,
+    out float4 Color : COLOR)
 {
     //
     // Depth is z / w

@@ -142,7 +142,7 @@ namespace Isles.Graphics
         public ParticleSettings Settings { get; }
 
         // For accessing view projection matrix
-        private readonly Game game;
+        private readonly BaseGame game;
 
         private Texture2D texture;
 
@@ -303,7 +303,7 @@ namespace Isles.Graphics
             }
         }
 
-        private ParticleSystem(Game game, ParticleSettings settings)
+        private ParticleSystem(BaseGame game, ParticleSettings settings)
         {
             this.game = game;
 
@@ -363,7 +363,7 @@ namespace Isles.Graphics
         /// </summary>
         private void LoadParticleEffect()
         {
-            particleEffect = game.Content.Load<Effect>("Effects/ParticleEffect");
+            particleEffect = game.ShaderLoader.LoadShader("shaders/ParticleEffect.cso");
 
             var parameters = particleEffect.Parameters;
 

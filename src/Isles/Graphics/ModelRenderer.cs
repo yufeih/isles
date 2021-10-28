@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Graphics
@@ -33,11 +32,11 @@ namespace Isles.Graphics
         private readonly List<DrawItem> _skinnedOpaque = new();
         private readonly List<DrawItem> _skinnedTransparent = new();
 
-        public ModelRenderer(GraphicsDevice graphics, ContentManager content)
+        public ModelRenderer(GraphicsDevice graphics, ShaderLoader shaderLoader)
         {
             _graphics = graphics;
 
-            _effect = content.Load<Effect>("Effects/Model");
+            _effect = shaderLoader.LoadShader("shaders/Model.cso");
             _view = _effect.Parameters["View"];
             _viewInverse = _effect.Parameters["ViewInverse"];
             _projection = _effect.Parameters["Projection"];

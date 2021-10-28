@@ -20,12 +20,12 @@ texture Texture;
 
 
 void VertexShaderNormal(
-	in  float3 pos	: POSITION0,
-	in  float3 norm : NORMAL0,
-	in  float2 uv	: TEXCOORD0,
-	in  float2 size	: TEXCOORD1,
-	out float4 oPos	: POSITION0,
-	out float2 oUV	: TEXCOORD0)
+    in  float3 pos	: POSITION0,
+    in  float3 norm : NORMAL0,
+    in  float2 uv : TEXCOORD0,
+    in  float2 size : TEXCOORD1,
+    out float4 oPos : POSITION0,
+    out float2 oUV : TEXCOORD0)
 {
     // Work out what direction we are viewing the billboard from.
     float3 viewDirection = View._m02_m12_m22;
@@ -50,11 +50,11 @@ void VertexShaderNormal(
 }
 
 void VertexShaderCenter(
-	in  float3 pos	: POSITION0,
-	in  float2 uv	: TEXCOORD0,
-	in  float2 size	: TEXCOORD1,
-	out float4 oPos	: POSITION0,
-	out float2 oUV	: TEXCOORD0)
+    in  float3 pos	: POSITION0,
+    in  float2 uv : TEXCOORD0,
+    in  float2 size : TEXCOORD1,
+    out float4 oPos : POSITION0,
+    out float2 oUV : TEXCOORD0)
 {
     // Calculate the position of this billboard vertex.
     float3 position = pos;
@@ -135,8 +135,8 @@ technique Normal
 
 technique Center
 {
-	// Center oriented billboards are usually used for render
-	// particles or animated textures, use only one render pass.
+    // Center oriented billboards are usually used for render
+    // particles or animated textures, use only one render pass.
 
     pass Render
     {
