@@ -11,7 +11,9 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/setup-dotnet@v1
-    - run: where msbuild
-    - run: echo $env:PATH
-    - run: ls "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\"
+    - run: $env:PATH+="C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\"
+    - run: dotnet build -warnAsError -c Release -o ${{ runner.temp }}/bin
+    - uses: actions/upload-artifact@v2
+      with:
+        name: isles
+        path: ${{ runner.temp }}/bin
