@@ -26,17 +26,6 @@ namespace Isles.Graphics
             {
                 transform = value;
                 isBoundingBoxDirty = true;
-
-                // Update model transform for static models
-                if (model != null && !IsAnimated && !IsSkinned)
-                {
-                    model.CopyAbsoluteBoneTransformsTo(bones);
-
-                    for (var i = 0; i < bones.Length; i++)
-                    {
-                        bones[i] *= transform;
-                    }
-                }
             }
         }
 
@@ -168,7 +157,7 @@ namespace Isles.Graphics
             // Make sure this is the upper case Model
             model = game.Content.Load<Model>(modelName);
             gltfModel = game.ModelLoader.LoadModel($"data/{modelName}.gltf");
-            Refresh();
+            Init();
         }
 
         /// <summary>
@@ -206,20 +195,13 @@ namespace Isles.Graphics
                 skinTransforms.CopyTo(copy.skinTransforms, 0);
             }
 
-            if (bones != null)
-            {
-                copy.bones = new Matrix[bones.Length];
-                bones.CopyTo(copy.bones, 0);
-            }
+            copy.bones = new Matrix[bones.Length];
+            bones.CopyTo(copy.bones, 0);
 
             return copy;
         }
 
-        /// <summary>
-        /// Manually refresh the game model.
-        /// This method currently re-compute the bounding box of the model.
-        /// </summary>
-        private void Refresh()
+        private void Init()
         {
             if (model.Tag is Dictionary<string, object> dictionary)
             {
@@ -266,10 +248,10 @@ namespace Isles.Graphics
 
             // Adjust bone array size
             bones = new Matrix[gltfModel.Nodes.Length];
+            model.CopyAbsoluteBoneTransformsTo(bones);
 
             // Compute model bounding box.
             orientedBoundingBox = OBBFromModel(model);
-            isBoundingBoxDirty = true;
         }
 
         /// <summary>
@@ -325,7 +307,7 @@ namespace Isles.Graphics
                 return BoundingBox.Intersects(ray);
             }
 
-            var m = Matrix.Invert(Transform);
+            var m = Matrix.Invert(transform);
             var relarayEnd = Vector3.Transform(ray.Position + ray.Direction, m);
             var relarayPosition = Vector3.Transform(ray.Position, m);
             var relaray = new Ray(relarayPosition, relarayEnd - relarayPosition);
@@ -542,7 +524,7 @@ namespace Isles.Graphics
             if (IsAnimated)
             {
                 // Reset current animation
-                players[currentPlayer].Update(TimeSpan.Zero, false, Transform);
+                players[currentPlayer].Update(TimeSpan.Zero, false, transform);
 
                 // Change animation state
                 animationState = AnimationState.Stopped;
@@ -562,12 +544,12 @@ namespace Isles.Graphics
             // Apply animation speed
             TimeSpan time = (animationState != AnimationState.Playing) ? TimeSpan.Zero : gameTime.ElapsedGameTime;
 
-            players[currentPlayer].Update(time, true, Transform);
+            players[currentPlayer].Update(time, true, transform);
 
             // update both players when we are blending animations
             if (blending)
             {
-                players[1 - currentPlayer].Update(time, true, Transform);
+                players[1 - currentPlayer].Update(time, true, transform);
             }
 
             if (IsSkinned)
@@ -662,7 +644,7 @@ namespace Isles.Graphics
                 }
                 else
                 {
-                    game.ModelRenderer.Draw(mesh, bones[mesh.Node.Index], null, tint, glow);
+                    game.ModelRenderer.Draw(mesh, bones[mesh.Node.Index] * transform, null, tint, glow);
                 }
             }
         }
