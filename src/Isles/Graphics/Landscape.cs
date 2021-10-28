@@ -43,9 +43,10 @@ namespace Isles.Graphics
         {
             base.Initialize(game);
 
+            WaterEffect = game.ShaderLoader.LoadShader("shaders/Water.cso");
             InitializeWater();
 
-            surfaceEffect = game.Content.Load<Effect>("Effects/Surface");
+            surfaceEffect = game.ShaderLoader.LoadShader("shaders/Surface.cso");
             surfaceDeclaration = new VertexDeclaration(game.GraphicsDevice,
                                      VertexPositionColorTexture.VertexElements);
             surfaceVertexBuffer = new DynamicVertexBuffer(game.GraphicsDevice,
@@ -228,39 +229,9 @@ namespace Isles.Graphics
                 PrimitiveType.TriangleList, 0, 0, surfaceVertices.Count, 0, surfaceIndices.Count / 3);
         }
 
-        private TextureCube skyTexture;
-        private Effect skyEffect;
-        private Model skyModel;
-
         private void ReadSkyContent(ContentReader input)
         {
-            skyEffect = input.ContentManager.Load<Effect>("Effects/Sky");
-            skyModel = input.ContentManager.Load<Model>("Models/Cube");
-            skyTexture = input.ReadExternalReference<TextureCube>();
-        }
-
-        public void DrawSky()
-        {
-            DrawSky(game.View, game.Projection);
-        }
-
-        private void DrawSky(Matrix view, Matrix projection)
-        {
-            // We have to retrieve the new graphics device every frame,
-            // since graphics device will be changed when resetting.
-            graphics = game.GraphicsDevice;
-
-            // Don't use or write to the z buffer
-            // Also don't use any kind of blending.
-            graphics.SetRenderState(BlendState.Opaque, DepthStencilState.None);
-
-            skyEffect.Parameters["View"].SetValue(view);
-            skyEffect.Parameters["Projection"].SetValue(projection);
-            skyEffect.Parameters["CubeTexture"].SetValue(skyTexture);
-
-            // Override model's effect and render
-            skyModel.Meshes[0].MeshParts[0].Effect = skyEffect;
-            skyModel.Meshes[0].Draw();
+            input.ReadExternalReference<TextureCube>();
         }
 
         private readonly List<Billboard> vegetations = new(512);
@@ -347,7 +318,6 @@ namespace Isles.Graphics
             earthRadius = input.ReadSingle();
             waterTexture = input.ReadExternalReference<Texture>();
             waterDstortion = input.ReadExternalReference<Texture>();
-            WaterEffect = input.ContentManager.Load<Effect>("Effects/Water");
         }
 
         private void InitializeWater()
@@ -451,8 +421,6 @@ namespace Isles.Graphics
             var viewReflect = Matrix.Multiply(
                 Matrix.CreateReflection(new Plane(Vector3.UnitZ, 0)), game.View);
 
-            DrawSky(viewReflect, game.Projection);
-
             DrawTerrain(viewReflect, game.Projection, true);
 
             // Draw other reflections
@@ -487,6 +455,8 @@ namespace Isles.Graphics
                 WaterEffect.Parameters["FogTexture"].SetValue(FogTexture);
             }
 
+            WaterEffect.Parameters["ColorTexture"].SetValue(waterTexture);
+
             if (game.Settings.ReflectionEnabled)
             {
                 WaterEffect.CurrentTechnique = WaterEffect.Techniques["Realisic"];
@@ -495,7 +465,6 @@ namespace Isles.Graphics
             else
             {
                 WaterEffect.CurrentTechnique = WaterEffect.Techniques["Default"];
-                WaterEffect.Parameters["ColorTexture"].SetValue(waterTexture);
             }
 
             WaterEffect.Parameters["DistortionTexture"].SetValue(waterDstortion);

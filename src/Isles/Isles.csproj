@@ -24,12 +24,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EffectShader Include="Shaders\**\*.fx" ShaderModel="2_0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Isles.Pipeline\Isles.Pipeline.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="SkiaSharp" Version="2.80.3" />
     <PackageReference Include="System.Text.Json" Version="5.0.2" />
+    <PackageReference Include="Microsoft.HLSL.CSharpVB" Version="1.0.2" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>

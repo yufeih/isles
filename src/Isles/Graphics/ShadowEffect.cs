@@ -3,14 +3,13 @@
 
 using System;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Graphics
 {
     public class ShadowEffect : IDisposable
     {
-        private const int ShadowMapSize = 1024;
+        private const int ShadowMapSize = 2048;
 
         /// <summary>
         /// Constant values use for shadow matrix calculation.
@@ -28,10 +27,10 @@ namespace Isles.Graphics
 
         public Texture2D ShadowMap { get; private set; }
 
-        public ShadowEffect(GraphicsDevice graphics, ContentManager content)
+        public ShadowEffect(GraphicsDevice graphics, ShaderLoader shaderLoader)
         {
             _graphics = graphics;
-            _effect = content.Load<Effect>("Effects/ShadowMap");
+            _effect = shaderLoader.LoadShader("shaders/ShadowMap.cso");
             _depthStencil = new DepthStencilBuffer(_graphics, ShadowMapSize, ShadowMapSize, _graphics.DepthStencilBuffer.Format);
             _renderTarget = new RenderTarget2D(_graphics, ShadowMapSize, ShadowMapSize, 1, SurfaceFormat.Single);
         }
@@ -104,7 +103,7 @@ namespace Isles.Graphics
 
             var lightDirection = Vector3.Normalize(new Vector3(1, 1, -2));
             var view = Matrix.CreateLookAt(target - lightDirection * (distance + 50), target, Vector3.UnitZ);
-            var projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, 1, near, far);
+            var projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.Pi * 0.3f, 1, near, far);
 
             return view * projection;
         }

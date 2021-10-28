@@ -22,7 +22,7 @@ namespace Isles.Graphics
             base.Initialize(game);
 
             // Load terrain effect
-            terrainEffect = game.Content.Load<Effect>("Effects/TiledTerrain");
+            terrainEffect = game.ShaderLoader.LoadShader("shaders/Terrain.cso");
 
             // Create vertex declaraction
             declaraction = new VertexDeclaration(game.GraphicsDevice, TerrainVertex.VertexElements);

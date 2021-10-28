@@ -3,7 +3,6 @@
 
 using System;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Graphics
@@ -46,17 +45,17 @@ namespace Isles.Graphics
         }
     }
 
-    public class BloomEffect : DrawableGameComponent
+    public class BloomEffect
     {
-        private readonly ContentManager content;
+        private readonly GraphicsDevice GraphicsDevice;
 
-        private SpriteBatch spriteBatch;
-        private Effect bloomExtractEffect;
-        private Effect bloomCombineEffect;
-        private Effect gaussianBlurEffect;
-        private RenderTarget2D resolveTarget;
-        private RenderTarget2D renderTarget1;
-        private RenderTarget2D renderTarget2;
+        private readonly SpriteBatch spriteBatch;
+        private readonly Effect bloomExtractEffect;
+        private readonly Effect bloomCombineEffect;
+        private readonly Effect gaussianBlurEffect;
+        private readonly RenderTarget2D resolveTarget;
+        private readonly RenderTarget2D renderTarget1;
+        private readonly RenderTarget2D renderTarget2;
 
         // Choose what display settings the bloom should use.
         public BloomSettings Settings { get; set; } = new();
@@ -74,22 +73,15 @@ namespace Isles.Graphics
 
         public IntermediateBuffer ShowBuffer { get; set; } = IntermediateBuffer.FinalResult;
 
-        public BloomEffect(Game game, ContentManager content)
-            : base(game)
+        public BloomEffect(GraphicsDevice graphics, ShaderLoader shaderLoader)
         {
-            this.content = content;
-        }
+            GraphicsDevice = graphics;
 
-        /// <summary>
-        /// Load your graphics content.
-        /// </summary>
-        protected override void LoadContent()
-        {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            bloomExtractEffect = content.Load<Effect>("Effects/BloomExtract");
-            bloomCombineEffect = content.Load<Effect>("Effects/BloomCombine");
-            gaussianBlurEffect = content.Load<Effect>("Effects/GaussianBlur");
+            bloomExtractEffect = shaderLoader.LoadShader("shaders/BloomExtract.cso");
+            bloomCombineEffect = shaderLoader.LoadShader("shaders/BloomCombine.cso");
+            gaussianBlurEffect = shaderLoader.LoadShader("shaders/GaussianBlur.cso");
 
             // Look up the resolution and format of our main backbuffer.
             PresentationParameters pp = GraphicsDevice.PresentationParameters;
@@ -116,26 +108,12 @@ namespace Isles.Graphics
                 format);
         }
 
-        /// <summary>
-        /// Unload your graphics content.
-        /// </summary>
-        protected override void UnloadContent()
-        {
-            resolveTarget.Dispose();
-            renderTarget1.Dispose();
-            renderTarget2.Dispose();
-        }
-
         public void BeginDraw()
         {
             GraphicsDevice.SetRenderTarget(resolveTarget);
         }
 
-        /// <summary>
-        /// This is where it all happens. Grabs a scene that has already been rendered,
-        /// and uses postprocess magic to add a glowing bloom effect over the top of it.
-        /// </summary>
-        public override void Draw(GameTime gameTime)
+        public void EndDraw()
         {
             // Resolve the scene into a texture, so we can
             // use it as input data for the bloom processing.

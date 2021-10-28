@@ -67,7 +67,7 @@ namespace Isles.Graphics
         {
             game = setGame;
             Font = game.Content.Load<SpriteFont>(game.Settings.DefaultFont);
-            Effect = game.Content.Load<Effect>(game.Settings.Graphics2DEffect);
+            Effect = game.ShaderLoader.LoadShader("shaders/Graphics2D.cso");
             Sprite = new SpriteBatch(game.GraphicsDevice);
             vertices = new DynamicVertexBuffer(
                 game.GraphicsDevice, typeof(VertexPositionColor), MaxPrimitiveVertexCount, BufferUsage.WriteOnly);

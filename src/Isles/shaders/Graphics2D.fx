@@ -1,16 +1,18 @@
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 texture BasicTexture;
 
 sampler2D BasicSampler = sampler_state
 {
-	Texture = <BasicTexture>;
+    Texture = <BasicTexture>;
 };
 
 texture OverlayTexture;
 
 sampler2D OverlaySampler = sampler_state
 {
-	Texture = <OverlayTexture>;
+    Texture = <OverlayTexture>;
 };
 
 struct VertexInput
@@ -21,8 +23,8 @@ struct VertexInput
 
 struct VertexOutput
 {
-   float4 pos   : POSITION;
-   float4 color : COLOR;
+    float4 pos   : POSITION;
+    float4 color : COLOR;
 };
 
 VertexOutput Graphics2DVS(VertexInput In)
@@ -43,27 +45,27 @@ float4 Graphics2DPS(VertexOutput In) : Color
 }
 
 void FogOfWarVS(float4 pos			: POSITION,
-			    float2 uv			: TEXCOORD0,
-			    out float4 oPos		: POSITION,
-			    out float2 oUV		: TEXCOORD0)
+    float2 uv : TEXCOORD0,
+    out float4 oPos : POSITION,
+    out float2 oUV : TEXCOORD0)
 {
-	oPos = pos;
-	oUV = uv;
+    oPos = pos;
+    oUV = uv;
 }
 
 float4 FogOfWarPS(float2 uv : TEXCOORD0) : Color
 {
-	// FIX Magic numbers
-	return float4(0, 0, 0, (uv.x > 0.07 && uv.x < 0.93 && uv.y > 0.00 && uv.y < 0.91)?
-							0.6 - tex2D(BasicSampler, uv).x * 0.6 : 0);
+    // FIX Magic numbers
+    return float4(0, 0, 0, (uv.x > 0.07 && uv.x < 0.93 && uv.y > 0.00 && uv.y < 0.91) ?
+                            0.6 - tex2D(BasicSampler, uv).x * 0.6 : 0);
 }
 
 float4 RuinedLandPS(float2 uv : TEXCOORD0) : Color
 {
-	float4 basic = tex2D(BasicSampler, uv);
-	float4 overlay = tex2D(OverlaySampler, uv);
-	//float map = basic.x * overlay.x;
-	return float4(basic.xxx, overlay.x);
+    float4 basic = tex2D(BasicSampler, uv);
+    float4 overlay = tex2D(OverlaySampler, uv);
+    //float map = basic.x * overlay.x;
+    return float4(basic.xxx, overlay.x);
 }
 
 technique Graphics2D
