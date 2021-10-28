@@ -385,17 +385,6 @@ namespace Isles.Engine
         }
 
         /// <summary>
-        /// Write the scene object to an output stream
-        /// Serialized attributes: Name, Position, Velocity.
-        /// </summary>
-        /// <param name="writer"></param>
-        public virtual void Serialize(XmlElement xml)
-        {
-            xml.SetAttribute("Name", Name);
-            xml.SetAttribute("Position", Helper.Vector3Tostring(position));
-        }
-
-        /// <summary>
         /// Read and initialize the scene object from an input stream.
         /// Deserialized attributes: Name, Position, Velocity.
         /// </summary>
@@ -666,9 +655,6 @@ namespace Isles.Engine
         /// </summary>
         public virtual bool IsInteractive => true;
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
         public Entity(GameWorld world)
             : base(world)
         {
@@ -784,21 +770,6 @@ namespace Isles.Engine
             // so calculate outline radius at this time.
             outline.SetCircle(Vector2.Zero, (Size.X + Size.Y) / 4);
             UpdateOutline(outline);
-        }
-
-        public override void Serialize(XmlElement xml)
-        {
-            base.Serialize(xml);
-
-            if (scale != Vector3.One)
-            {
-                xml.SetAttribute("Scale", Helper.Vector3Tostring(scale));
-            }
-
-            if (rotation != Quaternion.Identity)
-            {
-                xml.SetAttribute("Rotation", Helper.QuaternionTostring(rotation));
-            }
         }
 
         /// <summary>

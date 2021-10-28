@@ -1,7 +1,6 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using Isles.Engine;
 using Isles.Graphics;
 using Microsoft.Xna.Framework;
@@ -12,7 +11,7 @@ namespace Isles.UI
     /// <summary>
     /// Interface for implementing UI element.
     /// </summary>
-    public interface IUIElement : IDisposable, IEventListener
+    public interface IUIElement : IEventListener
     {
         /// <summary>
         /// Gets the reference area of an UI element.
@@ -324,21 +323,6 @@ namespace Isles.UI
         /// Handle input events.
         /// </summary>
         public abstract EventResult HandleEvent(EventType type, object sender, object tag);
-
-        /// <summary>
-        /// Dispose.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Dispose.
-        /// </summary>
-        /// <param name="disposing">Disposing.</param>
-        protected virtual void Dispose(bool disposing) { }
 
         /// <summary>
         /// Gets the relative rectangle based on current anchor,

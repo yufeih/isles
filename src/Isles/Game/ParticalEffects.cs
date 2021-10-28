@@ -5,9 +5,6 @@ using Microsoft.Xna.Framework;
 
 namespace Isles
 {
-    /// <summary>
-    /// Base class for all particle system effect.
-    /// </summary>
     public abstract class ParticleEffect : BaseEntity
     {
         public ParticleEffect(GameWorld world)
@@ -16,150 +13,6 @@ namespace Isles
         public override void Update(GameTime gameTime) { }
 
         public override void Draw(GameTime gameTime) { }
-    }
-
-    public enum ArrowState
-    {
-        Waiting = 0,
-        Flying = 1,
-        Fading = 2,
-        End = 3,
-    }
-
-    public class Arrow : BaseEntity
-    {
-        private Vector3 destination;
-
-        private Vector3 source;
-
-        private Vector3 acceleration;
-
-        private Vector3 velocity;
-
-        private float maxAcceleration;
-
-        private float maxSpeed;
-
-        private ArrowState state;
-
-        private float fadingAge;
-
-        /// <summary>
-        /// The target the arrow aims.
-        /// </summary>
-        public Vector3 Destination
-        {
-            get => destination;
-            set => destination = value;
-        }
-
-        /// <summary>
-        /// The source position of arrow.
-        /// </summary>
-        public Vector3 Source
-        {
-            get => source;
-            set => source = value;
-        }
-
-        public ArrowState State => state;
-
-        public float MaxAcceleration
-        {
-            get => maxAcceleration;
-            set => maxAcceleration = value;
-        }
-
-        public float MaxSpeed
-        {
-            get => MaxSpeed;
-            set => maxSpeed = value;
-        }
-
-        public Vector3 Accerlation => acceleration;
-
-        public Arrow(GameWorld world)
-            : base(world)
-        {
-            RestoreDefault();
-        }
-
-        public void Launch()
-        {
-            source = Position;
-            state = ArrowState.Flying;
-            velocity = Vector3.Normalize(destination - Position) * maxSpeed / 12;
-            velocity.Z += maxSpeed / 1.5f;
-        }
-
-        private void RestoreDefault()
-        {
-            maxAcceleration = 0.0003f;
-            maxSpeed = 0.08f;
-            state = ArrowState.Waiting;
-        }
-
-        public override void Update(GameTime gameTime)
-        {
-            if (state == ArrowState.Flying)
-            {
-                UpdateVelocity(gameTime);
-                UpdatePosition(gameTime);
-                if ((Position - destination).Length() <= 4f || Vector3.Dot(Position - destination, destination - source) > 0)
-                {
-                    state = ArrowState.Fading;
-                }
-            }
-
-            if (state == ArrowState.Fading)
-            {
-                UpdatePosition(gameTime);
-                fadingAge += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-                if (fadingAge >= 300)
-                {
-                    state = ArrowState.End;
-                    NotifyEnd();
-                }
-            }
-        }
-
-        private void UpdatePosition(GameTime gameTime)
-        {
-            Position += velocity * gameTime.ElapsedGameTime.Milliseconds;
-        }
-
-        private void UpdateVelocity(GameTime gameTime)
-        {
-            UpdateAcceleration(gameTime);
-            velocity += acceleration * gameTime.ElapsedGameTime.Milliseconds;
-            if (velocity.Length() > maxSpeed)
-            {
-                velocity.Normalize();
-                velocity *= maxSpeed;
-            }
-        }
-
-        private void UpdateAcceleration(GameTime gameTime)
-        {
-            Vector3 interval = destination - Position;
-            Vector3 interval2 = Position - source;
-            Vector3 desiredVelocity = Vector3.Normalize(interval) * interval2.Length() / maxSpeed;
-            acceleration = (desiredVelocity - velocity) / gameTime.ElapsedGameTime.Milliseconds;
-            if (acceleration.Length() > maxAcceleration && (Position - destination).Length() > 20)
-            {
-                acceleration.Normalize();
-                acceleration *= maxAcceleration;
-            }
-        }
-
-        public override void Draw(GameTime gameTime)
-        {
-        }
-
-        private void NotifyEnd()
-        {
-            World.Destroy(this);
-        }
     }
 
     /// <summary>
@@ -175,9 +28,6 @@ namespace Isles
         public float MinimumHeight;
         public float MaximumHeight;
 
-        /// <summary>
-        /// Creates a new area emitter.
-        /// </summary>
         public AreaEmitter(ParticleSystem particleSystem, float particlesPerSecond,
                            Outline area, float minHeight, float maxHeight)
             : base(particleSystem, particlesPerSecond,
@@ -229,9 +79,6 @@ namespace Isles
         public Vector3 Position;
         public float Radius;
 
-        /// <summary>
-        /// Creates a new area emitter.
-        /// </summary>
         public CircularEmitter(ParticleSystem particleSystem, float particlesPerSecond)
             : base(particleSystem, particlesPerSecond, Vector3.Zero) { }
 
@@ -281,9 +128,8 @@ namespace Isles
     {
         private Vector3 position;
         private Vector3 velocity;
-        private readonly IWorldObject target;
 
-        public IWorldObject Target => target;
+        public IWorldObject Target { get; }
 
         public Vector3 Position => position;
 
@@ -302,7 +148,7 @@ namespace Isles
                                  Vector3 initialPosition, Vector3 initialVelocity, IWorldObject target)
             : base(particleSystem, particlesPerSecond, initialPosition)
         {
-            this.target = target;
+            Target = target;
             position = initialPosition;
             velocity = initialVelocity;
         }
@@ -311,14 +157,14 @@ namespace Isles
         {
             Vector3 destination;
 
-            destination.X = target.Position.X;
-            destination.Y = target.Position.Y;
-            destination.Z = target.BoundingBox.Max.Z;
+            destination.X = Target.Position.X;
+            destination.Y = Target.Position.Y;
+            destination.Z = Target.BoundingBox.Max.Z;
 
             // For test only
             if (destination.Z <= 0)
             {
-                destination.Z = target.Position.Z;
+                destination.Z = Target.Position.Z;
             }
 
             // Creates a force that steer the emitter towards the target position
@@ -356,24 +202,6 @@ namespace Isles
             }
 
             base.Update(gameTime, position, Vector3.Zero, true);
-        }
-    }
-
-    public class EffectTest : ParticleEffect
-    {
-        private readonly ProjectileEmitter emitter;
-        private readonly ParticleSystem particle;
-
-        public EffectTest(GameWorld world, IWorldObject target, Vector3 position)
-            : base(world)
-        {
-            particle = ParticleSystem.Create("Fireball");
-            emitter = new ProjectileEmitter(particle, 100, position, Vector3.Zero, target);
-        }
-
-        public override void Update(GameTime gameTime)
-        {
-            emitter.Update(gameTime);
         }
     }
 
@@ -506,9 +334,6 @@ namespace Isles
                 Trigger();
                 counter = 0;
             }
-
-            // fireEmitter.Update(gameTime, Position, Vector3.Zero, true);
-            // smokeEmitter.Update(gameTime, Position + Vector3.UnitZ * 4, Vector3.Zero);
         }
     }
 

@@ -14,24 +14,9 @@ namespace Isles.Screens
 {
     public class ReadmePanel : TipBox
     {
-        /// <summary>
-        /// Page titles.
-        /// </summary>
         private readonly List<TextField> titles;
-
-        /// <summary>
-        /// Page contents.
-        /// </summary>
         private readonly List<List<TextField>> contents;
-
-        /// <summary>
-        /// Tatol page num.
-        /// </summary>
         private readonly int pages;
-
-        /// <summary>
-        /// Current page index.
-        /// </summary>
         private int currentPageIndex;
 
         public int CurrentPageIndex
@@ -48,15 +33,9 @@ namespace Isles.Screens
 
         private readonly Button previousPage;
         private readonly Button nextPage;
-        private readonly Button ok;
 
-        public Button OK => ok;
+        public Button OK { get; }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="pageTextures">Textures for pages.</param>
-        /// <param name="area">area.</param>
         public ReadmePanel(Rectangle area)
             : base(area)
         {
@@ -71,15 +50,15 @@ namespace Isles.Screens
 
             previousPage = new TextButton("Previous", 21f / 23, Color.Gold, preButtonArea);
             nextPage = new TextButton("Next", 21f / 23, Color.Gold, nextButtonArea);
-            ok = new TextButton("OK", 21f / 23, Color.Gold, okButtonArea);
+            OK = new TextButton("OK", 21f / 23, Color.Gold, okButtonArea);
 
             previousPage.HotKey = Keys.Left;
             nextPage.HotKey = Keys.Right;
-            ok.HotKey = Keys.Space;
+            OK.HotKey = Keys.Space;
 
             Add(previousPage);
             Add(nextPage);
-            Add(ok);
+            Add(OK);
 
             previousPage.Click += (o, e) =>
             {
@@ -237,33 +216,23 @@ namespace Isles.Screens
             }
         }
 
-        /// <summary>
-        /// Draw.
-        /// </summary>
         public override void Draw(GameTime gameTime, SpriteBatch sprite)
         {
             base.Draw(gameTime, sprite);
         }
 
-        /// <summary>
-        /// Event Handler.
-        /// </summary>
         public override EventResult HandleEvent(EventType type, object sender, object tag)
         {
             if (Visible && Enabled)
             {
                 previousPage.HandleEvent(type, sender, tag);
                 nextPage.HandleEvent(type, sender, tag);
-                ok.HandleEvent(type, sender, tag);
+                OK.HandleEvent(type, sender, tag);
             }
 
             return base.HandleEvent(type, sender, tag);
         }
 
-        /// <summary>
-        /// Update.
-        /// </summary>
-        /// <param name="gameTime"></param>
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);

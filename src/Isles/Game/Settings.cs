@@ -1,6 +1,8 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Isles.Graphics;
+
 namespace Isles.Engine
 {
     public class Settings
@@ -26,22 +28,10 @@ namespace Isles.Engine
         public bool ReflectionEnabled { get; set; }
         public bool ShadowEnabled { get; set; } = true;
         public bool ShowObjectReflection { get; set; } = true;
-        public BloomEffect BloomSettings { get; set; } = new();
+        public BloomSettings BloomSettings { get; set; } = new();
         public float ViewDistanceSquared { get; set; } = 800;
         public string ModelEffect { get; set; } = "Effects/Model";
 
         public bool VSync { get; set; }
-
-        public class BloomEffect
-        {
-            public bool Enabled { get; set; }
-            public string Type { get; set; } = "Saturated";
-            public float Threshold { get; set; } = 0.25f;
-            public float Blur { get; set; } = 2;
-            public float BloomIntensity { get; set; } = 1;
-            public float BaseIntensity { get; set; } = 1;
-            public float BloomSaturation { get; set; } = 2;
-            public float BaseSaturation { get; set; }
-        }
     }
 }

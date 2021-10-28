@@ -131,8 +131,6 @@ namespace Isles.UI
         /// <param name="gameTime"></param>
         public override void Update(GameTime gameTime)
         {
-            elements.Update();
-
             foreach (IUIElement element in elements)
             {
                 element.Update(gameTime);

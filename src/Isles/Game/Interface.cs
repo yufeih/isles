@@ -1,7 +1,6 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
 using System.Xml;
 using Isles.Graphics;
@@ -12,18 +11,8 @@ namespace Isles.Engine
     /// <summary>
     /// Represents a game screen.
     /// </summary>
-    public interface IScreen : IDisposable, IEventListener
+    public interface IScreen : IEventListener
     {
-        /// <summary>
-        /// Called when this screen is activated.
-        /// </summary>
-        void Enter();
-
-        /// <summary>
-        /// Called when this screen is deactivated.
-        /// </summary>
-        void Leave();
-
         /// <summary>
         /// Handle game updates.
         /// </summary>
@@ -35,23 +24,6 @@ namespace Isles.Engine
         /// </summary>
         /// <param name="gameTime"></param>
         void Draw(GameTime gameTime);
-
-        /// <summary>
-        /// Load your graphics content.  If loadAllContent is true, you should
-        /// load content from both ResourceManagementMode pools.  Otherwise, just
-        /// load ResourceManagementMode.Manual content.
-        /// </summary>
-        /// <param name="loadAllContent">Which type of content to load.</param>
-        void LoadContent();
-
-        /// <summary>
-        /// Unload your graphics content.  If unloadAllContent is true, you should
-        /// unload content from both ResourceManagementMode pools.  Otherwise, just
-        /// unload ResourceManagementMode.Manual content.  Manual content will get
-        /// Disposed by the GraphicsDevice during a Reset.
-        /// </summary>
-        /// <param name="unloadAllContent">Which type of content to unload.</param>
-        void UnloadContent();
     }
 
     /// <summary>
@@ -126,12 +98,6 @@ namespace Isles.Engine
         /// Draw the scene object to a reflection map.
         /// </summary>
         void DrawReflection(GameTime gameTime, Matrix view, Matrix projection);
-
-        /// <summary>
-        /// Write the scene object to an XML element.
-        /// </summary>
-        /// <param name="writer"></param>
-        void Serialize(XmlElement xml);
 
         /// <summary>
         /// Read and initialize the scene object from a set of attributes.

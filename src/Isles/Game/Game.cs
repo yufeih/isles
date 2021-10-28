@@ -13,42 +13,24 @@ namespace Isles
     /// </summary>
     public class GameIsles : BaseGame
     {
-        /// <summary>
-        /// Gets game screen.
-        /// </summary>
-        public GameScreen GameScreen { get; private set; }
-
-        private TitleScreen titleScreen;
-
-        /// <summary>
-        /// Initialize everything here.
-        /// </summary>
         protected override void FirstTimeInitialize()
         {
-            // Register everything
             Register();
 
-            // Register screens
-            AddScreen("GameScreen", GameScreen = new GameScreen());
-            AddScreen("TitleScreen", titleScreen = new TitleScreen(GameScreen));
-
-            if (Environment.GetEnvironmentVariable("ISLES_STARTUP_LEVEL") is string startupLevel)
+            if (Environment.GetEnvironmentVariable("ISLES_STARTUP_LEVEL") is var startupLevel)
             {
-                StartScreen(GameScreen);
-                GameScreen.StartLevel(startupLevel);
+                StartScreen(new GameScreen(startupLevel));
             }
             else
             {
-                StartScreen(titleScreen);
+                StartScreen(new TitleScreen());
             }
         }
 
         protected override void Update(GameTime gameTime)
         {
-            // Update game
             base.Update(gameTime);
 
-            // Update audios
             Audios.Update(gameTime);
         }
 
@@ -100,8 +82,6 @@ namespace Isles
             Player.RegisterCharactor("Hunter");
             Player.RegisterCharactor("FireSorceress");
             Player.RegisterCharactor("Hellfire");
-
-            GameWorld.RegisterCreator("Arrow", world => new Arrow(world));
 
             // Register spells
             Spell.RegisterCreator("LiveOfNature", world => new SpellUpgrade(world, "LiveOfNature", Upgrades.LiveOfNature));

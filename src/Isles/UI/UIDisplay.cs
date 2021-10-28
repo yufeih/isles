@@ -284,23 +284,5 @@ namespace Isles.UI
 
             return EventResult.Unhandled;
         }
-
-        /// <summary>
-        /// Dispose.
-        /// </summary>
-        public void Dispose()
-        {
-            sprite?.Dispose();
-            effect?.Dispose();
-
-            foreach (IUIElement element in elements)
-            {
-                element.Dispose();
-            }
-
-            Clear();
-
-            GC.SuppressFinalize(this);
-        }
     }
 }

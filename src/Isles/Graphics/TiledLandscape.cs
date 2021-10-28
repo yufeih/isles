@@ -9,34 +9,12 @@ namespace Isles.Graphics
 {
     public class TiledLandscape : Landscape
     {
-        /// <summary>
-        /// The effect used to draw the terrain.
-        /// </summary>
         private Effect terrainEffect;
-
-        /// <summary>
-        /// Index buffer for all patches.
-        /// </summary>
         private IndexBuffer indexBuffer;
-
-        /// <summary>
-        /// Vertex buffer for each individual patch.
-        /// </summary>
         private VertexBuffer[] vertexBuffers;
-
-        /// <summary>
-        /// Vertex declaraction for terrain mesh.
-        /// </summary>
         private VertexDeclaration declaraction;
 
-        /// <summary>
-        /// Stuff for drawing primitives.
-        /// </summary>
         private int vertexCount;
-
-        /// <summary>
-        /// Stuff for drawing primitives.
-        /// </summary>
         private int primitiveCount;
 
         public override void Initialize(BaseGame game)
@@ -155,9 +133,6 @@ namespace Isles.Graphics
             }
         }
 
-        /// <summary>
-        /// Internal method to draw the terrain.
-        /// </summary>
         private void DrawTerrain(Matrix view, Matrix projection, EffectTechnique technique)
         {
             graphics.SetRenderState(BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone);
@@ -244,39 +219,14 @@ namespace Isles.Graphics
 
         public struct TerrainVertex
         {
-            /// <summary>
-            /// Position.
-            /// </summary>
             public Vector3 Position;
-
-            /// <summary>
-            /// Texture coordinates.
-            /// </summary>
             public Vector2 TextureCoordinate0;
-
-            /// <summary>
-            /// Texture coordinates.
-            /// </summary>
             public Vector2 TextureCoordinate1;
-
-            /// <summary>
-            /// Normal.
-            /// </summary>
             public Vector3 Normal;
-
-            /// <summary>
-            /// Tangent.
-            /// </summary>
             public Vector3 Tangent;
 
-            /// <summary>
-            /// Stride Size, in XNA called SizeInBytes. I'm just conforming with that.
-            /// </summary>
             public static int SizeInBytes => 4 * (3 + 4 + 3 + 3);
 
-            /// <summary>
-            /// Generate vertex declaration.
-            /// </summary>
             public static VertexElement[] VertexElements
             {
                 get

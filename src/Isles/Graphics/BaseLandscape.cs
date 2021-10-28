@@ -85,22 +85,9 @@ namespace Isles.Graphics
             /// </summary>
             public void Dispose()
             {
-                Dispose(true);
-                GC.SuppressFinalize(this);
-            }
-
-            /// <summary>
-            /// Dispose.
-            /// </summary>
-            /// <param name="disposing">Disposing.</param>
-            protected virtual void Dispose(bool disposing)
-            {
-                if (disposing)
-                {
-                    ColorTexture?.Dispose();
-                    AlphaTexture?.Dispose();
-                    NormalTexture?.Dispose();
-                }
+                ColorTexture?.Dispose();
+                AlphaTexture?.Dispose();
+                NormalTexture?.Dispose();
             }
         }
 

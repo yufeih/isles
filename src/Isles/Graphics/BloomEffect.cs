@@ -8,54 +8,27 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Graphics
 {
-    /// <summary>
-    /// Class holds all the settings used to tweak the bloom effect.
-    /// Code grabbed from XNA creators club samples :).
-    /// </summary>
     public class BloomSettings
     {
-        // Name of a preset bloom setting, for display to the user.
-        public string Name { get; set; }
-
         // Controls how bright a pixel needs to be before it will bloom.
         // Zero makes everything bloom equally, while higher values select
         // only brighter colors. Somewhere between 0.25 and 0.5 is good.
-        public float BloomThreshold { get; set; }
+        public float Threshold { get; set; } = 0.25f;
 
         // Controls how much blurring is applied to the bloom image.
         // The typical range is from 1 up to 10 or so.
-        public float BlurAmount { get; set; }
+        public float Blur { get; set; } = 2;
 
         // Controls the amount of the bloom and base images that
         // will be mixed into the final scene. Range 0 to 1.
-        public float BloomIntensity { get; set; }
-        public float BaseIntensity { get; set; }
+        public float BloomIntensity { get; set; } = 1;
+        public float BaseIntensity { get; set; } = 1;
 
         // Independently control the color saturation of the bloom and
         // base images. Zero is totally desaturated, 1.0 leaves saturation
         // unchanged, while higher values increase the saturation level.
-        public float BloomSaturation { get; set; }
+        public float BloomSaturation { get; set; } = 2;
         public float BaseSaturation { get; set; }
-
-        public BloomSettings()
-        {
-        }
-
-        /// <summary>
-        /// Constructs a new bloom settings descriptor.
-        /// </summary>
-        public BloomSettings(string name, float bloomThreshold, float blurAmount,
-                             float bloomIntensity, float baseIntensity,
-                             float bloomSaturation, float baseSaturation)
-        {
-            Name = name;
-            BloomThreshold = bloomThreshold;
-            BlurAmount = blurAmount;
-            BloomIntensity = bloomIntensity;
-            BaseIntensity = baseIntensity;
-            BloomSaturation = bloomSaturation;
-            BaseSaturation = baseSaturation;
-        }
 
         public static BloomSettings Lerp(BloomSettings settings1, BloomSettings settings2, float amount)
         {
@@ -65,31 +38,18 @@ namespace Isles.Graphics
                 BaseSaturation = MathHelper.Lerp(settings1.BaseSaturation, settings2.BaseSaturation, amount),
                 BloomIntensity = MathHelper.Lerp(settings1.BloomIntensity, settings2.BloomIntensity, amount),
                 BloomSaturation = MathHelper.Lerp(settings1.BloomSaturation, settings2.BloomSaturation, amount),
-                BloomThreshold = MathHelper.Lerp(settings1.BloomThreshold, settings2.BloomThreshold, amount),
-                BlurAmount = MathHelper.Lerp(settings1.BlurAmount, settings2.BlurAmount, amount),
+                Threshold = MathHelper.Lerp(settings1.Threshold, settings2.Threshold, amount),
+                Blur = MathHelper.Lerp(settings1.Blur, settings2.Blur, amount),
             };
 
             return settings;
         }
-
-        /// <summary>
-        /// Table of preset bloom settings, used by the sample program.
-        /// </summary>
-        public static BloomSettings[] PresetSettings =
-        {
-            // Name           Thresh  Blur Bloom  Base  BloomSat BaseSat
-            new BloomSettings("Saturated",   0.25f,  4,   2,     1,    2,       0),
-            new BloomSettings("Soft",        0,      3,   1,     1,    1,       1),
-            new BloomSettings("Default",     0.25f,  0.02f,   1.25f, 1,    1,       1),
-            new BloomSettings("Desaturated", 0.5f,   8,   2,     1,    0,       1),
-            new BloomSettings("Blurry",      0,      2,   1,     0.1f, 1,       1),
-            new BloomSettings("Subtle",      0.5f,   2,   1,     1,    1,       1),
-        };
     }
 
     public class BloomEffect : DrawableGameComponent
     {
         private readonly ContentManager content;
+
         private SpriteBatch spriteBatch;
         private Effect bloomExtractEffect;
         private Effect bloomCombineEffect;
@@ -99,7 +59,7 @@ namespace Isles.Graphics
         private RenderTarget2D renderTarget2;
 
         // Choose what display settings the bloom should use.
-        public BloomSettings Settings { get; set; } = BloomSettings.PresetSettings[0];
+        public BloomSettings Settings { get; set; } = new();
 
         // Optionally displays one of the intermediate buffers used
         // by the bloom postprocess, so you can see exactly what is
@@ -117,11 +77,6 @@ namespace Isles.Graphics
         public BloomEffect(Game game, ContentManager content)
             : base(game)
         {
-            if (game == null)
-            {
-                throw new ArgumentNullException("game");
-            }
-
             this.content = content;
         }
 
@@ -189,7 +144,7 @@ namespace Isles.Graphics
             // Pass 1: draw the scene into rendertarget 1, using a
             // shader that extracts only the brightest parts of the image.
             bloomExtractEffect.Parameters["BloomThreshold"].SetValue(
-                Settings.BloomThreshold);
+                Settings.Threshold);
 
             DrawFullscreenQuad(resolveTarget.GetTexture(), renderTarget1,
                                bloomExtractEffect,
@@ -352,7 +307,7 @@ namespace Isles.Graphics
         /// </summary>
         private float ComputeGaussian(float n)
         {
-            var theta = Settings.BlurAmount;
+            var theta = Settings.Blur;
 
             return (float)(1.0 / Math.Sqrt(2 * Math.PI * theta) *
                            Math.Exp(-(n * n) / (2 * theta * theta)));

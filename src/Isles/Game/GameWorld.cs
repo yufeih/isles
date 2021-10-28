@@ -97,9 +97,6 @@ namespace Isles.Engine
             // Set picked entity to null
             pickedEntity = null;
 
-            // Update internal lists
-            worldObjects.Update();
-
             // Update landscape
             Landscape.Update(gameTime);
 

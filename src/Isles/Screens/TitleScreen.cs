@@ -15,10 +15,6 @@ namespace Isles
     /// </summary>
     public class TitleScreen : IScreen
     {
-        // The screen that will be loaded when
-        // new game button is pressed
-        private readonly GameScreen gameScreen;
-
         // Texture for the title screen
         private readonly Texture2D titleTexture;
 
@@ -29,6 +25,7 @@ namespace Isles
         private readonly Texture2D loadingDisplayTexture;
 
         private int highLightMoveTo;
+
         /// <summary>
         /// Use the double variable to describe the expected position
         /// of the high light panel.
@@ -68,13 +65,8 @@ namespace Isles
         private readonly Panel rightMaskPanel;
         private readonly Panel credit;
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="gameScreen"></param>
-        public TitleScreen(GameScreen gameScreen)
+        public TitleScreen()
         {
-            this.gameScreen = gameScreen;
             ui = new UIDisplay(BaseGame.Singleton);
 
             titleTexture = BaseGame.Singleton.TextureLoader.LoadTexture("data/ui/MainEntry.png");
@@ -200,13 +192,13 @@ namespace Isles
             buttons[0].Click += (o, e) =>
             {
                 Audios.Play("OK");
-                BaseGame.Singleton.StartScreen(gameScreen);
+                BaseGame.Singleton.StartScreen(new GameScreen("World.xml"));
             };
 
             buttons[1].Click += (o, e) =>
             {
                 Audios.Play("OK");
-                StartLoadingCampaign();
+                BaseGame.Singleton.StartScreen(new GameScreen("World.xml"));
             };
 
             buttons[3].Click += (o, e) =>
@@ -221,6 +213,10 @@ namespace Isles
 
             highLightMoveTo = buttons[0].Area.X;
             expectedHighlightPos = highLightMoveTo;
+
+            Audios.Counter = 0;
+            BaseGame.Singleton.Cursor = Cursors.MenuDefault;
+            Audios.PlayMusic("Menu", true, 0, 5);
         }
 
         /// <summary>
@@ -249,13 +245,6 @@ namespace Isles
             {
                 highLightMoveTo -= (int)(25.0 / 800 * ui.DestinationRectangle.Width);
             }
-        }
-
-        private void StartLoadingCampaign()
-        {
-            ui.Dispose();
-            gameScreen.StartLevel("World.xml");
-            BaseGame.Singleton.StartScreen(gameScreen);
         }
 
         private void StartCredit()
@@ -364,42 +353,6 @@ namespace Isles
             ui.Draw(gameTime);
         }
 
-        /// <summary>
-        /// Called when this screen is activated.
-        /// </summary>
-        public void Enter()
-        {
-            Audios.Counter = 0;
-            BaseGame.Singleton.Cursor = Cursors.MenuDefault;
-            Audios.PlayMusic("Menu", true, 0, 5);
-        }
-
-        /// <summary>
-        /// Called when this screen is deactivated.
-        /// </summary>
-        public void Leave()
-        {
-        }
-
-        /// <summary>
-        /// Load your graphics content.  If loadAllContent is true, you should
-        /// load content from both ResourceManagementMode pools.  Otherwise, just
-        /// load ResourceManagementMode.Manual content.
-        /// </summary>
-        /// <param name="loadAllContent">Which type of content to load.</param>
-        public void LoadContent()
-        {
-        }
-
-        /// <summary>
-        /// Unload your graphics content.  If unloadAllContent is true, you should
-        /// unload content from both ResourceManagementMode pools.  Otherwise, just
-        /// unload ResourceManagementMode.Manual content.  Manual content will get
-        /// Disposed by the GraphicsDevice during a Reset.
-        /// </summary>
-        /// <param name="unloadAllContent">Which type of content to unload.</param>
-        public void UnloadContent() { }
-
         public EventResult HandleEvent(EventType type, object sender, object tag)
         {
             if (type == EventType.Hit && sender == this)
@@ -419,25 +372,14 @@ namespace Isles
                 ? EventResult.Handled
                 : EventResult.Unhandled;
         }
-
-        public void Dispose()
-        {
-        }
     }
 
     public class MenuButton : Button
     {
-        // The name of the menu button
-        private string name;
-
         /// <summary>
         ///  Gets or sets the name of the menu button.
         /// </summary>
-        public string Name
-        {
-            get => name;
-            set => name = value;
-        }
+        public string Name { get; set; }
 
         /// <summary>
         /// Construct a new menu button.

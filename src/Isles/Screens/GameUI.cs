@@ -39,14 +39,6 @@ namespace Isles
         bool Selected { get; set; }
     }
 
-    /// <summary>
-    /// This is the in-game UI.
-    /// </summary>
-    /// <remarks>
-    /// Guess we are about to implement a configurable game UI,
-    /// maybe XML based or whatever. For now just hardcode most
-    /// of our game UI.
-    /// </remarks>
     public class GameUI : IEventListener
     {
         public const int ButtonWidth = 80;
@@ -71,19 +63,8 @@ namespace Isles
         private UI.Panel snapShot;
         private UI.Panel profilePanel;
 
-        /// <summary>
-        /// Gets the control panel in the game.
-        /// </summary>
         public UI.Panel ControlPanel { get; private set; }
-
-        /// <summary>
-        /// Gets the resource panel.
-        /// </summary>
         public UI.Panel ResourcePanel { get; private set; }
-
-        /// <summary>
-        /// Gets the tip box container.
-        /// </summary>
         public UI.Panel TipBoxContainer { get; private set; }
 
         public MiniMap Minimap { get; private set; }
@@ -122,9 +103,6 @@ namespace Isles
         private const int SpellButtonFullHeight = 34;
         private const int SpellButtonWidthSpace = 1;
 
-        /// <summary>
-        /// Creates a new game user interface.
-        /// </summary>
         public GameUI(BaseGame game, GameWorld world)
         {
             // Setup singleton
@@ -187,7 +165,7 @@ namespace Isles
             snapShotName = new TextField("Name", 17f / 23, Color.Gold, SnapShotNameDestination, Color.Black)
             {
                 Centered = true,
-            };// NameDestination);
+            };
 
             snapShot.Add(snapShotName);
 
@@ -302,24 +280,6 @@ namespace Isles
             elements[y, x] = element;
         }
 
-        /// <summary>
-        /// Remove a UI element.
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        public void RemoveUIElement(int x, int y)
-        {
-            if (elements[x, y] == null)
-            {
-                return;
-            }
-
-            ControlPanel.Remove(elements[x, y]);
-        }
-
-        /// <summary>
-        /// Clear all ui elements.
-        /// </summary>
         public void ClearUIElement()
         {
             foreach (IUIElement e in elements)
@@ -737,27 +697,6 @@ namespace Isles
             foodTextField.Color = color;
         }
 
-        // private void ResetProfileButtonArea()
-        // {
-        //    int currentProfileIndex = Player.LocalPlayer.CurrentGroupIndex;
-        //    Rectangle rect = new Rectangle(ProfileBaseX, 550, ProfileWidth, ProfileWidth);
-        //    for (int i = 0; i < profileButtons.Count; i++)
-        //    {
-        //        if (i == currentProfileIndex)
-        //        {
-        //            profileButtons[i].Area =
-        //                new Rectangle(  rect.X - ProfileWidth / 4, rect.Y - ProfileWidth / 2,
-        //                                rect.Width + ProfileWidth / 2, rect.Height + ProfileWidth / 2);
-        //        }
-        //        else
-        //        {
-        //            profileButtons[i].Area = rect;
-
-        // }
-        //        rect.X += ProfileWidth + ProfileSpace;
-        //        profileButtons[i].ResetDestinationRectangle();
-        //    }
-        // }
         public void Draw(GameTime gameTime)
         {
             PresentMessages(gameTime);
@@ -851,32 +790,6 @@ namespace Isles
             }
         }
 
-        /// <summary>
-        /// Set the profile button when character is selected.
-        /// </summary>
-        /// <param name="element"></param>
-        public void SetProfile(SpellButton[] buttons)
-        {
-            ClearProfile();
-            AddProfile(buttons);
-        }
-
-        /// <summary>
-        /// Add profile buttons.
-        /// </summary>
-        /// <param name="buttons"></param>
-        public void AddProfile(SpellButton[] buttons)
-        {
-            foreach (SpellButton button in buttons)
-            {
-                AddProfile(button, false);
-            }
-        }
-
-        /// <summary>
-        /// Add one profile button.
-        /// </summary>
-        /// <param name="button"></param>
         public void AddProfile(SpellButton button, bool enlarge)
         {
             var size = enlarge ? (int)(ProfileWidth * 1.2f) : ProfileWidth;
@@ -889,22 +802,6 @@ namespace Isles
             button.Click += (o, e) => Player.LocalPlayer.SelectionDirty = true;
         }
 
-        /// <summary>
-        /// Remove profile buttons.
-        /// </summary>
-        /// <param name="buttons"></param>
-        public void RemoveProfile(SpellButton[] buttons)
-        {
-            foreach (SpellButton button in buttons)
-            {
-                profileButtons.Remove(button);
-                profilePanel.Remove(button);
-            }
-        }
-
-        /// <summary>
-        /// Clear profile buttons.
-        /// </summary>
         public void ClearProfile()
         {
             foreach (SpellButton button in profileButtons)
@@ -937,216 +834,16 @@ namespace Isles
     {
         public static Cursor StoredCursor;
 
-        public static Cursor MenuDefault
-        {
-            get
-            {
-                if (menuDefaultCursor == null)
-                {
-                    menuDefaultCursor = LoadCursor("NormalCursor.cur");
-                }
-
-                return menuDefaultCursor;
-            }
-        }
-
-        public static Cursor MenuHighlight
-        {
-            get
-            {
-                if (menuHighlightCursor == null)
-                {
-                    menuHighlightCursor = LoadCursor("LightedCursor.cur");
-                }
-
-                return menuHighlightCursor;
-            }
-        }
-
-        public static Cursor Default
-        {
-            get
-            {
-                if (defaultCursor == null)
-                {
-                    defaultCursor = LoadCursor("default.ani");
-                }
-
-                return defaultCursor;
-            }
-        }
-
-        public static Cursor Attack
-        {
-            get
-            {
-                if (attack == null)
-                {
-                    attack = LoadCursor("attack.ani");
-                }
-
-                return attack;
-            }
-        }
-
-        public static Cursor Gather
-        {
-            get
-            {
-                if (gather == null)
-                {
-                    gather = LoadCursor("gather.ani");
-                }
-
-                return gather;
-            }
-        }
-
-        public static Cursor TargetRed
-        {
-            get
-            {
-                if (targetRed == null)
-                {
-                    targetRed = LoadCursor("target_red.ani");
-                }
-
-                return targetRed;
-            }
-        }
-
-        public static Cursor TargetGreen
-        {
-            get
-            {
-                if (targetGreen == null)
-                {
-                    targetGreen = LoadCursor("target_green.ani");
-                }
-
-                return targetGreen;
-            }
-        }
-
-        public static Cursor TargetNeutral
-        {
-            get
-            {
-                if (targetNeutral == null)
-                {
-                    targetNeutral = LoadCursor("target_neutral.ani");
-                }
-
-                return targetNeutral;
-            }
-        }
-
-        public static Cursor TargetDisable
-        {
-            get
-            {
-                if (targetDisable == null)
-                {
-                    targetDisable = LoadCursor("target_disable.ani");
-                }
-
-                return targetDisable;
-            }
-        }
-
-        public static Cursor Top
-        {
-            get
-            {
-                if (top == null)
-                {
-                    top = LoadCursor("screen_top.cur");
-                }
-
-                return top;
-            }
-        }
-
-        public static Cursor Bottom
-        {
-            get
-            {
-                if (bottom == null)
-                {
-                    bottom = LoadCursor("screen_bottom.cur");
-                }
-
-                return bottom;
-            }
-        }
-
-        public static Cursor Left
-        {
-            get
-            {
-                if (left == null)
-                {
-                    left = LoadCursor("screen_left.cur");
-                }
-
-                return left;
-            }
-        }
-
-        public static Cursor Right
-        {
-            get
-            {
-                if (right == null)
-                {
-                    right = LoadCursor("screen_right.cur");
-                }
-
-                return right;
-            }
-        }
-
-        public static Cursor Move
-        {
-            get
-            {
-                if (move == null)
-                {
-                    move = LoadCursor("screen_move.cur");
-                }
-
-                return move;
-            }
-        }
-
-        public static Cursor Rotate
-        {
-            get
-            {
-                if (rotate == null)
-                {
-                    rotate = LoadCursor("screen_rotate.cur");
-                }
-
-                return rotate;
-            }
-        }
-
-        private static Cursor menuDefaultCursor;
-        private static Cursor menuHighlightCursor;
-        private static Cursor defaultCursor;
-        private static Cursor attack;
-        private static Cursor gather;
-        private static Cursor targetRed;
-        private static Cursor targetGreen;
-        private static Cursor targetNeutral;
-        private static Cursor targetDisable;
-        private static Cursor top;
-        private static Cursor bottom;
-        private static Cursor left;
-        private static Cursor right;
-        private static Cursor move;
-        private static Cursor rotate;
+        public static Cursor MenuDefault { get; } = LoadCursor("NormalCursor.cur");
+        public static Cursor Default { get; } = LoadCursor("default.ani");
+        public static Cursor TargetRed { get; } = LoadCursor("target_red.ani");
+        public static Cursor TargetGreen { get; } = LoadCursor("target_green.ani");
+        public static Cursor Top { get; } = LoadCursor("screen_top.cur");
+        public static Cursor Bottom { get; } = LoadCursor("screen_bottom.cur");
+        public static Cursor Left { get; } = LoadCursor("screen_left.cur");
+        public static Cursor Right { get; } = LoadCursor("screen_right.cur");
+        public static Cursor Move { get; } = LoadCursor("screen_move.cur");
+        public static Cursor Rotate { get; } = LoadCursor("screen_rotate.cur");
 
         private static Cursor LoadCursor(string name)
         {

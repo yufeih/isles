@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Xml;
 using Isles.Engine;
 using Isles.Graphics;
@@ -14,27 +13,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Isles
 {
-    /// <summary>
-    /// Game replay and network game uses this interface.
-    /// </summary>
-    public interface IGameObject
-    {
-        /// <summary>
-        /// Serialize any change of this recordable.
-        /// </summary>
-        void Serialize(Stream output);
-
-        /// <summary>
-        /// Deserialize this recordable from input bytes.
-        /// </summary>
-        void Deserialize(Stream input);
-    }
-
-    /// <summary>
-    /// Base class for all game objects.
-    /// Incoorperating game logic specific members.
-    /// </summary>
-    public abstract class GameObject : Entity, ISelectable, IGameObject
+    public abstract class GameObject : Entity, ISelectable
     {
         /// <summary>
         /// Gets or sets the owner of this charactor.
@@ -346,20 +325,6 @@ namespace Isles
         public void Flash()
         {
             flashElapsedTime = 0;
-        }
-
-        /// <summary>
-        /// Serialize any changes made to the game object.
-        /// </summary>
-        public virtual void Serialize(Stream stream)
-        {
-        }
-
-        /// <summary>
-        /// Deserialize any changes made to the game object.
-        /// </summary>
-        public virtual void Deserialize(Stream stream)
-        {
         }
 
         /// <summary>
@@ -1254,14 +1219,6 @@ namespace Isles
             base.Deserialize(xml);
         }
 
-        public override void Serialize(XmlElement xml)
-        {
-            base.Serialize(xml);
-
-            // Overwrite rotation
-            xml.SetAttribute("Rotation", MathHelper.ToDegrees(RotationZ).ToString());
-        }
-
         private int minimapIcon = -1;
 
         public override void OnCreate()
@@ -1414,7 +1371,7 @@ namespace Isles
             }
 
             this.ammo = ammo.ShadowCopy();
-            this.Target = target;
+            Target = target;
 
             // Compute position
             Position = ammo.Transform.Translation;

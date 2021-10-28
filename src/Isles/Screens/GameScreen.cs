@@ -1,7 +1,6 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
@@ -67,29 +66,12 @@ namespace Isles
         /// </summary>
         public Level Level { get; set; }
 
-        /// <summary>
-        /// Creates a new game screen.
-        /// NOTE: You can only create a game screen after graphics device
-        /// is created and initialized.
-        /// </summary>
-        public GameScreen()
+        public GameScreen(string levelName)
         {
             Game = BaseGame.Singleton;
             graphics = Game.Graphics;
 
-            if (graphics == null)
-            {
-                throw new InvalidOperationException();
-            }
-        }
-
-        /// <summary>
-        /// Starts a new level.
-        /// </summary>
-        /// <param name="newLevel"></param>
-        public void StartLevel(string levelFilename)
-        {
-            LoadWorld(levelFilename, new Skirmish(this, CreateTestPlayerInfo()));
+            LoadWorld(levelName, new Skirmish(this, CreateTestPlayerInfo()));
         }
 
         /// <summary>
@@ -264,37 +246,6 @@ namespace Isles
             };
 
             yield return info2;
-        }
-
-        /// <summary>
-        /// Load your graphics content.  If loadAllContent is true, you should
-        /// load content from both ResourceManagementMode pools.  Otherwise, just
-        /// load ResourceManagementMode.Manual content.
-        /// </summary>
-        /// <param name="loadAllContent">Which type of content to load.</param>
-        public void LoadContent() { }
-
-        /// <summary>
-        /// Unload your graphics content.  If unloadAllContent is true, you should
-        /// unload content from both ResourceManagementMode pools.  Otherwise, just
-        /// unload ResourceManagementMode.Manual content.  Manual content will get
-        /// Disposed by the GraphicsDevice during a Reset.
-        /// </summary>
-        /// <param name="unloadAllContent">Which type of content to unload.</param>
-        public void UnloadContent() { }
-
-        /// <summary>
-        /// Called when this screen is activated.
-        /// </summary>
-        public void Enter()
-        {
-        }
-
-        /// <summary>
-        /// Called when this screen is deactivated.
-        /// </summary>
-        public void Leave()
-        {
         }
 
         private bool postScreen;
@@ -575,19 +526,6 @@ namespace Isles
 
         private void ReturnToTitleScreen()
         {
-            // Return to main menu
-            if (victoryTexture != null)
-            {
-                victoryTexture.Dispose();
-                victoryTexture = null;
-            }
-
-            if (failureTexture != null)
-            {
-                failureTexture.Dispose();
-                failureTexture = null;
-            }
-
             if (defaultSettings != null && Game.Bloom != null)
             {
                 Game.Bloom.Settings = defaultSettings;
@@ -595,27 +533,7 @@ namespace Isles
 
             Game.IsMouseVisible = true;
             postScreen = false;
-            Game.StartScreen(new TitleScreen(this));
-        }
-
-        /// <summary>
-        /// Dispose.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Dispose.
-        /// </summary>
-        /// <param name="disposing">Disposing.</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-            }
+            Game.StartScreen(new TitleScreen());
         }
     }
 }

@@ -6,9 +6,6 @@ using System.Collections.Generic;
 
 namespace Isles.Engine
 {
-    /// <summary>
-    /// Interface for a graph edge.
-    /// </summary>
     public struct GraphEdge
     {
         /// <summary>
@@ -26,9 +23,6 @@ namespace Isles.Engine
         /// </summary>
         public float Cost;
 
-        /// <summary>
-        /// Creates a graph edge.
-        /// </summary>
         public GraphEdge(int from, int to, float cost)
         {
             From = from;
@@ -37,9 +31,6 @@ namespace Isles.Engine
         }
     }
 
-    /// <summary>
-    /// Interface for a directed graph.
-    /// </summary>
     public interface IGraph
     {
         /// <summary>
@@ -183,35 +174,6 @@ namespace Isles.Engine
         public void RemoveEdge(int from, int to)
         {
             throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Test cases for graph.
-        /// </summary>
-        public static void Test()
-        {
-            var graph = new SparseGraph<int>();
-            var search = new GraphSearchAStar();
-
-            graph.AddNode(0);
-            graph.AddNode(1);
-            graph.AddNode(2);
-            graph.AddNode(3);
-            graph.AddNode(4);
-
-            graph.AddEdge(new GraphEdge(0, 1, 198));
-            graph.AddEdge(new GraphEdge(1, 0, 198));
-            graph.AddEdge(new GraphEdge(1, 2, 220));
-            graph.AddEdge(new GraphEdge(0, 4, 190));
-            graph.AddEdge(new GraphEdge(4, 1, 265));
-            graph.AddEdge(new GraphEdge(0, 3, 280));
-            graph.AddEdge(new GraphEdge(4, 3, 149));
-            graph.AddEdge(new GraphEdge(3, 2, 181));
-
-            search.Search(graph, 0, 2);
-
-            var path = new List<int>();
-            path.AddRange(search.Path);
         }
     }
 

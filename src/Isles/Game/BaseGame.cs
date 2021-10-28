@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using Isles.Graphics;
@@ -15,24 +14,12 @@ using Cursor = System.Windows.Forms.Cursor;
 
 namespace Isles.Engine
 {
-    /// <summary>
-    /// This is the main type for your game.
-    /// </summary>
     public class BaseGame : Game, IEventListener
     {
-        /// <summary>
-        /// Windows cursor.
-        /// </summary>
         private Cursor cursor;
 
-        /// <summary>
-        /// Background color used to clear the scene.
-        /// </summary>
         private Color backgroundColor = Color.Black;// new Color(47, 62, 97);
 
-        /// <summary>
-        /// Cached matrices of this frame.
-        /// </summary>
         private Matrix view;
         private Matrix projection;
         private Matrix viewProjection;
@@ -40,24 +27,10 @@ namespace Isles.Engine
         private Matrix projectionInverse;
         private Matrix viewProjectionInverse;
 
-        /// <summary>
-        /// Ray casted from cursor.
-        /// </summary>
         private Ray pickRay;
-
-        /// <summary>
-        /// Eye position of this frame.
-        /// </summary>
         private Vector3 eye;
-
-        /// <summary>
-        /// Facing direction of this frame.
-        /// </summary>
         private Vector3 facing;
 
-        /// <summary>
-        /// Gets or sets windows cursor.
-        /// </summary>
         public Cursor Cursor
         {
             get => cursor;
@@ -69,216 +42,61 @@ namespace Isles.Engine
             }
         }
 
-        /// <summary>
-        /// Gets game input.
-        /// </summary>
         public Input Input { get; private set; }
 
-        /// <summary>
-        /// Gets game sound.
-        /// </summary>
         public AudioManager Audio { get; private set; }
 
-        /// <summary>
-        /// Gets current game screen.
-        /// </summary>
         public IScreen CurrentScreen { get; private set; }
 
-        /// <summary>
-        /// Gets Game camera.
-        /// </summary>
         public ICamera Camera { get; set; }
 
-        /// <summary>
-        /// Gets view matrix.
-        /// </summary>
         public Matrix View => view;
 
-        /// <summary>
-        /// Gets projection matrix.
-        /// </summary>
         public Matrix Projection => projection;
 
-        /// <summary>
-        /// Gets view projection matrix.
-        /// </summary>
         public Matrix ViewProjection => viewProjection;
 
-        /// <summary>
-        /// Gets view inverse matrix.
-        /// </summary>
         public Matrix ViewInverse => viewInverse;
 
-        /// <summary>
-        /// Gets projection inverse matrix.
-        /// </summary>
         public Matrix ProjectionInverse => projectionInverse;
 
-        /// <summary>
-        /// Gets view projection inverse matrix.
-        /// </summary>
         public Matrix ViewProjectionInverse => viewProjectionInverse;
 
-        /// <summary>
-        /// Gets current view frustum.
-        /// </summary>
         public BoundingFrustum ViewFrustum { get; private set; }
 
-        /// <summary>
-        /// Gets the ray casted from current cursor position.
-        /// </summary>
         public Ray PickRay => pickRay;
 
-        /// <summary>
-        /// Gets the eye position of this frame.
-        /// </summary>
         public Vector3 Eye => eye;
 
-        /// <summary>
-        /// Gets the facing direction of this frame.
-        /// </summary>
         public Vector3 Facing => facing;
 
-        /// <summary>
-        /// Gets or sets Game Settings.
-        /// </summary>
         public Settings Settings { get; set; }
 
-        /// <summary>
-        /// Gets Xna graphics device manager.
-        /// </summary>
         public GraphicsDeviceManager Graphics { get; }
 
         public TextureLoader TextureLoader { get; private set; }
 
         public ModelLoader ModelLoader { get; private set; }
 
-        /// <summary>
-        /// Gets screen width.
-        /// </summary>
         public int ScreenWidth { get; private set; }
 
-        /// <summary>
-        /// Gets screen height.
-        /// </summary>
         public int ScreenHeight { get; private set; }
 
-        /// <summary>
-        /// Gets game billboard manager.
-        /// </summary>
         public BillboardManager Billboard { get; private set; }
 
-        /// <summary>
-        /// Gets game model manager.
-        /// </summary>
         public ModelRenderer ModelRenderer { get; private set; }
 
-        /// <summary>
-        /// Gets game 2D graphics.
-        /// </summary>
         public Graphics2D Graphics2D { get; private set; }
 
-        /// <summary>
-        /// Gets all game screens.
-        /// </summary>
-        public Dictionary<string, IScreen> Screens { get; } = new();
-
-        /// <summary>
-        /// Gets current game time.
-        /// </summary>
         public GameTime CurrentGameTime { get; private set; }
 
-        /// <summary>
-        /// Gets game shadow effect.
-        /// </summary>
         public ShadowEffect Shadow { get; private set; }
 
-        /// <summary>
-        /// Gets game bloom effect.
-        /// </summary>
         public BloomEffect Bloom { get; private set; }
 
-        /// <summary>
-        /// Gets whether the game is been paused.
-        /// </summary>
-        /// TODO: Fixe issues caused by pausing. (E.g., Timer)
-        public bool Paused { get; set; }
-
-        /// <summary>
-        /// Starts a game screen and run.
-        /// </summary>
-        /// <param name="gameScreen"></param>
-        public void Run(string screenName)
-        {
-            Run(Screens[screenName]);
-        }
-
-        /// <summary>
-        /// Starts a game screen and run.
-        /// </summary>
-        /// <param name="gameScreen"></param>
-        public void Run(IScreen screen)
-        {
-            // Sets game screen
-            StartScreen(screen);
-
-            // Run the application
-            Run();
-        }
-
-        /// <summary>
-        /// Starts a game screen.
-        /// </summary>
-        public void StartScreen(string screenName)
-        {
-            StartScreen(Screens[screenName]);
-        }
-
-        /// <summary>
-        /// Starts a game screen.
-        /// </summary>
         public void StartScreen(IScreen newScreen)
         {
-            if (newScreen != CurrentScreen)
-            {
-                // Leave current screen
-                if (CurrentScreen != null)
-                {
-                    CurrentScreen.Leave();
-                }
-
-                // Enter the new screen
-                if (newScreen != null)
-                {
-                    newScreen.Enter();
-                }
-
-                // Set current screen
-                CurrentScreen = newScreen;
-            }
-        }
-
-        /// <summary>
-        /// Adds a screen to the game.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="screen"></param>
-        public void AddScreen(string name, IScreen screen)
-        {
-            if (!Screens.ContainsKey(name))
-            {
-                Screens.Add(name, screen);
-            }
-        }
-
-        /// <summary>
-        /// Adds a screen to the game.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="screen"></param>
-        public void RemoveScreen(string name)
-        {
-            Screens.Remove(name);
+            CurrentScreen = newScreen;
         }
 
         public BaseGame()
@@ -331,21 +149,9 @@ namespace Isles.Engine
             TextureLoader = new(GraphicsDevice);
             ModelLoader = new(GraphicsDevice, TextureLoader);
 
-            if (Settings.BloomSettings != null &&
-                Settings.BloomSettings.Enabled)
+            if (Settings.BloomSettings != null)
             {
-                Bloom = new BloomEffect(this, Content)
-                {
-                    Settings = new BloomSettings(
-                    Settings.BloomSettings.Type,
-                    Settings.BloomSettings.Threshold,
-                    Settings.BloomSettings.Blur,
-                    Settings.BloomSettings.BloomIntensity,
-                    Settings.BloomSettings.BaseIntensity,
-                    Settings.BloomSettings.BloomSaturation,
-                    Settings.BloomSettings.BaseSaturation),
-                };
-
+                Bloom = new BloomEffect(this, Content) { Settings = Settings.BloomSettings };
                 Components.Add(Bloom);
             }
 
@@ -361,12 +167,6 @@ namespace Isles.Engine
                 Shadow = new ShadowEffect(GraphicsDevice, Content);
             }
 
-            // Notify all screens to load contents
-            foreach (KeyValuePair<string, IScreen> screen in Screens)
-            {
-                screen.Value.LoadContent();
-            }
-
             ModelRenderer = new ModelRenderer(GraphicsDevice, Content);
 
             base.Initialize();
@@ -378,25 +178,6 @@ namespace Isles.Engine
             ScreenHeight = GraphicsDevice.Viewport.Height;
         }
 
-        /// <summary>
-        /// Unload your graphics content.  If unloadAllContent is true, you should
-        /// unload content from both ResourceManagementMode pools.  Otherwise, just
-        /// unload ResourceManagementMode.Manual content.  Manual content will get
-        /// Disposed by the GraphicsDevice during a Reset.
-        /// </summary>
-        /// <param name="unloadAllContent">Which type of content to unload.</param>
-        protected override void UnloadContent()
-        {
-            // Notify all screens to unload contents
-            foreach (KeyValuePair<string, IScreen> screen in Screens)
-            {
-                screen.Value.UnloadContent();
-            }
-
-            // Content.Unload();
-            base.UnloadContent();
-        }
-
         private bool initialized;
 
         /// <summary>
@@ -406,47 +187,21 @@ namespace Isles.Engine
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            // Store game time
             CurrentGameTime = gameTime;
 
-            // Update input
             Input.Update(gameTime);
-
-            // Do not update other stuff when the game is paused
-            if (Paused)
-            {
-                return;
-            }
-
-            // Update events
             Event.Update(gameTime);
-
-            // Update timer
-            Timer.Update(gameTime);
 
             if (Camera != null)
             {
-                // Update camera
                 Camera.Update(gameTime);
-
-                // Update matrices
                 UpdateMatrices();
-
-                // Update view frustum
                 UpdateFrustum();
-
-                // Update ray from cursor
                 UpdatePickRay();
-
-                // Update audio listener
                 UpdateAudioListener();
             }
 
-            // Update current screen
-            if (CurrentScreen != null)
-            {
-                CurrentScreen.Update(gameTime);
-            }
+            CurrentScreen?.Update(gameTime);
 
             // Update particle system
             ParticleSystem.UpdateAll(gameTime);
@@ -501,15 +256,12 @@ namespace Isles.Engine
             pickRay.Position.X = viewInverse.M41;
             pickRay.Position.Y = viewInverse.M42;
             pickRay.Position.Z = viewInverse.M43;
-            pickRay.Direction = Vector3.Normalize(
-                Vector3.Transform(v, viewProjectionInverse) - pickRay.Position);
+            pickRay.Direction = Vector3.Normalize(Vector3.Transform(v, viewProjectionInverse) - pickRay.Position);
         }
 
         /// <summary>
         /// Unproject a point on the screen to a ray in the 3D world.
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
         public Ray Unproject(int x, int y)
         {
             Ray ray;
@@ -555,7 +307,6 @@ namespace Isles.Engine
                 viewProjection = view * projection;
                 viewInverse = Matrix.Invert(view);
                 projectionInverse = Matrix.Invert(projection);
-                // viewProjectionInverse = Matrix.Invert(viewProjection);
 
                 // Guess this is more accurate
                 viewProjectionInverse = projectionInverse * ViewInverse;
@@ -571,10 +322,6 @@ namespace Isles.Engine
             }
         }
 
-        /// <summary>
-        /// This is called when the game should draw itself.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
             // Invoke first time initialize
@@ -609,23 +356,6 @@ namespace Isles.Engine
                 Camera.HandleEvent(type, sender, tag) == EventResult.Handled
                 ? EventResult.Handled
                 : EventResult.Unhandled;
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                Billboard?.Dispose();
-                Shadow?.Dispose();
-
-                // Notify all screens to unload contents
-                foreach (var screen in Screens)
-                {
-                    screen.Value.Dispose();
-                }
-            }
-
-            base.Dispose(disposing);
         }
     }
 }

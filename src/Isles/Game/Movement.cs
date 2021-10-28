@@ -388,21 +388,8 @@ namespace Isles.Engine
                 return State;
             }
 
-            // pathManager.DrawPath(path);
             StateResult result = seek.Update(gameTime);
 
-            // BaseGame game = BaseGame.Singleton;
-            // Point pos = game.Project(owner.Position);
-            // game.Graphics2D.DrawString(retryCounter.ToString(), 14,
-            //    new Vector2(pos.X, pos.Y), Color.Blue);
-
-            // BaseGame game = BaseGame.Singleton;
-            // Point p = game.Project(owner.Position);
-            // game.Graphics2D.DrawLine(p, game.Project(new Vector3(destination,
-            //    pathManager.Landscape.GetHeight(destination.X, destination.Y))), Color.White);
-
-            // if (owner is Entity)
-            //    (owner as Entity).Model.Tint = (pathQuerying ? new Vector4(0, 0, 0, 1) : Vector4.One);
             if (result == StateResult.Failed)
             {
                 seek.Terminate();
@@ -457,15 +444,6 @@ namespace Isles.Engine
                     WaitTime = 0.1f * retryCounter,
                 };
 
-                // LinkedListNode<PathEdge> edge = path.Edges.First;
-                // while (edge != null && edge.Next != null)
-                // {
-                //    System.Diagnostics.Debug.Assert(
-                //        pathManager.CanMoveBetween(edge.Value.Position,
-                //                                   edge.Next.Value.Position, owner, true));
-
-                // edge = edge.Next;
-                // }
                 return EventResult.Handled;
             }
             else if (type == EventType.PathNotFound)
@@ -495,21 +473,14 @@ namespace Isles.Engine
 
         public override void Activate()
         {
-            // Event.SendMessage(EventType.BeginMove, owner, this, null);
         }
 
         public override void Terminate()
         {
-            // Event.SendMessage(EventType.EndMove, owner, this, null);
         }
 
         public StateSeekToPosition(Vector2 target, IMovable owner, PathManager pathManager)
         {
-            if (null == owner || null == pathManager)
-            {
-                throw new ArgumentNullException();
-            }
-
             this.owner = owner;
             this.pathManager = pathManager;
             destination = target;

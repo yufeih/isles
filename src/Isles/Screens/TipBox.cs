@@ -43,9 +43,6 @@ namespace Isles
         /// <summary>
         /// Construct a tipbox that follows the cursor.
         /// </summary>
-        /// <param name="trackCursor"></param>
-        /// <param name="text"></param>
-        /// <param name="fontSize"></param>
         public TipBox(int width, int height)
             : base(Rectangle.Empty)
         {
@@ -55,9 +52,6 @@ namespace Isles
             setPositionToCursor();
         }
 
-        /// <summary>
-        /// Draw a dialog.
-        /// </summary>
         public void DrawDialog(Rectangle rectangle, SpriteBatch sprite)
         {
             // Actual Width and Height for corner

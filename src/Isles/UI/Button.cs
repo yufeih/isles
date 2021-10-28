@@ -272,23 +272,6 @@ namespace Isles.UI
 
             return EventResult.Unhandled;
         }
-
-        /// <summary>
-        /// Dispose.
-        /// </summary>
-        /// <param name="disposing">Disposing.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (Texture != null)
-                {
-                    Texture.Dispose();
-                }
-            }
-
-            base.Dispose(disposing);
-        }
     }
 
     public class TextButton : Button

@@ -129,64 +129,15 @@ namespace Isles.UI
                 sprite.Draw(Texture, new Rectangle(FillingRectangle.X + FillingRectangle.Width / 2, FillingRectangle.Y,
                             FillingRectangle.Width / 2, FillingRectangle.Height), sourceRectangleRightEnd, Color.White);
             }
-
-            /*
-            // Draw the rolling highlight
-            int highLightFront = (int)((gameTime.TotalGameTime.TotalSeconds - StartingTime)
-                                % HightLightCycle * HighLightRollingSpeed);
-
-            if ( FillingRectangle.Width > HighLightLength)
-            {
-                if ( highLightFront - HighLightLength > FillingRectangle.Right)
-                {
-                    // Hight is not in the drawing region
-                    // So, do nothing
-                }
-                else if(highLightFront > FillingRectangle.Right)
-                {
-                    // End part of the highlight should be drow
-                    sprite.Draw(this.Texture, new Rectangle(highLightFront - HighLightLength, FillingRectangle.Y,
-                                FillingRectangle.Right - (highLightFront - HighLightLength), FillingRectangle.Height),
-                                new Rectangle(sourceRectangleHighLight.X, sourceRectangleHighLight.Y,
-                                            sourceRectangleHighLight.Width * (FillingRectangle.Right - (highLightFront - HighLightLength)) / HighLightLength,
-                                            sourceRectangleHighLight.Height),
-                                Color.White);
-                }
-                else if (highLightFront - HighLightLength > FillingRectangle.X)
-                {
-                    // Full part of the highlight to be drow
-                    sprite.Draw(Texture, new Rectangle(highLightFront - HighLightLength, FillingRectangle.Y,
-                                HighLightLength, FillingRectangle.Height), sourceRectangleHighLight, Color.White);
-                }
-                else
-                {
-                    int sourceX = sourceRectangleHighLight.X + (FillingRectangle.Left - (highLightFront - HighLightLength))
-                                                                / HighLightLength * sourceRectangleHighLight.Width;
-                    sprite.Draw(Texture, new Rectangle(FillingRectangle.X, FillingRectangle.Y, highLightFront - FillingRectangle.Right,
-                                FillingRectangle.Height),
-                                new Rectangle(sourceX, sourceRectangleHighLight.Y,
-                                                sourceRectangleHighLight.Right - sourceX, sourceRectangleHighLight.Height)
-                                , Color.White);
-                    //sprite.Draw(Texture, new Rectangle(highLightFront - HighLightLength, FillingRectangle.Y, highLightFront, FillingRectangle.Height),
-                    //            SourceRectangleHightLight, Color.White);
-                }
-            }
-            */
         }
 
         public override void Update(GameTime gameTime)
         {
-            // throw new Exception("The method or operation is not implemented.");
         }
 
         public override EventResult HandleEvent(EventType type, object sender, object tag)
         {
             return EventResult.Handled;
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
         }
 
         protected override void OnEnableStateChanged()

@@ -466,22 +466,9 @@ namespace Isles.Graphics
         /// </summary>
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Dispose.
-        /// </summary>
-        /// <param name="disposing">Disposing.</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                effect?.Dispose();
-                vertices?.Dispose();
-                indices?.Dispose();
-            }
+            effect?.Dispose();
+            vertices?.Dispose();
+            indices?.Dispose();
         }
     }
 }
