@@ -1,4 +1,4 @@
-name: Build
+name: build
 on:
   pull_request:
     branches: [ main ]
@@ -7,11 +7,12 @@ on:
 
 jobs:
   build:
-    name: Build
+    name: build
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-dotnet@v1
+    - run: where msbuild
     - run: dotnet build -warnAsError -c Release -o ${{ runner.temp }}/bin
     - uses: actions/upload-artifact@v2
       with:
