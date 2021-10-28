@@ -263,11 +263,9 @@ namespace Isles.Graphics
                 Player.Loop = true;
                 Play();
             }
-            else if (bones == null || bones.Length < model.Bones.Count)
-            {
-                // Adjust bone array size
-                bones = new Matrix[model.Bones.Count];
-            }
+
+            // Adjust bone array size
+            bones = new Matrix[gltfModel.Nodes.Length];
 
             // Compute model bounding box.
             orientedBoundingBox = OBBFromModel(model);
@@ -610,8 +608,7 @@ namespace Isles.Graphics
                 // Perform matrix lerp on all skin transforms
                 for (var i = 0; i < bones.Length; i++)
                 {
-                    bones[i] = Matrix.Lerp(
-                        prevBoneTransforms[i], bones[i], amount);
+                    bones[i] = Matrix.Lerp(prevBoneTransforms[i], bones[i], amount);
                 }
             }
         }
@@ -646,10 +643,8 @@ namespace Isles.Graphics
                 // Perform matrix lerp on all skin transforms
                 for (var i = 0; i < bones.Length; i++)
                 {
-                    bones[i] = Matrix.Lerp(
-                        prevWorldTransforms[i], bones[i], amount);
-                    skinTransforms[i] = Matrix.Lerp(
-                        prevSkinTransforms[i], skinTransforms[i], amount);
+                    bones[i] = Matrix.Lerp(prevWorldTransforms[i], bones[i], amount);
+                    skinTransforms[i] = Matrix.Lerp(prevSkinTransforms[i], skinTransforms[i], amount);
                 }
             }
         }
@@ -659,16 +654,15 @@ namespace Isles.Graphics
             var tint = new Vector4(Tint.X, Tint.Y, Tint.Z, MathHelper.Clamp(Alpha, 0, 1));
             var glow = new Vector4(Glow.X, Glow.Y, Glow.Z, 1);
 
-            for (var i = 0; i < gltfModel.Meshes.Length; i++)
+            foreach (var mesh in gltfModel.Meshes)
             {
-                var mesh = gltfModel.Meshes[i];
                 if (IsSkinned)
                 {
                     game.ModelRenderer.Draw(mesh, Matrix.Identity, skinTransforms, tint, glow);
                 }
                 else
                 {
-                    game.ModelRenderer.Draw(mesh, bones[model.Meshes[i].ParentBone.Index], null, tint, glow);
+                    game.ModelRenderer.Draw(mesh, bones[mesh.Node.Index], null, tint, glow);
                 }
             }
         }
