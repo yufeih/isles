@@ -338,10 +338,13 @@ namespace Isles.Pipeline
                             if (t > max) max = t;
                         }
 
+                        var inputIndex = accessors.Count;
                         accessors.Add(new { bufferView = bufferViews.Count, byteOffset = bytes.Count - byteOffset - chan.Value.Count * 4, componentType = 5126, type = "SCALAR", count = chan.Value.Count,
                             min = new[]{min}, max = new[]{max} });
 
-                        accessors.Add(new { bufferView = bufferViews.Count, byteOffset = bytes.Count - byteOffset, componentType = 5126, type = "VEC3", count = chan.Value.Count });
+                        var scales = new List<KeyValuePair<float, Vector3>>();
+                        var rotations = new List<KeyValuePair<float, Quaternion>>();
+                        var translations = new List<KeyValuePair<float, Vector3>>();
 
                         foreach (var frame in chan.Value)
                         {
@@ -350,47 +353,49 @@ namespace Isles.Pipeline
                             {
                                 throw new InvalidOperationException(frame.Transform.ToString());
                             }
-                            bytes.AddRange(BitConverter.GetBytes(s.X));
-                            bytes.AddRange(BitConverter.GetBytes(s.Y));
-                            bytes.AddRange(BitConverter.GetBytes(s.Z));
+
+                            scales.Add(new KeyValuePair<float, Vector3>((float)frame.Time.TotalSeconds, s));
+                            rotations.Add(new KeyValuePair<float, Quaternion>((float)frame.Time.TotalSeconds, r));
+                            translations.Add(new KeyValuePair<float, Vector3>((float)frame.Time.TotalSeconds, t));
                         }
 
-                        accessors.Add(new { bufferView = bufferViews.Count, byteOffset = bytes.Count - byteOffset, componentType = 5126, type = "VEC4", count = chan.Value.Count });
-
-                        foreach (var frame in chan.Value)
+                        if (!All(scales, x => Same(x.Value, Vector3.One)))
                         {
-                            Vector3 s, t; Quaternion r;
-                            if (!frame.Transform.Decompose(out s, out r, out t))
+                            channels.Add(new { sampler = samplers.Count, target = new { node, path = "scale" } });
+                            samplers.Add(new { input = inputIndex, output = accessors.Count });
+                            accessors.Add(new { bufferView = bufferViews.Count, byteOffset = bytes.Count - byteOffset, componentType = 5126, type = "VEC3", count = chan.Value.Count });
+                            foreach (var x in scales)
                             {
-                                throw new InvalidOperationException(frame.Transform.ToString());
+                                bytes.AddRange(BitConverter.GetBytes(x.Value.X));
+                                bytes.AddRange(BitConverter.GetBytes(x.Value.Y));
+                                bytes.AddRange(BitConverter.GetBytes(x.Value.Z));
                             }
-                            bytes.AddRange(BitConverter.GetBytes(r.X));
-                            bytes.AddRange(BitConverter.GetBytes(r.Y));
-                            bytes.AddRange(BitConverter.GetBytes(r.Z));
-                            bytes.AddRange(BitConverter.GetBytes(r.W));
                         }
-
-                        accessors.Add(new { bufferView = bufferViews.Count, byteOffset = bytes.Count - byteOffset, componentType = 5126, type = "VEC3", count = chan.Value.Count });
-
-                        foreach (var frame in chan.Value)
+                        if (!All(rotations, x => Same(x.Value, Quaternion.Identity)))
                         {
-                            Vector3 s, t; Quaternion r;
-                            if (!frame.Transform.Decompose(out s, out r, out t))
+                            channels.Add(new { sampler = samplers.Count, target = new { node, path = "rotation" } });
+                            samplers.Add(new { input = inputIndex, output = accessors.Count });
+                            accessors.Add(new { bufferView = bufferViews.Count, byteOffset = bytes.Count - byteOffset, componentType = 5126, type = "VEC4", count = chan.Value.Count });
+                            foreach (var x in rotations)
                             {
-                                throw new InvalidOperationException(frame.Transform.ToString());
+                                bytes.AddRange(BitConverter.GetBytes(x.Value.X));
+                                bytes.AddRange(BitConverter.GetBytes(x.Value.Y));
+                                bytes.AddRange(BitConverter.GetBytes(x.Value.Z));
+                                bytes.AddRange(BitConverter.GetBytes(x.Value.W));
                             }
-                            bytes.AddRange(BitConverter.GetBytes(t.X));
-                            bytes.AddRange(BitConverter.GetBytes(t.Y));
-                            bytes.AddRange(BitConverter.GetBytes(t.Z));
                         }
-
-                        channels.Add(new { sampler = samplers.Count, target = new { node, path = "scale" } });
-                        channels.Add(new { sampler = samplers.Count + 1, target = new { node, path = "rotation" } });
-                        channels.Add(new { sampler = samplers.Count + 2, target = new { node, path = "translation" } });
-
-                        samplers.Add(new { input = accessors.Count - 4, output = accessors.Count - 3 });
-                        samplers.Add(new { input = accessors.Count - 4, output = accessors.Count - 2 });
-                        samplers.Add(new { input = accessors.Count - 4, output = accessors.Count - 1 });
+                        if (!All(translations, x => Same(x.Value, Vector3.Zero)))
+                        {
+                            channels.Add(new { sampler = samplers.Count, target = new { node, path = "translation" } });
+                            samplers.Add(new { input = inputIndex, output = accessors.Count });
+                            accessors.Add(new { bufferView = bufferViews.Count, byteOffset = bytes.Count - byteOffset, componentType = 5126, type = "VEC3", count = chan.Value.Count });
+                            foreach (var x in translations)
+                            {
+                                bytes.AddRange(BitConverter.GetBytes(x.Value.X));
+                                bytes.AddRange(BitConverter.GetBytes(x.Value.Y));
+                                bytes.AddRange(BitConverter.GetBytes(x.Value.Z));
+                            }
+                        }
                     }
 
                     animations.Add(new { name = anim.Key, channels, samplers });
@@ -415,6 +420,33 @@ namespace Isles.Pipeline
                 skins = skins.Count > 0 ? skins : null,
                 animations = animations.Count > 0 ? animations : null,
             }, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }));
+        }
+
+        const float Eplison = 0.001f;
+
+        private bool Same(Quaternion a, Quaternion b)
+        {
+            return Math.Abs(a.X - b.X) < Eplison &&
+                   Math.Abs(a.Y - b.Y) < Eplison &&
+                   Math.Abs(a.Z - b.Z) < Eplison &&
+                   Math.Abs(a.W - b.W) < Eplison;
+        }
+
+        private bool Same(Vector3 a, Vector3 b)
+        {
+            return Math.Abs(a.X - b.X) < Eplison &&
+                   Math.Abs(a.Y - b.Y) < Eplison &&
+                   Math.Abs(a.Z - b.Z) < Eplison;
+        }
+
+        private static bool All<T>(List<T> list, Predicate<T> filter)
+        {
+            foreach (var item in list)
+            {
+                if (!filter(item))
+                    return false;
+            }
+            return true;
         }
 
         public static bool DecomposeRough(
