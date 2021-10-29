@@ -17,12 +17,15 @@ namespace Isles.Graphics
     {
         public Mesh[] Meshes { get; init; }
         public Node[] Nodes { get; init; }
+        public Dictionary<string, Node> NodeNames { get; init; }
         public Dictionary<string, Animation> Animations { get; init; }
 
         public class Mesh
         {
             public Node Node { get; init; }
             public Primitive[] Primitives { get; init; }
+            public Matrix[] InverseBindMatrices { get; init; }
+            public Node[] Joints { get; init; }
         }
 
         public class Primitive
@@ -91,13 +94,14 @@ namespace Isles.Graphics
             {
                 buffers = new[] { new { uri = "", byteLength = 0 } },
                 bufferViews = new[] { new { buffer = 0, byteOffset = 0, byteLength = 0, byteStride = 0, target = 0, } },
-                accessors = new[] { new { bufferView = 0, byteOffset = 0, componentType = 0, type = "", count = 0, min = new[] { 0f }, max = new[] { 0f } } },
+                accessors = new[] { new { bufferView = 0, byteOffset = 0, componentType = 0, type = "", count = 0, min = Array.Empty<float>(), max = Array.Empty<float>() } },
                 meshes = new[] { new { primitives = new[] { new { attributes = new { POSITION = 0, NORMAL = 0, TEXCOORD_0 = 0, JOINTS_0 = (int?)0, WEIGHTS_0 = (int?)0 }, indices = 0, material = (int?)0, mode = 0 } } } },
                 images = new[] { new { uri = "" } },
                 textures = new[] { new { source = 0 } },
                 materials = new[] { new { doubleSided = false, pbrMetallicRoughness = new { baseColorTexture = new { index = 0 } } } },
-                nodes = new[] { new { name = "", mesh = (int?)0, skin = (int?)0, children = new[] { 0 }, scale = new[] { 0f }, rotation = new[] { 0f }, translation = new[] { 0f } } },
+                nodes = new[] { new { name = "", mesh = (int?)0, skin = (int?)0, children = Array.Empty<int>(), scale = Array.Empty<float>(), rotation = Array.Empty<float>(), translation = Array.Empty<float>() } },
                 animations = new[] { new { name = "", channels = new[] { new { sampler = 0, target = new { node = 0, path = "" } } }, samplers = new[] { new { input = 0, output = 0 } } } },
+                skins = new[] { new { inverseBindMatrices = 0, skeleton = 0, joints = Array.Empty<int>() } },
             };
 
             var gltf = JsonHelper.DeserializeAnonymousType(File.ReadAllBytes(path), gltfSchema);
@@ -106,10 +110,11 @@ namespace Isles.Graphics
             var meshToNode = new GltfModel.Node[gltf.meshes.Length];
 
             var nodes = LoadNodes();
+            var nodeNames = nodes.Where(node => !string.IsNullOrEmpty(node.Name)).ToDictionary(node => node.Name, StringComparer.OrdinalIgnoreCase);
             var meshes = LoadMeshes();
             var animations = LoadAnimations();
 
-            return new() { Meshes = meshes.ToArray(), Nodes = nodes.ToArray(), Animations = animations };
+            return new() { Meshes = meshes.ToArray(), Nodes = nodes.ToArray(), NodeNames = nodeNames, Animations = animations };
 
             List<GltfModel.Node> LoadNodes()
             {
@@ -213,7 +218,17 @@ namespace Isles.Graphics
                         });
                     }
 
-                    meshes.Add(new() { Node = meshToNode[meshIndex], Primitives = primitives.ToArray() });
+                    var node = meshToNode[meshIndex];
+                    var skinIndex = gltf.nodes[node.Index].skin;
+                    var skin = skinIndex is null ? null : gltf.skins[skinIndex.Value];
+
+                    meshes.Add(new()
+                    {
+                        Node = node,
+                        Primitives = primitives.ToArray(),
+                        InverseBindMatrices = skin is null ? null : ReadBufferAs<Matrix>(skin.inverseBindMatrices),
+                        Joints = skin is null ? null : Array.ConvertAll(skin.joints, i => nodes[i]),
+                    });
                 }
 
                 return meshes;

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Isles.Engine;
 using Isles.Pipeline;
 using Microsoft.Xna.Framework;
@@ -112,7 +113,7 @@ namespace Isles.Graphics
         /// <summary>
         /// Current animation clip being played.
         /// </summary>
-        private AnimationClip currentClip;
+        private string currentClip;
 
         /// <summary>
         /// Represent the state of current animation.
@@ -203,6 +204,11 @@ namespace Isles.Graphics
 
         private void Init()
         {
+            if (gltfModel.Meshes[0].Joints != null)
+            {
+                skinTransforms = new Matrix[gltfModel.Meshes[0].Joints.Length];
+            }
+
             if (model.Tag is Dictionary<string, object> dictionary)
             {
                 if (dictionary.TryGetValue("SkinningData", out var value))
@@ -228,18 +234,11 @@ namespace Isles.Graphics
             {
                 if (IsSkinned)
                 {
-                    players[0] = new AnimationPlayer(skin);
-                    players[1] = new AnimationPlayer(skin);
-
-                    UpdateSkinTransform(new GameTime());
+                    players[0] = new AnimationPlayer(gltfModel);
+                    players[1] = new AnimationPlayer(gltfModel);
                 }
-                else
-                {
-                    players[0] = new AnimationPlayer(model);
-                    players[1] = new AnimationPlayer(model);
 
-                    UpdateBoneTransform(new GameTime());
-                }
+                UpdateBoneTransform(new GameTime());
 
                 // Play the first animation clip
                 Player.Loop = true;
@@ -262,25 +261,7 @@ namespace Isles.Graphics
         /// </returns>
         public int GetBone(string boneName)
         {
-            if (IsSkinned)
-            {
-                for (var i = 0; i < skin.BoneName.Count; i++)
-                {
-                    if (skin.BoneName[i].Equals(boneName))
-                    {
-                        return i;
-                    }
-                }
-            }
-            else
-            {
-                if (model.Bones.TryGetValue(boneName, out ModelBone bone))
-                {
-                    return bone.Index;
-                }
-            }
-
-            return -1;
+            return gltfModel.NodeNames.TryGetValue(boneName, out var node) ? node.Index : -1;
         }
 
         /// <summary>
@@ -361,23 +342,6 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Gets the default (first) animation clip of this game model.
-        /// </summary>
-        public AnimationClip GetDefaultAnimationClip()
-        {
-            if (!IsAnimated)
-            {
-                return null;
-            }
-
-            // This is a little bit tricky
-            IEnumerator<KeyValuePair<string, AnimationClip>> enumerator =
-                animationClips.GetEnumerator();
-
-            return enumerator.MoveNext() ? enumerator.Current.Value : null;
-        }
-
-        /// <summary>
         /// Gets the animation clip with the specified name.
         /// </summary>
         public AnimationClip GetAnimationClip(string clipName)
@@ -396,11 +360,6 @@ namespace Isles.Graphics
                 return false;
             }
 
-            if (currentClip == null)
-            {
-                currentClip = GetDefaultAnimationClip();
-            }
-
             // Play current animation if it is paused
             if (animationState == AnimationState.Paused)
             {
@@ -415,41 +374,26 @@ namespace Isles.Graphics
             return true;
         }
 
-        /// <summary>
-        /// Play an animation clip.
-        /// </summary>
-        /// <param name="clipName">
-        /// Clip name.
-        /// </param>
-        /// <returns>Succeeded or not.</returns>
-        public bool Play(string clipName)
+        public bool Play(string clip)
         {
-            if (!IsAnimated || clipName == null)
+            if (!IsAnimated || clip == null)
             {
                 return false;
             }
 
-            // Play the animation clip with the specified name
-            if (animationClips.TryGetValue(clipName, out AnimationClip clip))
+            // Do nothing if it's still the same animation clip
+            if (clip == currentClip)
             {
-                // Do nothing if it's still the same animation clip
-                if (clip == currentClip)
-                {
-                    return true;
-                }
-
-                currentClip = clip;
-                Player.Triggers = null;
-                Player.Loop = true;
-                Player.Complete = null;
-                Player.StartClip(clip);
-                animationState = AnimationState.Playing;
                 return true;
             }
 
-            // Stop if the clip is invalid
-            Stop();
-            return false;
+            currentClip = clip;
+            Player.Triggers = null;
+            Player.Loop = true;
+            Player.Complete = null;
+            Player.StartClip(clip);
+            animationState = AnimationState.Playing;
+            return true;
         }
 
         public bool Play(string clipName, bool loop, float blendTime)
@@ -457,80 +401,44 @@ namespace Isles.Graphics
             return Play(clipName, loop, blendTime, null, null);
         }
 
-        /// <summary>
-        /// Play an animation clip. Blend the new animation with the
-        /// old one to provide smooth transition.
-        /// </summary>
-        /// <param name="clipName"></param>
-        /// <param name="blendTime"></param>
-        /// <returns>Succeeded or not.</returns>
-        public bool Play(string clipName, bool loop, float blendTime, EventHandler OnComplete,
+        public bool Play(string clip, bool loop, float blendTime, EventHandler OnComplete,
                          IEnumerable<KeyValuePair<TimeSpan, EventHandler>> triggers)
         {
-            if (!IsAnimated || clipName == null)
+            if (!IsAnimated || clip == null)
             {
                 return false;
             }
 
-            // Play the animation clip with the specified name
-            if (animationClips.TryGetValue(clipName, out AnimationClip clip))
+            // Do nothing if it's still the same animation clip
+            if (clip == currentClip)
             {
-                // Do nothing if it's still the same animation clip
-                if (clip == currentClip)
-                {
-                    return true;
-                }
-
-                // No blend occurs if there's no blend duration
-                if (blendTime > 0)
-                {
-                    // Start the new animation clip on the other player
-                    currentPlayer = 1 - currentPlayer;
-                    blending = true;
-                    blendStart = game.CurrentGameTime.TotalGameTime.TotalSeconds;
-                    blendDuration = blendTime;
-                }
-
-                Player.StartClip(clip);
-                Player.Loop = loop;
-                Player.Complete = OnComplete;
-                Player.Triggers = triggers;
-                animationState = AnimationState.Playing;
-                currentClip = clip;
                 return true;
             }
 
-            // Stop if the clip is invalid
-            Stop();
-            return false;
+            // No blend occurs if there's no blend duration
+            if (blendTime > 0)
+            {
+                // Start the new animation clip on the other player
+                currentPlayer = 1 - currentPlayer;
+                blending = true;
+                blendStart = game.CurrentGameTime.TotalGameTime.TotalSeconds;
+                blendDuration = blendTime;
+            }
+
+            Player.StartClip(clip);
+            Player.Loop = loop;
+            Player.Complete = OnComplete;
+            Player.Triggers = triggers;
+            animationState = AnimationState.Playing;
+            currentClip = clip;
+            return true;
         }
 
-        /// <summary>
-        /// Pause the current animation.
-        /// </summary>
         public void Pause()
         {
             if (animationState == AnimationState.Playing)
             {
                 animationState = AnimationState.Paused;
-            }
-        }
-
-        /// <summary>
-        /// Stop the current animation (Reset current animation to the first frame).
-        /// </summary>
-        public void Stop()
-        {
-            if (IsAnimated)
-            {
-                // Reset current animation
-                players[currentPlayer].Update(TimeSpan.Zero, false);
-
-                // Change animation state
-                animationState = AnimationState.Stopped;
-
-                // Stop blending for whatever reason
-                blending = false;
             }
         }
 
@@ -552,14 +460,7 @@ namespace Isles.Graphics
                 players[1 - currentPlayer].Update(time, true);
             }
 
-            if (IsSkinned)
-            {
-                UpdateSkinTransform(gameTime);
-            }
-            else
-            {
-                UpdateBoneTransform(gameTime);
-            }
+            UpdateBoneTransform(gameTime);
         }
 
         private void UpdateBoneTransform(GameTime gameTime)
@@ -593,40 +494,13 @@ namespace Isles.Graphics
                     bones[i] = Matrix.Lerp(prevBoneTransforms[i], bones[i], amount);
                 }
             }
-        }
 
-        private void UpdateSkinTransform(GameTime gameTime)
-        {
-            // Update skin transforms (stored in bones)
-            bones = players[currentPlayer].GetWorldTransforms();
-            skinTransforms = players[currentPlayer].GetSkinTransforms();
-
-            // Lerp transforms when we are blending between animations
-            if (blending)
+            if (skin != null)
             {
-                // End blend if time exceeds
-                var timeNow = gameTime.TotalGameTime.TotalSeconds;
-
-                if (timeNow - blendStart > blendDuration)
+                var mesh = gltfModel.Meshes[0];
+                for (var i = 0; i < mesh.Joints.Length; i++)
                 {
-                    blending = false;
-                }
-
-                // Compute lerp amount
-                var amount = (float)((timeNow - blendStart) / blendDuration);
-
-                // Clamp lerp amount to [0..1]
-                amount = MathHelper.Clamp(amount, 0.0f, 1.0f);
-
-                // Get old transforms
-                Matrix[] prevWorldTransforms = players[1 - currentPlayer].GetWorldTransforms();
-                Matrix[] prevSkinTransforms = players[1 - currentPlayer].GetSkinTransforms();
-
-                // Perform matrix lerp on all skin transforms
-                for (var i = 0; i < bones.Length; i++)
-                {
-                    bones[i] = Matrix.Lerp(prevWorldTransforms[i], bones[i], amount);
-                    skinTransforms[i] = Matrix.Lerp(prevSkinTransforms[i], skinTransforms[i], amount);
+                    skinTransforms[i] = mesh.InverseBindMatrices[i] * bones[mesh.Joints[i].Index];
                 }
             }
         }
@@ -769,249 +643,6 @@ namespace Isles.Graphics
     }
 
     /// <summary>
-    /// The animation player is in charge of decoding bone position
-    /// matrices from an animation clip.
-    /// </summary>
-    public class AnimationPlayer
-    {
-        private readonly Model model;
-        private TimeSpan currentTimeValue;
-        private int currentKeyframe;
-
-        // Current animation transform matrices.
-        private readonly Matrix[] boneTransforms;
-        private readonly Matrix[] worldTransforms;
-        private readonly Matrix[] skinTransforms;
-
-        // Backlink to the bind pose and skeleton hierarchy data.
-        private readonly SkinningData skinningDataValue;
-
-        public IEnumerable<KeyValuePair<TimeSpan, EventHandler>> Triggers;
-        public EventHandler Complete;
-        public bool Loop;
-
-        /// <summary>
-        /// Constructs a new animation player.
-        /// </summary>
-        public AnimationPlayer(SkinningData skinningData)
-        {
-            skinningDataValue = skinningData ?? throw new ArgumentNullException();
-
-            boneTransforms = new Matrix[skinningData.BindPose.Count];
-            worldTransforms = new Matrix[skinningData.BindPose.Count];
-            skinTransforms = new Matrix[skinningData.BindPose.Count];
-        }
-
-        public AnimationPlayer(Model model)
-        {
-            this.model = model ?? throw new ArgumentNullException();
-            boneTransforms = new Matrix[model.Bones.Count];
-            worldTransforms = new Matrix[model.Bones.Count];
-        }
-
-        /// <summary>
-        /// Starts decoding the specified animation clip.
-        /// </summary>
-        public void StartClip(AnimationClip clip)
-        {
-            CurrentClip = clip ?? throw new ArgumentNullException("clip");
-            currentTimeValue = TimeSpan.Zero;
-            currentKeyframe = 0;
-
-            // Initialize bone transforms to the bind pose.
-            if (skinningDataValue != null)
-            {
-                skinningDataValue.BindPose.CopyTo(boneTransforms, 0);
-            }
-            else if (model != null)
-            {
-                model.CopyBoneTransformsTo(boneTransforms);
-            }
-        }
-
-        /// <summary>
-        /// Advances the current animation position.
-        /// </summary>
-        public void Update(TimeSpan time, bool relativeToCurrentTime)
-        {
-            UpdateBoneTransforms(time, relativeToCurrentTime);
-            UpdateWorldTransforms();
-
-            if (skinningDataValue != null)
-            {
-                UpdateSkinTransforms();
-            }
-        }
-
-        /// <summary>
-        /// Helper used by the Update method to refresh the BoneTransforms data.
-        /// </summary>
-        public void UpdateBoneTransforms(TimeSpan time, bool relativeToCurrentTime)
-        {
-            if (CurrentClip == null)
-            {
-                throw new InvalidOperationException(
-                            "AnimationPlayer.Update was called before StartClip");
-            }
-
-            if (currentTimeValue >= CurrentClip.Duration && !Loop)
-            {
-                return;
-            }
-
-            // Update triggers
-            if (Triggers != null)
-            {
-                foreach (KeyValuePair<TimeSpan, EventHandler> trigger in Triggers)
-                {
-                    if (currentTimeValue < trigger.Key &&
-                        currentTimeValue + time > trigger.Key)
-                    {
-                        trigger.Value(this, null);
-                    }
-                }
-            }
-
-            // Update the animation position.
-            if (relativeToCurrentTime)
-            {
-                time += currentTimeValue;
-
-                // If we reached the end, loop back to the start.
-                while (time >= CurrentClip.Duration)
-                {
-                    // Trigger complete event
-                    Complete?.Invoke(null, EventArgs.Empty);
-
-                    if (Loop)
-                    {
-                        time -= CurrentClip.Duration;
-                    }
-                    else
-                    {
-                        currentTimeValue = CurrentClip.Duration;
-                        time = currentTimeValue;
-                        break;
-                    }
-                }
-            }
-
-            if ((time < TimeSpan.Zero) || (time > CurrentClip.Duration))
-            {
-                throw new ArgumentOutOfRangeException("time");
-            }
-
-            // If the position moved backwards, reset the keyframe index.
-            if (time < currentTimeValue)
-            {
-                currentKeyframe = 0;
-                if (skinningDataValue != null)
-                {
-                    skinningDataValue.BindPose.CopyTo(boneTransforms, 0);
-                }
-                else if (model != null)
-                {
-                    model.CopyBoneTransformsTo(boneTransforms);
-                }
-            }
-
-            currentTimeValue = time;
-
-            // Read keyframe matrices.
-            IList<Keyframe> keyframes = CurrentClip.Keyframes;
-
-            while (currentKeyframe < keyframes.Count)
-            {
-                Keyframe keyframe = keyframes[currentKeyframe];
-
-                // Stop when we've read up to the current time position.
-                if (keyframe.Time > currentTimeValue)
-                {
-                    break;
-                }
-
-                // Use this keyframe.
-                boneTransforms[keyframe.Bone] = keyframe.Transform;
-
-                currentKeyframe++;
-            }
-        }
-
-        /// <summary>
-        /// Helper used by the Update method to refresh the WorldTransforms data.
-        /// </summary>
-        public void UpdateWorldTransforms()
-        {
-            // Root bone.
-            worldTransforms[0] = boneTransforms[0];
-
-            // Child bones.
-            for (var bone = 1; bone < worldTransforms.Length; bone++)
-            {
-                var parentBone = -1;
-
-                if (skinningDataValue != null)
-                {
-                    parentBone = skinningDataValue.SkeletonHierarchy[bone];
-                }
-                else if (model != null)
-                {
-                    parentBone = model.Bones[bone].Parent.Index;
-                }
-
-                worldTransforms[bone] = boneTransforms[bone] * worldTransforms[parentBone];
-            }
-        }
-
-        /// <summary>
-        /// Helper used by the Update method to refresh the SkinTransforms data.
-        /// </summary>
-        public void UpdateSkinTransforms()
-        {
-            for (var bone = 0; bone < skinTransforms.Length; bone++)
-            {
-                skinTransforms[bone] = skinningDataValue.InverseBindPose[bone] *
-                                            worldTransforms[bone];
-            }
-        }
-
-        /// <summary>
-        /// Gets the current bone transform matrices, relative to their parent bones.
-        /// </summary>
-        public Matrix[] GetBoneTransforms()
-        {
-            return boneTransforms;
-        }
-
-        /// <summary>
-        /// Gets the current bone transform matrices, in absolute format.
-        /// </summary>
-        public Matrix[] GetWorldTransforms()
-        {
-            return worldTransforms;
-        }
-
-        /// <summary>
-        /// Gets the current bone transform matrices,
-        /// relative to the skinning bind pose.
-        /// </summary>
-        public Matrix[] GetSkinTransforms()
-        {
-            return skinTransforms;
-        }
-
-        /// <summary>
-        /// Gets the clip currently being decoded.
-        /// </summary>
-        public AnimationClip CurrentClip { get; private set; }
-
-        /// <summary>
-        /// Gets the current play position.
-        /// </summary>
-        public TimeSpan CurrentTime => currentTimeValue;
-    }
-
-    /// <summary>
     /// Loads SkinningData objects from compiled XNB format.
     /// </summary>
     public class SkinningDataReader : ContentTypeReader<SkinningData>
@@ -1030,37 +661,6 @@ namespace Isles.Graphics
 
             return new SkinningData(bindPose, inverseBindPose,
                                     skeletonHierarchy, boneName);
-        }
-    }
-
-    /// <summary>
-    /// Loads AnimationClip objects from compiled XNB format.
-    /// </summary>
-    public class AnimationClipReader : ContentTypeReader<AnimationClip>
-    {
-        protected override AnimationClip Read(ContentReader input,
-                                              AnimationClip existingInstance)
-        {
-            TimeSpan duration = input.ReadObject<TimeSpan>();
-            IList<Keyframe> keyframes = input.ReadObject<IList<Keyframe>>();
-
-            return new AnimationClip(duration, keyframes);
-        }
-    }
-
-    /// <summary>
-    /// Loads Keyframe objects from compiled XNB format.
-    /// </summary>
-    public class KeyframeReader : ContentTypeReader<Keyframe>
-    {
-        protected override Keyframe Read(ContentReader input,
-                                         Keyframe existingInstance)
-        {
-            var bone = input.ReadObject<int>();
-            TimeSpan time = input.ReadObject<TimeSpan>();
-            Matrix transform = input.ReadObject<Matrix>();
-
-            return new Keyframe(bone, time, transform);
         }
     }
 }
