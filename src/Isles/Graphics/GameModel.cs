@@ -270,7 +270,7 @@ namespace Isles.Graphics
         /// </summary>
         public Matrix GetBoneTransform(int bone)
         {
-            return bones[bone];
+            return bones[bone] * transform;
         }
 
         /// <summary>
