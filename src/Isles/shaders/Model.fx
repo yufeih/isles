@@ -72,12 +72,12 @@ float4x4 GetSkinTransform(
 //-----------------------------------------------------------------------------
 void VS(
     float4 position		: POSITION,
-    float4 normal : NORMAL,
+    float3 normal : NORMAL,
     float2 uv : TEXCOORD0,
     out float4 oPos : POSITION,
     out float2 oUV : TEXCOORD0,
     out float oZ : TEXCOORD1,
-    out float4 oNormal : TEXCOORD3)
+    out float3 oNormal : TEXCOORD3)
 {
     // Transform position
     float4 worldPosition = mul(position, World);
@@ -88,19 +88,19 @@ void VS(
     oZ = worldPosition.z;
 
     // Compute light and eye vector in world space
-    oNormal = mul(normal, World);
+    oNormal = mul(normal, (float3x3)World);
 }
 
 void VSSkinned(
     float4 position		: POSITION,
-    float4 normal : NORMAL,
+    float3 normal : NORMAL,
     half4  boneIndices : BLENDINDICES0,
     float4 boneWeights : BLENDWEIGHT0,
     float2 uv : TEXCOORD0,
     out float4 oPos : POSITION,
     out float2 oUV : TEXCOORD0,
     out float oZ : TEXCOORD1,
-    out float4 oNormal : TEXCOORD3)
+    out float3 oNormal : TEXCOORD3)
 {
     // Skin transform
     float4x4 skinTransform = GetSkinTransform(boneIndices, boneWeights);
@@ -115,7 +115,7 @@ void VSSkinned(
     oZ = position.z;
 
     // Compute light and eye vector in world space
-    oNormal = mul(normal, skinTransform);
+    oNormal = mul(normal, (float3x3)skinTransform);
 }
 
 float4 PS(float2 uv		: TEXCOORD0,

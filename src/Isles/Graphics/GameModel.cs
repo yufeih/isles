@@ -507,8 +507,8 @@ namespace Isles.Graphics
 
         public void Draw()
         {
-            var tint = new Vector4(Tint.X, Tint.Y, Tint.Z, MathHelper.Clamp(Alpha, 0, 1));
-            var glow = new Vector4(Glow.X, Glow.Y, Glow.Z, 1);
+            var tint = new Vector4(Tint, MathHelper.Clamp(Alpha, 0, 1));
+            var glow = new Vector4(Glow, 1);
 
             foreach (var mesh in gltfModel.Meshes)
             {
