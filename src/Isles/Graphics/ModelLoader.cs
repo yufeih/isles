@@ -103,111 +103,130 @@ namespace Isles.Graphics
             var gltf = JsonHelper.DeserializeAnonymousType(File.ReadAllBytes(path), gltfSchema);
             var basedir = Path.GetDirectoryName(path);
             var buffers = gltf.buffers.Select(buffer => File.ReadAllBytes(Path.Combine(basedir, buffer.uri))).ToArray();
-            var meshes = new List<GltfModel.Mesh>();
-            var nodes = new List<GltfModel.Node>();
-            var animations = new Dictionary<string, GltfModel.Animation>();
-            var nodeParentIndex = new int[gltf.nodes.Length];
             var meshToNode = new GltfModel.Node[gltf.meshes.Length];
 
-            // Load nodes
-            for (var nodeIndex = 0; nodeIndex < gltf.nodes.Length; nodeIndex++)
+            var nodes = LoadNodes();
+            var meshes = LoadMeshes();
+            var animations = LoadAnimations();
+
+            return new() { Meshes = meshes.ToArray(), Nodes = nodes.ToArray(), Animations = animations };
+
+            List<GltfModel.Node> LoadNodes()
             {
-                var node = gltf.nodes[nodeIndex];
-                if (node.children != null)
+                var nodes = new List<GltfModel.Node>();
+                var nodeParentIndex = new int[gltf.nodes.Length];
+
+                for (var nodeIndex = 0; nodeIndex < gltf.nodes.Length; nodeIndex++)
                 {
-                    foreach (var child in node.children)
+                    var node = gltf.nodes[nodeIndex];
+                    if (node.children != null)
                     {
-                        nodeParentIndex[child] = nodeIndex + 1;
+                        foreach (var child in node.children)
+                        {
+                            nodeParentIndex[child] = nodeIndex + 1;
+                        }
                     }
                 }
-            }
 
-            for (var nodeIndex= 0; nodeIndex < gltf.nodes.Length; nodeIndex ++)
-            {
-                var node = gltf.nodes[nodeIndex];
-                nodes.Add(new()
+                for (var nodeIndex = 0; nodeIndex < gltf.nodes.Length; nodeIndex++)
                 {
-                    Index = nodeIndex,
-                    Name = node.name,
-                    ParentIndex = nodeParentIndex[nodeIndex] - 1,
-                    Scale = node.scale is null ? Vector3.One : new(node.scale[0], node.scale[1], node.scale[2]),
-                    Rotation = node.rotation is null ? Quaternion.Identity : new(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3]),
-                    Translation = node.translation is null ? Vector3.Zero : new(node.translation[0], node.translation[1], node.translation[2]),
-                });
-
-                if (node.mesh != null)
-                {
-                    meshToNode[node.mesh.Value] = nodes[nodes.Count - 1];
-                }
-            }
-
-            // Load meshes
-            for (var meshIndex = 0; meshIndex < gltf.meshes.Length; meshIndex++)
-            {
-                var mesh = gltf.meshes[meshIndex];
-                var primitives = new List<GltfModel.Primitive>();
-
-                foreach (var primitive in mesh.primitives)
-                {
-                    // Vertex Buffer
-                    var positionAccessor = gltf.accessors[primitive.attributes.POSITION];
-                    var positionBufferView = gltf.bufferViews[positionAccessor.bufferView];
-
-                    var boundingBox = new BoundingBox(
-                        min: new(positionAccessor.min[0], positionAccessor.min[1], positionAccessor.min[2]),
-                        max: new(positionAccessor.max[0], positionAccessor.max[1], positionAccessor.max[2]));
-
-                    var vertexStride = positionBufferView.byteStride;
-                    var elements = new List<VertexElement>
+                    var node = gltf.nodes[nodeIndex];
+                    nodes.Add(new()
                     {
-                        new(0, (short)gltf.accessors[primitive.attributes.POSITION].byteOffset, VertexElementFormat.Vector3, default, VertexElementUsage.Position, 0),
-                        new(0, (short)gltf.accessors[primitive.attributes.NORMAL].byteOffset, VertexElementFormat.Vector2, default, VertexElementUsage.Normal, 0),
-                        new(0, (short)gltf.accessors[primitive.attributes.TEXCOORD_0].byteOffset, VertexElementFormat.Vector2, default, VertexElementUsage.TextureCoordinate, 0)
-                    };
-
-                    if (primitive.attributes.JOINTS_0 != null && primitive.attributes.WEIGHTS_0 != 0)
-                    {
-                        elements.Add(new(0, (short)gltf.accessors[primitive.attributes.JOINTS_0.Value].byteOffset, VertexElementFormat.Byte4, default, VertexElementUsage.BlendIndices, 0));
-                        elements.Add(new(0, (short)gltf.accessors[primitive.attributes.WEIGHTS_0.Value].byteOffset, VertexElementFormat.Vector4, default, VertexElementUsage.BlendWeight, 0));
-                    }
-
-                    var vertexBuffer = new VertexBuffer(_graphicsDevice, positionBufferView.byteLength, BufferUsage.WriteOnly);
-                    vertexBuffer.SetData(buffers[positionBufferView.buffer], positionBufferView.byteOffset, positionBufferView.byteLength);
-
-                    // Index Buffer
-                    var indicesAccessor = gltf.accessors[primitive.indices];
-                    var indicesBufferView = gltf.bufferViews[indicesAccessor.bufferView];
-                    var (indicesSizeInBytes, indexElementSize) = indicesAccessor.componentType == 5123
-                        ? (indicesAccessor.count * 2, IndexElementSize.SixteenBits)
-                        : (indicesAccessor.count * 4, IndexElementSize.ThirtyTwoBits);
-                    var indexBuffer = new IndexBuffer(_graphicsDevice, indicesSizeInBytes, BufferUsage.WriteOnly, indexElementSize);
-                    indexBuffer.SetData(buffers[indicesBufferView.buffer], indicesBufferView.byteOffset, indicesSizeInBytes);
-
-                    // Material
-                    var material = primitive.material is null ? null : gltf.materials[primitive.material.Value];
-                    var imageUri = material is null ? null : gltf.images[gltf.textures[material.pbrMetallicRoughness.baseColorTexture.index].source].uri;
-                    var texture = imageUri is null ? null : _textureLoader.LoadTexture(Path.Combine(basedir, imageUri));
-
-                    primitives.Add(new()
-                    {
-                        VertexStride = vertexStride,
-                        NumVertices = positionAccessor.count,
-                        VertexDeclaration = new VertexDeclaration(_graphicsDevice, elements.ToArray()),
-                        VertexBuffer = vertexBuffer,
-                        IndexBuffer = indexBuffer,
-                        PrimitiveCount = indicesAccessor.count / 3,
-                        BoundingBox = boundingBox,
-                        Texture = texture,
-                        DoubleSided = material?.doubleSided ?? false,
+                        Index = nodeIndex,
+                        Name = node.name,
+                        ParentIndex = nodeParentIndex[nodeIndex] - 1,
+                        Scale = node.scale is null ? Vector3.One : new(node.scale[0], node.scale[1], node.scale[2]),
+                        Rotation = node.rotation is null ? Quaternion.Identity : new(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3]),
+                        Translation = node.translation is null ? Vector3.Zero : new(node.translation[0], node.translation[1], node.translation[2]),
                     });
+
+                    if (node.mesh != null)
+                    {
+                        meshToNode[node.mesh.Value] = nodes[nodes.Count - 1];
+                    }
                 }
 
-                meshes.Add(new() { Node = meshToNode[meshIndex], Primitives = primitives.ToArray() });
+                return nodes;
             }
 
-            // Animations
-            if (gltf.animations != null)
+            List<GltfModel.Mesh> LoadMeshes()
             {
+                var meshes = new List<GltfModel.Mesh>();
+                for (var meshIndex = 0; meshIndex < gltf.meshes.Length; meshIndex++)
+                {
+                    var mesh = gltf.meshes[meshIndex];
+                    var primitives = new List<GltfModel.Primitive>();
+
+                    foreach (var primitive in mesh.primitives)
+                    {
+                        // Vertex Buffer
+                        var positionAccessor = gltf.accessors[primitive.attributes.POSITION];
+                        var boundingBox = new BoundingBox(
+                            min: new(positionAccessor.min[0], positionAccessor.min[1], positionAccessor.min[2]),
+                            max: new(positionAccessor.max[0], positionAccessor.max[1], positionAccessor.max[2]));
+
+                        var vertexStride = gltf.bufferViews[positionAccessor.bufferView].byteStride;
+                        var verticesSizeInBytes = positionAccessor.count * vertexStride;
+                        var elements = new List<VertexElement>
+                        {
+                            new(0, (short)gltf.accessors[primitive.attributes.POSITION].byteOffset, VertexElementFormat.Vector3, default, VertexElementUsage.Position, 0),
+                            new(0, (short)gltf.accessors[primitive.attributes.NORMAL].byteOffset, VertexElementFormat.Vector2, default, VertexElementUsage.Normal, 0),
+                            new(0, (short)gltf.accessors[primitive.attributes.TEXCOORD_0].byteOffset, VertexElementFormat.Vector2, default, VertexElementUsage.TextureCoordinate, 0)
+                        };
+
+                        if (primitive.attributes.JOINTS_0 != null && primitive.attributes.WEIGHTS_0 != 0)
+                        {
+                            elements.Add(new(0, (short)gltf.accessors[primitive.attributes.JOINTS_0.Value].byteOffset, VertexElementFormat.Byte4, default, VertexElementUsage.BlendIndices, 0));
+                            elements.Add(new(0, (short)gltf.accessors[primitive.attributes.WEIGHTS_0.Value].byteOffset, VertexElementFormat.Vector4, default, VertexElementUsage.BlendWeight, 0));
+                        }
+
+                        var vertexBuffer = new VertexBuffer(_graphicsDevice, verticesSizeInBytes, BufferUsage.WriteOnly);
+                        var (vertices, verticesStartIndex) = ReadBuffer(primitive.attributes.POSITION);
+                        vertexBuffer.SetData(vertices, verticesStartIndex, verticesSizeInBytes);
+
+                        // Index Buffer
+                        var indicesAccessor = gltf.accessors[primitive.indices];
+                        var (indicesSizeInBytes, indexElementSize) = indicesAccessor.componentType == 5123
+                            ? (indicesAccessor.count * 2, IndexElementSize.SixteenBits)
+                            : (indicesAccessor.count * 4, IndexElementSize.ThirtyTwoBits);
+                        var indexBuffer = new IndexBuffer(_graphicsDevice, indicesSizeInBytes, BufferUsage.WriteOnly, indexElementSize);
+                        var (indices, indicesStartIndex) = ReadBuffer(primitive.indices);
+                        indexBuffer.SetData(indices, indicesStartIndex, indicesSizeInBytes);
+
+                        // Material
+                        var material = primitive.material is null ? null : gltf.materials[primitive.material.Value];
+                        var imageUri = material is null ? null : gltf.images[gltf.textures[material.pbrMetallicRoughness.baseColorTexture.index].source].uri;
+                        var texture = imageUri is null ? null : _textureLoader.LoadTexture(Path.Combine(basedir, imageUri));
+
+                        primitives.Add(new()
+                        {
+                            VertexStride = vertexStride,
+                            NumVertices = positionAccessor.count,
+                            VertexDeclaration = new VertexDeclaration(_graphicsDevice, elements.ToArray()),
+                            VertexBuffer = vertexBuffer,
+                            IndexBuffer = indexBuffer,
+                            PrimitiveCount = indicesAccessor.count / 3,
+                            BoundingBox = boundingBox,
+                            Texture = texture,
+                            DoubleSided = material?.doubleSided ?? false,
+                        });
+                    }
+
+                    meshes.Add(new() { Node = meshToNode[meshIndex], Primitives = primitives.ToArray() });
+                }
+
+                return meshes;
+            }
+
+            Dictionary<string, GltfModel.Animation> LoadAnimations()
+            {
+                if (gltf.animations is null)
+                {
+                    return null;
+                }
+
+                var animations = new Dictionary<string, GltfModel.Animation>();
                 foreach (var animation in gltf.animations)
                 {
                     var duration = 0f;
@@ -215,16 +234,14 @@ namespace Isles.Graphics
 
                     foreach (var channel in animation.channels)
                     {
-                        var timeAccessor = gltf.accessors[animation.samplers[channel.sampler].input];
-                        if (timeAccessor.max[0] > duration)
-                        {
-                            duration = timeAccessor.max[0];
-                        }
+                        var input = animation.samplers[channel.sampler].input;
+                        var output = animation.samplers[channel.sampler].output;
+                        var times = ReadBufferAs<float>(input);
 
-                        var timeBufferView = gltf.bufferViews[timeAccessor.bufferView];
-                        var times = MemoryMarshal.Cast<byte, float>(buffers[timeBufferView.buffer].AsSpan(timeBufferView.byteOffset, timeBufferView.byteLength)).ToArray();
-                        var valueBufferView = gltf.bufferViews[gltf.accessors[animation.samplers[channel.sampler].output].bufferView];
-                        var values = buffers[timeBufferView.buffer].AsSpan(timeBufferView.byteOffset, timeBufferView.byteLength);
+                        if (gltf.accessors[input].max[0] > duration)
+                        {
+                            duration = gltf.accessors[input].max[0];
+                        }
 
                         var node = channel.target.node;
                         if (!channels.TryGetValue(node, out var item))
@@ -235,22 +252,42 @@ namespace Isles.Graphics
                         switch (channel.target.path)
                         {
                             case "scale":
-                                item.Scale = new() { Times = times.ToArray(), Values = MemoryMarshal.Cast<byte, Vector3>(values).ToArray() };
+                                item.Scale = new() { Times = times, Values = ReadBufferAs<Vector3>(output) };
                                 break;
                             case "rotation":
-                                item.Rotation = new() { Times = times.ToArray(), Values = MemoryMarshal.Cast<byte, Quaternion>(values).ToArray() };
+                                item.Rotation = new() { Times = times, Values = ReadBufferAs<Quaternion>(output) };
                                 break;
                             case "translation":
-                                item.Translation = new() { Times = times.ToArray(), Values = MemoryMarshal.Cast<byte, Vector3>(values).ToArray() };
+                                item.Translation = new() { Times = times, Values = ReadBufferAs<Vector3>(output) };
                                 break;
                         }
                     }
 
                     animations.Add(animation.name, new() { Duration = duration, Channels = channels });
                 }
+
+                return animations;
             }
 
-            return new() { Meshes = meshes.ToArray(), Nodes = nodes.ToArray(), Animations = animations };
+            (byte[] bytes, int start) ReadBuffer(int accessorIndex)
+            {
+                var accessor = gltf.accessors[accessorIndex];
+                var bufferView = gltf.bufferViews[accessor.bufferView];
+                var bytes = buffers[bufferView.buffer];
+
+                return (bytes, bufferView.byteOffset + accessor.byteOffset);
+            }
+
+            T[] ReadBufferAs<T>(int accessorIndex) where T : struct
+            {
+                var accessor = gltf.accessors[accessorIndex];
+                var bufferView = gltf.bufferViews[accessor.bufferView];
+                var bytes = buffers[bufferView.buffer]
+                    .AsSpan(bufferView.byteOffset, bufferView.byteLength)
+                    .Slice(accessor.byteOffset, accessor.count * Marshal.SizeOf<T>());
+
+                return MemoryMarshal.Cast<byte, T>(bytes).ToArray();
+            }
         }
     }
 }
