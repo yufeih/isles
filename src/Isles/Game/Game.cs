@@ -4,7 +4,6 @@
 using Isles.Engine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
-using System;
 
 namespace Isles
 {
@@ -17,9 +16,9 @@ namespace Isles
         {
             Register();
 
-            if (Environment.GetEnvironmentVariable("ISLES_STARTUP_LEVEL") is var startupLevel && !string.IsNullOrEmpty(startupLevel))
+            if (!string.IsNullOrEmpty(EnvironmentVariables.StartupLevel))
             {
-                StartScreen(new GameScreen(startupLevel));
+                StartScreen(new GameScreen(EnvironmentVariables.StartupLevel));
             }
             else
             {

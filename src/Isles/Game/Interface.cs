@@ -34,11 +34,6 @@ namespace Isles.Engine
     public interface IWorldObject
     {
         /// <summary>
-        /// Gets the name of the world object.
-        /// </summary>
-        string Name { get; }
-
-        /// <summary>
         /// Gets the position of the scene object.
         /// </summary>
         Vector3 Position { get; set; }
@@ -182,11 +177,6 @@ namespace Isles.Engine
         /// Gets all world objects that are near the point (Not always intersects).
         /// </summary>
         IEnumerable<IWorldObject> GetNearbyObjects(Vector3 position, float radius);
-
-        /// <summary>
-        /// Gets a world object from its name.
-        /// </summary>
-        IWorldObject ObjectFromName(string name);
     }
 
     /// <summary>

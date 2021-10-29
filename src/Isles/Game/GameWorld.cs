@@ -29,7 +29,6 @@ namespace Isles.Engine
         public IEnumerable<IWorldObject> WorldObjects => worldObjects;
 
         private readonly InternalList<IWorldObject> worldObjects = new();
-        private readonly Dictionary<string, IWorldObject> nameToWorldObject = new();
 
         /// <summary>
         /// Gets main game instance.
@@ -466,8 +465,6 @@ namespace Isles.Engine
             return null;
         }
 
-        private int ObjectCounter;
-
         /// <summary>
         /// Adds a new world object.
         /// </summary>
@@ -484,15 +481,6 @@ namespace Isles.Engine
                     Activate(entity);
                 }
             }
-
-            var key = worldObject.Name;
-            if (nameToWorldObject.ContainsKey(worldObject.Name))
-            {
-                // Log.Write("[Warning] WorldObject name conflict: " + worldObject.Name);
-                key = worldObject.Name + "_" + ObjectCounter++;
-            }
-
-            nameToWorldObject.Add(key, worldObject);
         }
 
         /// <summary>
@@ -520,9 +508,6 @@ namespace Isles.Engine
 
             // Finally, remove it from object list
             worldObjects.Remove(worldObject);
-
-            // Make sure you don't change the name of an world object
-            nameToWorldObject.Remove(worldObject.Name);
         }
 
         public void Clear()
@@ -723,11 +708,6 @@ namespace Isles.Engine
                     yield return o;
                 }
             }
-        }
-
-        public IWorldObject ObjectFromName(string name)
-        {
-            return nameToWorldObject.TryGetValue(name, out IWorldObject o) ? o : null;
         }
 
         /// <summary>

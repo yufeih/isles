@@ -15,7 +15,7 @@
     "BloomSaturation": 1,
     "BaseSaturation": 1
   },
-  "PlayerName": "Unnamed",
+  "PlayerName": "Player 1",
   "IsMouseVisible": true,
   "IsFixedTimeStep": true,
   "ClipCursor": true,

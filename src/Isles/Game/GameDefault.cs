@@ -179,7 +179,7 @@ namespace Isles
         public GameDefault()
         {
             var doc = new XmlDocument();
-            doc.Load("data/settings/defaults.xml");
+            doc.Load(EnvironmentVariables.GameDefaults ?? "data/settings/defaults.xml");
 
             if (doc.DocumentElement.Name != "GameDefault")
             {
