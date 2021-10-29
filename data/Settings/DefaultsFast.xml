@@ -7,7 +7,7 @@
   <WorldObject>
 
     <Tree
-        Name="Tree" Lumber="0" Model="models/alphapalm" Alpha="0.99" RotationXBias="90" ScaleBias="2.75, 2.75, 2.75"/>
+        Name="Tree" Lumber="100" Model="models/alphapalm" Alpha="0.99" RotationXBias="90" ScaleBias="2.75, 2.75, 2.75"/>
 
     <BoxOfPandora
         Name="Box of Pandora" Description="This magic box is a gift from pandora.
