@@ -711,7 +711,6 @@ namespace Isles
     {
         private bool weaponVisible = true;
         private GameModel weapon;
-        private KeyValuePair<TimeSpan, EventHandler>[] trigger;
 
         public Hunter(GameWorld world, string type)
             : base(world, type)
@@ -731,18 +730,6 @@ namespace Isles
             {
                 throw new Exception("The input model do not have a weapon attached.");
             }
-
-            AnimationClip clip = Model.GetAnimationClip("Attack");
-            if (clip == null)
-            {
-                throw new InvalidOperationException();
-            }
-
-            var time = new TimeSpan((long)(clip.Duration.Ticks * 18.0f / 41));
-            trigger = new KeyValuePair<TimeSpan, EventHandler>[]
-            {
-                new KeyValuePair<TimeSpan, EventHandler>(time, Launch),
-            };
         }
 
         protected override void DrawAttachments(GameTime gameTime)
@@ -768,7 +755,7 @@ namespace Isles
             {
                 Stop();
                 Facing = target.Position - Position;
-                Model.Play(AttackAnimation, false, 0.0f, OnComplete, trigger);
+                Model.Play(AttackAnimation, false, 0.0f, OnComplete, (18.0f / 41, Launch));
                 AttackTarget = target as GameObject;
             }
         }
@@ -778,7 +765,7 @@ namespace Isles
             weaponVisible = true;
         }
 
-        private void Launch(object sender, EventArgs e)
+        private void Launch()
         {
             var missile = new Missile(World, weapon, AttackTarget);
 
@@ -812,7 +799,6 @@ namespace Isles
     public class FireSorceress : Charactor
     {
         private int rightHand;
-        private KeyValuePair<TimeSpan, EventHandler>[] trigger;
 
         public FireSorceress(GameWorld world, string classID)
             : base(world, classID) { }
@@ -862,27 +848,15 @@ namespace Isles
                 }
                 else
                 {
-                    AnimationClip clip = Model.GetAnimationClip(AttackAnimation);
-                    if (clip == null)
-                    {
-                        throw new InvalidOperationException();
-                    }
-
-                    var time = new TimeSpan((long)(clip.Duration.Ticks * 0.5f));
-                    trigger = new KeyValuePair<TimeSpan, EventHandler>[]
-                    {
-                        new KeyValuePair<TimeSpan, EventHandler>(time, Launch),
-                    };
-
                     Stop();
                     Facing = target.Position - Position;
-                    Model.Play("Attack", false, 0.0f, null, trigger);
+                    Model.Play("Attack", false, 0.0f, null, (0.5f, Launch));
                     AttackTarget = target as GameObject;
                 }
             }
         }
 
-        private void Launch(object sender, EventArgs e)
+        private void Launch()
         {
             Vector3 spawn = Vector3.Zero;
 

@@ -104,7 +104,7 @@ namespace Isles.Graphics
 
         private TimeSpan currentTimeValue;
 
-        public IEnumerable<KeyValuePair<TimeSpan, EventHandler>> Triggers;
+        public (float percent, Action)[] Triggers;
         public EventHandler Complete;
         public bool Loop;
 
@@ -137,12 +137,13 @@ namespace Isles.Graphics
             // Update triggers
             if (Triggers != null)
             {
-                foreach (KeyValuePair<TimeSpan, EventHandler> trigger in Triggers)
+                foreach (var (percent, trigger) in Triggers)
                 {
-                    if (currentTimeValue < trigger.Key &&
-                        currentTimeValue + time > trigger.Key)
+                    var key = duration.TotalSeconds * percent;
+                    if (currentTimeValue.TotalSeconds < key &&
+                        currentTimeValue.TotalSeconds + time.TotalSeconds > key)
                     {
-                        trigger.Value(this, null);
+                        trigger();
                     }
                 }
             }

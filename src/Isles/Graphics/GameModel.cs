@@ -73,11 +73,6 @@ namespace Isles.Graphics
         private bool IsAnimated => Player != null;
 
         /// <summary>
-        /// Gets whether the model is a skinned model.
-        /// </summary>
-        private bool IsSkinned => skin != null;
-
-        /// <summary>
         /// Skinned mesh animation player.
         /// We use 2 players to blend between animations.
         /// </summary>
@@ -87,8 +82,6 @@ namespace Isles.Graphics
         /// Gets the animation player for this game model.
         /// </summary>
         public AnimationPlayer Player => players[currentPlayer];
-
-        private IDictionary<string, AnimationClip> animationClips;
 
         /// <summary>
         /// Points to the primary player.
@@ -131,11 +124,6 @@ namespace Isles.Graphics
         private AnimationState animationState = AnimationState.Stopped;
 
         /// <summary>
-        /// For skinned mesh.
-        /// </summary>
-        private SkinningData skin;
-
-        /// <summary>
         /// Space partition information for this model.
         /// </summary>
         private ModelSpacePartitionInformation spacePartitionInfo;
@@ -169,7 +157,6 @@ namespace Isles.Graphics
         {
             var copy = new GameModel
             {
-                animationClips = animationClips,
                 animationState = animationState,
                 blendDuration = blendDuration,
                 blending = blending,
@@ -185,7 +172,6 @@ namespace Isles.Graphics
                 gltfModel = gltfModel,
                 orientedBoundingBox = orientedBoundingBox,
                 players = players,
-                skin = skin,
                 spacePartitionInfo = spacePartitionInfo,
                 transform = transform,
             };
@@ -211,17 +197,7 @@ namespace Isles.Graphics
 
             if (model.Tag is Dictionary<string, object> dictionary)
             {
-                if (dictionary.TryGetValue("SkinningData", out var value))
-                {
-                    skin = value as SkinningData;
-                }
-
-                if (dictionary.TryGetValue("AnimationData", out value))
-                {
-                    animationClips = value as IDictionary<string, AnimationClip>;
-                }
-
-                dictionary.TryGetValue("SpacePartition", out value);
+                dictionary.TryGetValue("SpacePartition", out var value);
 
                 spacePartitionInfo = new ModelSpacePartitionInformation
                 {
@@ -230,13 +206,10 @@ namespace Isles.Graphics
                 };
             }
 
-            if (animationClips != null)
+            if (gltfModel.Animations != null && gltfModel.Animations.Count > 0)
             {
-                if (IsSkinned)
-                {
-                    players[0] = new AnimationPlayer(gltfModel);
-                    players[1] = new AnimationPlayer(gltfModel);
-                }
+                players[0] = new AnimationPlayer(gltfModel);
+                players[1] = new AnimationPlayer(gltfModel);
 
                 UpdateBoneTransform(new GameTime());
 
@@ -342,14 +315,6 @@ namespace Isles.Graphics
         }
 
         /// <summary>
-        /// Gets the animation clip with the specified name.
-        /// </summary>
-        public AnimationClip GetAnimationClip(string clipName)
-        {
-            return animationClips.TryGetValue(clipName, out AnimationClip value) ? value : null;
-        }
-
-        /// <summary>
         /// Play the current (or default) animation.
         /// </summary>
         /// <returns>Succeeded or not.</returns>
@@ -396,13 +361,10 @@ namespace Isles.Graphics
             return true;
         }
 
-        public bool Play(string clipName, bool loop, float blendTime)
-        {
-            return Play(clipName, loop, blendTime, null, null);
-        }
-
-        public bool Play(string clip, bool loop, float blendTime, EventHandler OnComplete,
-                         IEnumerable<KeyValuePair<TimeSpan, EventHandler>> triggers)
+        public bool Play(
+            string clip, bool loop, float blendTime,
+            EventHandler OnComplete = null,
+            params (float percent, Action)[] triggers)
         {
             if (!IsAnimated || clip == null)
             {
@@ -495,7 +457,7 @@ namespace Isles.Graphics
                 }
             }
 
-            if (skin != null)
+            if (gltfModel.Meshes[0].Joints != null)
             {
                 var mesh = gltfModel.Meshes[0];
                 for (var i = 0; i < mesh.Joints.Length; i++)
@@ -512,7 +474,7 @@ namespace Isles.Graphics
 
             foreach (var mesh in gltfModel.Meshes)
             {
-                if (IsSkinned)
+                if (mesh.Joints != null)
                 {
                     game.ModelRenderer.Draw(mesh, transform, skinTransforms, tint, glow);
                 }

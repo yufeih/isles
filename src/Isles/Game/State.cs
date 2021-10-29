@@ -358,7 +358,6 @@ namespace Isles
         private Tree tree;
         private Building deposit;
         private StateMoveToPosition move;
-        private readonly KeyValuePair<TimeSpan, EventHandler>[] trigger;
 
         public StateHarvestLumber(GameWorld world, Worker peon, Tree tree)
         {
@@ -372,20 +371,7 @@ namespace Isles
             this.world = world;
             owner.GoldCarried = 0;
 
-            AnimationClip clip = owner.Model.GetAnimationClip(owner.AttackAnimation);
-            if (clip == null)
-            {
-                throw new InvalidOperationException();
-            }
-
-            var time = new TimeSpan((long)(clip.Duration.Ticks * 13.0f / 20));
-            trigger = new KeyValuePair<TimeSpan, EventHandler>[]
-            {
-                new KeyValuePair<TimeSpan, EventHandler>(time, HarvestOnce),
-            };
-
             // Initialize state
-            tree = FindAnotherTree(tree, owner.Position, world);
             state = StateType.MoveToTree;
         }
 
@@ -407,20 +393,7 @@ namespace Isles
             owner.GoldCarried = 0;
             this.deposit = deposit;
 
-            AnimationClip clip = owner.Model.GetAnimationClip(owner.AttackAnimation);
-            if (clip == null)
-            {
-                throw new InvalidOperationException();
-            }
-
-            var time = new TimeSpan((long)(clip.Duration.Ticks * 13.0f / 20));
-            trigger = new KeyValuePair<TimeSpan, EventHandler>[]
-            {
-                new KeyValuePair<TimeSpan, EventHandler>(time, HarvestOnce),
-            };
-
             // Initialize state
-            deposit = FindDeposit();
             state = StateType.BackToDeposit;
         }
 
@@ -520,7 +493,7 @@ namespace Isles
                     // Stop moving and start harvest lumber
                     owner.Stop();
                     owner.Facing = tree.Position - owner.Position;
-                    owner.Model.Play(owner.AttackAnimation, true, 0.2f, OnComplete, trigger);
+                    owner.Model.Play(owner.AttackAnimation, true, 0.2f, null, (13.0f / 20, HarvestOnce));
 
                     move = null;
                     tree.HarvesterCount++;
@@ -605,23 +578,7 @@ namespace Isles
             return StateResult.Active;
         }
 
-        private void OnComplete(object sender, EventArgs e)
-        {
-            // string anim = owner.AttackAnimation;
-
-            // AnimationClip clip = owner.Model.GetAnimationClip(anim);
-
-            // TimeSpan time = new TimeSpan((long)(clip.Duration.Ticks * 13.0f / 20));
-
-            // trigger = new KeyValuePair<TimeSpan, EventHandler>[]
-            // {
-            //    new KeyValuePair<TimeSpan, EventHandler>(time, HarvestOnce),
-            // };
-
-            // owner.Model.Play(owner.AttackAnimation, true, 0.2f, OnComplete, trigger);
-        }
-
-        private void HarvestOnce(object sender, EventArgs e)
+        private void HarvestOnce()
         {
             // Make sure we are in the correct state
             if (state != StateType.Harvest || tree == null || tree.Lumber < 0)
