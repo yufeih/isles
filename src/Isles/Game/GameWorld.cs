@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml;
 using Isles.Graphics;
 using Microsoft.Xna.Framework;
@@ -72,19 +73,15 @@ namespace Isles.Engine
         private Vector3 targetPosition = Vector3.Zero;
         private bool isTargetPositionOnLandscape = true;
 
+        private readonly ModelPicker<Entity> _modelPicker;
+
         public string Name;
         public string Description;
 
         public GameWorld()
         {
             Content = Game.Content;
-        }
-
-        /// <summary>
-        /// Reset the game world.
-        /// </summary>
-        public void Reset()
-        {
+            _modelPicker = new ModelPicker<Entity>(Game.GraphicsDevice, Game.ModelRenderer);
         }
 
         /// <summary>
@@ -93,9 +90,6 @@ namespace Isles.Engine
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
-            // Set picked entity to null
-            pickedEntity = null;
-
             // Update landscape
             Landscape.Update(gameTime);
 
@@ -135,12 +129,13 @@ namespace Isles.Engine
             }
         }
 
-        /// <summary>
-        /// Draw all world objects.
-        /// </summary>
-        /// <param name="gameTime"></param>
         public void Draw(GameTime gameTime)
         {
+            var objectMap = _modelPicker.DrawObjectMap(
+                Game.ViewProjection, worldObjects.OfType<Entity>().Where(entity => entity.IsPickable), entity => entity.Model);
+
+            pickedEntity = objectMap.Pick();
+
             if (Game.Settings.ReflectionEnabled)
             {
                 // Pre-render our landscape, update landscape
@@ -153,17 +148,21 @@ namespace Isles.Engine
             {
                 Game.Shadow.Begin(Game.Eye, Game.Facing);
 
+                Game.ModelRenderer.Clear();
+
                 // Draw shadow casters. Currently we only draw all world object
                 foreach (var o in worldObjects)
                 {
                     o.DrawShadowMap(gameTime, Game.Shadow);
                 }
 
-                Game.ModelRenderer.Present(Game.View, Game.Projection, Game.Shadow);
+                Game.ModelRenderer.DrawShadowMap(Game.Shadow);
 
                 // Resolve shadow map
                 Game.Shadow.End();
             }
+
+            Game.ModelRenderer.Clear();
 
             // Draw world objects before landscape
             foreach (IWorldObject o in worldObjects)
@@ -181,12 +180,12 @@ namespace Isles.Engine
 
             // FIXME: There are some weired things when models are drawed after
             // drawing the terrain... Annoying...
-            Game.ModelRenderer.Present(Game.View, Game.Projection, null, true, false);
+            Game.ModelRenderer.Draw(Game.ViewProjection, true, false);
 
             // TODO: Draw particles with ZEnable = true, ZWriteEnable = false
             ParticleSystem.Present();
 
-            Game.ModelRenderer.Present(Game.View, Game.Projection, null, false, true);
+            Game.ModelRenderer.Draw(Game.ViewProjection, false, true);
 
             Landscape.PresentSurface();
         }
@@ -355,119 +354,9 @@ namespace Isles.Engine
         /// </summary>
         public Entity Pick()
         {
-            if (pickedEntity != null)
-            {
-                return pickedEntity;
-            }
-
-            // Cache the result
-            return pickedEntity = Pick(BaseGame.Singleton.PickRay);
+            return pickedEntity;
         }
 
-        /// <summary>
-        /// Pick grid offset.
-        /// </summary>
-        private readonly Point[] PickGridOffset = new Point[9]
-        {
-            new Point(-1, -1), new Point(0, -1), new Point(1, -1),
-            new Point(-1, 0) , new Point(0, 0) , new Point(1, 0) ,
-            new Point(-1, 1) , new Point(0, 1) , new Point(1, 1) ,
-        };
-
-        /// <summary>
-        /// Pick a game entity from the given gay.
-        /// </summary>
-        public Entity Pick(Ray ray)
-        {
-            // This value affects how accurate this algorithm works.
-            // Basically, a sample point starts at the origion of the
-            // pick ray, it's position incremented along the direction
-            // of the ray each step with a value of PickPrecision.
-            // A pick precision of half the grid size is good.
-            const float PickPrecision = 5.0f;
-
-            // This is the bounding box for all game entities
-            BoundingBox boundingBox = Landscape.TerrainBoundingBox;
-            boundingBox.Max.Z += Entity.MaxHeight;
-
-            // Nothing will be picked if the ray doesn't even intersects
-            // with the bounding box of all grids
-            var result = ray.Intersects(boundingBox);
-            if (!result.HasValue)
-            {
-                return null;
-            }
-
-            // Initialize the sample point
-            Vector3 step = ray.Direction * PickPrecision;
-            Vector3 sampler = ray.Position + ray.Direction * result.Value;
-
-            // Keep track of the grid visited previously, so that we can
-            // avoid checking the same grid.
-            var previousGrid = new Point(-1, -1);
-
-            while (// Stop probing if we're outside the box
-                boundingBox.Contains(sampler) == ContainmentType.Contains)
-            {
-                // Project to XY plane and get which grid we're in
-                Point grid = Landscape.PositionToGrid(sampler.X, sampler.Y);
-
-                // If we hit the ground, nothing is picked
-                if (Landscape.HeightField[grid.X, grid.Y] > sampler.Z)
-                {
-                    return null;
-                }
-
-                // Check the grid visited previously
-                if (grid.X != previousGrid.X || grid.Y != previousGrid.Y)
-                {
-                    // Check the 9 adjacent grids in case we miss the some
-                    // entities like trees (Trees are big at the top but are
-                    // small at the bottom).
-                    // Also find the minimum distance from the entity to the
-                    // pick ray position to make the pick correct
-                    Point pt;
-                    float shortest = 10000;
-                    Entity pickEntity = null;
-
-                    for (var i = 0; i < PickGridOffset.Length; i++)
-                    {
-                        pt.X = grid.X + PickGridOffset[i].X;
-                        pt.Y = grid.Y + PickGridOffset[i].Y;
-
-                        if (IsValidGrid(pt))
-                        {
-                            foreach (Entity entity in Data[pt.X, pt.Y].Owners)
-                            {
-                                var value = entity.Intersects(ray);
-
-                                if (value.HasValue && value.Value < shortest)
-                                {
-                                    shortest = value.Value;
-                                    pickEntity = entity;
-                                }
-                            }
-                        }
-                    }
-
-                    if (pickEntity != null)
-                    {
-                        return pickEntity;
-                    }
-
-                    previousGrid = grid;
-                }
-
-                // Sample next position
-                sampler += step;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Adds a new world object.
-        /// </summary>
         public void Add(IWorldObject worldObject)
         {
             worldObjects.Add(worldObject);
@@ -483,10 +372,6 @@ namespace Isles.Engine
             }
         }
 
-        /// <summary>
-        /// Destroy a scene object.
-        /// </summary>
-        /// <param name="worldObject"></param>
         public void Destroy(IWorldObject worldObject)
         {
             if (worldObject == null)

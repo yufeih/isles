@@ -535,10 +535,7 @@ namespace Isles
             }
         }
 
-        public override float? Intersects(Ray ray)
-        {
-            return IsAlive ? base.Intersects(ray) : null;
-        }
+        public override bool IsPickable => IsAlive && base.IsPickable;
 
         public override bool Intersects(BoundingFrustum frustum)
         {
@@ -1034,10 +1031,7 @@ namespace Isles
             Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, Helper.RandomInRange(0, 2 * MathHelper.Pi));
         }
 
-        public override float? Intersects(Ray ray)
-        {
-            return Pickable ? base.Intersects(ray) : null;
-        }
+        public override bool IsPickable => Pickable && base.IsPickable;
 
         public override bool Intersects(BoundingFrustum frustum)
         {
@@ -1345,13 +1339,12 @@ namespace Isles
         IWorldObject Target { get; }
     }
 
-    public class Missile : BaseEntity, IProjectile
+    public class Missile : Entity, IProjectile
     {
         public event EventHandler Hit;
 
         public IWorldObject Target { get; }
 
-        private readonly GameModel ammo;
         private Vector3 velocity;
         private readonly float scaling;
 
@@ -1370,7 +1363,7 @@ namespace Isles
                 throw new ArgumentNullException();
             }
 
-            this.ammo = ammo.ShadowCopy();
+            this.Model = ammo.ShadowCopy();
             Target = target;
 
             // Compute position
@@ -1440,9 +1433,9 @@ namespace Isles
             var rotation = Matrix.CreateFromAxisAngle(rotationAxis, angle);
             var translation = Matrix.CreateTranslation(Position);
 
-            if (ammo != null)
+            if (Model != null)
             {
-                ammo.Transform = Matrix.CreateScale(scaling) * rotation * translation;
+                Model.Transform = Matrix.CreateScale(scaling) * rotation * translation;
             }
         }
 
@@ -1458,7 +1451,7 @@ namespace Isles
 
         public override void Draw(GameTime gameTime)
         {
-            ammo?.Draw();
+            Model?.Draw();
         }
     }
 

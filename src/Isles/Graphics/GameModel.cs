@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Isles.Engine;
 using Isles.Pipeline;
 using Microsoft.Xna.Framework;
@@ -123,11 +122,6 @@ namespace Isles.Graphics
         /// </summary>
         private AnimationState animationState = AnimationState.Stopped;
 
-        /// <summary>
-        /// Space partition information for this model.
-        /// </summary>
-        private ModelSpacePartitionInformation spacePartitionInfo;
-
         private Model model;
         private GltfModel gltfModel;
 
@@ -172,7 +166,6 @@ namespace Isles.Graphics
                 gltfModel = gltfModel,
                 orientedBoundingBox = orientedBoundingBox,
                 players = players,
-                spacePartitionInfo = spacePartitionInfo,
                 transform = transform,
             };
 
@@ -193,17 +186,6 @@ namespace Isles.Graphics
             if (gltfModel.Meshes[0].Joints != null)
             {
                 skinTransforms = new Matrix[gltfModel.Meshes[0].Joints.Length];
-            }
-
-            if (model.Tag is Dictionary<string, object> dictionary)
-            {
-                dictionary.TryGetValue("SpacePartition", out var value);
-
-                spacePartitionInfo = new ModelSpacePartitionInformation
-                {
-                    BitMap = value as bool[],
-                    Box = OBBFromModel(model),
-                };
             }
 
             if (gltfModel.Animations != null && gltfModel.Animations.Count > 0)
@@ -244,74 +226,6 @@ namespace Isles.Graphics
         public Matrix GetBoneTransform(int bone)
         {
             return bones[bone] * transform;
-        }
-
-        /// <summary>
-        /// Ray intersection test.
-        /// </summary>
-        /// <param name="ray">Target ray.</param>
-        /// <returns>
-        /// Distance from the intersection point to the ray starting position,
-        /// Null if there's no intersection.
-        /// </returns>
-        public float? Intersects(Ray ray)
-        {
-            if (spacePartitionInfo == null)
-            {
-                return BoundingBox.Intersects(ray);
-            }
-
-            var m = Matrix.Invert(transform);
-            var relarayEnd = Vector3.Transform(ray.Position + ray.Direction, m);
-            var relarayPosition = Vector3.Transform(ray.Position, m);
-            var relaray = new Ray(relarayPosition, relarayEnd - relarayPosition);
-            return Intersects(relaray, 0, 0);
-        }
-
-        private float? Intersects(Ray ray, int level, int index)
-        {
-            BoundingBox box;
-            float? dist = null;
-            if (level == 3)
-            {
-                if (spacePartitionInfo.BitMap[index])
-                {
-                    box = spacePartitionInfo.IndexToBoundingBox(index);
-                    dist = ray.Intersects(box);
-                }
-
-                return dist;
-            }
-
-            var minLength = float.PositiveInfinity;
-            if (!spacePartitionInfo.BitMap[index])
-            {
-                dist = ray.Intersects(spacePartitionInfo.IndexToBoundingBox(index));
-                if (!dist.HasValue)
-                {
-                    return dist;
-                }
-            }
-
-            for (var i = 0; i < 8; i++)
-            {
-                var son = spacePartitionInfo.SonOf(index, i, level);
-                if (spacePartitionInfo.BitMap[son])
-                {
-                    dist = ray.Intersects(spacePartitionInfo.IndexToBoundingBox(son));
-                    if (dist.HasValue)
-                    {
-                        var d = Intersects(ray, level + 1, son);
-                        if (d.HasValue)
-                        {
-                            minLength = Math.Min(d.Value, minLength);
-                        }
-                    }
-                }
-            }
-
-            dist = minLength != float.PositiveInfinity ? minLength : (float?)null;
-            return dist;
         }
 
         /// <summary>
@@ -467,20 +381,20 @@ namespace Isles.Graphics
             }
         }
 
-        public void Draw()
+        public void Draw(Vector4? color = null)
         {
-            var tint = new Vector4(Tint, MathHelper.Clamp(Alpha, 0, 1));
+            var tint = color ?? new Vector4(Tint, MathHelper.Clamp(Alpha, 0, 1));
             var glow = new Vector4(Glow, 1);
 
             foreach (var mesh in gltfModel.Meshes)
             {
                 if (mesh.Joints != null)
                 {
-                    game.ModelRenderer.Draw(mesh, transform, skinTransforms, tint, glow);
+                    game.ModelRenderer.AddDrawable(mesh, transform, skinTransforms, tint, glow);
                 }
                 else
                 {
-                    game.ModelRenderer.Draw(mesh, bones[mesh.Node.Index] * transform, null, tint, glow);
+                    game.ModelRenderer.AddDrawable(mesh, bones[mesh.Node.Index] * transform, null, tint, glow);
                 }
             }
         }

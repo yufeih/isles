@@ -321,13 +321,9 @@ namespace Isles.Engine
             Bloom?.BeginDraw();
             Graphics.GraphicsDevice.Clear(backgroundColor);
             CurrentScreen?.Draw(gameTime);
-            ModelRenderer?.Present(View, Projection);
             Billboard?.Present();
-
             ParticleSystem.Present();
-
             Graphics2D.Present();
-
             Bloom?.EndDraw();
         }
 

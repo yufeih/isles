@@ -418,7 +418,6 @@ namespace Isles
             Spell.CurrentSpell?.Draw(gameTime);
 
             // Force everything to be presented before UI is rendered
-            Game.ModelRenderer.Present(Game.View, Game.Projection);
             Game.Billboard.Present();
             Game.Graphics2D.Present();
             ParticleSystem.Present();

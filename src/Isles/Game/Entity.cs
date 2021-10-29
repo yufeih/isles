@@ -655,6 +655,8 @@ namespace Isles.Engine
         /// </summary>
         public virtual bool IsInteractive => true;
 
+        public virtual bool IsPickable => Visible;
+
         public Entity(GameWorld world)
             : base(world)
         {
@@ -875,16 +877,6 @@ namespace Isles.Engine
         {
             // Performs an axis aligned bounding box intersection test
             return Visible && BoundingBox.Contains(point) == ContainmentType.Contains;
-        }
-
-        /// <summary>
-        /// Tests whether the object intersects the specified ray.
-        /// </summary>
-        /// <param name="ray">Ray to be tested in world space.</param>
-        public virtual float? Intersects(Ray ray)
-        {
-            // Performs an axis aligned bounding box intersection test
-            return Visible ? model.Intersects(ray) : null;
         }
 
         /// <summary>

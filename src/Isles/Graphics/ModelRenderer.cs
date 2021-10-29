@@ -1,5 +1,6 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -12,10 +13,7 @@ namespace Isles.Graphics
 
         private readonly Effect _effect;
 
-        private readonly EffectParameter _view;
-        private readonly EffectParameter _projection;
         private readonly EffectParameter _viewProjection;
-        private readonly EffectParameter _viewInverse;
         private readonly EffectParameter _world;
         private readonly EffectParameter _bones;
         private readonly EffectParameter _diffuse;
@@ -26,20 +24,19 @@ namespace Isles.Graphics
         private readonly EffectTechnique _defaultSkinnedShader;
         private readonly EffectTechnique _shadowShader;
         private readonly EffectTechnique _shadowSkinnedShader;
+        private readonly EffectTechnique _pickShader;
+        private readonly EffectTechnique _pickSkinnedShader;
 
-        private readonly List<DrawItem> _defaultOpaque = new();
-        private readonly List<DrawItem> _defaultTransparent = new();
-        private readonly List<DrawItem> _skinnedOpaque = new();
-        private readonly List<DrawItem> _skinnedTransparent = new();
+        private readonly List<DrawableItem> _defaultOpaque = new();
+        private readonly List<DrawableItem> _defaultTransparent = new();
+        private readonly List<DrawableItem> _skinnedOpaque = new();
+        private readonly List<DrawableItem> _skinnedTransparent = new();
 
         public ModelRenderer(GraphicsDevice graphics, ShaderLoader shaderLoader)
         {
             _graphics = graphics;
 
             _effect = shaderLoader.LoadShader("shaders/Model.cso");
-            _view = _effect.Parameters["View"];
-            _viewInverse = _effect.Parameters["ViewInverse"];
-            _projection = _effect.Parameters["Projection"];
             _viewProjection = _effect.Parameters["ViewProjection"];
             _texture = _effect.Parameters["BasicTexture"];
             _world = _effect.Parameters["World"];
@@ -51,60 +48,80 @@ namespace Isles.Graphics
             _defaultSkinnedShader = _effect.Techniques["DefaultSkinned"];
             _shadowShader = _effect.Techniques["ShadowMapping"];
             _shadowSkinnedShader = _effect.Techniques["ShadowMappingSkinned"];
+            _pickShader = _effect.Techniques["Pick"];
+            _pickSkinnedShader = _effect.Techniques["PickSkinned"];
         }
 
-        public void Draw(GltfModel.Mesh mesh, Matrix transform, Matrix[] skinTransforms, Vector4 tint, Vector4 glow)
+        public void Clear()
+        {
+            _defaultOpaque.Clear();
+            _skinnedOpaque.Clear();
+            _defaultTransparent.Clear();
+            _skinnedTransparent.Clear();
+        }
+
+        public void AddDrawable(GltfModel.Mesh mesh, Matrix transform, Matrix[] boneTransforms, Vector4 tint, Vector4 glow)
         {
             var queue = tint.W < 1
-                ? (skinTransforms != null ? _skinnedTransparent : _defaultTransparent)
-                : (skinTransforms != null ? _skinnedOpaque : _defaultOpaque);
+                ? (boneTransforms != null ? _skinnedTransparent : _defaultTransparent)
+                : (boneTransforms != null ? _skinnedOpaque : _defaultOpaque);
 
             queue.Add(new()
             {
                 Mesh = mesh,
                 Transform = transform,
-                SkinTransforms = skinTransforms,
+                Bones = boneTransforms,
                 Tint = tint,
                 Glow = glow
             });
         }
 
-        public void Present(Matrix view, Matrix projection, ShadowEffect shadow = null, bool showOpaque = true, bool showTransparent = true)
+        public void Draw(Matrix viewProjection, bool showOpaque = true, bool showTransparent = true)
         {
-            _view.SetValue(view);
-            _projection.SetValue(projection);
-            _viewInverse.SetValue(Matrix.Invert(view));
-            _viewProjection.SetValue(view * projection);
-
-            if (shadow != null)
-            {
-                _effect.Parameters["LightViewProjection"].SetValue(shadow.LightViewProjection);
-            }
+            _viewProjection.SetValue(viewProjection);
 
             if (showOpaque)
             {
                 _graphics.SetRenderState(BlendState.Opaque, DepthStencilState.Default, RasterizerState.CullNone);
 
-                Draw(shadow is null ? _defaultShader : _shadowShader, _defaultOpaque);
-                Draw(shadow is null ? _defaultSkinnedShader : _shadowSkinnedShader, _skinnedOpaque);
-
-                _defaultOpaque.Clear();
-                _skinnedOpaque.Clear();
+                Draw(_defaultShader, _defaultOpaque);
+                Draw(_defaultSkinnedShader, _skinnedOpaque);
             }
 
             if (showTransparent)
             {
                 _graphics.SetRenderState(BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone);
 
-                Draw(shadow is null ? _defaultShader : _shadowShader, _defaultTransparent);
-                Draw(shadow is null ? _defaultSkinnedShader : _shadowSkinnedShader, _skinnedTransparent);
-
-                _defaultTransparent.Clear();
-                _skinnedTransparent.Clear();
+                Draw(_defaultShader, _defaultTransparent);
+                Draw(_defaultSkinnedShader, _skinnedTransparent);
             }
         }
 
-        private void Draw(EffectTechnique shader, List<DrawItem> items)
+        public void DrawShadowMap(ShadowEffect shadow)
+        {
+            _viewProjection.SetValue(shadow.LightViewProjection);
+
+            _graphics.SetRenderState(BlendState.Opaque, DepthStencilState.Default, RasterizerState.CullNone);
+
+            Draw(_shadowShader, _defaultOpaque);
+            Draw(_shadowSkinnedShader, _skinnedOpaque);
+            Draw(_shadowShader, _defaultTransparent);
+            Draw(_shadowSkinnedShader, _skinnedTransparent);
+        }
+
+        public void DrawObjectMap(Matrix viewProjection)
+        {
+            _viewProjection.SetValue(viewProjection);
+
+            _graphics.SetRenderState(BlendState.Opaque, DepthStencilState.Default, RasterizerState.CullNone);
+
+            Draw(_pickShader, _defaultOpaque);
+            Draw(_pickSkinnedShader, _skinnedOpaque);
+            Draw(_pickShader, _defaultTransparent);
+            Draw(_pickSkinnedShader, _skinnedTransparent);
+        }
+
+        private void Draw(EffectTechnique shader, List<DrawableItem> items)
         {
             _effect.CurrentTechnique = shader;
             _effect.Begin();
@@ -116,9 +133,9 @@ namespace Isles.Graphics
                 _diffuse?.SetValue(item.Tint);
                 _light?.SetValue(item.Glow);
 
-                if (item.SkinTransforms != null)
+                if (item.Bones != null)
                 {
-                    _bones?.SetValue(item.SkinTransforms);
+                    _bones?.SetValue(item.Bones);
                 }
 
                 foreach (var part in item.Mesh.Primitives)
@@ -138,11 +155,11 @@ namespace Isles.Graphics
             _effect.End();
         }
 
-        private struct DrawItem
+        private struct DrawableItem
         {
             public GltfModel.Mesh Mesh;
             public Matrix Transform;
-            public Matrix[] SkinTransforms;
+            public Matrix[] Bones;
             public Vector4 Tint;
             public Vector4 Glow;
         }
