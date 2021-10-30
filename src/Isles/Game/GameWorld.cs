@@ -170,6 +170,9 @@ namespace Isles.Engine
                 o.Draw(gameTime);
             }
 
+            // Draw spell
+            Spell.CurrentSpell?.Draw(gameTime);
+
             Landscape.DrawWater(gameTime);
 
             // Draw shadow receivers with the shadow map

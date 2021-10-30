@@ -64,30 +64,14 @@ namespace Isles
         /// <summary>
         /// Gets or sets the number of builders.
         /// </summary>
-        public int BuilderCount
-        {
-            get => builderCount;
-            set
-            {
-                System.Diagnostics.Debug.Assert(value >= 0);
-
-                builderCount = value;
-            }
-        }
+        public int BuilderCount { get; set; }
 
         private const float CorporationTradeoff = 0.5f;
-        private int builderCount;
 
         /// <summary>
         /// Gets or sets the rotation on the xy plane.
         /// </summary>
-        public float RotationZ
-        {
-            get => rotationZ;
-            set => rotationZ = value;
-        }
-
-        private float rotationZ;
+        public float RotationZ { get; set; }
 
         /// <summary>
         /// Path brush.
@@ -98,16 +82,12 @@ namespace Isles
         /// <summary>
         /// Gets the units that can be trained from this building.
         /// </summary>
-        public List<string> Units => units;
-
-        private List<string> units = new();
+        public List<string> Units { get; private set; } = new();
 
         /// <summary>
         /// Gets the pending requests that are going to be handled.
         /// </summary>
-        public Queue<Spell> QueuedSpells => pendingSpells;
-
-        private readonly Queue<Spell> pendingSpells = new();
+        public Queue<Spell> QueuedSpells { get; } = new();
 
         /// <summary>
         /// Gets or sets the spawn point of this building.
@@ -174,9 +154,9 @@ namespace Isles
 
             if ((value = xml.GetAttribute("Units")) != "")
             {
-                units = new List<string>(
+                Units = new List<string>(
                     value.Split(new char[] { ',', ' ', '\n', '\r' }));
-                units.RemoveAll(delegate(string v) { return v.Length <= 0; });
+                Units.RemoveAll(delegate(string v) { return v.Length <= 0; });
             }
 
             if ((value = xml.GetAttribute("Halo")) != "")
@@ -197,7 +177,7 @@ namespace Isles
             position.X = Position.X;
             position.Y = Position.Y;
 
-            outline.SetRectangle(-obstructorSize, obstructorSize, position, rotationZ);
+            outline.SetRectangle(-obstructorSize, obstructorSize, position, RotationZ);
         }
 
         public override void OnCreate()
@@ -221,7 +201,7 @@ namespace Isles
             if (spell is SpellTraining training)
             {
                 training.Enable = false;
-                units.Add(training.Type);
+                Units.Add(training.Type);
             }
         }
 
@@ -311,7 +291,7 @@ namespace Isles
         /// </summary>
         public bool CanTrain(string type)
         {
-            if (state == BuildingState.Normal && units != null && units.Contains(type))
+            if (state == BuildingState.Normal && Units != null && Units.Contains(type))
             {
                 return !Owner.IsUnique(type) || !Owner.IsFutureAvailable(type);
             }
@@ -369,7 +349,7 @@ namespace Isles
                     if (s is SpellTraining train && train.Type == type)
                     {
                         train.Count++;
-                        pendingSpells.Enqueue(train);
+                        QueuedSpells.Enqueue(train);
                         return true;
                     }
                 }
@@ -381,13 +361,13 @@ namespace Isles
         public void CancelTraining()
         {
             // Removes the last spell
-            if (pendingSpells.Count > 0)
+            if (QueuedSpells.Count > 0)
             {
-                Spell[] spells = pendingSpells.ToArray();
-                pendingSpells.Clear();
+                Spell[] spells = QueuedSpells.ToArray();
+                QueuedSpells.Clear();
                 for (var i = 0; i < spells.Length - 1; i++)
                 {
-                    pendingSpells.Enqueue(spells[i]);
+                    QueuedSpells.Enqueue(spells[i]);
                 }
 
                 Spell removed = spells[spells.Length - 1];
@@ -415,10 +395,10 @@ namespace Isles
         public void CancelTraining(Spell target)
         {
             // Removes the last specified spell
-            if (pendingSpells.Count > 0)
+            if (QueuedSpells.Count > 0)
             {
-                Spell[] spells = pendingSpells.ToArray();
-                pendingSpells.Clear();
+                Spell[] spells = QueuedSpells.ToArray();
+                QueuedSpells.Clear();
 
                 var removedIndex = -1;
                 for (var i = spells.Length - 1; i >= 0; i--)
@@ -439,7 +419,7 @@ namespace Isles
                 {
                     if (i != removedIndex)
                     {
-                        pendingSpells.Enqueue(spells[i]);
+                        QueuedSpells.Enqueue(spells[i]);
                     }
                 }
 
@@ -520,9 +500,6 @@ namespace Isles
         /// <param name="gameTime"></param>
         public override void Update(GameTime gameTime)
         {
-            // if (ClassID == "Townhall")
-            //    Health -= 2.0f;
-
             // Pre construct
             if (state == BuildingState.PreConstruct)
             {
@@ -572,7 +549,7 @@ namespace Isles
                 }
 
                 var elapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
-                ConstructionTimeElapsed += elapsedSeconds * (1 + (builderCount - 1) * CorporationTradeoff);
+                ConstructionTimeElapsed += elapsedSeconds * (1 + (BuilderCount - 1) * CorporationTradeoff);
 
                 if (ConstructionTimeElapsed > ConstructionTime)
                 {
@@ -650,19 +627,19 @@ namespace Isles
             }
 
             // Repair building
-            if (state == BuildingState.Normal && Health < MaximumHealth && builderCount > 0)
+            if (state == BuildingState.Normal && Health < MaximumHealth && BuilderCount > 0)
             {
                 var elapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
                 Health += 0.2f * MaximumHealth / ConstructionTime * elapsedSeconds *
-                                (1 + (builderCount - 1) * CorporationTradeoff);
+                                (1 + (BuilderCount - 1) * CorporationTradeoff);
             }
 
             // Produce units & upgrades
-            if (state == BuildingState.Normal && pendingSpells.Count > 0)
+            if (state == BuildingState.Normal && QueuedSpells.Count > 0)
             {
-                if (pendingSpells.Peek().Ready)
+                if (QueuedSpells.Peek().Ready)
                 {
-                    pendingSpells.Peek().Cast();
+                    QueuedSpells.Peek().Cast();
                 }
 
                 // Create halo effect

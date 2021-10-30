@@ -414,9 +414,6 @@ namespace Isles
                 player?.Draw(gameTime);
             }
 
-            // Draw spell
-            Spell.CurrentSpell?.Draw(gameTime);
-
             // Force everything to be presented before UI is rendered
             Game.Billboard.Present();
             Game.Graphics2D.Present();
