@@ -71,16 +71,10 @@ namespace Isles.Graphics
                 {
                     // Construct new vertex declaration with tangent info
                     // First the normal stuff (we should already have that)
-                    new VertexElement(0, 0, VertexElementFormat.Vector3,
-                        VertexElementMethod.Default, VertexElementUsage.Position, 0),
-                    new VertexElement(0, 12, VertexElementFormat.Vector3,
-                        VertexElementMethod.Default, VertexElementUsage.Normal, 0),
-                    new VertexElement(0, 24, VertexElementFormat.Vector2,
-                        VertexElementMethod.Default,
-                        VertexElementUsage.TextureCoordinate, 0),
-                    new VertexElement(0, 32, VertexElementFormat.Vector2,
-                        VertexElementMethod.Default,
-                        VertexElementUsage.TextureCoordinate, 1),
+                    new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
+                    new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0),
+                    new VertexElement(24, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0),
+                    new VertexElement(32, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 1),
                 };
             return decl;
         }

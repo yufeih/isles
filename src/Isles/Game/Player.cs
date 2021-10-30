@@ -1235,10 +1235,8 @@ namespace Isles
 
             public static readonly VertexElement[] VertexElement = new VertexElement[]
             {
-                new VertexElement(0, 0, VertexElementFormat.Vector3,
-                    VertexElementMethod.Default, VertexElementUsage.Position, 0),
-                new VertexElement(0, 12, VertexElementFormat.Color,
-                    VertexElementMethod.Default, VertexElementUsage.Color, 0),
+                new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
+                new VertexElement(12, VertexElementFormat.Color, VertexElementUsage.Color, 0),
             };
         }
 

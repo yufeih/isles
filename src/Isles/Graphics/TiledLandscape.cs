@@ -12,7 +12,6 @@ namespace Isles.Graphics
         private Effect terrainEffect;
         private IndexBuffer indexBuffer;
         private VertexBuffer[] vertexBuffers;
-        private VertexDeclaration declaraction;
 
         private int vertexCount;
         private int primitiveCount;
@@ -23,9 +22,6 @@ namespace Isles.Graphics
 
             // Load terrain effect
             terrainEffect = game.ShaderLoader.LoadShader("shaders/Terrain.cso");
-
-            // Create vertex declaraction
-            declaraction = new VertexDeclaration(game.GraphicsDevice, TerrainVertex.VertexElements);
 
             // Set patch LOD to highest
             foreach (Patch patch in Patches)
@@ -146,12 +142,10 @@ namespace Isles.Graphics
 
             // Set indices and vertices
             game.GraphicsDevice.Indices = indexBuffer;
-            game.GraphicsDevice.VertexDeclaration = declaraction;
 
             terrainEffect.CurrentTechnique = technique;
 
-            terrainEffect.Begin();
-            terrainEffect.CurrentTechnique.Passes[0].Begin();
+            terrainEffect.CurrentTechnique.Passes[0].Apply();
 
             // Draw each patch
             for (var iPatch = 0; iPatch < Patches.Count; iPatch++)
@@ -160,8 +154,7 @@ namespace Isles.Graphics
                 if (Patches[iPatch].Visible)
                 {
                     // Set patch vertex buffer
-                    game.GraphicsDevice.Vertices[0].SetSource(
-                        vertexBuffers[iPatch], 0, TerrainVertex.SizeInBytes);
+                    game.GraphicsDevice.SetVertexBuffer(vertexBuffers[iPatch]);
 
                     // Draw each layer
                     foreach (Layer layer in Layers)
@@ -169,7 +162,7 @@ namespace Isles.Graphics
                         // Set textures
                         terrainEffect.Parameters["ColorTexture"].SetValue(layer.ColorTexture);
                         terrainEffect.Parameters["AlphaTexture"].SetValue(layer.AlphaTexture);
-                        terrainEffect.CommitChanges();
+                        terrainEffect.CurrentTechnique.Passes[0].Apply();
 
                         // Draw patch primitives
                         game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList,
@@ -177,9 +170,6 @@ namespace Isles.Graphics
                     }
                 }
             }
-
-            terrainEffect.CurrentTechnique.Passes[0].End();
-            terrainEffect.End();
         }
 
         private void DrawTerrainShadow(ShadowEffect shadowEffect)
@@ -190,8 +180,7 @@ namespace Isles.Graphics
             terrainEffect.Parameters["LightViewProjection"].SetValue(shadowEffect.LightViewProjection);
             terrainEffect.CurrentTechnique = terrainEffect.Techniques["ShadowMapping"];
 
-            terrainEffect.Begin();
-            terrainEffect.CurrentTechnique.Passes[0].Begin();
+            terrainEffect.CurrentTechnique.Passes[0].Apply();
 
             // Draw each patch
             for (var iPatch = 0; iPatch < Patches.Count; iPatch++)
@@ -199,17 +188,13 @@ namespace Isles.Graphics
                 if (Patches[iPatch].Visible)
                 {
                     // Set patch vertex buffer
-                    game.GraphicsDevice.Vertices[0].SetSource(
-                        vertexBuffers[iPatch], 0, TerrainVertex.SizeInBytes);
+                    game.GraphicsDevice.SetVertexBuffer(vertexBuffers[iPatch]);
 
                     // Draw patch primitives
                     game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList,
                                                               0, 0, vertexCount, 0, primitiveCount);
                 }
             }
-
-            terrainEffect.CurrentTechnique.Passes[0].End();
-            terrainEffect.End();
         }
 
         public struct TerrainVertex
@@ -228,14 +213,9 @@ namespace Isles.Graphics
                     {
                         // Construct new vertex declaration with tangent info
                         // First the normal stuff (we should already have that)
-                        new VertexElement(0, 0, VertexElementFormat.Vector3,
-                            VertexElementMethod.Default, VertexElementUsage.Position, 0),
-                        new VertexElement(0, 12, VertexElementFormat.Vector2,
-                            VertexElementMethod.Default,
-                            VertexElementUsage.TextureCoordinate, 0),
-                        new VertexElement(0, 20, VertexElementFormat.Vector2,
-                            VertexElementMethod.Default,
-                            VertexElementUsage.TextureCoordinate, 1),
+                        new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
+                        new VertexElement(12, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0),
+                        new VertexElement(20, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 1),
                     };
                     return decl;
                 }

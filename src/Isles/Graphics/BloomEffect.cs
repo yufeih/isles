@@ -92,8 +92,7 @@ namespace Isles.Graphics
             SurfaceFormat format = pp.BackBufferFormat;
 
             // Create a texture for reading back the backbuffer contents.
-            resolveTarget = new RenderTarget2D(GraphicsDevice, width, height, 1,
-                format);
+            resolveTarget = new RenderTarget2D(GraphicsDevice, width, height, false, format, GraphicsDevice.PresentationParameters.DepthStencilFormat);
 
             // Create two rendertargets for the bloom processing. These are half the
             // size of the backbuffer, in order to minimize fillrate costs. Reducing
@@ -102,10 +101,8 @@ namespace Isles.Graphics
             width /= 2;
             height /= 2;
 
-            renderTarget1 = new RenderTarget2D(GraphicsDevice, width, height, 1,
-                format);
-            renderTarget2 = new RenderTarget2D(GraphicsDevice, width, height, 1,
-                format);
+            renderTarget1 = new RenderTarget2D(GraphicsDevice, width, height, false, format, GraphicsDevice.PresentationParameters.DepthStencilFormat);
+            renderTarget2 = new RenderTarget2D(GraphicsDevice, width, height, false, format, GraphicsDevice.PresentationParameters.DepthStencilFormat);
         }
 
         public void BeginDraw()
@@ -124,7 +121,7 @@ namespace Isles.Graphics
             bloomExtractEffect.Parameters["BloomThreshold"].SetValue(
                 Settings.Threshold);
 
-            DrawFullscreenQuad(resolveTarget.GetTexture(), renderTarget1,
+            DrawFullscreenQuad(resolveTarget, renderTarget1,
                                bloomExtractEffect,
                                IntermediateBuffer.PreBloom);
 
@@ -132,7 +129,7 @@ namespace Isles.Graphics
             // using a shader to apply a horizontal gaussian blur filter.
             SetBlurEffectParameters(1.0f / renderTarget1.Width, 0);
 
-            DrawFullscreenQuad(renderTarget1.GetTexture(), renderTarget2,
+            DrawFullscreenQuad(renderTarget1, renderTarget2,
                                gaussianBlurEffect,
                                IntermediateBuffer.BlurredHorizontally);
 
@@ -140,7 +137,7 @@ namespace Isles.Graphics
             // using a shader to apply a vertical gaussian blur filter.
             SetBlurEffectParameters(0, 1.0f / renderTarget1.Height);
 
-            DrawFullscreenQuad(renderTarget2.GetTexture(), renderTarget1,
+            DrawFullscreenQuad(renderTarget2, renderTarget1,
                                gaussianBlurEffect,
                                IntermediateBuffer.BlurredBothWays);
 
@@ -156,11 +153,11 @@ namespace Isles.Graphics
             parameters["BloomSaturation"].SetValue(Settings.BloomSaturation);
             parameters["BaseSaturation"].SetValue(Settings.BaseSaturation);
 
-            GraphicsDevice.Textures[1] = resolveTarget.GetTexture();
+            GraphicsDevice.Textures[1] = resolveTarget;
 
             Viewport viewport = GraphicsDevice.Viewport;
 
-            DrawFullscreenQuad(renderTarget1.GetTexture(),
+            DrawFullscreenQuad(renderTarget1,
                                viewport.Width, viewport.Height,
                                bloomCombineEffect,
                                IntermediateBuffer.FinalResult);
@@ -197,20 +194,12 @@ namespace Isles.Graphics
             // but might need to skip applying the custom pixel shader.
             if (ShowBuffer >= currentBuffer)
             {
-                effect.Begin();
-                effect.CurrentTechnique.Passes[0].Begin();
+                effect.CurrentTechnique.Passes[0].Apply();
             }
 
             // Draw the quad.
             spriteBatch.Draw(texture, new Rectangle(0, 0, width, height), Color.White);
             spriteBatch.End();
-
-            // End the custom effect.
-            if (ShowBuffer >= currentBuffer)
-            {
-                effect.CurrentTechnique.Passes[0].End();
-                effect.End();
-            }
         }
 
         /// <summary>

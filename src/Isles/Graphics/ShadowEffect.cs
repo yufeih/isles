@@ -20,7 +20,6 @@ namespace Isles.Graphics
 
         private readonly GraphicsDevice _graphics;
         private readonly Effect _effect;
-        private readonly DepthStencilBuffer _depthStencil;
         private readonly RenderTarget2D _renderTarget;
 
         public Matrix LightViewProjection { get; private set; }
@@ -31,27 +30,25 @@ namespace Isles.Graphics
         {
             _graphics = graphics;
             _effect = shaderLoader.LoadShader("shaders/ShadowMap.cso");
-            _depthStencil = new DepthStencilBuffer(_graphics, ShadowMapSize, ShadowMapSize, _graphics.DepthStencilBuffer.Format);
-            _renderTarget = new RenderTarget2D(_graphics, ShadowMapSize, ShadowMapSize, 1, SurfaceFormat.Single);
+            _renderTarget = new RenderTarget2D(_graphics, ShadowMapSize, ShadowMapSize, true, SurfaceFormat.Single, _graphics.PresentationParameters.DepthStencilFormat);
         }
 
         public void Begin(Vector3 eye, Vector3 facing)
         {
             LightViewProjection = CalculateShadowMatrix(eye, facing);
 
-            _graphics.PushRenderTarget(_renderTarget, _depthStencil);
+            _graphics.PushRenderTarget(_renderTarget);
             _graphics.Clear(Color.White);
         }
 
         public void End()
         {
             _graphics.PopRenderTarget();
-            ShadowMap = _renderTarget.GetTexture();
+            ShadowMap = _renderTarget;
         }
 
         public void Dispose()
         {
-            _depthStencil.Dispose();
             _renderTarget.Dispose();
             _effect.Dispose();
         }
