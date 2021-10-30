@@ -1,31 +1,13 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
 using Isles.Engine;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Graphics
 {
-    public class LandscapeReader : ContentTypeReader<BaseLandscape>
-    {
-        /// <summary>
-        /// Content loader for loading Landscape object from XNB file.
-        /// </summary>
-        protected override BaseLandscape Read(ContentReader input, BaseLandscape existingInstance)
-        {
-            BaseLandscape landscape = new TiledLandscape();
-
-            landscape.ReadContent(input);
-            landscape.Initialize(BaseGame.Singleton);
-
-            return landscape;
-        }
-    }
-
     public class TerrainData
     {
         public float Width { get; init; }
@@ -47,21 +29,10 @@ namespace Isles.Graphics
 
     public abstract class BaseLandscape : ILandscape
     {
-        public class Layer
+        public struct Layer
         {
-            public Texture2D ColorTexture { get; set; }
-            public Texture2D AlphaTexture { get; set; }
-
-            public Layer() { }
-
-            public Layer(ContentReader input)
-            {
-                input.ReadInt32();
-                input.ReadString();
-                ColorTexture = input.ReadExternalReference<Texture2D>();
-                AlphaTexture = input.ReadExternalReference<Texture2D>();
-                input.ReadExternalReference<Texture2D>();
-            }
+            public Texture2D ColorTexture;
+            public Texture2D AlphaTexture;
         }
 
         public class Patch
@@ -516,79 +487,6 @@ namespace Isles.Graphics
                     ColorTexture = textureLoader.LoadTexture(layer.ColorTexture),
                     AlphaTexture = textureLoader.LoadTexture(layer.AlphaTexture),
                 });
-            }
-        }
-
-        public virtual void ReadContent(ContentReader input)
-        {
-            // Size info
-            size.X = input.ReadSingle();
-            size.Y = input.ReadSingle();
-            size.Z = input.ReadSingle();
-
-            // Heightfield
-            GridCountOnXAxis = input.ReadInt32();
-            GridCountOnYAxis = input.ReadInt32();
-            HeightField = new float[GridCountOnXAxis, GridCountOnYAxis];
-            for (var y = 0; y < GridCountOnYAxis; y++)
-            {
-                for (var x = 0; x < GridCountOnXAxis; x++)
-                {
-                    // Remember how we write heighfield data
-                    HeightField[x, y] = input.ReadSingle();
-
-                    // TEST: Lower vertices under water
-                    if (HeightField[x, y] < 0)
-                    {
-                        HeightField[x, y] *= 1.4f;
-                    }
-                }
-            }
-
-            // Normals
-            for (var y = 0; y < GridCountOnYAxis; y++)
-            {
-                for (var x = 0; x < GridCountOnXAxis; x++)
-                {
-                    input.ReadVector3();
-                }
-            }
-
-            // Tangents
-            for (var y = 0; y < GridCountOnYAxis; y++)
-            {
-                for (var x = 0; x < GridCountOnXAxis; x++)
-                {
-                    input.ReadVector3();
-                }
-            }
-
-            // Patches
-            PatchCountOnXAxis = input.ReadInt32();
-            PatchCountOnYAxis = input.ReadInt32();
-            Patches = new List<Patch>(PatchCountOnXAxis * PatchCountOnYAxis);
-            for (var i = 0; i < PatchCountOnXAxis * PatchCountOnYAxis; i++)
-            {
-                Patches.Add(new Patch(new(input.ReadVector3(), input.ReadVector3()), i, this));
-            }
-
-            // Patch groups
-            var patchGroupCount = input.ReadInt32();
-            for (var i = 0; i < patchGroupCount; i++)
-            {
-                var n = input.ReadInt32();
-                for (var k = 0; k < n; k++)
-                {
-                    input.ReadInt32();
-                }
-            }
-
-            // Layers
-            var layerCount = input.ReadInt32();
-            Layers = new List<Layer>(layerCount);
-            for (var i = 0; i < layerCount; i++)
-            {
-                Layers.Add(new Layer(input));
             }
         }
 

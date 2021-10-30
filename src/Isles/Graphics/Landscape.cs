@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using Isles.Engine;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Graphics
@@ -20,16 +19,6 @@ namespace Isles.Graphics
             waterTexture = textureLoader.LoadTexture(data.WaterTexture);
             waterDstortion = textureLoader.LoadTexture(data.WaterBumpTexture);
 
-            Initialize(BaseGame.Singleton);
-        }
-
-        public override void ReadContent(ContentReader input)
-        {
-            base.ReadContent(input);
-
-            ReadWaterContent(input);
-            ReadSkyContent(input);
-            ReadVegetationContent(input);
             Initialize(BaseGame.Singleton);
         }
 
@@ -223,41 +212,6 @@ namespace Isles.Graphics
                 PrimitiveType.TriangleList, 0, 0, surfaceVertices.Count, 0, surfaceIndices.Count / 3);
         }
 
-        private void ReadSkyContent(ContentReader input)
-        {
-            input.ReadExternalReference<TextureCube>();
-        }
-
-        private readonly List<Billboard> vegetations = new(512);
-
-        private void ReadVegetationContent(ContentReader input)
-        {
-            var count = input.ReadInt32();
-
-            Vector2 position;
-            var billboard = new Billboard();
-            Texture2D texture;
-            for (var i = 0; i < count; i++)
-            {
-                texture = input.ReadExternalReference<Texture2D>();
-
-                var n = input.ReadInt32();
-
-                for (var k = 0; k < n; k++)
-                {
-                    billboard.Texture = texture;
-                    position = input.ReadVector2();
-                    billboard.Position = new Vector3(position, GetHeight(position.X, position.Y));
-                    billboard.Size = input.ReadVector2();
-                    billboard.Normal = Vector3.UnitZ;
-                    billboard.Type = BillboardType.NormalOriented;
-                    billboard.SourceRectangle = Billboard.DefaultSourceRectangle;
-
-                    vegetations.Add(billboard);
-                }
-            }
-        }
-
         /// <summary>
         /// Gets or sets the fog texture used to draw the landscape.
         /// </summary>
@@ -306,13 +260,6 @@ namespace Isles.Graphics
         private VertexDeclaration waterVertexDeclaration;
 
         public Effect WaterEffect { get; set; }
-
-        private void ReadWaterContent(ContentReader input)
-        {
-            earthRadius = input.ReadSingle();
-            waterTexture = input.ReadExternalReference<Texture>();
-            waterDstortion = input.ReadExternalReference<Texture>();
-        }
 
         private void InitializeWater()
         {

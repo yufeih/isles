@@ -5,13 +5,6 @@ VisualStudioVersion = 16.0.31727.386
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Isles", "src\Isles\Isles.csproj", "{23F408E0-D6E0-41C6-94C7-C64A7CB373A3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Isles.Pipeline", "src\Isles.Pipeline\Isles.Pipeline.csproj", "{77E31563-2EED-400D-8591-1ACED921E11F}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AF218E5B-63B8-47DC-901D-5FCE39088453}"
-	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -22,10 +15,6 @@ Global
 		{23F408E0-D6E0-41C6-94C7-C64A7CB373A3}.Debug|x86.Build.0 = Debug|x86
 		{23F408E0-D6E0-41C6-94C7-C64A7CB373A3}.Release|x86.ActiveCfg = Release|x86
 		{23F408E0-D6E0-41C6-94C7-C64A7CB373A3}.Release|x86.Build.0 = Release|x86
-		{77E31563-2EED-400D-8591-1ACED921E11F}.Debug|x86.ActiveCfg = Debug|x86
-		{77E31563-2EED-400D-8591-1ACED921E11F}.Debug|x86.Build.0 = Debug|x86
-		{77E31563-2EED-400D-8591-1ACED921E11F}.Release|x86.ActiveCfg = Release|x86
-		{77E31563-2EED-400D-8591-1ACED921E11F}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
