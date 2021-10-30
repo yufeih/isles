@@ -176,7 +176,7 @@ namespace Isles.Engine
             Landscape.DrawWater(gameTime);
 
             // Draw shadow receivers with the shadow map
-            Landscape.DrawTerrain(gameTime, Game.Shadow);
+            Landscape.DrawTerrain(Game.Shadow);
 
             // Present surface
             Landscape.PresentSurface();

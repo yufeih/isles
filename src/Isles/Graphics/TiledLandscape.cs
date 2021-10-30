@@ -82,9 +82,6 @@ namespace Isles.Graphics
                     },
                     delegate (uint index, int x, int y)
                     {
-                        vertices[index].Normal = NormalField[x, y];
-                        vertices[index].Tangent = TangentField[x, y];
-
                         vertices[index].Position = new Vector3(
                             x * Size.X / (GridCountOnXAxis - 1),
                             y * Size.Y / (GridCountOnYAxis - 1), HeightField[x, y]);
@@ -115,17 +112,17 @@ namespace Isles.Graphics
             }
         }
 
-        public override void DrawTerrain(Matrix view, Matrix projection, bool upper)
+        public override void DrawTerrain(Matrix viewProjection, bool upper)
         {
             EffectTechnique technique = upper ?
                 terrainEffect.Techniques["FastUpper"] : terrainEffect.Techniques["FastLower"];
 
-            DrawTerrain(view, projection, technique);
+            DrawTerrain(viewProjection, technique);
         }
 
-        public override void DrawTerrain(GameTime gameTime, ShadowEffect shadowEffect)
+        public override void DrawTerrain(ShadowEffect shadowEffect)
         {
-            DrawTerrain(game.View, game.Projection, terrainEffect.Techniques["Default"]);
+            DrawTerrain(game.ViewProjection, terrainEffect.Techniques["Default"]);
 
             if (shadowEffect != null)
             {
@@ -133,18 +130,16 @@ namespace Isles.Graphics
             }
         }
 
-        private void DrawTerrain(Matrix view, Matrix projection, EffectTechnique technique)
+        private void DrawTerrain(Matrix viewProjection, EffectTechnique technique)
         {
             graphics.SetRenderState(BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone);
 
             // Set parameters
-            Matrix viewProjection = view * projection;
             if (FogTexture != null)
             {
                 terrainEffect.Parameters["FogTexture"].SetValue(FogTexture);
             }
 
-            terrainEffect.Parameters["WorldView"].SetValue(view);
             terrainEffect.Parameters["WorldViewProjection"].SetValue(viewProjection);
 
             var viewFrustum = new BoundingFrustum(viewProjection);
@@ -222,10 +217,8 @@ namespace Isles.Graphics
             public Vector3 Position;
             public Vector2 TextureCoordinate0;
             public Vector2 TextureCoordinate1;
-            public Vector3 Normal;
-            public Vector3 Tangent;
 
-            public static int SizeInBytes => 4 * (3 + 4 + 3 + 3);
+            public static int SizeInBytes => 4 * (3 + 4);
 
             public static VertexElement[] VertexElements
             {
@@ -243,12 +236,6 @@ namespace Isles.Graphics
                         new VertexElement(0, 20, VertexElementFormat.Vector2,
                             VertexElementMethod.Default,
                             VertexElementUsage.TextureCoordinate, 1),
-                        new VertexElement(0, 28, VertexElementFormat.Vector3,
-                            VertexElementMethod.Default, VertexElementUsage.Normal, 0),
-
-                        // And now the tangent
-                        new VertexElement(0, 40, VertexElementFormat.Vector3,
-                            VertexElementMethod.Default, VertexElementUsage.Tangent, 0),
                     };
                     return decl;
                 }

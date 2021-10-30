@@ -28,9 +28,6 @@ namespace Isles.Graphics
 
     public abstract class BaseLandscape : ILandscape
     {
-        /// <summary>
-        /// Represents a texture layer on the terrain.
-        /// </summary>
         public class Layer : IDisposable
         {
             /// <summary>
@@ -91,9 +88,6 @@ namespace Isles.Graphics
             }
         }
 
-        /// <summary>
-        /// Represents the smallest unit of the terrain.
-        /// </summary>
         public class Patch
         {
             private BoundingBox boundingBox;
@@ -488,14 +482,7 @@ namespace Isles.Graphics
             private static readonly int[] MagicLength = new int[] { 16, 8, 4, 2, 1 };
         }
 
-        /// <summary>
-        /// Base game.
-        /// </summary>
         protected BaseGame game;
-
-        /// <summary>
-        /// Graphics device.
-        /// </summary>
         protected GraphicsDevice graphics;
 
         /// <summary>
@@ -509,16 +496,6 @@ namespace Isles.Graphics
         /// Gets the heightfield data of the landscape.
         /// </summary>
         public float[,] HeightField { get; private set; }
-
-        /// <summary>
-        /// Gets the normal field of the landscape.
-        /// </summary>
-        public Vector3[,] NormalField { get; private set; }
-
-        /// <summary>
-        /// Gets the tangent field of the landscape.
-        /// </summary>
-        public Vector3[,] TangentField { get; private set; }
 
         /// <summary>
         /// Gets the terrain bounding box.
@@ -591,22 +568,20 @@ namespace Isles.Graphics
             }
 
             // Normals
-            NormalField = new Vector3[GridCountOnXAxis, GridCountOnYAxis];
             for (var y = 0; y < GridCountOnYAxis; y++)
             {
                 for (var x = 0; x < GridCountOnXAxis; x++)
                 {
-                    NormalField[x, y] = input.ReadVector3();
+                    input.ReadVector3();
                 }
             }
 
             // Tangents
-            TangentField = new Vector3[GridCountOnXAxis, GridCountOnYAxis];
             for (var y = 0; y < GridCountOnYAxis; y++)
             {
                 for (var x = 0; x < GridCountOnXAxis; x++)
                 {
-                    TangentField[x, y] = input.ReadVector3();
+                    input.ReadVector3();
                 }
             }
 
@@ -647,21 +622,11 @@ namespace Isles.Graphics
             graphics = game.GraphicsDevice;
         }
 
-        /// <summary>
-        /// Gets a given patch.
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
         public Patch GetPatch(int x, int y)
         {
             return Patches[y * PatchCountOnXAxis + x];
         }
 
-        /// <summary>
-        /// Transform from heightfield grid to real world position.
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
         public Vector2 GridToPosition(int x, int y)
         {
             return new Vector2(
@@ -681,8 +646,6 @@ namespace Isles.Graphics
         /// <summary>
         /// Gets the landscape size.Z of a given point on the heightfield.
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
         public float GetGridHeight(int x, int y)
         {
             return HeightField[x, y];
@@ -699,8 +662,6 @@ namespace Isles.Graphics
         /// <summary>
         /// Gets the landscape size.Z of any given point.
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
         public float GetHeight(float x, float y)
         {
             // Grabbed and modified from racing game
@@ -770,66 +731,6 @@ namespace Isles.Graphics
 
             // For those area underwater, we set the height to zero
             return height;// < 0 ? 0 : height;
-        }
-
-        /// <summary>
-        /// Gets the normal of a grid.
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        public Vector3 GetNormal(int x, int y)
-        {
-            return NormalField[x, y];
-        }
-
-        /// <summary>
-        /// Gets the normal of the terrain from a world position. (normalized).
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        public Vector3 GetNormal(float x, float y)
-        {
-            // We don't want to cause any exception here
-            if (x < 0)
-            {
-                x = 0;
-            }
-            else if (x >= size.X)
-            {
-                x = size.X - 1;     // x can't be heightfieldWidth-1
-            }
-
-            // or there'll be an out of range
-            if (y < 0) // exception. So is y.
-            {
-                y = 0;
-            }
-            else if (y >= size.Y)
-            {
-                y = size.Y - 1;
-            }
-
-            // Rescale to our heightfield dimensions
-            x *= (GridCountOnXAxis - 1) / size.X;
-            y *= (GridCountOnYAxis - 1) / size.Y;
-
-            // Get the position ON the current tile (0.0-1.0)!!!
-            float
-                fX = x - ((float)(int)x),
-                fY = y - ((float)(int)y);
-
-            // Interpolate the current position
-            var ix2 = (int)x;
-            var iy2 = (int)y;
-
-            var ix1 = ix2 + 1;
-            var iy1 = iy2 + 1;
-
-            // Perform bilinear interpolation instead of spliting triangles :)
-            var a = Vector3.Lerp(NormalField[ix2, iy2], NormalField[ix2, iy1], fY);
-            var b = Vector3.Lerp(NormalField[ix1, iy2], NormalField[ix1, iy1], fY);
-
-            return Vector3.Lerp(a, b, fX);
         }
 
         /// <summary>

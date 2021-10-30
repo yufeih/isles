@@ -4,19 +4,9 @@
 //-----------------------------------------------------------------------------
 // Global variables
 //-----------------------------------------------------------------------------
-float4x4 ViewInverse;
-float4x4 WorldView;
 float4x4 WorldViewProjection;
 float4x4 LightViewProjection;
 
-float3 LightPosition = { 500, 500, 1000 };
-float3 LightDirection = { 0, 0, -1 };
-float4 LightColor = { 1, 1, 1, 1.0 };
-
-float4 AmbiColor : Ambient = { 0.1f, 0.1f, 0.1f, 1.0f };
-float4 SurfColor : DIFFUSE = { 1.0f, 1.0f, 1.0f, 1.0f };
-float SpecExpon : SpecularPower = 32.0;
-float Bumpy = 1.0;
 float FogStart = 0;
 float FogEnd = -20;
 
@@ -27,7 +17,6 @@ float FogEnd = -20;
 
 texture ColorTexture;
 texture AlphaTexture;
-texture NormalTexture;
 texture ShadowMap;
 texture FogTexture;
 
@@ -46,18 +35,6 @@ sampler2D ColorSampler = sampler_state
 sampler2D AlphaSampler = sampler_state
 {
     Texture = <AlphaTexture>;
-
-    MinFilter = Linear;
-    MagFilter = Linear;
-    MipFilter = Linear;
-    AddressU = Wrap;
-    AddressV = Wrap;
-    AddressW = Wrap;
-};
-
-sampler2D NormalSampler = sampler_state
-{
-    Texture = <NormalTexture>;
 
     MinFilter = Linear;
     MagFilter = Linear;
@@ -95,19 +72,6 @@ sampler2D FogSampler = sampler_state
 //-----------------------------------------------------------------------------
 // Default shader
 //-----------------------------------------------------------------------------
-
-struct VS_OUTPUT
-{
-    float4 Position : POSITION;
-    float4 Color : COLOR0;
-    float2 UV: TEXCOORD0;
-    float3 LightVec	: TEXCOORD1;
-    float3 WorldNormal	: TEXCOORD2;
-    float3 WorldEyeVec	: TEXCOORD3;
-    float3 WorldTangent	: TEXCOORD4;
-    float3 WorldBinorm	: TEXCOORD5;
-};
-
 
 void VS(
     float4 Pos		: POSITION,

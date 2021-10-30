@@ -10,35 +10,18 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Graphics
 {
-    /// <summary>
-    /// Landscape without terrain.
-    /// </summary>
     public abstract class Landscape : BaseLandscape
     {
-        /// <summary>
-        /// Initialize landscape from XNB file.
-        /// </summary>
-        /// <param name="input"></param>
         public override void ReadContent(ContentReader input)
         {
             base.ReadContent(input);
 
-            // Initialize Water
             ReadWaterContent(input);
-
-            // Initialize sky
             ReadSkyContent(input);
-
-            // Initialize vegetation
             ReadVegetationContent(input);
-
-            // Initialize everything
             Initialize(BaseGame.Singleton);
         }
 
-        /// <summary>
-        /// Call this everytime a landscape is loaded.
-        /// </summary>
         public override void Initialize(BaseGame game)
         {
             base.Initialize(game);
@@ -59,9 +42,9 @@ namespace Isles.Graphics
         /// Draw the terrain for water reflection and refraction.
         /// </summary>
         /// <param name="upper">Only draw upper part or underwater part.</param>
-        public abstract void DrawTerrain(Matrix view, Matrix projection, bool upper);
+        public abstract void DrawTerrain(Matrix viewProjection, bool upper);
 
-        public abstract void DrawTerrain(GameTime gameTime, ShadowEffect shadowEffect);
+        public abstract void DrawTerrain(ShadowEffect shadowEffect);
 
         private struct TexturedSurface
         {
@@ -421,7 +404,7 @@ namespace Isles.Graphics
             var viewReflect = Matrix.Multiply(
                 Matrix.CreateReflection(new Plane(Vector3.UnitZ, 0)), game.View);
 
-            DrawTerrain(viewReflect, game.Projection, true);
+            DrawTerrain(viewReflect * game.Projection, true);
 
             // Draw other reflections
             if (game.Settings.ReflectionEnabled)
@@ -433,7 +416,7 @@ namespace Isles.Graphics
             game.ModelRenderer.Draw(viewReflect * game.Projection);
 
             // Draw refraction onto the reflection texture
-            DrawTerrain(game.View, game.Projection, false);
+            DrawTerrain(game.ViewProjection, false);
 
             graphics.PopRenderTarget();
 

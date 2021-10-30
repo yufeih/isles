@@ -1,0 +1,23 @@
+﻿{
+  "Width": 2048,
+  "Depth": 2048,
+  "Height": 80,
+  "BaseHeight": -43.3,
+  "Heightmap": "isles.png",
+  "WaterTexture": "water.png",
+  "WaterBumpTexture": "water_normalmap.jpg",
+  "Layers": [
+    {
+      "ColorTexture": "shadi.png",
+      "AlphaTexture": "white.png"
+    },
+    {
+      "ColorTexture": "caodi.png",
+      "AlphaTexture": "2.png"
+    },
+    {
+      "ColorTexture": "daolu.png",
+      "AlphaTexture": "3.png"
+    }
+  ]
+}

@@ -197,11 +197,6 @@ namespace Isles.Engine
         float GetHeight(float x, float y);
 
         /// <summary>
-        /// Gets the normal of a point on the landscape.
-        /// </summary>
-        Vector3 GetNormal(float x, float y);
-
-        /// <summary>
         /// Gets the number of grids.
         /// </summary>
         Point GridCount { get; }
@@ -210,12 +205,5 @@ namespace Isles.Engine
         /// Gets whether the point is walkable (E.g., above water).
         /// </summary>
         bool IsPointOccluded(float x, float y);
-
-        /// <summary>
-        /// Performs a ray landscape intersection test, the intersection point
-        /// is returned.
-        /// </summary>
-        /// <param name="ray"></param>
-        Vector3? Intersects(Ray ray);
     }
 }
