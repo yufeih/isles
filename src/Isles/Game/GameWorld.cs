@@ -4,7 +4,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Xml;
 using Isles.Graphics;
 using Microsoft.Xna.Framework;
@@ -68,7 +70,7 @@ namespace Isles.Engine
         /// <summary>
         /// Gets the smoothed target position.
         /// </summary>
-        public Vector3? TargetPosition => isTargetPositionOnLandscape ? (Vector3?)targetPosition : null;
+        public Vector3? TargetPosition => isTargetPositionOnLandscape ? targetPosition : null;
 
         private Vector3 targetPosition = Vector3.Zero;
         private bool isTargetPositionOnLandscape = true;
@@ -223,12 +225,10 @@ namespace Isles.Engine
 
             // Load landscape
             landscapeFilename = node.GetAttribute("Landscape");
-            if (landscapeFilename == "")
-            {
-                throw new Exception("World does not have a landscape");
-            }
 
-            Landscape = Content.Load<Landscape>(landscapeFilename);
+            Landscape = new TiledLandscape();
+            Landscape.Load(JsonSerializer.Deserialize<TerrainData>(
+                File.ReadAllBytes($"data/{landscapeFilename}.json")), BaseGame.Singleton.TextureLoader);
             Landscape.DrawWaterReflection += new Landscape.DrawDelegate(DrawWaterReflection);
             InitializeGrid();
 
@@ -261,7 +261,7 @@ namespace Isles.Engine
                     }
                 }
 
-                context.Refresh(10 + (int)(100 * nObjects / node.ChildNodes.Count));
+                context.Refresh(10 + 100 * nObjects / node.ChildNodes.Count);
             }
         }
 

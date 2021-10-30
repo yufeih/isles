@@ -26,65 +26,41 @@ namespace Isles.Graphics
         }
     }
 
+    public class TerrainData
+    {
+        public float Width { get; init; }
+        public float Depth { get; init; }
+        public float Height { get; init; }
+        public float BaseHeight { get; init; }
+        public string Heightmap { get; init; }
+        public float EarthRadius { get; init; }
+        public string WaterTexture { get; init; }
+        public string WaterBumpTexture { get; init; }
+        public Layer[] Layers { get; init; }
+
+        public struct Layer
+        {
+            public string ColorTexture { get; init; }
+            public string AlphaTexture { get; init; }
+        }
+    }
+
     public abstract class BaseLandscape : ILandscape
     {
-        public class Layer : IDisposable
+        public class Layer
         {
-            /// <summary>
-            /// Gets Which patch group the layer is in.
-            /// </summary>
-            public int PatchGroup { get; }
-
-            /// <summary>
-            /// Gets or sets the technology used to render this layer.
-            /// </summary>
-            public string Technology { get; set; }
-
-            /// <summary>
-            /// Gets or sets the color texture of this layer.
-            /// </summary>
             public Texture2D ColorTexture { get; set; }
-
-            /// <summary>
-            /// Gets the alpha texture of this layer.
-            /// </summary>
-            /// <remarks>
-            /// Path group is not refreshed so setting alpha texture
-            /// might cause some unexpected rendering errors.
-            /// </remarks>
             public Texture2D AlphaTexture { get; set; }
 
-            /// <summary>
-            /// Gets or sets the normal texture of this layer.
-            /// </summary>
-            public Texture2D NormalTexture { get; set; }
-
-            /// <summary>
-            /// Creates a new layer.
-            /// </summary>
             public Layer() { }
 
-            /// <summary>
-            /// Create a layer from a content input.
-            /// </summary>
-            /// <param name="input"></param>
             public Layer(ContentReader input)
             {
-                PatchGroup = input.ReadInt32();
-                Technology = input.ReadString();
+                input.ReadInt32();
+                input.ReadString();
                 ColorTexture = input.ReadExternalReference<Texture2D>();
                 AlphaTexture = input.ReadExternalReference<Texture2D>();
-                NormalTexture = input.ReadExternalReference<Texture2D>();
-            }
-
-            /// <summary>
-            /// Dispose.
-            /// </summary>
-            public void Dispose()
-            {
-                ColorTexture?.Dispose();
-                AlphaTexture?.Dispose();
-                NormalTexture?.Dispose();
+                input.ReadExternalReference<Texture2D>();
             }
         }
 
@@ -92,7 +68,6 @@ namespace Isles.Graphics
         {
             private BoundingBox boundingBox;
             private readonly BaseLandscape landscape;
-            private Vector3 center;
 
             /// <summary>
             /// Gets or sets starting vertex index when filling patch indices.
@@ -101,12 +76,7 @@ namespace Isles.Graphics
 
             private static int i;
 
-            /// <summary>
-            /// Contruct a patch from content input.
-            /// </summary>
-            /// <param name="input"></param>
-            /// <param name="index"></param>
-            public Patch(ContentReader input, int index, BaseLandscape landscape)
+            public Patch(BoundingBox boundingBox, int index, BaseLandscape landscape)
             {
                 IndexOnXAxis = index % landscape.PatchCountOnXAxis;
                 IndexOnYAxis = index / landscape.PatchCountOnYAxis;
@@ -114,45 +84,8 @@ namespace Isles.Graphics
                 LevelOfDetail = i++ % 5;
                 Index = index;
                 this.landscape = landscape;
-
-                boundingBox = new BoundingBox(input.ReadVector3(), input.ReadVector3());
-
-                center = (boundingBox.Max + boundingBox.Max) / 2;
+                this.boundingBox = boundingBox;
             }
-
-            /// <summary>
-            /// Update patch LOD.
-            /// </summary>
-            /// <returns>Whether LOD has changed.</returns>
-            public bool UpdateLOD(Vector3 eye, float errorRatio)
-            {
-                // Compute distance
-                var distance = Vector3.Distance(eye, center);
-                var newLOD = 4 - (int)(distance * errorRatio);
-
-                // Clamp LOD value
-                if (newLOD < 0)
-                {
-                    newLOD = 0;
-                }
-                else if (newLOD > 4)
-                {
-                    newLOD = 4;
-                }
-
-                if (newLOD != LevelOfDetail)
-                {
-                    LevelOfDetail = newLOD;
-                    return true;
-                }
-
-                return false;
-            }
-
-            /// <summary>
-            /// Gets patch center position.
-            /// </summary>
-            public Vector3 Center => center;
 
             /// <summary>
             /// Gets or sets patch visibility.
@@ -196,7 +129,6 @@ namespace Isles.Graphics
             /// <summary>
             /// Fill the vertex list with the vertices on this patch based on current LOD.
             /// </summary>
-            /// <param name="vertices"></param>
             /// <returns>Number of vertices added to the list.</returns>
             public uint FillVertices(uint baseIndex, GetVertexPosition get,
                                                      SetVertexPosition set,
@@ -277,7 +209,6 @@ namespace Isles.Graphics
             /// <summary>
             /// Fill the vertex list with the indices on this patch based on current LOD.
             /// </summary>
-            /// <param name="indices"></param>
             /// <returns>Number of indices added to the list.</returns>
             public ushort FillIndices16(ref ushort[] indices, uint baseIndex)
             {
@@ -287,16 +218,6 @@ namespace Isles.Graphics
                 }
 
                 return (ushort)MagicIndices[LevelOfDetail].Length;
-            }
-
-            public uint FillIndices32(ref uint[] indices, uint baseIndex)
-            {
-                for (var i = 0; i < MagicIndices[LevelOfDetail].Length; i++)
-                {
-                    indices[baseIndex++] = (uint)(MagicIndices[LevelOfDetail][i] + StartingVertex);
-                }
-
-                return (uint)MagicIndices[LevelOfDetail].Length;
             }
 
             /// <summary>
@@ -498,13 +419,6 @@ namespace Isles.Graphics
         public float[,] HeightField { get; private set; }
 
         /// <summary>
-        /// Gets the terrain bounding box.
-        /// </summary>
-        public BoundingBox TerrainBoundingBox => terrainBoundingBox;
-
-        private BoundingBox terrainBoundingBox;
-
-        /// <summary>
         /// Gets the number of patches on the x axis.
         /// </summary>
         public int PatchCountOnXAxis { get; private set; }
@@ -518,11 +432,6 @@ namespace Isles.Graphics
         /// All terrain layers.
         /// </summary>
         public List<Layer> Layers { get; private set; } = new();
-
-        /// <summary>
-        /// Patch groups.
-        /// </summary>
-        public List<int>[] PatchGroups { get; private set; }
 
         /// <summary>
         /// Gets terrain patches.
@@ -539,14 +448,83 @@ namespace Isles.Graphics
         /// </summary>
         public int GridCountOnYAxis { get; private set; }
 
+        public virtual void Load(TerrainData data, TextureLoader textureLoader)
+        {
+            size = new(data.Width, data.Depth, data.Height);
+
+            var (heightmap, w, h) = TextureLoader.ReadAllPixels(data.Heightmap);
+
+            GridCountOnXAxis = w;
+            GridCountOnYAxis = h;
+
+            HeightField = new float[GridCountOnXAxis, GridCountOnYAxis];
+            for (var y = 0; y < GridCountOnYAxis; y++)
+            {
+                for (var x = 0; x < GridCountOnXAxis; x++)
+                {
+                    HeightField[x, y] = data.BaseHeight + data.Height * heightmap[y * w + x].R / 255f;
+
+                    // TEST: Lower vertices under water
+                    if (HeightField[x, y] < 0)
+                    {
+                        HeightField[x, y] *= 1.4f;
+                    }
+                }
+            }
+
+            PatchCountOnXAxis = w / 16;
+            PatchCountOnYAxis = h / 16;
+            Patches = new(PatchCountOnXAxis * PatchCountOnYAxis);
+
+            var pathIndex = 0;
+            for (var y = 0; y < PatchCountOnYAxis; y++)
+            {
+                for (var x = 0; x < PatchCountOnXAxis; x++)
+                {
+                    var min = float.MaxValue;
+                    var max = float.MinValue;
+
+                    for (var yy = 0; yy <= 16; yy++)
+                    {
+                        for (var xx = 0; xx <= 16; xx++)
+                        {
+                            var height = HeightField[x * 16 + xx, y * 16 + yy];
+                            if (height < min)
+                            {
+                                min = height;
+                            }
+
+                            if (height > max)
+                            {
+                                max = height;
+                            }
+                        }
+                    }
+
+                    var boundingBox = new BoundingBox(
+                        new(x * size.X / PatchCountOnXAxis, y * size.Y / PatchCountOnYAxis, min),
+                        new((x + 1) * size.X / PatchCountOnXAxis, (y + 1) * size.Y / PatchCountOnYAxis, max));
+
+                    Patches.Add(new(boundingBox, pathIndex++, this));
+                }
+            }
+
+            foreach (var layer in data.Layers)
+            {
+                Layers.Add(new()
+                {
+                    ColorTexture = textureLoader.LoadTexture(layer.ColorTexture),
+                    AlphaTexture = textureLoader.LoadTexture(layer.AlphaTexture),
+                });
+            }
+        }
+
         public virtual void ReadContent(ContentReader input)
         {
             // Size info
             size.X = input.ReadSingle();
             size.Y = input.ReadSingle();
             size.Z = input.ReadSingle();
-
-            terrainBoundingBox = new BoundingBox(Vector3.Zero, size);
 
             // Heightfield
             GridCountOnXAxis = input.ReadInt32();
@@ -591,19 +569,17 @@ namespace Isles.Graphics
             Patches = new List<Patch>(PatchCountOnXAxis * PatchCountOnYAxis);
             for (var i = 0; i < PatchCountOnXAxis * PatchCountOnYAxis; i++)
             {
-                Patches.Add(new Patch(input, i, this));
+                Patches.Add(new Patch(new(input.ReadVector3(), input.ReadVector3()), i, this));
             }
 
             // Patch groups
             var patchGroupCount = input.ReadInt32();
-            PatchGroups = new List<int>[patchGroupCount];
             for (var i = 0; i < patchGroupCount; i++)
             {
                 var n = input.ReadInt32();
-                PatchGroups[i] = new List<int>(n);
                 for (var k = 0; k < n; k++)
                 {
-                    PatchGroups[i].Add(input.ReadInt32());
+                    input.ReadInt32();
                 }
             }
 
@@ -691,8 +667,8 @@ namespace Isles.Graphics
 
             // Get the position ON the current tile (0.0-1.0)!!!
             float
-                fX = x - ((float)(int)x),
-                fY = y - ((float)(int)y);
+                fX = x - (int)x,
+                fY = y - (int)y;
 
             // Interpolate the current position
             var ix2 = (int)x;

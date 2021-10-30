@@ -77,7 +77,7 @@ namespace Isles
             ui.Anchor = Anchor.TopLeft;
 
             var height = loadingDisplayTexture.Height * ui.Area.Width / loadingDisplayTexture.Width;
-            loadingPanel = new Panel(new Rectangle(0, (int)((ui.Area.Height - height) / 2), ui.Area.Width, height))
+            loadingPanel = new Panel(new Rectangle(0, (ui.Area.Height - height) / 2, ui.Area.Width, height))
             {
                 Texture = loadingDisplayTexture,
                 SourceRectangle = new Rectangle(0, 0, loadingDisplayTexture.Width, loadingDisplayTexture.Height),
@@ -87,7 +87,7 @@ namespace Isles
             ui.Add(loadingPanel);
 
             // Set the panel
-            titlePanel = new Panel(new Rectangle(0, (int)((ui.Area.Height - height) / 2), ui.Area.Width, height))
+            titlePanel = new Panel(new Rectangle(0, (ui.Area.Height - height) / 2, ui.Area.Width, height))
             {
                 Texture = titleTexture,
                 SourceRectangle = new Rectangle(0, 0, titleTexture.Width, titleTexture.Height),

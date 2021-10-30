@@ -136,7 +136,7 @@ namespace Isles.Engine
             else if (keyNum >= (int)Keys.D0 && keyNum <= (int)Keys.D9 &&
                 shiftPressed == false)
             {
-                ret = (char)((int)'0' + (keyNum - Keys.D0));
+                ret = (char)('0' + (keyNum - Keys.D0));
             }
             else if (key == Keys.D1 && shiftPressed)
             {

@@ -3,6 +3,7 @@
 
 using System.Collections.Concurrent;
 using System.IO;
+using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Graphics;
 using SkiaSharp;
 
@@ -20,11 +21,19 @@ namespace Isles.Graphics
             return _textures.GetOrAdd(path, path =>
             {
                 using var stream = File.OpenRead(path);
-                var bitmap = SKBitmap.Decode(stream);
+                using var bitmap = SKBitmap.Decode(stream);
                 var texture = new Texture2D(_graphicsDevice, bitmap.Width, bitmap.Height, 0, TextureUsage.AutoGenerateMipMap, SurfaceFormat.Color);
                 texture.SetData(bitmap.Pixels);
                 return texture;
             });
+        }
+
+        public static (Color[], int width, int height) ReadAllPixels(string path)
+        {
+            using var stream = File.OpenRead(path);
+            using var bitmap = SKBitmap.Decode(stream);
+            var pixels = MemoryMarshal.Cast<SKColor, Color>(bitmap.Pixels).ToArray();
+            return (pixels, bitmap.Width, bitmap.Height);
         }
     }
 }

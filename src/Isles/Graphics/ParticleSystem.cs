@@ -374,7 +374,7 @@ namespace Isles.Graphics
             effectTimeParameter = parameters["CurrentTime"];
 
             // Load the particle texture, and set it onto the effect.
-            texture = ((BaseGame)game).TextureLoader.LoadTexture(Settings.TextureName);
+            texture = game.TextureLoader.LoadTexture(Settings.TextureName);
         }
 
         private void SetParameters()

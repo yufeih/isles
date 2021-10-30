@@ -12,6 +12,17 @@ namespace Isles.Graphics
 {
     public abstract class Landscape : BaseLandscape
     {
+        public override void Load(TerrainData data, TextureLoader textureLoader)
+        {
+            base.Load(data, textureLoader);
+
+            earthRadius = data.EarthRadius;
+            waterTexture = textureLoader.LoadTexture(data.WaterTexture);
+            waterDstortion = textureLoader.LoadTexture(data.WaterBumpTexture);
+
+            Initialize(BaseGame.Singleton);
+        }
+
         public override void ReadContent(ContentReader input)
         {
             base.ReadContent(input);

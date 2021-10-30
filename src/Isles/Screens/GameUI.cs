@@ -618,10 +618,10 @@ namespace Isles
         {
             Point position2D = game.Project(position);
 
-            var fullRect = new Rectangle((int)position2D.X - 1, (int)position2D.Y - 1 - yOffset,
+            var fullRect = new Rectangle(position2D.X - 1, position2D.Y - 1 - yOffset,
                                               length + 2, progressFullSize.Y + 2);
 
-            var percentagedRect = new Rectangle((int)position2D.X, (int)position2D.Y - yOffset,
+            var percentagedRect = new Rectangle(position2D.X, position2D.Y - yOffset,
                                             (int)(length * percentage / 100), progressFullSize.Y);
 
             fullRect.X -= length / 2;

@@ -84,7 +84,7 @@ namespace Isles.Engine
             var denom = Vector2.Dot(planeNormal, rayDirection);
 
             // Normal is parallel to vector
-            return FloatEqualsZero(denom) ? null : (float?)-(numer / denom);
+            return FloatEqualsZero(denom) ? null : -(numer / denom);
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace Isles.Engine
             var d = radius * radius - (length * length - v * v);
 
             // No intersection, return null
-            return d < 0 ? null : (float?)(v - (float)Math.Sqrt(d));
+            return d < 0 ? null : v - (float)Math.Sqrt(d);
         }
 
         /// <summary>
@@ -346,7 +346,7 @@ namespace Isles.Engine
 
             if (Bot == 0)// parallel
             {
-                return FloatEqualsZero(rTop) && FloatEqualsZero(sTop) ? 0 : (float?)null;
+                return FloatEqualsZero(rTop) && FloatEqualsZero(sTop) ? 0 : null;
             }
 
             var invBot = 1.0f / Bot;

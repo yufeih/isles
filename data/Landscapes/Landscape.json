@@ -1,23 +1,24 @@
-﻿{
+{
   "Width": 2048,
   "Depth": 2048,
   "Height": 80,
   "BaseHeight": -43.3,
-  "Heightmap": "isles.png",
-  "WaterTexture": "water.png",
-  "WaterBumpTexture": "water_normalmap.jpg",
+  "Heightmap": "data/landscapes/isles.png",
+  "EarthRadius": 65000,
+  "WaterTexture": "data/landscapes/water.png",
+  "WaterBumpTexture": "data/landscapes/water_normalmap.png",
   "Layers": [
     {
-      "ColorTexture": "shadi.png",
-      "AlphaTexture": "white.png"
+      "ColorTexture": "data/landscapes/shadi.png",
+      "AlphaTexture": "data/landscapes/white.png"
     },
     {
-      "ColorTexture": "caodi.png",
-      "AlphaTexture": "2.png"
+      "ColorTexture": "data/landscapes/caodi.png",
+      "AlphaTexture": "data/landscapes/2.png"
     },
     {
-      "ColorTexture": "daolu.png",
-      "AlphaTexture": "3.png"
+      "ColorTexture": "data/landscapes/daolu.png",
+      "AlphaTexture": "data/landscapes/3.png"
     }
   ]
 }

@@ -485,7 +485,7 @@ namespace Isles
                 }
             }
 
-            return attacker != null ? (Vector3?)attacker.Position : null;
+            return attacker != null ? attacker.Position : null;
         }
     }
 }

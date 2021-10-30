@@ -1146,8 +1146,8 @@ namespace Isles
             else if (step == 1 && input.Mouse.LeftButton == ButtonState.Pressed && entity != null)
             {
                 var rotation = beginDropRotation + MathHelper.PiOver2 + (float)Math.Atan2(
-                                -(double)(input.MousePosition.Y - beginDropPosition.Y),
-                                 (double)(input.MousePosition.X - beginDropPosition.X));
+                                -(input.MousePosition.Y - beginDropPosition.Y),
+                                 input.MousePosition.X - beginDropPosition.X);
 
                 entity.Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, rotation);
 
