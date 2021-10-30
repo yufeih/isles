@@ -105,7 +105,6 @@ namespace Isles.Engine
         {
             Singleton = this;
             Settings = JsonSerializer.Deserialize<Settings>(File.ReadAllText("data/settings/settings.json"));
-            Content = new ContentManager(Services, Settings.ContentDirectory);
 
             Graphics = new GraphicsDeviceManager(this)
             {

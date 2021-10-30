@@ -77,8 +77,8 @@ namespace Isles.Graphics
             {
                 var pp = _graphics.PresentationParameters;
                 var mouseState = Mouse.GetState();
-                var mapX = (int)(ObjectMapSize * MathHelper.Clamp(1.0f * mouseState.X / pp.BackBufferWidth, 0, 1));
-                var mapY = (int)(ObjectMapSize * MathHelper.Clamp(1.0f * mouseState.Y / pp.BackBufferHeight, 0, 1));
+                var mapX = (int)((ObjectMapSize - 1) * MathHelper.Clamp(1.0f * mouseState.X / pp.BackBufferWidth, 0, 1));
+                var mapY = (int)((ObjectMapSize - 1) * MathHelper.Clamp(1.0f * mouseState.Y / pp.BackBufferHeight, 0, 1));
                 var color = _colors[mapY * ObjectMapSize + mapX];
                 return _objectMap.TryGetValue(color, out var result) ? result : default;
             }

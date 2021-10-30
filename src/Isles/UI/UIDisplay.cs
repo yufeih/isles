@@ -9,9 +9,6 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.UI
 {
-    /// <summary>
-    /// Manages all UI elements.
-    /// </summary>
     public sealed class UIDisplay : IUIElement
     {
         /// <summary>
@@ -21,83 +18,16 @@ namespace Isles.UI
         public const int ReferenceScreenWidth = 800;
         public const int ReferenceScreenHeight = 600;
 
-        /// <summary>
-        /// UI content manager.
-        /// </summary>
         private readonly BaseGame game;
 
-        /// <summary>
-        /// Sprite batch used to draw all UI elements.
-        /// </summary>
-        private SpriteBatch sprite;
-
-        /// <summary>
-        /// Default UI font.
-        /// </summary>
-        private SpriteFont font;
-
-        /// <summary>
-        /// UI effect.
-        /// </summary>
-        private Effect effect;
-
-        /// <summary>
-        /// Area of the UI dialog.
-        /// </summary>
         private Rectangle area;
 
-        /// <summary>
-        /// UI Elements.
-        /// </summary>
-        private readonly BroadcastList<IUIElement, List<IUIElement>> elements = new
-();
+        private readonly BroadcastList<IUIElement, List<IUIElement>> elements = new();
 
-        /// <summary>
-        /// Visible.
-        /// </summary>
-        private bool visible = true;
+        private readonly Rectangle referenceArea = new(0, 0, ReferenceScreenWidth, ReferenceScreenHeight);
 
-        /// <summary>
-        /// Enable.
-        /// </summary>
-        private bool enabled = true;
+        public SpriteBatch Sprite { get; set; }
 
-        /// <summary>
-        /// Reference area.
-        /// </summary>
-        private readonly Rectangle referenceArea =
-            new(0, 0, ReferenceScreenWidth, ReferenceScreenHeight);
-
-        /// <summary>
-        /// Gets or sets the sprite batch used to draw all UI elements.
-        /// </summary>
-        public SpriteBatch Sprite
-        {
-            get => sprite;
-            set => sprite = value;
-        }
-
-        /// <summary>
-        /// Gets or sets the default UI font.
-        /// </summary>
-        public SpriteFont Font
-        {
-            get => font;
-            set => font = value;
-        }
-
-        /// <summary>
-        /// Gets or sets the default effect to render UI elements.
-        /// </summary>
-        public Effect Effect
-        {
-            get => effect;
-            set => effect = value;
-        }
-
-        /// <summary>
-        /// Gets or sets the area of the dialog.
-        /// </summary>
         public Rectangle Area
         {
             get => referenceArea;
@@ -110,9 +40,6 @@ namespace Isles.UI
             set { }
         }
 
-        /// <summary>
-        /// Gets or sets the parent of an UI element.
-        /// </summary>
         public IUIElement Parent
         {
             get => null;
@@ -121,41 +48,21 @@ namespace Isles.UI
             set { }
         }
 
-        /// <summary>
-        /// Gets or sets UI element anchor.
-        /// </summary>
         public Anchor Anchor
         {
             get => Anchor.TopLeft;
             set { }
         }
 
-        /// <summary>
-        /// Gets or sets UI element scale mode.
-        /// </summary>
         public ScaleMode ScaleMode
         {
             get => ScaleMode.Fixed;
             set { }
         }
 
-        /// <summary>
-        /// Gets or sets UI element visibility.
-        /// </summary>
-        public bool Visible
-        {
-            get => visible;
-            set => visible = value;
-        }
+        public bool Visible { get; set; } = true;
 
-        /// <summary>
-        /// Enable/Disable an UI element.
-        /// </summary>
-        public bool Enabled
-        {
-            get => enabled;
-            set => enabled = value;
-        }
+        public bool Enabled { get; set; } = true;
 
         public UIDisplay(BaseGame game)
         {
@@ -175,37 +82,24 @@ namespace Isles.UI
 
         public void LoadContent()
         {
-            sprite = new SpriteBatch(game.GraphicsDevice);
-            effect = new BasicEffect(game.GraphicsDevice, null);
-            font = game.Content.Load<SpriteFont>("Fonts/Default");
+            Sprite = new SpriteBatch(game.GraphicsDevice);
 
             GraphicsDevice_DeviceReset(game.GraphicsDevice, null);
             game.GraphicsDevice.DeviceReset += GraphicsDevice_DeviceReset;
         }
 
-        /// <summary>
-        /// Adds an UI element to the dialog.
-        /// </summary>
-        /// <param name="element"></param>
         public void Add(IUIElement element)
         {
             element.Parent = this;
             elements.Add(element);
         }
 
-        /// <summary>
-        /// Removes an UI elment from the dialog.
-        /// </summary>
-        /// <param name="element"></param>
         public void Remove(IUIElement element)
         {
             element.Parent = null;
             elements.Remove(element);
         }
 
-        /// <summary>
-        /// Clear all UI elements.
-        /// </summary>
         public void Clear()
         {
             foreach (IUIElement element in elements)
@@ -218,13 +112,9 @@ namespace Isles.UI
 
         public IEnumerable<IUIElement> Elements => elements;
 
-        /// <summary>
-        /// Update all UI elements.
-        /// </summary>
-        /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
-            if (!enabled)
+            if (!Enabled)
             {
                 return;
             }
@@ -235,22 +125,14 @@ namespace Isles.UI
             }
         }
 
-        /// <summary>
-        /// Draw all UI elements.
-        /// </summary>
-        /// <param name="gameTime"></param>
         public void Draw(GameTime gameTime)
         {
-            Draw(gameTime, sprite);
+            Draw(gameTime, Sprite);
         }
 
-        /// <summary>
-        /// Draw all UI elements.
-        /// </summary>
-        /// <param name="gameTime"></param>
         public void Draw(GameTime gameTime, SpriteBatch sprite)
         {
-            if (!visible)
+            if (!Visible)
             {
                 return;
             }
@@ -268,9 +150,6 @@ namespace Isles.UI
             sprite.End();
         }
 
-        /// <summary>
-        /// Handle UI input.
-        /// </summary>
         public EventResult HandleEvent(EventType type, object sender, object tag)
         {
             for (var i = elements.Count - 1; i >= 0; i--)

@@ -46,14 +46,14 @@ namespace Isles.Graphics
 
         public Effect Effect { get; }
 
-        public SpriteFont Font { get; }
+        public TextRenderer Font { get; }
 
         public SpriteBatch Sprite { get; }
 
         public Graphics2D(BaseGame setGame)
         {
             game = setGame;
-            Font = game.Content.Load<SpriteFont>("Fonts/Default");
+            Font = new(game.GraphicsDevice, "data/fonts/kooten.ttf", 19);
             Effect = game.ShaderLoader.LoadShader("shaders/Graphics2D.cso");
             Sprite = new SpriteBatch(game.GraphicsDevice);
             vertices = new DynamicVertexBuffer(
@@ -228,11 +228,8 @@ namespace Isles.Graphics
             Sprite.Begin();
             foreach (StringValue value in strings)
             {
-                Sprite.DrawString(
-                    Font, value.Text, value.Position, value.Color, 0,
-                    Vector2.Zero, value.Size, SpriteEffects.None, 0);
+                Font.DrawString(Sprite, value.Text, value.Position, value.Color, value.Size);
             }
-
             Sprite.End();
 
             // Clear all string in this frame
@@ -262,8 +259,7 @@ namespace Isles.Graphics
             Effect.Begin();
             Effect.CurrentTechnique.Passes[0].Begin();
 
-            game.GraphicsDevice.DrawPrimitives(
-                PrimitiveType.LineList, 0, lineCount / 2);
+            game.GraphicsDevice.DrawPrimitives(PrimitiveType.LineList, 0, lineCount / 2);
 
             Effect.CurrentTechnique.Passes[0].End();
             Effect.End();
@@ -326,7 +322,7 @@ namespace Isles.Graphics
         /// FormatString("ABCDEFGH", 40, 50)    : "ABCD\nEFGH"
         /// FormatString("ABCDEFGHIJ", 40, 50)  : "ABCD\nE...".
         /// </example>
-        public static string FormatString(string text, float width, float height, float fontSize, SpriteFont font)
+        public static string FormatString(string text, float width, float height, float fontSize, TextRenderer font)
         {
             width /= fontSize;
 

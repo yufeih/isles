@@ -10,7 +10,6 @@ using System.Text.Json;
 using System.Xml;
 using Isles.Graphics;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 
 namespace Isles.Engine
 {

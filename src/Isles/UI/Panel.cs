@@ -385,126 +385,53 @@ namespace Isles.UI
 
                 if (text == null)
                 {
-                    formatedText = null;
+                    FormatedText = null;
                     return;
                 }
 
                 // Format the input text based on text field size and font size
-                formatedText = Graphics2D.FormatString(text, DestinationRectangle.Width,
+                FormatedText = Graphics2D.FormatString(text, DestinationRectangle.Width,
                                                              DestinationRectangle.Height,
-                                                             fontSize, Graphics2D.Font);
-                if (centered)
-                {
-                    lines = formatedText.Split(new char[] { '\n' },
-                                               StringSplitOptions.RemoveEmptyEntries);
-                }
+                                                             FontSize, Graphics2D.Font);
+
+                lines = FormatedText.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
             }
         }
 
-        private string formatedText;
+        public string FormatedText { get; private set; }
 
-        /// <summary>
-        /// Gets the formatted text.
-        /// </summary>
-        public string FormatedText => formatedText;
+        public Color Color { get; set; }
 
-        /// <summary>
-        /// Color of the text.
-        /// </summary>
-        private Color color;
+        public bool Centered { get; set; }
 
-        public Color Color
-        {
-            get => color;
-            set => color = value;
-        }
+        public float FontSize { get; set; } = 13f / 23;
 
-        private bool centered;
+        public int RealHeight => (int)(Graphics2D.Font.MeasureString(FormatedText).Y * FontSize);
 
-        /// <summary>
-        /// Gets or sets whether the text is centered.
-        /// </summary>
-        public bool Centered
-        {
-            get => centered;
-            set
-            {
-                centered = value;
+        public bool Shadowed { get; set; }
 
-                if (centered)
-                {
-                    lines = formatedText.Split(new char[] { '\n' },
-                                               StringSplitOptions.RemoveEmptyEntries);
-                }
-            }
-        }
+        private Color ShadowColor { get; set; } = Color.Black;
 
-        private float fontSize = 13f / 23;
-
-        /// <summary>
-        /// Gets or sets the font size.
-        /// </summary>
-        public float FontSize
-        {
-            get => fontSize;
-            set => fontSize = value;
-        }
-
-        public int RealHeight => (int)(Graphics2D.Font.MeasureString(formatedText).Y * fontSize);
-
-        // Whether the text is shadowed
-        private bool shadowed;
-
-        public bool Shadowed
-        {
-            get => shadowed;
-            set => shadowed = value;
-        }
-
-        /// <summary>
-        /// Color for shadow.
-        /// </summary>
-        private Color shadowColor = Color.Black;
-
-        public Color ShadowColor
-        {
-            get => shadowColor;
-            set => shadowColor = value;
-        }
-
-        /// <summary>
-        /// Constructors.
-        /// </summary>
-        /// <param name="text"></param>
-        /// <param name="area"></param>
         public TextField(string text, float fontSize, Color color, Rectangle area)
             : base(area)
         {
-            this.color = color;
-            this.fontSize = fontSize;
+            Color = color;
+            FontSize = fontSize;
             EffectiveRegion = Rectangle.Empty;
             Text = text;   // Note this upper case Text
         }
 
-        /// <summary>
-        /// Constructors.
-        /// </summary>
-        /// <param name="text"></param>
-        /// <param name="area"></param>
         public TextField(string text, float fontSize, Color color, Rectangle area, Color shadowColor)
             : base(area)
         {
-            shadowed = true;
-            this.shadowColor = shadowColor;
-            this.color = color;
-            this.fontSize = fontSize;
+            Shadowed = true;
+            ShadowColor = shadowColor;
+            Color = color;
+            FontSize = fontSize;
             Text = text;
             EffectiveRegion = Rectangle.Empty;
         }
 
-        /// <summary>
-        /// Ignore event.
-        /// </summary>
         public override EventResult HandleEvent(EventType type, object sender, object tag)
         {
             return EventResult.Unhandled;
@@ -518,9 +445,9 @@ namespace Isles.UI
             {
                 if (IsDirty && text != null)
                 {
-                    formatedText = Graphics2D.FormatString(text,
+                    FormatedText = Graphics2D.FormatString(text,
                                     base.DestinationRectangle.Width,
-                                    base.DestinationRectangle.Height, fontSize,
+                                    base.DestinationRectangle.Height, FontSize,
                                     Graphics2D.Font);
                 }
 
@@ -528,9 +455,6 @@ namespace Isles.UI
             }
         }
 
-        /// <summary>
-        /// Draw.
-        /// </summary>
         public override void Draw(GameTime gameTime, SpriteBatch sprite)
         {
             if (text == null)
@@ -540,43 +464,24 @@ namespace Isles.UI
 
             _ = DestinationRectangle.Width;
 
-            if (Centered)
+            Vector2 size = Graphics2D.Font.MeasureString(FormatedText) * FontSize;
+            var heightOffset = Centered
+                ? (DestinationRectangle.Height - size.Y) / 2 + DestinationRectangle.Top
+                : DestinationRectangle.Top;
+            foreach (var line in lines)
             {
-                Vector2 size = Graphics2D.Font.MeasureString(formatedText) * fontSize;
-                var heightOffset = (DestinationRectangle.Height - size.Y) / 2 + DestinationRectangle.Top;
-                for (var i = 0; i < lines.Length; i++)
-                {
-                    size = Graphics2D.Font.MeasureString(lines[i]) * fontSize;
-                    sprite.DrawString(Graphics2D.Font, lines[i],
-                                        new Vector2((DestinationRectangle.Width - size.X) / 2 +
-                                                    DestinationRectangle.Left, heightOffset),
-                                        color, 0, Vector2.Zero, fontSize,
-                                        SpriteEffects.None, 0);
-                    if (shadowed)
-                    {
-                        sprite.DrawString(Graphics2D.Font, lines[i],
-                                        new Vector2((DestinationRectangle.Width - size.X) / 2 +
-                                                    1 + DestinationRectangle.Left, heightOffset + 1),
-                                         shadowColor, 0, Vector2.Zero, fontSize,
-                                        SpriteEffects.None, 0);
-                    }
+                size = Graphics2D.Font.MeasureString(line) * FontSize;
 
-                    heightOffset += size.Y;
-                }
-            }
-            else
-            {
-                sprite.DrawString(Graphics2D.Font, formatedText,
-                                   new Vector2(DestinationRectangle.X, DestinationRectangle.Y),
-                                   color, 0, Vector2.Zero, fontSize,
-                                   SpriteEffects.None, 0);
-                if (shadowed)
+                var position = Centered
+                    ? new Vector2(DestinationRectangle.Left + (DestinationRectangle.Width - size.X) / 2, heightOffset)
+                    : new Vector2(DestinationRectangle.Left, heightOffset);
+                Graphics2D.Font.DrawString(sprite, line, position, Color, FontSize);
+                if (Shadowed)
                 {
-                    sprite.DrawString(Graphics2D.Font, formatedText,
-                                        new Vector2(DestinationRectangle.X + 1, DestinationRectangle.Y + 1),
-                                        shadowColor, 0, Vector2.Zero, fontSize,
-                                        SpriteEffects.None, 0);
+                    Graphics2D.Font.DrawString(sprite, line, position + Vector2.One, ShadowColor, FontSize);
                 }
+
+                heightOffset += size.Y;
             }
 
             base.Draw(gameTime, sprite);
@@ -585,13 +490,7 @@ namespace Isles.UI
 
     public class TextBox : TextField
     {
-        public int MaxCharactors
-        {
-            get => maxCharactors;
-            set => maxCharactors = value;
-        }
-
-        private int maxCharactors = 20;
+        public int MaxCharactors { get; set; } = 20;
 
         public TextBox(float fontSize, Color color, Rectangle area)
             : base("", fontSize, color, area)
@@ -610,7 +509,7 @@ namespace Isles.UI
                 flash = !flash;
             }
 
-            if (flash && Text.Length < maxCharactors)
+            if (flash && Text.Length < MaxCharactors)
             {
                 Text += "_";
                 base.Draw(gameTime, sprite);
@@ -641,7 +540,7 @@ namespace Isles.UI
 
                 var inputChar = Input.KeyToChar(key, upperCase);
 
-                if (Text.Length < maxCharactors &&
+                if (Text.Length < MaxCharactors &&
                    (inputChar != ' ' || (inputChar == ' ' && key == Keys.Space)))
                 {
                     Text += inputChar;
