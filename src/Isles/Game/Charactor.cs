@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Xml;
 using Isles.Engine;
 using Isles.Graphics;
-using Isles.Pipeline;
 using Microsoft.Xna.Framework;
 
 namespace Isles

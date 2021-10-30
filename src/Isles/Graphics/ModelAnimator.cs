@@ -1,19 +1,16 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 using System;
-using System.Collections.Generic;
-using Isles.Pipeline;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 
 namespace Isles.Graphics
 {
     public class ModelAnimator
     {
-        private readonly GltfModel _model;
+        private readonly Model _model;
         private readonly Matrix[] _matrices;
 
-        public ModelAnimator(GltfModel model)
+        public ModelAnimator(Model model)
         {
             _model = model;
             _matrices = new Matrix[model.Nodes.Length];
@@ -68,7 +65,7 @@ namespace Isles.Graphics
             // Local transforms to world transforms
             for (var node = 1; node < _model.Nodes.Length; node++)
             {
-                _matrices[node] = _matrices[node] * _matrices[_model.Nodes[node].ParentIndex];
+                _matrices[node] *= _matrices[_model.Nodes[node].ParentIndex];
             }
 
             return _matrices;
@@ -97,7 +94,7 @@ namespace Isles.Graphics
     /// </summary>
     public class AnimationPlayer
     {
-        private readonly GltfModel _model;
+        private readonly Model _model;
         private readonly ModelAnimator _animator;
 
         private string CurrentClip = "";
@@ -108,7 +105,7 @@ namespace Isles.Graphics
         public EventHandler Complete;
         public bool Loop;
 
-        public AnimationPlayer(GltfModel model)
+        public AnimationPlayer(Model model)
         {
             _model = model;
             _animator = new ModelAnimator(model);
@@ -178,37 +175,6 @@ namespace Isles.Graphics
         public Matrix[] GetWorldTransforms()
         {
             return _animator.GetWorldTransforms(CurrentClip, (float)currentTimeValue.TotalSeconds, Loop);
-        }
-    }
-
-    /// <summary>
-    /// Loads AnimationClip objects from compiled XNB format.
-    /// </summary>
-    public class AnimationClipReader : ContentTypeReader<AnimationClip>
-    {
-        protected override AnimationClip Read(ContentReader input,
-                                              AnimationClip existingInstance)
-        {
-            TimeSpan duration = input.ReadObject<TimeSpan>();
-            IList<Keyframe> keyframes = input.ReadObject<IList<Keyframe>>();
-
-            return new AnimationClip(duration, keyframes);
-        }
-    }
-
-    /// <summary>
-    /// Loads Keyframe objects from compiled XNB format.
-    /// </summary>
-    public class KeyframeReader : ContentTypeReader<Keyframe>
-    {
-        protected override Keyframe Read(ContentReader input,
-                                         Keyframe existingInstance)
-        {
-            var bone = input.ReadObject<int>();
-            TimeSpan time = input.ReadObject<TimeSpan>();
-            Matrix transform = input.ReadObject<Matrix>();
-
-            return new Keyframe(bone, time, transform);
         }
     }
 }

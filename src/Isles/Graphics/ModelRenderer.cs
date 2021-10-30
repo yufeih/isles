@@ -60,7 +60,7 @@ namespace Isles.Graphics
             _skinnedTransparent.Clear();
         }
 
-        public void AddDrawable(GltfModel.Mesh mesh, Matrix transform, Matrix[] boneTransforms, Vector4 tint, Vector4 glow)
+        public void AddDrawable(Model.Mesh mesh, Matrix transform, Matrix[] boneTransforms, Vector4 tint, Vector4 glow)
         {
             var queue = tint.W < 1
                 ? (boneTransforms != null ? _skinnedTransparent : _defaultTransparent)
@@ -157,7 +157,7 @@ namespace Isles.Graphics
 
         private struct DrawableItem
         {
-            public GltfModel.Mesh Mesh;
+            public Model.Mesh Mesh;
             public Matrix Transform;
             public Matrix[] Bones;
             public Vector4 Tint;

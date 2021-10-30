@@ -2,12 +2,8 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
 using Isles.Engine;
-using Isles.Pipeline;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Graphics
 {
@@ -31,8 +27,8 @@ namespace Isles.Graphics
 
         private Matrix transform = Matrix.Identity;
 
-        private Matrix[] bones;
-        private Matrix[] skinTransforms;
+        private Matrix[] absoluteNodeTransforms;
+        private Matrix[] absoluteBoneTransforms;
 
         /// <summary>
         /// Gets the axis aligned bounding box of this model.
@@ -43,7 +39,7 @@ namespace Isles.Graphics
             {
                 if (isBoundingBoxDirty)
                 {
-                    boundingBox = AABBFromOBB(orientedBoundingBox, transform);
+                    boundingBox = AABBFromOBB(localBoundingBox, transform);
                     isBoundingBoxDirty = false;
                 }
 
@@ -59,7 +55,7 @@ namespace Isles.Graphics
         /// <summary>
         /// Bounding box of the xna model. (Not always axis aligned).
         /// </summary>
-        private BoundingBox orientedBoundingBox;
+        private BoundingBox localBoundingBox;
 
         /// <summary>
         /// Whether we should refresh our axis aligned bounding box.
@@ -117,13 +113,9 @@ namespace Isles.Graphics
             Paused,
         }
 
-        /// <summary>
-        /// Current animation state.
-        /// </summary>
         private AnimationState animationState = AnimationState.Stopped;
 
         private Model model;
-        private GltfModel gltfModel;
 
         public Vector3 Tint { get; set; } = new(1, 1, 1);
 
@@ -138,9 +130,29 @@ namespace Isles.Graphics
         public GameModel(string modelName)
         {
             // Make sure this is the upper case Model
-            model = game.Content.Load<Model>(modelName);
-            gltfModel = game.ModelLoader.LoadModel($"data/{modelName}.gltf");
-            Init();
+            model = game.ModelLoader.LoadModel($"data/{modelName}.gltf");
+
+            if (model.Meshes[0].Joints != null)
+            {
+                absoluteBoneTransforms = new Matrix[model.Meshes[0].Joints.Length];
+            }
+
+            if (model.Animations != null && model.Animations.Count > 0)
+            {
+                players[0] = new AnimationPlayer(model);
+                players[1] = new AnimationPlayer(model);
+
+                UpdateBoneTransform(new GameTime());
+
+                // Play the first animation clip
+                Player.Loop = true;
+                Play();
+            }
+
+            absoluteNodeTransforms = GetAbsoluteNodeTransforms(model);
+
+            // Compute model bounding box.
+            localBoundingBox = CalculateBoundingBox(model, absoluteNodeTransforms);
         }
 
         /// <summary>
@@ -163,49 +175,21 @@ namespace Isles.Graphics
                 Alpha = Alpha,
                 isBoundingBoxDirty = isBoundingBoxDirty,
                 model = model,
-                gltfModel = gltfModel,
-                orientedBoundingBox = orientedBoundingBox,
+                localBoundingBox = localBoundingBox,
                 players = players,
                 transform = transform,
             };
 
-            if (skinTransforms != null)
+            if (absoluteBoneTransforms != null)
             {
-                copy.skinTransforms = new Matrix[skinTransforms.Length];
-                skinTransforms.CopyTo(copy.skinTransforms, 0);
+                copy.absoluteBoneTransforms = new Matrix[absoluteBoneTransforms.Length];
+                absoluteBoneTransforms.CopyTo(copy.absoluteBoneTransforms, 0);
             }
 
-            copy.bones = new Matrix[bones.Length];
-            bones.CopyTo(copy.bones, 0);
+            copy.absoluteNodeTransforms = new Matrix[absoluteNodeTransforms.Length];
+            absoluteNodeTransforms.CopyTo(copy.absoluteNodeTransforms, 0);
 
             return copy;
-        }
-
-        private void Init()
-        {
-            if (gltfModel.Meshes[0].Joints != null)
-            {
-                skinTransforms = new Matrix[gltfModel.Meshes[0].Joints.Length];
-            }
-
-            if (gltfModel.Animations != null && gltfModel.Animations.Count > 0)
-            {
-                players[0] = new AnimationPlayer(gltfModel);
-                players[1] = new AnimationPlayer(gltfModel);
-
-                UpdateBoneTransform(new GameTime());
-
-                // Play the first animation clip
-                Player.Loop = true;
-                Play();
-            }
-
-            // Adjust bone array size
-            bones = new Matrix[gltfModel.Nodes.Length];
-            model.CopyAbsoluteBoneTransformsTo(bones);
-
-            // Compute model bounding box.
-            orientedBoundingBox = OBBFromModel(model);
         }
 
         /// <summary>
@@ -216,7 +200,7 @@ namespace Isles.Graphics
         /// </returns>
         public int GetBone(string boneName)
         {
-            return gltfModel.NodeNames.TryGetValue(boneName, out var node) ? node.Index : -1;
+            return model.NodeNames.TryGetValue(boneName, out var node) ? node.Index : -1;
         }
 
         /// <summary>
@@ -225,7 +209,7 @@ namespace Isles.Graphics
         /// </summary>
         public Matrix GetBoneTransform(int bone)
         {
-            return bones[bone] * transform;
+            return absoluteNodeTransforms[bone] * transform;
         }
 
         /// <summary>
@@ -342,7 +326,7 @@ namespace Isles.Graphics
         private void UpdateBoneTransform(GameTime gameTime)
         {
             // Update skin transforms (stored in bones)
-            bones = players[currentPlayer].GetWorldTransforms();
+            absoluteNodeTransforms = players[currentPlayer].GetWorldTransforms();
 
             // Lerp transforms when we are blending between animations
             if (blending)
@@ -365,18 +349,18 @@ namespace Isles.Graphics
                 Matrix[] prevBoneTransforms = players[1 - currentPlayer].GetWorldTransforms();
 
                 // Perform matrix lerp on all skin transforms
-                for (var i = 0; i < bones.Length; i++)
+                for (var i = 0; i < absoluteNodeTransforms.Length; i++)
                 {
-                    bones[i] = Matrix.Lerp(prevBoneTransforms[i], bones[i], amount);
+                    absoluteNodeTransforms[i] = Matrix.Lerp(prevBoneTransforms[i], absoluteNodeTransforms[i], amount);
                 }
             }
 
-            if (gltfModel.Meshes[0].Joints != null)
+            if (model.Meshes[0].Joints != null)
             {
-                var mesh = gltfModel.Meshes[0];
+                var mesh = model.Meshes[0];
                 for (var i = 0; i < mesh.Joints.Length; i++)
                 {
-                    skinTransforms[i] = mesh.InverseBindMatrices[i] * bones[mesh.Joints[i].Index];
+                    absoluteBoneTransforms[i] = mesh.InverseBindMatrices[i] * absoluteNodeTransforms[mesh.Joints[i].Index];
                 }
             }
         }
@@ -386,83 +370,86 @@ namespace Isles.Graphics
             var tint = color ?? new Vector4(Tint, MathHelper.Clamp(Alpha, 0, 1));
             var glow = new Vector4(Glow, 1);
 
-            foreach (var mesh in gltfModel.Meshes)
+            foreach (var mesh in model.Meshes)
             {
                 if (mesh.Joints != null)
                 {
-                    game.ModelRenderer.AddDrawable(mesh, transform, skinTransforms, tint, glow);
+                    game.ModelRenderer.AddDrawable(mesh, transform, absoluteBoneTransforms, tint, glow);
                 }
                 else
                 {
-                    game.ModelRenderer.AddDrawable(mesh, bones[mesh.Node.Index] * transform, null, tint, glow);
+                    game.ModelRenderer.AddDrawable(mesh, absoluteNodeTransforms[mesh.Node.Index] * transform, null, tint, glow);
                 }
             }
         }
 
-        /// <summary>
-        /// Compute bounding box for the specified xna model.
-        /// </summary>
-        protected static BoundingBox OBBFromModel(Model model)
+        private static BoundingBox CalculateBoundingBox(Model model, Matrix[] absoluteNodeTransforms)
         {
-            if (null == model || model.Meshes.Count <= 0)
+            var min = Vector3.One * float.MaxValue;
+            var max = Vector3.One * float.MinValue;
+
+            foreach (var mesh in model.Meshes)
             {
-                return new BoundingBox(Vector3.Zero, Vector3.Zero);
-            }
-
-            const float FloatMax = 1000000;
-
-            // Compute bounding box
-            var min = new Vector3(FloatMax, FloatMax, FloatMax);
-            var max = new Vector3(-FloatMax, -FloatMax, -FloatMax);
-
-            var bones = new Matrix[model.Bones.Count];
-            model.CopyAbsoluteBoneTransformsTo(bones);
-
-            foreach (ModelMesh mesh in model.Meshes)
-            {
-                var stride = mesh.MeshParts[0].VertexStride;
-                var elementCount = mesh.VertexBuffer.SizeInBytes / stride;
-                var vertices = new Vector3[elementCount];
-                mesh.VertexBuffer.GetData(0, vertices, 0, elementCount, stride);
-
-                foreach (Vector3 vertex in vertices)
+                foreach (var primitive in mesh.Primitives)
                 {
-                    // Transform vertex
-                    var v = Vector3.Transform(vertex, bones[mesh.ParentBone.Index]);
-
-                    if (v.X < min.X)
+                    foreach (var corner in primitive.BoundingBox.GetCorners())
                     {
-                        min.X = v.X;
-                    }
+                        // Transform vertex
+                        var v = Vector3.Transform(corner, absoluteNodeTransforms[mesh.Node.Index]);
 
-                    if (v.X > max.X)
-                    {
-                        max.X = v.X;
-                    }
+                        if (v.X < min.X)
+                        {
+                            min.X = v.X;
+                        }
 
-                    if (v.Y < min.Y)
-                    {
-                        min.Y = v.Y;
-                    }
+                        if (v.X > max.X)
+                        {
+                            max.X = v.X;
+                        }
 
-                    if (v.Y > max.Y)
-                    {
-                        max.Y = v.Y;
-                    }
+                        if (v.Y < min.Y)
+                        {
+                            min.Y = v.Y;
+                        }
 
-                    if (v.Z < min.Z)
-                    {
-                        min.Z = v.Z;
-                    }
+                        if (v.Y > max.Y)
+                        {
+                            max.Y = v.Y;
+                        }
 
-                    if (v.Z > max.Z)
-                    {
-                        max.Z = v.Z;
+                        if (v.Z < min.Z)
+                        {
+                            min.Z = v.Z;
+                        }
+
+                        if (v.Z > max.Z)
+                        {
+                            max.Z = v.Z;
+                        }
                     }
                 }
             }
 
             return new BoundingBox(min, max);
+        }
+
+        private static Matrix[] GetAbsoluteNodeTransforms(Model model)
+        {
+            var result = new Matrix[model.Nodes.Length];
+
+            foreach (var node in model.Nodes)
+            {
+                result[node.Index] = Matrix.CreateScale(node.Scale) *
+                                     Matrix.CreateFromQuaternion(node.Rotation) *
+                                     Matrix.CreateTranslation(node.Translation);
+
+                if (node.ParentIndex >= 0)
+                {
+                    result[node.Index] *= result[node.ParentIndex];
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -515,28 +502,6 @@ namespace Isles.Graphics
             }
 
             return new BoundingBox(min, max);
-        }
-    }
-
-    /// <summary>
-    /// Loads SkinningData objects from compiled XNB format.
-    /// </summary>
-    public class SkinningDataReader : ContentTypeReader<SkinningData>
-    {
-        protected override SkinningData Read(ContentReader input,
-                                             SkinningData existingInstance)
-        {
-            IList<Matrix> bindPose, inverseBindPose;
-            IList<int> skeletonHierarchy;
-            IList<string> boneName;
-
-            bindPose = input.ReadObject<IList<Matrix>>();
-            inverseBindPose = input.ReadObject<IList<Matrix>>();
-            skeletonHierarchy = input.ReadObject<IList<int>>();
-            boneName = input.ReadObject<IList<string>>();
-
-            return new SkinningData(bindPose, inverseBindPose,
-                                    skeletonHierarchy, boneName);
         }
     }
 }

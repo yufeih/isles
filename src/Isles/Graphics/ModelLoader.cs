@@ -13,7 +13,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Graphics
 {
-    public class GltfModel
+    public class Model
     {
         public Mesh[] Meshes { get; init; }
         public Node[] Nodes { get; init; }
@@ -75,7 +75,7 @@ namespace Isles.Graphics
     {
         private readonly GraphicsDevice _graphicsDevice;
         private readonly TextureLoader _textureLoader;
-        private readonly ConcurrentDictionary<string, GltfModel> _models = new();
+        private readonly ConcurrentDictionary<string, Model> _models = new();
 
         public ModelLoader(GraphicsDevice graphicsDevice, TextureLoader textureLoader)
         {
@@ -83,14 +83,14 @@ namespace Isles.Graphics
             _textureLoader = textureLoader;
         }
 
-        public GltfModel LoadModel(string path)
+        public Model LoadModel(string path)
         {
             return _models.GetOrAdd(path, LoadModelCore);
         }
 
-        private GltfModel LoadModelCore(string path)
+        private Model LoadModelCore(string path)
         {
-            var gltfSchema = new
+            var schema = new
             {
                 buffers = new[] { new { uri = "", byteLength = 0 } },
                 bufferViews = new[] { new { buffer = 0, byteOffset = 0, byteLength = 0, byteStride = 0, target = 0, } },
@@ -104,10 +104,10 @@ namespace Isles.Graphics
                 skins = new[] { new { inverseBindMatrices = 0, skeleton = 0, joints = Array.Empty<int>() } },
             };
 
-            var gltf = JsonHelper.DeserializeAnonymousType(File.ReadAllBytes(path), gltfSchema);
+            var model = JsonHelper.DeserializeAnonymousType(File.ReadAllBytes(path), schema);
             var basedir = Path.GetDirectoryName(path);
-            var buffers = gltf.buffers.Select(buffer => File.ReadAllBytes(Path.Combine(basedir, buffer.uri))).ToArray();
-            var meshToNode = new GltfModel.Node[gltf.meshes.Length];
+            var buffers = model.buffers.Select(buffer => File.ReadAllBytes(Path.Combine(basedir, buffer.uri))).ToArray();
+            var meshToNode = new Model.Node[model.meshes.Length];
 
             var nodes = LoadNodes();
             var nodeNames = nodes.Where(node => !string.IsNullOrEmpty(node.Name)).ToDictionary(node => node.Name, StringComparer.OrdinalIgnoreCase);
@@ -116,14 +116,14 @@ namespace Isles.Graphics
 
             return new() { Meshes = meshes.ToArray(), Nodes = nodes.ToArray(), NodeNames = nodeNames, Animations = animations };
 
-            List<GltfModel.Node> LoadNodes()
+            List<Model.Node> LoadNodes()
             {
-                var nodes = new List<GltfModel.Node>();
-                var nodeParentIndex = new int[gltf.nodes.Length];
+                var nodes = new List<Model.Node>();
+                var nodeParentIndex = new int[model.nodes.Length];
 
-                for (var nodeIndex = 0; nodeIndex < gltf.nodes.Length; nodeIndex++)
+                for (var nodeIndex = 0; nodeIndex < model.nodes.Length; nodeIndex++)
                 {
-                    var node = gltf.nodes[nodeIndex];
+                    var node = model.nodes[nodeIndex];
                     if (node.children != null)
                     {
                         foreach (var child in node.children)
@@ -133,9 +133,9 @@ namespace Isles.Graphics
                     }
                 }
 
-                for (var nodeIndex = 0; nodeIndex < gltf.nodes.Length; nodeIndex++)
+                for (var nodeIndex = 0; nodeIndex < model.nodes.Length; nodeIndex++)
                 {
-                    var node = gltf.nodes[nodeIndex];
+                    var node = model.nodes[nodeIndex];
                     nodes.Add(new()
                     {
                         Index = nodeIndex,
@@ -155,35 +155,35 @@ namespace Isles.Graphics
                 return nodes;
             }
 
-            List<GltfModel.Mesh> LoadMeshes()
+            List<Model.Mesh> LoadMeshes()
             {
-                var meshes = new List<GltfModel.Mesh>();
-                for (var meshIndex = 0; meshIndex < gltf.meshes.Length; meshIndex++)
+                var meshes = new List<Model.Mesh>();
+                for (var meshIndex = 0; meshIndex < model.meshes.Length; meshIndex++)
                 {
-                    var mesh = gltf.meshes[meshIndex];
-                    var primitives = new List<GltfModel.Primitive>();
+                    var mesh = model.meshes[meshIndex];
+                    var primitives = new List<Model.Primitive>();
 
                     foreach (var primitive in mesh.primitives)
                     {
                         // Vertex Buffer
-                        var positionAccessor = gltf.accessors[primitive.attributes.POSITION];
+                        var positionAccessor = model.accessors[primitive.attributes.POSITION];
                         var boundingBox = new BoundingBox(
                             min: new(positionAccessor.min[0], positionAccessor.min[1], positionAccessor.min[2]),
                             max: new(positionAccessor.max[0], positionAccessor.max[1], positionAccessor.max[2]));
 
-                        var vertexStride = gltf.bufferViews[positionAccessor.bufferView].byteStride;
+                        var vertexStride = model.bufferViews[positionAccessor.bufferView].byteStride;
                         var verticesSizeInBytes = positionAccessor.count * vertexStride;
                         var elements = new List<VertexElement>
                         {
-                            new(0, (short)gltf.accessors[primitive.attributes.POSITION].byteOffset, VertexElementFormat.Vector3, default, VertexElementUsage.Position, 0),
-                            new(0, (short)gltf.accessors[primitive.attributes.NORMAL].byteOffset, VertexElementFormat.Vector2, default, VertexElementUsage.Normal, 0),
-                            new(0, (short)gltf.accessors[primitive.attributes.TEXCOORD_0].byteOffset, VertexElementFormat.Vector2, default, VertexElementUsage.TextureCoordinate, 0)
+                            new(0, (short)model.accessors[primitive.attributes.POSITION].byteOffset, VertexElementFormat.Vector3, default, VertexElementUsage.Position, 0),
+                            new(0, (short)model.accessors[primitive.attributes.NORMAL].byteOffset, VertexElementFormat.Vector2, default, VertexElementUsage.Normal, 0),
+                            new(0, (short)model.accessors[primitive.attributes.TEXCOORD_0].byteOffset, VertexElementFormat.Vector2, default, VertexElementUsage.TextureCoordinate, 0)
                         };
 
                         if (primitive.attributes.JOINTS_0 != null && primitive.attributes.WEIGHTS_0 != 0)
                         {
-                            elements.Add(new(0, (short)gltf.accessors[primitive.attributes.JOINTS_0.Value].byteOffset, VertexElementFormat.Byte4, default, VertexElementUsage.BlendIndices, 0));
-                            elements.Add(new(0, (short)gltf.accessors[primitive.attributes.WEIGHTS_0.Value].byteOffset, VertexElementFormat.Vector4, default, VertexElementUsage.BlendWeight, 0));
+                            elements.Add(new(0, (short)model.accessors[primitive.attributes.JOINTS_0.Value].byteOffset, VertexElementFormat.Byte4, default, VertexElementUsage.BlendIndices, 0));
+                            elements.Add(new(0, (short)model.accessors[primitive.attributes.WEIGHTS_0.Value].byteOffset, VertexElementFormat.Vector4, default, VertexElementUsage.BlendWeight, 0));
                         }
 
                         var vertexBuffer = new VertexBuffer(_graphicsDevice, verticesSizeInBytes, BufferUsage.WriteOnly);
@@ -191,7 +191,7 @@ namespace Isles.Graphics
                         vertexBuffer.SetData(vertices, verticesStartIndex, verticesSizeInBytes);
 
                         // Index Buffer
-                        var indicesAccessor = gltf.accessors[primitive.indices];
+                        var indicesAccessor = model.accessors[primitive.indices];
                         var (indicesSizeInBytes, indexElementSize) = indicesAccessor.componentType == 5123
                             ? (indicesAccessor.count * 2, IndexElementSize.SixteenBits)
                             : (indicesAccessor.count * 4, IndexElementSize.ThirtyTwoBits);
@@ -200,8 +200,8 @@ namespace Isles.Graphics
                         indexBuffer.SetData(indices, indicesStartIndex, indicesSizeInBytes);
 
                         // Material
-                        var material = primitive.material is null ? null : gltf.materials[primitive.material.Value];
-                        var imageUri = material is null ? null : gltf.images[gltf.textures[material.pbrMetallicRoughness.baseColorTexture.index].source].uri;
+                        var material = primitive.material is null ? null : model.materials[primitive.material.Value];
+                        var imageUri = material is null ? null : model.images[model.textures[material.pbrMetallicRoughness.baseColorTexture.index].source].uri;
                         var texture = imageUri is null ? null : _textureLoader.LoadTexture(Path.Combine(basedir, imageUri));
 
                         primitives.Add(new()
@@ -219,8 +219,8 @@ namespace Isles.Graphics
                     }
 
                     var node = meshToNode[meshIndex];
-                    var skinIndex = gltf.nodes[node.Index].skin;
-                    var skin = skinIndex is null ? null : gltf.skins[skinIndex.Value];
+                    var skinIndex = model.nodes[node.Index].skin;
+                    var skin = skinIndex is null ? null : model.skins[skinIndex.Value];
 
                     meshes.Add(new()
                     {
@@ -234,18 +234,18 @@ namespace Isles.Graphics
                 return meshes;
             }
 
-            Dictionary<string, GltfModel.Animation> LoadAnimations()
+            Dictionary<string, Model.Animation> LoadAnimations()
             {
-                if (gltf.animations is null)
+                if (model.animations is null)
                 {
                     return null;
                 }
 
-                var animations = new Dictionary<string, GltfModel.Animation>();
-                foreach (var animation in gltf.animations)
+                var animations = new Dictionary<string, Model.Animation>();
+                foreach (var animation in model.animations)
                 {
                     var duration = 0f;
-                    var channels = new Dictionary<int, GltfModel.Animation.Channel>();
+                    var channels = new Dictionary<int, Model.Animation.Channel>();
 
                     foreach (var channel in animation.channels)
                     {
@@ -253,9 +253,9 @@ namespace Isles.Graphics
                         var output = animation.samplers[channel.sampler].output;
                         var times = ReadBufferAs<float>(input);
 
-                        if (gltf.accessors[input].max[0] > duration)
+                        if (model.accessors[input].max[0] > duration)
                         {
-                            duration = gltf.accessors[input].max[0];
+                            duration = model.accessors[input].max[0];
                         }
 
                         var node = channel.target.node;
@@ -286,8 +286,8 @@ namespace Isles.Graphics
 
             (byte[] bytes, int start) ReadBuffer(int accessorIndex)
             {
-                var accessor = gltf.accessors[accessorIndex];
-                var bufferView = gltf.bufferViews[accessor.bufferView];
+                var accessor = model.accessors[accessorIndex];
+                var bufferView = model.bufferViews[accessor.bufferView];
                 var bytes = buffers[bufferView.buffer];
 
                 return (bytes, bufferView.byteOffset + accessor.byteOffset);
@@ -295,8 +295,8 @@ namespace Isles.Graphics
 
             T[] ReadBufferAs<T>(int accessorIndex) where T : struct
             {
-                var accessor = gltf.accessors[accessorIndex];
-                var bufferView = gltf.bufferViews[accessor.bufferView];
+                var accessor = model.accessors[accessorIndex];
+                var bufferView = model.bufferViews[accessor.bufferView];
                 var bytes = buffers[bufferView.buffer]
                     .AsSpan(bufferView.byteOffset, bufferView.byteLength)
                     .Slice(accessor.byteOffset, accessor.count * Marshal.SizeOf<T>());
