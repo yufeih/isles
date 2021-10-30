@@ -51,13 +51,6 @@ namespace Isles.Engine
         public PathManager PathManager { get; private set; }
 
         /// <summary>
-        /// Game content manager.
-        /// Assets loaded using this content manager will not be unloaded
-        /// until the termination of the application.
-        /// </summary>
-        public ContentManager Content { get; }
-
-        /// <summary>
         /// Gets game the fog of war.
         /// </summary>
         public FogMask FogOfWar { get; private set; }
@@ -82,7 +75,6 @@ namespace Isles.Engine
 
         public GameWorld()
         {
-            Content = Game.Content;
             _modelPicker = new ModelPicker<Entity>(Game.GraphicsDevice, Game.ModelRenderer);
         }
 

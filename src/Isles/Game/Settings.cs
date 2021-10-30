@@ -9,7 +9,6 @@ namespace Isles.Engine
     {
         public string ContentDirectory { get; set; } = "Content";
 
-        public string DefaultFont { get; set; } = "Fonts/Default";
         public string PlayerName { get; set; } = "Unnamed";
         public bool IsMouseVisible { get; set; }
         public bool IsFixedTimeStep { get; set; } = true;

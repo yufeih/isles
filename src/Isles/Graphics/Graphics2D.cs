@@ -44,62 +44,22 @@ namespace Isles.Graphics
         private readonly DynamicVertexBuffer vertices;
         private readonly DynamicIndexBuffer indices;
 
-        /// <summary>
-        /// Gets graphics 2D effect.
-        /// </summary>
         public Effect Effect { get; }
 
-        /// <summary>
-        /// Get sprite font.
-        /// </summary>
         public SpriteFont Font { get; }
 
-        /// <summary>
-        /// Gets or Sets sprite batch used to drawing the text.
-        /// </summary>
         public SpriteBatch Sprite { get; }
 
-        /// <summary>
-        /// Initialize text system.
-        /// </summary>
-        /// <param name="game"></param>
         public Graphics2D(BaseGame setGame)
         {
             game = setGame;
-            Font = game.Content.Load<SpriteFont>(game.Settings.DefaultFont);
+            Font = game.Content.Load<SpriteFont>("Fonts/Default");
             Effect = game.ShaderLoader.LoadShader("shaders/Graphics2D.cso");
             Sprite = new SpriteBatch(game.GraphicsDevice);
             vertices = new DynamicVertexBuffer(
                 game.GraphicsDevice, typeof(VertexPositionColor), MaxPrimitiveVertexCount, BufferUsage.WriteOnly);
             indices = new DynamicIndexBuffer(
                 game.GraphicsDevice, typeof(ushort), MaxPrimitiveIndexCount, BufferUsage.WriteOnly);
-        }
-
-        /// <summary>
-        /// Default text drawing function.
-        /// </summary>
-        /// <param name="text"></param>
-        /// <param name="position"></param>
-        /// <param name="color"></param>
-        public void DrawString(string text, float size, Vector3 position, Color color)
-        {
-            Point v = game.Project(position);
-
-            DrawString(text, size, new Vector2(v.X, v.Y), color);
-        }
-
-        /// <summary>
-        /// Default text drawing function.
-        /// </summary>
-        public void DrawString(string text, float size, Vector2 position, Color color)
-        {
-            StringValue value;
-            value.Text = text;
-            value.Size = size;
-            value.Position = position;
-            value.Color = color;
-
-            strings.Add(value);
         }
 
         /// <summary>
@@ -176,11 +136,6 @@ namespace Isles.Graphics
             DrawLine(start, end, color);
         }
 
-        public void DrawLine(Vector3 start, Vector3 end, Color color)
-        {
-            DrawLine(game.Project(start), game.Project(end), color);
-        }
-
         /// <summary>
         /// Draws a 2D primitive.
         /// </summary>
@@ -201,7 +156,6 @@ namespace Isles.Graphics
             {
                 if (primitiveVertexCount >= MaxPrimitiveVertexCount)
                 {
-                    // Log.Write("Warning: 2D primitive vertex capacity exceeded...");
                     return;
                 }
 
@@ -236,11 +190,6 @@ namespace Isles.Graphics
             }
         }
 
-        /// <summary>
-        /// Draw a rectangle.
-        /// </summary>
-        /// <param name="rect"></param>
-        /// <param name="color"></param>
         public void DrawRectangle(Rectangle rect, Color color)
         {
             var vertices = new VertexPositionColor[4]
@@ -368,88 +317,6 @@ namespace Isles.Graphics
         /// </summary>
         public const float CharactorWidthPerSizeUnit = 0.7f;
         public const float CharactorHeightPerSizeUnit = 1.3f;
-
-        /// <summary>
-        /// Format the given text to make it fit in a rectangle area.
-        /// What if we could recognize and split english word?.
-        /// </summary>
-        /// <returns>The formatted text.</returns>
-        /// <example>
-        /// FormatString("ABCD", 20): "AB\nCD"
-        /// FormatString("What is your name?", 100): "What is \nyour name?".
-        /// </example>
-        public static string FormatString(string text, float width, float fontSize, SpriteFont font)
-        {
-            width /= fontSize;
-
-            // Charactors per line
-            float offset = 0;
-
-            // Identify whether the next word is the first word in its line
-            var firstWordInLine = true;
-
-            // Iterate words in the text
-            var wi = new WordIterator(text);
-
-            // Return value
-            var rtvSB = new StringBuilder();
-
-            // Store each word in the text
-            var str = wi.NextWord();
-
-            if (str == null)
-            {
-                return "";
-            }
-
-            // Arrange each word in the formatted lines
-            while (str != null)
-            {
-                if (firstWordInLine)
-                {
-                    rtvSB.Append(str);
-                    if (str[str.Length - 1] != '\n')
-                    {
-                        offset += font.MeasureString(str).X;
-                        firstWordInLine = false;
-                    }
-                    else
-                    {
-                        offset = 0;
-                    }
-                }
-                else
-                {
-                    if (offset + font.MeasureString(str).X > width)
-                    {
-                        firstWordInLine = true;
-                        if (rtvSB.Length != 0 && rtvSB[rtvSB.Length - 1] != '\n')
-                        {
-                            rtvSB.Append('\n');
-                        }
-
-                        offset = 0;
-                        continue;
-                    }
-                    else
-                    {
-                        rtvSB.Append(str);
-                        if (str[str.Length - 1] == '\n')
-                        {
-                            offset = 0;
-                        }
-                        else
-                        {
-                            offset += font.MeasureString(str).X;
-                        }
-                    }
-                }
-
-                str = wi.NextWord();
-            }
-
-            return rtvSB.ToString();
-        }
 
         /// <summary>
         /// Format the given text to make it fit in a rectangle area.

@@ -1119,10 +1119,6 @@ namespace Isles
                 Rotation = treeRotation * Quaternion.CreateFromAxisAngle(rotationAxis, shakeAmount);
             }
 
-            // BaseGame game = BaseGame.Singleton;
-            // Point p = game.Project(Position);
-            // game.Graphics2D.DrawString(harvesterCount.ToString() + ", " + lumber,
-            //    15, new Vector2(p.X, p.Y), Color.Blue);
             base.Update(gameTime);
         }
     }

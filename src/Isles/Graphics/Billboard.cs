@@ -59,28 +59,7 @@ namespace Isles.Graphics
     /// </summary>
     public class Billboard
     {
-        /// <summary>
-        /// Texture used to draw the billboard
-        /// TODO: Implement animated texture.
-        /// </summary>
-        public string TextureName
-        {
-            get => textureName;
-            set
-            {
-                texture = BaseGame.Singleton.Content.Load<Texture2D>(value);
-                textureName = value;
-            }
-        }
-
-        public Texture2D Texture
-        {
-            get => texture;
-            set => texture = value;
-        }
-
-        private string textureName;
-        private Texture2D texture;
+        public Texture2D Texture { get; set; }
 
         /// <summary>
         /// Position of the billboard. Bottom center in the texture.
@@ -97,24 +76,12 @@ namespace Isles.Graphics
         /// <summary>
         /// Type of the billboard.
         /// </summary>
-        public BillboardType Type
-        {
-            get => type;
-            set => type = value;
-        }
-
-        private BillboardType type;
+        public BillboardType Type { get; set; }
 
         /// <summary>
         /// Type of position anchor.
         /// </summary>
-        public AnchorType AchorType
-        {
-            get => achorType;
-            set => achorType = value;
-        }
-
-        private AnchorType achorType;
+        public AnchorType AchorType { get; set; }
 
         /// <summary>
         /// Normalized vector around which the billboard is rotating.
@@ -139,7 +106,7 @@ namespace Isles.Graphics
 
         public Billboard()
         {
-            achorType = AnchorType.Center;
+            AchorType = AnchorType.Center;
         }
 
         public void Draw()
