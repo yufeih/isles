@@ -211,7 +211,7 @@ namespace Isles.Graphics
         /// </summary>
         public void Present()
         {
-            game.GraphicsDevice.SetRenderState(BlendState.AlphaBlend, DepthStencilState.None);
+            game.GraphicsDevice.SetRenderState(BlendState.NonPremultiplied, DepthStencilState.None);
 
             PresentPrimitives();
             PresentText();
@@ -225,7 +225,7 @@ namespace Isles.Graphics
                 return;
             }
 
-            Sprite.Begin();
+            Sprite.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied);
             foreach (StringValue value in strings)
             {
                 Font.DrawString(Sprite, value.Text, value.Position, value.Color, value.Size);

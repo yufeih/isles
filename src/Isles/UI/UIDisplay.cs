@@ -137,7 +137,7 @@ namespace Isles.UI
                 return;
             }
 
-            sprite.Begin();
+            sprite.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied);
 
             foreach (IUIElement element in elements)
             {

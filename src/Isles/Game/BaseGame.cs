@@ -6,7 +6,6 @@ using System.IO;
 using System.Text.Json;
 using Isles.Graphics;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Control = System.Windows.Forms.Control;
@@ -108,6 +107,7 @@ namespace Isles.Engine
 
             Graphics = new GraphicsDeviceManager(this)
             {
+                GraphicsProfile = GraphicsProfile.HiDef,
                 IsFullScreen = Settings.Fullscreen,
                 PreferredBackBufferWidth = Settings.ScreenWidth,
                 PreferredBackBufferHeight = Settings.ScreenHeight,

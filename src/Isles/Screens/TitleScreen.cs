@@ -10,18 +10,10 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Isles
 {
-    /// <summary>
-    /// Screen that shows the Title.
-    /// </summary>
     public class TitleScreen : IScreen
     {
-        // Texture for the title screen
         private readonly Texture2D titleTexture;
-
-        // Texture for the buttons
         private readonly Texture2D buttonsTexture;
-
-        // Texture for transition to loading
         private readonly Texture2D loadingDisplayTexture;
 
         private int highLightMoveTo;
@@ -97,10 +89,8 @@ namespace Isles
             ui.Add(titlePanel);
 
             // Test textbox
-            // titlePanel.Add(new TextBox(1, Color.White, new Rectangle(0, 0, 400, 50)));
             TextField creditSegment;
             credit = new Panel(new Rectangle(800, 430, 0, 30));
-            // credit = new TextField("R", 16, Color.White, new Rectangle(800, 470, 10000, 30));
             titlePanel.Add(credit);
             var offset = 0;
 
@@ -344,10 +334,6 @@ namespace Isles
             UpdateCredit(gameTime);
         }
 
-        /// <summary>
-        /// Handle game draw event.
-        /// </summary>
-        /// <param name="gameTime"></param>
         public void Draw(GameTime gameTime)
         {
             ui.Draw(gameTime);
@@ -414,13 +400,13 @@ namespace Isles
                     switch (state)
                     {
                         case ButtonState.Normal:
-                            sourRect = SourceRectangle; buttonColor = new Color(255, 255, 255, (byte)(160 * alpha));
+                            sourRect = SourceRectangle; buttonColor = Color.White * (0.63f * alpha);
                             break;
                         case ButtonState.Hover:
-                            sourRect = Hovered; buttonColor = new Color(255, 255, 255, (byte)(255 * alpha));
+                            sourRect = Hovered; buttonColor = Color.White * alpha;
                             break;
                         case ButtonState.Press:
-                            sourRect = Pressed; buttonColor = new Color(255, 255, 255, (byte)(255 * alpha));
+                            sourRect = Pressed; buttonColor = Color.White * alpha;
                             destRect.Y += 2;
                             break;
                     }
@@ -428,7 +414,7 @@ namespace Isles
                 else
                 {
                     sourRect = Disabled;
-                    buttonColor = new Color(128, 128, 128, (byte)(128 * alpha));
+                    buttonColor = Color.Gray * (alpha * 0.5f);
                 }
 
                 sprite.Draw(Texture, destRect, sourRect, buttonColor);

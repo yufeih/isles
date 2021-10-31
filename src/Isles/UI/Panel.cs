@@ -11,21 +11,10 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Isles.UI
 {
-    /// <summary>
-    /// Basic Panel.
-    /// </summary>
     public class Panel : UIElement
     {
-        /// <summary>
-        /// All UI elements in this panel.
-        /// </summary>
-        /// FIXME: This is not a good design practise...
-        protected BroadcastList<IUIElement, List<IUIElement>> elements = new
-();
+        protected BroadcastList<IUIElement, List<IUIElement>> elements = new();
 
-        /// <summary>
-        /// Gets all ui elements contained in this panel.
-        /// </summary>
         public IEnumerable<IUIElement> Elements => elements;
 
         private Rectangle effectiveRegion;

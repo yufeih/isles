@@ -612,7 +612,7 @@ namespace Isles.Graphics
             // Enable the depth buffer (so particles will not be visible through
             // solid objects like the ground plane), but disable depth writes
             // (so particles will not obscure other particles).
-            device.SetRenderState(Settings.Additive ? BlendState.Additive : BlendState.AlphaBlend, DepthStencilState.DepthRead);
+            device.SetRenderState(Settings.Additive ? BlendState.Additive : BlendState.NonPremultiplied, DepthStencilState.DepthRead);
         }
 
         private Matrix view;

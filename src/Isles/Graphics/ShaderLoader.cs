@@ -35,7 +35,7 @@ namespace Isles.Graphics
             public override ContentBuildLogger Logger => null;
             public override OpaqueDataDictionary Parameters { get; } = new();
             public override TargetPlatform TargetPlatform => TargetPlatform.Windows;
-            public override GraphicsProfile TargetProfile => GraphicsProfile.Reach;
+            public override GraphicsProfile TargetProfile => GraphicsProfile.HiDef;
             public override string BuildConfiguration => "Release";
             public override string OutputFilename => "";
             public override string OutputDirectory => "";

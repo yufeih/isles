@@ -128,7 +128,7 @@ namespace Isles.Graphics
 
         private void DrawTerrain(Matrix viewProjection, EffectTechnique technique)
         {
-            graphics.SetRenderState(BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone);
+            graphics.SetRenderState(BlendState.NonPremultiplied, DepthStencilState.Default, RasterizerState.CullNone);
 
             // Set parameters
             if (FogTexture != null)
@@ -174,7 +174,7 @@ namespace Isles.Graphics
 
         private void DrawTerrainShadow(ShadowEffect shadowEffect)
         {
-            graphics.SetRenderState(BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone);
+            graphics.SetRenderState(BlendState.NonPremultiplied, DepthStencilState.Default, RasterizerState.CullNone);
 
             terrainEffect.Parameters["ShadowMap"].SetValue(shadowEffect.ShadowMap);
             terrainEffect.Parameters["LightViewProjection"].SetValue(shadowEffect.LightViewProjection);

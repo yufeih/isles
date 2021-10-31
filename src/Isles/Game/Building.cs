@@ -7,7 +7,6 @@ using System.Xml;
 using Isles.Engine;
 using Isles.Graphics;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace Isles

@@ -11,7 +11,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public static void PushRenderTarget(this GraphicsDevice graphicsDevice, RenderTarget2D renderTarget)
         {
-            _renderTargetStack.Push((RenderTarget2D)graphicsDevice.GetRenderTargets()[0].RenderTarget);
+            var renderTargets = graphicsDevice.GetRenderTargets();
+            var current = renderTargets.Length > 0 ? (RenderTarget2D)renderTargets[0].RenderTarget : null;
+            _renderTargetStack.Push(current);
             graphicsDevice.SetRenderTarget(renderTarget);
         }
 
@@ -30,7 +32,7 @@ namespace Microsoft.Xna.Framework.Graphics
             DepthStencilState depthStencilState = null,
             RasterizerState rasterizerState = null)
         {
-            graphicsDevice.BlendState = blendState;
+            graphicsDevice.BlendState = blendState ?? BlendState.NonPremultiplied;
             graphicsDevice.DepthStencilState = depthStencilState ?? DepthStencilState.Default;
             graphicsDevice.RasterizerState = rasterizerState ?? RasterizerState.CullCounterClockwise;
         }

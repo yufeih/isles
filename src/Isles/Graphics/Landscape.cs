@@ -110,7 +110,7 @@ namespace Isles.Graphics
                 return;
             }
 
-            game.GraphicsDevice.SetRenderState(BlendState.AlphaBlend, DepthStencilState.Default);
+            game.GraphicsDevice.SetRenderState(BlendState.NonPremultiplied, DepthStencilState.Default);
 
             surfaceEffect.Parameters["WorldViewProjection"].SetValue(game.ViewProjection);
 

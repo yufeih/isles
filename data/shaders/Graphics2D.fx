@@ -60,14 +60,6 @@ float4 FogOfWarPS(float2 uv : TEXCOORD0) : Color
                             0.6 - tex2D(BasicSampler, uv).x * 0.6 : 0);
 }
 
-float4 RuinedLandPS(float2 uv : TEXCOORD0) : Color
-{
-    float4 basic = tex2D(BasicSampler, uv);
-    float4 overlay = tex2D(OverlaySampler, uv);
-    //float map = basic.x * overlay.x;
-    return float4(basic.xxx, overlay.x);
-}
-
 technique Graphics2D
 {
     pass PassFor2D
@@ -83,14 +75,5 @@ technique FogOfWar
     {
         VertexShader = compile vs_2_0 FogOfWarVS();
         PixelShader = compile ps_2_0 FogOfWarPS();
-    }
-}
-
-technique RuinedLand
-{
-    pass PassFor2D
-    {
-        VertexShader = compile vs_2_0 FogOfWarVS();
-        PixelShader = compile ps_2_0 RuinedLandPS();
     }
 }

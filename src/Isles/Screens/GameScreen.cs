@@ -422,7 +422,7 @@ namespace Isles
             if (postScreen)
             {
                 // Draw post screen texture
-                Game.Graphics2D.Sprite.Begin();
+                Game.Graphics2D.Sprite.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied);
                 Game.Graphics2D.Sprite.Draw(victoryTexture ?? failureTexture, postScreenRectangle, Color.White);
                 Game.Graphics2D.Sprite.End();
 

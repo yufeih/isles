@@ -48,12 +48,9 @@ sampler2D ShadowSampler = sampler_state
 {
     Texture = <ShadowMap>;
 
-    MinFilter = Linear;
-    MagFilter = Linear;
-    MipFilter = Linear;
-    AddressU = Wrap;
-    AddressV = Wrap;
-    AddressW = Wrap;
+    MinFilter = Point;
+    MagFilter = Point;
+    MipFilter = Point;
 };
 
 sampler2D FogSampler = sampler_state

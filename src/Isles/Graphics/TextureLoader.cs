@@ -22,10 +22,7 @@ namespace Isles.Graphics
             return _textures.GetOrAdd(path, path =>
             {
                 using var stream = File.OpenRead(path);
-                using var bitmap = SKBitmap.Decode(stream);
-                var texture = new Texture2D(_graphicsDevice, bitmap.Width, bitmap.Height, true, SurfaceFormat.Color);
-                texture.SetData(bitmap.Pixels);
-                return texture;
+                return Texture2D.FromStream(_graphicsDevice, stream);
             });
         }
 

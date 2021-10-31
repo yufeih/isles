@@ -702,7 +702,7 @@ namespace Isles
             game.Graphics2D.Present();
 
             // Draw screen border fadeout
-            Display.Sprite.Begin();
+            Display.Sprite.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied);
             Display.Sprite.Draw(borderFadeout,
                 new Rectangle(0, 0, game.ScreenWidth, game.ScreenHeight), Color.White);
 
@@ -713,7 +713,7 @@ namespace Isles
             DrawFogOfWar();
 
             // Draw statistics
-            Display.Sprite.Begin();
+            Display.Sprite.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied);
 
             Player player = Player.LocalPlayer;
 

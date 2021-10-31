@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using Isles.Engine;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace Isles

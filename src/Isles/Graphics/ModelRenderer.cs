@@ -90,7 +90,7 @@ namespace Isles.Graphics
 
             if (showTransparent)
             {
-                _graphics.SetRenderState(BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone);
+                _graphics.SetRenderState(BlendState.NonPremultiplied, DepthStencilState.Default, RasterizerState.CullNone);
 
                 Draw(_defaultShader, _defaultTransparent);
                 Draw(_defaultSkinnedShader, _skinnedTransparent);
