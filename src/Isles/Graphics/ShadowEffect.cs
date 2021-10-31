@@ -29,7 +29,7 @@ namespace Isles.Graphics
         public ShadowEffect(GraphicsDevice graphics, ShaderLoader shaderLoader)
         {
             _graphics = graphics;
-            _effect = shaderLoader.LoadShader("shaders/ShadowMap.cso");
+            _effect = shaderLoader.LoadShader("data/shaders/ShadowMap.fx");
             _renderTarget = new RenderTarget2D(_graphics, ShadowMapSize, ShadowMapSize, true, SurfaceFormat.Single, _graphics.PresentationParameters.DepthStencilFormat);
         }
 

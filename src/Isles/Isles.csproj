@@ -19,16 +19,15 @@
     <Reference Include="Microsoft.Xna.Framework.Xact">
       <HintPath>..\..\xna\Microsoft.Xna.Framework.Xact.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Xna.Framework.Content.Pipeline">
+      <HintPath>..\..\xna\Microsoft.Xna.Framework.Content.Pipeline.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="..\..\data\**" LinkBase="data" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\xnb\**" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EffectShader Include="Shaders\**\*.fx" ShaderModel="2_0" />
   </ItemGroup>
 
   <ItemGroup>

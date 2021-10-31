@@ -21,7 +21,7 @@ namespace Isles.Graphics
             base.Initialize(game);
 
             // Load terrain effect
-            terrainEffect = game.ShaderLoader.LoadShader("shaders/Terrain.cso");
+            terrainEffect = game.ShaderLoader.LoadShader("data/shaders/Terrain.fx");
 
             // Set patch LOD to highest
             foreach (Patch patch in Patches)
@@ -197,29 +197,20 @@ namespace Isles.Graphics
             }
         }
 
-        public struct TerrainVertex
+        public struct TerrainVertex : IVertexType
         {
             public Vector3 Position;
             public Vector2 TextureCoordinate0;
             public Vector2 TextureCoordinate1;
 
-            public static int SizeInBytes => 4 * (3 + 4);
-
-            public static VertexElement[] VertexElements
+            public static readonly VertexDeclaration VertexDeclaration = new(new VertexElement[]
             {
-                get
-                {
-                    var decl = new VertexElement[]
-                    {
-                        // Construct new vertex declaration with tangent info
-                        // First the normal stuff (we should already have that)
-                        new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
-                        new VertexElement(12, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0),
-                        new VertexElement(20, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 1),
-                    };
-                    return decl;
-                }
-            }
+                new(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
+                new(12, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0),
+                new(20, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 1),
+            });
+
+            VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;
         }
     }
 }

@@ -54,7 +54,7 @@ namespace Isles.Graphics
         {
             game = setGame;
             Font = new(game.GraphicsDevice, "data/fonts/kooten.ttf", 19);
-            Effect = game.ShaderLoader.LoadShader("shaders/Graphics2D.cso");
+            Effect = game.ShaderLoader.LoadShader("data/shaders/Graphics2D.fx");
             Sprite = new SpriteBatch(game.GraphicsDevice);
             vertices = new DynamicVertexBuffer(
                 game.GraphicsDevice, typeof(VertexPositionColor), MaxPrimitiveVertexCount, BufferUsage.WriteOnly);

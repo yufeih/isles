@@ -357,7 +357,7 @@ namespace Isles.Graphics
         /// </summary>
         private void LoadParticleEffect()
         {
-            particleEffect = game.ShaderLoader.LoadShader("shaders/ParticleEffect.cso");
+            particleEffect = game.ShaderLoader.LoadShader("data/shaders/ParticleEffect.fx");
 
             var parameters = particleEffect.Parameters;
 
@@ -575,7 +575,7 @@ namespace Isles.Graphics
         /// </summary>
         private void AddNewParticlesToVertexBuffer()
         {
-            var stride = ParticleVertex.SizeInBytes;
+            var stride = ParticleVertex.VertexDeclaration.VertexStride;
 
             if (firstNewParticle < firstFreeParticle)
             {
@@ -810,10 +810,7 @@ namespace Isles.Graphics
         }
     }
 
-    /// <summary>
-    /// Custom vertex structure for drawing point sprite particles.
-    /// </summary>
-    public struct ParticleVertex
+    public struct ParticleVertex : IVertexType
     {
         // Stores which corner of the particle quad this vertex represents.
         public Short2 Corner;
@@ -830,18 +827,16 @@ namespace Isles.Graphics
         // The time (in seconds) at which this particle was created.
         public float Time;
 
-        // Describe the layout of this vertex structure.
-        public static readonly VertexElement[] VertexElements =
+        public static readonly VertexDeclaration VertexDeclaration = new(new VertexElement[]
         {
-            new VertexElement(0, VertexElementFormat.Short2, VertexElementUsage.Position, 0),
-            new VertexElement(4, VertexElementFormat.Vector3, VertexElementUsage.Position, 1),
-            new VertexElement(16, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0),
-            new VertexElement(28, VertexElementFormat.Color, VertexElementUsage.Color, 0),
-            new VertexElement(32, VertexElementFormat.Single, VertexElementUsage.TextureCoordinate, 0),
-        };
+            new(0, VertexElementFormat.Short2, VertexElementUsage.Position, 0),
+            new(4, VertexElementFormat.Vector3, VertexElementUsage.Position, 1),
+            new(16, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0),
+            new(28, VertexElementFormat.Color, VertexElementUsage.Color, 0),
+            new(32, VertexElementFormat.Single, VertexElementUsage.TextureCoordinate, 0),
+        });
 
-        // Describe the size of this vertex structure.
-        public const int SizeInBytes = 36;
+        VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;
     }
 
     /// <summary>

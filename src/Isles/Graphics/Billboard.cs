@@ -188,7 +188,7 @@ namespace Isles.Graphics
             this.game = game;
 
             // Initialize billboard effect
-            effect = game.ShaderLoader.LoadShader("shaders/billboard.cso");
+            effect = game.ShaderLoader.LoadShader("data/shaders/billboard.fx");
 
             techniqueVegetation = effect.Techniques["Vegetation"];
             techniqueNormal = effect.Techniques["Normal"];

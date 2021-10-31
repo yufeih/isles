@@ -56,9 +56,6 @@ namespace Isles.Engine
 
         }
 
-        /// <summary>
-        /// Loads the XACT data.
-        /// </summary>
         public override void Initialize()
         {
             Audio = new AudioEngine("Content/Audios/Isles.xgs");
@@ -68,9 +65,6 @@ namespace Isles.Engine
             base.Initialize();
         }
 
-        /// <summary>
-        /// Unloads the XACT data.
-        /// </summary>
         protected override void Dispose(bool disposing)
         {
             try

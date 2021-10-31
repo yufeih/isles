@@ -26,10 +26,10 @@ namespace Isles.Graphics
         {
             base.Initialize(game);
 
-            WaterEffect = game.ShaderLoader.LoadShader("shaders/Water.cso");
+            WaterEffect = game.ShaderLoader.LoadShader("data/shaders/Water.fx");
             InitializeWater();
 
-            surfaceEffect = game.ShaderLoader.LoadShader("shaders/Surface.cso");
+            surfaceEffect = game.ShaderLoader.LoadShader("data/shaders/Surface.fx");
             surfaceVertexBuffer = new DynamicVertexBuffer(game.GraphicsDevice,
                 typeof(VertexPositionColorTexture), MaxSurfaceVertices, BufferUsage.WriteOnly);
             surfaceIndexBuffer = new DynamicIndexBuffer(game.GraphicsDevice,
