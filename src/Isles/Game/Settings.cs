@@ -12,7 +12,6 @@ namespace Isles.Engine
         public string PlayerName { get; set; } = "Unnamed";
         public bool IsMouseVisible { get; set; }
         public bool IsFixedTimeStep { get; set; } = true;
-        public bool ClipCursor { get; set; }
         public bool RevealMap { get; set; }
         public int MaxPathSearchStepsPerUpdate { get; set; } = 2000;
         public bool TraceUnits { get; set; }

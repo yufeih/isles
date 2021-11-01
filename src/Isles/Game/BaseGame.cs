@@ -192,14 +192,6 @@ namespace Isles.Engine
             // Update particle system
             ParticleSystem.UpdateAll(gameTime);
 
-            // Clip cursor
-            if (Settings.ClipCursor && IsActive)
-            {
-                Cursor.Clip = new System.Drawing.Rectangle(
-                    Window.ClientBounds.X, Window.ClientBounds.Y,
-                    Window.ClientBounds.Width, Window.ClientBounds.Height);
-            }
-
             // Tell me why I have to set this every frame...
             Cursor = cursor;
 
