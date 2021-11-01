@@ -196,6 +196,8 @@ namespace Isles.Graphics
             surfaceIndexBuffer.SetData(surfaceIndices.ToArray());
             surfaceVertexBuffer.SetData(surfaceVertices.ToArray());
 
+            game.GraphicsDevice.SetRenderState(depthStencilState: DepthStencilState.DepthRead);
+
             game.GraphicsDevice.Indices = surfaceIndexBuffer;
             game.GraphicsDevice.SetVertexBuffer(surfaceVertexBuffer);
             game.GraphicsDevice.DrawIndexedPrimitives(
