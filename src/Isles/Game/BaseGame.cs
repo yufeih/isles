@@ -35,9 +35,9 @@ namespace Isles.Engine
             get => cursor;
             set
             {
-                var control = Control.FromHandle(Window.Handle);
-                control.Cursor = cursor;
-                cursor = value;
+                //var control = Control.FromHandle(Window.Handle);
+                //control.Cursor = cursor;
+                //cursor = value;
             }
         }
 

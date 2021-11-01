@@ -36,7 +36,7 @@ namespace Isles.Graphics
         {
             _graphics = graphics;
 
-            _effect = shaderLoader.LoadShader("data/shaders/Model.fx");
+            _effect = shaderLoader.LoadShader("shaders/Model.cso");
             _viewProjection = _effect.Parameters["ViewProjection"];
             _texture = _effect.Parameters["BasicTexture"];
             _world = _effect.Parameters["World"];

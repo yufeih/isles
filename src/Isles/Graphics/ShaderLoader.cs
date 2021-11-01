@@ -3,8 +3,6 @@
 
 using System.Collections.Concurrent;
 using System.IO;
-using Microsoft.Xna.Framework.Content.Pipeline;
-using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Graphics
@@ -13,21 +11,12 @@ namespace Isles.Graphics
     {
         private readonly GraphicsDevice _graphicsDevice;
         private readonly ConcurrentDictionary<string, Effect> _shaders = new();
-        private readonly EffectProcessor _effectProcessor = new();
 
         public ShaderLoader(GraphicsDevice graphicsDevice) => _graphicsDevice = graphicsDevice;
 
         public Effect LoadShader(string path)
         {
-            return _shaders.GetOrAdd(path, path => new(_graphicsDevice, CompileEffect(path)));
-        }
-
-        private byte[] CompileEffect(string path)
-        {
-            return _effectProcessor.Process(
-                new() { EffectCode = File.ReadAllText(path), Identity = new(path) },
-                null)
-                .GetEffectCode();
+            return _shaders.GetOrAdd(path, path => new(_graphicsDevice, File.ReadAllBytes(path)));
         }
     }
 }

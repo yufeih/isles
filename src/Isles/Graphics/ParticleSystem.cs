@@ -357,7 +357,7 @@ namespace Isles.Graphics
         /// </summary>
         private void LoadParticleEffect()
         {
-            particleEffect = game.ShaderLoader.LoadShader("data/shaders/ParticleEffect.fx");
+            particleEffect = game.ShaderLoader.LoadShader("shaders/ParticleEffect.cso");
 
             var parameters = particleEffect.Parameters;
 
