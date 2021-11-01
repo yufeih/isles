@@ -383,11 +383,6 @@ namespace Isles
         {
             alpha = a / 255f;
         }
-
-        /// <summary>
-        /// Draw UI element.
-        /// </summary>
-        /// <param name="gameTime"></param>
         public override void Draw(GameTime gameTime, SpriteBatch sprite)
         {
             if (Texture != null && Visible)
@@ -400,13 +395,13 @@ namespace Isles
                     switch (state)
                     {
                         case ButtonState.Normal:
-                            sourRect = SourceRectangle; buttonColor = Color.White * (0.63f * alpha);
+                            sourRect = SourceRectangle; buttonColor = new Color(255, 255, 255, (byte)(160 * alpha));
                             break;
                         case ButtonState.Hover:
-                            sourRect = Hovered; buttonColor = Color.White * alpha;
+                            sourRect = Hovered; buttonColor = new Color(255, 255, 255, (byte)(255 * alpha));
                             break;
                         case ButtonState.Press:
-                            sourRect = Pressed; buttonColor = Color.White * alpha;
+                            sourRect = Pressed; buttonColor = new Color(255, 255, 255, (byte)(255 * alpha));
                             destRect.Y += 2;
                             break;
                     }
@@ -414,7 +409,7 @@ namespace Isles
                 else
                 {
                     sourRect = Disabled;
-                    buttonColor = Color.Gray * (alpha * 0.5f);
+                    buttonColor = new Color(128, 128, 128, (byte)(128 * alpha));
                 }
 
                 sprite.Draw(Texture, destRect, sourRect, buttonColor);
