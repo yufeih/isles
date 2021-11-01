@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using Isles.Engine;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace Isles
@@ -1223,23 +1222,6 @@ namespace Isles
         {
             // Draw selection rectangle
             DrawSelectionRectangle();
-        }
-
-        /// <summary>
-        /// Vertex type used to draw 2D shapes.
-        /// </summary>
-        public struct VertexColor2D
-        {
-            public Vector3 Position;
-            public int Color;
-
-            public static readonly VertexElement[] VertexElement = new VertexElement[]
-            {
-                new VertexElement(0, 0, VertexElementFormat.Vector3,
-                    VertexElementMethod.Default, VertexElementUsage.Position, 0),
-                new VertexElement(0, 12, VertexElementFormat.Color,
-                    VertexElementMethod.Default, VertexElementUsage.Color, 0),
-            };
         }
 
         private void DrawSelectionRectangle()

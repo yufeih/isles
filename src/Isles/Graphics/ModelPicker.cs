@@ -15,7 +15,6 @@ namespace Isles.Graphics
 
         private readonly GraphicsDevice _graphics;
         private readonly ModelRenderer _renderer;
-        private readonly DepthStencilBuffer _depthStencil;
         private readonly RenderTarget2D _renderTarget;
 
         private readonly Dictionary<Color, T> _objectMap = new();
@@ -25,13 +24,12 @@ namespace Isles.Graphics
         {
             _graphics = graphics;
             _renderer = renderer;
-            _depthStencil = new DepthStencilBuffer(_graphics, ObjectMapSize, ObjectMapSize, _graphics.DepthStencilBuffer.Format);
-            _renderTarget = new RenderTarget2D(_graphics, ObjectMapSize, ObjectMapSize, 1, SurfaceFormat.Color, RenderTargetUsage.PreserveContents);
+            _renderTarget = new RenderTarget2D(_graphics, ObjectMapSize, ObjectMapSize, false, SurfaceFormat.Color, graphics.PresentationParameters.DepthStencilFormat, 0, RenderTargetUsage.PreserveContents);
         }
 
         public ObjectMap DrawObjectMap(Matrix viewProjection, IEnumerable<T> items, Func<T, GameModel> select)
         {
-            _graphics.PushRenderTarget(_renderTarget, _depthStencil);
+            _graphics.PushRenderTarget(_renderTarget);
             _graphics.Clear(Color.Black);
 
             _renderer.Clear();
@@ -49,14 +47,13 @@ namespace Isles.Graphics
             _renderer.DrawObjectMap(viewProjection);
             _graphics.PopRenderTarget();
 
-            _renderTarget.GetTexture().GetData(_colors, 0, _colors.Length);
+            _renderTarget.GetData(_colors, 0, _colors.Length);
 
             return new(_graphics, _objectMap, _colors);
         }
 
         public void Dispose()
         {
-            _depthStencil.Dispose();
             _renderTarget.Dispose();
         }
 

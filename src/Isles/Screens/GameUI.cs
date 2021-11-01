@@ -210,7 +210,6 @@ namespace Isles
             Display.Add(TipBoxContainer);
 
             // Init rendering of fog of war
-            fogOfWarDeclaration = new VertexDeclaration(game.GraphicsDevice, VertexPositionTexture.VertexElements);
             fogOfWarVertices = new VertexPositionTexture[4]
             {
                 new VertexPositionTexture(Vector3.Zero, new Vector2(0, 0)),
@@ -703,7 +702,7 @@ namespace Isles
             game.Graphics2D.Present();
 
             // Draw screen border fadeout
-            Display.Sprite.Begin();
+            Display.Sprite.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied);
             Display.Sprite.Draw(borderFadeout,
                 new Rectangle(0, 0, game.ScreenWidth, game.ScreenHeight), Color.White);
 
@@ -714,7 +713,7 @@ namespace Isles
             DrawFogOfWar();
 
             // Draw statistics
-            Display.Sprite.Begin();
+            Display.Sprite.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied);
 
             Player player = Player.LocalPlayer;
 
@@ -757,7 +756,6 @@ namespace Isles
         }
 
         private VertexPositionTexture[] fogOfWarVertices;
-        private VertexDeclaration fogOfWarDeclaration;
 
         private void DrawFogOfWar()
         {
@@ -776,14 +774,10 @@ namespace Isles
 
                 effect.CurrentTechnique = effect.Techniques["FogOfWar"];
                 effect.Parameters["BasicTexture"].SetValue(world.FogOfWar.Mask);
-                effect.Begin();
-                effect.CurrentTechnique.Passes[0].Begin();
 
-                game.GraphicsDevice.VertexDeclaration = fogOfWarDeclaration;
+                effect.CurrentTechnique.Passes[0].Apply();
+
                 game.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, fogOfWarVertices, 0, 2);
-
-                effect.CurrentTechnique.Passes[0].End();
-                effect.End();
 
                 // This will be drawed next frame...
                 world.Landscape.FogTexture = world.FogOfWar.Mask;

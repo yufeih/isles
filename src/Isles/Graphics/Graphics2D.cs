@@ -54,7 +54,7 @@ namespace Isles.Graphics
         {
             game = setGame;
             Font = new(game.GraphicsDevice, "data/fonts/kooten.ttf", 19);
-            Effect = game.ShaderLoader.LoadShader("shaders/Graphics2D.cso");
+            Effect = game.ShaderLoader.LoadShader("data/shaders/Graphics2D.fx");
             Sprite = new SpriteBatch(game.GraphicsDevice);
             vertices = new DynamicVertexBuffer(
                 game.GraphicsDevice, typeof(VertexPositionColor), MaxPrimitiveVertexCount, BufferUsage.WriteOnly);
@@ -211,7 +211,7 @@ namespace Isles.Graphics
         /// </summary>
         public void Present()
         {
-            game.GraphicsDevice.SetRenderState(BlendState.AlphaBlend, DepthStencilState.None);
+            game.GraphicsDevice.SetRenderState(BlendState.NonPremultiplied, DepthStencilState.None);
 
             PresentPrimitives();
             PresentText();
@@ -225,7 +225,7 @@ namespace Isles.Graphics
                 return;
             }
 
-            Sprite.Begin();
+            Sprite.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied);
             foreach (StringValue value in strings)
             {
                 Font.DrawString(Sprite, value.Text, value.Position, value.Color, value.Size);
@@ -243,26 +243,18 @@ namespace Isles.Graphics
                 return;
             }
 
-            game.GraphicsDevice.Vertices[0].SetSource(null, 0, 0);
+            game.GraphicsDevice.SetVertexBuffer(null);
 
             // Update line vertices
             vertices.SetData(lines, 0, lineCount);
 
             // Draw all lines
-            game.GraphicsDevice.VertexDeclaration = new VertexDeclaration(
-                game.GraphicsDevice, VertexPositionColor.VertexElements);
-
-            game.GraphicsDevice.Vertices[0].SetSource(
-                vertices, 0, VertexPositionColor.SizeInBytes);
+            game.GraphicsDevice.SetVertexBuffer(vertices);
 
             Effect.CurrentTechnique = Effect.Techniques["Graphics2D"];
-            Effect.Begin();
-            Effect.CurrentTechnique.Passes[0].Begin();
+            Effect.CurrentTechnique.Passes[0].Apply();
 
             game.GraphicsDevice.DrawPrimitives(PrimitiveType.LineList, 0, lineCount / 2);
-
-            Effect.CurrentTechnique.Passes[0].End();
-            Effect.End();
 
             // Clear all lines in this frame
             lineCount = 0;
@@ -275,29 +267,22 @@ namespace Isles.Graphics
                 return;
             }
 
-            game.GraphicsDevice.Vertices[0].SetSource(null, 0, 0);
+            game.GraphicsDevice.SetVertexBuffer(null);
 
             // Update primitive vertices
             vertices.SetData(primitives, 0, primitiveVertexCount);
             indices.SetData(primitiveIndices, 0, primitiveIndexCount);
 
             // Draw all lines
-            game.GraphicsDevice.VertexDeclaration = new VertexDeclaration(
-                game.GraphicsDevice, VertexPositionColor.VertexElements);
-
-            game.GraphicsDevice.Vertices[0].SetSource(
-                vertices, 0, VertexPositionColor.SizeInBytes);
+            game.GraphicsDevice.SetVertexBuffer(vertices);
             game.GraphicsDevice.Indices = indices;
 
             Effect.CurrentTechnique = Effect.Techniques["Graphics2D"];
-            Effect.Begin();
-            Effect.CurrentTechnique.Passes[0].Begin();
+
+            Effect.CurrentTechnique.Passes[0].Apply();
 
             game.GraphicsDevice.DrawIndexedPrimitives(
                     PrimitiveType.TriangleList, 0, 0, primitiveVertexCount, 0, primitiveIndexCount / 3);
-
-            Effect.CurrentTechnique.Passes[0].End();
-            Effect.End();
 
             // Clear all primitives after drawing them
             primitiveIndexCount = 0;

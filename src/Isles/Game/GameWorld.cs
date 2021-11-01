@@ -182,8 +182,6 @@ namespace Isles.Engine
             ParticleSystem.Present();
 
             Game.ModelRenderer.Draw(Game.ViewProjection, false, true);
-
-            Landscape.PresentSurface();
         }
 
         /// <summary>

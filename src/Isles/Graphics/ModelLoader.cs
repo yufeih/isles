@@ -30,7 +30,6 @@ namespace Isles.Graphics
 
         public class Primitive
         {
-            public VertexDeclaration VertexDeclaration { get; init; }
             public VertexBuffer VertexBuffer { get; init; }
             public IndexBuffer IndexBuffer { get; init; }
             public BoundingBox BoundingBox { get; init; }
@@ -175,18 +174,18 @@ namespace Isles.Graphics
                         var verticesSizeInBytes = positionAccessor.count * vertexStride;
                         var elements = new List<VertexElement>
                         {
-                            new(0, (short)model.accessors[primitive.attributes.POSITION].byteOffset, VertexElementFormat.Vector3, default, VertexElementUsage.Position, 0),
-                            new(0, (short)model.accessors[primitive.attributes.NORMAL].byteOffset, VertexElementFormat.Vector2, default, VertexElementUsage.Normal, 0),
-                            new(0, (short)model.accessors[primitive.attributes.TEXCOORD_0].byteOffset, VertexElementFormat.Vector2, default, VertexElementUsage.TextureCoordinate, 0)
+                            new((short)model.accessors[primitive.attributes.POSITION].byteOffset, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
+                            new((short)model.accessors[primitive.attributes.NORMAL].byteOffset, VertexElementFormat.Vector2, VertexElementUsage.Normal, 0),
+                            new((short)model.accessors[primitive.attributes.TEXCOORD_0].byteOffset, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0)
                         };
 
                         if (primitive.attributes.JOINTS_0 != null && primitive.attributes.WEIGHTS_0 != 0)
                         {
-                            elements.Add(new(0, (short)model.accessors[primitive.attributes.JOINTS_0.Value].byteOffset, VertexElementFormat.Byte4, default, VertexElementUsage.BlendIndices, 0));
-                            elements.Add(new(0, (short)model.accessors[primitive.attributes.WEIGHTS_0.Value].byteOffset, VertexElementFormat.Vector4, default, VertexElementUsage.BlendWeight, 0));
+                            elements.Add(new((short)model.accessors[primitive.attributes.JOINTS_0.Value].byteOffset, VertexElementFormat.Byte4, VertexElementUsage.BlendIndices, 0));
+                            elements.Add(new((short)model.accessors[primitive.attributes.WEIGHTS_0.Value].byteOffset, VertexElementFormat.Vector4, VertexElementUsage.BlendWeight, 0));
                         }
 
-                        var vertexBuffer = new VertexBuffer(_graphicsDevice, verticesSizeInBytes, BufferUsage.WriteOnly);
+                        var vertexBuffer = new VertexBuffer(_graphicsDevice, new VertexDeclaration(vertexStride, elements.ToArray()), positionAccessor.count, BufferUsage.WriteOnly);
                         var (vertices, verticesStartIndex) = ReadBuffer(primitive.attributes.POSITION);
                         vertexBuffer.SetData(vertices, verticesStartIndex, verticesSizeInBytes);
 
@@ -195,7 +194,7 @@ namespace Isles.Graphics
                         var (indicesSizeInBytes, indexElementSize) = indicesAccessor.componentType == 5123
                             ? (indicesAccessor.count * 2, IndexElementSize.SixteenBits)
                             : (indicesAccessor.count * 4, IndexElementSize.ThirtyTwoBits);
-                        var indexBuffer = new IndexBuffer(_graphicsDevice, indicesSizeInBytes, BufferUsage.WriteOnly, indexElementSize);
+                        var indexBuffer = new IndexBuffer(_graphicsDevice, indexElementSize, indicesAccessor.count, BufferUsage.WriteOnly);
                         var (indices, indicesStartIndex) = ReadBuffer(primitive.indices);
                         indexBuffer.SetData(indices, indicesStartIndex, indicesSizeInBytes);
 
@@ -208,7 +207,6 @@ namespace Isles.Graphics
                         {
                             VertexStride = vertexStride,
                             NumVertices = positionAccessor.count,
-                            VertexDeclaration = new VertexDeclaration(_graphicsDevice, elements.ToArray()),
                             VertexBuffer = vertexBuffer,
                             IndexBuffer = indexBuffer,
                             PrimitiveCount = indicesAccessor.count / 3,

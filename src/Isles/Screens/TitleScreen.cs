@@ -10,18 +10,10 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Isles
 {
-    /// <summary>
-    /// Screen that shows the Title.
-    /// </summary>
     public class TitleScreen : IScreen
     {
-        // Texture for the title screen
         private readonly Texture2D titleTexture;
-
-        // Texture for the buttons
         private readonly Texture2D buttonsTexture;
-
-        // Texture for transition to loading
         private readonly Texture2D loadingDisplayTexture;
 
         private int highLightMoveTo;
@@ -97,10 +89,8 @@ namespace Isles
             ui.Add(titlePanel);
 
             // Test textbox
-            // titlePanel.Add(new TextBox(1, Color.White, new Rectangle(0, 0, 400, 50)));
             TextField creditSegment;
             credit = new Panel(new Rectangle(800, 430, 0, 30));
-            // credit = new TextField("R", 16, Color.White, new Rectangle(800, 470, 10000, 30));
             titlePanel.Add(credit);
             var offset = 0;
 
@@ -344,10 +334,6 @@ namespace Isles
             UpdateCredit(gameTime);
         }
 
-        /// <summary>
-        /// Handle game draw event.
-        /// </summary>
-        /// <param name="gameTime"></param>
         public void Draw(GameTime gameTime)
         {
             ui.Draw(gameTime);
@@ -397,11 +383,6 @@ namespace Isles
         {
             alpha = a / 255f;
         }
-
-        /// <summary>
-        /// Draw UI element.
-        /// </summary>
-        /// <param name="gameTime"></param>
         public override void Draw(GameTime gameTime, SpriteBatch sprite)
         {
             if (Texture != null && Visible)

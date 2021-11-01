@@ -19,15 +19,13 @@
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 80,
-      "PackedValue": 1358954495
+      "A": 80
     },
     "MaxColor": {
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 100,
-      "PackedValue": 1694498815
+      "A": 100
     },
     "MinRotateSpeed": 0.00999999978,
     "MaxRotateSpeed": 0.140000001,
@@ -57,15 +55,13 @@
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 255,
-      "PackedValue": 4294967295
+      "A": 255
     },
     "MaxColor": {
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 255,
-      "PackedValue": 4294967295
+      "A": 255
     },
     "MinRotateSpeed": -1,
     "MaxRotateSpeed": 1,
@@ -95,15 +91,13 @@
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 80,
-      "PackedValue": 1358954495
+      "A": 80
     },
     "MaxColor": {
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 100,
-      "PackedValue": 1694498815
+      "A": 100
     },
     "MinRotateSpeed": 0,
     "MaxRotateSpeed": 0,
@@ -133,15 +127,13 @@
       "R": 0,
       "G": 255,
       "B": 0,
-      "A": 255,
-      "PackedValue": 4278255360
+      "A": 255
     },
     "MaxColor": {
       "R": 0,
       "G": 176,
       "B": 0,
-      "A": 255,
-      "PackedValue": 4278235136
+      "A": 255
     },
     "MinRotateSpeed": 0,
     "MaxRotateSpeed": 0,
@@ -171,15 +163,13 @@
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 255,
-      "PackedValue": 4294967295
+      "A": 255
     },
     "MaxColor": {
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 255,
-      "PackedValue": 4294967295
+      "A": 255
     },
     "MinRotateSpeed": 0,
     "MaxRotateSpeed": 0,
@@ -209,15 +199,13 @@
       "R": 3,
       "G": 199,
       "B": 220,
-      "A": 255,
-      "PackedValue": 4278437852
+      "A": 255
     },
     "MaxColor": {
       "R": 3,
       "G": 199,
       "B": 220,
-      "A": 255,
-      "PackedValue": 4278437852
+      "A": 255
     },
     "MinRotateSpeed": 0,
     "MaxRotateSpeed": 0,
@@ -247,15 +235,13 @@
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 255,
-      "PackedValue": 4294967295
+      "A": 255
     },
     "MaxColor": {
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 255,
-      "PackedValue": 4294967295
+      "A": 255
     },
     "MinRotateSpeed": 0,
     "MaxRotateSpeed": 0,
@@ -285,15 +271,13 @@
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 255,
-      "PackedValue": 4294967295
+      "A": 255
     },
     "MaxColor": {
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 255,
-      "PackedValue": 4294967295
+      "A": 255
     },
     "MinRotateSpeed": 0,
     "MaxRotateSpeed": 0,
@@ -323,15 +307,13 @@
       "R": 130,
       "G": 225,
       "B": 242,
-      "A": 255,
-      "PackedValue": 4286767602
+      "A": 255
     },
     "MaxColor": {
       "R": 23,
       "G": 201,
       "B": 232,
-      "A": 255,
-      "PackedValue": 4279749096
+      "A": 255
     },
     "MinRotateSpeed": 0,
     "MaxRotateSpeed": 0,
@@ -361,15 +343,13 @@
       "R": 130,
       "G": 225,
       "B": 242,
-      "A": 255,
-      "PackedValue": 4286767602
+      "A": 255
     },
     "MaxColor": {
       "R": 23,
       "G": 201,
       "B": 232,
-      "A": 255,
-      "PackedValue": 4279749096
+      "A": 255
     },
     "MinRotateSpeed": 0,
     "MaxRotateSpeed": 0,
@@ -399,15 +379,13 @@
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 255,
-      "PackedValue": 4294967295
+      "A": 255
     },
     "MaxColor": {
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 255,
-      "PackedValue": 4294967295
+      "A": 255
     },
     "MinRotateSpeed": 0,
     "MaxRotateSpeed": 0,
@@ -437,15 +415,13 @@
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 255,
-      "PackedValue": 4294967295
+      "A": 255
     },
     "MaxColor": {
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 255,
-      "PackedValue": 4294967295
+      "A": 255
     },
     "MinRotateSpeed": 0,
     "MaxRotateSpeed": 0,
@@ -475,15 +451,13 @@
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 128,
-      "PackedValue": 2164260863
+      "A": 128
     },
     "MaxColor": {
       "R": 64,
       "G": 96,
       "B": 128,
-      "A": 255,
-      "PackedValue": 4282409088
+      "A": 255
     },
     "MinRotateSpeed": -4,
     "MaxRotateSpeed": 4,
@@ -513,15 +487,13 @@
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 128,
-      "PackedValue": 2164260863
+      "A": 128
     },
     "MaxColor": {
       "R": 64,
       "G": 96,
       "B": 128,
-      "A": 255,
-      "PackedValue": 4282409088
+      "A": 255
     },
     "MinRotateSpeed": -4,
     "MaxRotateSpeed": 4,
@@ -551,15 +523,13 @@
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 10,
-      "PackedValue": 184549375
+      "A": 10
     },
     "MaxColor": {
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 40,
-      "PackedValue": 687865855
+      "A": 40
     },
     "MinRotateSpeed": 0,
     "MaxRotateSpeed": 0,
@@ -589,15 +559,13 @@
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 255,
-      "PackedValue": 4294967295
+      "A": 255
     },
     "MaxColor": {
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 255,
-      "PackedValue": 4294967295
+      "A": 255
     },
     "MinRotateSpeed": 0,
     "MaxRotateSpeed": 0,
@@ -627,15 +595,13 @@
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 255,
-      "PackedValue": 4294967295
+      "A": 255
     },
     "MaxColor": {
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 255,
-      "PackedValue": 4294967295
+      "A": 255
     },
     "MinRotateSpeed": -4,
     "MaxRotateSpeed": 4,
@@ -665,15 +631,13 @@
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 255,
-      "PackedValue": 4294967295
+      "A": 255
     },
     "MaxColor": {
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 255,
-      "PackedValue": 4294967295
+      "A": 255
     },
     "MinRotateSpeed": 0,
     "MaxRotateSpeed": 0,
@@ -703,15 +667,13 @@
       "R": 74,
       "G": 126,
       "B": 35,
-      "A": 255,
-      "PackedValue": 4283072035
+      "A": 255
     },
     "MaxColor": {
       "R": 74,
       "G": 126,
       "B": 35,
-      "A": 255,
-      "PackedValue": 4283072035
+      "A": 255
     },
     "MinRotateSpeed": 0,
     "MaxRotateSpeed": 0,
@@ -741,15 +703,13 @@
       "R": 74,
       "G": 126,
       "B": 35,
-      "A": 255,
-      "PackedValue": 4283072035
+      "A": 255
     },
     "MaxColor": {
       "R": 74,
       "G": 126,
       "B": 35,
-      "A": 255,
-      "PackedValue": 4283072035
+      "A": 255
     },
     "MinRotateSpeed": -1,
     "MaxRotateSpeed": 1,
@@ -779,15 +739,13 @@
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 10,
-      "PackedValue": 184549375
+      "A": 10
     },
     "MaxColor": {
       "R": 255,
       "G": 255,
       "B": 255,
-      "A": 40,
-      "PackedValue": 687865855
+      "A": 40
     },
     "MinRotateSpeed": 0,
     "MaxRotateSpeed": 0,

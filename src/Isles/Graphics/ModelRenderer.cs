@@ -36,7 +36,7 @@ namespace Isles.Graphics
         {
             _graphics = graphics;
 
-            _effect = shaderLoader.LoadShader("shaders/Model.cso");
+            _effect = shaderLoader.LoadShader("data/shaders/Model.fx");
             _viewProjection = _effect.Parameters["ViewProjection"];
             _texture = _effect.Parameters["BasicTexture"];
             _world = _effect.Parameters["World"];
@@ -90,7 +90,7 @@ namespace Isles.Graphics
 
             if (showTransparent)
             {
-                _graphics.SetRenderState(BlendState.AlphaBlend, DepthStencilState.Default, RasterizerState.CullNone);
+                _graphics.SetRenderState(BlendState.NonPremultiplied, DepthStencilState.Default, RasterizerState.CullNone);
 
                 Draw(_defaultShader, _defaultTransparent);
                 Draw(_defaultSkinnedShader, _skinnedTransparent);
@@ -124,8 +124,7 @@ namespace Isles.Graphics
         private void Draw(EffectTechnique shader, List<DrawableItem> items)
         {
             _effect.CurrentTechnique = shader;
-            _effect.Begin();
-            _effect.CurrentTechnique.Passes[0].Begin();
+            _effect.CurrentTechnique.Passes[0].Apply();
 
             foreach (var item in items)
             {
@@ -140,19 +139,15 @@ namespace Isles.Graphics
 
                 foreach (var part in item.Mesh.Primitives)
                 {
-                    _graphics.VertexDeclaration = part.VertexDeclaration;
-                    _graphics.Vertices[0].SetSource(part.VertexBuffer, 0, part.VertexStride);
+                    _graphics.SetVertexBuffer(part.VertexBuffer);
                     _graphics.Indices = part.IndexBuffer;
 
                     _texture?.SetValue(part.Texture);
-                    _effect.CommitChanges();
+                    _effect.CurrentTechnique.Passes[0].Apply();
 
                     _graphics.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, part.NumVertices, 0, part.PrimitiveCount);
                 }
             }
-
-            _effect.CurrentTechnique.Passes[0].End();
-            _effect.End();
         }
 
         private struct DrawableItem
