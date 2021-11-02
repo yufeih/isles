@@ -1,9 +1,7 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
 using Isles.Engine;
 using Isles.UI;
 using Microsoft.Xna.Framework;
@@ -821,27 +819,6 @@ namespace Isles
                 Display.HandleEvent(type, sender, tag) == EventResult.Handled
                 ? EventResult.Handled
                 : EventResult.Unhandled;
-        }
-    }
-
-    public static class Cursors
-    {
-        public static Cursor StoredCursor;
-
-        public static Cursor MenuDefault { get; } = LoadCursor("NormalCursor.cur");
-        public static Cursor Default { get; } = LoadCursor("default.ani");
-        public static Cursor TargetRed { get; } = LoadCursor("target_red.ani");
-        public static Cursor TargetGreen { get; } = LoadCursor("target_green.ani");
-        public static Cursor Top { get; } = LoadCursor("screen_top.cur");
-        public static Cursor Bottom { get; } = LoadCursor("screen_bottom.cur");
-        public static Cursor Left { get; } = LoadCursor("screen_left.cur");
-        public static Cursor Right { get; } = LoadCursor("screen_right.cur");
-        public static Cursor Move { get; } = LoadCursor("screen_move.cur");
-        public static Cursor Rotate { get; } = LoadCursor("screen_rotate.cur");
-
-        private static Cursor LoadCursor(string name)
-        {
-            return new(Win32.LoadCursorFromFile(System.IO.Path.Combine(AppContext.BaseDirectory, "data/cursors", name)));
         }
     }
 }

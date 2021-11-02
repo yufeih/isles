@@ -8,15 +8,11 @@ using Isles.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Control = System.Windows.Forms.Control;
-using Cursor = System.Windows.Forms.Cursor;
 
 namespace Isles.Engine
 {
     public class BaseGame : Game, IEventListener
     {
-        private Cursor cursor;
-
         private Color backgroundColor = Color.Black;
 
         private Matrix view;
@@ -29,17 +25,6 @@ namespace Isles.Engine
         private Ray pickRay;
         private Vector3 eye;
         private Vector3 facing;
-
-        public Cursor Cursor
-        {
-            get => cursor;
-            set
-            {
-                //var control = Control.FromHandle(Window.Handle);
-                //control.Cursor = cursor;
-                //cursor = value;
-            }
-        }
 
         public Input Input { get; private set; }
 
@@ -191,9 +176,6 @@ namespace Isles.Engine
 
             // Update particle system
             ParticleSystem.UpdateAll(gameTime);
-
-            // Tell me why I have to set this every frame...
-            Cursor = cursor;
 
             base.Update(gameTime);
         }

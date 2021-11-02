@@ -129,7 +129,7 @@ namespace Isles
             loadContext.Refresh(100);
 
             // Restore cursor
-            BaseGame.Singleton.Cursor = Cursors.Default;
+            Cursors.SetCursor(Cursors.Default);
             Game.IsMouseVisible = true;
 
             Event.SendMessage(EventType.Unknown, this, this, 1, 0.2f);
@@ -205,21 +205,16 @@ namespace Isles
 
             camera.BeginMove += (sender, e) =>
             {
-                Cursors.StoredCursor = Game.Cursor;
-                Game.Cursor = Cursors.Move;
+                Cursors.SetCursor(Cursors.Move);
                 scrollingCamera = true;
             };
             camera.EndMove += (sender, e) =>
             {
                 scrollingCamera = false;
-                Game.Cursor = Cursors.StoredCursor;
+                Cursors.SetCursor(Cursors.Default);
             };
-            camera.BeginRotate += (sender, e) =>
-            {
-                Cursors.StoredCursor = Game.Cursor;
-                Game.Cursor = Cursors.Rotate;
-            };
-            camera.EndRotate += (sender, e) => Game.Cursor = Cursors.StoredCursor;
+            camera.BeginRotate += (sender, e) => Cursors.SetCursor(Cursors.Rotate);
+            camera.EndRotate += (sender, e) => Cursors.SetCursor(Cursors.Default);
         }
 
         private IEnumerable<PlayerInfo> CreateTestPlayerInfo()
@@ -334,7 +329,7 @@ namespace Isles
             {
                 readme.Update(gameTime);
                 pausePanel.Update(gameTime);
-                Game.Cursor = Cursors.Default;
+                Cursors.SetCursor(Cursors.Default);
                 return;
             }
 
@@ -382,19 +377,19 @@ namespace Isles
 
                 if (mouse.Y <= border)
                 {
-                    Game.Cursor = Cursors.Top;
+                    Cursors.SetCursor(Cursors.Top);
                 }
                 else if (mouse.Y >= Game.ScreenHeight - border)
                 {
-                    Game.Cursor = Cursors.Bottom;
+                    Cursors.SetCursor(Cursors.Bottom);
                 }
                 else if (mouse.X <= border)
                 {
-                    Game.Cursor = Cursors.Left;
+                    Cursors.SetCursor(Cursors.Left);
                 }
                 else if (mouse.X >= Game.ScreenWidth - border)
                 {
-                    Game.Cursor = Cursors.Right;
+                    Cursors.SetCursor(Cursors.Right);
                 }
             }
         }

@@ -205,7 +205,7 @@ namespace Isles
             expectedHighlightPos = highLightMoveTo;
 
             Audios.Counter = 0;
-            BaseGame.Singleton.Cursor = Cursors.MenuDefault;
+            Cursors.SetCursor(Cursors.MenuDefault);
             Audios.PlayMusic("Menu", true, 0, 5);
         }
 
