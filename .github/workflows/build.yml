@@ -11,11 +11,15 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'true'
+
     - run: dotnet restore
 
     # Microsoft.HLSL.CSharpVB uses CodeTaskFactory which "dotnet build" does not support", use msbuild instead
     - uses: microsoft/setup-msbuild@v1.0.3
     - run: msbuild -warnAsError /p:Configuration=Release /p:OutputPath=${{ runner.temp }}/bin
+
     - uses: actions/upload-artifact@v2
       with:
         name: isles
