@@ -1314,7 +1314,7 @@ namespace Isles
                 Audios.Play("OK");
             }
 
-            world.Game.Cursor = Cursors.TargetRed;
+            Cursors.SetCursor(Cursors.TargetRed);
             return true;
         }
 
@@ -1329,7 +1329,7 @@ namespace Isles
                 if (minimapPoint.HasValue)
                 {
                     Player.LocalPlayer.AttackTo(minimapPoint.Value);
-                    world.Game.Cursor = Cursors.Default;
+                    Cursors.SetCursor(Cursors.Default);
                     Spell.EndSpell();
                     return EventResult.Handled;
                 }
@@ -1352,10 +1352,9 @@ namespace Isles
                 if (picked != null)
                 {
                     if (picked.IsAlive)
-                    // Player.LocalPlayer.GetRelation(picked.Owner) == PlayerRelation.Opponent)
                     {
                         Player.LocalPlayer.AttackTo(picked);
-                        world.Game.Cursor = Cursors.Default;
+                        Cursors.SetCursor(Cursors.Default);
                         Spell.EndSpell();
                     }
                     else
@@ -1372,7 +1371,7 @@ namespace Isles
                 if (point.HasValue)
                 {
                     Player.LocalPlayer.AttackTo(point.Value);
-                    world.Game.Cursor = Cursors.Default;
+                    Cursors.SetCursor(Cursors.Default);
                     Spell.EndSpell();
 
                     Vector3 location = point.Value;
@@ -1387,7 +1386,7 @@ namespace Isles
                (type == EventType.KeyDown && (tag is Keys?) && (tag as Keys?).Value == Keys.Escape))
             {
                 // Cancel attack
-                world.Game.Cursor = Cursors.Default;
+                Cursors.SetCursor(Cursors.Default);
                 Spell.EndSpell();
                 return EventResult.Handled;
             }
@@ -1409,7 +1408,7 @@ namespace Isles
         public override bool Trigger()
         {
             Audios.Play("OK");
-            world.Game.Cursor = Cursors.TargetGreen;
+            Cursors.SetCursor(Cursors.TargetGreen);
             return true;
         }
 
@@ -1424,7 +1423,7 @@ namespace Isles
                 if (minimapPoint.HasValue)
                 {
                     Player.LocalPlayer.MoveTo(minimapPoint.Value);
-                    world.Game.Cursor = Cursors.Default;
+                    Cursors.SetCursor(Cursors.Default);
                     Spell.EndSpell();
                     return EventResult.Handled;
                 }
@@ -1447,7 +1446,7 @@ namespace Isles
                 if (picked != null && picked.IsAlive)
                 {
                     Player.LocalPlayer.MoveTo(picked);
-                    world.Game.Cursor = Cursors.Default;
+                    Cursors.SetCursor(Cursors.Default);
                     Spell.EndSpell();
                     return EventResult.Handled;
                 }
@@ -1458,7 +1457,7 @@ namespace Isles
                 if (point.HasValue)
                 {
                     Player.LocalPlayer.MoveTo(point.Value);
-                    world.Game.Cursor = Cursors.Default;
+                    Cursors.SetCursor(Cursors.Default);
                     Spell.EndSpell();
 
                     Vector3 location = point.Value;
@@ -1473,7 +1472,7 @@ namespace Isles
                (type == EventType.KeyDown && (tag is Keys?) && (tag as Keys?).Value == Keys.Escape))
             {
                 // Cancel attack
-                world.Game.Cursor = Cursors.Default;
+                Cursors.SetCursor(Cursors.Default);
                 Spell.EndSpell();
                 return EventResult.Handled;
             }

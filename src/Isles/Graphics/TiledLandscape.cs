@@ -21,7 +21,7 @@ namespace Isles.Graphics
             base.Initialize(game);
 
             // Load terrain effect
-            terrainEffect = game.ShaderLoader.LoadShader("data/shaders/Terrain.fx");
+            terrainEffect = game.ShaderLoader.LoadShader("shaders/Terrain.cso");
 
             // Set patch LOD to highest
             foreach (Patch patch in Patches)

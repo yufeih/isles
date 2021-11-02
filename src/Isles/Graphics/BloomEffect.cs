@@ -79,9 +79,9 @@ namespace Isles.Graphics
 
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            bloomExtractEffect = shaderLoader.LoadShader("data/shaders/BloomExtract.fx");
-            bloomCombineEffect = shaderLoader.LoadShader("data/shaders/BloomCombine.fx");
-            gaussianBlurEffect = shaderLoader.LoadShader("data/shaders/GaussianBlur.fx");
+            bloomExtractEffect = shaderLoader.LoadShader("shaders/BloomExtract.cso");
+            bloomCombineEffect = shaderLoader.LoadShader("shaders/BloomCombine.cso");
+            gaussianBlurEffect = shaderLoader.LoadShader("shaders/GaussianBlur.cso");
 
             // Look up the resolution and format of our main backbuffer.
             PresentationParameters pp = GraphicsDevice.PresentationParameters;
