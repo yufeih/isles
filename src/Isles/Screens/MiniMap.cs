@@ -320,10 +320,7 @@ namespace Isles
                     RadiusFactor * DestinationRectangle.Width * RadiusFactor * DestinationRectangle.Width)
                 {
                     Vector3 position = MapPointToWorldPositionNegativeAllowed(game.Input.MousePosition);
-                    if (position != null)
-                    {
-                        camera.FlyTo(position, true);
-                    }
+                    camera.FlyTo(position, true);
                 }
                 else
                 {

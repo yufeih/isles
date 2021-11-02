@@ -5,6 +5,7 @@
     <ApplicationIcon>Game.ico</ApplicationIcon>
     <NoWarn>X4717</NoWarn>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FNA\FNA.csproj" />
+    <ProjectReference Include="..\FNA\FNA.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

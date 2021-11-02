@@ -18,7 +18,7 @@ jobs:
 
     # Microsoft.HLSL.CSharpVB uses CodeTaskFactory which "dotnet build" does not support", use msbuild instead
     - uses: microsoft/setup-msbuild@v1.0.3
-    - run: msbuild -m -warnAsError /p:Configuration=Release /p:OutputPath=${{ runner.temp }}/bin
+    - run: msbuild -m /p:Configuration=Release /p:OutputPath=${{ runner.temp }}/bin
 
     - uses: actions/upload-artifact@v2
       with:
