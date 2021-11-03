@@ -10,10 +10,9 @@ namespace Isles
 {
     public static unsafe class Cursors
     {
-        public static IntPtr StoredCursor;
-
+#if WINDOWS
         private static readonly SDL_Cursor* s_cursor = (SDL_Cursor*)SDL_CreateSystemCursor(SDL_SystemCursor.SDL_SYSTEM_CURSOR_ARROW);
-
+#endif
         public static IntPtr MenuDefault { get; } = LoadCursor("NormalCursor.cur");
         public static IntPtr Default { get; } = LoadCursor("default.ani");
         public static IntPtr TargetRed { get; } = LoadCursor("target_red.ani");
