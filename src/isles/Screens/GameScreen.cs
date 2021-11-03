@@ -18,6 +18,7 @@ namespace Isles
     public class GameScreen : IScreen, IEventListener
     {
         private readonly GraphicsDeviceManager graphics;
+        private readonly WorldRenderer _worldRenderer;
 
         public GameUI UI { get; private set; }
 
@@ -56,6 +57,7 @@ namespace Isles
             Game = BaseGame.Singleton;
             graphics = Game.Graphics;
 
+            _worldRenderer = new(Game.GraphicsDevice, Game.Settings, Game.ModelRenderer, Game.Shadow);
             LoadWorld(levelName, new Skirmish(this, CreateTestPlayerInfo()));
         }
 
@@ -92,6 +94,7 @@ namespace Isles
             // Load game world
             World = new GameWorld();
             World.Load(doc.DocumentElement, loadContext);
+            World.Pick = _worldRenderer.Pick;
 
             loadContext.Refresh(100);
 
@@ -376,8 +379,7 @@ namespace Isles
 
         public void Draw(GameTime gameTime)
         {
-            // Draw game world
-            World?.Draw(gameTime);
+            _worldRenderer.Draw(World, Game.ViewProjection, Game.Eye, Game.Facing, gameTime);
 
             // Draw player info
             foreach (var player in Player.AllPlayers)

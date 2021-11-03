@@ -28,20 +28,15 @@ namespace Isles.Engine
 
         public FogOfWar FogOfWar { get; private set; }
 
+        public Func<Entity> Pick { get; set; }
+
         public Vector3? TargetPosition => isTargetPositionOnLandscape ? targetPosition : null;
 
         private Vector3 targetPosition = Vector3.Zero;
         private bool isTargetPositionOnLandscape = true;
 
-        private readonly ModelPicker<Entity> _modelPicker;
-
         public string Name;
         public string Description;
-
-        public GameWorld()
-        {
-            _modelPicker = new ModelPicker<Entity>(Game.GraphicsDevice, Game.ModelRenderer);
-        }
 
         public void Update(GameTime gameTime)
         {
@@ -78,74 +73,6 @@ namespace Isles.Engine
             }
         }
 
-        public void Draw(GameTime gameTime)
-        {
-            var objectMap = _modelPicker.DrawObjectMap(
-                Game.ViewProjection, worldObjects.OfType<Entity>().Where(entity => entity.IsPickable), entity => entity.Model);
-
-            pickedEntity = objectMap.Pick();
-
-            if (Game.Settings.ReflectionEnabled)
-            {
-                Landscape.UpdateWaterReflectionAndRefraction(gameTime);
-            }
-
-            // Generate shadow map
-            if (Game.Shadow != null)
-            {
-                Game.Shadow.Begin(Game.Eye, Game.Facing);
-
-                Game.ModelRenderer.Clear();
-
-                // Draw shadow casters. Currently we only draw all world object
-                foreach (var o in worldObjects)
-                {
-                    o.DrawShadowMap(gameTime, Game.Shadow);
-                }
-
-                Game.ModelRenderer.DrawShadowMap(Game.Shadow);
-
-                // Resolve shadow map
-                Game.Shadow.End();
-            }
-
-            Game.ModelRenderer.Clear();
-
-            // Draw world objects before landscape
-            foreach (var o in worldObjects)
-            {
-                o.Draw(gameTime);
-            }
-
-            // Draw spell
-            Spell.CurrentSpell?.Draw(gameTime);
-
-            Landscape.DrawWater(gameTime);
-
-            // Draw shadow receivers with the shadow map
-            Landscape.DrawTerrain(Game.Shadow);
-
-            // Present surface
-            Landscape.PresentSurface();
-
-            // FIXME: There are some weired things when models are drawed after
-            // drawing the terrain... Annoying...
-            Game.ModelRenderer.Draw(Game.ViewProjection, true, false);
-
-            // TODO: Draw particles with ZEnable = true, ZWriteEnable = false
-            ParticleSystem.Present();
-
-            Game.ModelRenderer.Draw(Game.ViewProjection, false, true);
-        }
-
-        private void DrawWaterReflection(GameTime gameTime, Matrix view, Matrix projection)
-        {
-            foreach (var o in worldObjects)
-            {
-                o.DrawReflection(gameTime, view, projection);
-            }
-        }
-
         public virtual void Load(XmlElement node, ILoading context)
         {
             context.Refresh(2);
@@ -156,7 +83,6 @@ namespace Isles.Engine
             Landscape = new Terrain();
             Landscape.Load(JsonSerializer.Deserialize<TerrainData>(
                 File.ReadAllBytes($"data/{landscapeFilename}.json")), BaseGame.Singleton.TextureLoader);
-            Landscape.DrawWaterReflection += DrawWaterReflection;
             InitializeGrid();
 
             // Initialize fog of war
@@ -265,13 +191,6 @@ namespace Isles.Engine
             }
 
             return worldObject;
-        }
-
-        private Entity pickedEntity;
-        
-        public Entity Pick()
-        {
-            return pickedEntity;
         }
 
         public void Add(BaseEntity worldObject)

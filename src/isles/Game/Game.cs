@@ -22,13 +22,6 @@ namespace Isles
             }
         }
 
-        protected override void Update(GameTime gameTime)
-        {
-            base.Update(gameTime);
-
-            Audios.Update(gameTime);
-        }
-
         private void Register()
         {
             // Register world object creators

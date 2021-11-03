@@ -407,16 +407,7 @@ namespace Isles.Graphics
             waterIndices.SetData(indexData);
         }
 
-        public event DrawDelegate DrawWaterReflection;
-
-        public delegate void DrawDelegate(GameTime gameTime, Matrix view, Matrix projection);
-
-        /// <summary>
-        /// Draw landscape into an environment map.
-        /// Call this before anything is drawed.
-        /// </summary>
-        /// <param name="gameTime"></param>
-        public void UpdateWaterReflectionAndRefraction(GameTime gameTime)
+        public void UpdateWaterReflectionAndRefraction(GameTime gameTime, Action<GameTime, Matrix, Matrix> drawWaterReflection)
         {
             graphics.PushRenderTarget(reflectionRenderTarget);
 
@@ -431,7 +422,7 @@ namespace Isles.Graphics
             // Draw other reflections
             if (game.Settings.ReflectionEnabled)
             {
-                DrawWaterReflection(gameTime, viewReflect, game.Projection);
+                drawWaterReflection(gameTime, viewReflect, game.Projection);
             }
 
             // Present the model manager to draw those models

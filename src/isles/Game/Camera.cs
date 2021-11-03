@@ -8,25 +8,12 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Isles.Engine
 {
-    /// <summary>
-    /// Interface for game camera.
-    /// </summary>
     public interface ICamera : IEventListener
     {
-        /// <summary>
-        /// Gets the camera view matrix.
-        /// </summary>
         Matrix View { get; }
 
-        /// <summary>
-        /// Gets the camera projection matrix.
-        /// </summary>
         Matrix Projection { get; }
 
-        /// <summary>
-        /// Update camera parameters.
-        /// </summary>
-        /// <param name="gameTime"></param>
         void Update(GameTime gameTime);
     }
 
@@ -92,9 +79,6 @@ namespace Isles.Engine
         }
     }
 
-    /// <summary>
-    /// Settings for game camera.
-    /// </summary>
     public class GameCameraSettings
     {
         /// <summary>
@@ -141,23 +125,13 @@ namespace Isles.Engine
         public float MaxSpeed { get; set; } = 1.0f;
     }
 
-    /// <summary>
-    /// Game camera.
-    /// </summary>
     public class GameCamera : Camera
     {
-        /// <summary>
-        /// Game camera settings.
-        /// </summary>
         public GameCameraSettings Settings { get; set; }
 
         private readonly GameWorld world;
         private const float BorderSize = 100;
 
-        /// <summary>
-        /// GameCamera needs screen width and height and mouse
-        /// pick ray each frame, so BaseGame is presented here.
-        /// </summary>
         private readonly BaseGame game = BaseGame.Singleton;
 
         /// <summary>
@@ -225,11 +199,6 @@ namespace Isles.Engine
         private bool orbit;
         private float orbitSpeed;
 
-        /// <summary>
-        /// Creates a game camera.
-        /// </summary>
-        /// <param name="game"></param>
-        /// <param name="world.Landscape"></param>
         public GameCamera(GameCameraSettings settings, GameWorld world)
             : base(BaseGame.Singleton.GraphicsDevice)
         {
@@ -247,11 +216,6 @@ namespace Isles.Engine
                 world.Landscape.Size.X / 2, world.Landscape.Size.Y / 2, 0), true);
         }
 
-        /// <summary>
-        /// Fly the camera to a given location.
-        /// </summary>
-        /// <param name="position"></param>
-        /// <param name="teleport"></param>
         public void FlyTo(Vector3 position, bool teleport)
         {
             const float Distance = 200;
@@ -281,9 +245,6 @@ namespace Isles.Engine
             }
         }
 
-        /// <summary>
-        /// Make the game camera orbit around a specified point on the ground.
-        /// </summary>
         public void Orbit(Vector3? point, float speed, float radius, float roll)
         {
             if (point.HasValue)
@@ -296,11 +257,6 @@ namespace Isles.Engine
             rollTarget = roll;
             orbit = true;
             Freezed = true;
-        }
-
-        public void CancelOrbit()
-        {
-            orbit = false;
         }
 
         public override void Update(GameTime gameTime)
@@ -344,7 +300,6 @@ namespace Isles.Engine
         /// <summary>
         /// Adjust view distance (radius) using mouse wheel or 'PgUp', 'PgDown' button.
         /// </summary>
-        /// <param name="elapsedTime"></param>
         private void UpdateViewDistance(float elapsedTime, float smoother)
         {
             if (!Freezed && !orbit)
@@ -378,8 +333,6 @@ namespace Isles.Engine
         /// Update the position of camera lookat when the cursor enters the
         /// borders of the screen.
         /// </summary>
-        /// <param name="elapsedTime"></param>
-        /// <param name="heightFactor"></param>
         private void UpdateLookAt(float elapsedTime, float smoother)
         {
             float xDelta = 0;
