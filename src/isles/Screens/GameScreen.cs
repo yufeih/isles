@@ -222,7 +222,6 @@ namespace Isles
             var info1 = new PlayerInfo
             {
                 Name = Game.Settings.PlayerName,
-                Race = Race.Islander,
                 Team = 1,
                 TeamColor = Color.Wheat,
                 Type = PlayerType.Local,
@@ -233,7 +232,6 @@ namespace Isles
             var info2 = new PlayerInfo
             {
                 Name = "Computer",
-                Race = Race.Islander,
                 Team = 2,
                 TeamColor = Color.Green,
                 Type = PlayerType.Computer,

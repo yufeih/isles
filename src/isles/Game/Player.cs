@@ -24,18 +24,11 @@ namespace Isles
         Neutral,
     }
 
-    public enum Race
-    {
-        Islander,
-        Steamer,
-    }
-
     public class PlayerInfo
     {
         public string Name;
         public int Team;
         public Color TeamColor;
-        public Race Race;
         public Vector2 SpawnPoint;
         public PlayerType Type;
     }
@@ -62,37 +55,19 @@ namespace Isles
             LocalPlayer = null;
         }
 
-        private static readonly List<string> BuildingRegistry = new();
-        private static readonly List<string> CharactorRegistry = new();
-
-        public static void RegisterBuilding(string type)
+        private static readonly List<string> BuildingRegistry = new()
         {
-            if (!BuildingRegistry.Contains(type))
-            {
-                BuildingRegistry.Add(type);
-            }
-
-            System.Diagnostics.Debug.Assert(!CharactorRegistry.Contains(type));
-        }
-
-        public static void RegisterCharactor(string type)
-        {
-            if (!CharactorRegistry.Contains(type))
-            {
-                CharactorRegistry.Add(type);
-            }
-
-            System.Diagnostics.Debug.Assert(!BuildingRegistry.Contains(type));
-        }
+            "Townhall",
+            "Farmhouse",
+            "Lumbermill",
+            "Tower",
+            "Barracks",
+            "Altar",
+        };
 
         public static bool IsBuilding(string type)
         {
             return BuildingRegistry.Contains(type);
-        }
-
-        public static bool IsCharactor(string type)
-        {
-            return CharactorRegistry.Contains(type);
         }
 
         /// <summary>
@@ -109,11 +84,6 @@ namespace Isles
         /// Gets or sets the color of the team.
         /// </summary>
         public Color TeamColor;
-
-        /// <summary>
-        /// Gets or sets the race of the player.
-        /// </summary>
-        public Race Race;
 
         /// <summary>
         /// Gets or sets the spawnpoint of the player.
@@ -389,16 +359,6 @@ namespace Isles
         }
 
         /// <summary>
-        /// Marks a dependency to be unavailable.
-        /// </summary>
-        public void MarkUnavailable(string name)
-        {
-            availability[name]--;
-
-            System.Diagnostics.Debug.Assert(availability[name] >= 0);
-        }
-
-        /// <summary>
         /// Checks the dependency for given technique.
         /// </summary>
         public bool CheckDependency(string name)
@@ -423,21 +383,6 @@ namespace Isles
         public void AddDependency(string what, string dependsOnWhat)
         {
             Dependencies.Add(new KeyValuePair<string, string>(what, dependsOnWhat));
-        }
-
-        /// <summary>
-        /// Removes a new dependency.
-        /// </summary>
-        public void RemoveDependency(string what, string dependsOnWhat)
-        {
-            for (var i = 0; i < Dependencies.Count; i++)
-            {
-                if (Dependencies[i].Key == what && Dependencies[i].Value == dependsOnWhat)
-                {
-                    Dependencies.RemoveAt(i);
-                    break;
-                }
-            }
         }
 
         /// <summary>
@@ -501,20 +446,17 @@ namespace Isles
             return nearest;
         }
 
-        /// <summary>
-        /// Names.
-        /// </summary>
-        public string TownhallName => Race == Race.Islander ? "Townhall" : "SteamFort";
+        public string TownhallName => "Townhall";
 
-        public string LumbermillName => Race == Race.Islander ? "Lumbermill" : null;
+        public string LumbermillName => "Lumbermill";
 
-        public string HouseName => Race == Race.Islander ? "Farmhouse" : "Steamhouse";
+        public string HouseName => "Farmhouse";
 
-        public string WorkerName => Race == Race.Islander ? "Follower" : "Miner";
+        public string WorkerName => "Follower";
 
-        public string TowerName => Race == Race.Islander ? "Tower" : "SteamCannon";
+        public string TowerName => "Tower";
 
-        public string HeroName => Race == Race.Islander ? "FireSorceress" : "Steambot";
+        public string HeroName => "FireSorceress";
 
         /// <summary>
         /// Gets the relationship with the target player.
@@ -1531,18 +1473,6 @@ namespace Isles
                 {
                     o.Focused = true;
                 }
-
-                // if (groups[currentGroup].Count > 0 && groups[currentGroup][0] is Charactor &&
-                //    groups[currentGroup][0].Owner is LocalPlayer)
-                // {
-                //    GameUI.Singleton.SetUIElement(0, false, Attack.Button);
-                //    GameUI.Singleton.SetUIElement(1, false, Move.Button);
-                // }
-                // else
-                // {
-                //    GameUI.Singleton.SetUIElement(0, false, null);
-                //    GameUI.Singleton.SetUIElement(1, false, null);
-                // }
             }
         }
 
@@ -1792,22 +1722,6 @@ namespace Isles
             {
                 Requests[type] = MathHelper.Lerp(Requests[type], evaluation, 0.5f);
             }
-
-            // Check dependencis
-            // if (!CheckDependency(type))
-            // {
-            //    foreach (KeyValuePair<string, string> pair in Dependencies)
-            //    {
-            //        if (type == pair.Key && !IsFutureAvailable(pair.Value))
-            //        {
-            //            // Dependency table should not contain any circle,
-            //            // or this method will fail.
-            //            if (Requests.ContainsKey(pair.Value) &&
-            //                Requests[pair.Value] < evaluation * 1.5f)
-            //                Request(pair.Value, evaluation * 1.5f);
-            //        }
-            //    }
-            // }
         }
 
         /// <summary>

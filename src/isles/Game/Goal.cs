@@ -195,24 +195,24 @@ namespace Isles
                 (1.2f + 2.3f * (owner.Food - owner.FoodCapacity + 5) / 5) * FarmFactor);
 
             // Currently requests are fixed :(
-            owner.FutureObjects.TryGetValue(owner.Race == Race.Islander ? "Militia" : "Swordman", out var militiaCount);
-            owner.FutureObjects.TryGetValue(owner.Race == Race.Islander ? "Hunter" : "Rifleman", out var hunterCount);
-            owner.FutureObjects.TryGetValue(owner.Race == Race.Islander ? "Barracks" : "TrainingCenter", out var barracksCount);
+            owner.FutureObjects.TryGetValue("Militia", out var militiaCount);
+            owner.FutureObjects.TryGetValue("Hunter", out var hunterCount);
+            owner.FutureObjects.TryGetValue("Barracks", out var barracksCount);
 
             owner.Request(owner.HeroName, 1, 2.5f * HeroFactor);
             owner.Request(owner.TownhallName, 1, 3.5f * TownhallFactor);
-            owner.Request(owner.Race == Race.Islander ? "Altar" : "SteamFactory", 1, 2 * AltarFactor);
+            owner.Request("Altar", 1, 2 * AltarFactor);
 
-            owner.Request(owner.Race == Race.Islander ? "Militia" : "Swordman", 20,
+            owner.Request("Militia", 20,
                 (1.5f + 1.0f * (4 - militiaCount) / 4) * MilitiaFactor);
 
-            owner.Request(owner.Race == Race.Islander ? "Hunter" : "Rifleman", 20,
+            owner.Request("Hunter", 20,
                 (1.5f + 1.0f * (4 - hunterCount) / 4) * HunterFactor);
 
-            owner.Request(owner.Race == Race.Islander ? "Barracks" : "TrainingCenter", 2,
+            owner.Request("Barracks", 2,
                 ((barracksCount == 0) ? 1.5f : (militiaCount + hunterCount > 6 ? 2.0f : 1.2f)) * BarracksFactor);
 
-            owner.Request(owner.Race == Race.Islander ? "Lumbermill" : "Regenerator", 1, 2 * LumbermillFactor);
+            owner.Request("Lumbermill", 1, 2 * LumbermillFactor);
 
             owner.Request("AttackUpgrade", 1,
                 (1.0f + 1.5f * (militiaCount + hunterCount) / 4) * AttackUpgradeFactor);
@@ -220,11 +220,7 @@ namespace Isles
             owner.Request("DefenseUpgrade", 1,
                 (1.0f + 1.5f * (militiaCount + hunterCount) / 4) * DefenseUpgradeFactor);
 
-            if (owner.Race == Race.Islander)
-            {
-                // owner.Request("LiveOfNature", 1, Helper.RandomInRange(1.8f, 2.2f));
-                owner.Request("PunishOfNatureUpgrade", 1, militiaCount + hunterCount >= 8 ? 2.0f : 0.0f);
-            }
+            owner.Request("PunishOfNatureUpgrade", 1, militiaCount + hunterCount >= 8 ? 2.0f : 0.0f);
 
             owner.Request(owner.TowerName, 1, Helper.RandomInRange(1.0f, 2.0f));
 

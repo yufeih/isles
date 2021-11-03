@@ -52,13 +52,6 @@ namespace Isles
             Spell.RegisterCreator("Barracks", world => new SpellConstruct(world, "Barracks"));
             Spell.RegisterCreator("Altar", world => new SpellConstruct(world, "Altar"));
 
-            Player.RegisterBuilding("Townhall");
-            Player.RegisterBuilding("Farmhouse");
-            Player.RegisterBuilding("Lumbermill");
-            Player.RegisterBuilding("Tower");
-            Player.RegisterBuilding("Barracks");
-            Player.RegisterBuilding("Altar");
-
             // Islander units
             GameWorld.RegisterCreator("Follower", world => new Worker(world, "Follower"));
             GameWorld.RegisterCreator("Militia", world => new Charactor(world, "Militia"));
@@ -71,12 +64,6 @@ namespace Isles
             Spell.RegisterCreator("Hunter", world => new SpellTraining(world, "Hunter", null));
             Spell.RegisterCreator("FireSorceress", world => new SpellTraining(world, "FireSorceress", null));
             Spell.RegisterCreator("Hellfire", world => new SpellTraining(world, "Hellfire", null));
-
-            Player.RegisterCharactor("Follower");
-            Player.RegisterCharactor("Militia");
-            Player.RegisterCharactor("Hunter");
-            Player.RegisterCharactor("FireSorceress");
-            Player.RegisterCharactor("Hellfire");
 
             // Register spells
             Spell.RegisterCreator("LiveOfNature", world => new SpellUpgrade(world, "LiveOfNature", Upgrades.LiveOfNature));

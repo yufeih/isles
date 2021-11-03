@@ -35,11 +35,6 @@ namespace Isles
                     info.TeamColor = Helper.StringToColor(child.GetAttribute("TeamColor"));
                 }
 
-                if (child.HasAttribute("Race"))
-                {
-                    info.Race = (Race)Enum.Parse(typeof(Race), child.GetAttribute("Race"));
-                }
-
                 if (child.HasAttribute("Type"))
                 {
                     info.Type = (PlayerType)Enum.Parse(typeof(PlayerType), child.GetAttribute("Type"));
@@ -82,7 +77,6 @@ namespace Isles
                 }
 
                 player.Name = playerInfoFromMap[i].Name;
-                player.Race = playerInfoFromMap[i].Race;
                 player.Team = playerInfoFromMap[i].Team;
                 player.TeamColor = playerInfoFromMap[i].TeamColor;
                 player.SpawnPoint = playerInfoFromMap[i].SpawnPoint;
@@ -118,15 +112,7 @@ namespace Isles
                 }
             }
 
-            // Player sound
-            if (Player.LocalPlayer.Race == Race.Islander)
-            {
-                Audios.PlayMusic("Islander", true, 40, 10);
-            }
-            else
-            {
-                Audios.PlayMusic("Steamer", true, 40, 10);
-            }
+            Audios.PlayMusic("Islander", true, 40, 10);
         }
 
         public virtual void Update(GameTime gameTime) { }
@@ -263,11 +249,8 @@ namespace Isles
 
         public void CreateStartup(GameWorld world, Player player, Vector3 position)
         {
-            var townhall = player.Race == Race.Islander ? "Townhall" : "SteamFort";
-            var worker = player.Race == Race.Islander ? "Follower" : "Miner";
-
             // Create a townhall and 4 followers if this player is not used for quest
-            var building = world.Create(townhall) as Building;
+            var building = world.Create("Townhall") as Building;
 
             if (building != null)
             {
@@ -279,7 +262,7 @@ namespace Isles
 
             for (var i = 0; i < 5; i++)
             {
-                if (world.Create(worker) is Worker peon)
+                if (world.Create("Follower") is Worker peon)
                 {
                     peon.Position = building.Position + building.SpawnPoint;
                     peon.Owner = player;
