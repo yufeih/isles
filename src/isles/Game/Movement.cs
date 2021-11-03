@@ -52,14 +52,14 @@ namespace Isles.Engine
         public float FollowDistance = 30;
         private const float SensorDistance = 10;
         private readonly IMovable owner;
-        private readonly IWorldObject target;
+        private readonly BaseEntity target;
         private readonly PathManager pathManager;
         private StateMoveToPosition move;
         private Vector2 lastPosition;
         private readonly float priority;
         private double reactivateTimer;
 
-        public StateMoveToTarget(IMovable owner, IWorldObject target,
+        public StateMoveToTarget(IMovable owner, BaseEntity target,
                                  float priority, PathManager pathManager)
         {
             if (owner == null || target == null || pathManager == null)

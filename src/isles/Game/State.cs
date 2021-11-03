@@ -304,7 +304,7 @@ namespace Isles
             Goldmine minGoldmine = null;
             var distanceSq = float.MaxValue;
 
-            foreach (IWorldObject o in world.GetNearbyObjects(owner.Position, 500))
+            foreach (var o in world.GetNearbyObjects(owner.Position, 500))
             {
                 if (o is Goldmine)
                 {
@@ -637,7 +637,7 @@ namespace Isles
             Tree minTree = null;
             var distanceSq = float.MaxValue;
 
-            foreach (IWorldObject o in world.GetNearbyObjects(position, 500))
+            foreach (var o in world.GetNearbyObjects(position, 500))
             {
                 if (o is not Tree anotherTree || anotherTree == existingTree || !CanTreeBeHarvested(anotherTree))
                 {
@@ -940,7 +940,7 @@ namespace Isles
                 arbitrateTimer = random.NextDouble() * 1 + 1;
 
                 // Checks if we can attack somebody
-                foreach (IWorldObject worldObject in
+                foreach (var worldObject in
                     owner.World.GetNearbyObjects(owner.Position, owner.ViewDistance))
                 {
                     if (worldObject is GameObject o && owner.IsOpponent(o) &&
@@ -1230,7 +1230,7 @@ namespace Isles
             GameObject minTarget = null;
             var distanceSq = float.MaxValue;
 
-            foreach (IWorldObject o in world.GetNearbyObjects(owner.Position, owner.ViewDistance))
+            foreach (var o in world.GetNearbyObjects(owner.Position, owner.ViewDistance))
             {
                 var anotherTarget = o as GameObject;
 

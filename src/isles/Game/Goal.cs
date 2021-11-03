@@ -428,8 +428,7 @@ namespace Isles
                 // Defense
                 var defenderCounter = 0;
 
-                foreach (IWorldObject o in
-                    world.GetNearbyObjects(owner.Townhall.Position, 200))
+                foreach (var o in world.GetNearbyObjects(owner.Townhall.Position, 200))
                 {
                     if (o is Charactor c && c.Owner == owner && !(c is Worker))
                     {
@@ -467,8 +466,7 @@ namespace Isles
             count = 0;
             GameObject attacker = null;
 
-            foreach (IWorldObject o in
-                world.GetNearbyObjects(owner.Townhall.Position, 200))
+            foreach (var o in world.GetNearbyObjects(owner.Townhall.Position, 200))
             {
                 if (o is GameObject && (o as GameObject).Owner != null &&
                     owner.GetRelation((o as GameObject).Owner) == PlayerRelation.Opponent)

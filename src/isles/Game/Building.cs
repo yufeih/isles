@@ -745,10 +745,9 @@ namespace Isles
         private List<Charactor> GetNegotiables()
         {
             var obstructors = new List<Charactor>();
-            IEnumerable<IWorldObject> nearbyObjects;
-            nearbyObjects = World.GetNearbyObjects(Position, Math.Max(obstructorSize.X,
+            var nearbyObjects = World.GetNearbyObjects(Position, Math.Max(obstructorSize.X,
                                                                       obstructorSize.Y));
-            foreach (IWorldObject wo in nearbyObjects)
+            foreach (var wo in nearbyObjects)
             {
                 if (wo is Charactor c && c.IsAlive && c.Owner == Owner)
                 {
@@ -797,7 +796,7 @@ namespace Isles
             const float RadiusSquared = 80 * 80;
 
             // Buildings can't be placed near the goldmine
-            foreach (IWorldObject o in World.GetNearbyObjects(Position, 50))
+            foreach (var o in World.GetNearbyObjects(Position, 50))
             {
                 if (o is Goldmine g)
                 {
@@ -1013,7 +1012,7 @@ namespace Isles
                 affectedTrees = new List<Tree>();
 
                 // Set nearby tree to evergreen
-                foreach (IWorldObject wo in World.GetNearbyObjects(Position, EffectRadius))
+                foreach (var wo in World.GetNearbyObjects(Position, EffectRadius))
                 {
                     if (wo is Tree tree)
                     {

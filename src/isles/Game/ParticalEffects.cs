@@ -129,7 +129,7 @@ namespace Isles
         private Vector3 position;
         private Vector3 velocity;
 
-        public IWorldObject Target { get; }
+        public BaseEntity Target { get; }
 
         public Vector3 Position => position;
 
@@ -145,7 +145,7 @@ namespace Isles
         /// Create a new projectile emitter.
         /// </summary>
         public ProjectileEmitter(ParticleSystem particleSystem, float particlesPerSecond,
-                                 Vector3 initialPosition, Vector3 initialVelocity, IWorldObject target)
+                                 Vector3 initialPosition, Vector3 initialVelocity, BaseEntity target)
             : base(particleSystem, particlesPerSecond, initialPosition)
         {
             Target = target;
@@ -258,10 +258,10 @@ namespace Isles
 
         public IProjectile Projectile => fireEmitter;
 
-        public EffectFireball(GameWorld world, Vector3 position, Vector3 velocity, IWorldObject target)
+        public EffectFireball(GameWorld world, Vector3 position, Vector3 velocity, BaseEntity target)
             : this(world, position, velocity, target, "Fireball", "FireballExplosion") { }
 
-        public EffectFireball(GameWorld world, Vector3 position, Vector3 velocity, IWorldObject target,
+        public EffectFireball(GameWorld world, Vector3 position, Vector3 velocity, BaseEntity target,
                               string fireballParticle, string explosionParticle)
             : base(world)
         {

@@ -1599,7 +1599,7 @@ namespace Isles
         {
             if (Owner != null)
             {
-                IWorldObject wo = world.Create(type);
+                var wo = world.Create(type);
                 wo.Position = Owner.Position;
 
                 if (wo is GameObject)
@@ -1679,8 +1679,7 @@ namespace Isles
                 var elapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
                 elapsedTime += elapsedSeconds;
 
-                foreach (IWorldObject wo in
-                    world.GetNearbyObjectsPrecise(effect.Position, EffectPunishOfNature.Radius))
+                foreach (var wo in world.GetNearbyObjectsPrecise(effect.Position, EffectPunishOfNature.Radius))
                 {
                     if (wo is not Charactor o || o.Owner == null)
                     {

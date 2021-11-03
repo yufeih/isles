@@ -1035,7 +1035,7 @@ namespace Isles
             return Pickable && base.Intersects(frustum);
         }
 
-        public void Hit(IWorldObject hitter)
+        public void Hit(BaseEntity hitter)
         {
             if (lumber > 0 && hitter != null && shakeTime <= 0)
             {
@@ -1278,7 +1278,7 @@ namespace Isles
         public override void Update(GameTime gameTime)
         {
             // Checks if anyone hits me
-            foreach (IWorldObject wo in World.GetNearbyObjects(Position, 20))
+            foreach (var wo in World.GetNearbyObjects(Position, 20))
             {
                 if (wo is Charactor o && o.Owner != null &&
                     o.Outline.DistanceTo(Outline.Position) < 5)
@@ -1329,14 +1329,14 @@ namespace Isles
     {
         event EventHandler Hit;
 
-        IWorldObject Target { get; }
+        BaseEntity Target { get; }
     }
 
     public class Missile : Entity, IProjectile
     {
         public event EventHandler Hit;
 
-        public IWorldObject Target { get; }
+        public BaseEntity Target { get; }
 
         private Vector3 velocity;
         private readonly float scaling;
@@ -1348,7 +1348,7 @@ namespace Isles
         /// <summary>
         /// Creates a new missile.
         /// </summary>
-        public Missile(GameWorld world, GameModel ammo, IWorldObject target)
+        public Missile(GameWorld world, GameModel ammo, BaseEntity target)
             : base(world)
         {
             if (ammo == null || target == null)

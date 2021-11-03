@@ -17,9 +17,9 @@ namespace Isles.Engine
     {
         private sealed class InternalList<T> : BroadcastList<T, LinkedList<T>> { }
 
-        public IEnumerable<IWorldObject> WorldObjects => worldObjects;
+        public IEnumerable<BaseEntity> WorldObjects => worldObjects;
 
-        private readonly InternalList<IWorldObject> worldObjects = new();
+        private readonly InternalList<BaseEntity> worldObjects = new();
 
         public BaseGame Game { get; } = BaseGame.Singleton;
 
@@ -50,7 +50,7 @@ namespace Isles.Engine
 
             SmoothTargetPosition();
 
-            foreach (IWorldObject o in worldObjects)
+            foreach (var o in worldObjects)
             {
                 o.Update(gameTime);
             }
@@ -113,7 +113,7 @@ namespace Isles.Engine
             Game.ModelRenderer.Clear();
 
             // Draw world objects before landscape
-            foreach (IWorldObject o in worldObjects)
+            foreach (var o in worldObjects)
             {
                 o.Draw(gameTime);
             }
@@ -141,7 +141,7 @@ namespace Isles.Engine
 
         private void DrawWaterReflection(GameTime gameTime, Matrix view, Matrix projection)
         {
-            foreach (IWorldObject o in worldObjects)
+            foreach (var o in worldObjects)
             {
                 o.DrawReflection(gameTime, view, projection);
             }
@@ -176,13 +176,12 @@ namespace Isles.Engine
 
             // Load world objects
             var nObjects = 0;
-            IWorldObject worldObject;
             foreach (XmlNode child in node.ChildNodes)
             {
                 // Ignore comments and other stuff...
                 if (child is XmlElement element)
                 {
-                    if ((worldObject = Create(child.Name, element)) != null)
+                    if (Create(child.Name, element) is var worldObject)
                     {
                         Add(worldObject);
                         nObjects++;
@@ -229,19 +228,19 @@ namespace Isles.Engine
             return occluders;
         }
 
-        private static Dictionary<string, Func<GameWorld, IWorldObject>> Creators = new();
+        private static Dictionary<string, Func<GameWorld, BaseEntity>> Creators = new();
 
-        public static void RegisterCreator(string typeName, Func<GameWorld, IWorldObject> creator)
+        public static void RegisterCreator(string typeName, Func<GameWorld, BaseEntity> creator)
         {
             Creators.Add(typeName, creator);
         }
 
-        public IWorldObject Create(string typeName)
+        public BaseEntity Create(string typeName)
         {
             return Create(typeName, null);
         }
 
-        private IWorldObject Create(string typeName, XmlElement xml)
+        private BaseEntity Create(string typeName, XmlElement xml)
         {
             // Lookup the creators table to find a suitable creator
             if (!Creators.ContainsKey(typeName))
@@ -249,7 +248,7 @@ namespace Isles.Engine
                 throw new Exception("Unknown object type: " + typeName);
             }
 
-            IWorldObject worldObject = Creators[typeName](this);
+            BaseEntity worldObject = Creators[typeName](this);
 
             // Nothing created
             if (worldObject == null)
@@ -276,7 +275,7 @@ namespace Isles.Engine
             return pickedEntity;
         }
 
-        public void Add(IWorldObject worldObject)
+        public void Add(BaseEntity worldObject)
         {
             worldObjects.Add(worldObject);
 
@@ -291,7 +290,7 @@ namespace Isles.Engine
             }
         }
 
-        public void Destroy(IWorldObject worldObject)
+        public void Destroy(BaseEntity worldObject)
         {
             if (worldObject == null)
             {
@@ -314,7 +313,7 @@ namespace Isles.Engine
             worldObjects.Remove(worldObject);
         }
 
-        public void Activate(IWorldObject worldObject)
+        public void Activate(BaseEntity worldObject)
         {
             if (worldObject == null)
             {
@@ -349,7 +348,7 @@ namespace Isles.Engine
             worldObject.IsDirty = false;
         }
 
-        public void Deactivate(IWorldObject worldObject)
+        public void Deactivate(BaseEntity worldObject)
         {
             if (worldObject == null)
             {
@@ -385,7 +384,7 @@ namespace Isles.Engine
         {
             // For all active objects, change the grids it owns if its
             // bounding box is dirty, making it up to date.
-            foreach (IWorldObject o in worldObjects)
+            foreach (var o in worldObjects)
             {
                 if (o.IsActive && o.IsDirty)
                 {
@@ -395,10 +394,10 @@ namespace Isles.Engine
             }
         }
 
-        public IEnumerable<IWorldObject> ObjectsFromRegion(BoundingFrustum boundingFrustum)
+        public IEnumerable<BaseEntity> ObjectsFromRegion(BoundingFrustum boundingFrustum)
         {
             // This is a really slow method
-            foreach (IWorldObject o in worldObjects)
+            foreach (var o in worldObjects)
             {
                 if (o is Entity e && e.Intersects(boundingFrustum))
                 {
@@ -407,16 +406,16 @@ namespace Isles.Engine
             }
         }
 
-        private readonly List<IWorldObject> set = new(4);
+        private readonly List<BaseEntity> set = new(4);
 
-        public IEnumerable<IWorldObject> GetNearbyObjects(Vector3 position, float radius)
+        public IEnumerable<BaseEntity> GetNearbyObjects(Vector3 position, float radius)
         {
             set.Clear();
 
             // Treat it as a box instead of a sphere...
             foreach (Point grid in EnumerateGrid(position, new Vector3(radius * 2)))
             {
-                foreach (IWorldObject o in Data[grid.X, grid.Y].Owners)
+                foreach (var o in Data[grid.X, grid.Y].Owners)
                 {
                     if (!set.Contains(o))
                     {
@@ -428,9 +427,9 @@ namespace Isles.Engine
             return set;
         }
 
-        public IEnumerable<IWorldObject> GetNearbyObjectsPrecise(Vector3 position, float radius)
+        public IEnumerable<BaseEntity> GetNearbyObjectsPrecise(Vector3 position, float radius)
         {
-            foreach (IWorldObject o in GetNearbyObjects(position, radius))
+            foreach (var o in GetNearbyObjects(position, radius))
             {
                 Vector2 v;
 
@@ -452,7 +451,7 @@ namespace Isles.Engine
             /// <summary>
             /// Owners of this grid, allow overlapping.
             /// </summary>
-            public List<IWorldObject> Owners;
+            public List<BaseEntity> Owners;
         }
 
         private Grid[,] Data;
@@ -480,7 +479,7 @@ namespace Isles.Engine
             {
                 for (var y = 0; y < GridCountOnYAxis; y++)
                 {
-                    Data[x, y].Owners = new List<IWorldObject>(2);
+                    Data[x, y].Owners = new List<BaseEntity>(2);
                 }
             }
         }

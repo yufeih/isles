@@ -192,7 +192,7 @@ namespace Isles
             // Create box of pandora
             for (var i = 0; i < 12; i++)
             {
-                IWorldObject box = world.Create("BoxOfPandora");
+                var box = world.Create("BoxOfPandora");
 
                 Vector3 position;
 

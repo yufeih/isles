@@ -189,7 +189,7 @@ namespace Isles
             }
         }
 
-        public void MoveTo(IWorldObject target, bool queueAction)
+        public void MoveTo(BaseEntity target, bool queueAction)
         {
             if (IsAlive)
             {

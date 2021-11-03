@@ -242,7 +242,7 @@ namespace Isles.Engine
     /// <summary>
     /// Base world object.
     /// </summary>
-    public abstract class BaseEntity : IWorldObject, IAudioEmitter, IEventListener
+    public abstract class BaseEntity : IAudioEmitter, IEventListener
     {
         public static int EntityCount;
 
@@ -558,9 +558,6 @@ namespace Isles.Engine
 
         private Matrix transform = Matrix.Identity;
 
-        /// <summary>
-        /// Interface member for IWorldObject.
-        /// </summary>
         public override bool IsDirty
         {
             get => isDirty;

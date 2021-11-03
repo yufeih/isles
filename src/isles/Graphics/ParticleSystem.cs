@@ -17,17 +17,6 @@ namespace Isles.Graphics
     /// Settings class describes all the tweakable options used
     /// to control the appearance of a particle system.
     /// </summary>
-    /// <example>
-    /// ParticleSystem      -   Duplication of single type of particle
-    /// ParticleSettings    -   Description of a single particle
-    /// ParticleEmitter     -   Add new particles of any particle system
-    /// ParticleEffect      -   Base class for all particle system effects
-    ///
-    /// ParticleEffect : IWorldObject
-    /// world.Create("Fireball");
-    ///
-    /// new ParticleSystem(new ParticleSettings()).
-    /// </example>
     public class ParticleSettings
     {
         /// <summary>

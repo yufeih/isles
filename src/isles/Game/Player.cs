@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Isles.Engine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -910,24 +911,9 @@ namespace Isles
             Matrix.CreatePerspectiveOffCenter(
                 left * size.X, right * size.X, bottom * size.Y, top * size.Y, 1.0f, 5000.0f, out Matrix rectProject);
 
-            return SelectablesFromObjects(world.ObjectsFromRegion(
-                                            new BoundingFrustum(game.View * rectProject)));
+            return world.ObjectsFromRegion(new(game.View * rectProject)).OfType<GameObject>();
         }
 
-        private IEnumerable<GameObject> SelectablesFromObjects(IEnumerable<IWorldObject> iEnumerable)
-        {
-            foreach (IWorldObject o in iEnumerable)
-            {
-                if (o is GameObject)
-                {
-                    yield return o as GameObject;
-                }
-            }
-        }
-
-        /// <summary>
-        /// This method group the input selectable.
-        /// </summary>
         private IEnumerable<GameObject> Filter(IEnumerable<GameObject> selectables)
         {
             if (selectables == null)
