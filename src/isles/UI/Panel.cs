@@ -13,9 +13,9 @@ namespace Isles.UI
 {
     public class Panel : UIElement
     {
-        protected BroadcastList<IUIElement, List<IUIElement>> elements = new();
+        protected BroadcastList<UIElement, List<UIElement>> elements = new();
 
-        public IEnumerable<IUIElement> Elements => elements;
+        public IEnumerable<UIElement> Elements => elements;
 
         private Rectangle effectiveRegion;
 
@@ -77,7 +77,7 @@ namespace Isles.UI
         /// Adds an UI element to the panel.
         /// </summary>
         /// <param name="element"></param>
-        public virtual void Add(IUIElement element)
+        public virtual void Add(UIElement element)
         {
             element.Parent = this;
             elements.Add(element);
@@ -87,7 +87,7 @@ namespace Isles.UI
         /// Removes an UI elment from the panel.
         /// </summary>
         /// <param name="element"></param>
-        public virtual void Remove(IUIElement element)
+        public virtual void Remove(UIElement element)
         {
             if (element != null)
             {
@@ -98,7 +98,7 @@ namespace Isles.UI
 
         public virtual void Clear()
         {
-            foreach (IUIElement element in elements)
+            foreach (var element in elements)
             {
                 element.Parent = null;
             }
@@ -108,7 +108,7 @@ namespace Isles.UI
 
         protected override void OnEnableStateChanged()
         {
-            foreach (IUIElement element in elements)
+            foreach (var element in elements)
             {
                 element.Enabled = Enabled;
             }
@@ -120,7 +120,7 @@ namespace Isles.UI
         /// <param name="gameTime"></param>
         public override void Update(GameTime gameTime)
         {
-            foreach (IUIElement element in elements)
+            foreach (var element in elements)
             {
                 element.Update(gameTime);
             }
@@ -139,7 +139,7 @@ namespace Isles.UI
                     sprite.Draw(Texture, DestinationRectangle, SourceRectangle, Color.White);
                 }
 
-                foreach (IUIElement element in elements)
+                foreach (var element in elements)
                 {
                     element.Draw(gameTime, sprite);
                 }
@@ -152,7 +152,7 @@ namespace Isles.UI
             {
                 var input = sender as Input;
 
-                foreach (IUIElement element in elements)
+                foreach (var element in elements)
                 {
                     if (element.Enabled &&
                         element.HandleEvent(type, sender, tag) == EventResult.Handled)
@@ -253,7 +253,7 @@ namespace Isles.UI
             }
         }
 
-        public override void Add(IUIElement element)
+        public override void Add(UIElement element)
         {
             // Scroll panel works only with UIElement
             if (element is not UIElement e)
@@ -280,7 +280,7 @@ namespace Isles.UI
             base.Add(element);
         }
 
-        public override void Remove(IUIElement element)
+        public override void Remove(UIElement element)
         {
             base.Remove(element);
 

@@ -15,28 +15,15 @@ namespace Isles
 {
     public abstract class GameObject : Entity, ISelectable
     {
-        /// <summary>
-        /// Gets or sets the owner of this charactor.
-        /// </summary>
         public Player Owner { get; set; }
-
-        /// <summary>
-        /// Gets or sets the priority of the game object.
-        /// </summary>
         public float Priority { get; set; }
 
         private Icon icon;
 
-        /// <summary>
-        /// Gets or sets the snap for this game object.
-        /// </summary>
         public Icon Snapshot => snapshot;
 
         private Icon snapshot;
 
-        /// <summary>
-        /// Gets snapshot texture.
-        /// </summary>
         public static Texture2D SnapshotTexture
         {
             get
@@ -180,14 +167,8 @@ namespace Isles
         private float maximumHealth;
         private float health;
 
-        /// <summary>
-        /// Gets or sets game object spells.
-        /// </summary>
         public List<Spell> Spells = new();
 
-        /// <summary>
-        /// Gets or sets if the game object is selected.
-        /// </summary>
         public bool Selected
         {
             get => selected;
@@ -209,9 +190,6 @@ namespace Isles
 
         private bool selected;
 
-        /// <summary>
-        /// Gets of sets if the game object is highlighted.
-        /// </summary>
         public bool Highlighted
         {
             get => highlighted;
@@ -243,9 +221,6 @@ namespace Isles
 
         private bool highlighted;
 
-        /// <summary>
-        /// Gets of sets if the game object is currently focused.
-        /// </summary>
         public bool Focused
         {
             get => focused;
@@ -302,9 +277,6 @@ namespace Isles
         private const float FlashDuration = 0.5f;
         private float flashElapsedTime = FlashDuration + 0.1f;
 
-        /// <summary>
-        /// Get or sets the attachment of the game model.
-        /// </summary>
         public List<KeyValuePair<GameModel, int>> Attachment = new();
 
         public GameObject(GameWorld world, string classID)
@@ -316,17 +288,11 @@ namespace Isles
             }
         }
 
-        /// <summary>
-        /// Make the game object flash.
-        /// </summary>
         public void Flash()
         {
             flashElapsedTime = 0;
         }
 
-        /// <summary>
-        /// Deserialize the game object from an xml element.
-        /// </summary>
         public override void Deserialize(XmlElement xml)
         {
             base.Deserialize(xml);
@@ -849,9 +815,6 @@ namespace Isles
             }
         }
 
-        /// <summary>
-        /// Gets the game model attached to the specified bone.
-        /// </summary>
         public GameModel GetAttachment(string boneName)
         {
             var bone = Model.GetBone(boneName);
@@ -898,10 +861,6 @@ namespace Isles
             return (to is Building) ? value * BuildingWeakeness : value;
         }
 
-        /// <summary>
-        /// Virtual methods.
-        /// </summary>
-        /// <param name="ui"></param>
         protected virtual void OnSelect(GameUI ui)
         {
             Flash();
@@ -939,9 +898,6 @@ namespace Isles
 
     public class Tree : GameObject
     {
-        /// <summary>
-        /// Whether trees are pickable.
-        /// </summary>
         public static bool Pickable;
 
         /// <summary>
@@ -1218,11 +1174,6 @@ namespace Isles
             World.PathManager.Mark(pathGrids);
         }
 
-        public override void Update(GameTime gameTime)
-        {
-            base.Update(gameTime);
-        }
-
         public override void Start(GameWorld world)
         {
             minimapIcon = GameUI.Singleton.Minimap.AddGoldmine(Position);
@@ -1345,9 +1296,6 @@ namespace Isles
         public float MaxForce = 500;
         public float Mass = 0.5f;
 
-        /// <summary>
-        /// Creates a new missile.
-        /// </summary>
         public Missile(GameWorld world, GameModel ammo, BaseEntity target)
             : base(world)
         {

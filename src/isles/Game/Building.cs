@@ -706,7 +706,7 @@ namespace Isles
         private void RestoreStates()
         {
             // Restore states
-            foreach (KeyValuePair<Charactor, IState> pair in negotiables)
+            foreach (KeyValuePair<Charactor, BaseState> pair in negotiables)
             {
                 pair.Key.State = pair.Value;
             }
@@ -816,7 +816,7 @@ namespace Isles
         }
 
         private double waitTimer;
-        private readonly List<KeyValuePair<Charactor, IState>> negotiables = new();
+        private readonly List<KeyValuePair<Charactor, BaseState>> negotiables = new();
 
         public void Place()
         {
@@ -841,7 +841,7 @@ namespace Isles
                 foreach (Charactor c in GetNegotiables())
                 {
                     Vector2 target = World.PathManager.FindValidPosition(position, c.Brush);
-                    negotiables.Add(new KeyValuePair<Charactor, IState>(c, c.State));
+                    negotiables.Add(new KeyValuePair<Charactor, BaseState>(c, c.State));
                     c.MoveTo(new Vector3(target, 0), false);
 
                     temp.Clear();
@@ -869,7 +869,7 @@ namespace Isles
         {
             if (Builder != null)
             {
-                IState state = new StateConstruct(World, Builder, this);
+                BaseState state = new StateConstruct(World, Builder, this);
                 if (World.Game.Input.IsShiftPressed)
                 {
                     Builder.QueuedStates.Enqueue(state);

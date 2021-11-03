@@ -20,24 +20,9 @@ namespace Isles
     /// </summary>
     public struct Icon
     {
-        /// <summary>
-        /// Gets or sets the rectangle region on the texture.
-        /// </summary>
         public Rectangle Region;
 
-        /// <summary>
-        /// Gets or sets the icon texture.
-        /// </summary>
         public Texture2D Texture;
-
-        /// <summary>
-        /// For easy creation of icons.
-        /// </summary>
-        public Icon(Texture2D texture)
-        {
-            Texture = texture;
-            Region = new Rectangle(0, 0, texture.Width, texture.Height);
-        }
 
         public Icon(Texture2D texture, Rectangle region)
         {
@@ -45,9 +30,6 @@ namespace Isles
             Region = region;
         }
 
-        /// <summary>
-        /// Static stuff.
-        /// </summary>
         public static Texture2D DefaultTexture
         {
             get
@@ -311,7 +293,7 @@ namespace Isles
         /// <summary>
         /// Gets the button for this spell.
         /// </summary>
-        public virtual IUIElement Button
+        public virtual UIElement Button
         {
             get
             {

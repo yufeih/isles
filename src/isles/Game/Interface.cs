@@ -8,21 +8,9 @@ using Microsoft.Xna.Framework;
 
 namespace Isles.Engine
 {
-    /// <summary>
-    /// Represents a game screen.
-    /// </summary>
     public interface IScreen : IEventListener
     {
-        /// <summary>
-        /// Handle game updates.
-        /// </summary>
-        /// <param name="gameTime"></param>
         void Update(GameTime gameTime);
-
-        /// <summary>
-        /// Handle game draw event.
-        /// </summary>
-        /// <param name="gameTime"></param>
         void Draw(GameTime gameTime);
     }
 

@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Generic;
 using System.Xml;
 using Isles.Graphics;
 using Microsoft.Xna.Framework;
@@ -17,28 +16,7 @@ namespace Isles.Engine
         Failed,
     }
 
-    public interface IState : IEventListener
-    {
-        void Terminate();
-
-        /// <summary>
-        /// Perform any updates for this state.
-        /// </summary>
-        /// <returns>
-        /// True indicates keeping the state alive.
-        /// </returns>
-        StateResult Update(GameTime gameTime);
-
-        /// <summary>
-        /// Perform any drawings for this state.
-        /// </summary>
-        void Draw(GameTime gameTime);
-    }
-
-    /// <summary>
-    /// Base state.
-    /// </summary>
-    public abstract class BaseState : IState
+    public abstract class BaseState : IEventListener
     {
         protected StateResult State = StateResult.Inactive;
 
@@ -70,185 +48,10 @@ namespace Isles.Engine
         }
     }
 
-    /// <summary>
-    /// Represents a composite game state.
-    /// All child states will be executed.
-    /// </summary>
-    public class StateComposite : BaseState
-    {
-        public override void Activate() { }
-
-        public override void Terminate() { }
-
-        protected LinkedList<IState> SubStates = new();
-
-        /// <remarks>
-        /// Should be called before attaching this state to a state machine.
-        /// </remarks>
-        public void Add(IState state)
-        {
-            SubStates.AddLast(state);
-        }
-
-        /// <summary>
-        /// Clear all sub states.
-        /// </summary>
-        public void Clear()
-        {
-            SubStates.Clear();
-        }
-
-        /// <summary>
-        /// Update the composite state.
-        /// </summary>
-        /// <remarks>
-        /// If one of the substates failed, the whole composite state failed.
-        /// If all of the substates completed, the whole composite state complete.
-        /// </remarks>
-        public override StateResult Update(GameTime gameTime)
-        {
-            ActivateIfInactive();
-
-            LinkedListNode<IState> current = SubStates.First;
-
-            StateResult compositeResult = StateResult.Completed;
-
-            while (current != null)
-            {
-                StateResult result = current.Value.Update(gameTime);
-
-                if (result == StateResult.Failed)
-                {
-                    // The whole state fails
-                    SubStates.Clear();
-                    return StateResult.Failed;
-                }
-
-                if (result != StateResult.Completed)
-                {
-                    // The whole state continues
-                    LinkedListNode<IState> next = current.Next;
-                    SubStates.Remove(current);
-                    current = next;
-                    compositeResult = StateResult.Active;
-                }
-
-                // Move on to the next state
-                current = current.Next;
-            }
-
-            return compositeResult;
-        }
-
-        public override void Draw(GameTime gameTime)
-        {
-            foreach (IState state in SubStates)
-            {
-                state.Draw(gameTime);
-            }
-        }
-
-        public override EventResult HandleEvent(EventType type, object sender, object tag)
-        {
-            // Pass to all sub states
-            foreach (IState state in SubStates)
-            {
-                if (state.HandleEvent(type, state, tag) == EventResult.Handled)
-                {
-                    return EventResult.Handled;
-                }
-            }
-
-            return EventResult.Unhandled;
-        }
-    }
-
-    /// <summary>
-    /// Represents a sequence of game states.
-    /// Swith to the next state once the current state has completed.
-    /// </summary>
-    public class StateSequential : BaseState
-    {
-        public override void Activate() { }
-
-        public override void Terminate() { }
-
-        protected LinkedList<IState> SubStates = new();
-
-        /// <remarks>
-        /// Should be called before attaching this state to a state machine.
-        /// </remarks>
-        public void Add(IState state)
-        {
-            SubStates.AddLast(state);
-        }
-
-        public void Clear()
-        {
-            SubStates.Clear();
-        }
-
-        /// <remarks>
-        /// Derived classes must call base.Update first in their update functions.
-        /// </remarks>
-        public override StateResult Update(GameTime gameTime)
-        {
-            ActivateIfInactive();
-
-            LinkedListNode<IState> current = SubStates.First;
-
-            if (current != null)
-            {
-                StateResult result = current.Value.Update(gameTime);
-
-                if (result == StateResult.Failed)
-                {
-                    // The whole state failed
-                    SubStates.Clear();
-                    return StateResult.Failed;
-                }
-
-                if (result == StateResult.Completed)
-                {
-                    // Switch to the next state
-                    SubStates.Remove(current);
-                    return SubStates.Count > 0 ? StateResult.Active :
-                                                 StateResult.Completed;
-                }
-
-                // The current state is still active
-                return StateResult.Active;
-            }
-
-            return StateResult.Completed;
-        }
-
-        public override void Draw(GameTime gameTime)
-        {
-            // Only draw the first state
-            if (SubStates.First != null)
-            {
-                SubStates.First.Value.Draw(gameTime);
-            }
-        }
-
-        public override EventResult HandleEvent(EventType type, object sender, object tag)
-        {
-            // Only pass to the first state
-            return SubStates.First != null ? SubStates.First.Value.HandleEvent(type, sender, tag) : EventResult.Unhandled;
-        }
-    }
-
-    /// <summary>
-    /// Base world object.
-    /// </summary>
     public abstract class BaseEntity : IAudioEmitter, IEventListener
     {
         public static int EntityCount;
 
-        /// <summary>
-        /// Game world.
-        /// </summary>
         public GameWorld World { get; }
 
         /// <summary>
@@ -284,11 +87,7 @@ namespace Isles.Engine
         /// Gets or sets how fast this entity is moving.
         /// Used for 3D sound.
         /// </summary>
-        public virtual Vector3 Velocity
-        {
-            get => Vector3.Zero;
-            set { }
-        }
+        public virtual Vector3 Velocity  => Vector3.Zero;
 
         /// <summary>
         /// By marking the IsDirty property of a scene object, the scene
@@ -327,52 +126,22 @@ namespace Isles.Engine
             set => throw new Exception("Base entity is inactive by default");
         }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
         public BaseEntity(GameWorld world)
         {
             World = world;
             Name = "Entity " + EntityCount++;
         }
 
-        /// <summary>
-        /// Update.
-        /// </summary>
-        /// <param name="gameTime"></param>
         public abstract void Update(GameTime gameTime);
 
-        /// <summary>
-        /// Draw the entity.
-        /// </summary>
-        /// <param name="gameTime"></param>
         public abstract void Draw(GameTime gameTime);
-
-        /// <summary>
-        /// Called when this entity is been add to the world.
-        /// </summary>
         public virtual void OnCreate() { }
 
-        /// <summary>
-        /// Called when this entity is been destroyed.
-        /// </summary>
         public virtual void OnDestroy() { }
 
-        /// <summary>
-        /// Draw the scene object to a shadow map.
-        /// </summary>
-        public virtual void DrawShadowMap(GameTime gameTime, ShadowEffect shadow)
-        {
-            // Nothing is drawed
-        }
+        public virtual void DrawShadowMap(GameTime gameTime, ShadowEffect shadow) { }
 
-        /// <summary>
-        /// Draw the scene object to a reflection map.
-        /// </summary>
-        public virtual void DrawReflection(GameTime gameTime, Matrix view, Matrix projection)
-        {
-            // Nothing is drawed
-        }
+        public virtual void DrawReflection(GameTime gameTime, Matrix view, Matrix projection) { }
 
         /// <summary>
         /// Make the entity fall on the ground.
@@ -384,11 +153,6 @@ namespace Isles.Engine
                                    World.Landscape.GetHeight(Position.X, Position.Y));
         }
 
-        /// <summary>
-        /// Read and initialize the scene object from an input stream.
-        /// Deserialized attributes: Name, Position, Velocity.
-        /// </summary>
-        /// <param name="reader"></param>
         public virtual void Deserialize(XmlElement xml)
         {
             string value;
@@ -405,9 +169,6 @@ namespace Isles.Engine
             }
         }
 
-        /// <summary>
-        /// Handle events.
-        /// </summary>
         public virtual EventResult HandleEvent(EventType type, object sender, object tag)
         {
             return EventResult.Unhandled;
@@ -419,21 +180,12 @@ namespace Isles.Engine
     /// </summary>
     public abstract class Entity : BaseEntity
     {
-        /// <summary>
-        /// This is the max height for any game entity.
-        /// </summary>
-        public const float MaxHeight = 1000.0f;
-
-        /// <summary>
-        /// Gets or sets the state of the agent.
-        /// </summary>
-        public IState State
+        public BaseState State
         {
             get => state;
-
             set
             {
-                IState resultState = null;
+                BaseState resultState = null;
 
                 if (OnStateChanged(value, ref resultState))
                 {
@@ -447,13 +199,10 @@ namespace Isles.Engine
             }
         }
 
-        private IState state;
+        private BaseState state;
 
-        protected virtual bool OnStateChanged(IState newState, ref IState resultState) { return true; }
+        protected virtual bool OnStateChanged(BaseState newState, ref BaseState resultState) { return true; }
 
-        /// <summary>
-        /// Gets the model of the entity.
-        /// </summary>
         public GameModel Model
         {
             get => model;
@@ -472,14 +221,8 @@ namespace Isles.Engine
         /// </summary>
         public bool Visible { get; set; } = true;
 
-        /// <summary>
-        /// Gets or sets whether the entity is within the view frustum.
-        /// </summary>
         public bool WithinViewFrustum { get; private set; }
 
-        /// <summary>
-        /// Gets or sets entity position.
-        /// </summary>
         public override Vector3 Position
         {
             get => base.Position;
@@ -490,9 +233,6 @@ namespace Isles.Engine
             }
         }
 
-        /// <summary>
-        /// Gets or sets entity rotation.
-        /// </summary>
         public Quaternion Rotation
         {
             get => rotation;
@@ -505,9 +245,6 @@ namespace Isles.Engine
 
         private Quaternion rotation = Quaternion.Identity;
 
-        /// <summary>
-        /// Gets or sets entity scale.
-        /// </summary>
         public Vector3 Scale
         {
             get => scale;
@@ -519,25 +256,8 @@ namespace Isles.Engine
         }
 
         private Vector3 scale = Vector3.One;
-
-        /// <summary>
-        /// Gets or sets the bias of model transform.
-        /// </summary>
-        public Matrix TransformBias
-        {
-            get => transformBias;
-            set
-            {
-                MarkDirty();
-                transformBias = value;
-            }
-        }
-
         private Matrix transformBias = Matrix.Identity;
 
-        /// <summary>
-        /// Gets model transform.
-        /// </summary>
         public Matrix Transform
         {
             get
@@ -602,9 +322,6 @@ namespace Isles.Engine
         /// </summary>
         public virtual Vector3 Size => BoundingBox.Max - BoundingBox.Min;
 
-        /// <summary>
-        /// Gets entity outline.
-        /// </summary>
         public Outline Outline
         {
             get
@@ -866,19 +583,6 @@ namespace Isles.Engine
                 : base.HandleEvent(type, sender, tag);
         }
 
-        /// <summary>
-        /// Tests whether the object occupies the specified point.
-        /// </summary>
-        /// <param name="point">Point to be tested in world space.</param>
-        public virtual bool Intersects(Vector3 point)
-        {
-            // Performs an axis aligned bounding box intersection test
-            return Visible && BoundingBox.Contains(point) == ContainmentType.Contains;
-        }
-
-        /// <summary>
-        /// Tests whether the object intersects the specified frustum.
-        /// </summary>
         public virtual bool Intersects(BoundingFrustum frustum)
         {
             return Visible && frustum.Contains(Position) == ContainmentType.Contains;

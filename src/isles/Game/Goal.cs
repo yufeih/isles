@@ -446,7 +446,7 @@ namespace Isles
                     {
                         if (--number > 0)
                         {
-                            IState state = peon.State;
+                            BaseState state = peon.State;
                             peon.AttackTo(attacker.Value, false);
                             peon.QueuedStates.Enqueue(state);
                         }

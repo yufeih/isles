@@ -123,7 +123,7 @@ namespace Isles
             if (TrackCursor)
             {
                 setPositionToCursor();
-                foreach (IUIElement element in elements)
+                foreach (var element in elements)
                 {
                     if (element is UIElement)
                     {

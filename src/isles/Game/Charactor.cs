@@ -90,12 +90,12 @@ namespace Isles
         /// <summary>
         /// Gets or sets the default idle for this charactor.
         /// </summary>
-        public IState Idle;
+        public BaseState Idle;
 
         /// <summary>
         /// Stores those commands that are queued.
         /// </summary>
-        public Queue<IState> QueuedStates = new();
+        public Queue<BaseState> QueuedStates = new();
 
         /// <summary>
         /// Animation names.
@@ -176,7 +176,7 @@ namespace Isles
                     Audios.Play(Sound, Audios.Channel.Unit, this);
                 }
 
-                IState state = new StateMoveToPosition(new Vector2(position.X, position.Y), this, Priority, World.PathManager);
+                BaseState state = new StateMoveToPosition(new Vector2(position.X, position.Y), this, Priority, World.PathManager);
 
                 if (queueAction)
                 {
@@ -198,7 +198,7 @@ namespace Isles
                     Audios.Play(Sound, Audios.Channel.Unit, this);
                 }
 
-                IState state = new StateMoveToTarget(this, target, Priority, World.PathManager);
+                BaseState state = new StateMoveToTarget(this, target, Priority, World.PathManager);
 
                 if (queueAction)
                 {
@@ -226,7 +226,7 @@ namespace Isles
                     Audios.Play(Sound, Audios.Channel.Unit, this);
                 }
 
-                IState state = new StateAttack(World, this, position, Combat);
+                BaseState state = new StateAttack(World, this, position, Combat);
 
                 if (queueAction)
                 {
@@ -254,7 +254,7 @@ namespace Isles
                     Audios.Play(Sound, Audios.Channel.Unit, this);
                 }
 
-                IState state = new StateAttack(World, this, target, Combat);
+                BaseState state = new StateAttack(World, this, target, Combat);
 
                 if (queueAction)
                 {
@@ -380,7 +380,7 @@ namespace Isles
             State = new StateCharactorDie(this);
         }
 
-        protected override bool OnStateChanged(IState newState, ref IState resultState)
+        protected override bool OnStateChanged(BaseState newState, ref BaseState resultState)
         {
             if (!IsAlive && !(newState is StateCharactorDie))
             {
@@ -614,7 +614,7 @@ namespace Isles
         {
             if (IsAlive)
             {
-                IState state = null;
+                BaseState state = null;
 
                 if (Sound != null && Owner is LocalPlayer)
                 {
@@ -730,7 +730,7 @@ namespace Isles
             }
         }
 
-        protected override bool OnStateChanged(IState newState, ref IState resultState)
+        protected override bool OnStateChanged(BaseState newState, ref BaseState resultState)
         {
             weaponVisible = true;
             return base.OnStateChanged(newState, ref resultState);

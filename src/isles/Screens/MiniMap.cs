@@ -82,15 +82,8 @@ namespace Isles
         public Point Center => new(DestinationRectangle.Left + DestinationRectangle.Width / 2,
                                  DestinationRectangle.Top + DestinationRectangle.Height / 2);
 
-        /// <summary>
-        /// Gets or sets texture for gold mine pointer.
-        /// </summary>
         public Texture2D GoldMinePointerTexture { get; set; }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="game"></param>
         public MiniMap(BaseGame game, GameWorld world)
         {
             this.game = game;
@@ -100,28 +93,17 @@ namespace Isles
 
         private static int GoldmineCounter;
 
-        /// <summary>
-        /// Add a gold mine.
-        /// </summary>
         public int AddGoldmine(Vector3 postion)
         {
             GoldMineList.Add(GoldmineCounter, postion);
             return GoldmineCounter++;
         }
 
-        /// <summary>
-        /// Remove a gold mine.
-        /// </summary>
-        /// <param name="key"></param>
         public void RemoveGoldmine(int key)
         {
             GoldMineList.Remove(key);
         }
 
-        /// <summary>
-        /// Gets the corresponding position in the real world.
-        /// </summary>
-        /// <param name="mapPoint">Position in the map.</param>
         public Vector3? MapToWorld(Point mapPoint)
         {
             if (ActualArea.Contains(mapPoint))
@@ -149,10 +131,6 @@ namespace Isles
             return rtv;
         }
 
-        /// <summary>
-        /// Gets the corresponding point in the map.
-        /// </summary>
-        /// <param name="position">Position in real world.</param>
         public Point? WorldToMap(Vector3 position)
         {
             if (position.X >= 0 && position.X <= world.Landscape.Size.X &&
@@ -179,9 +157,6 @@ namespace Isles
             return mp;
         }
 
-        /// <summary>
-        /// Draw.
-        /// </summary>
         public override void Draw(GameTime gameTime, SpriteBatch sprite)
         {
             sprite.Draw(Texture, DestinationRectangle, SourceRectangle, Color.White);
@@ -212,9 +187,6 @@ namespace Isles
             DrawSightRegion();
         }
 
-        /// <summary>
-        /// Draw the sight region.
-        /// </summary>
         private void DrawSightRegion()
         {
             var sightRegion = new Point[4];
@@ -266,9 +238,6 @@ namespace Isles
             Graphics2D.DrawLine(sightRegion[3], sightRegion[0], Color.White);
         }
 
-        /// <summary>
-        /// Draw a game object on the minimap.
-        /// </summary>
         public void DrawGameObject(Vector3 position, float size, Color color)
         {
             EntitySign sign;
@@ -290,11 +259,6 @@ namespace Isles
 
         private readonly List<EntitySign> entitySigns = new();
 
-        /// <summary>
-        /// Draw the entites.
-        /// </summary>
-        /// <param name="gameTime"></param>
-        /// <param name="sprite"></param>
         private void DrawEntitySign()
         {
             foreach (EntitySign sign in entitySigns)
@@ -333,9 +297,6 @@ namespace Isles
 
         private bool draging;
 
-        /// <summary>
-        /// Event handler.
-        /// </summary>
         public override EventResult HandleEvent(EventType type, object sender, object tag)
         {
             if (Enabled && Visible)

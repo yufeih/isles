@@ -114,9 +114,6 @@ namespace Isles.UI
         Stretch,
     }
 
-    /// <summary>
-    /// Basic UI element.
-    /// </summary>
     public abstract class UIElement : IUIElement
     {
         /// <summary>

@@ -1804,7 +1804,7 @@ namespace Isles
                     building.Place();
                     building.PerformAction(defaultRallyPoint, false);
                     World.Add(building);
-                    IState state = builder.State;
+                    BaseState state = builder.State;
                     builder.PerformAction(building, queue);
                     builder.QueuedStates.Enqueue(state);
                 }

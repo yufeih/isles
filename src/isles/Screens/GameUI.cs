@@ -24,12 +24,6 @@ namespace Isles
         FlyAway,
     }
 
-    public enum ProgressStyle
-    {
-        Untextured,
-        Textured,
-    }
-
     public interface ISelectable : IEventListener
     {
         bool Highlighted { get; set; }
@@ -39,16 +33,11 @@ namespace Isles
 
     public class GameUI : IEventListener
     {
-        public const int ButtonWidth = 80;
-        public const int ButtonHeight = 40;
-        public const int ScrollButtonWidth = 40;
-        public const int IconTextureRowCount = 8;
-        public const int IconTextureColumnCount = 4;
         public const int ProfileBaseX = 440;
         public const int ProfileWidth = 40;
         public const int ProfileSpace = 4;
         private readonly BaseGame game;
-        private readonly IUIElement[,] elements = new IUIElement[3, 5];
+        private readonly UIElement[,] elements = new UIElement[3, 5];
         private readonly GameWorld world;
 
         public UIDisplay Display { get; private set; }
@@ -220,7 +209,7 @@ namespace Isles
         /// <summary>
         /// Adds a new spell to the scroll panel.
         /// </summary>
-        public void SetUIElement(int x, bool specialItem, IUIElement element)
+        public void SetUIElement(int x, bool specialItem, UIElement element)
         {
             if (!specialItem && (x < 0 || x > 4))
             {
@@ -279,7 +268,7 @@ namespace Isles
 
         public void ClearUIElement()
         {
-            foreach (IUIElement e in elements)
+            foreach (UIElement e in elements)
             {
                 if (e != null)
                 {
@@ -454,10 +443,6 @@ namespace Isles
             }
         }
 
-        /// <summary>
-        /// Present messages that may appear anywhere.
-        /// </summary>
-        /// <param name="gameTime"></param>
         private void PresentWhereverMessages(GameTime gameTime)
         {
             if (BubbleUpMessageOn)
@@ -476,10 +461,6 @@ namespace Isles
             }
         }
 
-        /// <summary>
-        /// Present Bubble-up Message.
-        /// </summary>
-        /// <param name="gameTime"></param>
         private void PresentBubbleUpMessage(GameTime gameTime)
         {
             while (BubbleUpMessageQueue.Count != 0 &&
@@ -517,10 +498,6 @@ namespace Isles
             }
         }
 
-        /// <summary>
-        /// Present Flay-away message.
-        /// </summary>
-        /// <param name="gameTime"></param>
         private void PresentFlyAwayMessage(GameTime gameTime)
         {
             // ! Time not finished
@@ -530,10 +507,6 @@ namespace Isles
             }
         }
 
-        /// <summary>
-        /// Present None-style Message.
-        /// </summary>
-        /// <param name="gameTime"></param>
         private void PresentNoneStyleMessage(GameTime gameTime)
         {
             while (NoneStyleMessageQueue.Count != 0 && gameTime.TotalGameTime.TotalSeconds > NoneStyleMessageQueue.Peek().PushTime + NoneStyleMessageShowingPeriodLength)
@@ -547,10 +520,6 @@ namespace Isles
             }
         }
 
-        /// <summary>
-        /// Present all kinds of messages.
-        /// </summary>
-        /// <param name="gameTime"></param>
         private void PresentMessages(GameTime gameTime)
         {
             if (SideBarMessageOn)
@@ -561,9 +530,6 @@ namespace Isles
             PresentWhereverMessages(gameTime);
         }
 
-        /// <summary>
-        /// Shows a message at specific position.
-        /// </summary>
         public void ShowMessage(string message, Vector3 position, MessageType type,
                                                                   MessageStyle style,
                                                                   Color color)
@@ -585,9 +551,6 @@ namespace Isles
             }
         }
 
-        /// <summary>
-        /// Push a message into the side-bar message queue.
-        /// </summary>
         public void PushMessage(string message, MessageType type, Color color)
         {
             lastPushTime = BaseGame.Singleton.CurrentGameTime.TotalGameTime.TotalSeconds;

@@ -10,15 +10,7 @@ namespace Isles.Engine
 {
     public class Input
     {
-        /// <summary>
-        /// Mouse state, set every frame in the Update method.
-        /// </summary>
-        private MouseState mouseState =
-            Microsoft.Xna.Framework.Input.Mouse.GetState();
-
-        /// <summary>
-        /// Mouse state, set every frame in the Update method.
-        /// </summary>
+        private MouseState mouseState = Microsoft.Xna.Framework.Input.Mouse.GetState();
         private MouseState mouseStateLastFrame;
 
         /// <summary>
@@ -31,8 +23,7 @@ namespace Isles.Engine
         /// information, section Input). We store our own array of keys from
         /// the last frame for comparing stuff.
         /// </summary>
-        private KeyboardState keyboardState =
-            Microsoft.Xna.Framework.Input.Keyboard.GetState();
+        private KeyboardState keyboardState = Microsoft.Xna.Framework.Input.Keyboard.GetState();
 
         /// <summary>
         /// Keys pressed last frame, for comparison if a key was just pressed.
@@ -40,27 +31,12 @@ namespace Isles.Engine
         private List<Keys> keysPressedLastFrame = new();
         private int mouseWheelValue;
 
-        /// <summary>
-        /// Mouse position.
-        /// </summary>
         public Point MousePosition => new(mouseState.X, mouseState.Y);
 
-        /// <summary>
-        /// Gets current mouse state.
-        /// </summary>
         public MouseState Mouse => mouseState;
 
-        /// <summary>
-        /// Mouse wheel delta.
-        /// </summary>
-        /// <returns>Int.</returns>
         public int MouseWheelDelta { get; private set; }
 
-        /// <summary>
-        /// Mouse in box.
-        /// </summary>
-        /// <param name="rect">Rectangle.</param>
-        /// <returns>Bool.</returns>
         public bool MouseInBox(Rectangle rect)
         {
             return mouseState.X >= rect.X &&
@@ -68,27 +44,10 @@ namespace Isles.Engine
                    mouseState.X < rect.Right &&
                    mouseState.Y < rect.Bottom;
         }
-
-        /// <summary>
-        /// Keyboard.
-        /// </summary>
-        /// <returns>Keyboard state.</returns>
+        
         public KeyboardState Keyboard => keyboardState;
 
-        /// <summary>
-        /// Gets whether left ALT or right ALT key is pressed.
-        /// </summary>
-        public bool IsAltPressed => keyboardState.IsKeyDown(Keys.LeftAlt) || keyboardState.IsKeyDown(Keys.RightAlt);
-
-        /// <summary>
-        /// Gets whether left shift or right shift key is pressed.
-        /// </summary>
         public bool IsShiftPressed => keyboardState.IsKeyDown(Keys.LeftShift) || keyboardState.IsKeyDown(Keys.RightShift);
-
-        /// <summary>
-        /// Gets whether left ctrl or right ctrl key is pressed.
-        /// </summary>
-        public bool IsCtrlPressed => keyboardState.IsKeyDown(Keys.LeftControl) || keyboardState.IsKeyDown(Keys.RightControl);
 
         public static bool IsSpecialKey(Keys key)
         {
@@ -227,43 +186,6 @@ namespace Isles.Engine
             return ret;
         }
 
-        /// <summary>
-        /// Handle keyboard input helper method to catch keyboard input
-        /// for an input text. Only used to enter the player name in the game.
-        /// </summary>
-        /// <param name="inputText">Input text.</param>
-        public void HandleKeyboardInput(ref string inputText)
-        {
-            // Is a shift key pressed (we have to check both, left and right)
-            var isShiftPressed =
-                keyboardState.IsKeyDown(Keys.LeftShift) ||
-                keyboardState.IsKeyDown(Keys.RightShift);
-
-            // Go through all pressed keys
-            foreach (Keys pressedKey in keyboardState.GetPressedKeys())
-            {
-                // Only process if it was not pressed last frame
-                if (keysPressedLastFrame.Contains(pressedKey) == false)
-                {
-                    // No special key?
-                    if (IsSpecialKey(pressedKey) == false &&
-                        // Max. allow 32 chars
-                        inputText.Length < 32)
-                    {
-                        // Then add the letter to our inputText.
-                        // Check also the shift state!
-                        inputText += KeyToChar(pressedKey, isShiftPressed);
-                    }
-                    else if (pressedKey == Keys.Back &&
-                        inputText.Length > 0)
-                    {
-                        // Remove 1 character at end
-                        inputText = inputText.Substring(0, inputText.Length - 1);
-                    }
-                }
-            }
-        }
-
         private struct Entry
         {
             public float Order;
@@ -278,13 +200,6 @@ namespace Isles.Engine
 
         private readonly LinkedList<Entry> handlers = new();
 
-        /// <summary>
-        /// Registers a new input event handler.
-        /// </summary>
-        /// <param name="handler"></param>
-        /// <param name="order">
-        /// Handlers with lower order will be notified first.
-        /// </param>
         public void Register(IEventListener handler, float order)
         {
             if (null == handler)
@@ -322,39 +237,6 @@ namespace Isles.Engine
             handlers.AddLast(new Entry(handler, order));
         }
 
-        /// <summary>
-        /// Removes an input event handler.
-        /// </summary>
-        /// <param name="handler"></param>
-        public void Unregister(IEventListener handler)
-        {
-            if (null == handler)
-            {
-                throw new ArgumentNullException();
-            }
-
-            LinkedListNode<Entry> p = handlers.First;
-
-            while (p != null)
-            {
-                if (p.Value.Handler == handler)
-                {
-                    handlers.Remove(p);
-                    break;
-                }
-
-                p = p.Next;
-            }
-        }
-
-        /// <summary>
-        /// Clear all handler registries.
-        /// </summary>
-        public void Clear()
-        {
-            handlers.Clear();
-        }
-
         private IEventListener captured;
 
         /// <summary>
@@ -390,10 +272,6 @@ namespace Isles.Engine
         private int doubleClickFlag;
         private double doubleClickTime;
 
-        /// <summary>
-        /// Update, called from BaseGame.Update().
-        /// Will catch all new states for keyboard, mouse and the gamepad.
-        /// </summary>
         public void Update(GameTime gameTime)
         {
             // Handle mouse input variables

@@ -15,9 +15,6 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Isles
 {
-    /// <summary>
-    /// Represents a game screen.
-    /// </summary>
     public class GameScreen : IScreen, IEventListener
     {
         private readonly GraphicsDeviceManager graphics;
@@ -26,9 +23,6 @@ namespace Isles
 
         private TipBox pausePanel;
 
-        /// <summary>
-        /// Gets basic game instance.
-        /// </summary>
         public BaseGame Game { get; }
 
         private bool paused;
@@ -51,19 +45,10 @@ namespace Isles
             (Game.Camera as GameCamera).Freezed = false;
         }
 
-        /// <summary>
-        /// Gets game world.
-        /// </summary>
         public GameWorld World { get; private set; }
 
-        /// <summary>
-        /// The read me panel.
-        /// </summary>
         private ReadmePanel readme;
 
-        /// <summary>
-        /// Gets or sets game level.
-        /// </summary>
         public Level Level { get; set; }
 
         public GameScreen(string levelName)
@@ -74,9 +59,6 @@ namespace Isles
             LoadWorld(levelName, new Skirmish(this, CreateTestPlayerInfo()));
         }
 
-        /// <summary>
-        /// Internal load world method.
-        /// </summary>
         private void LoadWorld(string levelFilename, Level level)
         {
             // Creates a default level if no input specified
@@ -392,10 +374,6 @@ namespace Isles
             }
         }
 
-        /// <summary>
-        /// Handle game draw event.
-        /// </summary>
-        /// <param name="gameTime"></param>
         public void Draw(GameTime gameTime)
         {
             // Draw game world
