@@ -3,7 +3,6 @@
 
 using System;
 using System.Runtime.InteropServices;
-using Isles.Engine;
 
 using static SDL2.SDL;
 
@@ -28,7 +27,11 @@ namespace Isles
 
         private static IntPtr LoadCursor(string name)
         {
-            return Win32.LoadCursorFromFile(System.IO.Path.Combine(AppContext.BaseDirectory, "data/cursors", name));
+#if WINDOWS
+            return LoadCursorFromFile(System.IO.Path.Combine(AppContext.BaseDirectory, "data/cursors", name));
+#else
+            return default;
+#endif
         }
 
         public static unsafe void SetCursor(IntPtr cursor)
@@ -49,5 +52,10 @@ namespace Isles
             public IntPtr next;
             public IntPtr driverdata;
         };
+
+#if WINDOWS
+        [DllImport("user32.dll", EntryPoint = "LoadCursorFromFileW", CharSet = CharSet.Unicode)]
+        private extern static IntPtr LoadCursorFromFile(string filename);
+#endif
     }
 }
