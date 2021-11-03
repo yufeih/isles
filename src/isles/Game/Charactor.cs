@@ -106,11 +106,6 @@ namespace Isles
 
         public virtual string AttackAnimation => "Attack";
 
-        public Charactor(GameWorld world) : base(world)
-        {
-            VisibleInFogOfWar = false;
-        }
-
         public Charactor(GameWorld world, string classID) : base(world, classID)
         {
             VisibleInFogOfWar = false;

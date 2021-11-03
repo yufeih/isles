@@ -307,9 +307,6 @@ namespace Isles
         /// </summary>
         public List<KeyValuePair<GameModel, int>> Attachment = new();
 
-        public GameObject(GameWorld world)
-            : base(world) { }
-
         public GameObject(GameWorld world, string classID)
             : base(world)
         {
