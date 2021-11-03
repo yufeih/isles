@@ -10,9 +10,6 @@ using Microsoft.Xna.Framework;
 
 namespace Isles
 {
-    /// <summary>
-    /// Base class for all game charactors.
-    /// </summary>
     public class Charactor : GameObject, IMovable
     {
         public EffectGlow Glow;
@@ -548,10 +545,6 @@ namespace Isles
 
         public override string RunAnimation => LumberCarried > 0 ? "Carry" : "Run";
 
-        // public override string AttackAnimation
-        // {
-        //    get { return Helper.Random.Next(2) == 0 ? "Attack" : "Chop"; }
-        // }
         public override float Speed
         {
             get => LumberCarried > 0 || GoldCarried > 0 ? base.Speed * 0.75f : base.Speed;

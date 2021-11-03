@@ -1,16 +1,66 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Collections.Generic;
 using Isles.Engine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Collections.Generic;
 
 namespace Isles.Graphics
 {
-    public abstract class Landscape : BaseLandscape
+    public class Terrain : BaseLandscape
     {
+        private Effect terrainEffect;
+        private IndexBuffer indexBuffer;
+        private VertexBuffer[] vertexBuffers;
+
+        private int vertexCount;
+        private int primitiveCount;
+
+        /// <summary>
+        /// Gets or sets the fog texture used to draw the landscape.
+        /// </summary>
+        public Texture2D FogTexture { get; set; }
+
+        /// <summary>
+        /// The water is part of a spherical surface to make it look vast.
+        /// But during rendering, e.g., for computing reflection and refraction,
+        /// the water is treated as a flat plane with the height of zero.
+        /// This value determines the shape of the surface.
+        /// </summary>
+        private float earthRadius;
+
+        /// <summary>
+        /// A static texture applied to the water surface.
+        /// </summary>
+        private Texture waterTexture;
+
+        /// <summary>
+        /// This texture is used as a bump map to simulate water.
+        /// </summary>
+        private Texture waterDstortion;
+
+        /// <summary>
+        /// Render target used to draw the reflection & refraction texture.
+        /// </summary>
+        private RenderTarget2D reflectionRenderTarget;
+
+        /// <summary>
+        /// This texture is generated each frame for water reflection color sampling.
+        /// </summary>
+        private Texture2D waterReflection;
+
+        /// <summary>
+        /// Water mesh.
+        /// </summary>
+        private int waterVertexCount;
+        private int waterPrimitiveCount;
+        private VertexBuffer waterVertices;
+        private IndexBuffer waterIndices;
+
+        public Effect WaterEffect { get; set; }
+
         public override void Load(TerrainData data, TextureLoader textureLoader)
         {
             base.Load(data, textureLoader);
@@ -26,6 +76,93 @@ namespace Isles.Graphics
         {
             base.Initialize(game);
 
+            // Load terrain effect
+            terrainEffect = game.ShaderLoader.LoadShader("shaders/Terrain.cso");
+
+            // Set patch LOD to highest
+            foreach (Patch patch in Patches)
+            {
+                patch.LevelOfDetail = Patch.HighestLOD;
+            }
+
+            // Initialize index buffer.
+            // All patches use the same index buffer since tiled landscape
+            // do not deal with LOD stuff :)
+            indexBuffer = new IndexBuffer(game.GraphicsDevice, typeof(ushort),
+                                          6 * Patch.MaxPatchResolution *
+                                              Patch.MaxPatchResolution,
+                                          BufferUsage.WriteOnly);
+
+            var indices = new ushort[6 * Patch.MaxPatchResolution *
+                                              Patch.MaxPatchResolution];
+
+            // Fill index buffer and
+            Patches[0].FillIndices16(ref indices, 0);
+
+            indexBuffer.SetData(indices);
+
+            // Initialize vertices
+            var vertexBufferElementCount = (Patch.MaxPatchResolution + 1) *
+                                           (Patch.MaxPatchResolution + 1);
+
+            vertexCount = vertexBufferElementCount;
+            primitiveCount = Patch.MaxPatchResolution * Patch.MaxPatchResolution * 2;
+
+            // Create a vertex buffer for each patch
+            vertexBuffers = new VertexBuffer[PatchCountOnXAxis * PatchCountOnYAxis];
+
+            // Create an array to store the vertices
+            var vertices = new TerrainVertex[vertexBufferElementCount];
+
+            // Initialize individual patch vertex buffer
+            var patchIndex = 0;
+            for (var yPatch = 0; yPatch < PatchCountOnYAxis; yPatch++)
+            {
+                for (var xPatch = 0; xPatch < PatchCountOnYAxis; xPatch++)
+                {
+                    // Fill patch vertices
+                    Patches[patchIndex].FillVertices(0,
+                    delegate (int x, int y)
+                    {
+                        return new Vector3(x * Size.X / (GridCountOnXAxis - 1),
+                                           y * Size.Y / (GridCountOnYAxis - 1),
+                                           HeightField[x, y]);
+                    },
+                    delegate (uint index, Vector3 position)
+                    {
+                        vertices[index].Position = position;
+                    },
+                    delegate (uint index, int x, int y)
+                    {
+                        vertices[index].Position = new Vector3(
+                            x * Size.X / (GridCountOnXAxis - 1),
+                            y * Size.Y / (GridCountOnYAxis - 1), HeightField[x, y]);
+
+                        // Texture0 is the tile texture, which only covers half patch
+                        vertices[index].TextureCoordinate0 = new Vector2(
+                            2.0f * PatchCountOnXAxis * x / (GridCountOnXAxis - 1),
+                            2.0f * PatchCountOnYAxis * y / (GridCountOnYAxis - 1));
+
+                        // Texture1 is the visibility texture, which covers the entire terrain
+                        vertices[index].TextureCoordinate1 = new Vector2(
+                            1.0f * x / (GridCountOnXAxis - 1),
+                            1.0f * y / (GridCountOnYAxis - 1));
+                    });
+
+                    // Create a vertex buffer for the patch
+                    vertexBuffers[patchIndex] = new VertexBuffer(game.GraphicsDevice,
+                                                                 typeof(TerrainVertex),
+                                                                 vertexBufferElementCount,
+                                                                 BufferUsage.WriteOnly);
+
+                    // Set vertex buffer vertices
+                    vertexBuffers[patchIndex].SetData(vertices);
+
+                    // Next patch
+                    patchIndex++;
+                }
+            }
+
             WaterEffect = game.ShaderLoader.LoadShader("shaders/Water.cso");
             InitializeWater();
 
@@ -35,14 +172,6 @@ namespace Isles.Graphics
             surfaceIndexBuffer = new DynamicIndexBuffer(game.GraphicsDevice,
                 typeof(ushort), MaxSurfaceIndices, BufferUsage.WriteOnly);
         }
-
-        /// <summary>
-        /// Draw the terrain for water reflection and refraction.
-        /// </summary>
-        /// <param name="upper">Only draw upper part or underwater part.</param>
-        public abstract void DrawTerrain(Matrix viewProjection, bool upper);
-
-        public abstract void DrawTerrain(ShadowEffect shadowEffect);
 
         private struct TexturedSurface
         {
@@ -138,8 +267,7 @@ namespace Isles.Graphics
             texturedSurfaces.Clear();
         }
 
-        private void PresentSurface(LinkedListNode<TexturedSurface> start,
-                            LinkedListNode<TexturedSurface> end)
+        private void PresentSurface(LinkedListNode<TexturedSurface> start, LinkedListNode<TexturedSurface> end)
         {
             Texture2D texture = start.Value.Texture;
             VertexPositionColorTexture vertex;
@@ -203,49 +331,6 @@ namespace Isles.Graphics
             game.GraphicsDevice.DrawIndexedPrimitives(
                 PrimitiveType.TriangleList, 0, 0, surfaceVertices.Count, 0, surfaceIndices.Count / 3);
         }
-
-        /// <summary>
-        /// Gets or sets the fog texture used to draw the landscape.
-        /// </summary>
-        public Texture2D FogTexture { get; set; }
-
-        /// <summary>
-        /// The water is part of a spherical surface to make it look vast.
-        /// But during rendering, e.g., for computing reflection and refraction,
-        /// the water is treated as a flat plane with the height of zero.
-        /// This value determines the shape of the surface.
-        /// </summary>
-        private float earthRadius;
-
-        /// <summary>
-        /// A static texture applied to the water surface.
-        /// </summary>
-        private Texture waterTexture;
-
-        /// <summary>
-        /// This texture is used as a bump map to simulate water.
-        /// </summary>
-        private Texture waterDstortion;
-
-        /// <summary>
-        /// Render target used to draw the reflection & refraction texture.
-        /// </summary>
-        private RenderTarget2D reflectionRenderTarget;
-
-        /// <summary>
-        /// This texture is generated each frame for water reflection color sampling.
-        /// </summary>
-        private Texture2D waterReflection;
-
-        /// <summary>
-        /// Water mesh.
-        /// </summary>
-        private int waterVertexCount;
-        private int waterPrimitiveCount;
-        private VertexBuffer waterVertices;
-        private IndexBuffer waterIndices;
-
-        public Effect WaterEffect { get; set; }
 
         private void InitializeWater()
         {
@@ -410,246 +495,110 @@ namespace Isles.Graphics
 
             return new Vector2(x, y);
         }
-    }
 
-    /// <summary>
-    /// Game fog of war.
-    /// </summary>
-    public class FogMask
-    {
-        private const int Size = 128;
-
-        /// <summary>
-        /// Gets the default glow texture for each unit.
-        /// </summary>
-        public static Texture2D Glow
+        public void DrawTerrain(Matrix viewProjection, bool upper)
         {
-            get
-            {
-                if (glow == null || glow.IsDisposed)
-                {
-                    glow = BaseGame.Singleton.TextureLoader.LoadTexture("data/ui/glow.png");
-                }
+            EffectTechnique technique = upper ?
+                terrainEffect.Techniques["FastUpper"] : terrainEffect.Techniques["FastLower"];
 
-                return glow;
+            DrawTerrain(viewProjection, technique);
+        }
+
+        public void DrawTerrain(ShadowEffect shadowEffect)
+        {
+            DrawTerrain(game.ViewProjection, terrainEffect.Techniques["Default"]);
+
+            if (shadowEffect != null)
+            {
+                DrawTerrainShadow(shadowEffect);
             }
         }
 
-        private static Texture2D glow;
-
-        /// <summary>
-        /// Gets the width of the mask.
-        /// </summary>
-        public float Width { get; }
-
-        /// <summary>
-        /// Gets the height of the mask.
-        /// </summary>
-        public float Height { get; }
-
-        /// <summary>
-        /// Objects are invisible when the intensity is below this value.
-        /// </summary>
-        public const float VisibleIntensity = 0.5f;
-
-        /// <summary>
-        /// Common stuff.
-        /// </summary>
-        private readonly GraphicsDevice graphics;
-        private readonly SpriteBatch sprite;
-        private Rectangle textureRectangle;
-
-        /// <summary>
-        /// Gets the result mask texture (Fog of war).
-        /// </summary>
-        public Texture2D Mask { get; private set; }
-
-        private RenderTarget2D allFramesVisibleArea;
-        private readonly RenderTarget2D thisFrameVisibleArea;
-        private readonly RenderTarget2D maskCanvas;
-
-        /// <summary>
-        /// Fog intensities.
-        /// </summary>
-        private readonly bool[] visibility;
-
-        /// <summary>
-        /// Visible areas.
-        /// </summary>
-        private struct Entry
+        private void DrawTerrain(Matrix viewProjection, EffectTechnique technique)
         {
-            public float Radius;
-            public Vector2 Position;
-        }
+            graphics.SetRenderState(BlendState.NonPremultiplied, DepthStencilState.Default, RasterizerState.CullNone);
 
-        private readonly List<Entry> visibleAreas = new();
-
-        /// <summary>
-        /// Creates a new fog of war mask.
-        /// </summary>
-        public FogMask(GraphicsDevice graphics, float width, float height)
-        {
-            if (graphics == null || width <= 0 || height <= 0)
+            // Set parameters
+            if (FogTexture != null)
             {
-                throw new ArgumentException();
+                terrainEffect.Parameters["FogTexture"].SetValue(FogTexture);
             }
 
-            Width = width;
-            Height = height;
-            this.graphics = graphics;
-            sprite = new SpriteBatch(graphics);
-            visibility = new bool[Size * Size];
-            textureRectangle = new Rectangle(0, 0, Size, Size);
-            thisFrameVisibleArea = new RenderTarget2D(graphics, Size, Size, true, SurfaceFormat.Color, graphics.PresentationParameters.DepthStencilFormat);
-            maskCanvas = new RenderTarget2D(graphics, Size, Size, true, SurfaceFormat.Color, graphics.PresentationParameters.DepthStencilFormat, 0, RenderTargetUsage.PreserveContents);
-        }
+            terrainEffect.Parameters["WorldViewProjection"].SetValue(viewProjection);
 
-        /// <summary>
-        /// Gets the whether the specified point is in the fog of war.
-        /// </summary>
-        public bool Contains(float x, float y)
-        {
-            return x <= 0 || y <= 0 || x >= Width || y >= Height || !visibility[Size * (int)(Size * y / Height) + (int)(Size * x / Width)];
-        }
+            var viewFrustum = new BoundingFrustum(viewProjection);
 
-        /// <summary>
-        /// Call this each frame to mark an area as visible.
-        /// </summary>
-        /// <remarks>
-        /// TODO: Custom glow texture.
-        /// </remarks>
-        public void DrawVisibleArea(float radius, float x, float y)
-        {
-            Entry entry;
+            // Set indices and vertices
+            game.GraphicsDevice.Indices = indexBuffer;
 
-            entry.Radius = radius;
-            entry.Position.X = x;
-            entry.Position.Y = y;
+            terrainEffect.CurrentTechnique = technique;
 
-            visibleAreas.Add(entry);
-        }
+            terrainEffect.CurrentTechnique.Passes[0].Apply();
 
-        /// <summary>
-        /// Call this to refresh the fog of war texture.
-        /// </summary>
-        public void Refresh()
-        {
-            if (Mask != null && visibleAreas.Count <= 0)
+            // Draw each patch
+            for (var iPatch = 0; iPatch < Patches.Count; iPatch++)
             {
-                return;
-            }
-
-            // Draw current glows
-            graphics.PushRenderTarget(thisFrameVisibleArea);
-            graphics.Clear(Color.Black);
-
-            // Draw glows
-            sprite.Begin(SpriteSortMode.Immediate, BlendState.Additive);
-
-            Rectangle destination;
-            foreach (Entry entry in visibleAreas)
-            {
-                destination.X = (int)(Size * (entry.Position.X - entry.Radius) / Width);
-                destination.Y = (int)(Size * (entry.Position.Y - entry.Radius) / Height);
-                destination.Width = (int)(Size * entry.Radius * 2 / Width);
-                destination.Height = (int)(Size * entry.Radius * 2 / Height);
-
-                // Draw the glow texture
-                sprite.Draw(Glow, destination, Color.White);
-            }
-
-            sprite.End();
-
-            // Draw discovered area texture without clearing it
-            if (allFramesVisibleArea is null)
-            {
-                allFramesVisibleArea = new RenderTarget2D(graphics, Size, Size, true, SurfaceFormat.Color, graphics.PresentationParameters.DepthStencilFormat, 0, RenderTargetUsage.PreserveContents);
-                graphics.SetRenderTarget(allFramesVisibleArea);
-                graphics.Clear(Color.Black);
-            }
-            else
-            {
-                graphics.SetRenderTarget(allFramesVisibleArea);
-            }
-
-            sprite.Begin(SpriteSortMode.Immediate, BlendState.Additive);
-            sprite.Draw(thisFrameVisibleArea, textureRectangle, Color.White);
-            sprite.End();
-
-            // Draw final mask texture
-            graphics.SetRenderTarget(maskCanvas);
-            graphics.Clear(Color.Black);
-
-            sprite.Begin(SpriteSortMode.Immediate, BlendState.Additive);
-            sprite.Draw(allFramesVisibleArea, textureRectangle, Color.Gray * 0.5f);
-            sprite.Draw(thisFrameVisibleArea, textureRectangle, Color.White);
-            sprite.End();
-
-            // Restore states
-            graphics.PopRenderTarget();
-
-            Mask = maskCanvas;
-
-            // Manually update intensity map
-            UpdateIntensity();
-
-            // Clear visible areas
-            visibleAreas.Clear();
-        }
-
-        private void UpdateIntensity()
-        {
-            for (var i = 0; i < visibility.Length; i++)
-            {
-                visibility[i] = false;
-            }
-
-            var CellWidth = Width / Size;
-            var CellHeight = Height / Size;
-
-            foreach (Entry entry in visibleAreas)
-            {
-                var minX = (int)(Size * (entry.Position.X - entry.Radius) / Width);
-                var minY = (int)(Size * (entry.Position.Y - entry.Radius) / Height);
-                var maxX = (int)(Size * (entry.Position.X + entry.Radius) / Width) + 1;
-                var maxY = (int)(Size * (entry.Position.Y + entry.Radius) / Height) + 1;
-
-                if (minX < 0)
+                Patches[iPatch].Visible = viewFrustum.Intersects(Patches[iPatch].BoundingBox);
+                if (Patches[iPatch].Visible)
                 {
-                    minX = 0;
-                }
+                    // Set patch vertex buffer
+                    game.GraphicsDevice.SetVertexBuffer(vertexBuffers[iPatch]);
 
-                if (minY < 0)
-                {
-                    minY = 0;
-                }
-
-                if (maxX >= Size)
-                {
-                    maxX = Size - 1;
-                }
-
-                if (maxY >= Size)
-                {
-                    maxY = Size - 1;
-                }
-
-                for (var y = minY; y <= maxY; y++)
-                {
-                    for (var x = minX; x <= maxX; x++)
+                    // Draw each layer
+                    foreach (Layer layer in Layers)
                     {
-                        Vector2 v;
+                        // Set textures
+                        terrainEffect.Parameters["ColorTexture"].SetValue(layer.ColorTexture);
+                        terrainEffect.Parameters["AlphaTexture"].SetValue(layer.AlphaTexture);
+                        terrainEffect.CurrentTechnique.Passes[0].Apply();
 
-                        v.X = x * CellWidth + CellWidth / 2 - entry.Position.X;
-                        v.Y = y * CellHeight + CellHeight / 2 - entry.Position.Y;
-
-                        if (v.LengthSquared() <= entry.Radius * entry.Radius)
-                        {
-                            visibility[y * Size + x] = true;
-                        }
+                        // Draw patch primitives
+                        game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList,
+                                                                  0, 0, vertexCount, 0, primitiveCount);
                     }
                 }
             }
+        }
+
+        private void DrawTerrainShadow(ShadowEffect shadowEffect)
+        {
+            graphics.SetRenderState(BlendState.NonPremultiplied, DepthStencilState.Default, RasterizerState.CullNone);
+
+            terrainEffect.Parameters["ShadowMap"].SetValue(shadowEffect.ShadowMap);
+            terrainEffect.Parameters["LightViewProjection"].SetValue(shadowEffect.LightViewProjection);
+            terrainEffect.CurrentTechnique = terrainEffect.Techniques["ShadowMapping"];
+
+            terrainEffect.CurrentTechnique.Passes[0].Apply();
+
+            // Draw each patch
+            for (var iPatch = 0; iPatch < Patches.Count; iPatch++)
+            {
+                if (Patches[iPatch].Visible)
+                {
+                    // Set patch vertex buffer
+                    game.GraphicsDevice.SetVertexBuffer(vertexBuffers[iPatch]);
+
+                    // Draw patch primitives
+                    game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList,
+                                                              0, 0, vertexCount, 0, primitiveCount);
+                }
+            }
+        }
+
+        public struct TerrainVertex : IVertexType
+        {
+            public Vector3 Position;
+            public Vector2 TextureCoordinate0;
+            public Vector2 TextureCoordinate1;
+
+            public static readonly VertexDeclaration VertexDeclaration = new(new VertexElement[]
+            {
+                new(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
+                new(12, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0),
+                new(20, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 1),
+            });
+
+            VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;
         }
     }
 }

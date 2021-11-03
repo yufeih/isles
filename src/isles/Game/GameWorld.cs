@@ -40,7 +40,7 @@ namespace Isles.Engine
         /// <summary>
         /// Landscape of the game world.
         /// </summary>
-        public Landscape Landscape { get; private set; }
+        public Terrain Landscape { get; private set; }
 
         private string landscapeFilename;
 
@@ -52,7 +52,7 @@ namespace Isles.Engine
         /// <summary>
         /// Gets game the fog of war.
         /// </summary>
-        public FogMask FogOfWar { get; private set; }
+        public FogOfWar FogOfWar { get; private set; }
 
         /// <summary>
         /// Gets or sets whether fog of war is enable.
@@ -215,14 +215,14 @@ namespace Isles.Engine
             // Load landscape
             landscapeFilename = node.GetAttribute("Landscape");
 
-            Landscape = new TiledLandscape();
+            Landscape = new Terrain();
             Landscape.Load(JsonSerializer.Deserialize<TerrainData>(
                 File.ReadAllBytes($"data/{landscapeFilename}.json")), BaseGame.Singleton.TextureLoader);
-            Landscape.DrawWaterReflection += new Landscape.DrawDelegate(DrawWaterReflection);
+            Landscape.DrawWaterReflection += DrawWaterReflection;
             InitializeGrid();
 
             // Initialize fog of war
-            FogOfWar = new FogMask(Game.GraphicsDevice, Landscape.Size.X, Landscape.Size.Y);
+            FogOfWar = new FogOfWar(Game.GraphicsDevice, Landscape.Size.X, Landscape.Size.Y);
 
             context.Refresh(5);
 
@@ -740,7 +740,7 @@ namespace Isles.Engine
             private Vector2 vMin;
             private Vector2 vMax;
             private Vector2 min, max;
-            private readonly Landscape landscape;
+            private readonly Terrain landscape;
 
             /// <summary>
             /// Create the rectangle from 2 points and a transform matrix.
@@ -748,7 +748,7 @@ namespace Isles.Engine
             /// <param name="landscape">The landscape on which to enumerate.</param>
             /// <param name="min">The minimum point of the bounding box, Z value is ignored.</param>
             /// <param name="max">The maximum point of the bounding box, Z value is ignored.</param>
-            public GridEnumerator(Landscape landscape, Vector3 min, Vector3 max, Vector3 position, float rotationZ)
+            public GridEnumerator(Terrain landscape, Vector3 min, Vector3 max, Vector3 position, float rotationZ)
                 : this(landscape, new Vector2(min.X, min.Y), new Vector2(max.X, max.Y),
                 Matrix.CreateRotationZ(rotationZ) * Matrix.CreateTranslation(position))
             {
@@ -761,7 +761,7 @@ namespace Isles.Engine
             /// <param name="min">The minimum point of the bounding box, Z value is ignored.</param>
             /// <param name="max">The maximum point of the bounding box, Z value is ignored.</param>
             /// <param name="transform">The matrix used to transform the bounding box.</param>
-            public GridEnumerator(Landscape landscape, Vector3 min, Vector3 max, Matrix transform)
+            public GridEnumerator(Terrain landscape, Vector3 min, Vector3 max, Matrix transform)
                 : this(landscape, new Vector2(min.X, min.Y), new Vector2(max.X, max.Y), transform)
             {
             }
@@ -773,7 +773,7 @@ namespace Isles.Engine
             /// <param name="size"></param>
             /// <param name="position"></param>
             /// <param name="rotationZ"></param>
-            public GridEnumerator(Landscape landscape, Vector2 size, Vector3 position, float rotationZ)
+            public GridEnumerator(Terrain landscape, Vector2 size, Vector3 position, float rotationZ)
                 : this(landscape, new Vector2(-size.X / 2, -size.Y / 2), new Vector2(size.X / 2, size.Y / 2),
                 Matrix.CreateRotationZ(rotationZ) * Matrix.CreateTranslation(position))
             {
@@ -786,7 +786,7 @@ namespace Isles.Engine
             /// <param name="min">The minimum point of the bounding box.</param>
             /// <param name="max">The maximum point of the bounding box.</param>
             /// <param name="transform">The matrix used to transform the bounding box.</param>
-            public GridEnumerator(Landscape landscape, Vector2 min, Vector2 max, Matrix transform)
+            public GridEnumerator(Terrain landscape, Vector2 min, Vector2 max, Matrix transform)
             {
                 this.min = min;
                 this.max = max;

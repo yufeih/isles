@@ -10,9 +10,6 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Isles.Graphics
 {
-    /// <summary>
-    /// Provide 2D graphics drawing functionalities.
-    /// </summary>
     public class Graphics2D
     {
         /// <summary>

@@ -36,6 +36,7 @@ namespace Isles
 
         public static unsafe void SetCursor(IntPtr cursor)
         {
+#if WINDOWS
             // SDL calls SetCursor in the WM_SETCURSOR message handler:
             // https://github.com/libsdl-org/SDL/blob/19dee1cd16e38451f1d7beae67dd74b471b403a8/src/video/windows/SDL_windowsevents.c#L1168
             //
@@ -44,6 +45,7 @@ namespace Isles
             // doesn't respect Windows pointer size settings.
             s_cursor->driverdata = cursor;
             SDL_SetCursor((IntPtr)s_cursor);
+#endif
         }
 
         [StructLayout(LayoutKind.Sequential)]

@@ -151,11 +151,6 @@ namespace Isles.Engine
         /// </summary>
         public GameCameraSettings Settings { get; set; }
 
-        /// <summary>
-        /// Landscape for the game camera.
-        /// </summary>
-        public ILandscape Landscape => world.Landscape;
-
         private readonly GameWorld world;
         private const float BorderSize = 100;
 

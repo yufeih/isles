@@ -6,6 +6,9 @@
     <NoWarn>X4717</NoWarn>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Platforms>x64</Platforms>
+    <DefineConstants Condition="$([MSBuild]::IsOSPlatform('windows'))">WINDOWS</DefineConstants>
+    <DefineConstants Condition="$([MSBuild]::IsOSPlatform('osx'))">OSX</DefineConstants>
+    <DefineConstants Condition="$([MSBuild]::IsOSPlatform('linux'))">LINUX</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
