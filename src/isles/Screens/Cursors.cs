@@ -2,61 +2,45 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Runtime.InteropServices;
-
+using System.IO;
+using System.Text.Json;
+using Isles.Graphics;
+using Microsoft.Xna.Framework;
 using static SDL2.SDL;
 
 namespace Isles
 {
-    public static unsafe class Cursors
+    public static class Cursors
     {
-#if WINDOWS
-        private static readonly SDL_Cursor* s_cursor = (SDL_Cursor*)SDL_CreateSystemCursor(SDL_SystemCursor.SDL_SYSTEM_CURSOR_ARROW);
-#endif
-        public static IntPtr MenuDefault { get; } = LoadCursor("NormalCursor.cur");
-        public static IntPtr Default { get; } = LoadCursor("default.ani");
-        public static IntPtr TargetRed { get; } = LoadCursor("target_red.ani");
-        public static IntPtr TargetGreen { get; } = LoadCursor("target_green.ani");
-        public static IntPtr Top { get; } = LoadCursor("screen_top.cur");
-        public static IntPtr Bottom { get; } = LoadCursor("screen_bottom.cur");
-        public static IntPtr Left { get; } = LoadCursor("screen_left.cur");
-        public static IntPtr Right { get; } = LoadCursor("screen_right.cur");
-        public static IntPtr Move { get; } = LoadCursor("screen_move.cur");
-        public static IntPtr Rotate { get; } = LoadCursor("screen_rotate.cur");
+        public static IntPtr MenuDefault { get; } = LoadCursor("menu");
+        public static IntPtr Default { get; } = LoadCursor("default");
+        public static IntPtr TargetRed { get; } = LoadCursor("target_red");
+        public static IntPtr TargetGreen { get; } = LoadCursor("target_green");
+        public static IntPtr Top { get; } = LoadCursor("screen_top");
+        public static IntPtr Bottom { get; } = LoadCursor("screen_bottom");
+        public static IntPtr Left { get; } = LoadCursor("screen_left");
+        public static IntPtr Right { get; } = LoadCursor("screen_right");
+        public static IntPtr Move { get; } = LoadCursor("screen_move");
+        public static IntPtr Rotate { get; } = LoadCursor("screen_rotate");
 
-        private static IntPtr LoadCursor(string name)
+        public static void SetCursor(IntPtr cursor)
         {
-#if WINDOWS
-            return LoadCursorFromFile(System.IO.Path.Combine(AppContext.BaseDirectory, "data/cursors", name));
-#else
-            return default;
-#endif
+            SDL_SetCursor(cursor);
         }
 
-        public static unsafe void SetCursor(IntPtr cursor)
+        private static unsafe IntPtr LoadCursor(string name)
         {
-#if WINDOWS
-            // SDL calls SetCursor in the WM_SETCURSOR message handler:
-            // https://github.com/libsdl-org/SDL/blob/19dee1cd16e38451f1d7beae67dd74b471b403a8/src/video/windows/SDL_windowsevents.c#L1168
-            //
-            // This hack tricks SDL to use our own cursor returned by LoadCursorFromFile.
-            // Cursors created from SDL_CreateColorCursor doesn't support animation and
-            // doesn't respect Windows pointer size settings.
-            s_cursor->driverdata = cursor;
-            SDL_SetCursor((IntPtr)s_cursor);
-#endif
+            var (pixels, w, h) = TextureLoader.ReadAllPixels($"data/cursors/{name}.png");
+            var info = JsonHelper.DeserializeAnonymousType(
+                File.ReadAllBytes($"data/cursors/{name}.json"), new { hotspot = Array.Empty<int>() });
+
+            fixed (Color* ptr = pixels)
+            {
+                var surface = SDL_CreateRGBSurfaceFrom((IntPtr)ptr, w, h, 32, w * 4, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+                var cursor = SDL_CreateColorCursor(surface, info.hotspot[0], info.hotspot[1]);
+                SDL_FreeSurface(surface);
+                return cursor;
+            }
         }
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct SDL_Cursor
-        {
-            public IntPtr next;
-            public IntPtr driverdata;
-        };
-
-#if WINDOWS
-        [DllImport("user32.dll", EntryPoint = "LoadCursorFromFileW", CharSet = CharSet.Unicode)]
-        private extern static IntPtr LoadCursorFromFile(string filename);
-#endif
     }
 }
