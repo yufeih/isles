@@ -1118,9 +1118,10 @@ namespace Isles
             // Update entity position
             if (step == 0)
             {
-                if (world.TargetPosition.HasValue)
+                var target = world.Landscape.Pick();
+                if (target.HasValue)
                 {
-                    baseEntity.Position = world.TargetPosition.Value;
+                    baseEntity.Position = target.Value;
                 }
             }
 

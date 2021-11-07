@@ -30,19 +30,12 @@ namespace Isles.Engine
 
         public Func<Entity> Pick { get; set; }
 
-        public Vector3? TargetPosition => isTargetPositionOnLandscape ? targetPosition : null;
-
-        private Vector3 targetPosition = Vector3.Zero;
-        private bool isTargetPositionOnLandscape = true;
-
         public string Name;
         public string Description;
 
         public void Update(GameTime gameTime)
         {
             Landscape.Update(gameTime);
-
-            SmoothTargetPosition();
 
             foreach (var o in worldObjects)
             {
@@ -57,20 +50,6 @@ namespace Isles.Engine
             PathManager.Update();
 
             UpdateSceneManager();
-        }
-
-        private void SmoothTargetPosition()
-        {
-            Vector3? hitPoint = Landscape.Pick();
-            if (isTargetPositionOnLandscape = hitPoint.HasValue)
-            {
-                targetPosition += (hitPoint.Value - targetPosition) * 0.5f;
-                var height = Landscape.GetHeight(targetPosition.X, targetPosition.Y);
-                if (height > targetPosition.Z)
-                {
-                    targetPosition.Z = height;
-                }
-            }
         }
 
         public virtual void Load(XmlElement node, ILoading context)
