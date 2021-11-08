@@ -1401,8 +1401,6 @@ namespace Isles
         public Decoration(GameWorld world)
             : base(world) { }
 
-        public override bool IsInteractive => false;
-
         public override void Deserialize(XmlElement xml)
         {
             base.Deserialize(xml);

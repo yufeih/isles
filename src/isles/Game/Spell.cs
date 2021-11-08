@@ -1662,7 +1662,7 @@ namespace Isles
                 var elapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
                 elapsedTime += elapsedSeconds;
 
-                foreach (var wo in world.GetNearbyObjectsPrecise(effect.Position, EffectPunishOfNature.Radius))
+                foreach (var wo in world.GetNearbyObjects(effect.Position, EffectPunishOfNature.Radius))
                 {
                     if (wo is not Charactor o || o.Owner == null)
                     {

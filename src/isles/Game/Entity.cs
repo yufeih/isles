@@ -100,11 +100,6 @@ namespace Isles.Engine
             set { }
         }
 
-        /// <summary>
-        /// Gets or sets scene manager data.
-        /// </summary>
-        public object SceneManagerTag { get; set; }
-
         public virtual BoundingBox BoundingBox => new();
 
         /// <summary>
@@ -362,12 +357,6 @@ namespace Isles.Engine
         }
 
         private bool isActive;
-
-        /// <summary>
-        /// Gets whether the entity is interactive. you can make an entity
-        /// interactive by calling GameWorld.Activate().
-        /// </summary>
-        public virtual bool IsInteractive => true;
 
         public virtual bool IsPickable => Visible;
 

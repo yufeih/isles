@@ -327,28 +327,16 @@ namespace Isles
             // Update players
             foreach (Player player in Player.AllPlayers)
             {
-                if (player != null)
-                {
-                    player.Update(gameTime);
-                }
+                player?.Update(gameTime);
             }
 
             // Update world
-            if (World != null)
-            {
-                World.Update(gameTime);
-            }
+            World?.Update(gameTime);
 
             // Update spells
-            if (Spell.CurrentSpell != null)
-            {
-                Spell.CurrentSpell.UpdateCast(gameTime);
-            }
+            Spell.CurrentSpell?.UpdateCast(gameTime);
 
-            if (Level != null)
-            {
-                Level.Update(gameTime);
-            }
+            Level?.Update(gameTime);
         }
 
         private void UpdateCursorArrows()

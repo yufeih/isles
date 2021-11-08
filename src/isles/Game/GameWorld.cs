@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.Json;
 using System.Xml;
 using Isles.Graphics;
@@ -14,11 +13,11 @@ namespace Isles.Engine
 {
     public class GameWorld
     {
-        private sealed class InternalList<T> : BroadcastList<T, LinkedList<T>> { }
+        private readonly List<BaseEntity> worldObjects = new();
+        private readonly List<BaseEntity> addedWorldObjects = new();
+        private readonly List<BaseEntity> removedWorldObjects = new();
 
         public IEnumerable<BaseEntity> WorldObjects => worldObjects;
-
-        private readonly InternalList<BaseEntity> worldObjects = new();
 
         public BaseGame Game { get; } = BaseGame.Singleton;
 
@@ -30,11 +29,10 @@ namespace Isles.Engine
 
         public Func<Entity> Pick { get; set; }
 
-        public string Name;
-        public string Description;
-
         public void Update(GameTime gameTime)
         {
+            FlushAddedOrRemovedEntities();
+
             Landscape.Update(gameTime);
 
             foreach (var o in worldObjects)
@@ -48,8 +46,6 @@ namespace Isles.Engine
             }
 
             PathManager.Update();
-
-            UpdateSceneManager();
         }
 
         public virtual void Load(XmlElement node, ILoading context)
@@ -62,7 +58,6 @@ namespace Isles.Engine
             Landscape = new Terrain();
             Landscape.Load(JsonSerializer.Deserialize<TerrainData>(
                 File.ReadAllBytes($"data/{landscapeFilename}.json")), BaseGame.Singleton.TextureLoader);
-            InitializeGrid();
 
             // Initialize fog of war
             FogOfWar = new FogOfWar(Game.GraphicsDevice, Landscape.Size.X, Landscape.Size.Y);
@@ -71,10 +66,6 @@ namespace Isles.Engine
 
             // Create a path manager for the landscape
             PathManager = new PathManager(Landscape, ReadOccluders(node));
-
-            // Name & description
-            Name = node.GetAttribute("Name");
-            Description = node.GetAttribute("Description");
 
             context.Refresh(10);
 
@@ -94,6 +85,8 @@ namespace Isles.Engine
 
                 context.Refresh(10 + 100 * nObjects / node.ChildNodes.Count);
             }
+
+            FlushAddedOrRemovedEntities();
         }
 
         private static List<Point> ReadOccluders(XmlElement node)
@@ -174,17 +167,7 @@ namespace Isles.Engine
 
         public void Add(BaseEntity worldObject)
         {
-            worldObjects.Add(worldObject);
-
-            if (worldObject is Entity entity)
-            {
-                entity.OnCreate();
-
-                if (entity.IsInteractive)
-                {
-                    Activate(entity);
-                }
-            }
+            addedWorldObjects.Add(worldObject);
         }
 
         public void Destroy(BaseEntity worldObject)
@@ -194,101 +177,30 @@ namespace Isles.Engine
                 return;
             }
 
-            // Deactivate the object
-            if (worldObject.IsActive)
-            {
-                Deactivate(worldObject);
-            }
-
-            // Remove it from selected and highlighed
-            if (worldObject is Entity e)
-            {
-                e.OnDestroy();
-            }
-
-            // Finally, remove it from object list
-            worldObjects.Remove(worldObject);
+            removedWorldObjects.Add(worldObject);
         }
 
-        public void Activate(BaseEntity worldObject)
+        private void FlushAddedOrRemovedEntities()
         {
-            if (worldObject == null)
+            foreach (var o in addedWorldObjects)
             {
-                throw new ArgumentNullException();
-            }
-
-            if (worldObject.IsActive)
-            {
-                return;
-            }
-
-            worldObject.IsActive = true;
-
-            if (worldObject.SceneManagerTag is not List<Point> grids)
-            {
-                grids = new List<Point>();
-                worldObject.SceneManagerTag = grids;
-            }
-
-            grids.Clear();
-
-            foreach (Point grid in EnumerateGrid(worldObject.BoundingBox))
-            {
-                System.Diagnostics.Debug.Assert(
-                    !Data[grid.X, grid.Y].Owners.Contains(worldObject));
-
-                grids.Add(grid);
-
-                Data[grid.X, grid.Y].Owners.Add(worldObject);
-            }
-
-            worldObject.IsDirty = false;
-        }
-
-        public void Deactivate(BaseEntity worldObject)
-        {
-            if (worldObject == null)
-            {
-                throw new ArgumentNullException();
-            }
-
-            if (!worldObject.IsActive)
-            {
-                return;
-            }
-
-            worldObject.IsActive = false;
-
-            if (worldObject.SceneManagerTag is not List<Point> grids)
-            {
-                throw new InvalidOperationException();
-            }
-
-            foreach (Point grid in grids)
-            {
-                System.Diagnostics.Debug.Assert(
-                    Data[grid.X, grid.Y].Owners.Contains(worldObject));
-
-                Data[grid.X, grid.Y].Owners.Remove(worldObject);
-            }
-
-            grids.Clear();
-
-            worldObject.IsDirty = false;
-        }
-
-        private void UpdateSceneManager()
-        {
-            // For all active objects, change the grids it owns if its
-            // bounding box is dirty, making it up to date.
-            foreach (var o in worldObjects)
-            {
-                if (o.IsActive && o.IsDirty)
+                worldObjects.Add(o);
+                if (o is Entity e)
                 {
-                    Deactivate(o);
-                    Activate(o);
+                    e.OnCreate();
                 }
             }
+            addedWorldObjects.Clear();
+
+            foreach (var o in removedWorldObjects)
+            {
+                if (o is Entity e)
+                {
+                    e.OnDestroy();
+                }
+                worldObjects.Remove(o);
+            }
+            removedWorldObjects.Clear();
         }
 
         public IEnumerable<BaseEntity> ObjectsFromRegion(BoundingFrustum boundingFrustum)
@@ -303,30 +215,9 @@ namespace Isles.Engine
             }
         }
 
-        private readonly List<BaseEntity> set = new(4);
-
         public IEnumerable<BaseEntity> GetNearbyObjects(Vector3 position, float radius)
         {
-            set.Clear();
-
-            // Treat it as a box instead of a sphere...
-            foreach (Point grid in EnumerateGrid(position, new Vector3(radius * 2)))
-            {
-                foreach (var o in Data[grid.X, grid.Y].Owners)
-                {
-                    if (!set.Contains(o))
-                    {
-                        set.Add(o);
-                    }
-                }
-            }
-
-            return set;
-        }
-
-        public IEnumerable<BaseEntity> GetNearbyObjectsPrecise(Vector3 position, float radius)
-        {
-            foreach (var o in GetNearbyObjects(position, radius))
+            foreach (var o in worldObjects)
             {
                 Vector2 v;
 
@@ -336,115 +227,6 @@ namespace Isles.Engine
                 if (v.LengthSquared() <= radius * radius)
                 {
                     yield return o;
-                }
-            }
-        }
-
-        /// <summary>
-        /// The data to hold on each grid.
-        /// </summary>
-        public struct Grid
-        {
-            /// <summary>
-            /// Owners of this grid, allow overlapping.
-            /// </summary>
-            public List<BaseEntity> Owners;
-        }
-
-        private Grid[,] Data;
-
-        public int GridCountOnXAxis { get; private set; }
-
-        public int GridCountOnYAxis { get; private set; }
-
-        public float GridSizeOnXAxis { get; private set; }
-
-        public float GridSizeOnYAxis { get; private set; }
-
-        private void InitializeGrid()
-        {
-            GridCountOnXAxis = Landscape.GridCountOnXAxis;
-            GridCountOnYAxis = Landscape.GridCountOnYAxis;
-
-            Data = new Grid[GridCountOnXAxis, GridCountOnYAxis];
-
-            GridSizeOnXAxis = Landscape.Size.X / GridCountOnXAxis;
-            GridSizeOnYAxis = Landscape.Size.Y / GridCountOnYAxis;
-
-            // Initialize landscape type
-            for (var x = 0; x < GridCountOnXAxis; x++)
-            {
-                for (var y = 0; y < GridCountOnYAxis; y++)
-                {
-                    Data[x, y].Owners = new List<BaseEntity>(2);
-                }
-            }
-        }
-
-        public IEnumerable<Point> EnumerateGrid(Vector3 position, Vector3 size)
-        {
-            Point min = Landscape.PositionToGrid(position.X - size.X / 2, position.Y - size.Y / 2);
-            Point max = Landscape.PositionToGrid(position.X + size.X / 2, position.Y + size.Y / 2);
-
-            if (min.X < 0)
-            {
-                min.X = 0;
-            }
-
-            if (min.Y < 0)
-            {
-                min.Y = 0;
-            }
-
-            if (max.X >= GridCountOnXAxis)
-            {
-                max.X = GridCountOnXAxis - 1;
-            }
-
-            if (max.Y >= GridCountOnYAxis)
-            {
-                max.Y = GridCountOnYAxis - 1;
-            }
-
-            for (var y = min.Y; y <= max.Y; y++)
-            {
-                for (var x = min.X; x <= max.X; x++)
-                {
-                    yield return new Point(x, y);
-                }
-            }
-        }
-
-        public IEnumerable<Point> EnumerateGrid(BoundingBox boundingBox)
-        {
-            Point min = Landscape.PositionToGrid(boundingBox.Min.X, boundingBox.Min.Y);
-            Point max = Landscape.PositionToGrid(boundingBox.Max.X, boundingBox.Max.Y);
-
-            if (min.X < 0)
-            {
-                min.X = 0;
-            }
-
-            if (min.Y < 0)
-            {
-                min.Y = 0;
-            }
-
-            if (max.X >= GridCountOnXAxis)
-            {
-                max.X = GridCountOnXAxis - 1;
-            }
-
-            if (max.Y >= GridCountOnYAxis)
-            {
-                max.Y = GridCountOnYAxis - 1;
-            }
-
-            for (var y = min.Y; y <= max.Y; y++)
-            {
-                for (var x = min.X; x <= max.X; x++)
-                {
-                    yield return new Point(x, y);
                 }
             }
         }
