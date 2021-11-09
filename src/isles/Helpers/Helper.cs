@@ -1,137 +1,133 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
 
-namespace Isles.Engine
+namespace Isles;
+
+public static class Helper
 {
-    public static class Helper
+    public static Color StringToColor(string value)
     {
-        public static Color StringToColor(string value)
-        {
-            var split = value.Split(new char[] { ',' }, 3);
+        var split = value.Split(new char[] { ',' }, 3);
 
-            return split.Length >= 3
-                ? new Color(byte.Parse(split[0]),
-                                 byte.Parse(split[1]),
-                                 byte.Parse(split[2]), 255)
-                : Color.White;
-        }
-
-        public static Vector2 StringToVector2(string value)
-        {
-            var split = value.Split(new char[] { ',' }, 2);
-
-            return split.Length >= 2
-                ? new Vector2(
-                    float.Parse(split[0]),
-                    float.Parse(split[1]))
-                : Vector2.Zero;
-        }
-
-        public static Vector3 StringToVector3(string value)
-        {
-            var split = value.Split(new char[] { ',' }, 3);
-
-            return split.Length >= 3
-                ? new Vector3(
-                    float.Parse(split[0]),
-                    float.Parse(split[1]),
-                    float.Parse(split[2]))
-                : Vector3.Zero;
-        }
-
-        public static Quaternion StringToQuaternion(string value)
-        {
-            var split = value.Split(new char[] { ',' }, 4);
-
-            return split.Length >= 3
-                ? new Quaternion(
-                    float.Parse(split[0]),
-                    float.Parse(split[1]),
-                    float.Parse(split[2]),
-                    float.Parse(split[3]))
-                : Quaternion.Identity;
-        }
-
-        public static Random Random { get; } = new();
-
-        public static float RandomInRange(float min, float max)
-        {
-            return min + (float)(Random.NextDouble() * (max - min));
-        }
+        return split.Length >= 3
+            ? new Color(byte.Parse(split[0]),
+                             byte.Parse(split[1]),
+                             byte.Parse(split[2]), 255)
+            : Color.White;
     }
 
-    /// <summary>
-    /// A list, allow safe deletion of objects.
-    /// </summary>
-    /// <typeparam name="TValue"></typeparam>
-    /// <remarks>
-    /// Remove objects until update is called.
-    /// </remarks>
-    public class BroadcastList<TValue, TList>
-        : IEnumerable<TValue>, ICollection<TValue> where TList : ICollection<TValue>, new()
+    public static Vector2 StringToVector2(string value)
     {
-        private bool isDirty = true;
-        private readonly TList copy = new();
+        var split = value.Split(new char[] { ',' }, 2);
 
-        public TList Elements { get; } = new();
+        return split.Length >= 2
+            ? new Vector2(
+                float.Parse(split[0]),
+                float.Parse(split[1]))
+            : Vector2.Zero;
+    }
 
-        public IEnumerator<TValue> GetEnumerator()
+    public static Vector3 StringToVector3(string value)
+    {
+        var split = value.Split(new char[] { ',' }, 3);
+
+        return split.Length >= 3
+            ? new Vector3(
+                float.Parse(split[0]),
+                float.Parse(split[1]),
+                float.Parse(split[2]))
+            : Vector3.Zero;
+    }
+
+    public static Quaternion StringToQuaternion(string value)
+    {
+        var split = value.Split(new char[] { ',' }, 4);
+
+        return split.Length >= 3
+            ? new Quaternion(
+                float.Parse(split[0]),
+                float.Parse(split[1]),
+                float.Parse(split[2]),
+                float.Parse(split[3]))
+            : Quaternion.Identity;
+    }
+
+    public static Random Random { get; } = new();
+
+    public static float RandomInRange(float min, float max)
+    {
+        return min + (float)(Random.NextDouble() * (max - min));
+    }
+}
+
+/// <summary>
+/// A list, allow safe deletion of objects.
+/// </summary>
+/// <typeparam name="TValue"></typeparam>
+/// <remarks>
+/// Remove objects until update is called.
+/// </remarks>
+public class BroadcastList<TValue, TList>
+    : IEnumerable<TValue>, ICollection<TValue> where TList : ICollection<TValue>, new()
+{
+    private bool isDirty = true;
+    private readonly TList copy = new();
+
+    public TList Elements { get; } = new();
+
+    public IEnumerator<TValue> GetEnumerator()
+    {
+        // Copy a new list whiling iterating it
+        if (isDirty)
         {
-            // Copy a new list whiling iterating it
-            if (isDirty)
+            copy.Clear();
+            foreach (TValue e in Elements)
             {
-                copy.Clear();
-                foreach (TValue e in Elements)
-                {
-                    copy.Add(e);
-                }
-
-                isDirty = false;
+                copy.Add(e);
             }
 
-            return copy.GetEnumerator();
+            isDirty = false;
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        return copy.GetEnumerator();
+    }
 
-        public void Add(TValue e)
-        {
-            isDirty = true;
-            Elements.Add(e);
-        }
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 
-        public bool Remove(TValue e)
-        {
-            isDirty = true;
-            return Elements.Remove(e);
-        }
+    public void Add(TValue e)
+    {
+        isDirty = true;
+        Elements.Add(e);
+    }
 
-        public void Clear()
-        {
-            isDirty = true;
-            Elements.Clear();
-        }
+    public bool Remove(TValue e)
+    {
+        isDirty = true;
+        return Elements.Remove(e);
+    }
 
-        public bool IsReadOnly => true;
+    public void Clear()
+    {
+        isDirty = true;
+        Elements.Clear();
+    }
 
-        public int Count => Elements.Count;
+    public bool IsReadOnly => true;
 
-        public bool Contains(TValue item)
-        {
-            return Elements.Contains(item);
-        }
+    public int Count => Elements.Count;
 
-        public void CopyTo(TValue[] array, int arrayIndex)
-        {
-            Elements.CopyTo(array, arrayIndex);
-        }
+    public bool Contains(TValue item)
+    {
+        return Elements.Contains(item);
+    }
+
+    public void CopyTo(TValue[] array, int arrayIndex)
+    {
+        Elements.CopyTo(array, arrayIndex);
     }
 }

@@ -1,202 +1,197 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Collections.Generic;
-using Isles.Engine;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+namespace Isles.Graphics;
 
-namespace Isles.Graphics
+public abstract class BaseLandscape : ILandscape
 {
-    public abstract class BaseLandscape : ILandscape
+    public struct Layer
     {
-        public struct Layer
+        public Texture2D ColorTexture;
+        public Texture2D AlphaTexture;
+    }
+
+    public class Patch
+    {
+        private BoundingBox boundingBox;
+        private readonly BaseLandscape landscape;
+
+        /// <summary>
+        /// Gets or sets starting vertex index when filling patch indices.
+        /// </summary>
+        public uint StartingVertex;
+
+        private static int i;
+
+        public Patch(BoundingBox boundingBox, int index, BaseLandscape landscape)
         {
-            public Texture2D ColorTexture;
-            public Texture2D AlphaTexture;
+            IndexOnXAxis = index % landscape.PatchCountOnXAxis;
+            IndexOnYAxis = index / landscape.PatchCountOnYAxis;
+
+            LevelOfDetail = i++ % 5;
+            Index = index;
+            this.landscape = landscape;
+            this.boundingBox = boundingBox;
         }
 
-        public class Patch
+        /// <summary>
+        /// Gets or sets patch visibility.
+        /// </summary>
+        public bool Visible { get; set; } = true;
+
+        public const int HighestLOD = 4;
+        public const int LowestLOD = 0;
+
+        /// <summary>
+        /// Gets patch level of detail. 0 is the lowest, 4 is the highest.
+        /// </summary>
+        public int LevelOfDetail { get; set; }
+
+        /// <summary>
+        /// Gets index in all terrain patches.
+        /// </summary>
+        public int Index { get; }
+
+        /// <summary>
+        /// Gets the patch index on the x axis.
+        /// </summary>
+        public int IndexOnXAxis { get; }
+
+        /// <summary>
+        /// Gets the patch index on the y axis.
+        /// </summary>
+        public int IndexOnYAxis { get; }
+
+        /// <summary>
+        /// Gets patch bounding box.
+        /// </summary>
+        public BoundingBox BoundingBox => boundingBox;
+
+        public delegate Vector3 GetVertexPosition(int x, int y);
+
+        public delegate void SetVertexPosition(uint index, Vector3 position);
+
+        public delegate void SetVertex(uint index, int x, int y);
+
+        /// <summary>
+        /// Fill the vertex list with the vertices on this patch based on current LOD.
+        /// </summary>
+        /// <returns>Number of vertices added to the list.</returns>
+        public uint FillVertices(uint baseIndex, GetVertexPosition get,
+                                                 SetVertexPosition set,
+                                                 SetVertex setVertex)
         {
-            private BoundingBox boundingBox;
-            private readonly BaseLandscape landscape;
-
-            /// <summary>
-            /// Gets or sets starting vertex index when filling patch indices.
-            /// </summary>
-            public uint StartingVertex;
-
-            private static int i;
-
-            public Patch(BoundingBox boundingBox, int index, BaseLandscape landscape)
+            int x, y, xPatch, yPatch, lowerLOD, t, k;
+            for (var i = 0; i < MagicVertices[LevelOfDetail].Length; i++)
             {
-                IndexOnXAxis = index % landscape.PatchCountOnXAxis;
-                IndexOnYAxis = index / landscape.PatchCountOnYAxis;
+                xPatch = (int)MagicVertices[LevelOfDetail][i] % (MaxPatchResolution + 1);
+                yPatch = (int)MagicVertices[LevelOfDetail][i] / (MaxPatchResolution + 1);
 
-                LevelOfDetail = i++ % 5;
-                Index = index;
-                this.landscape = landscape;
-                this.boundingBox = boundingBox;
-            }
+                x = IndexOnXAxis * MaxPatchResolution;
+                y = IndexOnYAxis * MaxPatchResolution;
 
-            /// <summary>
-            /// Gets or sets patch visibility.
-            /// </summary>
-            public bool Visible { get; set; } = true;
+                Vector3 position = get(x + xPatch, y + yPatch);
+                setVertex(baseIndex, x + xPatch, y + yPatch);
 
-            public const int HighestLOD = 4;
-            public const int LowestLOD = 0;
+                // FIX patch tearing caused by different LOD
+                // Perform fixing on 4 edges
 
-            /// <summary>
-            /// Gets patch level of detail. 0 is the lowest, 4 is the highest.
-            /// </summary>
-            public int LevelOfDetail { get; set; }
-
-            /// <summary>
-            /// Gets index in all terrain patches.
-            /// </summary>
-            public int Index { get; }
-
-            /// <summary>
-            /// Gets the patch index on the x axis.
-            /// </summary>
-            public int IndexOnXAxis { get; }
-
-            /// <summary>
-            /// Gets the patch index on the y axis.
-            /// </summary>
-            public int IndexOnYAxis { get; }
-
-            /// <summary>
-            /// Gets patch bounding box.
-            /// </summary>
-            public BoundingBox BoundingBox => boundingBox;
-
-            public delegate Vector3 GetVertexPosition(int x, int y);
-
-            public delegate void SetVertexPosition(uint index, Vector3 position);
-
-            public delegate void SetVertex(uint index, int x, int y);
-
-            /// <summary>
-            /// Fill the vertex list with the vertices on this patch based on current LOD.
-            /// </summary>
-            /// <returns>Number of vertices added to the list.</returns>
-            public uint FillVertices(uint baseIndex, GetVertexPosition get,
-                                                     SetVertexPosition set,
-                                                     SetVertex setVertex)
-            {
-                int x, y, xPatch, yPatch, lowerLOD, t, k;
-                for (var i = 0; i < MagicVertices[LevelOfDetail].Length; i++)
+                // Fix left edge
+                if (xPatch == 0 && yPatch != MaxPatchResolution && IndexOnXAxis > 0 && LevelOfDetail >
+                   (lowerLOD = landscape.GetPatch(IndexOnXAxis - 1, IndexOnYAxis).LevelOfDetail))
                 {
-                    xPatch = (int)MagicVertices[LevelOfDetail][i] % (MaxPatchResolution + 1);
-                    yPatch = (int)MagicVertices[LevelOfDetail][i] / (MaxPatchResolution + 1);
-
-                    x = IndexOnXAxis * MaxPatchResolution;
-                    y = IndexOnYAxis * MaxPatchResolution;
-
-                    Vector3 position = get(x + xPatch, y + yPatch);
-                    setVertex(baseIndex, x + xPatch, y + yPatch);
-
-                    // FIX patch tearing caused by different LOD
-                    // Perform fixing on 4 edges
-
-                    // Fix left edge
-                    if (xPatch == 0 && yPatch != MaxPatchResolution && IndexOnXAxis > 0 && LevelOfDetail >
-                       (lowerLOD = landscape.GetPatch(IndexOnXAxis - 1, IndexOnYAxis).LevelOfDetail))
-                    {
-                        k = MagicLength[lowerLOD];
-                        t = yPatch / k * k;
-                        position.Z = MathHelper.Lerp(get(x + xPatch, y + t).Z,
-                                                     get(x + xPatch, y + t + k).Z,
-                                                     (float)(yPatch % k) / k);
-                        set(baseIndex, position);
-                    }
-
-                    // Fix right edge
-                    else if (xPatch == MaxPatchResolution && yPatch != MaxPatchResolution &&
-                             IndexOnXAxis < landscape.PatchCountOnXAxis - 1 && LevelOfDetail >
-                            (lowerLOD = landscape.GetPatch(IndexOnXAxis + 1, IndexOnYAxis).LevelOfDetail))
-                    {
-                        k = MagicLength[lowerLOD];
-                        t = yPatch / k * k;
-                        position.Z = MathHelper.Lerp(get(x + xPatch, y + t).Z,
-                                                     get(x + xPatch, y + t + k).Z,
-                                                     (float)(yPatch % k) / k);
-                        set(baseIndex, position);
-                    }
-
-                    // Fix bottom edge
-                    else if (yPatch == 0 && xPatch != MaxPatchResolution && IndexOnYAxis > 0 && LevelOfDetail >
-                            (lowerLOD = landscape.GetPatch(IndexOnXAxis, IndexOnYAxis - 1).LevelOfDetail))
-                    {
-                        k = MagicLength[lowerLOD];
-                        t = xPatch / k * k;
-                        position.Z = MathHelper.Lerp(get(x + t, y + yPatch).Z,
-                                                     get(x + t + k, y + yPatch).Z,
-                                                     (float)(xPatch % k) / k);
-                        set(baseIndex, position);
-                    }
-
-                    // Fix top edge
-                    else if (yPatch == MaxPatchResolution && xPatch != MaxPatchResolution &&
-                             IndexOnYAxis < landscape.PatchCountOnYAxis - 1 && LevelOfDetail >
-                            (lowerLOD = landscape.GetPatch(IndexOnXAxis, IndexOnYAxis + 1).LevelOfDetail))
-                    {
-                        k = MagicLength[lowerLOD];
-                        t = xPatch / k * k;
-                        position.Z = MathHelper.Lerp(get(x + t, y + yPatch).Z,
-                                                     get(x + t + k, y + yPatch).Z,
-                                                     (float)(xPatch % k) / k);
-                        set(baseIndex, position);
-                    }
-
-                    // Increment vertex counter
-                    baseIndex++;
+                    k = MagicLength[lowerLOD];
+                    t = yPatch / k * k;
+                    position.Z = MathHelper.Lerp(get(x + xPatch, y + t).Z,
+                                                 get(x + xPatch, y + t + k).Z,
+                                                 (float)(yPatch % k) / k);
+                    set(baseIndex, position);
                 }
 
-                return (uint)MagicVertices[LevelOfDetail].Length;
-            }
-
-            /// <summary>
-            /// Fill the vertex list with the indices on this patch based on current LOD.
-            /// </summary>
-            /// <returns>Number of indices added to the list.</returns>
-            public ushort FillIndices16(ref ushort[] indices, uint baseIndex)
-            {
-                for (var i = 0; i < MagicIndices[LevelOfDetail].Length; i++)
+                // Fix right edge
+                else if (xPatch == MaxPatchResolution && yPatch != MaxPatchResolution &&
+                         IndexOnXAxis < landscape.PatchCountOnXAxis - 1 && LevelOfDetail >
+                        (lowerLOD = landscape.GetPatch(IndexOnXAxis + 1, IndexOnYAxis).LevelOfDetail))
                 {
-                    indices[baseIndex++] = (ushort)(MagicIndices[LevelOfDetail][i] + StartingVertex);
+                    k = MagicLength[lowerLOD];
+                    t = yPatch / k * k;
+                    position.Z = MathHelper.Lerp(get(x + xPatch, y + t).Z,
+                                                 get(x + xPatch, y + t + k).Z,
+                                                 (float)(yPatch % k) / k);
+                    set(baseIndex, position);
                 }
 
-                return (ushort)MagicIndices[LevelOfDetail].Length;
+                // Fix bottom edge
+                else if (yPatch == 0 && xPatch != MaxPatchResolution && IndexOnYAxis > 0 && LevelOfDetail >
+                        (lowerLOD = landscape.GetPatch(IndexOnXAxis, IndexOnYAxis - 1).LevelOfDetail))
+                {
+                    k = MagicLength[lowerLOD];
+                    t = xPatch / k * k;
+                    position.Z = MathHelper.Lerp(get(x + t, y + yPatch).Z,
+                                                 get(x + t + k, y + yPatch).Z,
+                                                 (float)(xPatch % k) / k);
+                    set(baseIndex, position);
+                }
+
+                // Fix top edge
+                else if (yPatch == MaxPatchResolution && xPatch != MaxPatchResolution &&
+                         IndexOnYAxis < landscape.PatchCountOnYAxis - 1 && LevelOfDetail >
+                        (lowerLOD = landscape.GetPatch(IndexOnXAxis, IndexOnYAxis + 1).LevelOfDetail))
+                {
+                    k = MagicLength[lowerLOD];
+                    t = xPatch / k * k;
+                    position.Z = MathHelper.Lerp(get(x + t, y + yPatch).Z,
+                                                 get(x + t + k, y + yPatch).Z,
+                                                 (float)(xPatch % k) / k);
+                    set(baseIndex, position);
+                }
+
+                // Increment vertex counter
+                baseIndex++;
             }
 
-            /// <summary>
-            /// At maximun resolution, a patch has 16 * 16 grids.
-            /// </summary>
-            public const int MaxPatchResolution = 16;
+            return (uint)MagicVertices[LevelOfDetail].Length;
+        }
 
-            // Vertices
-            private static readonly uint[] Vertices0 = new uint[] { 0, 16, 272, 288 };
-            private static readonly uint[] Vertices1 = new uint[] { 0, 8, 16, 136, 144, 152, 272, 280, 288 };
-            private static readonly uint[] Vertices2 = new uint[]
+        /// <summary>
+        /// Fill the vertex list with the indices on this patch based on current LOD.
+        /// </summary>
+        /// <returns>Number of indices added to the list.</returns>
+        public ushort FillIndices16(ref ushort[] indices, uint baseIndex)
+        {
+            for (var i = 0; i < MagicIndices[LevelOfDetail].Length; i++)
             {
+                indices[baseIndex++] = (ushort)(MagicIndices[LevelOfDetail][i] + StartingVertex);
+            }
+
+            return (ushort)MagicIndices[LevelOfDetail].Length;
+        }
+
+        /// <summary>
+        /// At maximun resolution, a patch has 16 * 16 grids.
+        /// </summary>
+        public const int MaxPatchResolution = 16;
+
+        // Vertices
+        private static readonly uint[] Vertices0 = new uint[] { 0, 16, 272, 288 };
+        private static readonly uint[] Vertices1 = new uint[] { 0, 8, 16, 136, 144, 152, 272, 280, 288 };
+        private static readonly uint[] Vertices2 = new uint[]
+        {
                 0, 4, 8, 12, 16, 68, 72, 76, 80, 84, 136, 140, 144, 148, 152,
                 204, 208, 212, 216, 220, 272, 276, 280, 284, 288,
-            };
+        };
 
-            private static readonly uint[] Vertices3 = new uint[]
-            {
+        private static readonly uint[] Vertices3 = new uint[]
+        {
                 0, 2, 4, 6, 8, 10, 12, 14, 16, 34, 36, 38, 40, 42, 44, 46, 48, 50, 68, 70, 72,
                 74, 76, 78, 80, 82, 84, 102, 104, 106, 108, 110, 112, 114, 116, 118, 136, 138,
                 140, 142, 144, 146, 148, 150, 152, 170, 172, 174, 176, 178, 180, 182, 184, 186,
                 204, 206, 208, 210, 212, 214, 216, 218, 220, 238, 240, 242, 244, 246, 248, 250,
                 252, 254, 272, 274, 276, 278, 280, 282, 284, 286, 288,
-            };
+        };
 
-            private static readonly uint[] Vertices4 = new uint[]
-            {
+        private static readonly uint[] Vertices4 = new uint[]
+        {
                 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22
                 , 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42
                 , 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62
@@ -214,26 +209,26 @@ namespace Isles.Graphics
                 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261,
                 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277,
                 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288,
-            };
+        };
 
-            // Indices
-            private static readonly uint[] Indices0 = new uint[] { 0, 1, 3, 0, 3, 2 };
-            private static readonly uint[] Indices1 = new uint[]
-            {
+        // Indices
+        private static readonly uint[] Indices0 = new uint[] { 0, 1, 3, 0, 3, 2 };
+        private static readonly uint[] Indices1 = new uint[]
+        {
                 0, 1, 4, 0, 4, 3, 1, 2, 5, 1, 5, 4, 3, 4, 7, 3, 7, 6, 4, 5, 8, 4, 8, 7,
-            };
+        };
 
-            private static readonly uint[] Indices2 = new uint[]
-            {
+        private static readonly uint[] Indices2 = new uint[]
+        {
                 0, 1, 6, 0, 6, 5, 1, 2, 7, 1, 7, 6, 2, 3, 8, 2, 8, 7, 3, 4, 9, 3, 9, 8, 5, 6, 11
                 , 5, 11, 10, 6, 7, 12, 6, 12, 11, 7, 8, 13, 7, 13, 12, 8, 9, 14, 8, 14, 13, 10,
                 11, 16, 10, 16, 15, 11, 12, 17, 11, 17, 16, 12, 13, 18, 12, 18, 17, 13, 14, 19,
                 13, 19, 18, 15, 16, 21, 15, 21, 20, 16, 17, 22, 16, 22, 21, 17, 18, 23, 17, 23,
                 22, 18, 19, 24, 18, 24, 23,
-            };
+        };
 
-            private static readonly uint[] Indices3 = new uint[]
-            {
+        private static readonly uint[] Indices3 = new uint[]
+        {
                 0, 1, 10, 0, 10, 9, 1, 2, 11, 1, 11, 10, 2, 3, 12, 2, 12, 11, 3, 4, 13, 3, 13,
                 12, 4, 5, 14, 4, 14, 13, 5, 6, 15, 5, 15, 14, 6, 7, 16, 6, 16, 15, 7, 8, 17, 7,
                 17, 16, 9, 10, 19, 9, 19, 18, 10, 11, 20, 10, 20, 19, 11, 12, 21, 11, 21, 20, 12,
@@ -253,10 +248,10 @@ namespace Isles.Graphics
                 60, 70, 69, 61, 62, 71, 61, 71, 70, 63, 64, 73, 63, 73, 72, 64, 65, 74, 64, 74,
                 73, 65, 66, 75, 65, 75, 74, 66, 67, 76, 66, 76, 75, 67, 68, 77, 67, 77, 76, 68,
                 69, 78, 68, 78, 77, 69, 70, 79, 69, 79, 78, 70, 71, 80, 70, 80, 79,
-            };
+        };
 
-            private static readonly uint[] Indices4 = new uint[]
-            {
+        private static readonly uint[] Indices4 = new uint[]
+        {
                 0, 1, 18, 0, 18, 17, 1, 2, 19, 1, 19, 18, 2, 3, 20, 2, 20, 19, 3, 4, 21, 3, 21,
                 20, 4, 5, 22, 4, 22, 21, 5, 6, 23, 5, 23, 22, 6, 7, 24, 6, 24, 23, 7, 8, 25, 7,
                 25, 24, 8, 9, 26, 8, 26, 25, 9, 10, 27, 9, 27, 26, 10, 11, 28, 10, 28, 27, 11,
@@ -347,420 +342,419 @@ namespace Isles.Graphics
                 , 283, 265, 283, 282, 266, 267, 284, 266, 284, 283, 267, 268, 285, 267, 285, 284
                 , 268, 269, 286, 268, 286, 285, 269, 270, 287, 269, 287, 286, 270, 271, 288, 270
                 , 288, 287,
-            };
+        };
 
-            // Vertices & Indices
-            private static readonly uint[][] MagicVertices = new uint[][] { Vertices0, Vertices1, Vertices2, Vertices3, Vertices4 };
-            private static readonly uint[][] MagicIndices = new uint[][] { Indices0, Indices1, Indices2, Indices3, Indices4 };
-            private static readonly int[] MagicLength = new int[] { 16, 8, 4, 2, 1 };
-        }
+        // Vertices & Indices
+        private static readonly uint[][] MagicVertices = new uint[][] { Vertices0, Vertices1, Vertices2, Vertices3, Vertices4 };
+        private static readonly uint[][] MagicIndices = new uint[][] { Indices0, Indices1, Indices2, Indices3, Indices4 };
+        private static readonly int[] MagicLength = new int[] { 16, 8, 4, 2, 1 };
+    }
 
-        protected BaseGame game;
-        protected GraphicsDevice graphics;
+    protected BaseGame game;
+    protected GraphicsDevice graphics;
 
-        /// <summary>
-        /// Gets terrain size (x, y, z).
-        /// </summary>
-        public Vector3 Size => size;
+    /// <summary>
+    /// Gets terrain size (x, y, z).
+    /// </summary>
+    public Vector3 Size => size;
 
-        private Vector3 size;
+    private Vector3 size;
 
-        /// <summary>
-        /// Gets the heightfield data of the landscape.
-        /// </summary>
-        public float[,] HeightField { get; private set; }
+    /// <summary>
+    /// Gets the heightfield data of the landscape.
+    /// </summary>
+    public float[,] HeightField { get; private set; }
 
-        /// <summary>
-        /// Gets the number of patches on the x axis.
-        /// </summary>
-        public int PatchCountOnXAxis { get; private set; }
+    /// <summary>
+    /// Gets the number of patches on the x axis.
+    /// </summary>
+    public int PatchCountOnXAxis { get; private set; }
 
-        /// <summary>
-        /// Gets the number of patches on the y axis.
-        /// </summary>
-        public int PatchCountOnYAxis { get; private set; }
+    /// <summary>
+    /// Gets the number of patches on the y axis.
+    /// </summary>
+    public int PatchCountOnYAxis { get; private set; }
 
-        /// <summary>
-        /// All terrain layers.
-        /// </summary>
-        public List<Layer> Layers { get; private set; } = new();
+    /// <summary>
+    /// All terrain layers.
+    /// </summary>
+    public List<Layer> Layers { get; private set; } = new();
 
-        /// <summary>
-        /// Gets terrain patches.
-        /// </summary>
-        public List<Patch> Patches { get; private set; }
+    /// <summary>
+    /// Gets terrain patches.
+    /// </summary>
+    public List<Patch> Patches { get; private set; }
 
-        /// <summary>
-        /// Gets the width of grid.
-        /// </summary>
-        public int GridCountOnXAxis { get; private set; }
+    /// <summary>
+    /// Gets the width of grid.
+    /// </summary>
+    public int GridCountOnXAxis { get; private set; }
 
-        /// <summary>
-        /// Gets the height of grid.
-        /// </summary>
-        public int GridCountOnYAxis { get; private set; }
+    /// <summary>
+    /// Gets the height of grid.
+    /// </summary>
+    public int GridCountOnYAxis { get; private set; }
 
-        public virtual void Load(TerrainData data, TextureLoader textureLoader)
+    public virtual void Load(TerrainData data, TextureLoader textureLoader)
+    {
+        size = new(data.Width, data.Depth, data.Height);
+
+        var (heightmap, w, h) = TextureLoader.ReadAllPixels(data.Heightmap);
+
+        GridCountOnXAxis = w;
+        GridCountOnYAxis = h;
+
+        HeightField = new float[GridCountOnXAxis, GridCountOnYAxis];
+        for (var y = 0; y < GridCountOnYAxis; y++)
         {
-            size = new(data.Width, data.Depth, data.Height);
-
-            var (heightmap, w, h) = TextureLoader.ReadAllPixels(data.Heightmap);
-
-            GridCountOnXAxis = w;
-            GridCountOnYAxis = h;
-
-            HeightField = new float[GridCountOnXAxis, GridCountOnYAxis];
-            for (var y = 0; y < GridCountOnYAxis; y++)
+            for (var x = 0; x < GridCountOnXAxis; x++)
             {
-                for (var x = 0; x < GridCountOnXAxis; x++)
-                {
-                    HeightField[x, y] = data.BaseHeight + data.Height * heightmap[y * w + x].R / 255f;
+                HeightField[x, y] = data.BaseHeight + data.Height * heightmap[y * w + x].R / 255f;
 
-                    // TEST: Lower vertices under water
-                    if (HeightField[x, y] < 0)
-                    {
-                        HeightField[x, y] *= 1.4f;
-                    }
+                // TEST: Lower vertices under water
+                if (HeightField[x, y] < 0)
+                {
+                    HeightField[x, y] *= 1.4f;
                 }
             }
+        }
 
-            PatchCountOnXAxis = w / 16;
-            PatchCountOnYAxis = h / 16;
-            Patches = new(PatchCountOnXAxis * PatchCountOnYAxis);
+        PatchCountOnXAxis = w / 16;
+        PatchCountOnYAxis = h / 16;
+        Patches = new(PatchCountOnXAxis * PatchCountOnYAxis);
 
-            var pathIndex = 0;
-            for (var y = 0; y < PatchCountOnYAxis; y++)
+        var pathIndex = 0;
+        for (var y = 0; y < PatchCountOnYAxis; y++)
+        {
+            for (var x = 0; x < PatchCountOnXAxis; x++)
             {
-                for (var x = 0; x < PatchCountOnXAxis; x++)
+                var min = float.MaxValue;
+                var max = float.MinValue;
+
+                for (var yy = 0; yy <= 16; yy++)
                 {
-                    var min = float.MaxValue;
-                    var max = float.MinValue;
-
-                    for (var yy = 0; yy <= 16; yy++)
+                    for (var xx = 0; xx <= 16; xx++)
                     {
-                        for (var xx = 0; xx <= 16; xx++)
+                        var height = HeightField[x * 16 + xx, y * 16 + yy];
+                        if (height < min)
                         {
-                            var height = HeightField[x * 16 + xx, y * 16 + yy];
-                            if (height < min)
-                            {
-                                min = height;
-                            }
+                            min = height;
+                        }
 
-                            if (height > max)
-                            {
-                                max = height;
-                            }
+                        if (height > max)
+                        {
+                            max = height;
                         }
                     }
-
-                    var boundingBox = new BoundingBox(
-                        new(x * size.X / PatchCountOnXAxis, y * size.Y / PatchCountOnYAxis, min),
-                        new((x + 1) * size.X / PatchCountOnXAxis, (y + 1) * size.Y / PatchCountOnYAxis, max));
-
-                    Patches.Add(new(boundingBox, pathIndex++, this));
                 }
-            }
 
-            foreach (var layer in data.Layers)
+                var boundingBox = new BoundingBox(
+                    new(x * size.X / PatchCountOnXAxis, y * size.Y / PatchCountOnYAxis, min),
+                    new((x + 1) * size.X / PatchCountOnXAxis, (y + 1) * size.Y / PatchCountOnYAxis, max));
+
+                Patches.Add(new(boundingBox, pathIndex++, this));
+            }
+        }
+
+        foreach (var layer in data.Layers)
+        {
+            Layers.Add(new()
             {
-                Layers.Add(new()
-                {
-                    ColorTexture = textureLoader.LoadTexture(layer.ColorTexture),
-                    AlphaTexture = textureLoader.LoadTexture(layer.AlphaTexture),
-                });
-            }
+                ColorTexture = textureLoader.LoadTexture(layer.ColorTexture),
+                AlphaTexture = textureLoader.LoadTexture(layer.AlphaTexture),
+            });
+        }
+    }
+
+    public virtual void Initialize(BaseGame game)
+    {
+        this.game = game;
+        graphics = game.GraphicsDevice;
+    }
+
+    public Patch GetPatch(int x, int y)
+    {
+        return Patches[y * PatchCountOnXAxis + x];
+    }
+
+    public Vector2 GridToPosition(int x, int y)
+    {
+        return new Vector2(
+            x * size.X / (GridCountOnXAxis - 1),
+            y * size.Y / (GridCountOnYAxis - 1));
+    }
+
+    public Point PositionToGrid(float x, float y)
+    {
+        return new Point(
+            (int)(x * (GridCountOnXAxis - 1) / size.X),
+            (int)(y * (GridCountOnYAxis - 1) / size.Y));
+    }
+
+    public Point GridCount => new(GridCountOnXAxis, GridCountOnYAxis);
+
+    /// <summary>
+    /// Gets the landscape size.Z of a given point on the heightfield.
+    /// </summary>
+    public float GetGridHeight(int x, int y)
+    {
+        return HeightField[x, y];
+    }
+
+    /// <summary>
+    /// Gets whether the point is walkable (E.g., above water).
+    /// </summary>
+    public bool IsPointOccluded(float x, float y)
+    {
+        return GetHeight(x, y) < -4;
+    }
+
+    /// <summary>
+    /// Gets the landscape size.Z of any given point.
+    /// </summary>
+    public float GetHeight(float x, float y)
+    {
+        // Grabbed and modified from racing game
+        // We don't want to cause any exception here
+        if (x < 0)
+        {
+            x = 0;
+        }
+        else if (x >= size.X)
+        {
+            x = size.X - 1;  // x can't be heightfieldWidth-1
         }
 
-        public virtual void Initialize(BaseGame game)
+        // or there'll be an out of range
+        if (y < 0) // exception. So is y.
         {
-            this.game = game;
-            graphics = game.GraphicsDevice;
+            y = 0;
+        }
+        else if (y >= size.Y)
+        {
+            y = size.Y - 1;
         }
 
-        public Patch GetPatch(int x, int y)
+        // Rescale to our heightfield dimensions
+        x *= (GridCountOnXAxis - 1) / size.X;
+        y *= (GridCountOnYAxis - 1) / size.Y;
+
+        // Get the position ON the current tile (0.0-1.0)!!!
+        float
+            fX = x - (int)x,
+            fY = y - (int)y;
+
+        // Interpolate the current position
+        var ix2 = (int)x;
+        var iy2 = (int)y;
+
+        var ix1 = ix2 + 1;
+        var iy1 = iy2 + 1;
+
+        if (fX + fY > 1) // opt. version
         {
-            return Patches[y * PatchCountOnXAxis + x];
-        }
-
-        public Vector2 GridToPosition(int x, int y)
-        {
-            return new Vector2(
-                x * size.X / (GridCountOnXAxis - 1),
-                y * size.Y / (GridCountOnYAxis - 1));
-        }
-
-        public Point PositionToGrid(float x, float y)
-        {
-            return new Point(
-                (int)(x * (GridCountOnXAxis - 1) / size.X),
-                (int)(y * (GridCountOnYAxis - 1) / size.Y));
-        }
-
-        public Point GridCount => new(GridCountOnXAxis, GridCountOnYAxis);
-
-        /// <summary>
-        /// Gets the landscape size.Z of a given point on the heightfield.
-        /// </summary>
-        public float GetGridHeight(int x, int y)
-        {
-            return HeightField[x, y];
-        }
-
-        /// <summary>
-        /// Gets whether the point is walkable (E.g., above water).
-        /// </summary>
-        public bool IsPointOccluded(float x, float y)
-        {
-            return GetHeight(x, y) < -4;
-        }
-
-        /// <summary>
-        /// Gets the landscape size.Z of any given point.
-        /// </summary>
-        public float GetHeight(float x, float y)
-        {
-            // Grabbed and modified from racing game
-            // We don't want to cause any exception here
-            if (x < 0)
-            {
-                x = 0;
-            }
-            else if (x >= size.X)
-            {
-                x = size.X - 1;  // x can't be heightfieldWidth-1
-            }
-
-            // or there'll be an out of range
-            if (y < 0) // exception. So is y.
-            {
-                y = 0;
-            }
-            else if (y >= size.Y)
-            {
-                y = size.Y - 1;
-            }
-
-            // Rescale to our heightfield dimensions
-            x *= (GridCountOnXAxis - 1) / size.X;
-            y *= (GridCountOnYAxis - 1) / size.Y;
-
-            // Get the position ON the current tile (0.0-1.0)!!!
-            float
-                fX = x - (int)x,
-                fY = y - (int)y;
-
-            // Interpolate the current position
-            var ix2 = (int)x;
-            var iy2 = (int)y;
-
-            var ix1 = ix2 + 1;
-            var iy1 = iy2 + 1;
-
-            if (fX + fY > 1) // opt. version
-            {
-                // we are on triangle 1 !!
-                //  0____1
-                //   \   |
-                //    \  |
-                //     \ |
-                //      \|
-                //  2    3
-                return
-                    HeightField[ix1, iy1] + // 1
-                    (1.0f - fX) * (HeightField[ix2, iy1] - HeightField[ix1, iy1]) + // 0
-                    (1.0f - fY) * (HeightField[ix1, iy2] - HeightField[ix1, iy1]); // 3
-            }
-
             // we are on triangle 1 !!
-            //  0     1
-            //  |\
-            //  | \
-            //  |  \
-            //  |   \
-            //  |    \
-            //  2_____3
-            var height =
-                HeightField[ix2, iy2] + // 2
-                fX * (HeightField[ix1, iy2] - HeightField[ix2, iy2]) + // 3
-                fY * (HeightField[ix2, iy1] - HeightField[ix2, iy2]); // 0
-
-            // For those area underwater, we set the height to zero
-            return height;// < 0 ? 0 : height;
+            //  0____1
+            //   \   |
+            //    \  |
+            //     \ |
+            //      \|
+            //  2    3
+            return
+                HeightField[ix1, iy1] + // 1
+                (1.0f - fX) * (HeightField[ix2, iy1] - HeightField[ix1, iy1]) + // 0
+                (1.0f - fY) * (HeightField[ix1, iy2] - HeightField[ix1, iy1]); // 3
         }
 
-        /// <summary>
-        /// Cached pick position. Remember to set it to null each frame.
-        /// </summary>
-        private Vector3? picked;
+        // we are on triangle 1 !!
+        //  0     1
+        //  |\
+        //  | \
+        //  |  \
+        //  |   \
+        //  |    \
+        //  2_____3
+        var height =
+            HeightField[ix2, iy2] + // 2
+            fX * (HeightField[ix1, iy2] - HeightField[ix2, iy2]) + // 3
+            fY * (HeightField[ix2, iy1] - HeightField[ix2, iy2]); // 0
 
-        /// <summary>
-        /// Gets the current point of the terrain picked by the cursor.
-        /// </summary>
-        public Vector3? Pick()
+        // For those area underwater, we set the height to zero
+        return height;// < 0 ? 0 : height;
+    }
+
+    /// <summary>
+    /// Cached pick position. Remember to set it to null each frame.
+    /// </summary>
+    private Vector3? picked;
+
+    /// <summary>
+    /// Gets the current point of the terrain picked by the cursor.
+    /// </summary>
+    public Vector3? Pick()
+    {
+        return picked != null ? picked : Intersects(game.PickRay);
+    }
+
+    /// <summary>
+    /// Checks whether a ray intersects the terrain mesh.
+    /// </summary>
+    /// <param name="ray"></param>
+    /// <returns>Intersection point or null if there's no intersection.</returns>
+    public Vector3? Intersects(Ray ray)
+    {
+        // Normalize ray direction
+        ray.Direction.Normalize();
+
+        // Get two vertices to draw a line through the
+        // heightfield.
+        //
+        // 1. Project the ray to XY plane
+        // 2. Compute the 2 intersections of the ray and
+        //    terrain bounding box (Projected)
+        // 3. Find the 2 points to draw
+        var i = 0;
+        var points = new Vector3[2];
+
+        // Line equation: y = k * (x - x0) + y0
+        var k = ray.Direction.Y / ray.Direction.X;
+        var invK = ray.Direction.X / ray.Direction.Y;
+        var r = ray.Position.Y - ray.Position.X * k;
+        if (r >= 0 && r <= size.Y)
         {
-            return picked != null ? picked : Intersects(game.PickRay);
+            points[i++] = new Vector3(0, r,
+                ray.Position.Z - ray.Position.X *
+                ray.Direction.Z / ray.Direction.X);
         }
 
-        /// <summary>
-        /// Checks whether a ray intersects the terrain mesh.
-        /// </summary>
-        /// <param name="ray"></param>
-        /// <returns>Intersection point or null if there's no intersection.</returns>
-        public Vector3? Intersects(Ray ray)
+        r = ray.Position.Y + (size.X - ray.Position.X) * k;
+        if (r >= 0 && r <= size.Y)
         {
-            // Normalize ray direction
-            ray.Direction.Normalize();
+            points[i++] = new Vector3(size.X, r,
+                ray.Position.Z + (size.X - ray.Position.X) *
+                ray.Direction.Z / ray.Direction.X);
+        }
 
-            // Get two vertices to draw a line through the
-            // heightfield.
-            //
-            // 1. Project the ray to XY plane
-            // 2. Compute the 2 intersections of the ray and
-            //    terrain bounding box (Projected)
-            // 3. Find the 2 points to draw
-            var i = 0;
-            var points = new Vector3[2];
-
-            // Line equation: y = k * (x - x0) + y0
-            var k = ray.Direction.Y / ray.Direction.X;
-            var invK = ray.Direction.X / ray.Direction.Y;
-            var r = ray.Position.Y - ray.Position.X * k;
-            if (r >= 0 && r <= size.Y)
+        if (i < 2)
+        {
+            r = ray.Position.X - ray.Position.Y * invK;
+            if (r >= 0 && r <= size.X)
             {
-                points[i++] = new Vector3(0, r,
-                    ray.Position.Z - ray.Position.X *
-                    ray.Direction.Z / ray.Direction.X);
+                points[i++] = new Vector3(r, 0,
+                    ray.Position.Z - ray.Position.Y *
+                    ray.Direction.Z / ray.Direction.Y);
             }
+        }
 
-            r = ray.Position.Y + (size.X - ray.Position.X) * k;
-            if (r >= 0 && r <= size.Y)
+        if (i < 2)
+        {
+            r = ray.Position.X + (size.Y - ray.Position.Y) * invK;
+            if (r >= 0 && r <= size.X)
             {
-                points[i++] = new Vector3(size.X, r,
-                    ray.Position.Z + (size.X - ray.Position.X) *
-                    ray.Direction.Z / ray.Direction.X);
+                points[i++] = new Vector3(r, size.Y,
+                    ray.Position.Z + (size.Y - ray.Position.Y) *
+                    ray.Direction.Z / ray.Direction.Y);
             }
+        }
 
-            if (i < 2)
-            {
-                r = ray.Position.X - ray.Position.Y * invK;
-                if (r >= 0 && r <= size.X)
-                {
-                    points[i++] = new Vector3(r, 0,
-                        ray.Position.Z - ray.Position.Y *
-                        ray.Direction.Z / ray.Direction.Y);
-                }
-            }
-
-            if (i < 2)
-            {
-                r = ray.Position.X + (size.Y - ray.Position.Y) * invK;
-                if (r >= 0 && r <= size.X)
-                {
-                    points[i++] = new Vector3(r, size.Y,
-                        ray.Position.Z + (size.Y - ray.Position.Y) *
-                        ray.Direction.Z / ray.Direction.Y);
-                }
-            }
-
-            if (i < 2)
-            {
-                return null;
-            }
-
-            // When ray position is inside the box, it should be one
-            // of the starting point
-            var inside = ray.Position.X > 0 && ray.Position.X < size.X &&
-                          ray.Position.Y > 0 && ray.Position.Y < size.Y;
-
-            Vector3 v1 = Vector3.Zero, v2 = Vector3.Zero;
-            // Sort the 2 points to make the line follow the direction
-            if (ray.Direction.X > 0)
-            {
-                if (points[0].X < points[1].X)
-                {
-                    v2 = points[1];
-                    v1 = inside ? ray.Position : points[0];
-                }
-                else
-                {
-                    v2 = points[0];
-                    v1 = inside ? ray.Position : points[1];
-                }
-            }
-            else if (ray.Direction.X < 0)
-            {
-                if (points[0].X > points[1].X)
-                {
-                    v2 = points[1];
-                    v1 = inside ? ray.Position : points[0];
-                }
-                else
-                {
-                    v2 = points[0];
-                    v1 = inside ? ray.Position : points[1];
-                }
-            }
-
-            // Trace steps along your line and determine the size.Z at each point,
-            // for each sample point look up the size.Z of the terrain and determine
-            // if the point on the line is above or below the terrain. Once you have
-            // determined the two sampling points that are above and below the terrain
-            // you can refine using binary searching.
-            const float SamplePrecision = 5.0f;
-            const int RefineSteps = 5;
-
-            var length = Vector3.Subtract(v2, v1).Length();
-            float current = 0;
-
-            var point = new Vector3[2];
-            Vector3 step = ray.Direction * SamplePrecision;
-            point[0] = v1;
-
-            while (current < length)
-            {
-                if (GetHeight(point[0].X, point[0].Y) >= point[0].Z)
-                {
-                    break;
-                }
-
-                point[0] += step;
-                current += SamplePrecision;
-            }
-
-            if (current > 0 && current < length)
-            {
-                // Perform binary search
-                Vector3 p = point[0];
-                point[1] = point[0] - step;
-
-                for (i = 0; i < RefineSteps; i++)
-                {
-                    p = (point[0] + point[1]) * 0.5f;
-
-                    if (GetHeight(p.X, p.Y) >= p.Z)
-                    {
-                        point[0] = p;
-                    }
-                    else
-                    {
-                        point[1] = p;
-                    }
-                }
-
-                return p;
-            }
-
+        if (i < 2)
+        {
             return null;
         }
 
-        /// <summary>
-        /// Update landscape every frame.
-        /// </summary>
-        /// <param name="gameTime"></param>
-        public virtual void Update(GameTime gameTime)
+        // When ray position is inside the box, it should be one
+        // of the starting point
+        var inside = ray.Position.X > 0 && ray.Position.X < size.X &&
+                      ray.Position.Y > 0 && ray.Position.Y < size.Y;
+
+        Vector3 v1 = Vector3.Zero, v2 = Vector3.Zero;
+        // Sort the 2 points to make the line follow the direction
+        if (ray.Direction.X > 0)
         {
-            // Set picked to null
-            picked = null;
+            if (points[0].X < points[1].X)
+            {
+                v2 = points[1];
+                v1 = inside ? ray.Position : points[0];
+            }
+            else
+            {
+                v2 = points[0];
+                v1 = inside ? ray.Position : points[1];
+            }
         }
+        else if (ray.Direction.X < 0)
+        {
+            if (points[0].X > points[1].X)
+            {
+                v2 = points[1];
+                v1 = inside ? ray.Position : points[0];
+            }
+            else
+            {
+                v2 = points[0];
+                v1 = inside ? ray.Position : points[1];
+            }
+        }
+
+        // Trace steps along your line and determine the size.Z at each point,
+        // for each sample point look up the size.Z of the terrain and determine
+        // if the point on the line is above or below the terrain. Once you have
+        // determined the two sampling points that are above and below the terrain
+        // you can refine using binary searching.
+        const float SamplePrecision = 5.0f;
+        const int RefineSteps = 5;
+
+        var length = Vector3.Subtract(v2, v1).Length();
+        float current = 0;
+
+        var point = new Vector3[2];
+        Vector3 step = ray.Direction * SamplePrecision;
+        point[0] = v1;
+
+        while (current < length)
+        {
+            if (GetHeight(point[0].X, point[0].Y) >= point[0].Z)
+            {
+                break;
+            }
+
+            point[0] += step;
+            current += SamplePrecision;
+        }
+
+        if (current > 0 && current < length)
+        {
+            // Perform binary search
+            Vector3 p = point[0];
+            point[1] = point[0] - step;
+
+            for (i = 0; i < RefineSteps; i++)
+            {
+                p = (point[0] + point[1]) * 0.5f;
+
+                if (GetHeight(p.X, p.Y) >= p.Z)
+                {
+                    point[0] = p;
+                }
+                else
+                {
+                    point[1] = p;
+                }
+            }
+
+            return p;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Update landscape every frame.
+    /// </summary>
+    /// <param name="gameTime"></param>
+    public virtual void Update(GameTime gameTime)
+    {
+        // Set picked to null
+        picked = null;
     }
 }
