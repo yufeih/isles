@@ -273,7 +273,7 @@ public class EffectFireball : ParticleEffect
                 explosion.AddParticle(fireEmitter.Position, fireEmitter.Velocity);
             }
 
-            World.Destroy(this);
+            World.Remove(this);
         };
     }
 
@@ -547,7 +547,7 @@ public class EffectSpawn : ParticleEffect
 
         if (spawn.Z - Position.Z > 15)
         {
-            World.Destroy(this);
+            World.Remove(this);
         }
     }
 }

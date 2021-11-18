@@ -276,7 +276,7 @@ public class Building : GameObject, IPlaceable
 
         state = BuildingState.Destroyed;
 
-        World.Destroy(this);
+        World.Remove(this);
     }
 
     /// <summary>

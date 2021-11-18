@@ -97,11 +97,6 @@ public abstract class BaseEntity : IAudioEmitter, IEventListener
         set { }
     }
 
-    /// <summary>
-    /// Gets or sets scene manager data.
-    /// </summary>
-    public object SceneManagerTag { get; set; }
-
     public virtual BoundingBox BoundingBox => new();
 
     /// <summary>
@@ -114,15 +109,6 @@ public abstract class BaseEntity : IAudioEmitter, IEventListener
     /// </summary>
     public string ClassID { get; set; }
 
-    /// <summary>
-    /// Gets or sets whether this world object is active.
-    /// </summary>
-    public virtual bool IsActive
-    {
-        get => false;
-        set => throw new Exception("Base entity is inactive by default");
-    }
-
     public BaseEntity(GameWorld world)
     {
         World = world;
@@ -132,6 +118,7 @@ public abstract class BaseEntity : IAudioEmitter, IEventListener
     public abstract void Update(GameTime gameTime);
 
     public abstract void Draw(GameTime gameTime);
+
     public virtual void OnCreate() { }
 
     public virtual void OnDestroy() { }
@@ -343,28 +330,6 @@ public abstract class Entity : BaseEntity
     }
 
     private readonly Outline outline = new();
-
-    /// <summary>
-    /// Gets or sets whether this world object is active.
-    /// </summary>
-    /// <remarks>
-    /// This property is internally used by ISceneManager.
-    /// If you want to active or deactive a world object, call
-    /// ISceneManager.Active or ISceneManager.Deactive instead.
-    /// </remarks>
-    public override bool IsActive
-    {
-        get => isActive;
-        set => isActive = value;
-    }
-
-    private bool isActive;
-
-    /// <summary>
-    /// Gets whether the entity is interactive. you can make an entity
-    /// interactive by calling GameWorld.Activate().
-    /// </summary>
-    public virtual bool IsInteractive => true;
 
     public virtual bool IsPickable => Visible;
 

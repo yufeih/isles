@@ -1001,7 +1001,7 @@ public class StateCharactorDie : BaseState
 
             if (height <= 0)
             {
-                owner.World.Destroy(owner);
+                owner.World.Remove(owner);
                 return StateResult.Completed;
             }
         }

@@ -1058,7 +1058,7 @@ public class Tree : GameObject
 
             if (shakeAmount > MathHelper.ToRadians(160))
             {
-                World.Destroy(this);
+                World.Remove(this);
             }
 
             Rotation = treeRotation * Quaternion.CreateFromAxisAngle(rotationAxis, shakeAmount);
@@ -1101,7 +1101,7 @@ public class Goldmine : GameObject
                 value = 0;
 
                 // Collapse
-                World.Destroy(this);
+                World.Remove(this);
             }
 
             gold = value;
@@ -1259,7 +1259,7 @@ public class BoxOfPandora : GameObject
                     }
                 }
 
-                World.Destroy(this);
+                World.Remove(this);
                 return;
             }
         }
@@ -1355,7 +1355,7 @@ public class Missile : Entity, IProjectile
         {
             Hit?.Invoke(this, null);
 
-            World.Destroy(this);
+            World.Remove(this);
         }
 
         // Update ammo transform
@@ -1392,8 +1392,6 @@ public class Decoration : Entity
 {
     public Decoration(GameWorld world)
         : base(world) { }
-
-    public override bool IsInteractive => false;
 
     public override void Deserialize(XmlElement xml)
     {

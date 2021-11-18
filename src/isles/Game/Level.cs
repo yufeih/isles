@@ -175,6 +175,8 @@ public class Skirmish : Level
             CreateStartup(world, player, new Vector3(player.SpawnPoint, 0));
         }
 
+        world.Flush();
+
         base.Start(world);
 
         // Select peons
@@ -201,6 +203,8 @@ public class Skirmish : Level
 
             world.Add(box);
         }
+
+        world.Flush();
     }
 
     private void CreateDependency(Player player)
@@ -240,7 +244,7 @@ public class Skirmish : Level
         player.AddDependency("DefenseUpgrade", "TraningCenter");
     }
 
-    public void CreateStartup(GameWorld world, Player player, Vector3 position)
+    private void CreateStartup(GameWorld world, Player player, Vector3 position)
     {
         // Create a townhall and 4 followers if this player is not used for quest
         var building = world.Create("Townhall") as Building;
