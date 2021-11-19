@@ -549,11 +549,6 @@ public class Worker : Charactor
         base.Update(gameTime);
     }
 
-    public override void Draw(GameTime gameTime)
-    {
-        base.Draw(gameTime);
-    }
-
     protected override void OnSelect(GameUI ui)
     {
         if (ui != null)
@@ -576,25 +571,25 @@ public class Worker : Charactor
 
     protected override void DrawAttachments(GameTime gameTime)
     {
-        foreach (KeyValuePair<GameModel, int> pair in Attachment)
+        foreach (var (model, _) in Attachment)
         {
-            if (pair.Key == wood)
+            if (model == wood)
             {
                 if (LumberCarried > 0)
                 {
-                    pair.Key.Draw();
+                    model.Draw();
                 }
             }
-            else if (pair.Key == gold)
+            else if (model == gold)
             {
                 if (GoldCarried > 0)
                 {
-                    pair.Key.Draw();
+                    model.Draw();
                 }
             }
             else
             {
-                pair.Key.Draw();
+                model.Draw();
             }
         }
     }
@@ -710,11 +705,11 @@ public class Hunter : Charactor
 
     protected override void DrawAttachments(GameTime gameTime)
     {
-        foreach (KeyValuePair<GameModel, int> pair in Attachment)
+        foreach (var (model, _) in Attachment)
         {
-            if (pair.Key == weapon && weaponVisible || pair.Key != weapon)
+            if (model == weapon && weaponVisible || model != weapon)
             {
-                pair.Key.Draw();
+                model.Draw();
             }
         }
     }

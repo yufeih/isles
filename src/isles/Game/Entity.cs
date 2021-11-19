@@ -30,10 +30,6 @@ public abstract class BaseState : IEventListener
         }
     }
 
-    public virtual void Draw(GameTime gameTime)
-    {
-    }
-
     public virtual StateResult Update(GameTime gameTime)
     {
         return StateResult.Completed;
@@ -122,10 +118,6 @@ public abstract class BaseEntity : IAudioEmitter, IEventListener
     public virtual void OnCreate() { }
 
     public virtual void OnDestroy() { }
-
-    public virtual void DrawShadowMap(GameTime gameTime, ShadowEffect shadow) { }
-
-    public virtual void DrawReflection(GameTime gameTime, Matrix view, Matrix projection) { }
 
     /// <summary>
     /// Make the entity fall on the ground.
@@ -505,33 +497,7 @@ public abstract class Entity : BaseEntity
 
     public override void Draw(GameTime gameTime)
     {
-        if (Visible)
-        {
-            // Draw current state
-            if (state != null)
-            {
-                state.Draw(gameTime);
-            }
-
-            if (model != null && WithinViewFrustum)
-            {
-                // model.Tint = highlighted ? new Vector4(0, 0, 0, 1) : Vector4.One;
-                model.Draw();
-            }
-        }
-    }
-
-    public override void DrawShadowMap(GameTime gameTime, ShadowEffect shadow)
-    {
-        if (Visible && model != null && IsVisible(shadow.LightViewProjection))
-        {
-            model.Draw();
-        }
-    }
-
-    public override void DrawReflection(GameTime gameTime, Matrix view, Matrix projection)
-    {
-        if (Visible && model != null && IsVisible(view * projection))
+        if (Visible && model != null && WithinViewFrustum)
         {
             model.Draw();
         }

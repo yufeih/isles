@@ -401,7 +401,7 @@ public class Terrain : BaseLandscape
         waterIndices.SetData(indexData);
     }
 
-    public void UpdateWaterReflectionAndRefraction(GameTime gameTime, Action<GameTime, Matrix, Matrix> drawWaterReflection)
+    public void UpdateWaterReflectionAndRefraction()
     {
         graphics.PushRenderTarget(reflectionRenderTarget);
 
@@ -412,12 +412,6 @@ public class Terrain : BaseLandscape
             Matrix.CreateReflection(new Plane(Vector3.UnitZ, 0)), game.View);
 
         DrawTerrain(viewReflect * game.Projection, true);
-
-        // Draw other reflections
-        if (game.Settings.ReflectionEnabled)
-        {
-            drawWaterReflection(gameTime, viewReflect, game.Projection);
-        }
 
         // Present the model manager to draw those models
         game.ModelRenderer.Draw(viewReflect * game.Projection);

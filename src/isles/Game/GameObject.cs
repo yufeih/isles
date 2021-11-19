@@ -695,9 +695,9 @@ public abstract class GameObject : Entity, ISelectable
 
     protected virtual void DrawAttachments(GameTime gameTime)
     {
-        foreach (KeyValuePair<GameModel, int> attach in Attachment)
+        foreach (var (model, _) in Attachment)
         {
-            attach.Key.Draw();
+            model.Draw();
         }
     }
 
@@ -759,26 +759,6 @@ public abstract class GameObject : Entity, ISelectable
         v.Z = MathHelper.Lerp(v1.Z, v2.Z, percentage);
 
         return new Color(v);
-    }
-
-    public override void DrawShadowMap(GameTime gameTime, ShadowEffect shadow)
-    {
-        if (!InFogOfWar)
-        {
-            base.DrawShadowMap(gameTime, shadow);
-        }
-        else if (modelShadow != null && IsVisible(shadow.LightViewProjection))
-        {
-            modelShadow.Draw();
-        }
-    }
-
-    public override void DrawReflection(GameTime gameTime, Matrix view, Matrix projection)
-    {
-        if (!InFogOfWar)
-        {
-            base.DrawReflection(gameTime, view, projection);
-        }
     }
 
     /// <summary>

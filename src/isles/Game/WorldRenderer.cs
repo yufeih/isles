@@ -30,43 +30,24 @@ public class WorldRenderer
 
         _pickedEntity = objectMap.Pick();
 
+        // Collect models
+        _modelRenderer.Clear();
+        foreach (var o in world.WorldObjects)
+        {
+            o.Draw(gameTime);
+        }
+
         if (_settings.ReflectionEnabled)
         {
-            world.Landscape.UpdateWaterReflectionAndRefraction(
-                gameTime, (gameTime, view, projection) =>
-                {
-                    foreach (var o in world.WorldObjects)
-                    {
-                        o.DrawReflection(gameTime, view, projection);
-                    }
-                });
+            world.Landscape.UpdateWaterReflectionAndRefraction();
         }
 
         // Generate shadow map
         if (_shadow != null)
         {
             _shadow.Begin(eye, facing);
-
-            _modelRenderer.Clear();
-
-            // Draw shadow casters. Currently we only draw all world object
-            foreach (var o in world.WorldObjects)
-            {
-                o.DrawShadowMap(gameTime, _shadow);
-            }
-
             _modelRenderer.DrawShadowMap(_shadow);
-
-            // Resolve shadow map
             _shadow.End();
-        }
-
-        _modelRenderer.Clear();
-
-        // Draw world objects before landscape
-        foreach (var o in world.WorldObjects)
-        {
-            o.Draw(gameTime);
         }
 
         // Draw spell
