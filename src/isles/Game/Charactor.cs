@@ -15,18 +15,12 @@ public class Charactor : GameObject, IMovable
     /// <summary>
     /// Gets or sets the speed of this charactor.
     /// </summary>
-    public virtual float Speed
-    {
-        get => speed;
-        set => speed = value;
-    }
-
-    private float speed;
+    public virtual float Speed { get; set; }
 
     /// <summary>
     /// Used by the movement system.
     /// </summary>
-    public object MovementTag { get; set; }
+    public List<Point> PathMarks { get; set; }
 
     /// <summary>
     /// Gets or sets the radius of the charactor.
@@ -114,7 +108,7 @@ public class Charactor : GameObject, IMovable
 
         if ((value = xml.GetAttribute("Speed")) != "")
         {
-            speed = float.Parse(value);
+            Speed = float.Parse(value);
         }
 
         if ((value = xml.GetAttribute("ObstructorRadius")) != "")

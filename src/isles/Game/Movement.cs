@@ -37,7 +37,7 @@ public interface IMovable : IEventListener
     /// <summary>
     /// Gets or sets the tag used for movement.
     /// </summary>
-    object MovementTag { get; set; }
+    List<Point> PathMarks { get; set; }
 }
 
 /// <summary>

@@ -389,7 +389,6 @@ public class PathGraph : IGraph
     /// </summary>
     public void Mark(int x, int y)
     {
-        // System.Diagnostics.Debug.Assert(data[x, y] == 0);
         data[x, y]++;
     }
 
@@ -398,7 +397,6 @@ public class PathGraph : IGraph
     /// </summary>
     public void Unmark(int x, int y)
     {
-        // System.Diagnostics.Debug.Assert(data[x, y] > 0);
         data[x, y]--;
     }
 
@@ -407,10 +405,6 @@ public class PathGraph : IGraph
     /// </summary>
     public void MarkDynamic(int x, int y)
     {
-        // Note agents can ignore dynamic obstacles when they're
-        // moving, so this assertion does not hold.
-
-        // System.Diagnostics.Debug.Assert(dynamicData[x, y] == 0);
         dynamicData[x, y]++;
     }
 
@@ -419,8 +413,12 @@ public class PathGraph : IGraph
     /// </summary>
     public void UnmarkDynamic(int x, int y)
     {
-        // System.Diagnostics.Debug.Assert(dynamicData[x, y] > 0);
         dynamicData[x, y]--;
+    }
+
+    public void ClearDynamic()
+    {
+        Array.Clear(dynamicData, 0, dynamicData.Length);
     }
 
     /// <summary>
@@ -787,22 +785,6 @@ public class PathManager
     }
 
     /// <summary>
-    /// Info attached to each dynamic obstacle.
-    /// </summary>
-    private class Tag
-    {
-        /// <summary>
-        /// List of marks that the obstacle currently overlaps.
-        /// </summary>
-        public List<Point> Marks;
-
-        /// <summary>
-        /// Stored obstacle position.
-        /// </summary>
-        public Vector3 Position = Vector3.Zero;
-    }
-
-    /// <summary>
     /// Create a circular path brush.
     /// </summary>
     public PathBrush CreateBrush(float radius)
@@ -874,29 +856,14 @@ public class PathManager
     /// </summary>
     public void AddMovable(IMovable obstacle)
     {
-        if (obstacle == null || obstacle.MovementTag != null)
-        {
-            throw new ArgumentException();
-        }
-
-        System.Diagnostics.Debug.Assert(!dynamicObstacles.Contains(obstacle));
-
         // Add the entity to internal list
         dynamicObstacles.Add(obstacle);
 
         // Store marked grids in the tag of the obstacle
-        var tag = new Tag
-        {
-            Position = obstacle.Position,
-            Marks = new List<Point>(),
-        };
-        tag.Marks.AddRange(Graph.EnumerateGridsInBrush(new Vector2(obstacle.Position.X,
-                                                                   obstacle.Position.Y),
-                                                                   obstacle.Brush));
-        obstacle.MovementTag = tag;
+        obstacle.PathMarks = Graph.EnumerateGridsInBrush(new(obstacle.Position.X, obstacle.Position.Y), obstacle.Brush).ToList();
 
         // Change graph structure
-        foreach (Point p in tag.Marks)
+        foreach (var p in obstacle.PathMarks)
         {
             Graph.MarkDynamic(p.X, p.Y);
         }
@@ -907,54 +874,20 @@ public class PathManager
     /// </summary>
     public void RemoveMovable(IMovable obstacle)
     {
-        if (obstacle == null)
-        {
-            throw new ArgumentException();
-        }
-
         // Removes the entity from internal list
         for (var i = 0; i < dynamicObstacles.Count; i++)
         {
             if (dynamicObstacles[i] == obstacle)
             {
-                var tag = obstacle.MovementTag as Tag;
-
                 // Change path graph structure
-                foreach (Point p in tag.Marks)
+                foreach (Point p in obstacle.PathMarks)
                 {
                     Graph.UnmarkDynamic(p.X, p.Y);
                 }
 
-                obstacle.MovementTag = null;
+                obstacle.PathMarks = null;
                 dynamicObstacles.RemoveAt(i);
                 return;
-            }
-        }
-    }
-
-    public IEnumerable<Point> EnumerateGridsInAxisAlignedRectangle(Vector2 position, int grids)
-    {
-        var x = position.X / Graph.CellSize;
-        var y = position.Y / Graph.CellSize;
-
-        if (grids % 2 == 1)
-        {
-            var xx = (int)x;
-            var yy = (int)y;
-
-            for (var i = -grids / 2; i <= grids / 2; i++)
-            {
-                yield return new Point(xx + i, yy + i);
-            }
-        }
-        else
-        {
-            var xx = (x - (int)x) > 0.5f ? (int)x + 1 : (int)x;
-            var yy = (y - (int)y) > 0.5f ? (int)y + 1 : (int)y;
-
-            for (var i = -grids / 2; i < grids / 2; i++)
-            {
-                yield return new Point(xx + i, yy + i);
             }
         }
     }
@@ -1068,33 +1001,23 @@ public class PathManager
 
     public void Mark(IMovable agent)
     {
-        if (agent != null && agent.MovementTag is Tag)
+        foreach (var p in agent.PathMarks)
         {
-            var tag = agent.MovementTag as Tag;
-
-            foreach (Point p in tag.Marks)
-            {
-                Graph.MarkDynamic(p.X, p.Y);
-            }
+            Graph.MarkDynamic(p.X, p.Y);
         }
     }
 
     public void Unmark(IMovable agent)
     {
-        if (agent != null && agent.MovementTag is Tag)
+        foreach (var p in agent.PathMarks)
         {
-            var tag = agent.MovementTag as Tag;
-
-            foreach (Point p in tag.Marks)
-            {
-                Graph.UnmarkDynamic(p.X, p.Y);
-            }
+            Graph.UnmarkDynamic(p.X, p.Y);
         }
     }
 
     public void Mark(IEnumerable<Point> staticMarks)
     {
-        foreach (Point p in staticMarks)
+        foreach (var p in staticMarks)
         {
             Graph.Mark(p.X, p.Y);
         }
@@ -1102,7 +1025,7 @@ public class PathManager
 
     public void Unmark(IEnumerable<Point> staticMarks)
     {
-        foreach (Point p in staticMarks)
+        foreach (var p in staticMarks)
         {
             Graph.Unmark(p.X, p.Y);
         }
@@ -1123,7 +1046,7 @@ public class PathManager
         }
 
         // look up its adjancent grids
-        foreach (Point p in EnumerateGridsInnerOut(x, y, 512))
+        foreach (var p in EnumerateGridsInnerOut(x, y, 512))
         {
             if (p.X >= 0 && p.X < Graph.EntryWidth &&
                 p.Y >= 0 && p.Y < Graph.EntryHeight)
@@ -1249,40 +1172,11 @@ public class PathManager
     }
 
     /// <summary>
-    /// Gets the unobstructed grid that are nearest to the specified point.
-    /// </summary>
-    public Vector2 FindValidPosition(Vector2 position, Vector2? start, IMovable agent)
-    {
-        return FindNextValidPosition(position, start, start, agent);
-    }
-
-    /// <summary>
     /// Tests to see if the specified grids can be placed at a given location.
     /// </summary>
     public bool CanBePlacedAt(IEnumerable<Point> grids, bool includingDynamics)
     {
-        foreach (Point p in grids)
-        {
-            if (Graph.IsGridObstructed(p.X, p.Y, includingDynamics))
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /// <summary>
-    /// Tests to see if the specified brush can be placed at a given location.
-    /// </summary>
-    public bool CanBePlacedAt(float x, float y, PathBrush brush, bool includingDynamics)
-    {
-        if (brush == null)
-        {
-            throw new ArgumentNullException();
-        }
-
-        foreach (Point p in Graph.EnumerateGridsInBrush(new Vector2(x, y), brush))
+        foreach (var p in grids)
         {
             if (Graph.IsGridObstructed(p.X, p.Y, includingDynamics))
             {
@@ -1298,11 +1192,6 @@ public class PathManager
     /// </summary>
     public bool CanBePlacedAt(float x, float y, IMovable agent)
     {
-        if (agent == null || agent.MovementTag is not Tag)
-        {
-            return true;
-        }
-
         Unmark(agent);
 
         foreach (Point p in Graph.EnumerateGridsInBrush(new Vector2(x, y), agent.Brush))
@@ -1323,11 +1212,6 @@ public class PathManager
     /// </summary>
     public bool CanMoveBetween(Vector2 start, Vector2 end, IMovable agent, bool includeDynamic)
     {
-        if (agent == null || agent.MovementTag is not Tag)
-        {
-            return true;
-        }
-
         Unmark(agent);
 
         var step = Vector2.Subtract(end, start);
@@ -1514,36 +1398,18 @@ public class PathManager
 
     private void UpdatePathGraph()
     {
+        Graph.ClearDynamic();
+
         // Change the structure of the graph if any dynamic obstacle moves
-        for (var i = 0; i < dynamicObstacles.Count; i++)
+        foreach (var obstacle in dynamicObstacles)
         {
-            IMovable obstacle = dynamicObstacles[i];
-
-            // Make sure this is called before GameWorld.UpdateSceneManager,
-            // because that method will reset entity.IsDirty to false...
-            if (obstacle != null && obstacle.MovementTag is Tag)
+            // Gets grids from brush
+            obstacle.PathMarks.Clear();
+            obstacle.PathMarks.AddRange(Graph.EnumerateGridsInBrush(new(obstacle.Position.X, obstacle.Position.Y), obstacle.Brush));
+            // Mark new grids
+            foreach (Point p in obstacle.PathMarks)
             {
-                var tag = obstacle.MovementTag as Tag;
-
-                if (obstacle.Position != tag.Position)
-                {
-                    // Unmark previous grids
-                    foreach (Point p in tag.Marks)
-                    {
-                        Graph.UnmarkDynamic(p.X, p.Y);
-                    }
-
-                    // Gets grids from brush
-                    tag.Marks.Clear();
-                    tag.Marks.AddRange(Graph.EnumerateGridsInBrush(
-                        new Vector2(obstacle.Position.X, obstacle.Position.Y),
-                                                         obstacle.Brush));
-                    // Mark new grids
-                    foreach (Point p in tag.Marks)
-                    {
-                        Graph.MarkDynamic(p.X, p.Y);
-                    }
-                }
+                Graph.MarkDynamic(p.X, p.Y);
             }
         }
     }
@@ -1553,26 +1419,20 @@ public class PathManager
     /// </summary>
     public void UpdateMovable(IMovable obstacle)
     {
-        if (obstacle != null && obstacle.MovementTag is Tag)
+        // Unmark previous grids
+        foreach (Point p in obstacle.PathMarks)
         {
-            var tag = obstacle.MovementTag as Tag;
+            Graph.UnmarkDynamic(p.X, p.Y);
+        }
 
-            // Unmark previous grids
-            foreach (Point p in tag.Marks)
-            {
-                Graph.UnmarkDynamic(p.X, p.Y);
-            }
+        // Gets grids from brush
+        obstacle.PathMarks.Clear();
+        obstacle.PathMarks.AddRange(Graph.EnumerateGridsInBrush(new(obstacle.Position.X, obstacle.Position.Y), obstacle.Brush));
 
-            // Gets grids from brush
-            tag.Marks.Clear();
-            tag.Marks.AddRange(Graph.EnumerateGridsInBrush(
-                new Vector2(obstacle.Position.X, obstacle.Position.Y),
-                                                 obstacle.Brush));
-            // Mark new grids
-            foreach (Point p in tag.Marks)
-            {
-                Graph.MarkDynamic(p.X, p.Y);
-            }
+        // Mark new grids
+        foreach (Point p in obstacle.PathMarks)
+        {
+            Graph.MarkDynamic(p.X, p.Y);
         }
     }
 
@@ -1664,15 +1524,6 @@ public class PathManager
                 // Remove it from the pending requests
                 pendingRequests[min] = null;
                 pendingRequestsCount--;
-
-                System.Diagnostics.Debug.Assert(pendingRequestsCount >= 0);
-
-                // BaseGame game = BaseGame.Singleton;
-                // Vector2 s = graph.IndexToPosition(query.Start);
-                // Vector2 e = graph.IndexToPosition(query.End);
-                // game.Graphics2D.DrawLine(game.Project(new Vector3(s, landscape.GetHeight(s.X, s.Y))),
-                //                         game.Project(new Vector3(e, landscape.GetHeight(e.X, e.Y))),
-                //                         result.Value ? Color.White : Color.Black);
             }
 
             totalSteps += steps;
@@ -1689,7 +1540,7 @@ public class PathManager
     {
         var previous = new Point();
         var resultPath = new GraphPath();
-        PathBrush brush = agent != null ? agent.Brush : null;
+        var brush = agent?.Brush;
 
         // Ignore first edge
         var firstEdge = true;

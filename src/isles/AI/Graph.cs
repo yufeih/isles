@@ -19,13 +19,6 @@ public struct GraphEdge
     /// Gets a non-negtive cost associated to the edge.
     /// </summary>
     public float Cost;
-
-    public GraphEdge(int from, int to, float cost)
-    {
-        From = from;
-        To = to;
-        Cost = cost;
-    }
 }
 
 public interface IGraph
