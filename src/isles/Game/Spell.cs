@@ -1009,7 +1009,6 @@ public class SpellConstruct : Spell
     private readonly string entityType;
     private readonly Input input;
     private Entity entity;
-    private BaseEntity baseEntity;
     private IPlaceable placeable;
 
     public SpellConstruct(GameWorld world, string entityType)
@@ -1019,36 +1018,22 @@ public class SpellConstruct : Spell
         this.entityType = entityType;
     }
 
-    public SpellConstruct(GameWorld world, BaseEntity baseEntity)
-        : base(world)
-    {
-        if (null == baseEntity || null == world)
-        {
-            throw new ArgumentNullException();
-        }
-
-        input = BaseGame.Singleton.Input;
-        this.baseEntity = baseEntity;
-        entityType = baseEntity.ClassID;
-    }
-
     public override bool Trigger()
     {
         hasCasted = false;
         step = 0;
 
-        if (baseEntity == null)
+        if (entity == null)
         {
-            baseEntity = world.Create(entityType) as BaseEntity;
+            entity = world.Create(entityType) as Entity;
         }
 
-        if (baseEntity != null)
+        if (entity != null)
         {
-            entity = baseEntity as Entity;
-            placeable = baseEntity as IPlaceable;
+            placeable = entity as IPlaceable;
 
             // Set owner if it's a building
-            if (Player.LocalPlayer != null && baseEntity is Building building)
+            if (Player.LocalPlayer != null && entity is Building building)
             {
                 building.Owner = Player.LocalPlayer;
             }
@@ -1061,7 +1046,7 @@ public class SpellConstruct : Spell
         }
 
         Audios.Play("OK");
-        return baseEntity != null;
+        return entity != null;
     }
 
     protected override TipBox CreateTipBox()
@@ -1113,7 +1098,7 @@ public class SpellConstruct : Spell
             var target = world.Landscape.Pick();
             if (target.HasValue)
             {
-                baseEntity.Position = target.Value;
+                entity.Position = target.Value;
             }
         }
 
@@ -1136,12 +1121,12 @@ public class SpellConstruct : Spell
             }
         }
 
-        baseEntity.Update(gameTime);
-    }
+        entity.Update(gameTime);
+    } 
 
     public override void Draw(GameTime gameTime)
     {
-        baseEntity.Draw(gameTime);
+        entity.Model.Draw();
     }
 
     private Point beginDropPosition;
@@ -1211,7 +1196,7 @@ public class SpellConstruct : Spell
             }
 
             // Get builder
-            if (baseEntity is Building)
+            if (entity is Building)
             {
                 Worker builder = null;
                 Worker firstBuilder = null;
@@ -1235,7 +1220,7 @@ public class SpellConstruct : Spell
                 {
                     builder = firstBuilder;
                 }
-(baseEntity as Building).Builder = builder;
+                (entity as Building).Builder = builder;
             }
 
             if (placeable != null)
@@ -1243,11 +1228,10 @@ public class SpellConstruct : Spell
                 placeable.Place();
             }
 
-            world.Add(baseEntity);
+            world.Add(entity);
 
             // Reset everything
             entity = null;
-            baseEntity = null;
             placeable = null;
             Spell.EndSpell();
 

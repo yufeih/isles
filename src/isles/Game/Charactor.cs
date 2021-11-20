@@ -411,22 +411,6 @@ public class Charactor : GameObject, IMovable
     private Vector3 positionLastFrame;
     private bool moving;
 
-    public override void Draw(GameTime gameTime)
-    {
-        if (ShowGlow && ShouldDrawModel)
-        {
-            if (Glow == null)
-            {
-                Glow = new EffectGlow(World, this);
-            }
-
-            Glow.Update(gameTime);
-            ShowGlow = false;
-        }
-
-        base.Draw(gameTime);
-    }
-
     public override void Update(GameTime gameTime)
     {
         if (IsAlive)
@@ -522,8 +506,8 @@ public class Worker : Charactor
     public int GoldCarried;
     public int LumberCapacity = 10;
     public int GoldCapacity = 10;
-    private GameModel wood;
-    private GameModel gold;
+    public GameModel wood;
+    public GameModel gold;
 
     public Worker(GameWorld world, string classID) : base(world, classID) { }
 
@@ -567,31 +551,6 @@ public class Worker : Charactor
         }
 
         base.OnDeselect(ui);
-    }
-
-    protected override void DrawAttachments(GameTime gameTime)
-    {
-        foreach (var (model, _) in Attachment)
-        {
-            if (model == wood)
-            {
-                if (LumberCarried > 0)
-                {
-                    model.Draw();
-                }
-            }
-            else if (model == gold)
-            {
-                if (GoldCarried > 0)
-                {
-                    model.Draw();
-                }
-            }
-            else
-            {
-                model.Draw();
-            }
-        }
     }
 
     public override void PerformAction(Entity entity, bool queueAction)
@@ -680,8 +639,8 @@ public class Worker : Charactor
 
 public class Hunter : Charactor
 {
-    private bool weaponVisible = true;
-    private GameModel weapon;
+    public bool weaponVisible = true;
+    public GameModel weapon;
 
     public Hunter(GameWorld world, string type)
         : base(world, type)
@@ -700,17 +659,6 @@ public class Hunter : Charactor
         if (weapon == null)
         {
             throw new Exception("The input model do not have a weapon attached.");
-        }
-    }
-
-    protected override void DrawAttachments(GameTime gameTime)
-    {
-        foreach (var (model, _) in Attachment)
-        {
-            if (model == weapon && weaponVisible || model != weapon)
-            {
-                model.Draw();
-            }
         }
     }
 

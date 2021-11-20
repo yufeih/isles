@@ -32,9 +32,9 @@ public class WorldRenderer
 
         // Collect models
         _modelRenderer.Clear();
-        foreach (var o in world.WorldObjects)
+        foreach (var entity in world.WorldObjects)
         {
-            o.Draw(gameTime);
+            Draw(entity, gameTime);
         }
 
         if (_settings.ReflectionEnabled)
@@ -69,5 +69,213 @@ public class WorldRenderer
         ParticleSystem.Present();
 
         _modelRenderer.Draw(viewProjection, false, true);
+    }
+
+    private void Draw(BaseEntity baseEntity, GameTime gameTime)
+    {
+        switch (baseEntity)
+        {
+            case GameObject gameObject:
+                DrawGameObject(gameObject, gameTime);
+                break;
+            case Entity entity:
+                DrawEntity(entity);
+                break;
+        }
+    }
+
+    private void DrawEntity(Entity entity)
+    {
+        if (entity.Model != null && entity.Visible && entity.WithinViewFrustum)
+        {
+            entity.Model.Draw();
+        }
+    }
+
+    private void DrawGameObject(GameObject entity, GameTime gameTime)
+    {
+        if (entity is Charactor charactor)
+        {
+            if (charactor.ShowGlow && charactor.ShouldDrawModel)
+            {
+                if (charactor.Glow == null)
+                {
+                    charactor.Glow = new EffectGlow(charactor.World, charactor);
+                }
+
+                charactor.Glow.Update(gameTime);
+                charactor.ShowGlow = false;
+            }
+        }
+
+        // Flash the model
+        if (entity.flashElapsedTime <= GameObject.FlashDuration)
+        {
+            var glow = (float)Math.Sin(MathHelper.Pi * entity.flashElapsedTime / GameObject.FlashDuration);
+            entity.Model.Glow = new Vector3(MathHelper.Clamp(glow, 0, 1));
+
+            entity.flashElapsedTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (entity.flashElapsedTime > GameObject.FlashDuration)
+            {
+                entity.Model.Glow = default;
+            }
+        }
+
+        // Draw model
+        if (!entity.InFogOfWar)
+        {
+            DrawEntity(entity);
+
+            if (entity.Owner != null)
+            {
+                GameUI.Singleton.Minimap.DrawGameObject(entity.Position, 4, entity.Owner.TeamColor);
+            }
+        }
+
+        // Draw copyed model shadow
+        if (entity.InFogOfWar && entity.Spotted && entity.VisibleInFogOfWar && entity.modelShadow != null)
+        {
+            if (entity.WithinViewFrustum)
+            {
+                entity.modelShadow.Draw();
+            }
+
+            if (entity.Owner != null)
+            {
+                GameUI.Singleton.Minimap.DrawGameObject(entity.Position, 4, entity.Owner.TeamColor);
+            }
+        }
+
+        // Draw attachments
+        if (entity.ShouldDrawModel)
+        {
+            switch (entity)
+            {
+                case Worker worker:
+                    DrawWorkerAttachments(worker);
+                    break;
+                case Hunter hunter:
+                    DrawHunterAttachments(hunter);
+                    break;
+                default:
+                    DrawAttachments(entity);
+                    break;
+            }
+        }
+
+        // Draw status
+        if (entity.Visible && !entity.InFogOfWar && entity.WithinViewFrustum && entity.ShowStatus)
+        {
+            if (entity.Selected && entity.IsAlive)
+            {
+                entity.World.Landscape.DrawSurface(
+                    entity.SelectionAreaRadius > 16 ?
+                    GameObject.SelectionAreaTextureLarge : GameObject.SelectionAreaTexture, 
+                    entity.Position,
+                    entity.SelectionAreaRadius * 2, entity.SelectionAreaRadius * 2,
+                    entity.Owner == null ? Color.Yellow : (
+                        entity.Owner.GetRelation(Player.LocalPlayer) == PlayerRelation.Opponent ?
+                                            Color.Red : Color.GreenYellow));
+            }
+
+            if (entity.IsAlive && entity.maximumHealth > 0)
+            {
+                if (entity.Highlighted || entity.World.Game.Input.Keyboard.IsKeyDown(Keys.LeftAlt) ||
+                                   entity.World.Game.Input.Keyboard.IsKeyDown(Keys.RightAlt))
+                {
+                    Color color = GameObject.ColorFromPercentage(1.0f * entity.health / entity.maximumHealth);
+                    GameUI.Singleton.DrawProgress(entity.TopCenter, 0, (int)(entity.SelectionAreaRadius * 10.0f),
+                        100 * entity.health / entity.maximumHealth, color);
+
+                    if (entity is Building building)
+                    {
+                        DrawBuildingStatus(building);
+                    }
+                }
+            }
+        }
+
+        if (entity is Building building1)
+        {
+            DrawRallyPoints(building1);
+        }
+    }
+
+    private void DrawWorkerAttachments(Worker worker)
+    {
+        foreach (var (model, _) in worker.Attachment)
+        {
+            if (model == worker.wood)
+            {
+                if (worker.LumberCarried > 0)
+                {
+                    model.Draw();
+                }
+            }
+            else if (model == worker.gold)
+            {
+                if (worker.GoldCarried > 0)
+                {
+                    model.Draw();
+                }
+            }
+            else
+            {
+                model.Draw();
+            }
+        }
+    }
+
+    private void DrawHunterAttachments(Hunter hunter)
+    {
+        foreach (var (model, _) in hunter.Attachment)
+        {
+            if (model == hunter.weapon && hunter.weaponVisible || model != hunter.weapon)
+            {
+                model.Draw();
+            }
+        }
+    }
+
+    private void DrawAttachments(GameObject entity)
+    {
+        foreach (var (model, _) in entity.Attachment)
+        {
+            model.Draw();
+        }
+    }
+
+    private void DrawBuildingStatus(Building building)
+    {
+        if (building.state == Building.BuildingState.Constructing)
+        {
+            GameUI.Singleton.DrawProgress(building.TopCenter, 5,
+                                        (int)(building.SelectionAreaRadius * 10.0f),
+                                        100 * building.ConstructionTimeElapsed / building.ConstructionTime,
+                                        Color.Orange);
+        }
+    }
+
+    private void DrawRallyPoints(Building building)
+    {
+        // Draw rally point
+        if (building.Selected && building.ShouldDrawModel && building.IsAlive && building.Owner is LocalPlayer &&
+            (building.state == Building.BuildingState.Normal || building.state == Building.BuildingState.Constructing) &&
+            Building.RallyPointModel != null && building.RallyPoints.Count > 0)
+        {
+            Vector3 position = Vector3.Zero;
+
+            if (building.RallyPoints[0] is Entity)
+            {
+                position = (building.RallyPoints[0] as Entity).Position;
+            }
+            else if (building.RallyPoints[0] is Vector3 vector)
+            {
+                position = vector;
+            }
+
+            Building.RallyPointModel.Transform = Matrix.CreateTranslation(position);
+            Building.RallyPointModel.Draw();
+        }
     }
 }

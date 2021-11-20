@@ -156,8 +156,8 @@ public abstract class GameObject : Entity, ISelectable
     /// </summary>
     public bool IsAlive => health > 0 || (health <= 0 && maximumHealth <= 0);
 
-    private float maximumHealth;
-    private float health;
+    public float maximumHealth;
+    public float health;
 
     public List<Spell> Spells = new();
 
@@ -266,8 +266,8 @@ public abstract class GameObject : Entity, ISelectable
     /// <summary>
     /// Flash related stuff.
     /// </summary>
-    private const float FlashDuration = 0.5f;
-    private float flashElapsedTime = FlashDuration + 0.1f;
+    public const float FlashDuration = 0.5f;
+    public float flashElapsedTime = FlashDuration + 0.1f;
 
     public List<KeyValuePair<GameModel, int>> Attachment = new();
 
@@ -620,87 +620,6 @@ public abstract class GameObject : Entity, ISelectable
     /// </summary>
     public bool ShouldDrawModel => !InFogOfWar && Visible && WithinViewFrustum;
 
-    public override void Draw(GameTime gameTime)
-    {
-        // Flash the model
-        if (flashElapsedTime <= FlashDuration)
-        {
-            var glow = (float)Math.Sin(MathHelper.Pi * flashElapsedTime / FlashDuration);
-            Model.Glow = new Vector3(MathHelper.Clamp(glow, 0, 1));
-
-            flashElapsedTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if (flashElapsedTime > FlashDuration)
-            {
-                Model.Glow = default;
-            }
-        }
-
-        // Draw model
-        if (!InFogOfWar)
-        {
-            base.Draw(gameTime);
-
-            if (Owner != null)
-            {
-                GameUI.Singleton.Minimap.DrawGameObject(Position, 4, Owner.TeamColor);
-            }
-        }
-
-        // Draw copyed model shadow
-        if (InFogOfWar && Spotted && VisibleInFogOfWar && modelShadow != null)
-        {
-            if (WithinViewFrustum)
-            {
-                modelShadow.Draw();
-            }
-
-            if (Owner != null)
-            {
-                GameUI.Singleton.Minimap.DrawGameObject(Position, 4, Owner.TeamColor);
-            }
-        }
-
-        // Draw attachments
-        if (ShouldDrawModel)
-        {
-            DrawAttachments(gameTime);
-        }
-
-        // Draw status
-        if (Visible && !InFogOfWar && WithinViewFrustum && ShowStatus)
-        {
-            if (Selected && IsAlive)
-            {
-                World.Landscape.DrawSurface(SelectionAreaRadius > 16 ?
-                                            SelectionAreaTextureLarge : SelectionAreaTexture, Position,
-                                            SelectionAreaRadius * 2, SelectionAreaRadius * 2,
-                                            Owner == null ? Color.Yellow : (
-                                            Owner.GetRelation(Player.LocalPlayer) == PlayerRelation.Opponent ?
-                                            Color.Red : Color.GreenYellow));
-            }
-
-            if (IsAlive && maximumHealth > 0)
-            {
-                if (Highlighted || World.Game.Input.Keyboard.IsKeyDown(Keys.LeftAlt) ||
-                                   World.Game.Input.Keyboard.IsKeyDown(Keys.RightAlt))
-                {
-                    Color color = ColorFromPercentage(1.0f * health / maximumHealth);
-                    GameUI.Singleton.DrawProgress(TopCenter, 0, (int)(SelectionAreaRadius * 10.0f),
-                        100 * health / maximumHealth, color);
-                    DrawStatus();
-                }
-            }
-        }
-    }
-
-    protected virtual void DrawAttachments(GameTime gameTime)
-    {
-        foreach (var (model, _) in Attachment)
-        {
-            model.Draw();
-        }
-    }
-
     protected virtual TipBox CreateTipBox()
     {
         TextField content = null;
@@ -769,7 +688,7 @@ public abstract class GameObject : Entity, ISelectable
     /// <summary>
     /// Copyed model for drawing in the fog of war.
     /// </summary>
-    private GameModel modelShadow;
+    public GameModel modelShadow;
 
     protected virtual void LeaveFogOfWar()
     {
@@ -1360,11 +1279,6 @@ public class Missile : Entity, IProjectile
         destination.Y = Target.Position.Y;
         destination.Z = (Target.BoundingBox.Max.Z + Target.Position.Z) / 2;
         return destination;
-    }
-
-    public override void Draw(GameTime gameTime)
-    {
-        Model?.Draw();
     }
 }
 

@@ -5,10 +5,6 @@ public abstract class ParticleEffect : BaseEntity
 {
     public ParticleEffect(GameWorld world)
         : base(world) { }
-
-    public override void Update(GameTime gameTime) { }
-
-    public override void Draw(GameTime gameTime) { }
 }
 
 /// <summary>

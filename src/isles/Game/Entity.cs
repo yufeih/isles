@@ -111,9 +111,7 @@ public abstract class BaseEntity : IAudioEmitter, IEventListener
         Name = "Entity " + EntityCount++;
     }
 
-    public abstract void Update(GameTime gameTime);
-
-    public abstract void Draw(GameTime gameTime);
+    public virtual void Update(GameTime gameTime) { }
 
     public virtual void OnCreate() { }
 
@@ -493,14 +491,6 @@ public abstract class Entity : BaseEntity
         }
 
         WithinViewFrustum = IsVisible(BaseGame.Singleton.ViewProjection);
-    }
-
-    public override void Draw(GameTime gameTime)
-    {
-        if (Visible && model != null && WithinViewFrustum)
-        {
-            model.Draw();
-        }
     }
 
     public override EventResult HandleEvent(EventType type, object sender, object tag)

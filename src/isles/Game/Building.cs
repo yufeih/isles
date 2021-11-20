@@ -27,7 +27,7 @@ public class Building : GameObject, IPlaceable
     /// </summary>
     public new BuildingState State => state;
 
-    protected BuildingState state = BuildingState.Normal;
+    public BuildingState state = BuildingState.Normal;
 
     /// <summary>
     /// Gets or sets the time to construct this building.
@@ -648,31 +648,6 @@ public class Building : GameObject, IPlaceable
         }
 
         base.Update(gameTime);
-    }
-
-    public override void Draw(GameTime gameTime)
-    {
-        base.Draw(gameTime);
-
-        // Draw rally point
-        if (Selected && ShouldDrawModel && IsAlive && Owner is LocalPlayer &&
-            (state == BuildingState.Normal || state == BuildingState.Constructing) &&
-            RallyPointModel != null && RallyPoints.Count > 0)
-        {
-            Vector3 position = Vector3.Zero;
-
-            if (RallyPoints[0] is Entity)
-            {
-                position = (RallyPoints[0] as Entity).Position;
-            }
-            else if (RallyPoints[0] is Vector3 vector)
-            {
-                position = vector;
-            }
-
-            RallyPointModel.Transform = Matrix.CreateTranslation(position);
-            RallyPointModel.Draw();
-        }
     }
 
     public override EventResult HandleEvent(EventType type, object sender, object tag)
