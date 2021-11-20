@@ -369,9 +369,6 @@ public class EffectGlow : ParticleEffect
     private readonly ParticleSystem particle;
     private readonly ParticleEmitter emitter;
 
-    public EffectGlow(GameWorld world)
-        : this(world, null) { }
-
     public EffectGlow(GameWorld world, GameObject gameObject)
         : base(world)
     {

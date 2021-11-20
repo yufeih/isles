@@ -88,31 +88,10 @@ public class Building : GameObject, IPlaceable
     public Vector3 SpawnPoint;
     public Worker Builder;
 
-    /// <summary>
-    /// Effects.
-    /// </summary>
     private EffectConstruct construct;
     private List<EffectFire> fire;
     private List<Vector3> fireSpawnPoints;
     private List<Vector3> fireSpawnPointsLeft;
-
-    /// <summary>
-    /// Gets the rally point model for all buildings.
-    /// </summary>
-    public static GameModel RallyPointModel
-    {
-        get
-        {
-            if (rallyPointModel == null)
-            {
-                rallyPointModel = new GameModel("Models/rally");
-            }
-
-            return rallyPointModel;
-        }
-    }
-
-    private static GameModel rallyPointModel;
 
     /// <summary>
     /// Halo effect.
@@ -120,9 +99,6 @@ public class Building : GameObject, IPlaceable
     private EffectHalo halo;
     private string haloParticle;
 
-    /// <summary>
-    /// Create a new building.
-    /// </summary>
     public Building(GameWorld world, string classID)
         : base(world, classID) { }
 
@@ -467,17 +443,6 @@ public class Building : GameObject, IPlaceable
         }
     }
 
-    protected override void DrawStatus()
-    {
-        if (state == BuildingState.Constructing)
-        {
-            GameUI.Singleton.DrawProgress(TopCenter, 5,
-                                          (int)(SelectionAreaRadius * 10.0f),
-                                          100 * ConstructionTimeElapsed / ConstructionTime,
-                                          Color.Orange);
-        }
-    }
-
     protected override void DrawFogOfWar()
     {
         if (state != BuildingState.PreConstruct &&
@@ -487,10 +452,6 @@ public class Building : GameObject, IPlaceable
         }
     }
 
-    /// <summary>
-    /// Update.
-    /// </summary>
-    /// <param name="gameTime"></param>
     public override void Update(GameTime gameTime)
     {
         // Pre construct
@@ -675,7 +636,7 @@ public class Building : GameObject, IPlaceable
     private void RestoreStates()
     {
         // Restore states
-        foreach (KeyValuePair<Charactor, BaseState> pair in negotiables)
+        foreach (var pair in negotiables)
         {
             pair.Key.State = pair.Value;
         }

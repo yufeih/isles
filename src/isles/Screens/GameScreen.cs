@@ -50,7 +50,7 @@ public class GameScreen : IScreen, IEventListener
         Game = BaseGame.Singleton;
         graphics = Game.Graphics;
 
-        _worldRenderer = new(Game.GraphicsDevice, Game.Settings, Game.ModelRenderer, Game.Shadow);
+        _worldRenderer = new(Game.GraphicsDevice, Game.Settings, Game.ModelRenderer, Game.ShaderLoader, Game.Input);
         LoadWorld(levelName, new Skirmish(this, CreateTestPlayerInfo()));
     }
 

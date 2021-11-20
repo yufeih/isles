@@ -5,20 +5,24 @@ namespace Isles;
 
 public class WorldRenderer
 {
+    private readonly Input _input;
     private readonly ShadowEffect _shadow;
     private readonly Settings _settings;
     private readonly ModelRenderer _modelRenderer;
     private readonly ModelPicker<Entity> _modelPicker;
+    private readonly GameModel _rallyPointModel = new("Models/rally");
     private Entity _pickedEntity;
 
     public Entity Pick() => _pickedEntity;
 
-    public WorldRenderer(GraphicsDevice graphics, Settings settings, ModelRenderer modelRenderer, ShadowEffect shadow)
+    public WorldRenderer(
+        GraphicsDevice graphics, Settings settings, ModelRenderer modelRenderer, ShaderLoader shaderLoader, Input input)
     {
-        _shadow = shadow;
+        _input = input;
         _settings = settings;
         _modelRenderer = modelRenderer;
-        _modelPicker = new ModelPicker<Entity>(graphics, modelRenderer);
+        _shadow = settings.ShadowEnabled ? new(graphics, shaderLoader) : null;
+        _modelPicker = new(graphics, modelRenderer);
     }
 
     public void Draw(GameWorld world, Matrix viewProjection, Vector3 eye, Vector3 facing, GameTime gameTime)
@@ -180,10 +184,9 @@ public class WorldRenderer
 
             if (entity.IsAlive && entity.maximumHealth > 0)
             {
-                if (entity.Highlighted || entity.World.Game.Input.Keyboard.IsKeyDown(Keys.LeftAlt) ||
-                                   entity.World.Game.Input.Keyboard.IsKeyDown(Keys.RightAlt))
+                if (entity.Highlighted || _input.Keyboard.IsKeyDown(Keys.LeftAlt) || _input.Keyboard.IsKeyDown(Keys.RightAlt))
                 {
-                    Color color = GameObject.ColorFromPercentage(1.0f * entity.health / entity.maximumHealth);
+                    var color = ProgressColor(1.0f * entity.health / entity.maximumHealth);
                     GameUI.Singleton.DrawProgress(entity.TopCenter, 0, (int)(entity.SelectionAreaRadius * 10.0f),
                         100 * entity.health / entity.maximumHealth, color);
 
@@ -198,6 +201,30 @@ public class WorldRenderer
         if (entity is Building building1)
         {
             DrawRallyPoints(building1);
+        }
+
+        static Color ProgressColor(float percentage)
+        {
+            Vector3 v, v1, v2;
+
+            if (percentage > 0.5f)
+            {
+                percentage = (percentage - 0.5f) * 2;
+                v1 = Color.Yellow.ToVector3();
+                v2 = Color.Green.ToVector3();
+            }
+            else
+            {
+                percentage *= 2;
+                v1 = Color.Red.ToVector3();
+                v2 = Color.Yellow.ToVector3();
+            }
+
+            v.X = MathHelper.Lerp(v1.X, v2.X, percentage);
+            v.Y = MathHelper.Lerp(v1.Y, v2.Y, percentage);
+            v.Z = MathHelper.Lerp(v1.Z, v2.Z, percentage);
+
+            return new Color(v);
         }
     }
 
@@ -261,7 +288,7 @@ public class WorldRenderer
         // Draw rally point
         if (building.Selected && building.ShouldDrawModel && building.IsAlive && building.Owner is LocalPlayer &&
             (building.state == Building.BuildingState.Normal || building.state == Building.BuildingState.Constructing) &&
-            Building.RallyPointModel != null && building.RallyPoints.Count > 0)
+            building.RallyPoints.Count > 0)
         {
             Vector3 position = Vector3.Zero;
 
@@ -274,8 +301,8 @@ public class WorldRenderer
                 position = vector;
             }
 
-            Building.RallyPointModel.Transform = Matrix.CreateTranslation(position);
-            Building.RallyPointModel.Draw();
+            _rallyPointModel.Transform = Matrix.CreateTranslation(position);
+            _rallyPointModel.Draw();
         }
     }
 }

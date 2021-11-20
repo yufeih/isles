@@ -50,19 +50,7 @@ public abstract class BaseEntity : IAudioEmitter, IEventListener
     /// <summary>
     /// Gets or sets the 3D position of the entity.
     /// </summary>
-    public virtual Vector3 Position
-    {
-        get => position;
-
-        set
-        {
-            // Mark bounding box dirty, save the old bounding box
-            IsDirty = true;
-            position = value;
-        }
-    }
-
-    private Vector3 position;
+    public virtual Vector3 Position { get; set; }
 
     /// <summary>
     /// Gets or sets which way the entity is facing.
@@ -81,17 +69,6 @@ public abstract class BaseEntity : IAudioEmitter, IEventListener
     /// Used for 3D sound.
     /// </summary>
     public virtual Vector3 Velocity => Vector3.Zero;
-
-    /// <summary>
-    /// By marking the IsDirty property of a scene object, the scene
-    /// manager will be able to adjust its internal data structure
-    /// to adopt to the change of transformation.
-    /// </summary>
-    public virtual bool IsDirty
-    {
-        get => false;
-        set { }
-    }
 
     public virtual BoundingBox BoundingBox => new();
 
@@ -122,9 +99,7 @@ public abstract class BaseEntity : IAudioEmitter, IEventListener
     /// </summary>
     public void Fall()
     {
-        Position = new Vector3(Position.X,
-                               Position.Y,
-                               World.Landscape.GetHeight(Position.X, Position.Y));
+        Position = new(Position.X, Position.Y, World.Landscape.GetHeight(Position.X, Position.Y));
     }
 
     public virtual void Deserialize(XmlElement xml)
@@ -175,7 +150,7 @@ public abstract class Entity : BaseEntity
 
     private BaseState state;
 
-    protected virtual bool OnStateChanged(BaseState newState, ref BaseState resultState) { return true; }
+    protected virtual bool OnStateChanged(BaseState newState, ref BaseState resultState) => true;
 
     public GameModel Model
     {
@@ -251,12 +226,6 @@ public abstract class Entity : BaseEntity
     }
 
     private Matrix transform = Matrix.Identity;
-
-    public override bool IsDirty
-    {
-        get => isDirty;
-        set => isDirty = value;
-    }
 
     private bool isDirty = true;
     private bool isTransformDirty = true;

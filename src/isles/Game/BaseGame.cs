@@ -70,7 +70,6 @@ public class BaseGame : Game, IEventListener
 
     public GameTime CurrentGameTime { get; private set; }
 
-    public ShadowEffect Shadow { get; private set; }
 
     public BloomEffect Bloom { get; private set; }
 
@@ -126,11 +125,6 @@ public class BaseGame : Game, IEventListener
         Graphics2D = new Graphics2D(this);
 
         Billboard = new BillboardManager(this);
-
-        if (Settings.ShadowEnabled)
-        {
-            Shadow = new ShadowEffect(GraphicsDevice, ShaderLoader);
-        }
 
         ModelRenderer = new ModelRenderer(GraphicsDevice, ShaderLoader);
 

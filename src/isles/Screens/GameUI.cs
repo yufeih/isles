@@ -74,8 +74,6 @@ public class GameUI : IEventListener
     private readonly Rectangle ControlPanelEffectiveRegion = new(0, 480, 442, 122);
     private readonly Rectangle MapDestinationRectangle = new(26, 38, 120, 120);
     private readonly Rectangle SnapshotDestinationRectangle = new(314, 44, 85, 85);
-    private readonly Rectangle EnvironmentIndicatorSource = new(960, 0, 46, 46);
-    private readonly Rectangle EnvironmentIndicatorDestination = new(760, 6, 12, 12);
     private readonly Rectangle SnapShotNameDestination = new(0, 78, 85, 30);
     private const int SpellButtonBaseX = 145;
     private const int SpellButtonBaseY = 53;
@@ -662,14 +660,6 @@ public class GameUI : IEventListener
 
         // Draw statistics
         Display.Sprite.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied);
-
-        Player player = Player.LocalPlayer;
-
-        // Draw environment indicator
-        Display.Sprite.Draw(panelsTexture,
-            UIElement.GetRelativeRectangle(EnvironmentIndicatorDestination, Display,
-                                           ScaleMode.ScaleY, Anchor.TopRight),
-            EnvironmentIndicatorSource, GameObject.ColorFromPercentage(1 - player.EnvironmentLevel));
 
         DrawCursorFocus(gameTime, Display.Sprite);
 

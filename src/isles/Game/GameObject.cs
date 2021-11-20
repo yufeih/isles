@@ -609,13 +609,6 @@ public abstract class GameObject : Entity, ISelectable
     public bool VisibleInFogOfWar = true;
 
     /// <summary>
-    /// Colors.
-    /// </summary>
-    private static readonly Vector3 Green = Color.Green.ToVector3();
-    private static readonly Vector3 Yellow = Color.Yellow.ToVector3();
-    private static readonly Vector3 Red = Color.Red.ToVector3();
-
-    /// <summary>
     /// Gets whether models should be drawed.
     /// </summary>
     public bool ShouldDrawModel => !InFogOfWar && Visible && WithinViewFrustum;
@@ -652,32 +645,6 @@ public abstract class GameObject : Entity, ISelectable
     protected virtual void DrawFogOfWar()
     {
         World.FogOfWar.DrawVisibleArea(ViewDistance, Position.X, Position.Y);
-    }
-
-    protected virtual void DrawStatus() { }
-
-    public static Color ColorFromPercentage(float percentage)
-    {
-        Vector3 v, v1, v2;
-
-        if (percentage > 0.5f)
-        {
-            percentage = (percentage - 0.5f) * 2;
-            v1 = Yellow;
-            v2 = Green;
-        }
-        else
-        {
-            percentage *= 2;
-            v1 = Red;
-            v2 = Yellow;
-        }
-
-        v.X = MathHelper.Lerp(v1.X, v2.X, percentage);
-        v.Y = MathHelper.Lerp(v1.Y, v2.Y, percentage);
-        v.Z = MathHelper.Lerp(v1.Z, v2.Z, percentage);
-
-        return new Color(v);
     }
 
     /// <summary>
