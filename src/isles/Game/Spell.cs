@@ -910,14 +910,6 @@ public static class Upgrades
     {
         if (owner != null && owner.Owner != null)
         {
-            foreach (GameObject o in owner.Owner.EnumerateObjects("Lumbermill"))
-            {
-                if (o is Lumbermill)
-                {
-                    (o as Lumbermill).LiveOfNatureResearched();
-                }
-            }
-
             owner.Owner.MarkAvailable("LiveOfNature");
         }
     }

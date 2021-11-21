@@ -777,41 +777,13 @@ public class Tree : GameObject
     }
 
     private int lumber = 50;
-
-    /// <summary>
-    /// Gets or sets whether this tree is ever green.
-    /// </summary>
-    public bool EverGreen
-    {
-        get => everGreen;
-        set
-        {
-            if (Lumber > 0)
-            {
-                everGreen = value;
-            }
-        }
-    }
-
     private bool everGreen;
 
     /// <summary>
     /// Gets or sets how many peons are harvesting this tree.
     /// </summary>
-    public int HarvesterCount
-    {
-        get => harvesterCount;
+    public int HarvesterCount { get; set; }
 
-        set
-        {
-            System.Diagnostics.Debug.Assert(
-                value >= 0 && value <= StateHarvestLumber.MaxPeonsPerTree);
-
-            harvesterCount = value;
-        }
-    }
-
-    private int harvesterCount;
     private Vector3 rotationAxis;
     private float shakeTime;
     private float totalShakeTime = 0.2f;
@@ -893,6 +865,9 @@ public class Tree : GameObject
 
     public override void Update(GameTime gameTime)
     {
+        const float EffectRadius = 50;
+        everGreen = World.GetNearbyObjects(Position, EffectRadius).OfType<Building>().Where(o => o.ClassID == "Lumbermill" && o.Owner.IsAvailable("LiveOfNature")).Any();
+
         if (everGreen && ShouldDrawModel)
         {
             if (star == null)

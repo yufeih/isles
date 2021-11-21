@@ -32,7 +32,7 @@ public class GameIsles : BaseGame
         // Islander architectures
         GameWorld.RegisterCreator("Townhall", world => new Building(world, "Townhall"));
         GameWorld.RegisterCreator("Farmhouse", world => new Building(world, "Farmhouse"));
-        GameWorld.RegisterCreator("Lumbermill", world => new Lumbermill(world, "Lumbermill"));
+        GameWorld.RegisterCreator("Lumbermill", world => new Building(world, "Lumbermill"));
         GameWorld.RegisterCreator("Tower", world => new Tower(world, "Tower"));
         GameWorld.RegisterCreator("Barracks", world => new Building(world, "Barracks"));
         GameWorld.RegisterCreator("Altar", world => new Building(world, "Altar"));

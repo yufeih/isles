@@ -284,10 +284,7 @@ public class GameScreen : IScreen, IEventListener
             position = Building.LastDestroyedBuilding.Position;
         }
 
-        if (Game.Camera is GameCamera)
-        {
-            (Game.Camera as GameCamera).Orbit(position, 0.00008f, 150, MathHelper.ToRadians(40));
-        }
+        ((GameCamera)Game.Camera).Orbit(position, 0.00008f, 150, MathHelper.ToRadians(40));
 
         Game.Input.Uncapture();
         postScreen = true;
