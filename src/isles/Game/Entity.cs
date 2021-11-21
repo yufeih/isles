@@ -152,89 +152,17 @@ public abstract class Entity : BaseEntity
 
     protected virtual bool OnStateChanged(BaseState newState, ref BaseState resultState) => true;
 
-    public GameModel Model
-    {
-        get => model;
-
-        set
-        {
-            MarkDirty();
-            model = value;
-        }
-    }
-
-    private GameModel model;
+    public GameModel Model { get; private set; }
 
     public virtual bool Visible => true;
 
     public bool WithinViewFrustum { get; private set; }
 
-    public override Vector3 Position
-    {
-        get => base.Position;
-        set
-        {
-            MarkDirty();
-            base.Position = value;
-        }
-    }
+    public Quaternion Rotation { get; set;} = Quaternion.Identity;
 
-    public Quaternion Rotation
-    {
-        get => rotation;
-        set
-        {
-            MarkDirty();
-            rotation = value;
-        }
-    }
+    public Vector3 Scale { get; set; } = Vector3.One;
 
-    private Quaternion rotation = Quaternion.Identity;
-
-    public Vector3 Scale
-    {
-        get => scale;
-        set
-        {
-            MarkDirty();
-            scale = value;
-        }
-    }
-
-    private Vector3 scale = Vector3.One;
     private Matrix transformBias = Matrix.Identity;
-
-    public Matrix Transform
-    {
-        get
-        {
-            if (isTransformDirty)
-            {
-                transform = // Build transform from SRT values
-                    Matrix.CreateScale(scale) *
-                    Matrix.CreateFromQuaternion(rotation) *
-                    Matrix.CreateTranslation(Position);
-
-                isTransformDirty = false;
-            }
-
-            return transform;
-        }
-    }
-
-    private Matrix transform = Matrix.Identity;
-
-    private bool isDirty = true;
-    private bool isTransformDirty = true;
-
-    /// <summary>
-    /// Mark both bounding box and transform.
-    /// </summary>
-    private void MarkDirty()
-    {
-        isDirty = true;
-        isTransformDirty = true;
-    }
 
     /// <summary>
     /// Returns the axis aligned bounding box of the game model.
@@ -243,34 +171,20 @@ public abstract class Entity : BaseEntity
     {
         get
         {
-            if (model == null)
+            if (Model == null)
             {
                 return new BoundingBox();
             }
 
-            if (isDirty)
-            {
-                model.Transform = transformBias * Transform;
-            }
-
-            return model.BoundingBox;
+            return Model.BoundingBox;
         }
     }
-
-    /// <summary>
-    /// Gets the size of the entity.
-    /// </summary>
-    public virtual Vector3 Size => BoundingBox.Max - BoundingBox.Min;
 
     public Outline Outline
     {
         get
         {
-            if (isDirty)
-            {
-                UpdateOutline(outline);
-            }
-
+            UpdateOutline(outline);
             return outline;
         }
     }
@@ -289,9 +203,10 @@ public abstract class Entity : BaseEntity
 
     public virtual bool IsPickable => Visible;
 
-    public Entity(GameWorld world)
+    public Entity(GameWorld world, GameModel model)
         : base(world)
     {
+        Model = model;
     }
 
     public override void Deserialize(XmlElement xml)
@@ -354,13 +269,13 @@ public abstract class Entity : BaseEntity
                             Matrix.CreateTranslation(translation);
 
             // Update model transform
-            model.Transform = transformBias;
+            Model.Transform = transformBias;
 
             // Center game model
-            Vector3 center = (model.BoundingBox.Max + model.BoundingBox.Min) / 2;
+            Vector3 center = (Model.BoundingBox.Max + Model.BoundingBox.Min) / 2;
             transformBias.M41 -= center.X;
             transformBias.M42 -= center.Y;
-            transformBias.M43 -= model.BoundingBox.Min.Z;
+            transformBias.M43 -= Model.BoundingBox.Min.Z;
             transformBias.M43 -= 0.2f;  // A little offset under the ground
         }
 
@@ -399,11 +314,6 @@ public abstract class Entity : BaseEntity
         {
             Scale = Helper.StringToVector3(value);
         }
-
-        // Deserialize is probably always called during initialization,
-        // so calculate outline radius at this time.
-        outline.SetCircle(Vector2.Zero, (Size.X + Size.Y) / 4);
-        UpdateOutline(outline);
     }
 
     /// <summary>
@@ -442,19 +352,12 @@ public abstract class Entity : BaseEntity
             }
         }
 
-        if (isDirty)
-        {
-            // Update model transform, this will update the bounding box
-            model.Transform = transformBias * Transform;
+        Model.Transform = transformBias *
+            Matrix.CreateScale(Scale) *
+            Matrix.CreateFromQuaternion(Rotation) *
+            Matrix.CreateTranslation(Position);
 
-            // Update outline
-            UpdateOutline(outline);
-        }
-
-        if (model != null)
-        {
-            model.Update(gameTime);
-        }
+        Model.Update(gameTime);
 
         WithinViewFrustum = IsVisible(BaseGame.Singleton.ViewProjection);
     }

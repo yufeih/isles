@@ -272,7 +272,7 @@ public abstract class GameObject : Entity, ISelectable
     public List<KeyValuePair<GameModel, int>> Attachment = new();
 
     public GameObject(GameWorld world, string classID)
-        : base(world)
+        : base(world, null)
     {
         if (GameDefault.Singleton.WorldObjectDefaults.TryGetValue(classID, out XmlElement xml))
         {
@@ -1155,14 +1155,8 @@ public class Missile : Entity, IProjectile
     public float Mass = 0.5f;
 
     public Missile(GameWorld world, GameModel ammo, BaseEntity target)
-        : base(world)
+        : base(world, ammo.ShadowCopy())
     {
-        if (ammo == null || target == null)
-        {
-            throw new ArgumentNullException();
-        }
-
-        Model = ammo.ShadowCopy();
         Target = target;
 
         // Compute position
@@ -1252,7 +1246,7 @@ public class Missile : Entity, IProjectile
 public class Decoration : Entity
 {
     public Decoration(GameWorld world)
-        : base(world) { }
+        : base(world, null) { }
 
     public override void Deserialize(XmlElement xml)
     {
