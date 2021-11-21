@@ -6,7 +6,6 @@ namespace Isles;
 public class MiniMap : UIElement
 {
     private readonly Rectangle FogOfWarSourceRectangle = new(500, 692, 429, 429);
-    private readonly Dictionary<int, Vector3> GoldMineList = new();
     private GameCamera camera;
     private readonly BaseGame game;
     private readonly GameWorld world;
@@ -82,19 +81,6 @@ public class MiniMap : UIElement
         this.world = world;
     }
 
-    private static int GoldmineCounter;
-
-    public int AddGoldmine(Vector3 postion)
-    {
-        GoldMineList.Add(GoldmineCounter, postion);
-        return GoldmineCounter++;
-    }
-
-    public void RemoveGoldmine(int key)
-    {
-        GoldMineList.Remove(key);
-    }
-
     public Vector3? MapToWorld(Point mapPoint)
     {
         if (ActualArea.Contains(mapPoint))
@@ -157,10 +143,10 @@ public class MiniMap : UIElement
         Rectangle goldMineDest;
         goldMineDest.Width = (int)(GoldMinePointerFactor * DestinationRectangle.Width);
         goldMineDest.Height = goldMineDest.Width;
-        Point? goldMinePointerPosition;
-        foreach (Vector3 position in GoldMineList.Values)
+
+        foreach (var goldmine in world.WorldObjects.OfType<Goldmine>())
         {
-            goldMinePointerPosition = WorldToMap(position);
+            var goldMinePointerPosition = WorldToMap(goldmine.Position);
             if (goldMinePointerPosition == null)
             {
                 throw new InvalidOperationException("Gold Mine position out of range.");

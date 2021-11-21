@@ -75,7 +75,7 @@ public abstract class BaseEntity : IAudioEmitter, IEventListener
     /// <summary>
     /// Gets or sets entity name.
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; set; } = "Entity " + EntityCount++;
 
     /// <summary>
     /// Gets or sets the class ID of this world object.
@@ -85,7 +85,6 @@ public abstract class BaseEntity : IAudioEmitter, IEventListener
     public BaseEntity(GameWorld world)
     {
         World = world;
-        Name = "Entity " + EntityCount++;
     }
 
     public virtual void Update(GameTime gameTime) { }

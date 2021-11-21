@@ -939,19 +939,7 @@ public class Goldmine : GameObject
     /// <summary>
     /// Gets or sets how many peons are harvesting this tree.
     /// </summary>
-    public int HarvesterCount
-    {
-        get => harvesterCount;
-
-        set
-        {
-            System.Diagnostics.Debug.Assert(value >= 0);
-
-            harvesterCount = value;
-        }
-    }
-
-    private int harvesterCount;
+    public int HarvesterCount { get; set; }
 
     /// <summary>
     /// Gets or sets how much gold the goldmine have.
@@ -1020,8 +1008,6 @@ public class Goldmine : GameObject
         base.Deserialize(xml);
     }
 
-    private int minimapIcon = -1;
-
     public override void OnCreate()
     {
         SpawnPoint = new Vector3(Math2D.LocalToWorld(
@@ -1032,21 +1018,9 @@ public class Goldmine : GameObject
         World.PathManager.Mark(pathGrids);
     }
 
-    public override void Start(GameWorld world)
-    {
-        minimapIcon = GameUI.Singleton.Minimap.AddGoldmine(Position);
-    }
-
     public override void OnDestroy()
     {
         World.PathManager.Unmark(pathGrids);
-
-        if (minimapIcon >= 0)
-        {
-            GameUI.Singleton.Minimap.RemoveGoldmine(minimapIcon);
-        }
-
-        base.OnDestroy();
     }
 
     protected override void UpdateOutline(Outline outline)
