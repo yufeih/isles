@@ -458,9 +458,6 @@ public class Building : GameObject, IPlaceable
         if (state == BuildingState.PreConstruct)
         {
             Model.Tint = IsLocationPlacable() ? Vector3.One : Vector3.UnitX;
-
-            // Hide the building if our mouse is over the UI
-            Visible = !GameUI.Singleton.Overlaps(World.Game.Input.MousePosition);
         }
 
         // Wait

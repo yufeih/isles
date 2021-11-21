@@ -95,6 +95,8 @@ public class Charactor : GameObject, IMovable
 
     public virtual string AttackAnimation => "Attack";
 
+    public override bool Visible => State is not StateHarvestGold harvestGold || (harvestGold.state != StateHarvestGold.StateType.Wait && harvestGold.state != StateHarvestGold.StateType.Harvest);
+
     public Charactor(GameWorld world, string classID) : base(world, classID)
     {
         VisibleInFogOfWar = false;
@@ -291,7 +293,6 @@ public class Charactor : GameObject, IMovable
         spawnPosition = World.PathManager.FindValidPosition(spawnPosition, Brush);
         Position = new Vector3(spawnPosition, 0);
         Fall();
-        Visible = true;
         World.PathManager.AddMovable(this);
     }
 
@@ -300,7 +301,6 @@ public class Charactor : GameObject, IMovable
     /// </summary>
     public void Unspawn()
     {
-        Visible = false;
         World.PathManager.RemoveMovable(this);
     }
 

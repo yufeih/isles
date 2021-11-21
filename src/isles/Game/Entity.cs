@@ -165,10 +165,7 @@ public abstract class Entity : BaseEntity
 
     private GameModel model;
 
-    /// <summary>
-    /// Gets or sets whether this entity is visible.
-    /// </summary>
-    public bool Visible { get; set; } = true;
+    public virtual bool Visible => true;
 
     public bool WithinViewFrustum { get; private set; }
 

@@ -15,7 +15,7 @@ public class StateHarvestGold : BaseState
     /// <summary>
     /// State transitions.
     /// </summary>
-    private enum StateType
+    public enum StateType
     {
         MoveToGoldmine,
         Wait,
@@ -23,7 +23,7 @@ public class StateHarvestGold : BaseState
         BackToDeposit,
     }
 
-    private StateType state;
+    public StateType state;
 
     /// <summary>
     /// Common stuff.
@@ -48,7 +48,7 @@ public class StateHarvestGold : BaseState
         owner.LumberCarried = 0;
 
         // Initialize state
-        _ = FindAnotherGoldmine();
+        FindAnotherGoldmine();
         state = StateType.MoveToGoldmine;
     }
 
