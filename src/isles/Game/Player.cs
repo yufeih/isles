@@ -1794,7 +1794,6 @@ public class ComputerPlayer : Player
                 // Place the building
                 building.Owner = this;
                 building.BeginPlace();
-                building.Fall();
                 building.Place();
                 building.PerformAction(defaultRallyPoint, false);
                 World.Add(building);

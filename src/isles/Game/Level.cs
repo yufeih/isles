@@ -253,7 +253,6 @@ public class Skirmish : Level
         {
             building.Position = position;
             building.Owner = player;
-            building.Fall();
             world.Add(building);
         }
 
@@ -263,7 +262,6 @@ public class Skirmish : Level
             {
                 peon.Position = building.Position + building.SpawnPoint;
                 peon.Owner = player;
-                peon.Fall();
                 world.Add(peon);
 
                 position.X += 4;

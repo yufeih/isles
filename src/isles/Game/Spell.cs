@@ -856,7 +856,6 @@ public class SpellTraining : Spell
             c.Position = ownerBuilding.Position + ownerBuilding.SpawnPoint;
             c.Owner = ownerBuilding.Owner;
             c.Owner.Food -= c.Food;
-            c.Fall();
             world.Add(c);
 
             if (c.IsHero && spellButton != null)

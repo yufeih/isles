@@ -526,10 +526,13 @@ public abstract class GameObject : Entity, ISelectable
         // Update fog of war state for other players
         UpdateFogOfWar();
 
+        // Snap to ground
+        Position = new(Position.X, Position.Y, World.Landscape.GetHeight(Position.X, Position.Y));
+
         base.Update(gameTime);
 
         // Update attachments after model is updated
-        foreach (KeyValuePair<GameModel, int> attach in Attachment)
+        foreach (var attach in Attachment)
         {
             if (attach.Value >= 0)
             {
@@ -1026,7 +1029,6 @@ public class BoxOfPandora : GameObject
         position = World.PathManager.FindValidPosition(position, null);
 
         Position = new Vector3(position, 0);
-        Fall();
 
         Update(new GameTime());
 

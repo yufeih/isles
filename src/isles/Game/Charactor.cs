@@ -62,7 +62,6 @@ public class Charactor : GameObject, IMovable
                 spawnPoint = World.PathManager.FindValidPosition(spawnPoint, Brush);
                 Position = new Vector3(spawnPoint, 0);
                 World.PathManager.UpdateMovable(this);
-                Fall();
             }
 
             ignoreDynamicObstacles = value;
@@ -292,7 +291,6 @@ public class Charactor : GameObject, IMovable
         spawnPosition.Y = position.Y;
         spawnPosition = World.PathManager.FindValidPosition(spawnPosition, Brush);
         Position = new Vector3(spawnPosition, 0);
-        Fall();
         World.PathManager.AddMovable(this);
     }
 
@@ -322,9 +320,6 @@ public class Charactor : GameObject, IMovable
         // Find a valid position
         Position = new Vector3(World.PathManager.FindValidPosition(
                    new Vector2(Position.X, Position.Y), Brush), 0);
-
-        // Fall on the ground
-        Fall();
 
         // Add this to the path manager
         World.PathManager.AddMovable(this);

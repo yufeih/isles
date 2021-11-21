@@ -52,24 +52,6 @@ public abstract class BaseEntity : IAudioEmitter, IEventListener
     /// </summary>
     public virtual Vector3 Position { get; set; }
 
-    /// <summary>
-    /// Gets or sets which way the entity is facing.
-    /// Used for 3D sound.
-    /// </summary>
-    public virtual Vector3 Forward => Vector3.UnitZ;
-
-    /// <summary>
-    /// Gets or sets the orientation of this entity.
-    /// Used for 3D sound.
-    /// </summary>
-    public Vector3 Up => Vector3.UnitZ;
-
-    /// <summary>
-    /// Gets or sets how fast this entity is moving.
-    /// Used for 3D sound.
-    /// </summary>
-    public virtual Vector3 Velocity => Vector3.Zero;
-
     public virtual BoundingBox BoundingBox => new();
 
     /// <summary>
@@ -92,14 +74,6 @@ public abstract class BaseEntity : IAudioEmitter, IEventListener
     public virtual void OnCreate() { }
 
     public virtual void OnDestroy() { }
-
-    /// <summary>
-    /// Make the entity fall on the ground.
-    /// </summary>
-    public void Fall()
-    {
-        Position = new(Position.X, Position.Y, World.Landscape.GetHeight(Position.X, Position.Y));
-    }
 
     public virtual void Deserialize(XmlElement xml)
     {
@@ -211,9 +185,6 @@ public abstract class Entity : BaseEntity
     public override void Deserialize(XmlElement xml)
     {
         base.Deserialize(xml);
-
-        // Make entity fall on the ground
-        Fall();
 
         string value;
 

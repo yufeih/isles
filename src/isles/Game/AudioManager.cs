@@ -10,12 +10,6 @@ namespace Isles;
 public interface IAudioEmitter
 {
     Vector3 Position { get; }
-
-    Vector3 Forward { get; }
-
-    Vector3 Up { get; }
-
-    Vector3 Velocity { get; }
 }
 
 /// <summary>
@@ -228,9 +222,8 @@ public class AudioManager : GameComponent
         if (!cue3D.Cue.IsDisposed)
         {
             emitter.Position = cue3D.Emitter.Position;
-            emitter.Forward = cue3D.Emitter.Forward;
-            emitter.Up = cue3D.Emitter.Up;
-            emitter.Velocity = cue3D.Emitter.Velocity;
+            emitter.Forward = Vector3.UnitZ;
+            emitter.Up = Vector3.UnitZ;
 
             cue3D.Cue.Apply3D(Listener, emitter);
         }
