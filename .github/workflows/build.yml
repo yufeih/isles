@@ -20,6 +20,13 @@ jobs:
     - uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '6.0.x'
+    - run: |
+        mkdir build
+        cd build
+        cmake ..
+        cmake --build .
+      name: cmake
+      working-directory: src/native
     - run: dotnet build -c Release -o ${{ runner.temp }}/bin
     - uses: actions/upload-artifact@v2
       with:

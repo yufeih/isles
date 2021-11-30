@@ -1,3 +1,6 @@
 [submodule "src/FNA"]
 	path = extern/FNA
 	url = https://github.com/FNA-XNA/FNA
+[submodule "src/native/extern/box2d"]
+	path = src/native/extern/box2d
+	url = https://github.com/erincatto/box2d
