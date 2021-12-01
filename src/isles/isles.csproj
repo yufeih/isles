@@ -14,17 +14,17 @@
   <ItemGroup>
     <Content Include="..\..\data\**" LinkBase="data" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\xnb\**" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="..\binaries\shaders\**" LinkBase="shaders" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="$(IntermediateOutputPath)\shaders\**" LinkBase="shaders" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\binaries\fna\x64\**" Condition="$([MSBuild]::IsOSPlatform('windows'))" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="..\binaries\fna\osx\**" Condition="$([MSBuild]::IsOSPlatform('osx'))" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="..\binaries\fna\lib64\**" Condition="$([MSBuild]::IsOSPlatform('linux'))" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\extern\FNA-redist\x64\**" Condition="$([MSBuild]::IsOSPlatform('windows'))" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\extern\FNA-redist\osx\**" Condition="$([MSBuild]::IsOSPlatform('osx'))" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\extern\FNA-redist\lib64\**" Condition="$([MSBuild]::IsOSPlatform('linux'))" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FNA\FNA.Core.csproj" />
+    <ProjectReference Include="..\..\extern\FNA\FNA.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -39,7 +39,7 @@
   </ItemGroup>
 
   <Target Name="CopyShaderBinaries" AfterTargets="AfterBuild">
-    <Copy SourceFiles="@(FxCompileOutput)" DestinationFolder="$(MSBuildThisFileDirectory)../binaries/shaders" />
+    <Copy SourceFiles="@(FxCompileOutput)" DestinationFolder="$(IntermediateOutputPath)/shaders" />
   </Target>
 
 </Project>
