@@ -24,6 +24,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="..\..\native\out\win\isles.native.dll" Condition="$([MSBuild]::IsOSPlatform('windows'))" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\native\out\osx\libisles.native.dylib" Condition="$([MSBuild]::IsOSPlatform('osx'))" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\native\out\linux\libisles.native.so" Condition="$([MSBuild]::IsOSPlatform('linux'))" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\extern\FNA\FNA.Core.csproj" />
   </ItemGroup>
 

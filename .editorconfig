@@ -12,15 +12,7 @@ insert_final_newline = true
 # (Please don't specify an indent_size here; that has too many unintended consequences.)
 
 # XML files
-[*.{xml,csproj,props}]
-indent_size = 2
-
-# JSON files
-[*.json]
-indent_size = 2
-
-# YAML files
-[*.{yml}]
+[*.{xml,csproj,props,json,yml,h,cpp}]
 indent_size = 2
 
 # Markdown files
@@ -29,6 +21,15 @@ trim_trailing_whitespace = false
 
 # C# files
 [*.cs]
+
+# Indentation and spacing
+indent_size = 4
+indent_style = space
+tab_width = 4
+
+# New line preferences
+end_of_line = crlf
+insert_final_newline = false
 
 # IDE0051: Remove unused private members
 dotnet_diagnostic.IDE0051.severity = warning
@@ -50,17 +51,6 @@ dotnet_diagnostic.IDE0051.severity = warning
 
 # IDE0052: Remove unread private member
 dotnet_diagnostic.IDE0052.severity = warning
-
-#### Core EditorConfig Options ####
-
-# Indentation and spacing
-indent_size = 4
-indent_style = space
-tab_width = 4
-
-# New line preferences
-end_of_line = crlf
-insert_final_newline = false
 
 #### .NET Coding Conventions ####
 
