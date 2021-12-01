@@ -14,7 +14,7 @@
   <ItemGroup>
     <Content Include="..\..\data\**" LinkBase="data" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\xnb\**" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="$(IntermediateOutputPath)\shaders\**" LinkBase="shaders" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="shaders/compiled\**" LinkBase="shaders" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
@@ -39,7 +39,7 @@
   </ItemGroup>
 
   <Target Name="CopyShaderBinaries" AfterTargets="AfterBuild">
-    <Copy SourceFiles="@(FxCompileOutput)" DestinationFolder="$(IntermediateOutputPath)/shaders" />
+    <Copy SourceFiles="@(FxCompileOutput)" DestinationFolder="shaders/compiled" />
   </Target>
 
 </Project>
