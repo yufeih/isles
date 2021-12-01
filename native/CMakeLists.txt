@@ -16,6 +16,9 @@ set(ISLES_HEADER_FILES
 set(ISLES_SOURCE_FILES
     src/lib.cpp)
 
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/out)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/out)
+
 add_library(isles.native SHARED ${ISLES_SOURCE_FILES})
 
 target_include_directories(isles.native PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)

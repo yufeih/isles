@@ -21,8 +21,8 @@ jobs:
       with:
         dotnet-version: '6.0.x'
     - run: |
-        mkdir out/${MATRIX_OS/-latest/}
-        cd out/${MATRIX_OS/-latest/}
+        mkdir out
+        cd out
         cmake -DCMAKE_BUILD_TYPE=Release ..
         cmake --build . --config Release
       name: cmake
