@@ -27,6 +27,8 @@ jobs:
         cmake --build . --config Release
       name: cmake
       working-directory: native
+    - run: dotnet test -c Release --collect:"XPlat Code Coverage"
+    - uses: codecov/codecov-action@v1
     - run: dotnet build -c Release -o ${{ runner.temp }}/bin
     - uses: actions/upload-artifact@v2
       with:
