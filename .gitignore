@@ -3,6 +3,10 @@
 
 bin
 obj
+out
+Debug
+Release
+
 
 launchSettings.json
 

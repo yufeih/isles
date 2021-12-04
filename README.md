@@ -21,10 +21,7 @@ Prerequisite:
 - [.NET Core 6 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
 
 1. Run `git submodule update --init --recursive` to fetch all dependencies.
-2. Build native libraries by `cd native` followed by `./build.bat` on Windows and `./build.sh` on other systems. This step is only required for the first time, or on native code change.
-3. Run `dotnet build -c Release` to build the game.
-
-You will see the binary files under `src/isles/bin/Release` folder.
+2. Run `build.bat` on Windows and `./build/sh` on other systems to produce binary files under `out` folder.
 
 > The only way to rebuild  shaders (`*.fx` files) today is using Visual Studio on Windows due to dependency on `Microsoft.HLSL.CSharpVB`.
 
