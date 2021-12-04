@@ -7,5 +7,3 @@
 #else
 #define EXPORT_API extern "C"
 #endif
-
-EXPORT_API int32_t run();

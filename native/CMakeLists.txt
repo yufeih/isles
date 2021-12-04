@@ -5,22 +5,21 @@ project(isles.native)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 
-set(BOX2D_BUILD_UNIT_TESTS OFF CACHE BOOL "Build the Box2D unit tests" FORCE)
-set(BOX2D_BUILD_TESTBED OFF CACHE BOOL "Build the Box2D testbed" FORCE)
-
-add_subdirectory(../extern/box2d box2d)
-
+# isles.native
 set(ISLES_HEADER_FILES
-    include/box2d_interop.h)
+    include/move.h)
 
 set(ISLES_SOURCE_FILES
-    src/box2d_interop.cpp)
+    src/move.cpp)
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/out)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/out)
 
 add_library(isles.native SHARED ${ISLES_SOURCE_FILES})
-
 target_include_directories(isles.native PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+# box2d
+set(BOX2D_BUILD_UNIT_TESTS OFF CACHE BOOL "Build the Box2D unit tests" FORCE)
+set(BOX2D_BUILD_TESTBED OFF CACHE BOOL "Build the Box2D testbed" FORCE)
+add_subdirectory(../extern/box2d box2d)
 target_link_libraries(isles.native PUBLIC box2d)
