@@ -4,7 +4,7 @@ pushd native
 rmdir /s /q out
 mkdir out
 cd out
-cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake ..
 cmake --build --config Release .
 popd
 
