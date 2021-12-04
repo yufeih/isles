@@ -14,7 +14,7 @@ jobs:
       matrix:
         os:
         - name: windows-latest
-          build: build.bat
+          build: ./build.bat
         - name: macos-latest
           build: ./build.sh
         - name: ubuntu-latest
