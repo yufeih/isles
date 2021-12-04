@@ -27,7 +27,6 @@ jobs:
       with:
         dotnet-version: '6.0.x'
     - run: ${{ matrix.os.build }}
-      name: build
     - run: dotnet test -c Release --collect:"XPlat Code Coverage"
     - uses: codecov/codecov-action@v1
     - uses: actions/upload-artifact@v2
