@@ -12,14 +12,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os:
-        - name: windows-latest
-          build: ./build.bat
-        - name: macos-latest
-          build: ./build.sh
-        - name: ubuntu-latest
-          build: ./build.sh
-    runs-on: ${{ matrix.os.name }}
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
       with:
@@ -27,10 +21,11 @@ jobs:
     - uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '6.0.x'
-    - run: ${{ matrix.os.build }}
+    - run: ./build.sh
+      shell: bash
     - run: dotnet test -c Release --collect:"XPlat Code Coverage"
     - uses: codecov/codecov-action@v1
     - uses: actions/upload-artifact@v2
       with:
-        name: isles-${{ matrix.os.name }}
+        name: isles-${{ matrix.os }}
         path: out
