@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\..\native\out\$(Configuration)\isles.native.dll" Condition="$([MSBuild]::IsOSPlatform('windows'))" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\native\out\isles.native.dll" Condition="$([MSBuild]::IsOSPlatform('windows'))" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\native\out\libisles.native.dylib" Condition="$([MSBuild]::IsOSPlatform('osx'))" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\native\out\libisles.native.so" Condition="$([MSBuild]::IsOSPlatform('linux'))" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>

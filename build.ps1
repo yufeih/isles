@@ -1,7 +1,9 @@
-REM Build native code
+# Build native code
 
 pushd native
-rmdir /s /q out
+if (test-path out) {
+    rmdir -r -Force out
+}
 mkdir out
 cd out
 cmake ..
