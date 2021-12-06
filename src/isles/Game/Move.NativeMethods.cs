@@ -20,6 +20,9 @@ public partial class Move
     [DllImport(LibName)] private static extern Obstacle move_add_obstacle(World world, float x, float y, float w, float h);
     [DllImport(LibName)] private static extern void move_remove_obstacle(World world, Obstacle unit);
 
+#pragma warning disable IDE0051 // Remove unused private members
+#pragma warning disable CS0169  // The field '_' is never used
+
     struct World { private IntPtr _; }
     struct Unit { private IntPtr _; }
     struct Obstacle { private IntPtr _; }

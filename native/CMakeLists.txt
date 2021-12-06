@@ -4,6 +4,7 @@ project(isles.native)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # isles.native
 set(ISLES_HEADER_FILES
@@ -27,5 +28,6 @@ endif ( MSVC )
 # box2d
 set(BOX2D_BUILD_UNIT_TESTS OFF CACHE BOOL "Build the Box2D unit tests" FORCE)
 set(BOX2D_BUILD_TESTBED OFF CACHE BOOL "Build the Box2D testbed" FORCE)
+
 add_subdirectory(../extern/box2d box2d)
 target_link_libraries(isles.native PUBLIC box2d)
