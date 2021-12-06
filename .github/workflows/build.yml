@@ -10,6 +10,7 @@ on:
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
@@ -20,10 +21,11 @@ jobs:
     - uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '6.0.x'
+    - run: ./build.sh
+      shell: bash
     - run: dotnet test -c Release --collect:"XPlat Code Coverage"
     - uses: codecov/codecov-action@v1
-    - run: dotnet build -c Release -o ${{ runner.temp }}/bin
     - uses: actions/upload-artifact@v2
       with:
         name: isles-${{ matrix.os }}
-        path: ${{ runner.temp }}/bin
+        path: out
