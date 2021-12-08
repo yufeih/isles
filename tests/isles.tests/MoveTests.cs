@@ -20,7 +20,7 @@ public class MoveTests
         }
 
         var duration = 0.0f;
-        while (move.IsRunning())
+        while (move.IsRunning() && duration < 5)
         {
             move.Step(TimeStep);
             duration += TimeStep;
@@ -46,8 +46,8 @@ public class MoveTests
         {
             if (i == 0)
             {
-                move.AddUnit(-100, 0, 2);
-                svg.AddCircle(-100, 0, 2);
+                move.AddUnit(-20, 0, 2);
+                svg.AddCircle(-20, 0, 2);
             }
             else
             {
@@ -57,11 +57,11 @@ public class MoveTests
         }
 
         var duration = 0.0f;
-        while (move.IsRunning())
+        while (move.IsRunning() && duration < 5)
         {
-            if (move.GetUnitPosition(0).x < 30)
+            if (move.GetUnitPosition(0).x < 10)
             {
-                move.SetUnitVelocity(0, 80, 0);
+                move.SetUnitVelocity(0, 20, 0);
             }
 
             move.Step(TimeStep);

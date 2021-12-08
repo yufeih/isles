@@ -58,6 +58,7 @@ void move_set_unit_velocity(move_unit unit, float vx, float vy)
 {
   b2Vec2 v(vx, vy);
   unit->SetLinearVelocity(v);
+  unit->SetType(b2_kinematicBody);
 }
 
 move_obstacle move_add_obstacle(move_world world, float x, float y, float w, float h)
