@@ -11,11 +11,12 @@ public partial class Move
 
     [DllImport(LibName)] private static extern World move_world_new();
     [DllImport(LibName)] private static extern void move_world_delete(World world);
-    [DllImport(LibName)] private static extern void move_world_step(World world);
+    [DllImport(LibName)] private static extern void move_world_step(World world, float timeStep);
 
     [DllImport(LibName)] private static extern Unit move_add_unit(World world, float x, float y, float radius);
     [DllImport(LibName)] private static extern void move_remove_unit(World world, Unit unit);
-    [DllImport(LibName)] private static extern void move_get_unit(World world, Unit unit, ref float x, ref float y, ref float vx, ref float vy);
+    [DllImport(LibName)] private static extern void move_get_unit(Unit unit, out float x, out float y, out float vx, out float vy);
+    [DllImport(LibName)] private static extern void move_set_unit_velocity(Unit unit, float vx, float vy);
 
     [DllImport(LibName)] private static extern Obstacle move_add_obstacle(World world, float x, float y, float w, float h);
     [DllImport(LibName)] private static extern void move_remove_obstacle(World world, Obstacle unit);

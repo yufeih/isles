@@ -11,8 +11,7 @@ trim_trailing_whitespace = true
 insert_final_newline = true
 # (Please don't specify an indent_size here; that has too many unintended consequences.)
 
-# XML files
-[*.{xml,csproj,props,json,yml,h,cpp}]
+[*.{xml,csproj,props,json,yml,h,cpp,svg}]
 indent_size = 2
 
 # Markdown files
