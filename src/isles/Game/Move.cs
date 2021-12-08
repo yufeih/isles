@@ -18,6 +18,11 @@ public sealed partial class Move : IDisposable
         _units.Add(move_add_unit(_world, x, y, radius));
     }
 
+    public void SetUnitVelocity(int i, float vx, float vy)
+    {
+        move_set_unit_velocity(_units[i], vx, vy);
+    }
+
     public (float x, float y) GetUnitPosition(int i)
     {
         move_get_unit(_units[i], out var x, out var y, out var vx, out var vy);

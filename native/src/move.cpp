@@ -2,8 +2,7 @@
 
 move_world move_world_new()
 {
-  b2Vec2 g;
-  return new b2World(g);
+  return new b2World({});
 }
 
 void move_world_delete(move_world world)

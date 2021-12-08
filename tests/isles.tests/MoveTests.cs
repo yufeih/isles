@@ -12,13 +12,15 @@ public class MoveTests
         using var move = new Move();
 
         var svg = new SvgBuilder();
-        var unitCount = 1;
+        var unitCount = 10;
 
         for (var i = 0; i < unitCount; i++)
         {
             move.AddUnit(0, 0, 5);
             svg.AddCircle(0, 0, 5);
         }
+
+        move.SetUnitVelocity(0, 10, 10);
 
         for (var step = 0; step < 100; step++)
         {
