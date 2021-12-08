@@ -24,15 +24,21 @@ public class SvgBuilder
     public void Snapshot(string name, float duration)
     {
         var path = Path.Combine(s_baseDirectory, "tests", "snapshots", name);
-        if (s_isCI)
+        var actual = Build(duration);
+
+        Directory.CreateDirectory(Path.GetDirectoryName(path));
+        File.WriteAllText(path, actual);
+
+        if (!File.Exists(path))
         {
-            Assert.True(File.Exists(path));
+            if (s_isCI)
+            {
+                throw new InvalidOperationException($"Cannot find snapshot file '{path}'");
+            }
+            return;
         }
 
         var expected = File.ReadAllText(path);
-        var actual = Build(duration);
-
-        File.WriteAllText(path, actual);
 
         try
         {
@@ -40,7 +46,9 @@ public class SvgBuilder
         }
         catch when (s_isCI)
         {
-            File.WriteAllText(Path.Combine(s_baseDirectory, "tests", "failed", name), actual);
+            var failedPath = Path.Combine(s_baseDirectory, "tests", "failed", name);
+            Directory.CreateDirectory(Path.GetDirectoryName(failedPath));
+            File.WriteAllText(failedPath, actual);
             throw;
         }
     }

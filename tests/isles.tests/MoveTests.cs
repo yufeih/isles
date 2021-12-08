@@ -34,4 +34,46 @@ public class MoveTests
 
         svg.Snapshot("move/spawn.svg", duration);
     }
+
+    [Fact]
+    public void PassThrough()
+    {
+        using var move = new Move();
+
+        var svg = new SvgBuilder();
+        var unitCount = 10;
+        for (var i = 0; i < unitCount; i++)
+        {
+            if (i == 0)
+            {
+                move.AddUnit(-100, 0, 2);
+                svg.AddCircle(-100, 0, 2);
+            }
+            else
+            {
+                move.AddUnit(0, 0, 5);
+                svg.AddCircle(0, 0, 5);
+            }
+        }
+
+        var duration = 0.0f;
+        while (move.IsRunning())
+        {
+            if (move.GetUnitPosition(0).x < 30)
+            {
+                move.SetUnitVelocity(0, 80, 0);
+            }
+
+            move.Step(TimeStep);
+            duration += TimeStep;
+
+            for (var i = 0; i < unitCount; i++)
+            {
+                var (x, y) = move.GetUnitPosition(i);
+                svg.AnimateCircle(i, x, y);
+            }
+        }
+
+        svg.Snapshot("move/passthrough.svg", duration);
+    }
 }
