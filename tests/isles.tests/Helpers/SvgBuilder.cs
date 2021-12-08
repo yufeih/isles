@@ -1,10 +1,12 @@
+using System.Text;
 using System.Xml;
+using Xunit;
 
 namespace isles.tests;
 
 public class SvgBuilder
 {
-    private static readonly string s_baseDirectory = Path.Combine(FindRepositoryRoot(), "tests/svg");
+    private static readonly string s_baseDirectory = Path.Combine(FindRepositoryRoot(), "tests", "snapshots");
 
     private readonly List<(float x, float y, float r, List<(float x, float y)> animations)> _circles = new();
 
@@ -18,15 +20,29 @@ public class SvgBuilder
         _circles[index].animations.Add((x, y));
     }
 
-    public void Save(string path, float duration)
+    public void Snapshot(string path, float duration)
     {
         path = Path.Combine(s_baseDirectory, path);
-        Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path)));
+        if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CI")))
+        {
+            Assert.True(File.Exists(path));
+        }
 
-        using var xml = XmlWriter.Create(path, new() { Indent = true, OmitXmlDeclaration = true });
+        var expected = File.ReadAllText(path);
+        var actual = Build(duration);
+
+        File.WriteAllText(path, actual);
+
+        Assert.Equal(expected, actual, ignoreLineEndingDifferences: true, ignoreWhiteSpaceDifferences: true);
+    }
+
+    private string Build(float duration)
+    {
+        var sb = new StringBuilder();
+        using var xml = XmlWriter.Create(new StringWriter(sb), new() { Indent = true, OmitXmlDeclaration = true });
         xml.WriteStartElement("svg", ns: "http://www.w3.org/2000/svg");
 
-        var random = new Random(999);
+        var random = new Random(0);
         var viewBox = ComputeViewBox();
         xml.WriteAttributeString("viewBox", $"{viewBox.x} {viewBox.y} {viewBox.w} {viewBox.h}");
 
@@ -58,6 +74,9 @@ public class SvgBuilder
         }
 
         xml.WriteEndElement();
+        xml.Flush();
+
+        return sb.ToString();
     }
 
     private (float x, float y, float w, float h) ComputeViewBox()

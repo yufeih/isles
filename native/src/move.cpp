@@ -15,12 +15,15 @@ void move_world_step(move_world world, float timeStep)
   world->Step(timeStep, 8, 3);
 }
 
-move_unit move_add_unit(move_world world, float x, float y, float radius)
+move_unit move_add_unit(move_world world, float radius, float damping, float x, float y, float vx, float vy)
 {
   b2CircleShape shape;
   shape.m_radius = radius;
 
   b2BodyDef bd;
+  bd.linearDamping = damping;
+  bd.linearVelocity.x = vx;
+  bd.linearVelocity.y = vy;
   bd.fixedRotation = true;
   bd.type = b2_dynamicBody;
   bd.position.Set(x, y);
@@ -44,6 +47,11 @@ void move_get_unit(move_unit unit, float* x, float* y, float* vx, float* vy)
   auto vel = unit->GetLinearVelocity();
   *vx = vel.x;
   *vy = vel.y;
+}
+
+int32_t move_get_unit_is_awake(move_unit unit)
+{
+  return unit->IsAwake() ? 1 : 0;
 }
 
 void move_set_unit_velocity(move_unit unit, float vx, float vy)
