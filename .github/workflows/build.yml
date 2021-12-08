@@ -27,5 +27,11 @@ jobs:
     - uses: codecov/codecov-action@v1
     - uses: actions/upload-artifact@v2
       with:
+        name: failed-${{ matrix.os }}
+        path: tests/failed
+        if-no-files-found: ignore
+    - uses: actions/upload-artifact@v2
+      with:
         name: isles-${{ matrix.os }}
         path: out
+        if-no-files-found: error
