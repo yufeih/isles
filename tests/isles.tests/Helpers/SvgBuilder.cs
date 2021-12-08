@@ -6,7 +6,8 @@ namespace isles.tests;
 
 public class SvgBuilder
 {
-    private static readonly string s_baseDirectory = Path.Combine(FindRepositoryRoot(), "tests", "snapshots");
+    private static readonly bool s_isCI = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CI"));
+    private static readonly string s_baseDirectory = FindRepositoryRoot();
 
     private readonly List<(float x, float y, float r, List<(float x, float y)> animations)> _circles = new();
 
@@ -20,10 +21,10 @@ public class SvgBuilder
         _circles[index].animations.Add((x, y));
     }
 
-    public void Snapshot(string path, float duration)
+    public void Snapshot(string name, float duration)
     {
-        path = Path.Combine(s_baseDirectory, path);
-        if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CI")))
+        var path = Path.Combine(s_baseDirectory, "tests", "snapshots", name);
+        if (s_isCI)
         {
             Assert.True(File.Exists(path));
         }
@@ -33,7 +34,15 @@ public class SvgBuilder
 
         File.WriteAllText(path, actual);
 
-        Assert.Equal(expected, actual, ignoreLineEndingDifferences: true, ignoreWhiteSpaceDifferences: true);
+        try
+        {
+            Assert.Equal(expected, actual, ignoreLineEndingDifferences: true, ignoreWhiteSpaceDifferences: true);
+        }
+        catch when (s_isCI)
+        {
+            File.WriteAllText(Path.Combine(s_baseDirectory, "tests", "failed", name), actual);
+            throw;
+        }
     }
 
     private string Build(float duration)
