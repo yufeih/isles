@@ -10,6 +10,7 @@ public class SvgBuilder
     private static readonly string s_baseDirectory = FindRepositoryRoot();
 
     private readonly List<(float x, float y, float r, List<(float x, float y)> animations)> _circles = new();
+    private readonly List<(float x, float y, float w, float h)> _rectangles = new();
 
     public void AddCircle(float x, float y, float radius)
     {
@@ -19,6 +20,11 @@ public class SvgBuilder
     public void AnimateCircle(int index, float x, float y)
     {
         _circles[index].animations.Add((x, y));
+    }
+
+    public void AddRectangle(float x, float y, float w, float h)
+    {
+        _rectangles.Add((x, y, w, h));
     }
 
     public void Snapshot(string name, float duration)
@@ -77,6 +83,7 @@ public class SvgBuilder
                 xml.WriteAttributeString("attributeName", "cx");
                 xml.WriteAttributeString("dur", $"{duration}s");
                 xml.WriteAttributeString("repeatCount", "indefinite");
+                xml.WriteAttributeString("calcMode", "discrete");
                 xml.WriteAttributeString("values", string.Join(';', animations.Select(a => a.x)));
                 xml.WriteEndElement();
 
@@ -84,9 +91,21 @@ public class SvgBuilder
                 xml.WriteAttributeString("attributeName", "cy");
                 xml.WriteAttributeString("dur", $"{duration}s");
                 xml.WriteAttributeString("repeatCount", "indefinite");
+                xml.WriteAttributeString("calcMode", "discrete");
                 xml.WriteAttributeString("values", string.Join(';', animations.Select(a => a.y)));
                 xml.WriteEndElement();
             }
+            xml.WriteEndElement();
+        }
+
+        foreach (var (x, y, w, h) in _rectangles)
+        {
+            xml.WriteStartElement("rect");
+            xml.WriteAttributeString("x", x.ToString());
+            xml.WriteAttributeString("y", y.ToString());
+            xml.WriteAttributeString("width", w.ToString());
+            xml.WriteAttributeString("height", h.ToString());
+            xml.WriteAttributeString("fill", $"#{Convert.ToHexString(BitConverter.GetBytes(random.Next()), 0, 3)}");
             xml.WriteEndElement();
         }
 
@@ -98,9 +117,15 @@ public class SvgBuilder
 
     private (float x, float y, float w, float h) ComputeViewBox()
     {
-        var x = _circles.Select(c => c.x).Concat(_circles.SelectMany(c => c.animations.Select(a => a.x)));
-        var y = _circles.Select(c => c.y).Concat(_circles.SelectMany(c => c.animations.Select(a => a.y)));
-        var r = _circles.Select(c => c.r).Max();
+        var x = _circles.Select(c => c.x).Concat(
+            _circles.SelectMany(c => c.animations.Select(a => a.x))).Concat(
+            _rectangles.SelectMany(r => new[] { r.x, r.x + r.w }));
+
+        var y = _circles.Select(c => c.y).Concat(
+            _circles.SelectMany(c => c.animations.Select(a => a.y))).Concat(
+            _rectangles.SelectMany(r => new[] { r.y, r.y + r.h }));
+
+        var r = _circles.Select(c => c.r).DefaultIfEmpty().Max();
 
         var minX = x.Min() - r;
         var minY = y.Min() - r;

@@ -15,30 +15,38 @@ void move_world_step(move_world world, float timeStep)
   world->Step(timeStep, 8, 3);
 }
 
-move_unit move_add_unit(move_world world, float radius, float damping, float x, float y, float vx, float vy)
+move_unit move_unit_add(move_world world, float radius, float x, float y)
 {
   b2CircleShape shape;
   shape.m_radius = radius;
 
   b2BodyDef bd;
-  bd.linearDamping = damping;
-  bd.linearVelocity.x = vx;
-  bd.linearVelocity.y = vy;
   bd.fixedRotation = true;
   bd.type = b2_dynamicBody;
   bd.position.Set(x, y);
 
+  b2FixtureDef fd = {};
+  fd.shape = &shape;
+
+  b2MassData mass = {1, b2Vec2_zero};
+
   auto body = world->CreateBody(&bd);
-  body->CreateFixture(&shape, 1.0f);
+  body->CreateFixture(&fd);
+  body->SetMassData(&mass);
   return body;
 }
 
-void move_remove_unit(move_world world, move_unit unit)
+void move_unit_remove(move_world world, move_unit unit)
 {
   world->DestroyBody(unit);
 }
 
-void move_get_unit(move_unit unit, float* x, float* y, float* vx, float* vy)
+int32_t move_unit_is_awake(move_unit unit)
+{
+  return unit->IsAwake() ? 1 : 0;
+}
+
+void move_unit_get(move_unit unit, float *x, float *y, float *vx, float *vy)
 {
   auto pos = unit->GetPosition();
   *x = pos.x;
@@ -49,29 +57,42 @@ void move_get_unit(move_unit unit, float* x, float* y, float* vx, float* vy)
   *vy = vel.y;
 }
 
-int32_t move_get_unit_is_awake(move_unit unit)
+void move_unit_set_velocity(move_unit unit, float x, float y)
 {
-  return unit->IsAwake() ? 1 : 0;
-}
-
-void move_set_unit_velocity(move_unit unit, float vx, float vy)
-{
-  b2Vec2 v(vx, vy);
+  b2Vec2 v{x, y};
   unit->SetLinearVelocity(v);
-  unit->SetType(b2_kinematicBody);
 }
 
-move_obstacle move_add_obstacle(move_world world, float x, float y, float w, float h)
+void move_unit_apply_force(move_unit unit, float x, float y)
 {
+  b2Vec2 f{x, y};
+  unit->ApplyForceToCenter(f, true);
+}
+
+void move_unit_apply_impulse(move_unit unit, float x, float y)
+{
+  b2Vec2 i{x, y};
+  unit->ApplyLinearImpulseToCenter(i, true);
+}
+
+move_obstacle move_obstacle_add(move_world world, float x, float y, float w, float h)
+{
+  auto hx = w * 0.5f;
+  auto hy = w * 0.5f;
+
   b2PolygonShape shape;
-  shape.SetAsBox(w, h);
+  shape.SetAsBox(hx, hy);
 
   b2BodyDef bd;
-  bd.fixedRotation = true;
   bd.type = b2_staticBody;
-  bd.position.Set(x, y);
+  bd.position.Set(x + hx, y + hy);
 
   auto body = world->CreateBody(&bd);
   body->CreateFixture(&shape, 0.0f);
   return body;
+}
+
+void move_obstacle_remove(move_world world, move_obstacle obstacle)
+{
+  world->DestroyBody(obstacle);
 }
