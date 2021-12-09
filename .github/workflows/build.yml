@@ -26,11 +26,14 @@ jobs:
     - run: dotnet test -c Release --collect:"XPlat Code Coverage"
     - uses: codecov/codecov-action@v1
     - uses: actions/upload-artifact@v2
+      name: Upload test snapshots
+      if: failure()
       with:
-        name: failed-${{ matrix.os }}
+        name: snapshots-${{ matrix.os }}
         path: tests/failed
         if-no-files-found: ignore
     - uses: actions/upload-artifact@v2
+      name: Upload binaries
       with:
         name: isles-${{ matrix.os }}
         path: out
