@@ -1,79 +1,78 @@
+using System.Runtime.CompilerServices;
 using Xunit;
 
 namespace isles.tests;
 
-public class MoveTests
+public sealed class MoveTests : IDisposable
 {
-    private const float TimeStep = 1.0f / 60;
+    private readonly Move _move = new();
+    private readonly SvgBuilder _svg = new();
 
     [Fact]
     public void Spawn()
     {
-        using var move = new Move();
-
-        var svg = new SvgBuilder();
-        var unitCount = 10;
-        for (var i = 0; i < unitCount; i++)
+        for (var i = 0; i < 10; i++)
         {
-            move.AddUnit(0, 0, 5);
-            svg.AddCircle(0, 0, 5);
+            AddUnit(0, 0, 5);
         }
 
-        var duration = 0.0f;
-        while (move.IsRunning() && duration < 5)
-        {
-            move.Step(TimeStep);
-            duration += TimeStep;
-
-            for (var i = 0; i < unitCount; i++)
-            {
-                var (x, y) = move.GetUnitPosition(i);
-                svg.AnimateCircle(i, x, y);
-            }
-        }
-
-        svg.Snapshot("move/spawn.svg", duration);
+        Run();
     }
 
     [Fact]
     public void PassThrough()
     {
-        using var move = new Move();
-
-        var svg = new SvgBuilder();
-        var unitCount = 10;
-        for (var i = 0; i < unitCount; i++)
+        for (var i = 0; i < 10; i++)
         {
             if (i == 0)
             {
-                move.AddUnit(-20, 0, 2);
-                svg.AddCircle(-20, 0, 2);
+                AddUnit(-20, 0, 2);
             }
             else
             {
-                move.AddUnit(0, 0, 5);
-                svg.AddCircle(0, 0, 5);
+                AddUnit(0, 0, 5);
             }
         }
 
-        var duration = 0.0f;
-        while (move.IsRunning() && duration < 5)
+        Run(() =>
         {
-            if (move.GetUnitPosition(0).x < 10)
+            if (_move.GetUnitPosition(0).x < 10)
             {
-                move.SetUnitVelocity(0, 20, 0);
+                _move.SetUnitVelocity(0, 20, 0);
             }
+        });
+    }
 
-            move.Step(TimeStep);
-            duration += TimeStep;
+    private void AddUnit(float x, float y, float radius)
+    {
+        _move.AddUnit(x, y, radius);
+        _svg.AddCircle(x, y, radius);
+    }
 
-            for (var i = 0; i < unitCount; i++)
+    private void Run(Action? update = null, [CallerMemberName]string? testName = null)
+    {
+        var duration = 0.0f;
+        var timeStep = 1.0f / 60;
+
+        while (duration < 5 && _move.IsRunning())
+        {
+            update?.Invoke();
+
+            _move.Step(timeStep);
+            duration += timeStep;
+
+            for (var i = 0; i < _move.UnitCount; i++)
             {
-                var (x, y) = move.GetUnitPosition(i);
-                svg.AnimateCircle(i, x, y);
+                var (x, y) = _move.GetUnitPosition(i);
+                _svg.AnimateCircle(i, x, y);
             }
         }
 
-        svg.Snapshot("move/passthrough.svg", duration);
+        _svg.Snapshot($"move/{testName?.ToLowerInvariant()}.svg", duration);
+    }
+
+    public void Dispose()
+    {
+        _move.Dispose();
     }
 }

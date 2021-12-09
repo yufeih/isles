@@ -13,6 +13,8 @@ public sealed class Move : IDisposable
     private readonly List<IntPtr> _units = new();
     private readonly Random _random = new(0);
 
+    public int UnitCount => _units.Count;
+
     public void Step(float timeStep = 1.0f / 60)
     {
         move_world_step(_world, timeStep);
