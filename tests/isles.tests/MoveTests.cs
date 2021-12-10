@@ -14,14 +14,23 @@ public sealed class MoveTests : IDisposable
     public void AToB()
     {
         AddUnit(0, 0, 2);
-        Run(() => _move.SetUnitTarget(0, 10, 0));
+        Run(new[] { (10f, 0f) });
+    }
+
+    [Fact]
+    public void PingPong()
+    {
+        var offset = 0.5f;
+        AddUnit(0, offset, 2);
+        AddUnit(10, -offset, 2);
+        Run(new[] { (10f, offset), (0, -offset) });
     }
 
     [Fact]
     public void Spawn()
     {
-        AddUnits(10, 5);
-        Run(checkSpeed: false);
+        AddUnits(10, 5, spread: 5);
+        Run(Array.Empty<(float, float)>(), checkSpeed: false);
     }
 
     [Fact]
@@ -29,8 +38,7 @@ public sealed class MoveTests : IDisposable
     {
         AddUnit(-10, 0, 2);
         AddUnits(9, 2);
-
-        Run(() => _move.SetUnitTarget(0, 20, 0));
+        Run(new[] { (20f, 0f) });
     }
 
     [Fact]
@@ -38,17 +46,16 @@ public sealed class MoveTests : IDisposable
     {
         AddUnit(-5, 5, 1);
         AddObstacle(0, 0, 10, 10);
-
-        Run(() => _move.SetUnitTarget(0, 5, -2));
+        Run(new[] { (5f, -2f) });
     }
 
-    private void AddUnits(int count, float radius)
+    private void AddUnits(int count, float radius, float spread = 0.01f)
     {
         for (var i = 0; i < count; i++)
         {
             // Give it some random offset to kick start the simulation
-            var vx = (_random.NextSingle() - 0.5f) * 0.01f;
-            var vy = (_random.NextSingle() - 0.5f) * 0.01f;
+            var vx = (_random.NextSingle() - 0.5f) * spread;
+            var vy = (_random.NextSingle() - 0.5f) * spread;
 
             AddUnit(vx, vy, radius);
         }
@@ -66,7 +73,7 @@ public sealed class MoveTests : IDisposable
         _svg.AddRectangle(x, y, w, h);
     }
 
-    private void Run(Action? update = null, bool checkSpeed = true, [CallerMemberName] string? testName = null)
+    private void Run((float x, float y)[] targets, bool checkSpeed = true, [CallerMemberName] string? testName = null)
     {
         var duration = 0.0f;
         var timeStep = 1.0f / 60;
@@ -76,9 +83,7 @@ public sealed class MoveTests : IDisposable
 
         while (duration < 5 && _move.IsRunning())
         {
-            update?.Invoke();
-
-            _move.Step(timeStep);
+            _move.Update(timeStep, targets);
             duration += timeStep;
 
             for (var i = 0; i < _move.UnitCount; i++)

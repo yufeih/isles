@@ -15,8 +15,14 @@ public sealed class Move : IDisposable
 
     public int UnitCount => _units.Count;
 
-    public void Step(float timeStep = 1.0f / 60)
+    public void Update(float timeStep, (float x, float y)[] targets)
     {
+        for (var i = 0; i < _units.Count; i++)
+        {
+            var (x, y) = i < targets.Length ? targets[i] : (float.NaN, float.NaN);
+            SetUnitTarget(i, x, y);
+        }
+
         move_world_step(_world, timeStep);
     }
 
@@ -29,6 +35,12 @@ public sealed class Move : IDisposable
     public void SetUnitTarget(int i, float x, float y)
     {
         var (ptr, radius, speed) = _units[i];
+        if (float.IsNaN(x) || float.IsNaN(y))
+        {
+            //move_unit_set_velocity(ptr, 0, 0);
+            return;
+        }
+
         move_unit_get(ptr, out var px, out var py, out var _, out var _);
 
         var gap = new Vector2(x - px, y - py);
