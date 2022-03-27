@@ -7,9 +7,9 @@ public class LevelModel
 {
     public string Landscape { get; init; } = "";
 
-    public Vector3[] SpawnPoints { get; init; } = Array.Empty<Vector3>();
+    public Vector2[] SpawnPoints { get; init; } = Array.Empty<Vector2>();
 
-    public int[] PathOccluders { get; init; } = Array.Empty<int>();
+    public Point[] PathOccluders { get; init; } = Array.Empty<Point>();
 
     public EntityModel[] Entities { get; init; } = Array.Empty<EntityModel>();
 

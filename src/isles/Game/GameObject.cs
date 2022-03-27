@@ -957,20 +957,15 @@ public class Goldmine : GameObject
         SelectionAreaRadius = 30;
     }
 
+    public void SetRotation(float value)
+    {
+        RotationZ = MathHelper.ToRadians(value);
+        Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, RotationZ);
+    }
+
     public override void Deserialize(XmlElement xml)
     {
         string value;
-
-        // Read in rotation
-        if ((value = xml.GetAttribute("Rotation")) != "")
-        {
-            RotationZ = MathHelper.ToRadians(float.Parse(value));
-            Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, RotationZ);
-
-            // Don't forget to remove the Rotation attribute from the xml,
-            // otherwise our base will parse it as a Quaternion.
-            xml.RemoveAttribute("Rotation");
-        }
 
         // Read in obstructor & spawn point
         if ((_ = xml.GetAttribute("ObstructorSize")) != "")
