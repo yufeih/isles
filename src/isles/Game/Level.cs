@@ -39,11 +39,6 @@ public class Level : IEventListener
 
             Player.AllPlayers.Add(player);
         }
-
-        if (Player.LocalPlayer == null)
-        {
-            Player.LocalPlayer = new LocalPlayer();
-        }
     }
 
     protected virtual void CreatePlayers(List<PlayerInfo> info) { }
