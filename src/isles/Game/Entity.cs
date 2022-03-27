@@ -289,7 +289,7 @@ public abstract class Entity : BaseEntity
     /// <summary>
     /// Test to see if this entity is visible from a given view and projection.
     /// </summary>
-    public virtual bool IsVisible(Matrix viewProjection)
+    private bool IsVisible(Matrix viewProjection)
     {
         // Transform position to projection space
         var f = new BoundingFrustum(viewProjection);

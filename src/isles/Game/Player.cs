@@ -995,7 +995,7 @@ public class LocalPlayer : Player
         foreach (Entity e in gameObject.Owner.EnumerateObjects(gameObject.ClassID))
         {
             if (e is GameObject o && o.Owner == gameObject.Owner &&
-                o.Visible && o.IsVisible(game.ViewProjection) &&
+                o.Visible && o.WithinViewFrustum &&
                 o.IsAlive && o.ClassID == gameObject.ClassID)
             {
                 yield return o;
