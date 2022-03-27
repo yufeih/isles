@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Text.Json;
-using System.Xml;
 
 namespace Isles;
 
@@ -63,7 +62,7 @@ public class GameWorld
         context.Refresh(10);
 
         // Load world objects
-        foreach (var entity in model.Entities)
+        foreach (ref readonly var entity in model.Entities.AsSpan())
         {
             if (Create(entity.Type) is var worldObject)
             {
@@ -76,19 +75,17 @@ public class GameWorld
             }
         }
 
-        foreach (var decoration in model.Decorations)
+        foreach (ref readonly var decoration in model.Decorations.AsSpan())
         {
-            if (Create("Decoration") is Decoration worldObject)
-            {
-                worldObject.Model = new(decoration.Model);
-                worldObject.Position = decoration.Position;
-                worldObject.Rotation = Quaternion.CreateFromRotationMatrix(
-                                Matrix.CreateRotationX(MathHelper.ToRadians(decoration.RotationX)) *
-                                Matrix.CreateRotationY(MathHelper.ToRadians(decoration.RotationY)) *
-                                Matrix.CreateRotationZ(MathHelper.ToRadians(decoration.RotationZ)));
-                worldObject.Scale = decoration.Scale;
-                Add(worldObject);
-            }
+            var worldObject = new Decoration(this);
+            worldObject.Model = new(decoration.Model);
+            worldObject.Position = decoration.Position;
+            worldObject.Rotation = Quaternion.CreateFromRotationMatrix(
+                            Matrix.CreateRotationX(MathHelper.ToRadians(decoration.RotationX)) *
+                            Matrix.CreateRotationY(MathHelper.ToRadians(decoration.RotationY)) *
+                            Matrix.CreateRotationZ(MathHelper.ToRadians(decoration.RotationZ)));
+            worldObject.Scale = decoration.Scale;
+            Add(worldObject);
         }
 
         Flush();

@@ -1,6 +1,8 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Runtime.InteropServices;
+
 namespace Isles.Graphics;
 
 public class ModelRenderer
@@ -122,7 +124,7 @@ public class ModelRenderer
         _effect.CurrentTechnique = shader;
         _effect.CurrentTechnique.Passes[0].Apply();
 
-        foreach (var item in items)
+        foreach (ref readonly var item in CollectionsMarshal.AsSpan(items))
         {
             _world?.SetValue(item.Transform);
             _diffuse?.SetValue(item.Tint);
@@ -133,7 +135,7 @@ public class ModelRenderer
                 _bones?.SetValue(item.Bones);
             }
 
-            foreach (var part in item.Mesh.Primitives)
+            foreach (ref readonly var part in item.Mesh.Primitives.AsSpan())
             {
                 _graphics.SetVertexBuffer(part.VertexBuffer);
                 _graphics.Indices = part.IndexBuffer;

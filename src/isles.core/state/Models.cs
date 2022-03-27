@@ -15,18 +15,18 @@ public class LevelModel
 
     public DecorationModel[] Decorations { get; init; } = Array.Empty<DecorationModel>();
 
-    public class EntityModel
+    public struct EntityModel
     {
-        public string Type { get; init; } = "";
+        public string Type { get; init; }
 
         public Vector3 Position { get; init; }
 
         public float Rotation { get; init; }
     }
 
-    public class DecorationModel
+    public struct DecorationModel
     {
-        public string Model { get; init; } = "";
+        public string Model { get; init; }
 
         public Vector3 Scale { get; init; }
 

@@ -67,6 +67,7 @@ public abstract class BaseEntity : IAudioEmitter, IEventListener
     public BaseEntity(GameWorld world)
     {
         World = world;
+        ClassID = GetType().Name;
     }
 
     public virtual void Update(GameTime gameTime) { }

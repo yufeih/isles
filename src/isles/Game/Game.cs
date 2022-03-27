@@ -24,7 +24,6 @@ public class GameIsles : BaseGame
     private void Register()
     {
         // Register world object creators
-        GameWorld.RegisterCreator("Decoration", world => new Decoration(world));
         GameWorld.RegisterCreator("Tree", world => new Tree(world));
         GameWorld.RegisterCreator("Goldmine", world => new Goldmine(world));
         GameWorld.RegisterCreator("BoxOfPandora", world => new BoxOfPandora(world));
