@@ -79,11 +79,8 @@ public class GameWorld
         {
             var worldObject = new Decoration(this);
             worldObject.Model = new(decoration.Model);
-            worldObject.Position = decoration.Position;
-            worldObject.Rotation = Quaternion.CreateFromRotationMatrix(
-                            Matrix.CreateRotationX(MathHelper.ToRadians(decoration.RotationX)) *
-                            Matrix.CreateRotationY(MathHelper.ToRadians(decoration.RotationY)) *
-                            Matrix.CreateRotationZ(MathHelper.ToRadians(decoration.RotationZ)));
+            worldObject.Position = decoration.Translation;
+            worldObject.Rotation = decoration.Rotation;
             worldObject.Scale = decoration.Scale;
             Add(worldObject);
         }

@@ -18,6 +18,7 @@ public static class JsonHelper
         Options.Converters.Add(new PointJsonConverter());
         Options.Converters.Add(new Vector2JsonConverter());
         Options.Converters.Add(new Vector3JsonConverter());
+        Options.Converters.Add(new QuaternionJsonConverter());
     }
 
     private class PointJsonConverter : JsonConverter<Point>
@@ -110,6 +111,41 @@ public static class JsonHelper
         }
 
         public override void Write(Utf8JsonWriter writer, Vector3 value, JsonSerializerOptions options)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    private class QuaternionJsonConverter : JsonConverter<Quaternion>
+    {
+        public override bool CanConvert(Type typeToConvert) => typeToConvert == typeof(Quaternion);
+
+        public override Quaternion Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            if (reader.TokenType != JsonTokenType.StartArray)
+            {
+                throw new JsonException();
+            }
+
+            reader.Read();
+            var x = reader.GetSingle();
+            reader.Read();
+            var y = reader.GetSingle();
+            reader.Read();
+            var z = reader.GetSingle();
+            reader.Read();
+            var w = reader.GetSingle();
+
+            reader.Read();
+            if (reader.TokenType != JsonTokenType.EndArray)
+            {
+                throw new JsonException();
+            }
+
+            return new(x, y, z, w);
+        }
+
+        public override void Write(Utf8JsonWriter writer, Quaternion value, JsonSerializerOptions options)
         {
             throw new NotImplementedException();
         }

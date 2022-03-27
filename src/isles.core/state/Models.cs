@@ -30,12 +30,8 @@ public class LevelModel
 
         public Vector3 Scale { get; init; }
 
-        public Vector3 Position { get; init; }
+        public Quaternion Rotation { get; init; }
 
-        public float RotationX { get; init; }
-
-        public float RotationY { get; init; }
-
-        public float RotationZ { get; init; }
+        public Vector3 Translation { get; init; }
     }
 }
