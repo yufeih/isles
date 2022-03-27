@@ -183,22 +183,6 @@ public class Skirmish : Level
         player.AddDependency("PunishOfNatureUpgrade", "Altar");
         player.AddDependency("AttackUpgrade", "Barracks");
         player.AddDependency("DefenseUpgrade", "Barracks");
-
-        // Steamer
-        player.AddDependency("Steamhouse", "SteamFort");
-        player.AddDependency("Regenerator", "SteamFort");
-        player.AddDependency("SteamCannon", "SteamFort");
-        player.AddDependency("TraningCenter", "SteamFort");
-        player.AddDependency("SteamFactory", "SteamFort");
-        player.AddDependency("Miner", "SteamFort");
-        player.AddDependency("Swordman", "SteamFort");
-        player.AddDependency("Rifleman", "SteamFort");
-        player.AddDependency("Steambot", "SteamFort");
-        player.AddDependency("Swordman", "TraningCenter");
-        player.AddDependency("Rifleman", "TraningCenter");
-        player.AddDependency("Steambot", "SteamFactory");
-        player.AddDependency("AttackUpgrade", "TraningCenter");
-        player.AddDependency("DefenseUpgrade", "TraningCenter");
     }
 
     private void CreateStartup(GameWorld world, Player player, Vector3 position)
