@@ -125,7 +125,7 @@ public abstract class Entity : BaseEntity
 
     protected virtual bool OnStateChanged(BaseState newState, ref BaseState resultState) => true;
 
-    public GameModel Model { get; private set; }
+    public GameModel Model { get; set; }
 
     public virtual bool Visible => true;
 
@@ -250,31 +250,6 @@ public abstract class Entity : BaseEntity
         }
 
         // Get entity transform
-        rotationX = rotationY = rotationZ = 0;
-
-        if ((value = xml.GetAttribute("RotationX")) != "")
-        {
-            rotationX = MathHelper.ToRadians(float.Parse(value));
-        }
-
-        if ((value = xml.GetAttribute("RotationY")) != "")
-        {
-            rotationY = MathHelper.ToRadians(float.Parse(value));
-        }
-
-        if ((value = xml.GetAttribute("RotationZ")) != "")
-        {
-            rotationZ = MathHelper.ToRadians(float.Parse(value));
-        }
-
-        if (rotationX != 0 || rotationX != 0 || rotationZ != 0)
-        {
-            Rotation = Quaternion.CreateFromRotationMatrix(
-                                Matrix.CreateRotationX(rotationX) *
-                                Matrix.CreateRotationY(rotationY) *
-                                Matrix.CreateRotationZ(rotationZ));
-        }
-
         if ((value = xml.GetAttribute("Rotation")) != "")
         {
             Rotation = Helper.StringToQuaternion(value);

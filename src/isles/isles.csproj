@@ -12,6 +12,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Using Include="Isles" />
+    <Using Include="Isles.UI" />
+    <Using Include="Isles.Graphics" />
+    <Using Include="Microsoft.Xna.Framework" />
+    <Using Include="Microsoft.Xna.Framework.Audio" />
+    <Using Include="Microsoft.Xna.Framework.Graphics" />
+    <Using Include="Microsoft.Xna.Framework.Graphics.PackedVector" />
+    <Using Include="Microsoft.Xna.Framework.Input" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="..\..\data\**" LinkBase="data" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\xnb\**" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="shaders\**\*.cso" LinkBase="shaders" CopyToOutputDirectory="PreserveNewest" />
@@ -25,6 +36,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\extern\FNA\FNA.Core.csproj" />
+    <ProjectReference Include="..\isles.core\isles.core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

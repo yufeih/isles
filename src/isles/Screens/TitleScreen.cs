@@ -175,13 +175,13 @@ public class TitleScreen : IScreen
         buttons[0].Click += (o, e) =>
         {
             Audios.Play("OK");
-            BaseGame.Singleton.StartScreen(new GameScreen("World.xml"));
+            BaseGame.Singleton.StartScreen(new GameScreen("data/levels/demo.json"));
         };
 
         buttons[1].Click += (o, e) =>
         {
             Audios.Play("OK");
-            BaseGame.Singleton.StartScreen(new GameScreen("World.xml"));
+            BaseGame.Singleton.StartScreen(new GameScreen("data/levels/demo.json"));
         };
 
         buttons[3].Click += (o, e) =>

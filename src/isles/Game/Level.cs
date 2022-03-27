@@ -1,49 +1,22 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Xml;
-
 namespace Isles;
 
 public class Level : IEventListener
 {
-    private readonly List<PlayerInfo> playerInfoFromMap = new();
-
-    public virtual void Load(XmlElement xml, ILoading progress)
+    public virtual void Load(LevelModel model, ILoading progress)
     {
-        // Read in player info from the map
-        XmlNodeList childNodes = xml.SelectNodes("Player");
+        var playerInfoFromMap = new List<PlayerInfo>();
 
-        foreach (XmlElement child in childNodes)
+        foreach (var spawnPoint in model.SpawnPoints)
         {
             var info = new PlayerInfo
             {
-                Name = child.GetAttribute("Name"),
+                SpawnPoint = spawnPoint,
             };
-            if (child.HasAttribute("Team"))
-            {
-                info.Team = int.Parse(child.GetAttribute("Team"));
-            }
-
-            if (child.HasAttribute("TeamColor"))
-            {
-                info.TeamColor = Helper.StringToColor(child.GetAttribute("TeamColor"));
-            }
-
-            if (child.HasAttribute("Type"))
-            {
-                info.Type = (PlayerType)Enum.Parse(typeof(PlayerType), child.GetAttribute("Type"));
-            }
-
-            if (child.HasAttribute("SpawnPoint"))
-            {
-                info.SpawnPoint = Helper.StringToVector2(child.GetAttribute("SpawnPoint"));
-            }
 
             playerInfoFromMap.Add(info);
-
-            // Remove those tag from xml since the world do not recognize them
-            xml.RemoveChild(child);
         }
 
         CreatePlayers(playerInfoFromMap);

@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Text.Json;
-using System.Xml;
 
 using Isles.Screens;
 
@@ -64,15 +63,14 @@ public class GameScreen : IScreen, IEventListener
         // Reset players
         Player.Reset();
 
-        // Read XML scene content
-        var doc = new XmlDocument();
-        doc.Load($"data/levels/{levelName}");
+        // Read level
+        var doc = JsonSerializer.Deserialize<LevelModel>(File.ReadAllBytes(levelName), JsonHelper.Options);
 
-        Level.Load(doc.DocumentElement, loadContext);
+        Level.Load(doc, loadContext);
 
         // Load game world
         World = new GameWorld();
-        World.Load(doc.DocumentElement, loadContext);
+        World.Load(doc, loadContext);
         World.Pick = _worldRenderer.Pick;
 
         loadContext.Refresh(100);

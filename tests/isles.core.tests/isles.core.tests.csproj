@@ -1,11 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../src/isles/isles.csproj" />
+    <ProjectReference Include="../../src/isles.core/isles.core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
