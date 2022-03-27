@@ -43,7 +43,7 @@ public class GameScreen : IScreen, IEventListener
 
     private ReadmePanel readme;
 
-    public Level Level { get; set; }
+    private readonly Level Level;
 
     public GameScreen(string levelName)
     {
@@ -51,18 +51,7 @@ public class GameScreen : IScreen, IEventListener
         graphics = Game.Graphics;
 
         _worldRenderer = new(Game.GraphicsDevice, Game.Settings, Game.ModelRenderer, Game.ShaderLoader, Game.Input);
-        LoadWorld(levelName, new Skirmish(this, CreateTestPlayerInfo()));
-    }
-
-    private void LoadWorld(string levelFilename, Level level)
-    {
-        // Creates a default level if no input specified
-        if (level == null)
-        {
-            level = new Level();
-        }
-
-        Level = level;
+        Level = new Skirmish(this, CreateTestPlayerInfo());
 
         // Hide cursor
         Game.IsMouseVisible = false;
@@ -77,12 +66,9 @@ public class GameScreen : IScreen, IEventListener
 
         // Read XML scene content
         var doc = new XmlDocument();
-        doc.Load($"data/levels/{levelFilename}");
+        doc.Load($"data/levels/{levelName}");
 
-        if (level != null)
-        {
-            level.Load(doc.DocumentElement, loadContext);
-        }
+        Level.Load(doc.DocumentElement, loadContext);
 
         // Load game world
         World = new GameWorld();
@@ -98,10 +84,7 @@ public class GameScreen : IScreen, IEventListener
         ResetUI();
 
         // Start level
-        if (level != null)
-        {
-            level.Start(World);
-        }
+        Level.Start(World);
 
         // Load complete
         loadContext.Refresh(100);

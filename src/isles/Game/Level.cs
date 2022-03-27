@@ -50,37 +50,21 @@ public class Level : IEventListener
 
         // Create actual player instances
         Player.LocalPlayer = null;
-        for (var i = 0; i < playerInfoFromMap.Count; i++)
+        foreach (var playerInfo in playerInfoFromMap)
         {
-            Player player;
-            if (playerInfoFromMap[i].Type == PlayerType.Local)
+            Player player = playerInfo.Type switch
             {
-                if (Player.LocalPlayer != null)
-                {
-                    throw new Exception("Only one local player is allowed");
-                }
-
-                player = Player.LocalPlayer = new LocalPlayer();
-            }
-            else
-            {
-                player = playerInfoFromMap[i].Type == PlayerType.Computer
-                    ? new ComputerPlayer()
-                    : (Player)(playerInfoFromMap[i].Type == PlayerType.Dummy ? new DummyPlayer() : throw new NotImplementedException());
-            }
-
-            player.Name = playerInfoFromMap[i].Name;
-            player.Team = playerInfoFromMap[i].Team;
-            player.TeamColor = playerInfoFromMap[i].TeamColor;
-            player.SpawnPoint = playerInfoFromMap[i].SpawnPoint;
+                PlayerType.Local => new LocalPlayer(),
+                PlayerType.Computer => new ComputerPlayer(),
+                _ => throw new InvalidOperationException(),
+            };
+            
+            player.Name = playerInfo.Name;
+            player.Team = playerInfo.Team;
+            player.TeamColor = playerInfo.TeamColor;
+            player.SpawnPoint = playerInfo.SpawnPoint;
 
             Player.AllPlayers.Add(player);
-        }
-
-        // Make sure one local player is created
-        if (Player.LocalPlayer == null)
-        {
-            Player.AllPlayers.Add(Player.LocalPlayer = new LocalPlayer());
         }
     }
 

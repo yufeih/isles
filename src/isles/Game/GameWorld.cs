@@ -43,7 +43,7 @@ public class GameWorld
         PathManager.Update();
     }
 
-    public virtual void Load(XmlElement node, ILoading context)
+    public void Load(XmlElement node, ILoading context)
     {
         context.Refresh(2);
 

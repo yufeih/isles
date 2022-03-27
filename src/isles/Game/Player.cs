@@ -5,10 +5,8 @@ namespace Isles;
 
 public enum PlayerType
 {
-    Dummy,
     Local,
     Computer,
-    Remote,
 }
 
 public enum PlayerRelation
@@ -609,16 +607,6 @@ public abstract class Player : IEventListener
 }
 
 /// <summary>
-/// Dummy player will do nothing.
-/// </summary>
-public class DummyPlayer : Player
-{
-    public override void Update(GameTime gameTime) { }
-
-    public override void Start(GameWorld world) { }
-}
-
-/// <summary>
 /// The human player on the local machine.
 /// </summary>
 public class LocalPlayer : Player
@@ -670,6 +658,11 @@ public class LocalPlayer : Player
     /// </summary>
     private readonly List<GameObject> attackers = new();
     private readonly List<double> attackTimer = new();
+
+    public LocalPlayer()
+    {
+        Player.LocalPlayer = this;
+    }
 
     public override void Start(GameWorld world)
     {
