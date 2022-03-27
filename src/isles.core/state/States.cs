@@ -3,9 +3,7 @@
 
 namespace Isles;
 
-public class State
+public class EntityState
 {
     public long Id { get; init; }
-
-    public bool IsDeleted { get; init; }
 }

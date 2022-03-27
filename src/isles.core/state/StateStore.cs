@@ -5,9 +5,9 @@ namespace Isles;
 
 public class StateStore
 {
-    private readonly Dictionary<int, State> _states = new();
+    private readonly Dictionary<int, EntityState> _states = new();
 
-    public State? Get(int id)
+    public EntityState? Get(int id)
     {
         return _states.TryGetValue(id, out var value) ? value : null;
     }
