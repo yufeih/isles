@@ -965,8 +965,6 @@ public class Goldmine : GameObject
 
     public override void Deserialize(XmlElement xml)
     {
-        string value;
-
         // Read in obstructor & spawn point
         if ((_ = xml.GetAttribute("ObstructorSize")) != "")
         {

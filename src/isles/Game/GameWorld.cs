@@ -76,6 +76,21 @@ public class GameWorld
             }
         }
 
+        foreach (var decoration in model.Decorations)
+        {
+            if (Create("Decoration") is Decoration worldObject)
+            {
+                worldObject.Model = new(decoration.Model);
+                worldObject.Position = decoration.Position;
+                worldObject.Rotation = Quaternion.CreateFromRotationMatrix(
+                                Matrix.CreateRotationX(MathHelper.ToRadians(decoration.RotationX)) *
+                                Matrix.CreateRotationY(MathHelper.ToRadians(decoration.RotationY)) *
+                                Matrix.CreateRotationZ(MathHelper.ToRadians(decoration.RotationZ)));
+                worldObject.Scale = decoration.Scale;
+                Add(worldObject);
+            }
+        }
+
         Flush();
     }
 

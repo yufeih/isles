@@ -64,8 +64,7 @@ public class GameScreen : IScreen, IEventListener
         Player.Reset();
 
         // Read level
-        var jsonOptions = new JsonSerializerOptions();
-        var doc = JsonSerializer.Deserialize<LevelModel>(File.ReadAllBytes($"data/levels/{levelName}"), jsonOptions);
+        var doc = JsonSerializer.Deserialize<LevelModel>(File.ReadAllBytes(levelName), JsonHelper.Options);
 
         Level.Load(doc, loadContext);
 
