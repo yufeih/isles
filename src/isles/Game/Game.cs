@@ -50,11 +50,11 @@ public class GameIsles : BaseGame
         GameWorld.RegisterCreator("FireSorceress", world => new FireSorceress(world, "FireSorceress"));
         GameWorld.RegisterCreator("Hellfire", world => new Hellfire(world, "Hellfire"));
 
-        Spell.RegisterCreator("Follower", world => new SpellTraining(world, "Follower", null));
-        Spell.RegisterCreator("Militia", world => new SpellTraining(world, "Militia", null));
-        Spell.RegisterCreator("Hunter", world => new SpellTraining(world, "Hunter", null));
-        Spell.RegisterCreator("FireSorceress", world => new SpellTraining(world, "FireSorceress", null));
-        Spell.RegisterCreator("Hellfire", world => new SpellTraining(world, "Hellfire", null));
+        Spell.RegisterCreator("Follower", world => new SpellTraining(world, "Follower"));
+        Spell.RegisterCreator("Militia", world => new SpellTraining(world, "Militia"));
+        Spell.RegisterCreator("Hunter", world => new SpellTraining(world, "Hunter"));
+        Spell.RegisterCreator("FireSorceress", world => new SpellTraining(world, "FireSorceress"));
+        Spell.RegisterCreator("Hellfire", world => new SpellTraining(world, "Hellfire"));
 
         // Register spells
         Spell.RegisterCreator("LiveOfNature", world => new SpellUpgrade(world, "LiveOfNature", Upgrades.LiveOfNature));

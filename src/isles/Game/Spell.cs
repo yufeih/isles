@@ -648,11 +648,10 @@ public class SpellTraining : Spell
         }
     }
 
-    public SpellTraining(GameWorld world, string type, Building owner)
+    public SpellTraining(GameWorld world, string type)
         : base(world)
     {
         Type = type ?? throw new ArgumentNullException();
-        ownerBuilding = owner;
     }
 
     public override void Deserialize(XmlElement xml)
@@ -881,13 +880,13 @@ public class SpellTraining : Spell
 public class SpellUpgrade : SpellTraining
 {
     public SpellUpgrade(GameWorld world, string type)
-        : base(world, type, null)
+        : base(world, type)
     {
         GameDefault.Singleton.SetUnique(Type);
     }
 
     public SpellUpgrade(GameWorld world, string type, Action<Spell, Building> onComplete)
-        : base(world, type, null)
+        : base(world, type)
     {
         GameDefault.Singleton.SetUnique(Type);
         Complete = onComplete;
