@@ -15,14 +15,12 @@ public class GameDefault
     /// The key of the outer dictionary is the type name of a world object,
     /// the inner dictionary stores its default {attribute, value} pair.
     /// </summary>
-    public Dictionary<string, XmlElement>
-        WorldObjectDefaults = new();
+    public Dictionary<string, XmlElement> WorldObjectDefaults = new();
 
     /// <summary>
     /// Gets or sets the default attributes for spells.
     /// </summary>
-    public Dictionary<string, XmlElement>
-        SpellDefaults = new();
+    public Dictionary<string, XmlElement>  SpellDefaults = new();
 
     private readonly Dictionary<string, float> lumber = new();
     private readonly Dictionary<string, float> gold = new();

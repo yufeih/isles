@@ -91,11 +91,6 @@ public abstract class Spell : IEventListener
         creators.Add(spellName, creator);
     }
 
-    public static Spell Create(Type spellType, GameWorld world)
-    {
-        return Create(spellType.Name, world);
-    }
-
     /// <summary>
     /// Create a new game spell.
     /// </summary>
@@ -626,11 +621,6 @@ public class SpellTraining : Spell
     protected override void OnOwnerChanged()
     {
         ownerBuilding = Owner as Building;
-
-        if (ownerBuilding == null)
-        {
-            throw new ArgumentException();
-        }
     }
 
     /// <summary>
@@ -649,7 +639,7 @@ public class SpellTraining : Spell
     }
 
     public SpellTraining(GameWorld world, string type)
-        : base(world)
+        : base(world, type)
     {
         Type = type ?? throw new ArgumentNullException();
     }
@@ -1002,7 +992,7 @@ public class SpellConstruct : Spell
     private IPlaceable placeable;
 
     public SpellConstruct(GameWorld world, string entityType)
-        : base(world)
+        : base(world, entityType)
     {
         input = BaseGame.Singleton.Input;
         this.entityType = entityType;

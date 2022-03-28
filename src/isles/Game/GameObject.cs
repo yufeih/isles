@@ -439,20 +439,7 @@ public abstract class GameObject : Entity, ISelectable
     /// <param name="spell"></param>
     public void AddSpell(string name)
     {
-        Dictionary<string, XmlElement> objectConfig = GameDefault.Singleton.WorldObjectDefaults;
-        Dictionary<string, XmlElement> spellConfig = GameDefault.Singleton.SpellDefaults;
-
         var spell = Spell.Create(name, World);
-        if (objectConfig.ContainsKey(name))
-        {
-            spell.Deserialize(objectConfig[name]);
-        }
-
-        if (spellConfig.ContainsKey(name))
-        {
-            spell.Deserialize(spellConfig[name]);
-        }
-
         spell.Owner = this;
         OnCreateSpell(spell);
         Spells.Add(spell);
