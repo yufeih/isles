@@ -202,12 +202,12 @@ public abstract class Entity : BaseEntity
 
         Vector3 scaleBias = Vector3.One;
         Vector3 translation = Vector3.Zero;
-        float rotationX = 0, rotationY = 0, rotationZ = 0;
+        float rotationX = MathHelper.PiOver2, rotationY = 0, rotationZ = 0;
 
         // Get entity transform bias
         if ((value = xml.GetAttribute("RotationXBias")) != "")
         {
-            rotationX = MathHelper.ToRadians(float.Parse(value));
+            rotationX += MathHelper.ToRadians(float.Parse(value));
         }
 
         if ((value = xml.GetAttribute("RotationYBias")) != "")

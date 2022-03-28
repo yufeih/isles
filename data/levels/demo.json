@@ -7,7 +7,7 @@
     [383.0642,380.4125]
   ],
   "Decorations": [
-    { "Model": "Models/Ruined", "Scale": [0.12,0.12,0.12], "Rotation": [0.7071068,0,0,0.7071068], "Translation": [1024,1024,22] }
+    { "Model": "Models/Ruined", "Scale": 0.12, "Position": [1024,1024,22] }
   ],
   "Entities": [
     { "Type": "Goldmine", "Position": [1786.521,316.5644,38.63349], "Rotation": -80 },

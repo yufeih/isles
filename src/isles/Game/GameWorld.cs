@@ -75,13 +75,15 @@ public class GameWorld
             }
         }
 
+        var rotateX = Quaternion.CreateFromAxisAngle(Vector3.UnitX, MathHelper.PiOver2);
+        
         foreach (ref readonly var decoration in model.Decorations.AsSpan())
         {
             var worldObject = new Decoration(this);
             worldObject.Model = new(decoration.Model);
-            worldObject.Position = decoration.Translation;
-            worldObject.Rotation = decoration.Rotation;
-            worldObject.Scale = decoration.Scale;
+            worldObject.Position = decoration.Position;
+            worldObject.Rotation = rotateX * Quaternion.CreateFromAxisAngle(Vector3.UnitZ, MathHelper.ToRadians(decoration.Rotation));
+            worldObject.Scale = decoration.Scale * Vector3.One;
             Add(worldObject);
         }
 

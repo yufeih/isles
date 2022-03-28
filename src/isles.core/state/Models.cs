@@ -28,10 +28,10 @@ public class LevelModel
     {
         public string Model { get; init; }
 
-        public Vector3 Scale { get; init; }
+        public float Scale { get; init; }
 
-        public Quaternion Rotation { get; init; }
+        public float Rotation { get; init; }
 
-        public Vector3 Translation { get; init; }
+        public Vector3 Position { get; init; }
     }
 }
