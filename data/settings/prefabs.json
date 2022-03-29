@@ -1,4 +1,4 @@
-﻿{
+{
     "Tree": {
         "Name": "Tree",
         "Lumber": 100,
@@ -57,8 +57,7 @@
         ],
         "SpawnPoint": [
             0,
-            -20,
-            0
+            -20
         ],
         "Food": 10,
         "Health": 2000,
