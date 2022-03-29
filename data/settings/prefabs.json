@@ -367,7 +367,7 @@
             "SummonHellfire"
         ],
         "Sound": "Flame",
-        "SoundDir": "Flame",
+        "SoundDie": "Flame",
         "Snapshot": 3
     },
     "Hellfire": {
