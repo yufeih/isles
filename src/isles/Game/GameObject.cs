@@ -12,9 +12,9 @@ public abstract class GameObject : Entity, ISelectable
 
     private Icon icon;
 
-    public Icon Snapshot => snapshot;
+    public int? Snapshot { get; set; }
 
-    private Icon snapshot;
+    public Icon SnapshotIcon { get; private set; }
 
     public static Texture2D SnapshotTexture
     {
@@ -282,11 +282,6 @@ public abstract class GameObject : Entity, ISelectable
             MaxHealth = float.Parse(xml.GetAttribute("MaxHealth"));
         }
 
-        if (xml.HasAttribute("Owner"))
-        {
-            Owner = Player.FromID(int.Parse(xml.GetAttribute("Owner")));
-        }
-
         if (xml.HasAttribute("Priority"))
         {
             Priority = float.Parse(xml.GetAttribute("Priority"));
@@ -356,10 +351,9 @@ public abstract class GameObject : Entity, ISelectable
             ProfileButton.DoubleClick += (sender, e) => Player.LocalPlayer.SelectGroup(this);
         }
 
-        if (xml.HasAttribute("Snapshot") &&
-            int.TryParse(xml.GetAttribute("Snapshot"), out iconIndex))
+        if (xml.HasAttribute("Snapshot"))
         {
-            snapshot = Icon.FromTiledTexture(iconIndex, 8, 4, SnapshotTexture);
+            Snapshot = int.Parse(xml.GetAttribute("Snapshot"));
         }
 
         if (xml.HasAttribute("Sound"))
@@ -405,6 +399,11 @@ public abstract class GameObject : Entity, ISelectable
             }
 
             Attachment.Add(new KeyValuePair<GameModel, int>(new(model), attachPoint));
+        }
+
+        if (Snapshot != null)
+        {
+            SnapshotIcon = Icon.FromTiledTexture(Snapshot.Value, 8, 4, SnapshotTexture);
         }
     }
     /// <summary>
