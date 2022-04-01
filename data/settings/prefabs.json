@@ -249,10 +249,10 @@
             "Barracks",
             "Altar"
         ],
-        "Attachment": {
+        "Attachments": {
             "Weapon": "models/hammer",
             "Wood": "models/wood",
-            "Gold": "models/gold|Gold"
+            "Gold": "models/gold"
         },
         "Hotkey": "F",
         "TrainingTime": 10,
@@ -276,7 +276,7 @@
         "Model": "models/militia",
         "Speed": 30,
         "ObstructorRadius": 7,
-        "Attachment": {
+        "Attachments": {
             "Weapon": "models/warhammer",
             "Shield": "models/shield"
         },
@@ -310,7 +310,7 @@
         "Name": "Hunter",
         "Description": "Islander ranged units. Years of hunting life makes them masters of spears.",
         "Model": "models/hunter",
-        "Attachment": {
+        "Attachments": {
             "Weapon": "models/spear"
         },
         "Speed": 35,

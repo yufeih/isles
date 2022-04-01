@@ -69,7 +69,7 @@ public class Building : GameObject, IPlaceable
     /// <summary>
     /// Path brush.
     /// </summary>
-    private Vector2 obstructorSize;
+    public Vector2 ObstructorSize { get; set; }
     private readonly List<Point> pathGrids = new();
 
     /// <summary>
@@ -113,7 +113,7 @@ public class Building : GameObject, IPlaceable
 
         if ((value = xml.GetAttribute("ObstructorSize")) != "")
         {
-            obstructorSize = Helper.StringToVector2(value) / 2;
+            ObstructorSize = Helper.StringToVector2(value);
         }
 
         if ((value = xml.GetAttribute("SpawnPoint")) != "")
@@ -146,7 +146,7 @@ public class Building : GameObject, IPlaceable
         position.X = Position.X;
         position.Y = Position.Y;
 
-        outline.SetRectangle(-obstructorSize, obstructorSize, position, RotationZ);
+        outline.SetRectangle(-ObstructorSize / 2, ObstructorSize / 2, position, RotationZ);
     }
 
     public override void OnCreate()
@@ -672,8 +672,8 @@ public class Building : GameObject, IPlaceable
     private List<Charactor> GetNegotiables()
     {
         var obstructors = new List<Charactor>();
-        var nearbyObjects = World.GetNearbyObjects(Position, Math.Max(obstructorSize.X,
-                                                                  obstructorSize.Y));
+        var nearbyObjects = World.GetNearbyObjects(Position, Math.Max(ObstructorSize.X / 2,
+                                                                  ObstructorSize.Y / 2));
         foreach (var wo in nearbyObjects)
         {
             if (wo is Charactor c && c.IsAlive && c.Owner == Owner)

@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Xml;
+using System.Text.Json.Serialization;
 
 namespace Isles;
 
@@ -41,7 +42,7 @@ public abstract class BaseState : IEventListener
     }
 }
 
-public abstract class BaseEntity : IAudioEmitter, IEventListener
+public abstract class BaseEntity : IAudioEmitter, IEventListener, IJsonOnDeserialized
 {
     public static int EntityCount;
 
@@ -93,6 +94,8 @@ public abstract class BaseEntity : IAudioEmitter, IEventListener
     {
         return EventResult.Unhandled;
     }
+
+    public virtual void OnDeserialized() { }
 }
 
 /// <summary>
@@ -122,6 +125,18 @@ public abstract class Entity : BaseEntity
     private BaseState state;
 
     protected virtual bool OnStateChanged(BaseState newState, ref BaseState resultState) => true;
+
+    public string Model { get; set; }
+
+    public float Alpha { get; set; } = 1;
+
+    public Vector3 ScaleBias { get; set; } = Vector3.One;
+
+    public float RotationXBias { get; set; }
+
+    public float RotationYBias { get; set; }
+
+    public float RotationZBias { get; set; }
 
     public GameModel GameModel { get; set; }
 
@@ -183,63 +198,39 @@ public abstract class Entity : BaseEntity
         // Treat game model as level content
         if ((value = xml.GetAttribute("Model")) != "")
         {
-            GameModel = new GameModel(value);
+            Model = value;
         }
 
         if ((value = xml.GetAttribute("Alpha")) != "")
         {
-            GameModel.Alpha = float.Parse(value);
+            Alpha = float.Parse(value);
         }
-
-        Vector3 scaleBias = Vector3.One;
-        Vector3 translation = Vector3.Zero;
-        float rotationX = MathHelper.PiOver2, rotationY = 0, rotationZ = 0;
 
         // Get entity transform bias
         if ((value = xml.GetAttribute("RotationXBias")) != "")
         {
-            rotationX += MathHelper.ToRadians(float.Parse(value));
+            RotationXBias += float.Parse(value);
         }
 
         if ((value = xml.GetAttribute("RotationYBias")) != "")
         {
-            rotationY = MathHelper.ToRadians(float.Parse(value));
+            RotationYBias = float.Parse(value);
         }
 
         if ((value = xml.GetAttribute("RotationZBias")) != "")
         {
-            rotationZ = MathHelper.ToRadians(float.Parse(value));
+            RotationZBias = float.Parse(value);
         }
 
         if ((value = xml.GetAttribute("ScaleBias")) != "")
         {
-            scaleBias = Helper.StringToVector3(value);
+            ScaleBias = Helper.StringToVector3(value);
         }
 
-        if ((value = xml.GetAttribute("PositionBias")) != "")
-        {
-            translation = Helper.StringToVector3(value);
-        }
-
-        if (scaleBias != Vector3.One || rotationX != 0 || rotationY != 0 || rotationZ != 0 ||
-            translation != Vector3.Zero)
-        {
-            transformBias = Matrix.CreateScale(scaleBias) *
-                            Matrix.CreateRotationX(rotationX) *
-                            Matrix.CreateRotationY(rotationY) *
-                            Matrix.CreateRotationZ(rotationZ) *
-                            Matrix.CreateTranslation(translation);
-
-            // Update model transform
-            GameModel.Transform = transformBias;
-
-            // Center game model
-            Vector3 center = (GameModel.BoundingBox.Max + GameModel.BoundingBox.Min) / 2;
-            transformBias.M41 -= center.X;
-            transformBias.M42 -= center.Y;
-            transformBias.M43 -= GameModel.BoundingBox.Min.Z;
-            transformBias.M43 -= 0.2f;  // A little offset under the ground
-        }
+        transformBias = Matrix.CreateScale(ScaleBias) *
+                        Matrix.CreateRotationX(MathHelper.ToRadians(RotationXBias) + MathHelper.PiOver2) *
+                        Matrix.CreateRotationY(MathHelper.ToRadians(RotationYBias)) *
+                        Matrix.CreateRotationZ(MathHelper.ToRadians(RotationZBias));
 
         // Get entity transform
         if ((value = xml.GetAttribute("Rotation")) != "")
@@ -250,6 +241,27 @@ public abstract class Entity : BaseEntity
         if ((value = xml.GetAttribute("Scale")) != "")
         {
             Scale = Helper.StringToVector3(value);
+        }
+    }
+
+    public override void OnDeserialized()
+    {
+        base.OnDeserialized();
+
+        if (Model != null)
+        {
+            GameModel = new(Model);
+
+            // Update model transform
+            GameModel.Transform = transformBias;
+            GameModel.Alpha = Alpha;
+
+            // Center game model
+            Vector3 center = (GameModel.BoundingBox.Max + GameModel.BoundingBox.Min) / 2;
+            transformBias.M41 -= center.X;
+            transformBias.M42 -= center.Y;
+            transformBias.M43 -= GameModel.BoundingBox.Min.Z;
+            transformBias.M43 -= 0.2f;  // A little offset under the ground
         }
     }
 

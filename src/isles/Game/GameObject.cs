@@ -269,6 +269,8 @@ public abstract class GameObject : Entity, ISelectable
     public const float FlashDuration = 0.5f;
     public float flashElapsedTime = FlashDuration + 0.1f;
 
+    public Dictionary<string, string> Attachments = new();
+
     public List<KeyValuePair<GameModel, int>> Attachment = new();
 
     public GameObject(string classID)
@@ -276,6 +278,7 @@ public abstract class GameObject : Entity, ISelectable
         if (GameDefault.Singleton.WorldObjectDefaults.TryGetValue(classID, out XmlElement xml))
         {
             Deserialize(xml);
+            OnDeserialized();
         }
     }
 
@@ -296,11 +299,6 @@ public abstract class GameObject : Entity, ISelectable
         if (xml.HasAttribute("MaxHealth"))
         {
             float.TryParse(xml.GetAttribute("MaxHealth"), out maximumHealth);
-        }
-
-        if (health > maximumHealth)
-        {
-            maximumHealth = health;
         }
 
         if (xml.HasAttribute("Owner"))
@@ -328,17 +326,6 @@ public abstract class GameObject : Entity, ISelectable
             DefensePoint = Helper.StringToVector2(xml.GetAttribute("Defense"));
         }
 
-        // Make sure max (Y) is greater or equal then min (X)
-        if (AttackPoint.Y < AttackPoint.X)
-        {
-            AttackPoint.Y = AttackPoint.X;
-        }
-
-        if (DefensePoint.Y < DefensePoint.X)
-        {
-            DefensePoint.Y = DefensePoint.X;
-        }
-
         if (xml.HasAttribute("AttackDuration"))
         {
             AttackDuration = float.Parse(xml.GetAttribute("AttackDuration"));
@@ -363,15 +350,7 @@ public abstract class GameObject : Entity, ISelectable
 
             for (var i = 0; i < items.Length; i += 2)
             {
-                var model = new GameModel(items[i]);
-                var attachPoint = GameModel.GetBone(items[i + 1]);
-
-                if (attachPoint < 0)
-                {
-                    throw new Exception("Bone '" + items[i + 1] + "' do not exist in model '" + items[i] + "'.");
-                }
-
-                Attachment.Add(new KeyValuePair<GameModel, int>(model, attachPoint));
+                Attachments.Add(items[i + 1], items[i]);
             }
         }
 
@@ -432,6 +411,21 @@ public abstract class GameObject : Entity, ISelectable
         }
     }
 
+    public override void OnDeserialized()
+    {
+        base.OnDeserialized();
+
+        foreach (var (bone, model) in Attachments)
+        {
+            var attachPoint = GameModel.GetBone(bone);
+            if (attachPoint < 0)
+            {
+                throw new Exception("Bone '" + bone + "' do not exist in model '" + Model + "'.");
+            }
+
+            Attachment.Add(new KeyValuePair<GameModel, int>(new(model), attachPoint));
+        }
+    }
     /// <summary>
     /// Add a new spell for the game object.
     /// </summary>
@@ -796,6 +790,11 @@ public class Tree : GameObject
         }
 
         base.Deserialize(xml);
+    }
+    
+    public override void OnDeserialized()
+    {
+        base.OnDeserialized();
 
         // Randomize scale and rotation
         var size = Helper.RandomInRange(0.9f, 1.1f);
@@ -927,7 +926,7 @@ public class Goldmine : GameObject
     }
 
     private int gold = 10000;
-    private Vector2 obstructorSize;
+    public Vector2 ObstructorSize { get; set; }
     private readonly List<Point> pathGrids = new();
 
     public float RotationZ;
@@ -954,7 +953,7 @@ public class Goldmine : GameObject
         // Read in obstructor & spawn point
         if ((_ = xml.GetAttribute("ObstructorSize")) != "")
         {
-            obstructorSize = Helper.StringToVector2(xml.GetAttribute("ObstructorSize")) / 2;
+            ObstructorSize = Helper.StringToVector2(xml.GetAttribute("ObstructorSize"));
         }
 
         if ((_ = xml.GetAttribute("SpawnPoint")) != "")
@@ -986,7 +985,7 @@ public class Goldmine : GameObject
         position.X = Position.X;
         position.Y = Position.Y;
 
-        outline.SetRectangle(-obstructorSize, obstructorSize, position, RotationZ);
+        outline.SetRectangle(-ObstructorSize / 2, ObstructorSize / 2, position, RotationZ);
     }
 }
 
