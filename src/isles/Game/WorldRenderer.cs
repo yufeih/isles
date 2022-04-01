@@ -182,13 +182,13 @@ public class WorldRenderer
                                             Color.Red : Color.GreenYellow));
             }
 
-            if (entity.IsAlive && entity.maximumHealth > 0)
+            if (entity.IsAlive && entity.MaxHealth > 0)
             {
                 if (entity.Highlighted || _input.Keyboard.IsKeyDown(Keys.LeftAlt) || _input.Keyboard.IsKeyDown(Keys.RightAlt))
                 {
-                    var color = ProgressColor(1.0f * entity.health / entity.maximumHealth);
+                    var color = ProgressColor(1.0f * entity.health / entity.MaxHealth);
                     GameUI.Singleton.DrawProgress(entity.TopCenter, 0, (int)(entity.SelectionAreaRadius * 10.0f),
-                        100 * entity.health / entity.maximumHealth, color);
+                        100 * entity.health / entity.MaxHealth, color);
 
                     if (entity is Building building)
                     {

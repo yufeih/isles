@@ -516,7 +516,7 @@ public class Building : GameObject, IPlaceable
 
         // Building onfire
         const float StartBurnPercentage = 0.7f;
-        if (state == BuildingState.Normal && Health < MaximumHealth * StartBurnPercentage)
+        if (state == BuildingState.Normal && Health < MaxHealth * StartBurnPercentage)
         {
             if (fire == null)
             {
@@ -537,7 +537,7 @@ public class Building : GameObject, IPlaceable
             }
 
             // How many fire we should set
-            var count = 1 + (int)(fireSpawnPoints.Count * (1 - Health / (MaximumHealth * StartBurnPercentage)));
+            var count = 1 + (int)(fireSpawnPoints.Count * (1 - Health / (MaxHealth * StartBurnPercentage)));
             if (count > fireSpawnPoints.Count)
             {
                 count = fireSpawnPoints.Count;
@@ -578,10 +578,10 @@ public class Building : GameObject, IPlaceable
         }
 
         // Repair building
-        if (state == BuildingState.Normal && Health < MaximumHealth && BuilderCount > 0)
+        if (state == BuildingState.Normal && Health < MaxHealth && BuilderCount > 0)
         {
             var elapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            Health += 0.2f * MaximumHealth / ConstructionTime * elapsedSeconds *
+            Health += 0.2f * MaxHealth / ConstructionTime * elapsedSeconds *
                             (1 + (BuilderCount - 1) * CorporationTradeoff);
         }
 

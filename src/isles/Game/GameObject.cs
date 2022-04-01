@@ -75,9 +75,9 @@ public abstract class GameObject : Entity, ISelectable
 
         set
         {
-            if (value > maximumHealth)
+            if (value > MaxHealth)
             {
-                value = maximumHealth;
+                value = MaxHealth;
             }
 
             // Cannot reborn
@@ -114,7 +114,7 @@ public abstract class GameObject : Entity, ISelectable
                 OnDie();
             }
 
-            if (value < health && health > 0 && maximumHealth > 0 && Owner is LocalPlayer)
+            if (value < health && health > 0 && MaxHealth > 0 && Owner is LocalPlayer)
             {
                 Audios.Play("UnderAttack", Audios.Channel.UnderAttack, null);
             }
@@ -131,32 +131,13 @@ public abstract class GameObject : Entity, ISelectable
     /// <summary>
     /// Gets or sets the maximum health of this charactor.
     /// </summary>
-    public float MaximumHealth
-    {
-        get => maximumHealth;
-
-        set
-        {
-            if (value < 0)
-            {
-                throw new ArgumentOutOfRangeException();
-            }
-
-            if (maximumHealth < health)
-            {
-                Health = maximumHealth;
-            }
-
-            maximumHealth = value;
-        }
-    }
+    public float MaxHealth { get; set; }
 
     /// <summary>
     /// Gets whether the game object is alive.
     /// </summary>
-    public bool IsAlive => health > 0 || (health <= 0 && maximumHealth <= 0);
+    public bool IsAlive => health > 0 || (health <= 0 && MaxHealth <= 0);
 
-    public float maximumHealth;
     public float health;
 
     public List<Spell> Spells = new();
@@ -295,12 +276,12 @@ public abstract class GameObject : Entity, ISelectable
 
         if (xml.HasAttribute("MaxHealth"))
         {
-            float.TryParse(xml.GetAttribute("MaxHealth"), out maximumHealth);
+            MaxHealth = float.Parse(xml.GetAttribute("MaxHealth"));
         }
 
-        if (health > maximumHealth)
+        if (health > MaxHealth)
         {
-            maximumHealth = health;
+            MaxHealth = health;
         }
 
         if (xml.HasAttribute("Owner"))

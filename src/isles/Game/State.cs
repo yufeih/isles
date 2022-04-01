@@ -902,7 +902,7 @@ public class StateRepair : BaseState
     {
         return building == null || building.State != Building.BuildingState.Normal ||
                                   (building.State == Building.BuildingState.Normal &&
-                                   building.Health == building.MaximumHealth);
+                                   building.Health == building.MaxHealth);
     }
 }
 

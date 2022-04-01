@@ -584,7 +584,7 @@ public class Worker : Charactor
 
                     // Help repair building
                     else if (building.State == Building.BuildingState.Normal &&
-                             building.Health < building.MaximumHealth)
+                             building.Health < building.MaxHealth)
                     {
                         state = new StateRepair(World, this, building);
                     }
