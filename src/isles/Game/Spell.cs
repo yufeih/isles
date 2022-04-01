@@ -1552,7 +1552,7 @@ public class SpellSummon : Spell
 
             if (wo is GameObject)
             {
-                radius = (wo as GameObject).SelectionAreaRadius;
+                radius = (wo as GameObject).AreaRadius;
             }
 
             var effect = new EffectSpawn(wo.Position, radius, "Summon");
@@ -1628,7 +1628,7 @@ public class SpellPunishOfNature : Spell
                 {
                     var health = (0.2f + (1 - o.Owner.EnvironmentLevel) * 0.6f) * 40;
                     o.Health += health * elapsedSeconds;
-                    if (o.Health < o.MaximumHealth)
+                    if (o.Health < o.MaxHealth)
                     {
                         o.ShowGlow = true;
                     }

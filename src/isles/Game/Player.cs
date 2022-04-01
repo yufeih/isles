@@ -505,9 +505,9 @@ public abstract class Player : IEventListener
         foreach (GameObject charactor in members)
         {
             // Find the max radius
-            if (charactor.SelectionAreaRadius > space)
+            if (charactor.AreaRadius > space)
             {
-                space = charactor.SelectionAreaRadius * 1.5f;
+                space = charactor.AreaRadius * 1.5f;
             }
         }
 

@@ -49,7 +49,7 @@ public abstract class GameObject : Entity, ISelectable
     /// <summary>
     /// Gets or sets the radius of selection circle.
     /// </summary>
-    public float SelectionAreaRadius = 10;
+    public float AreaRadius = 10;
 
     /// <summary>
     /// Gets or sets the sound effect associated with this game object.
@@ -75,9 +75,9 @@ public abstract class GameObject : Entity, ISelectable
 
         set
         {
-            if (value > maximumHealth)
+            if (value > MaxHealth)
             {
-                value = maximumHealth;
+                value = MaxHealth;
             }
 
             // Cannot reborn
@@ -114,7 +114,7 @@ public abstract class GameObject : Entity, ISelectable
                 OnDie();
             }
 
-            if (value < health && health > 0 && maximumHealth > 0 && Owner is LocalPlayer)
+            if (value < health && health > 0 && MaxHealth > 0 && Owner is LocalPlayer)
             {
                 Audios.Play("UnderAttack", Audios.Channel.UnderAttack, null);
             }
@@ -131,32 +131,13 @@ public abstract class GameObject : Entity, ISelectable
     /// <summary>
     /// Gets or sets the maximum health of this charactor.
     /// </summary>
-    public float MaximumHealth
-    {
-        get => maximumHealth;
-
-        set
-        {
-            if (value < 0)
-            {
-                throw new ArgumentOutOfRangeException();
-            }
-
-            if (maximumHealth < health)
-            {
-                Health = maximumHealth;
-            }
-
-            maximumHealth = value;
-        }
-    }
+    public float MaxHealth { get; set; }
 
     /// <summary>
     /// Gets whether the game object is alive.
     /// </summary>
-    public bool IsAlive => health > 0 || (health <= 0 && maximumHealth <= 0);
+    public bool IsAlive => health > 0 || (health <= 0 && MaxHealth <= 0);
 
-    public float maximumHealth;
     public float health;
 
     public List<Spell> Spells = new();
@@ -298,7 +279,7 @@ public abstract class GameObject : Entity, ISelectable
 
         if (xml.HasAttribute("MaxHealth"))
         {
-            float.TryParse(xml.GetAttribute("MaxHealth"), out maximumHealth);
+            MaxHealth = float.Parse(xml.GetAttribute("MaxHealth"));
         }
 
         if (xml.HasAttribute("Owner"))
@@ -313,7 +294,7 @@ public abstract class GameObject : Entity, ISelectable
 
         if (xml.HasAttribute("AreaRadius"))
         {
-            SelectionAreaRadius = float.Parse(xml.GetAttribute("AreaRadius"));
+            AreaRadius = float.Parse(xml.GetAttribute("AreaRadius"));
         }
 
         if (xml.HasAttribute("Attack"))
@@ -939,7 +920,7 @@ public class Goldmine : GameObject
     public Goldmine() : base("Goldmine")
     {
         Spotted = true;
-        SelectionAreaRadius = 30;
+        AreaRadius = 30;
     }
 
     public void SetRotation(float value)
