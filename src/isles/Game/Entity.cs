@@ -209,7 +209,7 @@ public abstract class Entity : BaseEntity
         // Get entity transform bias
         if ((value = xml.GetAttribute("RotationXBias")) != "")
         {
-            RotationXBias += float.Parse(value);
+            RotationXBias = float.Parse(value);
         }
 
         if ((value = xml.GetAttribute("RotationYBias")) != "")

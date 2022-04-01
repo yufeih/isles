@@ -42,17 +42,17 @@ public class Building : GameObject, IPlaceable
     /// <summary>
     /// Gets or sets how much wood needed for the building.
     /// </summary>
-    public int Lumber;
+    public int Lumber { get; set; }
 
     /// <summary>
     /// Gets or sets how much gold needed for the building.
     /// </summary>
-    public int Gold;
+    public int Gold { get; set; }
 
     /// <summary>
     /// Gets or sets how much food this building can provide.
     /// </summary>
-    public int Food;
+    public int Food { get; set; }
 
     /// <summary>
     /// Gets or sets the number of builders.
@@ -97,17 +97,23 @@ public class Building : GameObject, IPlaceable
     /// Halo effect.
     /// </summary>
     private EffectHalo halo;
-    private string haloParticle;
+    
+    
+    public string Halo { get; set; }
 
     public Building(string classID)
-        : base(classID) { }
+        : base(classID)
+    {
+        // Reset sound die to explosion
+        SoundDie = "Explosion";
+    }
 
     public override void Deserialize(XmlElement xml)
     {
-        int.TryParse(xml.GetAttribute("Lumber"), out Lumber);
-        int.TryParse(xml.GetAttribute("Gold"), out Gold);
-        int.TryParse(xml.GetAttribute("Food"), out Food);
-        float.TryParse(xml.GetAttribute("ConstructionTime"), out ConstructionTime);
+        Lumber = int.Parse(xml.GetAttribute("Lumber"));
+        Gold = int.Parse(xml.GetAttribute("Gold"));
+        Food = int.Parse(xml.GetAttribute("Food"));
+        ConstructionTime = float.Parse(xml.GetAttribute("ConstructionTime"));
 
         string value;
 
@@ -130,14 +136,11 @@ public class Building : GameObject, IPlaceable
 
         if ((value = xml.GetAttribute("Halo")) != "")
         {
-            haloParticle = value;
+            Halo = value;
         }
 
         // Deserialize models after default attributes are assigned
         base.Deserialize(xml);
-
-        // Reset sound die to explosion
-        SoundDie = "Explosion";
     }
 
     protected override void UpdateOutline(Outline outline)
@@ -594,11 +597,11 @@ public class Building : GameObject, IPlaceable
             }
 
             // Create halo effect
-            if (ShouldDrawModel && haloParticle != null)
+            if (ShouldDrawModel && Halo != null)
             {
                 if (halo == null)
                 {
-                    halo = new EffectHalo(TopCenter, 30, haloParticle);
+                    halo = new EffectHalo(TopCenter, 30, Halo);
                 }
 
                 halo.Update(gameTime);

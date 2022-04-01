@@ -7,10 +7,10 @@ namespace Isles;
 
 public class Charactor : GameObject, IMovable
 {
-    public EffectGlow Glow;
-    public bool ShowGlow;
-    public bool IsHero;
-    public int Food;
+    public EffectGlow Glow { get; set; }
+    public bool ShowGlow { get; set; }
+    public bool IsHero { get; set; }
+    public int Food { get; set; }
 
     /// <summary>
     /// Gets or sets the speed of this charactor.
@@ -25,7 +25,7 @@ public class Charactor : GameObject, IMovable
     /// <summary>
     /// Gets or sets the radius of the charactor.
     /// </summary>
-    public float PathObstructorRadius { get; set; } = 5;
+    public float ObstructorRadius { get; set; } = 5;
 
     /// <summary>
     /// Gets or sets the facing of the charactor.
@@ -114,7 +114,7 @@ public class Charactor : GameObject, IMovable
 
         if ((value = xml.GetAttribute("ObstructorRadius")) != "")
         {
-            PathObstructorRadius = float.Parse(value);
+            ObstructorRadius = float.Parse(value);
         }
 
         if ((value = xml.GetAttribute("IsHero")) != "")
@@ -122,7 +122,7 @@ public class Charactor : GameObject, IMovable
             IsHero = bool.Parse(value);
         }
 
-        int.TryParse(xml.GetAttribute("Food"), out Food);
+        Food = int.Parse(xml.GetAttribute("Food"));
     }
 
     /// <summary>
@@ -262,7 +262,7 @@ public class Charactor : GameObject, IMovable
         Vector2 position;
         position.X = Position.X;
         position.Y = Position.Y;
-        outline.SetCircle(position, PathObstructorRadius * 2);
+        outline.SetCircle(position, ObstructorRadius * 2);
     }
 
     /// <summary>
@@ -315,7 +315,7 @@ public class Charactor : GameObject, IMovable
         Combat = new SpellCombat(this);
 
         // Create a path brush
-        Brush = World.PathManager.CreateBrush(PathObstructorRadius);
+        Brush = World.PathManager.CreateBrush(ObstructorRadius);
 
         // Find a valid position
         Position = new Vector3(World.PathManager.FindValidPosition(
@@ -331,7 +331,7 @@ public class Charactor : GameObject, IMovable
 
         positionLastFrame = Position;
 
-        SelectionAreaRadius = PathObstructorRadius;
+        SelectionAreaRadius = ObstructorRadius;
 
         // Initialize idle state
         if (Idle == null)
