@@ -23,7 +23,7 @@ public class GameDefault
     /// </summary>
     public Dictionary<string, XmlElement>  SpellDefaults = new();
 
-    public Dictionary<string, PrefabModel> Prefabs = new();
+    public Dictionary<string, JsonElement> Prefabs = new();
 
     private readonly Dictionary<string, float> lumber = new();
     private readonly Dictionary<string, float> gold = new();
@@ -211,8 +211,7 @@ public class GameDefault
             }
         }
 
-        Prefabs = JsonSerializer.Deserialize<Dictionary<string, PrefabModel>>(
-            File.ReadAllBytes("data/settings/prefabs.json"), JsonHelper.Options);
+        Prefabs = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(File.ReadAllBytes("data/settings/prefabs.json"));
     }
 
     public static GameDefault Singleton { get; } = new GameDefault();
