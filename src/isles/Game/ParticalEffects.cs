@@ -119,7 +119,7 @@ public class ProjectileEmitter : ParticleEmitter, IProjectile
     private Vector3 position;
     private Vector3 velocity;
 
-    public BaseEntity Target { get; }
+    public Entity Target { get; }
 
     public Vector3 Position => position;
 
@@ -135,7 +135,7 @@ public class ProjectileEmitter : ParticleEmitter, IProjectile
     /// Create a new projectile emitter.
     /// </summary>
     public ProjectileEmitter(ParticleSystem particleSystem, float particlesPerSecond,
-                             Vector3 initialPosition, Vector3 initialVelocity, BaseEntity target)
+                             Vector3 initialPosition, Vector3 initialVelocity, Entity target)
         : base(particleSystem, particlesPerSecond, initialPosition)
     {
         Target = target;
@@ -246,10 +246,10 @@ public class EffectFireball : ParticleEffect
 
     public IProjectile Projectile => fireEmitter;
 
-    public EffectFireball(Vector3 position, Vector3 velocity, BaseEntity target)
+    public EffectFireball(Vector3 position, Vector3 velocity, Entity target)
         : this(position, velocity, target, "Fireball", "FireballExplosion") { }
 
-    public EffectFireball(Vector3 position, Vector3 velocity, BaseEntity target,
+    public EffectFireball(Vector3 position, Vector3 velocity, Entity target,
                           string fireballParticle, string explosionParticle)
     {
         fire = ParticleSystem.Create(fireballParticle);

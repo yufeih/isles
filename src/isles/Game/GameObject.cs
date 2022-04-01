@@ -272,7 +272,6 @@ public abstract class GameObject : Entity, ISelectable
     public List<KeyValuePair<GameModel, int>> Attachment = new();
 
     public GameObject(string classID)
-        : base(null)
     {
         if (GameDefault.Singleton.WorldObjectDefaults.TryGetValue(classID, out XmlElement xml))
         {
@@ -1069,14 +1068,14 @@ public interface IProjectile
 {
     event EventHandler Hit;
 
-    BaseEntity Target { get; }
+    Entity Target { get; }
 }
 
 public class Missile : Entity, IProjectile
 {
     public event EventHandler Hit;
 
-    public BaseEntity Target { get; }
+    public Entity Target { get; }
 
     private Vector3 velocity;
     private readonly float scaling;
@@ -1085,10 +1084,11 @@ public class Missile : Entity, IProjectile
     public float MaxForce = 500;
     public float Mass = 0.5f;
 
-    public Missile(GameModel ammo, BaseEntity target)
-        : base(ammo.ShadowCopy())
+    public Missile(GameModel ammo, Entity target)
     {
         Target = target;
+
+        Model = ammo.ShadowCopy();
 
         // Compute position
         Position = ammo.Transform.Translation;
@@ -1176,9 +1176,6 @@ public class Missile : Entity, IProjectile
 
 public class Decoration : Entity
 {
-    public Decoration()
-        : base(null) { }
-
     public override void Deserialize(XmlElement xml)
     {
         base.Deserialize(xml);

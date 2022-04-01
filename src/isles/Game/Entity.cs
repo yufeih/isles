@@ -52,8 +52,6 @@ public abstract class BaseEntity : IAudioEmitter, IEventListener
     /// </summary>
     public Vector3 Position { get; set; }
 
-    public virtual BoundingBox BoundingBox => new();
-
     /// <summary>
     /// Gets or sets entity name.
     /// </summary>
@@ -140,7 +138,7 @@ public abstract class Entity : BaseEntity
     /// <summary>
     /// Returns the axis aligned bounding box of the game model.
     /// </summary>
-    public override BoundingBox BoundingBox
+    public BoundingBox BoundingBox
     {
         get
         {
@@ -175,11 +173,6 @@ public abstract class Entity : BaseEntity
     private readonly Outline outline = new();
 
     public virtual bool IsPickable => Visible;
-
-    public Entity(GameModel model)
-    {
-        Model = model;
-    }
 
     public override void Deserialize(XmlElement xml)
     {
