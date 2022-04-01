@@ -1,5 +1,6 @@
 {
     "Tree": {
+        "Type": "Tree",
         "Name": "Tree",
         "Lumber": 100,
         "Model": "models/alphapalm",
@@ -7,12 +8,14 @@
         "ScaleBias": 2.75
     },
     "BoxOfPandora": {
+        "Type": "BoxOfPandora",
         "Name": "Box of Pandora",
         "Description": "This magic box is a gift from pandora. Upon opened, it will either give you good fortune or create deadly damage. Be carefull when walk upon it.",
         "Model": "models/box",
         "ScaleBias": 0.15
     },
     "Goldmine": {
+        "Type": "Goldmine",
         "Name": "Goldmine",
         "Model": "models/goldmine",
         "Icon": 34,
@@ -29,6 +32,7 @@
         "Snapshot": 15
     },
     "Townhall": {
+        "Type": "Building",
         "Name": "Town hall",
         "Description": "Base structure of Islander village. It provides food and stores gold and lumber. You can train followers from this building.",
         "Hotkey": "T",
@@ -64,6 +68,7 @@
         "Sound": "Townhall"
     },
     "Barracks": {
+        "Type": "Building",
         "Name": "Barracks",
         "Description": "Islander military structure. It trains militias and hunters. It can also upgrade attack and defense point for all Islander units.",
         "Hotkey": "B",
@@ -97,6 +102,7 @@
         "Sound": "Barracks"
     },
     "Altar": {
+        "Type": "Building",
         "Name": "Altar of Peace",
         "Description": "A place where islanders worshiped their gold and nature. Fire sorceress can be summoned here. It can also reveal the ultimate spell \u0027Punish of Nature\u0027",
         "Hotkey": "R",
@@ -128,6 +134,7 @@
         ]
     },
     "Lumbermill": {
+        "Type": "Building",
         "Name": "Lumbermill",
         "Description": "Wood can be stored in the lumbermill. \u0027Live of Nature\u0027 can be researched here to make nearby trees evergreen.",
         "Halo": "Green",
@@ -156,6 +163,7 @@
         "Sound": "Lumbermill"
     },
     "Tower": {
+        "Type": "Building",
         "Name": "Defence Tower",
         "Description": "Islander defense structure.",
         "Hotkey": "D",
@@ -190,6 +198,7 @@
         "AttackDuration": 2
     },
     "Farmhouse": {
+        "Type": "Building",
         "Name": "Farm house",
         "Description": "Provides food for Islander units.",
         "ViewDistance": 60,
@@ -216,6 +225,7 @@
         "Food": 8
     },
     "Follower": {
+        "Type": "Worker",
         "Name": "Follower",
         "Description": "Religious followers of Islander god. Can construct buildings, harvest gold and lumber, repair damaged buildings and fight on the battlefield when necessary.",
         "Model": "models/follower",
@@ -260,6 +270,7 @@
         "SoundDie": "FollowerDie"
     },
     "Militia": {
+        "Type": "Charactor",
         "Name": "Militia",
         "Description": "Basic Islander soldiers. They are good at combat using their power hammer.",
         "Model": "models/militia",
@@ -295,6 +306,7 @@
         "Snapshot": 1
     },
     "Hunter": {
+        "Type": "Hunter",
         "Name": "Hunter",
         "Description": "Islander ranged units. Years of hunting life makes them masters of spears.",
         "Model": "models/hunter",
@@ -332,6 +344,7 @@
         "Snapshot": 2
     },
     "FireSorceress": {
+        "Type": "FireSorceress",
         "Name": "Fire Sorceress",
         "Description": "One of the five golds that the Islander worshiped. She is the master of all fire magic. She can also summon the powerful hellfire to fight on the battlefield. When \u0027Punish of Nature\u0027 is researched, she will serve the justice for the nature.",
         "Model": "models/sorceress",
@@ -370,6 +383,7 @@
         "Snapshot": 3
     },
     "Hellfire": {
+        "Type": "Hellfire",
         "Name": "Hellfire",
         "Description": "Summon the mighty giant creature that fight with fire sorceress.",
         "Model": "models/hellfire",
