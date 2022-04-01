@@ -99,8 +99,8 @@ public class Building : GameObject, IPlaceable
     private EffectHalo halo;
     private string haloParticle;
 
-    public Building(GameWorld world, string classID)
-        : base(world, classID) { }
+    public Building(string classID)
+        : base(classID) { }
 
     public override void Deserialize(XmlElement xml)
     {
@@ -247,7 +247,7 @@ public class Building : GameObject, IPlaceable
         // Create explosion
         if (ShouldDrawModel)
         {
-            new EffectExplosion(World, (TopCenter + Position) / 2);
+            new EffectExplosion((TopCenter + Position) / 2);
         }
 
         state = BuildingState.Destroyed;
@@ -491,7 +491,7 @@ public class Building : GameObject, IPlaceable
         {
             if (construct == null)
             {
-                construct = new EffectConstruct(World, Outline * 0.5f, Position.Z, Position.Z + 10);
+                construct = new EffectConstruct(Outline * 0.5f, Position.Z, Position.Z + 10);
             }
 
             if (ShouldDrawModel)
@@ -551,7 +551,7 @@ public class Building : GameObject, IPlaceable
 
                 fireSpawnPointsLeft.Remove(position);
 
-                fire.Add(new EffectFire(World, position));
+                fire.Add(new EffectFire(position));
 
                 Audios.Play("Damage", this);
             }
@@ -598,7 +598,7 @@ public class Building : GameObject, IPlaceable
             {
                 if (halo == null)
                 {
-                    halo = new EffectHalo(World, TopCenter, 30, haloParticle);
+                    halo = new EffectHalo(TopCenter, 30, haloParticle);
                 }
 
                 halo.Update(gameTime);
@@ -820,11 +820,11 @@ public class Tower : Building
     private readonly SpellCombat combat;
     private GameObject currentTarget;
 
-    public Tower(GameWorld world, string classID)
-        : base(world, classID)
+    public Tower(string classID)
+        : base(classID)
     {
         // Add a combat spell
-        combat = new SpellCombat(world, this);
+        combat = new SpellCombat(this);
     }
 
     public override void TriggerAttack(Entity target)
@@ -836,7 +836,7 @@ public class Tower : Building
         velocity *= 75;
 
         var fireball = new EffectFireball(
-            World, TopCenter - Vector3.UnitZ * 5, velocity, target,
+            TopCenter - Vector3.UnitZ * 5, velocity, target,
             "Frost", "FrostExplosion");
         fireball.Projectile.Hit += Hit;
         World.Add(fireball);

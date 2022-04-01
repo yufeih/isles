@@ -271,8 +271,8 @@ public abstract class GameObject : Entity, ISelectable
 
     public List<KeyValuePair<GameModel, int>> Attachment = new();
 
-    public GameObject(GameWorld world, string classID)
-        : base(world, null)
+    public GameObject(string classID)
+        : base(null)
     {
         if (GameDefault.Singleton.WorldObjectDefaults.TryGetValue(classID, out XmlElement xml))
         {
@@ -782,7 +782,7 @@ public class Tree : GameObject
     private readonly Random random = new();
     private List<Point> pathGrids = new();
 
-    public Tree(GameWorld world) : base(world, "Tree")
+    public Tree() : base("Tree")
     {
         ShowStatus = false;
         Spotted = true;
@@ -862,11 +862,11 @@ public class Tree : GameObject
         {
             if (star == null)
             {
-                star = new EffectStar(World, this);
+                star = new EffectStar(this);
 
                 if (Helper.Random.Next(10) == 0)
                 {
-                    glow = new EffectGlow(World, this);
+                    glow = new EffectGlow(this);
                 }
             }
 
@@ -938,7 +938,7 @@ public class Goldmine : GameObject
     /// </summary>
     public Vector3 SpawnPoint;
 
-    public Goldmine(GameWorld world) : base(world, "Goldmine")
+    public Goldmine() : base("Goldmine")
     {
         Spotted = true;
         SelectionAreaRadius = 30;
@@ -993,8 +993,8 @@ public class Goldmine : GameObject
 
 public class BoxOfPandora : GameObject
 {
-    public BoxOfPandora(GameWorld world)
-        : base(world, "BoxOfPandora")
+    public BoxOfPandora()
+        : base("BoxOfPandora")
     {
         VisibleInFogOfWar = false;
     }
@@ -1085,8 +1085,8 @@ public class Missile : Entity, IProjectile
     public float MaxForce = 500;
     public float Mass = 0.5f;
 
-    public Missile(GameWorld world, GameModel ammo, BaseEntity target)
-        : base(world, ammo.ShadowCopy())
+    public Missile(GameModel ammo, BaseEntity target)
+        : base(ammo.ShadowCopy())
     {
         Target = target;
 
@@ -1176,8 +1176,8 @@ public class Missile : Entity, IProjectile
 
 public class Decoration : Entity
 {
-    public Decoration(GameWorld world)
-        : base(world, null) { }
+    public Decoration()
+        : base(null) { }
 
     public override void Deserialize(XmlElement xml)
     {

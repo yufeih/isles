@@ -3,8 +3,6 @@ namespace Isles;
 
 public abstract class ParticleEffect : BaseEntity
 {
-    public ParticleEffect(GameWorld world)
-        : base(world) { }
 }
 
 /// <summary>
@@ -202,8 +200,7 @@ public class EffectConstruct : ParticleEffect
     private readonly AreaEmitter emitter;
     private readonly ParticleSystem particle;
 
-    public EffectConstruct(GameWorld world, Outline outline, float minHeight, float maxHeight)
-        : base(world)
+    public EffectConstruct(Outline outline, float minHeight, float maxHeight)
     {
         particle = ParticleSystem.Create("Construct");
         emitter = new AreaEmitter(particle, 0.075f * outline.Area, outline, minHeight, maxHeight);
@@ -222,11 +219,10 @@ public class EffectFire : ParticleEffect
     private readonly ParticleEmitter fireEmitter;
     private readonly ParticleEmitter smokeEmitter;
 
-    public EffectFire(GameWorld world)
-        : this(world, Vector3.Zero) { }
+    public EffectFire()
+        : this(Vector3.Zero) { }
 
-    public EffectFire(GameWorld world, Vector3 position)
-        : base(world)
+    public EffectFire(Vector3 position)
     {
         Position = position;
         fire = ParticleSystem.Create("Fire");
@@ -250,12 +246,11 @@ public class EffectFireball : ParticleEffect
 
     public IProjectile Projectile => fireEmitter;
 
-    public EffectFireball(GameWorld world, Vector3 position, Vector3 velocity, BaseEntity target)
-        : this(world, position, velocity, target, "Fireball", "FireballExplosion") { }
+    public EffectFireball(Vector3 position, Vector3 velocity, BaseEntity target)
+        : this(position, velocity, target, "Fireball", "FireballExplosion") { }
 
-    public EffectFireball(GameWorld world, Vector3 position, Vector3 velocity, BaseEntity target,
+    public EffectFireball(Vector3 position, Vector3 velocity, BaseEntity target,
                           string fireballParticle, string explosionParticle)
-        : base(world)
     {
         fire = ParticleSystem.Create(fireballParticle);
         explosion = ParticleSystem.Create(explosionParticle);
@@ -285,11 +280,7 @@ public class EffectExplosion : ParticleEffect
     private readonly ParticleSystem smoke;
     private readonly ParticleSystem spark;
 
-    public EffectExplosion(GameWorld world)
-        : this(world, Vector3.Zero) { }
-
-    public EffectExplosion(GameWorld world, Vector3 position)
-        : base(world)
+    public EffectExplosion(Vector3 position)
     {
         Position = position;
         fire = ParticleSystem.Create("Explosion");
@@ -335,11 +326,10 @@ public class EffectStar : ParticleEffect
     private readonly ParticleSystem particle;
     private readonly CircularEmitter emitter;
 
-    public EffectStar(GameWorld world)
-        : this(world, null) { }
+    public EffectStar()
+        : this(null) { }
 
-    public EffectStar(GameWorld world, GameObject gameObject)
-        : base(world)
+    public EffectStar(GameObject gameObject)
     {
         if (gameObject != null)
         {
@@ -369,8 +359,7 @@ public class EffectGlow : ParticleEffect
     private readonly ParticleSystem particle;
     private readonly ParticleEmitter emitter;
 
-    public EffectGlow(GameWorld world, GameObject gameObject)
-        : base(world)
+    public EffectGlow(GameObject gameObject)
     {
         if (gameObject != null)
         {
@@ -405,8 +394,7 @@ public class EffectPunishOfNature : ParticleEffect
     private readonly ParticleEmitter[] rainEmitters = new ParticleEmitter[MaxRainDrops];
     private readonly float[] sleepTimes = new float[MaxRainDrops];
 
-    public EffectPunishOfNature(GameWorld world, Vector3 position)
-        : base(world)
+    public EffectPunishOfNature(Vector3 position)
     {
         Position = position;
 
@@ -474,8 +462,7 @@ public class EffectHalo : ParticleEffect
     private readonly ParticleEmitter emitter;
     private readonly ParticleSystem particle;
 
-    public EffectHalo(GameWorld world, Vector3 position, float radius, string particleSystem)
-        : base(world)
+    public EffectHalo(Vector3 position, float radius, string particleSystem)
     {
         Radius = radius;
         Position = position;
@@ -506,8 +493,7 @@ public class EffectSpawn : ParticleEffect
     private readonly ParticleEmitter[] emitters;
     private readonly ParticleSystem particle;
 
-    public EffectSpawn(GameWorld world, Vector3 position, float radius, string particleSystem)
-        : base(world)
+    public EffectSpawn(Vector3 position, float radius, string particleSystem)
     {
         Radius = radius;
         Position = position;

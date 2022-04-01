@@ -127,7 +127,7 @@ public abstract class Spell : IEventListener
     /// </summary>
     public static Spell CurrentSpell { get; private set; }
 
-    protected GameWorld world;
+    protected GameWorld world = GameWorld.Singleton;
 
     public GameObject Owner
     {
@@ -159,15 +159,12 @@ public abstract class Spell : IEventListener
 
     private bool enable = true;
 
-    public Spell(GameWorld world)
+    public Spell()
     {
-        this.world = world;
     }
 
-    public Spell(GameWorld world, string classID)
+    public Spell(string classID)
     {
-        this.world = world;
-
         // Initialize from xml element
         if (GameDefault.Singleton.WorldObjectDefaults.TryGetValue(classID, out XmlElement xml))
         {
@@ -638,8 +635,8 @@ public class SpellTraining : Spell
         }
     }
 
-    public SpellTraining(GameWorld world, string type)
-        : base(world, type)
+    public SpellTraining(string type)
+        : base(type)
     {
         Type = type ?? throw new ArgumentNullException();
     }
@@ -869,14 +866,14 @@ public class SpellTraining : Spell
 
 public class SpellUpgrade : SpellTraining
 {
-    public SpellUpgrade(GameWorld world, string type)
-        : base(world, type)
+    public SpellUpgrade(string type)
+        : base(type)
     {
         GameDefault.Singleton.SetUnique(Type);
     }
 
-    public SpellUpgrade(GameWorld world, string type, Action<Spell, Building> onComplete)
-        : base(world, type)
+    public SpellUpgrade(string type, Action<Spell, Building> onComplete)
+        : base(type)
     {
         GameDefault.Singleton.SetUnique(Type);
         Complete = onComplete;
@@ -991,8 +988,8 @@ public class SpellConstruct : Spell
     private Entity entity;
     private IPlaceable placeable;
 
-    public SpellConstruct(GameWorld world, string entityType)
-        : base(world, entityType)
+    public SpellConstruct(string entityType)
+        : base(entityType)
     {
         input = BaseGame.Singleton.Input;
         this.entityType = entityType;
@@ -1234,8 +1231,7 @@ public class SpellAttack : Spell
     /// <summary>
     /// Creates a new team attack.
     /// </summary>
-    public SpellAttack(GameWorld world)
-        : base(world)
+    public SpellAttack()
     {
         Name = "Attack";
         Hotkey = Keys.A;
@@ -1336,8 +1332,7 @@ public class SpellAttack : Spell
 
 public class SpellMove : Spell
 {
-    public SpellMove(GameWorld world)
-        : base(world)
+    public SpellMove()
     {
         Name = "Move";
         Hotkey = Keys.M;
@@ -1444,8 +1439,7 @@ public class SpellCombat : Spell
     /// <summary>
     /// Creates a new combat spell.
     /// </summary>
-    public SpellCombat(GameWorld world, GameObject owner)
-        : base(world)
+    public SpellCombat(GameObject owner)
     {
         Owner = owner ?? throw new ArgumentNullException();
     }
@@ -1511,8 +1505,8 @@ public class SpellSummon : Spell
 {
     private readonly string type;
 
-    public SpellSummon(GameWorld world, string type)
-        : base(world, type)
+    public SpellSummon(string type)
+        : base(type)
     {
         this.type = type;
     }
@@ -1561,7 +1555,7 @@ public class SpellSummon : Spell
                 radius = (wo as GameObject).SelectionAreaRadius;
             }
 
-            var effect = new EffectSpawn(world, wo.Position, radius, "Summon");
+            var effect = new EffectSpawn(wo.Position, radius, "Summon");
 
             world.Add(effect);
 
@@ -1578,8 +1572,8 @@ public class SpellPunishOfNature : Spell
     private float elapsedTime;
     private EffectPunishOfNature effect;
 
-    public SpellPunishOfNature(GameWorld world)
-        : base(world, "PunishOfNature")
+    public SpellPunishOfNature()
+        : base("PunishOfNature")
     {
     }
 
@@ -1603,7 +1597,7 @@ public class SpellPunishOfNature : Spell
     {
         if (Owner != null)
         {
-            effect = new EffectPunishOfNature(world, Owner.Position);
+            effect = new EffectPunishOfNature(Owner.Position);
             elapsedTime = 0;
             base.Cast();
         }

@@ -104,7 +104,7 @@ public class WorldRenderer
             {
                 if (charactor.Glow == null)
                 {
-                    charactor.Glow = new EffectGlow(charactor.World, charactor);
+                    charactor.Glow = new EffectGlow(charactor);
                 }
 
                 charactor.Glow.Update(gameTime);

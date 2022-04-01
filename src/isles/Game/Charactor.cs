@@ -96,7 +96,7 @@ public class Charactor : GameObject, IMovable
 
     public override bool Visible => State is not StateHarvestGold harvestGold || (harvestGold.state != StateHarvestGold.StateType.Wait && harvestGold.state != StateHarvestGold.StateType.Harvest);
 
-    public Charactor(GameWorld world, string classID) : base(world, classID)
+    public Charactor(string classID) : base(classID)
     {
         VisibleInFogOfWar = false;
     }
@@ -312,7 +312,7 @@ public class Charactor : GameObject, IMovable
             Owner.MarkFutureObject(ClassID);
         }
 
-        Combat = new SpellCombat(World, this);
+        Combat = new SpellCombat(this);
 
         // Create a path brush
         Brush = World.PathManager.CreateBrush(PathObstructorRadius);
@@ -504,7 +504,7 @@ public class Worker : Charactor
     public GameModel wood;
     public GameModel gold;
 
-    public Worker(GameWorld world, string classID) : base(world, classID) { }
+    public Worker(string classID) : base(classID) { }
 
     public override string RunAnimation => LumberCarried > 0 ? "Carry" : "Run";
 
@@ -637,8 +637,8 @@ public class Hunter : Charactor
     public bool weaponVisible = true;
     public GameModel weapon;
 
-    public Hunter(GameWorld world, string type)
-        : base(world, type)
+    public Hunter(string type)
+        : base(type)
     {
     }
 
@@ -681,7 +681,7 @@ public class Hunter : Charactor
 
     private void Launch()
     {
-        var missile = new Missile(World, weapon, AttackTarget);
+        var missile = new Missile(weapon, AttackTarget);
 
         missile.Hit += Hit;
         World.Add(missile);
@@ -714,8 +714,8 @@ public class FireSorceress : Charactor
 {
     private int rightHand;
 
-    public FireSorceress(GameWorld world, string classID)
-        : base(world, classID) { }
+    public FireSorceress(string classID)
+        : base(classID) { }
 
     public override string AttackAnimation => Helper.Random.Next(2) == 0 ? "Attack" : "Attack_2";
 
@@ -776,8 +776,7 @@ public class FireSorceress : Charactor
 
         spawn = rightHand >= 0 ? Model.GetBoneTransform(rightHand).Translation : TopCenter - Vector3.UnitZ * 5;
 
-        var fireball = new EffectFireball(
-            World, spawn, Vector3.UnitZ * 50, AttackTarget);
+        var fireball = new EffectFireball(spawn, Vector3.UnitZ * 50, AttackTarget);
         fireball.Projectile.Hit += Hit;
         World.Add(fireball);
 
@@ -805,8 +804,8 @@ public class FireSorceress : Charactor
 
 public class Hellfire : Charactor
 {
-    public Hellfire(GameWorld world, string classID)
-        : base(world, classID) { }
+    public Hellfire(string classID)
+        : base(classID) { }
 
     public override string AttackAnimation => Helper.Random.Next(2) == 0 ? "Attack" : "Attack_2";
 }

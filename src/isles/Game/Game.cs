@@ -24,44 +24,44 @@ public class GameIsles : BaseGame
     private void Register()
     {
         // Register world object creators
-        GameWorld.RegisterCreator("Tree", world => new Tree(world));
-        GameWorld.RegisterCreator("Goldmine", world => new Goldmine(world));
-        GameWorld.RegisterCreator("BoxOfPandora", world => new BoxOfPandora(world));
+        GameWorld.RegisterCreator("Tree", world => new Tree());
+        GameWorld.RegisterCreator("Goldmine", world => new Goldmine());
+        GameWorld.RegisterCreator("BoxOfPandora", world => new BoxOfPandora());
 
         // Islander architectures
-        GameWorld.RegisterCreator("Townhall", world => new Building(world, "Townhall"));
-        GameWorld.RegisterCreator("Farmhouse", world => new Building(world, "Farmhouse"));
-        GameWorld.RegisterCreator("Lumbermill", world => new Building(world, "Lumbermill"));
-        GameWorld.RegisterCreator("Tower", world => new Tower(world, "Tower"));
-        GameWorld.RegisterCreator("Barracks", world => new Building(world, "Barracks"));
-        GameWorld.RegisterCreator("Altar", world => new Building(world, "Altar"));
+        GameWorld.RegisterCreator("Townhall", world => new Building("Townhall"));
+        GameWorld.RegisterCreator("Farmhouse", world => new Building("Farmhouse"));
+        GameWorld.RegisterCreator("Lumbermill", world => new Building("Lumbermill"));
+        GameWorld.RegisterCreator("Tower", world => new Tower("Tower"));
+        GameWorld.RegisterCreator("Barracks", world => new Building("Barracks"));
+        GameWorld.RegisterCreator("Altar", world => new Building("Altar"));
 
-        Spell.RegisterCreator("Townhall", world => new SpellConstruct(world, "Townhall"));
-        Spell.RegisterCreator("Farmhouse", world => new SpellConstruct(world, "Farmhouse"));
-        Spell.RegisterCreator("Lumbermill", world => new SpellConstruct(world, "Lumbermill"));
-        Spell.RegisterCreator("Tower", world => new SpellConstruct(world, "Tower"));
-        Spell.RegisterCreator("Barracks", world => new SpellConstruct(world, "Barracks"));
-        Spell.RegisterCreator("Altar", world => new SpellConstruct(world, "Altar"));
+        Spell.RegisterCreator("Townhall", world => new SpellConstruct("Townhall"));
+        Spell.RegisterCreator("Farmhouse", world => new SpellConstruct("Farmhouse"));
+        Spell.RegisterCreator("Lumbermill", world => new SpellConstruct("Lumbermill"));
+        Spell.RegisterCreator("Tower", world => new SpellConstruct("Tower"));
+        Spell.RegisterCreator("Barracks", world => new SpellConstruct("Barracks"));
+        Spell.RegisterCreator("Altar", world => new SpellConstruct("Altar"));
 
         // Islander units
-        GameWorld.RegisterCreator("Follower", world => new Worker(world, "Follower"));
-        GameWorld.RegisterCreator("Militia", world => new Charactor(world, "Militia"));
-        GameWorld.RegisterCreator("Hunter", world => new Hunter(world, "Hunter"));
-        GameWorld.RegisterCreator("FireSorceress", world => new FireSorceress(world, "FireSorceress"));
-        GameWorld.RegisterCreator("Hellfire", world => new Hellfire(world, "Hellfire"));
+        GameWorld.RegisterCreator("Follower", world => new Worker("Follower"));
+        GameWorld.RegisterCreator("Militia", world => new Charactor("Militia"));
+        GameWorld.RegisterCreator("Hunter", world => new Hunter("Hunter"));
+        GameWorld.RegisterCreator("FireSorceress", world => new FireSorceress("FireSorceress"));
+        GameWorld.RegisterCreator("Hellfire", world => new Hellfire("Hellfire"));
 
-        Spell.RegisterCreator("Follower", world => new SpellTraining(world, "Follower"));
-        Spell.RegisterCreator("Militia", world => new SpellTraining(world, "Militia"));
-        Spell.RegisterCreator("Hunter", world => new SpellTraining(world, "Hunter"));
-        Spell.RegisterCreator("FireSorceress", world => new SpellTraining(world, "FireSorceress"));
-        Spell.RegisterCreator("Hellfire", world => new SpellTraining(world, "Hellfire"));
+        Spell.RegisterCreator("Follower", world => new SpellTraining("Follower"));
+        Spell.RegisterCreator("Militia", world => new SpellTraining("Militia"));
+        Spell.RegisterCreator("Hunter", world => new SpellTraining("Hunter"));
+        Spell.RegisterCreator("FireSorceress", world => new SpellTraining("FireSorceress"));
+        Spell.RegisterCreator("Hellfire", world => new SpellTraining("Hellfire"));
 
         // Register spells
-        Spell.RegisterCreator("LiveOfNature", world => new SpellUpgrade(world, "LiveOfNature", Upgrades.LiveOfNature));
-        Spell.RegisterCreator("PunishOfNatureUpgrade", world => new SpellUpgrade(world, "PunishOfNatureUpgrade", Upgrades.PunishOfNature));
-        Spell.RegisterCreator("AttackUpgrade", world => new SpellUpgrade(world, "AttackUpgrade", Upgrades.Attack));
-        Spell.RegisterCreator("DefenseUpgrade", world => new SpellUpgrade(world, "DefenseUpgrade", Upgrades.Defense));
-        Spell.RegisterCreator("PunishOfNature", world => new SpellPunishOfNature(world));
-        Spell.RegisterCreator("SummonHellfire", world => new SpellSummon(world, "Hellfire"));
+        Spell.RegisterCreator("LiveOfNature", world => new SpellUpgrade("LiveOfNature", Upgrades.LiveOfNature));
+        Spell.RegisterCreator("PunishOfNatureUpgrade", world => new SpellUpgrade("PunishOfNatureUpgrade", Upgrades.PunishOfNature));
+        Spell.RegisterCreator("AttackUpgrade", world => new SpellUpgrade("AttackUpgrade", Upgrades.Attack));
+        Spell.RegisterCreator("DefenseUpgrade", world => new SpellUpgrade("DefenseUpgrade", Upgrades.Defense));
+        Spell.RegisterCreator("PunishOfNature", world => new SpellPunishOfNature());
+        Spell.RegisterCreator("SummonHellfire", world => new SpellSummon("Hellfire"));
     }
 }

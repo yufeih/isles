@@ -7,6 +7,8 @@ namespace Isles;
 
 public class GameWorld
 {
+    public static GameWorld Singleton { get; set; }
+
     private readonly List<BaseEntity> _pendingAdds = new();
     private readonly List<BaseEntity> _pendingRemoves = new();
 
@@ -79,7 +81,7 @@ public class GameWorld
         
         foreach (ref readonly var decoration in model.Decorations.AsSpan())
         {
-            var worldObject = new Decoration(this);
+            var worldObject = new Decoration();
             worldObject.Model = new(decoration.Model);
             worldObject.Position = decoration.Position;
             worldObject.Rotation = rotateX * Quaternion.CreateFromAxisAngle(Vector3.UnitZ, MathHelper.ToRadians(decoration.Rotation));

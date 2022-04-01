@@ -69,7 +69,7 @@ public class GameScreen : IScreen, IEventListener
         Level.Load(doc, loadContext);
 
         // Load game world
-        World = new GameWorld();
+        GameWorld.Singleton = World = new GameWorld();
         World.Load(doc, loadContext);
         World.Pick = _worldRenderer.Pick;
 

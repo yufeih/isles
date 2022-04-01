@@ -45,12 +45,12 @@ public abstract class BaseEntity : IAudioEmitter, IEventListener
 {
     public static int EntityCount;
 
-    public GameWorld World { get; }
+    public GameWorld World => GameWorld.Singleton;
 
     /// <summary>
     /// Gets or sets the 3D position of the entity.
     /// </summary>
-    public virtual Vector3 Position { get; set; }
+    public Vector3 Position { get; set; }
 
     public virtual BoundingBox BoundingBox => new();
 
@@ -64,9 +64,8 @@ public abstract class BaseEntity : IAudioEmitter, IEventListener
     /// </summary>
     public string ClassID { get; set; }
 
-    public BaseEntity(GameWorld world)
+    public BaseEntity()
     {
-        World = world;
         ClassID = GetType().Name;
     }
 
@@ -177,8 +176,7 @@ public abstract class Entity : BaseEntity
 
     public virtual bool IsPickable => Visible;
 
-    public Entity(GameWorld world, GameModel model)
-        : base(world)
+    public Entity(GameModel model)
     {
         Model = model;
     }

@@ -668,8 +668,8 @@ public class LocalPlayer : Player
     {
         this.world = world ?? throw new ArgumentNullException();
         camera = game.Camera as GameCamera;
-        Attack = new SpellAttack(world);
-        Move = new SpellMove(world);
+        Attack = new SpellAttack();
+        Move = new SpellMove();
 
         for (var i = 0; i < teams.Length; i++)
         {
