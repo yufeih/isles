@@ -457,7 +457,7 @@ public class Building : GameObject, IPlaceable
         // Pre construct
         if (state == BuildingState.PreConstruct)
         {
-            Model.Tint = IsLocationPlacable() ? Vector3.One : Vector3.UnitX;
+            GameModel.Tint = IsLocationPlacable() ? Vector3.One : Vector3.UnitX;
         }
 
         // Wait
@@ -509,7 +509,7 @@ public class Building : GameObject, IPlaceable
                 // Build complete
                 OnComplete();
 
-                Model.Alpha = 1.0f;
+                GameModel.Alpha = 1.0f;
                 state = BuildingState.Normal;
             }
         }
@@ -527,10 +527,10 @@ public class Building : GameObject, IPlaceable
 
                 var index = 1;
                 int bone;
-                while ((bone = Model.GetBone("fire" + index)) >= 0)
+                while ((bone = GameModel.GetBone("fire" + index)) >= 0)
                 {
                     index++;
-                    fireSpawnPoints.Add(Model.GetBoneTransform(bone).Translation);
+                    fireSpawnPoints.Add(GameModel.GetBoneTransform(bone).Translation);
                 }
 
                 fireSpawnPointsLeft.AddRange(fireSpawnPoints);
@@ -662,7 +662,7 @@ public class Building : GameObject, IPlaceable
 
             Owner.Gold -= Gold;
             Owner.Lumber -= Lumber;
-            Model.Alpha = 0.3f;
+            GameModel.Alpha = 0.3f;
             state = BuildingState.PreConstruct;
         }
 

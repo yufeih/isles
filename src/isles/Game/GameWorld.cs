@@ -82,7 +82,7 @@ public class GameWorld
         foreach (ref readonly var decoration in model.Decorations.AsSpan())
         {
             var worldObject = new Decoration();
-            worldObject.Model = new(decoration.Model);
+            worldObject.GameModel = new(decoration.Model);
             worldObject.Position = decoration.Position;
             worldObject.Rotation = rotateX * Quaternion.CreateFromAxisAngle(Vector3.UnitZ, MathHelper.ToRadians(decoration.Rotation));
             worldObject.Scale = decoration.Scale * Vector3.One;

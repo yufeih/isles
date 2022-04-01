@@ -30,7 +30,7 @@ public class WorldRenderer
         var objectMap = _modelPicker.DrawObjectMap(
             viewProjection,
             world.WorldObjects.OfType<Entity>().Where(entity => entity.IsPickable),
-            entity => entity.Model);
+            entity => entity.GameModel);
 
         _pickedEntity = objectMap.Pick();
 
@@ -90,9 +90,9 @@ public class WorldRenderer
 
     private void DrawEntity(Entity entity)
     {
-        if (entity.Model != null && entity.Visible && entity.WithinViewFrustum)
+        if (entity.GameModel != null && entity.Visible && entity.WithinViewFrustum)
         {
-            entity.Model.Draw();
+            entity.GameModel.Draw();
         }
     }
 
@@ -116,12 +116,12 @@ public class WorldRenderer
         if (entity.flashElapsedTime <= GameObject.FlashDuration)
         {
             var glow = (float)Math.Sin(MathHelper.Pi * entity.flashElapsedTime / GameObject.FlashDuration);
-            entity.Model.Glow = new Vector3(MathHelper.Clamp(glow, 0, 1));
+            entity.GameModel.Glow = new Vector3(MathHelper.Clamp(glow, 0, 1));
 
             entity.flashElapsedTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (entity.flashElapsedTime > GameObject.FlashDuration)
             {
-                entity.Model.Glow = default;
+                entity.GameModel.Glow = default;
             }
         }
 

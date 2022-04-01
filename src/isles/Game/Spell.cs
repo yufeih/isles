@@ -1103,7 +1103,7 @@ public class SpellConstruct : Spell
 
     public override void Draw(GameTime gameTime)
     {
-        entity.Model.Draw();
+        entity.GameModel.Draw();
     }
 
     private Point beginDropPosition;

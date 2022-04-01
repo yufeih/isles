@@ -190,9 +190,9 @@ public abstract class GameObject : Entity, ISelectable
         {
             highlighted = value;
 
-            if (Model != null)
+            if (GameModel != null)
             {
-                Model.Glow = highlighted ? Vector3.One : Vector3.Zero;
+                GameModel.Glow = highlighted ? Vector3.One : Vector3.Zero;
             }
 
             if (highlighted && Owner != null && ShouldDrawModel)
@@ -364,7 +364,7 @@ public abstract class GameObject : Entity, ISelectable
             for (var i = 0; i < items.Length; i += 2)
             {
                 var model = new GameModel(items[i]);
-                var attachPoint = Model.GetBone(items[i + 1]);
+                var attachPoint = GameModel.GetBone(items[i + 1]);
 
                 if (attachPoint < 0)
                 {
@@ -522,7 +522,7 @@ public abstract class GameObject : Entity, ISelectable
         {
             if (attach.Value >= 0)
             {
-                attach.Key.Transform = Model.GetBoneTransform(attach.Value);
+                attach.Key.Transform = GameModel.GetBoneTransform(attach.Value);
             }
         }
 
@@ -657,14 +657,14 @@ public abstract class GameObject : Entity, ISelectable
         // Create a model shadow, draw the shadow model when we're in fog of war
         if (VisibleInFogOfWar)
         {
-            modelShadow = Model.ShadowCopy();
+            modelShadow = GameModel.ShadowCopy();
             modelShadow.Tint *= 0.3f;
         }
     }
 
     public GameModel GetAttachment(string boneName)
     {
-        var bone = Model.GetBone(boneName);
+        var bone = GameModel.GetBone(boneName);
 
         if (bone < 0)
         {
@@ -1088,7 +1088,7 @@ public class Missile : Entity, IProjectile
     {
         Target = target;
 
-        Model = ammo.ShadowCopy();
+        GameModel = ammo.ShadowCopy();
 
         // Compute position
         Position = ammo.Transform.Translation;
@@ -1157,9 +1157,9 @@ public class Missile : Entity, IProjectile
         var rotation = Matrix.CreateFromAxisAngle(rotationAxis, angle);
         var translation = Matrix.CreateTranslation(Position);
 
-        if (Model != null)
+        if (GameModel != null)
         {
-            Model.Transform = Matrix.CreateScale(scaling) * rotation * translation;
+            GameModel.Transform = Matrix.CreateScale(scaling) * rotation * translation;
         }
     }
 

@@ -136,7 +136,7 @@ public class Charactor : GameObject, IMovable
             moving = false;
         }
 
-        Model.Play(IdleAnimation, true, 0.2f);
+        GameModel.Play(IdleAnimation, true, 0.2f);
         positionLastFrame = Position;
     }
 
@@ -324,9 +324,9 @@ public class Charactor : GameObject, IMovable
         // Add this to the path manager
         World.PathManager.AddMovable(this);
 
-        if (Model != null)
+        if (GameModel != null)
         {
-            Model.Play(IdleAnimation);
+            GameModel.Play(IdleAnimation);
         }
 
         positionLastFrame = Position;
@@ -450,13 +450,13 @@ public class Charactor : GameObject, IMovable
             {
                 moving = true;
                 elapsedAnimationTime = 0;
-                Model.Play(RunAnimation, true, 0.2f);
+                GameModel.Play(RunAnimation, true, 0.2f);
             }
             else if (!moved && moving && elapsedAnimationTime > MinAnimationDuraction)
             {
                 elapsedAnimationTime = 0;
                 moving = false;
-                Model.Play(IdleAnimation, true, 0.2f);
+                GameModel.Play(IdleAnimation, true, 0.2f);
             }
 
             if (Combat != null)
@@ -476,7 +476,7 @@ public class Charactor : GameObject, IMovable
         {
             Stop();
             Facing = target.Position - Position;
-            Model.Play(AttackAnimation, false, 0.0f, OnComplete, null);
+            GameModel.Play(AttackAnimation, false, 0.0f, OnComplete, null);
             AttackTarget = target as GameObject;
         }
     }
@@ -669,7 +669,7 @@ public class Hunter : Charactor
         {
             Stop();
             Facing = target.Position - Position;
-            Model.Play(AttackAnimation, false, 0.0f, OnComplete, (18.0f / 41, Launch));
+            GameModel.Play(AttackAnimation, false, 0.0f, OnComplete, (18.0f / 41, Launch));
             AttackTarget = target as GameObject;
         }
     }
@@ -723,7 +723,7 @@ public class FireSorceress : Charactor
     {
         base.OnCreate();
 
-        rightHand = Model.GetBone("Bip01_R_Hand");
+        rightHand = GameModel.GetBone("Bip01_R_Hand");
 
         if (Owner != null && Owner.IsAvailable("PunishOfNatureUpgrade"))
         {
@@ -764,7 +764,7 @@ public class FireSorceress : Charactor
             {
                 Stop();
                 Facing = target.Position - Position;
-                Model.Play("Attack", false, 0.0f, null, (0.5f, Launch));
+                GameModel.Play("Attack", false, 0.0f, null, (0.5f, Launch));
                 AttackTarget = target as GameObject;
             }
         }
@@ -774,7 +774,7 @@ public class FireSorceress : Charactor
     {
         Vector3 spawn = Vector3.Zero;
 
-        spawn = rightHand >= 0 ? Model.GetBoneTransform(rightHand).Translation : TopCenter - Vector3.UnitZ * 5;
+        spawn = rightHand >= 0 ? GameModel.GetBoneTransform(rightHand).Translation : TopCenter - Vector3.UnitZ * 5;
 
         var fireball = new EffectFireball(spawn, Vector3.UnitZ * 50, AttackTarget);
         fireball.Projectile.Hit += Hit;

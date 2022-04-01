@@ -123,7 +123,7 @@ public abstract class Entity : BaseEntity
 
     protected virtual bool OnStateChanged(BaseState newState, ref BaseState resultState) => true;
 
-    public GameModel Model { get; set; }
+    public GameModel GameModel { get; set; }
 
     public virtual bool Visible => true;
 
@@ -142,12 +142,12 @@ public abstract class Entity : BaseEntity
     {
         get
         {
-            if (Model == null)
+            if (GameModel == null)
             {
                 return new BoundingBox();
             }
 
-            return Model.BoundingBox;
+            return GameModel.BoundingBox;
         }
     }
 
@@ -183,12 +183,12 @@ public abstract class Entity : BaseEntity
         // Treat game model as level content
         if ((value = xml.GetAttribute("Model")) != "")
         {
-            Model = new GameModel(value);
+            GameModel = new GameModel(value);
         }
 
         if ((value = xml.GetAttribute("Alpha")) != "")
         {
-            Model.Alpha = float.Parse(value);
+            GameModel.Alpha = float.Parse(value);
         }
 
         Vector3 scaleBias = Vector3.One;
@@ -231,13 +231,13 @@ public abstract class Entity : BaseEntity
                             Matrix.CreateTranslation(translation);
 
             // Update model transform
-            Model.Transform = transformBias;
+            GameModel.Transform = transformBias;
 
             // Center game model
-            Vector3 center = (Model.BoundingBox.Max + Model.BoundingBox.Min) / 2;
+            Vector3 center = (GameModel.BoundingBox.Max + GameModel.BoundingBox.Min) / 2;
             transformBias.M41 -= center.X;
             transformBias.M42 -= center.Y;
-            transformBias.M43 -= Model.BoundingBox.Min.Z;
+            transformBias.M43 -= GameModel.BoundingBox.Min.Z;
             transformBias.M43 -= 0.2f;  // A little offset under the ground
         }
 
@@ -289,12 +289,12 @@ public abstract class Entity : BaseEntity
             }
         }
 
-        Model.Transform = transformBias *
+        GameModel.Transform = transformBias *
             Matrix.CreateScale(Scale) *
             Matrix.CreateFromQuaternion(Rotation) *
             Matrix.CreateTranslation(Position);
 
-        Model.Update(gameTime);
+        GameModel.Update(gameTime);
 
         WithinViewFrustum = IsVisible(BaseGame.Singleton.ViewProjection);
     }
