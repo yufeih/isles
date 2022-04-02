@@ -1,7 +1,6 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Text.Json;
 using System.Xml;
 
 namespace Isles;
@@ -22,8 +21,6 @@ public class GameDefault
     /// Gets or sets the default attributes for spells.
     /// </summary>
     public Dictionary<string, XmlElement>  SpellDefaults = new();
-
-    public Dictionary<string, JsonElement> Prefabs = new();
 
     private readonly Dictionary<string, float> lumber = new();
     private readonly Dictionary<string, float> gold = new();
@@ -210,8 +207,6 @@ public class GameDefault
                 }
             }
         }
-
-        Prefabs = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(File.ReadAllBytes("data/settings/prefabs.json"));
     }
 
     public static GameDefault Singleton { get; } = new GameDefault();
