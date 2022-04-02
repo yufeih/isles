@@ -839,7 +839,7 @@ public class SpellTraining : Spell
                 ownerBuilding.Owner.UnmarkFutureObject(Type);
             }
 
-            c.Position = ownerBuilding.Position + ownerBuilding.SpawnPoint;
+            c.Position = ownerBuilding.Position + new Vector3(ownerBuilding.SpawnPoint, 0);
             c.Owner = ownerBuilding.Owner;
             c.Owner.Food -= c.Food;
             world.Add(c);
@@ -923,8 +923,7 @@ public static class Upgrades
             {
                 if (o.AttackPoint.X > 0)
                 {
-                    o.AttackPoint.X += 20;
-                    o.AttackPoint.Y += 20;
+                    o.AttackPoint += 20 * Vector2.One;
                 }
             }
         }
@@ -941,8 +940,7 @@ public static class Upgrades
             {
                 if (o.DefensePoint.X > 0)
                 {
-                    o.DefensePoint.X += 20;
-                    o.DefensePoint.Y += 20;
+                    o.DefensePoint += 20 * Vector2.One;
                 }
             }
         }

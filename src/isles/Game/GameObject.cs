@@ -46,27 +46,27 @@ public abstract class GameObject : Entity, ISelectable
     /// <summary>
     /// Gets or sets the view distance of this game object.
     /// </summary>
-    public float ViewDistance = 100;
+    public float ViewDistance { get; set; } = 100;
 
     /// <summary>
     /// Gets or sets the radius of selection circle.
     /// </summary>
-    public float AreaRadius = 10;
+    public float AreaRadius { get; set; } = 10;
 
     /// <summary>
     /// Gets or sets the sound effect associated with this game object.
     /// </summary>
-    public string Sound;
+    public string Sound { get; set; }
 
     /// <summary>
     /// Gets or sets the sound effect for combat.
     /// </summary>
-    public string SoundCombat;
+    public string SoundCombat { get; set; }
 
     /// <summary>
     /// Gets or sets the sound effect for die.
     /// </summary>
-    public string SoundDie;
+    public string SoundDie { get; set; }
 
     /// <summary>
     /// Gets or sets the health of this game object.
@@ -231,22 +231,22 @@ public abstract class GameObject : Entity, ISelectable
     /// <summary>
     /// Min/Max attack point.
     /// </summary>
-    public Vector2 AttackPoint;
+    public Vector2 AttackPoint { get; set; }
 
     /// <summary>
     /// Min/Max defense point.
     /// </summary>
-    public Vector2 DefensePoint;
+    public Vector2 DefensePoint { get; set; }
 
     /// <summary>
     /// Gets or sets the min/max attack range of this charactor.
     /// </summary>
-    public Vector2 AttackRange;
+    public Vector2 AttackRange { get; set; }
 
     /// <summary>
     /// Gets or sets the duration of each individual attack.
     /// </summary>
-    public float AttackDuration;
+    public float AttackDuration { get; set; }
 
     /// <summary>
     /// Flash related stuff.
@@ -254,111 +254,13 @@ public abstract class GameObject : Entity, ISelectable
     public const float FlashDuration = 0.5f;
     public float flashElapsedTime = FlashDuration + 0.1f;
 
-    public Dictionary<string, string> Attachments = new();
+    public Dictionary<string, string> Attachments { get; set; } = new();
 
     public List<KeyValuePair<GameModel, int>> Attachment = new();
-
-    public GameObject(string classID)
-    {
-        if (GameDefault.Singleton.WorldObjectDefaults.TryGetValue(classID, out XmlElement xml))
-        {
-            Deserialize(xml);
-            OnDeserialized();
-        }
-    }
 
     public void Flash()
     {
         flashElapsedTime = 0;
-    }
-
-    public override void Deserialize(XmlElement xml)
-    {
-        base.Deserialize(xml);
-
-        if (xml.HasAttribute("MaxHealth"))
-        {
-            MaxHealth = float.Parse(xml.GetAttribute("MaxHealth"));
-        }
-
-        if (xml.HasAttribute("Priority"))
-        {
-            Priority = float.Parse(xml.GetAttribute("Priority"));
-        }
-
-        if (xml.HasAttribute("AreaRadius"))
-        {
-            AreaRadius = float.Parse(xml.GetAttribute("AreaRadius"));
-        }
-
-        if (xml.HasAttribute("Attack"))
-        {
-            AttackPoint = Helper.StringToVector2(xml.GetAttribute("Attack"));
-        }
-
-        if (xml.HasAttribute("Defense"))
-        {
-            DefensePoint = Helper.StringToVector2(xml.GetAttribute("Defense"));
-        }
-
-        if (xml.HasAttribute("AttackDuration"))
-        {
-            AttackDuration = float.Parse(xml.GetAttribute("AttackDuration"));
-        }
-
-        if (xml.HasAttribute("AttackRange"))
-        {
-            AttackRange = Helper.StringToVector2(xml.GetAttribute("AttackRange"));
-        }
-
-        if (xml.HasAttribute("ViewDistance"))
-        {
-            ViewDistance = float.Parse(xml.GetAttribute("ViewDistance"));
-        }
-
-        // Initialize attachments
-        if (xml.HasAttribute("Attachment"))
-        {
-            var value = xml.GetAttribute("Attachment");
-
-            var items = value.Split(new char[] { '|' });
-
-            for (var i = 0; i < items.Length; i += 2)
-            {
-                Attachments.Add(items[i + 1], items[i]);
-            }
-        }
-
-        if (xml.HasAttribute("Icon"))
-        {
-            Icon = int.Parse(xml.GetAttribute("Icon"));
-        }
-
-        if (xml.HasAttribute("Snapshot"))
-        {
-            Snapshot = int.Parse(xml.GetAttribute("Snapshot"));
-        }
-
-        if (xml.HasAttribute("Sound"))
-        {
-            Sound = xml.GetAttribute("Sound");
-        }
-
-        if (xml.HasAttribute("SoundCombat"))
-        {
-            SoundCombat = xml.GetAttribute("SoundCombat");
-        }
-
-        if (xml.HasAttribute("SoundDie"))
-        {
-            SoundDie = xml.GetAttribute("SoundDie");
-        }
-
-        // Initialize spells
-        if (xml.HasAttribute("Spells"))
-        {
-            Spells = xml.GetAttribute("Spells").Split(new char[] { ',', ' ', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).ToArray();
-        }
     }
 
     public override void OnDeserialized()
@@ -440,14 +342,12 @@ public abstract class GameObject : Entity, ISelectable
             // Model.Tint = owner.TeamColor.ToVector3();
             if (AttackPoint.X > 0)
             {
-                AttackPoint.X += Owner.AttackPoint;
-                AttackPoint.Y += Owner.AttackPoint;
+                AttackPoint += Owner.AttackPoint * Vector2.One;
             }
 
             if (DefensePoint.X > 0)
             {
-                DefensePoint.X += Owner.DefensePoint;
-                DefensePoint.Y += Owner.DefensePoint;
+                DefensePoint += Owner.DefensePoint * Vector2.One;
             }
         }
     }
@@ -757,23 +657,12 @@ public class Tree : GameObject
     private readonly Random random = new();
     private List<Point> pathGrids = new();
 
-    public Tree() : base("Tree")
+    public Tree()
     {
         ShowStatus = false;
         Spotted = true;
     }
 
-    public override void Deserialize(XmlElement xml)
-    {
-        string value;
-        if ((value = xml.GetAttribute("Lumber")) != "")
-        {
-            lumber = int.Parse(value);
-        }
-
-        base.Deserialize(xml);
-    }
-    
     public override void OnDeserialized()
     {
         base.OnDeserialized();
@@ -916,9 +805,9 @@ public class Goldmine : GameObject
     /// <summary>
     /// Gets or sets the spawn point for the goldmine.
     /// </summary>
-    public Vector3 SpawnPoint;
+    public Vector2 SpawnPoint { get; set; }
 
-    public Goldmine() : base("Goldmine")
+    public Goldmine()
     {
         Spotted = true;
         AreaRadius = 30;
@@ -930,27 +819,9 @@ public class Goldmine : GameObject
         Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, RotationZ);
     }
 
-    public override void Deserialize(XmlElement xml)
-    {
-        // Read in obstructor & spawn point
-        if ((_ = xml.GetAttribute("ObstructorSize")) != "")
-        {
-            ObstructorSize = Helper.StringToVector2(xml.GetAttribute("ObstructorSize"));
-        }
-
-        if ((_ = xml.GetAttribute("SpawnPoint")) != "")
-        {
-            SpawnPoint = new Vector3(Helper.StringToVector2(xml.GetAttribute("SpawnPoint")), 0);
-        }
-
-        base.Deserialize(xml);
-    }
-
     public override void OnCreate()
     {
-        SpawnPoint = new Vector3(Math2D.LocalToWorld(
-                     new Vector2(SpawnPoint.X, SpawnPoint.Y),
-                         Vector2.Zero, RotationZ), 0);
+        SpawnPoint = Math2D.LocalToWorld(SpawnPoint, Vector2.Zero, RotationZ);
 
         pathGrids.AddRange(World.PathManager.EnumerateGridsInOutline(Outline));
         World.PathManager.Mark(pathGrids);
@@ -974,7 +845,6 @@ public class Goldmine : GameObject
 public class BoxOfPandora : GameObject
 {
     public BoxOfPandora()
-        : base("BoxOfPandora")
     {
         VisibleInFogOfWar = false;
     }
@@ -1157,15 +1027,4 @@ public class Missile : Entity, IProjectile
 
 public class Decoration : Entity
 {
-    public override void Deserialize(XmlElement xml)
-    {
-        base.Deserialize(xml);
-
-        string value;
-
-        if ((value = xml.GetAttribute("Position")) != "")
-        {
-            Position = Helper.StringToVector3(value);
-        }
-    }
 }

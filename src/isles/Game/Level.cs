@@ -201,7 +201,7 @@ public class Skirmish : Level
         {
             if (world.Create("Follower") is Worker peon)
             {
-                peon.Position = building.Position + building.SpawnPoint;
+                peon.Position = building.Position + new Vector3(building.SpawnPoint, 0);
                 peon.Owner = player;
                 world.Add(peon);
 

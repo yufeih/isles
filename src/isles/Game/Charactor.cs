@@ -96,36 +96,9 @@ public class Charactor : GameObject, IMovable
 
     public override bool Visible => State is not StateHarvestGold harvestGold || (harvestGold.state != StateHarvestGold.StateType.Wait && harvestGold.state != StateHarvestGold.StateType.Harvest);
 
-    public Charactor(string classID) : base(classID)
+    public Charactor()
     {
         VisibleInFogOfWar = false;
-    }
-
-    public override void Deserialize(XmlElement xml)
-    {
-        base.Deserialize(xml);
-
-        string value;
-
-        if ((value = xml.GetAttribute("Speed")) != "")
-        {
-            Speed = float.Parse(value);
-        }
-
-        if ((value = xml.GetAttribute("ObstructorRadius")) != "")
-        {
-            ObstructorRadius = float.Parse(value);
-        }
-
-        if ((value = xml.GetAttribute("IsHero")) != "")
-        {
-            IsHero = bool.Parse(value);
-        }
-
-        if ((value = xml.GetAttribute("Food")) != "")
-        {
-            Food = int.Parse(value);
-        }
     }
 
     /// <summary>
@@ -507,8 +480,6 @@ public class Worker : Charactor
     public GameModel wood;
     public GameModel gold;
 
-    public Worker(string classID) : base(classID) { }
-
     public override string RunAnimation => LumberCarried > 0 ? "Carry" : "Run";
 
     public override float Speed
@@ -640,11 +611,6 @@ public class Hunter : Charactor
     public bool weaponVisible = true;
     public GameModel weapon;
 
-    public Hunter(string type)
-        : base(type)
-    {
-    }
-
     public override string AttackAnimation => Helper.Random.Next(2) == 0 ? "Attack" : "Attack_2";
 
     public override void OnCreate()
@@ -716,9 +682,6 @@ public class Hunter : Charactor
 public class FireSorceress : Charactor
 {
     private int rightHand;
-
-    public FireSorceress(string classID)
-        : base(classID) { }
 
     public override string AttackAnimation => Helper.Random.Next(2) == 0 ? "Attack" : "Attack_2";
 
@@ -807,8 +770,5 @@ public class FireSorceress : Charactor
 
 public class Hellfire : Charactor
 {
-    public Hellfire(string classID)
-        : base(classID) { }
-
     public override string AttackAnimation => Helper.Random.Next(2) == 0 ? "Attack" : "Attack_2";
 }

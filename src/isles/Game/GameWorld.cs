@@ -92,32 +92,11 @@ public class GameWorld
         Flush();
     }
 
-    private static readonly Dictionary<string, Func<GameWorld, BaseEntity>> Creators = new();
-
-    public static void RegisterCreator(string typeName, Func<GameWorld, BaseEntity> creator)
-    {
-        Creators.Add(typeName, creator);
-    }
-
     public BaseEntity Create(string typeName)
     {
-        // Lookup the creators table to find a suitable creator
-        if (!Creators.ContainsKey(typeName))
-        {
-            throw new Exception("Unknown object type: " + typeName);
-        }
-
-        BaseEntity worldObject = Creators[typeName](this);
-
-        // Nothing created
-        if (worldObject == null)
-        {
-            return null;
-        }
-
-        // Set object class ID
-        worldObject.ClassID = typeName;
-        return worldObject;
+        var entity = JsonSerializer.Deserialize<BaseEntity>(GameDefault.Singleton.Prefabs[typeName], JsonHelper.Options);
+        entity.ClassID = typeName;
+        return entity;
     }
 
     public void Add(BaseEntity worldObject)
