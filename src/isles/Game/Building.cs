@@ -32,7 +32,7 @@ public class Building : GameObject, IPlaceable
     /// <summary>
     /// Gets or sets the time to construct this building.
     /// </summary>
-    public float ConstructionTime;
+    public float ConstructionTime { get; set; }
 
     /// <summary>
     /// Gets or sets the time to construct this building.

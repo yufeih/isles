@@ -46,27 +46,27 @@ public abstract class GameObject : Entity, ISelectable
     /// <summary>
     /// Gets or sets the view distance of this game object.
     /// </summary>
-    public float ViewDistance = 100;
+    public float ViewDistance { get; set; } = 100;
 
     /// <summary>
     /// Gets or sets the radius of selection circle.
     /// </summary>
-    public float AreaRadius = 10;
+    public float AreaRadius { get; set; } = 10;
 
     /// <summary>
     /// Gets or sets the sound effect associated with this game object.
     /// </summary>
-    public string Sound;
+    public string Sound { get; set; }
 
     /// <summary>
     /// Gets or sets the sound effect for combat.
     /// </summary>
-    public string SoundCombat;
+    public string SoundCombat { get; set; }
 
     /// <summary>
     /// Gets or sets the sound effect for die.
     /// </summary>
-    public string SoundDie;
+    public string SoundDie { get; set; }
 
     /// <summary>
     /// Gets or sets the health of this game object.
@@ -231,22 +231,22 @@ public abstract class GameObject : Entity, ISelectable
     /// <summary>
     /// Min/Max attack point.
     /// </summary>
-    public Vector2 AttackPoint;
+    public Vector2 AttackPoint { get; set; }
 
     /// <summary>
     /// Min/Max defense point.
     /// </summary>
-    public Vector2 DefensePoint;
+    public Vector2 DefensePoint { get; set; }
 
     /// <summary>
     /// Gets or sets the min/max attack range of this charactor.
     /// </summary>
-    public Vector2 AttackRange;
+    public Vector2 AttackRange { get; set; }
 
     /// <summary>
     /// Gets or sets the duration of each individual attack.
     /// </summary>
-    public float AttackDuration;
+    public float AttackDuration { get; set; }
 
     /// <summary>
     /// Flash related stuff.
@@ -254,7 +254,7 @@ public abstract class GameObject : Entity, ISelectable
     public const float FlashDuration = 0.5f;
     public float flashElapsedTime = FlashDuration + 0.1f;
 
-    public Dictionary<string, string> Attachments = new();
+    public Dictionary<string, string> Attachments { get; set; } = new();
 
     public List<KeyValuePair<GameModel, int>> Attachment = new();
 
@@ -342,14 +342,12 @@ public abstract class GameObject : Entity, ISelectable
             // Model.Tint = owner.TeamColor.ToVector3();
             if (AttackPoint.X > 0)
             {
-                AttackPoint.X += Owner.AttackPoint;
-                AttackPoint.Y += Owner.AttackPoint;
+                AttackPoint += Owner.AttackPoint * Vector2.One;
             }
 
             if (DefensePoint.X > 0)
             {
-                DefensePoint.X += Owner.DefensePoint;
-                DefensePoint.Y += Owner.DefensePoint;
+                DefensePoint += Owner.DefensePoint * Vector2.One;
             }
         }
     }

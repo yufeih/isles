@@ -923,8 +923,7 @@ public static class Upgrades
             {
                 if (o.AttackPoint.X > 0)
                 {
-                    o.AttackPoint.X += 20;
-                    o.AttackPoint.Y += 20;
+                    o.AttackPoint += 20 * Vector2.One;
                 }
             }
         }
@@ -941,8 +940,7 @@ public static class Upgrades
             {
                 if (o.DefensePoint.X > 0)
                 {
-                    o.DefensePoint.X += 20;
-                    o.DefensePoint.Y += 20;
+                    o.DefensePoint += 20 * Vector2.One;
                 }
             }
         }
