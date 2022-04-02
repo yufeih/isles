@@ -173,10 +173,10 @@ public class WorldRenderer
             if (entity.Selected && entity.IsAlive)
             {
                 entity.World.Landscape.DrawSurface(
-                    entity.SelectionAreaRadius > 16 ?
+                    entity.AreaRadius > 16 ?
                     GameObject.SelectionAreaTextureLarge : GameObject.SelectionAreaTexture, 
                     entity.Position,
-                    entity.SelectionAreaRadius * 2, entity.SelectionAreaRadius * 2,
+                    entity.AreaRadius * 2, entity.AreaRadius * 2,
                     entity.Owner == null ? Color.Yellow : (
                         entity.Owner.GetRelation(Player.LocalPlayer) == PlayerRelation.Opponent ?
                                             Color.Red : Color.GreenYellow));
@@ -187,8 +187,8 @@ public class WorldRenderer
                 if (entity.Highlighted || _input.Keyboard.IsKeyDown(Keys.LeftAlt) || _input.Keyboard.IsKeyDown(Keys.RightAlt))
                 {
                     var color = ProgressColor(1.0f * entity.health / entity.MaxHealth);
-                    GameUI.Singleton.DrawProgress(entity.TopCenter, 0, (int)(entity.SelectionAreaRadius * 10.0f),
-                        100 * entity.health / entity.MaxHealth, color);
+                    GameUI.Singleton.DrawProgress(entity.TopCenter, 0, (int)(entity.AreaRadius * 10.0f),
+                        100 * entity.Health / entity.MaxHealth, color);
 
                     if (entity is Building building)
                     {
@@ -277,7 +277,7 @@ public class WorldRenderer
         if (building.state == Building.BuildingState.Constructing)
         {
             GameUI.Singleton.DrawProgress(building.TopCenter, 5,
-                                        (int)(building.SelectionAreaRadius * 10.0f),
+                                        (int)(building.AreaRadius * 10.0f),
                                         100 * building.ConstructionTimeElapsed / building.ConstructionTime,
                                         Color.Orange);
         }

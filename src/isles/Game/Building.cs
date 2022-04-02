@@ -42,17 +42,17 @@ public class Building : GameObject, IPlaceable
     /// <summary>
     /// Gets or sets how much wood needed for the building.
     /// </summary>
-    public int Lumber;
+    public int Lumber { get; set; }
 
     /// <summary>
     /// Gets or sets how much gold needed for the building.
     /// </summary>
-    public int Gold;
+    public int Gold { get; set; }
 
     /// <summary>
     /// Gets or sets how much food this building can provide.
     /// </summary>
-    public int Food;
+    public int Food { get; set; }
 
     /// <summary>
     /// Gets or sets the number of builders.
@@ -69,7 +69,7 @@ public class Building : GameObject, IPlaceable
     /// <summary>
     /// Path brush.
     /// </summary>
-    private Vector2 obstructorSize;
+    public Vector2 ObstructorSize { get; set; }
     private readonly List<Point> pathGrids = new();
 
     /// <summary>
@@ -97,23 +97,44 @@ public class Building : GameObject, IPlaceable
     /// Halo effect.
     /// </summary>
     private EffectHalo halo;
-    private string haloParticle;
+    
+    
+    public string Halo { get; set; }
 
     public Building(string classID)
-        : base(classID) { }
+        : base(classID)
+    {
+        // Reset sound die to explosion
+        SoundDie = "Explosion";
+    }
 
     public override void Deserialize(XmlElement xml)
     {
-        int.TryParse(xml.GetAttribute("Lumber"), out Lumber);
-        int.TryParse(xml.GetAttribute("Gold"), out Gold);
-        int.TryParse(xml.GetAttribute("Food"), out Food);
-        float.TryParse(xml.GetAttribute("ConstructionTime"), out ConstructionTime);
-
         string value;
+
+        if ((value = xml.GetAttribute("Lumber")) != "")
+        {
+            Lumber = int.Parse(value);
+        }
+
+        if ((value = xml.GetAttribute("Gold")) != "")
+        {
+            Gold = int.Parse(value);
+        }
+
+        if ((value = xml.GetAttribute("Food")) != "")
+        {
+            Food = int.Parse(value);
+        }
+
+        if ((value = xml.GetAttribute("ConstructionTime")) != "")
+        {
+            ConstructionTime = float.Parse(value);
+        }
 
         if ((value = xml.GetAttribute("ObstructorSize")) != "")
         {
-            obstructorSize = Helper.StringToVector2(value) / 2;
+            ObstructorSize = Helper.StringToVector2(value);
         }
 
         if ((value = xml.GetAttribute("SpawnPoint")) != "")
@@ -130,14 +151,11 @@ public class Building : GameObject, IPlaceable
 
         if ((value = xml.GetAttribute("Halo")) != "")
         {
-            haloParticle = value;
+            Halo = value;
         }
 
         // Deserialize models after default attributes are assigned
         base.Deserialize(xml);
-
-        // Reset sound die to explosion
-        SoundDie = "Explosion";
     }
 
     protected override void UpdateOutline(Outline outline)
@@ -146,7 +164,7 @@ public class Building : GameObject, IPlaceable
         position.X = Position.X;
         position.Y = Position.Y;
 
-        outline.SetRectangle(-obstructorSize, obstructorSize, position, RotationZ);
+        outline.SetRectangle(-ObstructorSize / 2, ObstructorSize / 2, position, RotationZ);
     }
 
     public override void OnCreate()
@@ -192,7 +210,7 @@ public class Building : GameObject, IPlaceable
             Owner.FoodCapacity += Food;
         }
 
-        foreach (Spell spell in Spells)
+        foreach (Spell spell in SpellList)
         {
             spell.Enable = true;
         }
@@ -313,7 +331,7 @@ public class Building : GameObject, IPlaceable
             Owner.Food += food;
             Owner.MarkFutureObject(type);
 
-            foreach (Spell s in Spells)
+            foreach (Spell s in SpellList)
             {
                 if (s is SpellTraining train && train.Type == type)
                 {
@@ -594,11 +612,11 @@ public class Building : GameObject, IPlaceable
             }
 
             // Create halo effect
-            if (ShouldDrawModel && haloParticle != null)
+            if (ShouldDrawModel && Halo != null)
             {
                 if (halo == null)
                 {
-                    halo = new EffectHalo(TopCenter, 30, haloParticle);
+                    halo = new EffectHalo(TopCenter, 30, Halo);
                 }
 
                 halo.Update(gameTime);
@@ -672,8 +690,8 @@ public class Building : GameObject, IPlaceable
     private List<Charactor> GetNegotiables()
     {
         var obstructors = new List<Charactor>();
-        var nearbyObjects = World.GetNearbyObjects(Position, Math.Max(obstructorSize.X,
-                                                                  obstructorSize.Y));
+        var nearbyObjects = World.GetNearbyObjects(Position, Math.Max(ObstructorSize.X / 2,
+                                                                  ObstructorSize.Y / 2));
         foreach (var wo in nearbyObjects)
         {
             if (wo is Charactor c && c.IsAlive && c.Owner == Owner)

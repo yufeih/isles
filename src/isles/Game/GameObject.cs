@@ -12,9 +12,11 @@ public abstract class GameObject : Entity, ISelectable
 
     private Icon icon;
 
-    public Icon Snapshot => snapshot;
+    public int? Icon { get; set; }
 
-    private Icon snapshot;
+    public int? Snapshot { get; set; }
+
+    public Icon SnapshotIcon { get; private set; }
 
     public static Texture2D SnapshotTexture
     {
@@ -49,7 +51,7 @@ public abstract class GameObject : Entity, ISelectable
     /// <summary>
     /// Gets or sets the radius of selection circle.
     /// </summary>
-    public float SelectionAreaRadius = 10;
+    public float AreaRadius = 10;
 
     /// <summary>
     /// Gets or sets the sound effect associated with this game object.
@@ -89,12 +91,12 @@ public abstract class GameObject : Entity, ISelectable
             if (value <= 0 && health > 0)
             {
                 // Clear all spells
-                foreach (Spell spell in Spells)
+                foreach (Spell spell in SpellList)
                 {
                     spell.Enable = false;
                 }
 
-                Spells.Clear();
+                SpellList.Clear();
 
                 if (SoundDie != null && ShouldDrawModel)
                 {
@@ -140,7 +142,9 @@ public abstract class GameObject : Entity, ISelectable
 
     public float health;
 
-    public List<Spell> Spells = new();
+    public string[] Spells { get; set; } = Array.Empty<string>();
+
+    public List<Spell> SpellList = new();
 
     public bool Selected
     {
@@ -250,6 +254,8 @@ public abstract class GameObject : Entity, ISelectable
     public const float FlashDuration = 0.5f;
     public float flashElapsedTime = FlashDuration + 0.1f;
 
+    public Dictionary<string, string> Attachments = new();
+
     public List<KeyValuePair<GameModel, int>> Attachment = new();
 
     public GameObject(string classID)
@@ -257,6 +263,7 @@ public abstract class GameObject : Entity, ISelectable
         if (GameDefault.Singleton.WorldObjectDefaults.TryGetValue(classID, out XmlElement xml))
         {
             Deserialize(xml);
+            OnDeserialized();
         }
     }
 
@@ -274,13 +281,6 @@ public abstract class GameObject : Entity, ISelectable
             MaxHealth = float.Parse(xml.GetAttribute("MaxHealth"));
         }
 
-        health = MaxHealth;
-
-        if (xml.HasAttribute("Owner"))
-        {
-            Owner = Player.FromID(int.Parse(xml.GetAttribute("Owner")));
-        }
-
         if (xml.HasAttribute("Priority"))
         {
             Priority = float.Parse(xml.GetAttribute("Priority"));
@@ -288,7 +288,7 @@ public abstract class GameObject : Entity, ISelectable
 
         if (xml.HasAttribute("AreaRadius"))
         {
-            SelectionAreaRadius = float.Parse(xml.GetAttribute("AreaRadius"));
+            AreaRadius = float.Parse(xml.GetAttribute("AreaRadius"));
         }
 
         if (xml.HasAttribute("Attack"))
@@ -299,17 +299,6 @@ public abstract class GameObject : Entity, ISelectable
         if (xml.HasAttribute("Defense"))
         {
             DefensePoint = Helper.StringToVector2(xml.GetAttribute("Defense"));
-        }
-
-        // Make sure max (Y) is greater or equal then min (X)
-        if (AttackPoint.Y < AttackPoint.X)
-        {
-            AttackPoint.Y = AttackPoint.X;
-        }
-
-        if (DefensePoint.Y < DefensePoint.X)
-        {
-            DefensePoint.Y = DefensePoint.X;
         }
 
         if (xml.HasAttribute("AttackDuration"))
@@ -336,43 +325,18 @@ public abstract class GameObject : Entity, ISelectable
 
             for (var i = 0; i < items.Length; i += 2)
             {
-                var model = new GameModel(items[i]);
-                var attachPoint = GameModel.GetBone(items[i + 1]);
-
-                if (attachPoint < 0)
-                {
-                    throw new Exception("Bone '" + items[i + 1] + "' do not exist in model '" + items[i] + "'.");
-                }
-
-                Attachment.Add(new KeyValuePair<GameModel, int>(model, attachPoint));
+                Attachments.Add(items[i + 1], items[i]);
             }
         }
 
-        var iconIndex = 0;
         if (xml.HasAttribute("Icon"))
         {
-            iconIndex = int.Parse(xml.GetAttribute("Icon"));
-            icon = Icon.FromTiledTexture(iconIndex);
-
-            ProfileButton = new SpellButton
-            {
-                Texture = icon.Texture,
-                SourceRectangle = icon.Region,
-                Hovered = Icon.RectangeFromIndex(iconIndex + 1),
-                Pressed = Icon.RectangeFromIndex(iconIndex + 2),
-                Anchor = Anchor.BottomLeft,
-                ScaleMode = ScaleMode.ScaleY,
-            };
-
-            ProfileButton.Click += (sender, e) => Player.LocalPlayer.Focus(this);
-
-            ProfileButton.DoubleClick += (sender, e) => Player.LocalPlayer.SelectGroup(this);
+            Icon = int.Parse(xml.GetAttribute("Icon"));
         }
 
-        if (xml.HasAttribute("Snapshot") &&
-            int.TryParse(xml.GetAttribute("Snapshot"), out iconIndex))
+        if (xml.HasAttribute("Snapshot"))
         {
-            snapshot = Icon.FromTiledTexture(iconIndex, 8, 4, SnapshotTexture);
+            Snapshot = int.Parse(xml.GetAttribute("Snapshot"));
         }
 
         if (xml.HasAttribute("Sound"))
@@ -393,18 +357,57 @@ public abstract class GameObject : Entity, ISelectable
         // Initialize spells
         if (xml.HasAttribute("Spells"))
         {
-            var spells = xml.GetAttribute("Spells").Split(new char[] { ',', ' ', '\n', '\r' });
-
-            for (var i = 0; i < spells.Length; i++)
-            {
-                if (spells[i].Length > 0)
-                {
-                    AddSpell(spells[i]);
-                }
-            }
+            Spells = xml.GetAttribute("Spells").Split(new char[] { ',', ' ', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).ToArray();
         }
     }
 
+    public override void OnDeserialized()
+    {
+        base.OnDeserialized();
+
+        health = MaxHealth;
+
+        foreach (var (bone, model) in Attachments)
+        {
+            var attachPoint = GameModel.GetBone(bone);
+            if (attachPoint < 0)
+            {
+                throw new Exception("Bone '" + bone + "' do not exist in model '" + Model + "'.");
+            }
+
+            Attachment.Add(new KeyValuePair<GameModel, int>(new(model), attachPoint));
+        }
+
+        if (Snapshot != null)
+        {
+            SnapshotIcon = Isles.Icon.FromTiledTexture(Snapshot.Value, 8, 4, SnapshotTexture);
+        }
+
+        if (Icon != null)
+        {
+            var iconIndex = Icon.Value;
+            icon = Isles.Icon.FromTiledTexture(iconIndex);
+
+            ProfileButton = new SpellButton
+            {
+                Texture = icon.Texture,
+                SourceRectangle = icon.Region,
+                Hovered = Isles.Icon.RectangeFromIndex(iconIndex + 1),
+                Pressed = Isles.Icon.RectangeFromIndex(iconIndex + 2),
+                Anchor = Anchor.BottomLeft,
+                ScaleMode = ScaleMode.ScaleY,
+            };
+
+            ProfileButton.Click += (sender, e) => Player.LocalPlayer.Focus(this);
+
+            ProfileButton.DoubleClick += (sender, e) => Player.LocalPlayer.SelectGroup(this);
+        }
+
+        foreach (var spell in Spells)
+        {
+            AddSpell(spell);
+        }
+    }
     /// <summary>
     /// Add a new spell for the game object.
     /// </summary>
@@ -414,7 +417,7 @@ public abstract class GameObject : Entity, ISelectable
         var spell = Spell.Create(name, World);
         spell.Owner = this;
         OnCreateSpell(spell);
-        Spells.Add(spell);
+        SpellList.Add(spell);
 
         if (Selected && Focused)
         {
@@ -477,7 +480,7 @@ public abstract class GameObject : Entity, ISelectable
     public override void Update(GameTime gameTime)
     {
         // Update spells
-        foreach (Spell spell in Spells)
+        foreach (Spell spell in SpellList)
         {
             spell.Update(gameTime);
         }
@@ -696,9 +699,9 @@ public abstract class GameObject : Entity, ISelectable
 
         if (Owner is LocalPlayer)
         {
-            for (var i = 0; i < Spells.Count; i++)
+            for (var i = 0; i < SpellList.Count; i++)
             {
-                ui.SetUIElement(i, true, Spells[i].Button);
+                ui.SetUIElement(i, true, SpellList[i].Button);
             }
         }
     }
@@ -769,6 +772,11 @@ public class Tree : GameObject
         }
 
         base.Deserialize(xml);
+    }
+    
+    public override void OnDeserialized()
+    {
+        base.OnDeserialized();
 
         // Randomize scale and rotation
         var size = Helper.RandomInRange(0.9f, 1.1f);
@@ -900,7 +908,7 @@ public class Goldmine : GameObject
     }
 
     private int gold = 10000;
-    private Vector2 obstructorSize;
+    public Vector2 ObstructorSize { get; set; }
     private readonly List<Point> pathGrids = new();
 
     public float RotationZ;
@@ -913,7 +921,7 @@ public class Goldmine : GameObject
     public Goldmine() : base("Goldmine")
     {
         Spotted = true;
-        SelectionAreaRadius = 30;
+        AreaRadius = 30;
     }
 
     public void SetRotation(float value)
@@ -927,7 +935,7 @@ public class Goldmine : GameObject
         // Read in obstructor & spawn point
         if ((_ = xml.GetAttribute("ObstructorSize")) != "")
         {
-            obstructorSize = Helper.StringToVector2(xml.GetAttribute("ObstructorSize")) / 2;
+            ObstructorSize = Helper.StringToVector2(xml.GetAttribute("ObstructorSize"));
         }
 
         if ((_ = xml.GetAttribute("SpawnPoint")) != "")
@@ -959,7 +967,7 @@ public class Goldmine : GameObject
         position.X = Position.X;
         position.Y = Position.Y;
 
-        outline.SetRectangle(-obstructorSize, obstructorSize, position, RotationZ);
+        outline.SetRectangle(-ObstructorSize / 2, ObstructorSize / 2, position, RotationZ);
     }
 }
 

@@ -1552,7 +1552,7 @@ public class SpellSummon : Spell
 
             if (wo is GameObject)
             {
-                radius = (wo as GameObject).SelectionAreaRadius;
+                radius = (wo as GameObject).AreaRadius;
             }
 
             var effect = new EffectSpawn(wo.Position, radius, "Summon");

@@ -616,7 +616,7 @@ public class GameUI : IEventListener
             if (Player.LocalPlayer.CurrentGroup != null &&
                 Player.LocalPlayer.CurrentGroup.Count > 0)
             {
-                Icon snapshot = Player.LocalPlayer.CurrentGroup[0].Snapshot;
+                Icon snapshot = Player.LocalPlayer.CurrentGroup[0].SnapshotIcon;
                 snapShot.Texture = snapshot.Texture;
                 snapShot.SourceRectangle = snapshot.Region;
             }
