@@ -64,7 +64,7 @@
             -20
         ],
         "Food": 10,
-        "Health": 2000,
+        "MaxHealth": 2000,
         "Sound": "Townhall"
     },
     "Barracks": {
@@ -85,7 +85,7 @@
             32
         ],
         "AreaRadius": 20,
-        "Health": 1500,
+        "MaxHealth": 1500,
         "Lumber": 175,
         "Gold": 225,
         "Defense": [
@@ -120,7 +120,7 @@
         ],
         "AreaRadius": 26,
         "ConstructionTime": 20,
-        "Health": 1800,
+        "MaxHealth": 1800,
         "Defense": [
             60,
             80
@@ -148,7 +148,7 @@
         ],
         "ScaleBias": 0.25,
         "ConstructionTime": 20,
-        "Health": 750,
+        "MaxHealth": 750,
         "ObstructorSize": [
             30,
             30
@@ -177,7 +177,7 @@
             28
         ],
         "AreaRadius": 18,
-        "Health": 800,
+        "MaxHealth": 800,
         "Lumber": 115,
         "Gold": 150,
         "Priority": 104,
@@ -213,7 +213,7 @@
         "Sound": "Farm",
         "ScaleBias": 0.45,
         "ConstructionTime": 20,
-        "Health": 500,
+        "MaxHealth": 500,
         "ObstructorSize": [
             28,
             28
@@ -233,7 +233,7 @@
         "ObstructorRadius": 5,
         "RotationZBias": -90,
         "ScaleBias": 0.1,
-        "Health": 200,
+        "MaxHealth": 200,
         "Gold": 50,
         "Lumber": 0,
         "Food": 1,
@@ -282,7 +282,7 @@
         },
         "RotationZBias": -90,
         "ScaleBias": 0.13,
-        "Health": 425,
+        "MaxHealth": 425,
         "Gold": 155,
         "Lumber": 50,
         "Food": 2,
@@ -317,7 +317,7 @@
         "ObstructorRadius": 7,
         "RotationZBias": -90,
         "ScaleBias": 0.13,
-        "Health": 350,
+        "MaxHealth": 350,
         "Gold": 125,
         "Lumber": 105,
         "Food": 2,
@@ -352,7 +352,7 @@
         "ObstructorRadius": 8,
         "RotationZBias": -90,
         "ScaleBias": 0.18,
-        "Health": 750,
+        "MaxHealth": 750,
         "Gold": 200,
         "Lumber": 175,
         "Food": 5,
@@ -391,7 +391,7 @@
         "ObstructorRadius": 12,
         "RotationZBias": -90,
         "ScaleBias": 0.18,
-        "Health": 1000,
+        "MaxHealth": 1000,
         "Gold": 0,
         "Lumber": 0,
         "Food": 0,
