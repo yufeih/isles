@@ -839,7 +839,7 @@ public class SpellTraining : Spell
                 ownerBuilding.Owner.UnmarkFutureObject(Type);
             }
 
-            c.Position = ownerBuilding.Position + ownerBuilding.SpawnPoint;
+            c.Position = ownerBuilding.Position + new Vector3(ownerBuilding.SpawnPoint, 0);
             c.Owner = ownerBuilding.Owner;
             c.Owner.Food -= c.Food;
             world.Add(c);

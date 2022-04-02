@@ -83,7 +83,7 @@ public class StateHarvestGold : BaseState
         if (state == StateType.Harvest || state == StateType.Wait)
         {
             // Respawn our charactor
-            owner.Spawn(goldmine.Position + goldmine.SpawnPoint);
+            owner.Spawn(goldmine.Position + new Vector3(goldmine.SpawnPoint, 0));
         }
 
         if (state == StateType.Harvest && goldmine != null)
@@ -199,7 +199,7 @@ public class StateHarvestGold : BaseState
                 owner.GoldCarried += harvested;
 
                 // Back to home happily
-                owner.Spawn(goldmine.Position + goldmine.SpawnPoint);
+                owner.Spawn(goldmine.Position + new Vector3(goldmine.SpawnPoint, 0));
                 goldmine.HarvesterCount--;
                 elapsedWorkTime = 0;
 

@@ -805,7 +805,7 @@ public class Goldmine : GameObject
     /// <summary>
     /// Gets or sets the spawn point for the goldmine.
     /// </summary>
-    public Vector3 SpawnPoint;
+    public Vector2 SpawnPoint { get; set; }
 
     public Goldmine()
     {
@@ -821,9 +821,7 @@ public class Goldmine : GameObject
 
     public override void OnCreate()
     {
-        SpawnPoint = new Vector3(Math2D.LocalToWorld(
-                     new Vector2(SpawnPoint.X, SpawnPoint.Y),
-                         Vector2.Zero, RotationZ), 0);
+        SpawnPoint = Math2D.LocalToWorld(SpawnPoint, Vector2.Zero, RotationZ);
 
         pathGrids.AddRange(World.PathManager.EnumerateGridsInOutline(Outline));
         World.PathManager.Mark(pathGrids);

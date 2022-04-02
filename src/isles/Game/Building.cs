@@ -85,7 +85,7 @@ public class Building : GameObject, IPlaceable
     /// <summary>
     /// Gets or sets the spawn point of this building.
     /// </summary>
-    public Vector3 SpawnPoint;
+    public Vector2 SpawnPoint { get; set; }
     public Worker Builder;
 
     private EffectConstruct construct;
