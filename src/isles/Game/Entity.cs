@@ -42,8 +42,21 @@ public abstract class BaseState : IEventListener
     }
 }
 
+[JsonConverter(typeof(BaseEntity.JsonConverter))]
 public abstract class BaseEntity : IAudioEmitter, IEventListener, IJsonOnDeserialized
 {
+    private static readonly Type[] s_knownTypes = new[]
+    {
+        typeof(Tree), typeof(Building), typeof(Goldmine), typeof(BoxOfPandora),
+        typeof(Tower), typeof(Worker), typeof(Charactor),
+        typeof(Hunter), typeof(FireSorceress), typeof(Hellfire)
+    };
+
+    class JsonConverter : TypeDiscriminatorJsonConverter<BaseEntity>
+    {
+        public JsonConverter() : base(s_knownTypes) { }
+    }
+
     public static int EntityCount;
 
     public GameWorld World => GameWorld.Singleton;
@@ -73,22 +86,6 @@ public abstract class BaseEntity : IAudioEmitter, IEventListener, IJsonOnDeseria
     public virtual void OnCreate() { }
 
     public virtual void OnDestroy() { }
-
-    public virtual void Deserialize(XmlElement xml)
-    {
-        string value;
-
-        if (xml.HasAttribute("Name"))
-        {
-            Name = xml.GetAttribute("Name");
-        }
-
-        if ((value = xml.GetAttribute("Position")) != "")
-        {
-            // Note this should be the upper case Position!!!
-            Position = Helper.StringToVector3(value);
-        }
-    }
 
     public virtual EventResult HandleEvent(EventType type, object sender, object tag)
     {
@@ -130,7 +127,7 @@ public abstract class Entity : BaseEntity
 
     public float Alpha { get; set; } = 1;
 
-    public Vector3 ScaleBias { get; set; } = Vector3.One;
+    public float ScaleBias { get; set; } = 1;
 
     public float RotationXBias { get; set; }
 
@@ -189,64 +186,14 @@ public abstract class Entity : BaseEntity
 
     public virtual bool IsPickable => Visible;
 
-    public override void Deserialize(XmlElement xml)
+    public override void OnDeserialized()
     {
-        base.Deserialize(xml);
-
-        string value;
-
-        // Treat game model as level content
-        if ((value = xml.GetAttribute("Model")) != "")
-        {
-            Model = value;
-        }
-
-        if ((value = xml.GetAttribute("Alpha")) != "")
-        {
-            Alpha = float.Parse(value);
-        }
-
-        // Get entity transform bias
-        if ((value = xml.GetAttribute("RotationXBias")) != "")
-        {
-            RotationXBias = float.Parse(value);
-        }
-
-        if ((value = xml.GetAttribute("RotationYBias")) != "")
-        {
-            RotationYBias = float.Parse(value);
-        }
-
-        if ((value = xml.GetAttribute("RotationZBias")) != "")
-        {
-            RotationZBias = float.Parse(value);
-        }
-
-        if ((value = xml.GetAttribute("ScaleBias")) != "")
-        {
-            ScaleBias = Helper.StringToVector3(value);
-        }
+        base.OnDeserialized();
 
         transformBias = Matrix.CreateScale(ScaleBias) *
                         Matrix.CreateRotationX(MathHelper.ToRadians(RotationXBias) + MathHelper.PiOver2) *
                         Matrix.CreateRotationY(MathHelper.ToRadians(RotationYBias)) *
                         Matrix.CreateRotationZ(MathHelper.ToRadians(RotationZBias));
-
-        // Get entity transform
-        if ((value = xml.GetAttribute("Rotation")) != "")
-        {
-            Rotation = Helper.StringToQuaternion(value);
-        }
-
-        if ((value = xml.GetAttribute("Scale")) != "")
-        {
-            Scale = Helper.StringToVector3(value);
-        }
-    }
-
-    public override void OnDeserialized()
-    {
-        base.OnDeserialized();
 
         if (Model != null)
         {

@@ -258,107 +258,9 @@ public abstract class GameObject : Entity, ISelectable
 
     public List<KeyValuePair<GameModel, int>> Attachment = new();
 
-    public GameObject(string classID)
-    {
-        if (GameDefault.Singleton.WorldObjectDefaults.TryGetValue(classID, out XmlElement xml))
-        {
-            Deserialize(xml);
-            OnDeserialized();
-        }
-    }
-
     public void Flash()
     {
         flashElapsedTime = 0;
-    }
-
-    public override void Deserialize(XmlElement xml)
-    {
-        base.Deserialize(xml);
-
-        if (xml.HasAttribute("MaxHealth"))
-        {
-            MaxHealth = float.Parse(xml.GetAttribute("MaxHealth"));
-        }
-
-        if (xml.HasAttribute("Priority"))
-        {
-            Priority = float.Parse(xml.GetAttribute("Priority"));
-        }
-
-        if (xml.HasAttribute("AreaRadius"))
-        {
-            AreaRadius = float.Parse(xml.GetAttribute("AreaRadius"));
-        }
-
-        if (xml.HasAttribute("Attack"))
-        {
-            AttackPoint = Helper.StringToVector2(xml.GetAttribute("Attack"));
-        }
-
-        if (xml.HasAttribute("Defense"))
-        {
-            DefensePoint = Helper.StringToVector2(xml.GetAttribute("Defense"));
-        }
-
-        if (xml.HasAttribute("AttackDuration"))
-        {
-            AttackDuration = float.Parse(xml.GetAttribute("AttackDuration"));
-        }
-
-        if (xml.HasAttribute("AttackRange"))
-        {
-            AttackRange = Helper.StringToVector2(xml.GetAttribute("AttackRange"));
-        }
-
-        if (xml.HasAttribute("ViewDistance"))
-        {
-            ViewDistance = float.Parse(xml.GetAttribute("ViewDistance"));
-        }
-
-        // Initialize attachments
-        if (xml.HasAttribute("Attachment"))
-        {
-            var value = xml.GetAttribute("Attachment");
-
-            var items = value.Split(new char[] { '|' });
-
-            for (var i = 0; i < items.Length; i += 2)
-            {
-                Attachments.Add(items[i + 1], items[i]);
-            }
-        }
-
-        if (xml.HasAttribute("Icon"))
-        {
-            Icon = int.Parse(xml.GetAttribute("Icon"));
-        }
-
-        if (xml.HasAttribute("Snapshot"))
-        {
-            Snapshot = int.Parse(xml.GetAttribute("Snapshot"));
-        }
-
-        if (xml.HasAttribute("Sound"))
-        {
-            Sound = xml.GetAttribute("Sound");
-        }
-
-        if (xml.HasAttribute("SoundCombat"))
-        {
-            SoundCombat = xml.GetAttribute("SoundCombat");
-        }
-
-        if (xml.HasAttribute("SoundDie"))
-        {
-            SoundDie = xml.GetAttribute("SoundDie");
-        }
-
-        // Initialize spells
-        if (xml.HasAttribute("Spells"))
-        {
-            Spells = xml.GetAttribute("Spells").Split(new char[] { ',', ' ', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).ToArray();
-        }
     }
 
     public override void OnDeserialized()
@@ -757,23 +659,12 @@ public class Tree : GameObject
     private readonly Random random = new();
     private List<Point> pathGrids = new();
 
-    public Tree() : base("Tree")
+    public Tree()
     {
         ShowStatus = false;
         Spotted = true;
     }
 
-    public override void Deserialize(XmlElement xml)
-    {
-        string value;
-        if ((value = xml.GetAttribute("Lumber")) != "")
-        {
-            lumber = int.Parse(value);
-        }
-
-        base.Deserialize(xml);
-    }
-    
     public override void OnDeserialized()
     {
         base.OnDeserialized();
@@ -918,7 +809,7 @@ public class Goldmine : GameObject
     /// </summary>
     public Vector3 SpawnPoint;
 
-    public Goldmine() : base("Goldmine")
+    public Goldmine()
     {
         Spotted = true;
         AreaRadius = 30;
@@ -928,22 +819,6 @@ public class Goldmine : GameObject
     {
         RotationZ = MathHelper.ToRadians(value);
         Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, RotationZ);
-    }
-
-    public override void Deserialize(XmlElement xml)
-    {
-        // Read in obstructor & spawn point
-        if ((_ = xml.GetAttribute("ObstructorSize")) != "")
-        {
-            ObstructorSize = Helper.StringToVector2(xml.GetAttribute("ObstructorSize"));
-        }
-
-        if ((_ = xml.GetAttribute("SpawnPoint")) != "")
-        {
-            SpawnPoint = new Vector3(Helper.StringToVector2(xml.GetAttribute("SpawnPoint")), 0);
-        }
-
-        base.Deserialize(xml);
     }
 
     public override void OnCreate()
@@ -974,7 +849,6 @@ public class Goldmine : GameObject
 public class BoxOfPandora : GameObject
 {
     public BoxOfPandora()
-        : base("BoxOfPandora")
     {
         VisibleInFogOfWar = false;
     }
@@ -1157,15 +1031,4 @@ public class Missile : Entity, IProjectile
 
 public class Decoration : Entity
 {
-    public override void Deserialize(XmlElement xml)
-    {
-        base.Deserialize(xml);
-
-        string value;
-
-        if ((value = xml.GetAttribute("Position")) != "")
-        {
-            Position = Helper.StringToVector3(value);
-        }
-    }
 }

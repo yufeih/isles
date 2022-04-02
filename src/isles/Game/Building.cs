@@ -101,61 +101,10 @@ public class Building : GameObject, IPlaceable
     
     public string Halo { get; set; }
 
-    public Building(string classID)
-        : base(classID)
+    public Building()
     {
         // Reset sound die to explosion
         SoundDie = "Explosion";
-    }
-
-    public override void Deserialize(XmlElement xml)
-    {
-        string value;
-
-        if ((value = xml.GetAttribute("Lumber")) != "")
-        {
-            Lumber = int.Parse(value);
-        }
-
-        if ((value = xml.GetAttribute("Gold")) != "")
-        {
-            Gold = int.Parse(value);
-        }
-
-        if ((value = xml.GetAttribute("Food")) != "")
-        {
-            Food = int.Parse(value);
-        }
-
-        if ((value = xml.GetAttribute("ConstructionTime")) != "")
-        {
-            ConstructionTime = float.Parse(value);
-        }
-
-        if ((value = xml.GetAttribute("ObstructorSize")) != "")
-        {
-            ObstructorSize = Helper.StringToVector2(value);
-        }
-
-        if ((value = xml.GetAttribute("SpawnPoint")) != "")
-        {
-            SpawnPoint = Helper.StringToVector3(value);
-        }
-
-        if ((value = xml.GetAttribute("Units")) != "")
-        {
-            Units = new List<string>(
-                value.Split(new char[] { ',', ' ', '\n', '\r' }));
-            Units.RemoveAll(delegate (string v) { return v.Length <= 0; });
-        }
-
-        if ((value = xml.GetAttribute("Halo")) != "")
-        {
-            Halo = value;
-        }
-
-        // Deserialize models after default attributes are assigned
-        base.Deserialize(xml);
     }
 
     protected override void UpdateOutline(Outline outline)
@@ -838,8 +787,7 @@ public class Tower : Building
     private readonly SpellCombat combat;
     private GameObject currentTarget;
 
-    public Tower(string classID)
-        : base(classID)
+    public Tower()
     {
         // Add a combat spell
         combat = new SpellCombat(this);
