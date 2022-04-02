@@ -272,11 +272,6 @@ public abstract class GameObject : Entity, ISelectable
     {
         base.Deserialize(xml);
 
-        if (xml.HasAttribute("Health"))
-        {
-            float.TryParse(xml.GetAttribute("Health"), out health);
-        }
-
         if (xml.HasAttribute("MaxHealth"))
         {
             MaxHealth = float.Parse(xml.GetAttribute("MaxHealth"));
@@ -389,6 +384,8 @@ public abstract class GameObject : Entity, ISelectable
     public override void OnDeserialized()
     {
         base.OnDeserialized();
+
+        health = MaxHealth;
 
         foreach (var (bone, model) in Attachments)
         {

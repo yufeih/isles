@@ -188,7 +188,7 @@ public class WorldRenderer
                 {
                     var color = ProgressColor(1.0f * entity.health / entity.MaxHealth);
                     GameUI.Singleton.DrawProgress(entity.TopCenter, 0, (int)(entity.AreaRadius * 10.0f),
-                        100 * entity.health / entity.MaxHealth, color);
+                        100 * entity.Health / entity.MaxHealth, color);
 
                     if (entity is Building building)
                     {
