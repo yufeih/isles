@@ -269,20 +269,12 @@ public abstract class GameObject : Entity, ISelectable
     {
         base.Deserialize(xml);
 
-        if (xml.HasAttribute("Health"))
-        {
-            float.TryParse(xml.GetAttribute("Health"), out health);
-        }
-
         if (xml.HasAttribute("MaxHealth"))
         {
             MaxHealth = float.Parse(xml.GetAttribute("MaxHealth"));
         }
 
-        if (health > MaxHealth)
-        {
-            MaxHealth = health;
-        }
+        health = MaxHealth;
 
         if (xml.HasAttribute("Owner"))
         {
