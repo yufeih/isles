@@ -110,12 +110,27 @@ public class Building : GameObject, IPlaceable
 
     public override void Deserialize(XmlElement xml)
     {
-        Lumber = int.Parse(xml.GetAttribute("Lumber"));
-        Gold = int.Parse(xml.GetAttribute("Gold"));
-        Food = int.Parse(xml.GetAttribute("Food"));
-        ConstructionTime = float.Parse(xml.GetAttribute("ConstructionTime"));
-
         string value;
+
+        if ((value = xml.GetAttribute("Lumber")) != "")
+        {
+            Lumber = int.Parse(value);
+        }
+
+        if ((value = xml.GetAttribute("Gold")) != "")
+        {
+            Gold = int.Parse(value);
+        }
+
+        if ((value = xml.GetAttribute("Food")) != "")
+        {
+            Food = int.Parse(value);
+        }
+
+        if ((value = xml.GetAttribute("ConstructionTime")) != "")
+        {
+            ConstructionTime = float.Parse(value);
+        }
 
         if ((value = xml.GetAttribute("ObstructorSize")) != "")
         {
@@ -195,7 +210,7 @@ public class Building : GameObject, IPlaceable
             Owner.FoodCapacity += Food;
         }
 
-        foreach (Spell spell in Spells)
+        foreach (Spell spell in SpellList)
         {
             spell.Enable = true;
         }
@@ -316,7 +331,7 @@ public class Building : GameObject, IPlaceable
             Owner.Food += food;
             Owner.MarkFutureObject(type);
 
-            foreach (Spell s in Spells)
+            foreach (Spell s in SpellList)
             {
                 if (s is SpellTraining train && train.Type == type)
                 {

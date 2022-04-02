@@ -122,7 +122,10 @@ public class Charactor : GameObject, IMovable
             IsHero = bool.Parse(value);
         }
 
-        Food = int.Parse(xml.GetAttribute("Food"));
+        if ((value = xml.GetAttribute("Food")) != "")
+        {
+            Food = int.Parse(value);
+        }
     }
 
     /// <summary>
@@ -737,7 +740,7 @@ public class FireSorceress : Charactor
         {
             if (Owner is ComputerPlayer && Helper.Random.Next(10) == 0)
             {
-                foreach (Spell spell in Spells)
+                foreach (Spell spell in SpellList)
                 {
                     if (spell is SpellPunishOfNature)
                     {
@@ -750,7 +753,7 @@ public class FireSorceress : Charactor
             {
                 if (Owner is ComputerPlayer)
                 {
-                    foreach (Spell spell in Spells)
+                    foreach (Spell spell in SpellList)
                     {
                         if (spell is SpellSummon)
                         {

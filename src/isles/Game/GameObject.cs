@@ -12,6 +12,8 @@ public abstract class GameObject : Entity, ISelectable
 
     private Icon icon;
 
+    public int? Icon { get; set; }
+
     public int? Snapshot { get; set; }
 
     public Icon SnapshotIcon { get; private set; }
@@ -89,12 +91,12 @@ public abstract class GameObject : Entity, ISelectable
             if (value <= 0 && health > 0)
             {
                 // Clear all spells
-                foreach (Spell spell in Spells)
+                foreach (Spell spell in SpellList)
                 {
                     spell.Enable = false;
                 }
 
-                Spells.Clear();
+                SpellList.Clear();
 
                 if (SoundDie != null && ShouldDrawModel)
                 {
@@ -140,7 +142,9 @@ public abstract class GameObject : Entity, ISelectable
 
     public float health;
 
-    public List<Spell> Spells = new();
+    public string[] Spells { get; set; } = Array.Empty<string>();
+
+    public List<Spell> SpellList = new();
 
     public bool Selected
     {
@@ -325,25 +329,9 @@ public abstract class GameObject : Entity, ISelectable
             }
         }
 
-        var iconIndex = 0;
         if (xml.HasAttribute("Icon"))
         {
-            iconIndex = int.Parse(xml.GetAttribute("Icon"));
-            icon = Icon.FromTiledTexture(iconIndex);
-
-            ProfileButton = new SpellButton
-            {
-                Texture = icon.Texture,
-                SourceRectangle = icon.Region,
-                Hovered = Icon.RectangeFromIndex(iconIndex + 1),
-                Pressed = Icon.RectangeFromIndex(iconIndex + 2),
-                Anchor = Anchor.BottomLeft,
-                ScaleMode = ScaleMode.ScaleY,
-            };
-
-            ProfileButton.Click += (sender, e) => Player.LocalPlayer.Focus(this);
-
-            ProfileButton.DoubleClick += (sender, e) => Player.LocalPlayer.SelectGroup(this);
+            Icon = int.Parse(xml.GetAttribute("Icon"));
         }
 
         if (xml.HasAttribute("Snapshot"))
@@ -369,15 +357,7 @@ public abstract class GameObject : Entity, ISelectable
         // Initialize spells
         if (xml.HasAttribute("Spells"))
         {
-            var spells = xml.GetAttribute("Spells").Split(new char[] { ',', ' ', '\n', '\r' });
-
-            for (var i = 0; i < spells.Length; i++)
-            {
-                if (spells[i].Length > 0)
-                {
-                    AddSpell(spells[i]);
-                }
-            }
+            Spells = xml.GetAttribute("Spells").Split(new char[] { ',', ' ', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).ToArray();
         }
     }
 
@@ -400,7 +380,32 @@ public abstract class GameObject : Entity, ISelectable
 
         if (Snapshot != null)
         {
-            SnapshotIcon = Icon.FromTiledTexture(Snapshot.Value, 8, 4, SnapshotTexture);
+            SnapshotIcon = Isles.Icon.FromTiledTexture(Snapshot.Value, 8, 4, SnapshotTexture);
+        }
+
+        if (Icon != null)
+        {
+            var iconIndex = Icon.Value;
+            icon = Isles.Icon.FromTiledTexture(iconIndex);
+
+            ProfileButton = new SpellButton
+            {
+                Texture = icon.Texture,
+                SourceRectangle = icon.Region,
+                Hovered = Isles.Icon.RectangeFromIndex(iconIndex + 1),
+                Pressed = Isles.Icon.RectangeFromIndex(iconIndex + 2),
+                Anchor = Anchor.BottomLeft,
+                ScaleMode = ScaleMode.ScaleY,
+            };
+
+            ProfileButton.Click += (sender, e) => Player.LocalPlayer.Focus(this);
+
+            ProfileButton.DoubleClick += (sender, e) => Player.LocalPlayer.SelectGroup(this);
+        }
+
+        foreach (var spell in Spells)
+        {
+            AddSpell(spell);
         }
     }
     /// <summary>
@@ -412,7 +417,7 @@ public abstract class GameObject : Entity, ISelectable
         var spell = Spell.Create(name, World);
         spell.Owner = this;
         OnCreateSpell(spell);
-        Spells.Add(spell);
+        SpellList.Add(spell);
 
         if (Selected && Focused)
         {
@@ -475,7 +480,7 @@ public abstract class GameObject : Entity, ISelectable
     public override void Update(GameTime gameTime)
     {
         // Update spells
-        foreach (Spell spell in Spells)
+        foreach (Spell spell in SpellList)
         {
             spell.Update(gameTime);
         }
@@ -694,9 +699,9 @@ public abstract class GameObject : Entity, ISelectable
 
         if (Owner is LocalPlayer)
         {
-            for (var i = 0; i < Spells.Count; i++)
+            for (var i = 0; i < SpellList.Count; i++)
             {
-                ui.SetUIElement(i, true, Spells[i].Button);
+                ui.SetUIElement(i, true, SpellList[i].Button);
             }
         }
     }
