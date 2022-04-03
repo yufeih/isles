@@ -1,16 +1,14 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Xml;
-
 namespace Isles;
 
 public class Charactor : GameObject, IMovable
 {
-    public EffectGlow Glow;
-    public bool ShowGlow;
-    public bool IsHero;
-    public int Food;
+    public EffectGlow Glow { get; set; }
+    public bool ShowGlow { get; set; }
+    public bool IsHero { get; set; }
+    public int Food { get; set; }
 
     /// <summary>
     /// Gets or sets the speed of this charactor.
@@ -25,7 +23,7 @@ public class Charactor : GameObject, IMovable
     /// <summary>
     /// Gets or sets the radius of the charactor.
     /// </summary>
-    public float PathObstructorRadius { get; set; } = 5;
+    public float ObstructorRadius { get; set; } = 5;
 
     /// <summary>
     /// Gets or sets the facing of the charactor.
@@ -96,33 +94,9 @@ public class Charactor : GameObject, IMovable
 
     public override bool Visible => State is not StateHarvestGold harvestGold || (harvestGold.state != StateHarvestGold.StateType.Wait && harvestGold.state != StateHarvestGold.StateType.Harvest);
 
-    public Charactor(GameWorld world, string classID) : base(world, classID)
+    public Charactor()
     {
         VisibleInFogOfWar = false;
-    }
-
-    public override void Deserialize(XmlElement xml)
-    {
-        base.Deserialize(xml);
-
-        string value;
-
-        if ((value = xml.GetAttribute("Speed")) != "")
-        {
-            Speed = float.Parse(value);
-        }
-
-        if ((value = xml.GetAttribute("ObstructorRadius")) != "")
-        {
-            PathObstructorRadius = float.Parse(value);
-        }
-
-        if ((value = xml.GetAttribute("IsHero")) != "")
-        {
-            IsHero = bool.Parse(value);
-        }
-
-        int.TryParse(xml.GetAttribute("Food"), out Food);
     }
 
     /// <summary>
@@ -136,7 +110,7 @@ public class Charactor : GameObject, IMovable
             moving = false;
         }
 
-        Model.Play(IdleAnimation, true, 0.2f);
+        GameModel.Play(IdleAnimation, true, 0.2f);
         positionLastFrame = Position;
     }
 
@@ -262,7 +236,7 @@ public class Charactor : GameObject, IMovable
         Vector2 position;
         position.X = Position.X;
         position.Y = Position.Y;
-        outline.SetCircle(position, PathObstructorRadius * 2);
+        outline.SetCircle(position, ObstructorRadius * 2);
     }
 
     /// <summary>
@@ -312,10 +286,10 @@ public class Charactor : GameObject, IMovable
             Owner.MarkFutureObject(ClassID);
         }
 
-        Combat = new SpellCombat(World, this);
+        Combat = new SpellCombat(this);
 
         // Create a path brush
-        Brush = World.PathManager.CreateBrush(PathObstructorRadius);
+        Brush = World.PathManager.CreateBrush(ObstructorRadius);
 
         // Find a valid position
         Position = new Vector3(World.PathManager.FindValidPosition(
@@ -324,14 +298,14 @@ public class Charactor : GameObject, IMovable
         // Add this to the path manager
         World.PathManager.AddMovable(this);
 
-        if (Model != null)
+        if (GameModel != null)
         {
-            Model.Play(IdleAnimation);
+            GameModel.Play(IdleAnimation);
         }
 
         positionLastFrame = Position;
 
-        SelectionAreaRadius = PathObstructorRadius;
+        AreaRadius = ObstructorRadius;
 
         // Initialize idle state
         if (Idle == null)
@@ -450,13 +424,13 @@ public class Charactor : GameObject, IMovable
             {
                 moving = true;
                 elapsedAnimationTime = 0;
-                Model.Play(RunAnimation, true, 0.2f);
+                GameModel.Play(RunAnimation, true, 0.2f);
             }
             else if (!moved && moving && elapsedAnimationTime > MinAnimationDuraction)
             {
                 elapsedAnimationTime = 0;
                 moving = false;
-                Model.Play(IdleAnimation, true, 0.2f);
+                GameModel.Play(IdleAnimation, true, 0.2f);
             }
 
             if (Combat != null)
@@ -476,7 +450,7 @@ public class Charactor : GameObject, IMovable
         {
             Stop();
             Facing = target.Position - Position;
-            Model.Play(AttackAnimation, false, 0.0f, OnComplete, null);
+            GameModel.Play(AttackAnimation, false, 0.0f, OnComplete, null);
             AttackTarget = target as GameObject;
         }
     }
@@ -503,8 +477,6 @@ public class Worker : Charactor
     public int GoldCapacity = 10;
     public GameModel wood;
     public GameModel gold;
-
-    public Worker(GameWorld world, string classID) : base(world, classID) { }
 
     public override string RunAnimation => LumberCarried > 0 ? "Carry" : "Run";
 
@@ -584,7 +556,7 @@ public class Worker : Charactor
 
                     // Help repair building
                     else if (building.State == Building.BuildingState.Normal &&
-                             building.Health < building.MaximumHealth)
+                             building.Health < building.MaxHealth)
                     {
                         state = new StateRepair(World, this, building);
                     }
@@ -637,11 +609,6 @@ public class Hunter : Charactor
     public bool weaponVisible = true;
     public GameModel weapon;
 
-    public Hunter(GameWorld world, string type)
-        : base(world, type)
-    {
-    }
-
     public override string AttackAnimation => Helper.Random.Next(2) == 0 ? "Attack" : "Attack_2";
 
     public override void OnCreate()
@@ -669,7 +636,7 @@ public class Hunter : Charactor
         {
             Stop();
             Facing = target.Position - Position;
-            Model.Play(AttackAnimation, false, 0.0f, OnComplete, (18.0f / 41, Launch));
+            GameModel.Play(AttackAnimation, false, 0.0f, OnComplete, (18.0f / 41, Launch));
             AttackTarget = target as GameObject;
         }
     }
@@ -681,7 +648,7 @@ public class Hunter : Charactor
 
     private void Launch()
     {
-        var missile = new Missile(World, weapon, AttackTarget);
+        var missile = new Missile(weapon, AttackTarget);
 
         missile.Hit += Hit;
         World.Add(missile);
@@ -714,20 +681,17 @@ public class FireSorceress : Charactor
 {
     private int rightHand;
 
-    public FireSorceress(GameWorld world, string classID)
-        : base(world, classID) { }
-
     public override string AttackAnimation => Helper.Random.Next(2) == 0 ? "Attack" : "Attack_2";
 
     public override void OnCreate()
     {
         base.OnCreate();
 
-        rightHand = Model.GetBone("Bip01_R_Hand");
+        rightHand = GameModel.GetBone("Bip01_R_Hand");
 
         if (Owner != null && Owner.IsAvailable("PunishOfNatureUpgrade"))
         {
-            AddSpell("PunishOfNature");
+            AddSpell(new SpellPunishOfNature());
         }
     }
 
@@ -737,7 +701,7 @@ public class FireSorceress : Charactor
         {
             if (Owner is ComputerPlayer && Helper.Random.Next(10) == 0)
             {
-                foreach (Spell spell in Spells)
+                foreach (Spell spell in SpellList)
                 {
                     if (spell is SpellPunishOfNature)
                     {
@@ -750,7 +714,7 @@ public class FireSorceress : Charactor
             {
                 if (Owner is ComputerPlayer)
                 {
-                    foreach (Spell spell in Spells)
+                    foreach (Spell spell in SpellList)
                     {
                         if (spell is SpellSummon)
                         {
@@ -764,7 +728,7 @@ public class FireSorceress : Charactor
             {
                 Stop();
                 Facing = target.Position - Position;
-                Model.Play("Attack", false, 0.0f, null, (0.5f, Launch));
+                GameModel.Play("Attack", false, 0.0f, null, (0.5f, Launch));
                 AttackTarget = target as GameObject;
             }
         }
@@ -774,10 +738,9 @@ public class FireSorceress : Charactor
     {
         Vector3 spawn = Vector3.Zero;
 
-        spawn = rightHand >= 0 ? Model.GetBoneTransform(rightHand).Translation : TopCenter - Vector3.UnitZ * 5;
+        spawn = rightHand >= 0 ? GameModel.GetBoneTransform(rightHand).Translation : TopCenter - Vector3.UnitZ * 5;
 
-        var fireball = new EffectFireball(
-            World, spawn, Vector3.UnitZ * 50, AttackTarget);
+        var fireball = new EffectFireball(spawn, Vector3.UnitZ * 50, AttackTarget);
         fireball.Projectile.Hit += Hit;
         World.Add(fireball);
 
@@ -805,8 +768,5 @@ public class FireSorceress : Charactor
 
 public class Hellfire : Charactor
 {
-    public Hellfire(GameWorld world, string classID)
-        : base(world, classID) { }
-
     public override string AttackAnimation => Helper.Random.Next(2) == 0 ? "Attack" : "Attack_2";
 }

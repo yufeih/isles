@@ -1,9 +1,6 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Diagnostics.CodeAnalysis;
-using System.Xml;
-
 namespace Isles;
 
 /// <summary>
@@ -77,38 +74,6 @@ public struct Icon
 public abstract class Spell : IEventListener
 {
     /// <summary>
-    /// Spell creators.
-    /// </summary>
-    private static readonly Dictionary<string, Func<GameWorld, Spell>> creators = new();
-
-    public static void RegisterCreator(Type spellType, Func<GameWorld, Spell> creator)
-    {
-        creators.Add(spellType.Name, creator);
-    }
-
-    public static void RegisterCreator(string spellName, Func<GameWorld, Spell> creator)
-    {
-        creators.Add(spellName, creator);
-    }
-
-    public static Spell Create(Type spellType, GameWorld world)
-    {
-        return Create(spellType.Name, world);
-    }
-
-    /// <summary>
-    /// Create a new game spell.
-    /// </summary>
-    /// <param name="spellTypeName"></param>
-    /// <param name="world"></param>
-    public static Spell Create(string spellTypeName, GameWorld world)
-    {
-        return !creators.TryGetValue(spellTypeName, out var creator)
-            ? throw new Exception("Failed to create spell, unknown spell type: " + spellTypeName)
-            : creator(world);
-    }
-
-    /// <summary>
     /// Cast a spell.
     /// </summary>
     public static void Cast(Spell spell)
@@ -132,7 +97,7 @@ public abstract class Spell : IEventListener
     /// </summary>
     public static Spell CurrentSpell { get; private set; }
 
-    protected GameWorld world;
+    protected GameWorld world = GameWorld.Singleton;
 
     public GameObject Owner
     {
@@ -164,74 +129,29 @@ public abstract class Spell : IEventListener
 
     private bool enable = true;
 
-    public Spell(GameWorld world)
+    public Spell()
     {
-        this.world = world;
     }
 
-    public Spell(GameWorld world, string classID)
+    public Spell(string classID)
     {
-        this.world = world;
+        var dataSchema = new { Name = "", Description = "", Icon = 0, Hotkey = default(Keys), CoolDown = 0.0f, AutoCast = false };
+        var data = JsonHelper.DeserializeAnonymousType(GameDefault.Singleton.Prefabs[classID], dataSchema);
 
-        // Initialize from xml element
-        if (GameDefault.Singleton.WorldObjectDefaults.TryGetValue(classID, out XmlElement xml))
-        {
-            Deserialize(xml);
-        }
-
-        if (GameDefault.Singleton.SpellDefaults.TryGetValue(classID, out xml))
-        {
-            Deserialize(xml);
-        }
+        Name = data.Name;
+        Description = data.Description;
+        Icon = Icon.FromTiledTexture(data.Icon);
+        Hotkey = data.Hotkey;
+        CoolDown = data.CoolDown;
+        AutoCast = data.AutoCast;
     }
 
-    public virtual void Deserialize(XmlElement xml)
-    {
-        Name = xml.GetAttribute("Name");
-        Description = xml.GetAttribute("Description");
-        Description.Replace('\t', ' ');
-
-        string value;
-
-        if ((value = xml.GetAttribute("Icon")) != "")
-        {
-            Icon = Icon.FromTiledTexture(int.Parse(value));
-        }
-
-        if ((value = xml.GetAttribute("Hotkey")) != "")
-        {
-            Hotkey = (Keys)Enum.Parse(typeof(Keys), value);
-        }
-
-        if ((value = xml.GetAttribute("CoolDown")) != "")
-        {
-            CoolDown = float.Parse(value);
-        }
-
-        if ((value = xml.GetAttribute("AutoCast")) != "")
-        {
-            AutoCast = bool.Parse(value);
-        }
-    }
-
-    /// <summary>
-    /// Gets or sets the name of the spell.
-    /// </summary>
     public string Name;
 
-    /// <summary>
-    /// Gets or sets the description of the spell.
-    /// </summary>
     public string Description;
 
-    /// <summary>
-    /// Gets or sets the spell icon.
-    /// </summary>
     public Icon Icon = Icon.FromTiledTexture(0);
 
-    /// <summary>
-    /// Gets or sets the hot key for the spell.
-    /// </summary>
     public Keys Hotkey;
 
     /// <summary>
@@ -626,11 +546,6 @@ public class SpellTraining : Spell
     protected override void OnOwnerChanged()
     {
         ownerBuilding = Owner as Building;
-
-        if (ownerBuilding == null)
-        {
-            throw new ArgumentException();
-        }
     }
 
     /// <summary>
@@ -648,21 +563,10 @@ public class SpellTraining : Spell
         }
     }
 
-    public SpellTraining(GameWorld world, string type, Building owner)
-        : base(world)
+    public SpellTraining(string type)
+        : base(type)
     {
         Type = type ?? throw new ArgumentNullException();
-        ownerBuilding = owner;
-    }
-
-    public override void Deserialize(XmlElement xml)
-    {
-        if (xml.HasAttribute("TrainingTime"))
-        {
-            CoolDown = float.Parse(xml.GetAttribute("TrainingTime"));
-        }
-
-        base.Deserialize(xml);
     }
 
     protected override SpellButton CreateUIElement(GameUI ui)
@@ -853,7 +757,7 @@ public class SpellTraining : Spell
                 ownerBuilding.Owner.UnmarkFutureObject(Type);
             }
 
-            c.Position = ownerBuilding.Position + ownerBuilding.SpawnPoint;
+            c.Position = ownerBuilding.Position + new Vector3(ownerBuilding.SpawnPoint, 0);
             c.Owner = ownerBuilding.Owner;
             c.Owner.Food -= c.Food;
             world.Add(c);
@@ -880,17 +784,18 @@ public class SpellTraining : Spell
 
 public class SpellUpgrade : SpellTraining
 {
-    public SpellUpgrade(GameWorld world, string type)
-        : base(world, type, null)
+    public SpellUpgrade(string type)
+        : base(type)
     {
         GameDefault.Singleton.SetUnique(Type);
-    }
-
-    public SpellUpgrade(GameWorld world, string type, Action<Spell, Building> onComplete)
-        : base(world, type, null)
-    {
-        GameDefault.Singleton.SetUnique(Type);
-        Complete = onComplete;
+        Complete = type switch
+        {
+            "LiveOfNature" => LiveOfNature,
+            "PunishOfNatureUpgrade" => PunishOfNature,
+            "AttackUpgrade" => Attack,
+            "DefenseUpgrade" => Defense,
+            _ => throw new ArgumentException(type),
+        };
     }
 
     protected override void OnComplete()
@@ -900,12 +805,8 @@ public class SpellUpgrade : SpellTraining
             Audios.Play("UpgradeComplete");
         }
     }
-}
 
-[SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Uniform delegate")]
-public static class Upgrades
-{
-    public static void LiveOfNature(Spell spell, Building owner)
+    private static void LiveOfNature(Spell spell, Building owner)
     {
         if (owner != null && owner.Owner != null)
         {
@@ -913,7 +814,7 @@ public static class Upgrades
         }
     }
 
-    public static void PunishOfNature(Spell spell, Building owner)
+    private static void PunishOfNature(Spell spell, Building owner)
     {
         if (owner != null && owner.Owner != null)
         {
@@ -921,12 +822,12 @@ public static class Upgrades
 
             foreach (GameObject o in owner.Owner.EnumerateObjects("FireSorceress"))
             {
-                o.AddSpell("PunishOfNature");
+                o.AddSpell(new SpellPunishOfNature());
             }
         }
     }
 
-    public static void Attack(Spell spell, Building owner)
+    private static void Attack(Spell spell, Building owner)
     {
         if (owner != null && owner.Owner != null)
         {
@@ -937,14 +838,13 @@ public static class Upgrades
             {
                 if (o.AttackPoint.X > 0)
                 {
-                    o.AttackPoint.X += 20;
-                    o.AttackPoint.Y += 20;
+                    o.AttackPoint += 20 * Vector2.One;
                 }
             }
         }
     }
 
-    public static void Defense(Spell spell, Building owner)
+    private static void Defense(Spell spell, Building owner)
     {
         if (owner != null && owner.Owner != null)
         {
@@ -955,8 +855,7 @@ public static class Upgrades
             {
                 if (o.DefensePoint.X > 0)
                 {
-                    o.DefensePoint.X += 20;
-                    o.DefensePoint.Y += 20;
+                    o.DefensePoint += 20 * Vector2.One;
                 }
             }
         }
@@ -1002,8 +901,8 @@ public class SpellConstruct : Spell
     private Entity entity;
     private IPlaceable placeable;
 
-    public SpellConstruct(GameWorld world, string entityType)
-        : base(world)
+    public SpellConstruct(string entityType)
+        : base(entityType)
     {
         input = BaseGame.Singleton.Input;
         this.entityType = entityType;
@@ -1117,7 +1016,7 @@ public class SpellConstruct : Spell
 
     public override void Draw(GameTime gameTime)
     {
-        entity.Model.Draw();
+        entity.GameModel.Draw();
     }
 
     private Point beginDropPosition;
@@ -1245,8 +1144,7 @@ public class SpellAttack : Spell
     /// <summary>
     /// Creates a new team attack.
     /// </summary>
-    public SpellAttack(GameWorld world)
-        : base(world)
+    public SpellAttack()
     {
         Name = "Attack";
         Hotkey = Keys.A;
@@ -1347,8 +1245,7 @@ public class SpellAttack : Spell
 
 public class SpellMove : Spell
 {
-    public SpellMove(GameWorld world)
-        : base(world)
+    public SpellMove()
     {
         Name = "Move";
         Hotkey = Keys.M;
@@ -1455,8 +1352,7 @@ public class SpellCombat : Spell
     /// <summary>
     /// Creates a new combat spell.
     /// </summary>
-    public SpellCombat(GameWorld world, GameObject owner)
-        : base(world)
+    public SpellCombat(GameObject owner)
     {
         Owner = owner ?? throw new ArgumentNullException();
     }
@@ -1522,8 +1418,8 @@ public class SpellSummon : Spell
 {
     private readonly string type;
 
-    public SpellSummon(GameWorld world, string type)
-        : base(world, type)
+    public SpellSummon(string type)
+        : base(type)
     {
         this.type = type;
     }
@@ -1569,10 +1465,10 @@ public class SpellSummon : Spell
 
             if (wo is GameObject)
             {
-                radius = (wo as GameObject).SelectionAreaRadius;
+                radius = (wo as GameObject).AreaRadius;
             }
 
-            var effect = new EffectSpawn(world, wo.Position, radius, "Summon");
+            var effect = new EffectSpawn(wo.Position, radius, "Summon");
 
             world.Add(effect);
 
@@ -1589,8 +1485,8 @@ public class SpellPunishOfNature : Spell
     private float elapsedTime;
     private EffectPunishOfNature effect;
 
-    public SpellPunishOfNature(GameWorld world)
-        : base(world, "PunishOfNature")
+    public SpellPunishOfNature()
+        : base("PunishOfNature")
     {
     }
 
@@ -1614,7 +1510,7 @@ public class SpellPunishOfNature : Spell
     {
         if (Owner != null)
         {
-            effect = new EffectPunishOfNature(world, Owner.Position);
+            effect = new EffectPunishOfNature(Owner.Position);
             elapsedTime = 0;
             base.Cast();
         }
@@ -1645,7 +1541,7 @@ public class SpellPunishOfNature : Spell
                 {
                     var health = (0.2f + (1 - o.Owner.EnvironmentLevel) * 0.6f) * 40;
                     o.Health += health * elapsedSeconds;
-                    if (o.Health < o.MaximumHealth)
+                    if (o.Health < o.MaxHealth)
                     {
                         o.ShowGlow = true;
                     }

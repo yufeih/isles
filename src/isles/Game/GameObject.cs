@@ -1,8 +1,6 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Xml;
-
 namespace Isles;
 
 public abstract class GameObject : Entity, ISelectable
@@ -12,9 +10,11 @@ public abstract class GameObject : Entity, ISelectable
 
     private Icon icon;
 
-    public Icon Snapshot => snapshot;
+    public int? Icon { get; set; }
 
-    private Icon snapshot;
+    public int? Snapshot { get; set; }
+
+    public Icon SnapshotIcon { get; private set; }
 
     public static Texture2D SnapshotTexture
     {
@@ -44,27 +44,27 @@ public abstract class GameObject : Entity, ISelectable
     /// <summary>
     /// Gets or sets the view distance of this game object.
     /// </summary>
-    public float ViewDistance = 100;
+    public float ViewDistance { get; set; } = 100;
 
     /// <summary>
     /// Gets or sets the radius of selection circle.
     /// </summary>
-    public float SelectionAreaRadius = 10;
+    public float AreaRadius { get; set; } = 10;
 
     /// <summary>
     /// Gets or sets the sound effect associated with this game object.
     /// </summary>
-    public string Sound;
+    public string Sound { get; set; }
 
     /// <summary>
     /// Gets or sets the sound effect for combat.
     /// </summary>
-    public string SoundCombat;
+    public string SoundCombat { get; set; }
 
     /// <summary>
     /// Gets or sets the sound effect for die.
     /// </summary>
-    public string SoundDie;
+    public string SoundDie { get; set; }
 
     /// <summary>
     /// Gets or sets the health of this game object.
@@ -75,9 +75,9 @@ public abstract class GameObject : Entity, ISelectable
 
         set
         {
-            if (value > maximumHealth)
+            if (value > MaxHealth)
             {
-                value = maximumHealth;
+                value = MaxHealth;
             }
 
             // Cannot reborn
@@ -89,12 +89,12 @@ public abstract class GameObject : Entity, ISelectable
             if (value <= 0 && health > 0)
             {
                 // Clear all spells
-                foreach (Spell spell in Spells)
+                foreach (Spell spell in SpellList)
                 {
                     spell.Enable = false;
                 }
 
-                Spells.Clear();
+                SpellList.Clear();
 
                 if (SoundDie != null && ShouldDrawModel)
                 {
@@ -114,7 +114,7 @@ public abstract class GameObject : Entity, ISelectable
                 OnDie();
             }
 
-            if (value < health && health > 0 && maximumHealth > 0 && Owner is LocalPlayer)
+            if (value < health && health > 0 && MaxHealth > 0 && Owner is LocalPlayer)
             {
                 Audios.Play("UnderAttack", Audios.Channel.UnderAttack, null);
             }
@@ -131,35 +131,24 @@ public abstract class GameObject : Entity, ISelectable
     /// <summary>
     /// Gets or sets the maximum health of this charactor.
     /// </summary>
-    public float MaximumHealth
-    {
-        get => maximumHealth;
-
-        set
-        {
-            if (value < 0)
-            {
-                throw new ArgumentOutOfRangeException();
-            }
-
-            if (maximumHealth < health)
-            {
-                Health = maximumHealth;
-            }
-
-            maximumHealth = value;
-        }
-    }
+    public float MaxHealth { get; set; }
 
     /// <summary>
     /// Gets whether the game object is alive.
     /// </summary>
-    public bool IsAlive => health > 0 || (health <= 0 && maximumHealth <= 0);
+    public bool IsAlive => health > 0 || (health <= 0 && MaxHealth <= 0);
 
-    public float maximumHealth;
     public float health;
 
-    public List<Spell> Spells = new();
+    public string[] Units { get; set; } = Array.Empty<string>();
+
+    public string[] Buildings { get; set; } = Array.Empty<string>();
+
+    public string[] Summons { get; set; } = Array.Empty<string>();
+
+    public string[] Upgrades { get; set; } = Array.Empty<string>();
+
+    public List<Spell> SpellList = new();
 
     public bool Selected
     {
@@ -190,9 +179,9 @@ public abstract class GameObject : Entity, ISelectable
         {
             highlighted = value;
 
-            if (Model != null)
+            if (GameModel != null)
             {
-                Model.Glow = highlighted ? Vector3.One : Vector3.Zero;
+                GameModel.Glow = highlighted ? Vector3.One : Vector3.Zero;
             }
 
             if (highlighted && Owner != null && ShouldDrawModel)
@@ -246,22 +235,22 @@ public abstract class GameObject : Entity, ISelectable
     /// <summary>
     /// Min/Max attack point.
     /// </summary>
-    public Vector2 AttackPoint;
+    public Vector2 AttackPoint { get; set; }
 
     /// <summary>
     /// Min/Max defense point.
     /// </summary>
-    public Vector2 DefensePoint;
+    public Vector2 DefensePoint { get; set; }
 
     /// <summary>
     /// Gets or sets the min/max attack range of this charactor.
     /// </summary>
-    public Vector2 AttackRange;
+    public Vector2 AttackRange { get; set; }
 
     /// <summary>
     /// Gets or sets the duration of each individual attack.
     /// </summary>
-    public float AttackDuration;
+    public float AttackDuration { get; set; }
 
     /// <summary>
     /// Flash related stuff.
@@ -269,125 +258,48 @@ public abstract class GameObject : Entity, ISelectable
     public const float FlashDuration = 0.5f;
     public float flashElapsedTime = FlashDuration + 0.1f;
 
-    public List<KeyValuePair<GameModel, int>> Attachment = new();
+    public Dictionary<string, string> Attachments { get; set; } = new();
 
-    public GameObject(GameWorld world, string classID)
-        : base(world, null)
-    {
-        if (GameDefault.Singleton.WorldObjectDefaults.TryGetValue(classID, out XmlElement xml))
-        {
-            Deserialize(xml);
-        }
-    }
+    public List<KeyValuePair<GameModel, int>> Attachment = new();
 
     public void Flash()
     {
         flashElapsedTime = 0;
     }
 
-    public override void Deserialize(XmlElement xml)
+    public override void OnDeserialized()
     {
-        base.Deserialize(xml);
+        base.OnDeserialized();
 
-        if (xml.HasAttribute("Health"))
+        health = MaxHealth;
+
+        foreach (var (bone, model) in Attachments)
         {
-            float.TryParse(xml.GetAttribute("Health"), out health);
-        }
-
-        if (xml.HasAttribute("MaxHealth"))
-        {
-            float.TryParse(xml.GetAttribute("MaxHealth"), out maximumHealth);
-        }
-
-        if (health > maximumHealth)
-        {
-            maximumHealth = health;
-        }
-
-        if (xml.HasAttribute("Owner"))
-        {
-            Owner = Player.FromID(int.Parse(xml.GetAttribute("Owner")));
-        }
-
-        if (xml.HasAttribute("Priority"))
-        {
-            Priority = float.Parse(xml.GetAttribute("Priority"));
-        }
-
-        if (xml.HasAttribute("AreaRadius"))
-        {
-            SelectionAreaRadius = float.Parse(xml.GetAttribute("AreaRadius"));
-        }
-
-        if (xml.HasAttribute("Attack"))
-        {
-            AttackPoint = Helper.StringToVector2(xml.GetAttribute("Attack"));
-        }
-
-        if (xml.HasAttribute("Defense"))
-        {
-            DefensePoint = Helper.StringToVector2(xml.GetAttribute("Defense"));
-        }
-
-        // Make sure max (Y) is greater or equal then min (X)
-        if (AttackPoint.Y < AttackPoint.X)
-        {
-            AttackPoint.Y = AttackPoint.X;
-        }
-
-        if (DefensePoint.Y < DefensePoint.X)
-        {
-            DefensePoint.Y = DefensePoint.X;
-        }
-
-        if (xml.HasAttribute("AttackDuration"))
-        {
-            AttackDuration = float.Parse(xml.GetAttribute("AttackDuration"));
-        }
-
-        if (xml.HasAttribute("AttackRange"))
-        {
-            AttackRange = Helper.StringToVector2(xml.GetAttribute("AttackRange"));
-        }
-
-        if (xml.HasAttribute("ViewDistance"))
-        {
-            ViewDistance = float.Parse(xml.GetAttribute("ViewDistance"));
-        }
-
-        // Initialize attachments
-        if (xml.HasAttribute("Attachment"))
-        {
-            var value = xml.GetAttribute("Attachment");
-
-            var items = value.Split(new char[] { '|' });
-
-            for (var i = 0; i < items.Length; i += 2)
+            var attachPoint = GameModel.GetBone(bone);
+            if (attachPoint < 0)
             {
-                var model = new GameModel(items[i]);
-                var attachPoint = Model.GetBone(items[i + 1]);
-
-                if (attachPoint < 0)
-                {
-                    throw new Exception("Bone '" + items[i + 1] + "' do not exist in model '" + items[i] + "'.");
-                }
-
-                Attachment.Add(new KeyValuePair<GameModel, int>(model, attachPoint));
+                throw new Exception("Bone '" + bone + "' do not exist in model '" + Model + "'.");
             }
+
+            Attachment.Add(new KeyValuePair<GameModel, int>(new(model), attachPoint));
         }
 
-        var iconIndex = 0;
-        if (xml.HasAttribute("Icon"))
+        if (Snapshot != null)
         {
-            iconIndex = int.Parse(xml.GetAttribute("Icon"));
-            icon = Icon.FromTiledTexture(iconIndex);
+            SnapshotIcon = Isles.Icon.FromTiledTexture(Snapshot.Value, 8, 4, SnapshotTexture);
+        }
+
+        if (Icon != null)
+        {
+            var iconIndex = Icon.Value;
+            icon = Isles.Icon.FromTiledTexture(iconIndex);
 
             ProfileButton = new SpellButton
             {
                 Texture = icon.Texture,
                 SourceRectangle = icon.Region,
-                Hovered = Icon.RectangeFromIndex(iconIndex + 1),
-                Pressed = Icon.RectangeFromIndex(iconIndex + 2),
+                Hovered = Isles.Icon.RectangeFromIndex(iconIndex + 1),
+                Pressed = Isles.Icon.RectangeFromIndex(iconIndex + 2),
                 Anchor = Anchor.BottomLeft,
                 ScaleMode = ScaleMode.ScaleY,
             };
@@ -397,65 +309,32 @@ public abstract class GameObject : Entity, ISelectable
             ProfileButton.DoubleClick += (sender, e) => Player.LocalPlayer.SelectGroup(this);
         }
 
-        if (xml.HasAttribute("Snapshot") &&
-            int.TryParse(xml.GetAttribute("Snapshot"), out iconIndex))
+        foreach (var building in Buildings)
         {
-            snapshot = Icon.FromTiledTexture(iconIndex, 8, 4, SnapshotTexture);
+            AddSpell(new SpellConstruct(building));
         }
 
-        if (xml.HasAttribute("Sound"))
+        foreach (var unit in Units)
         {
-            Sound = xml.GetAttribute("Sound");
+            AddSpell(new SpellTraining(unit));
         }
 
-        if (xml.HasAttribute("SoundCombat"))
+        foreach (var upgrade in Upgrades)
         {
-            SoundCombat = xml.GetAttribute("SoundCombat");
+            AddSpell(new SpellUpgrade(upgrade));
         }
 
-        if (xml.HasAttribute("SoundDie"))
+        foreach (var summon in Summons)
         {
-            SoundDie = xml.GetAttribute("SoundDie");
-        }
-
-        // Initialize spells
-        if (xml.HasAttribute("Spells"))
-        {
-            var spells = xml.GetAttribute("Spells").Split(new char[] { ',', ' ', '\n', '\r' });
-
-            for (var i = 0; i < spells.Length; i++)
-            {
-                if (spells[i].Length > 0)
-                {
-                    AddSpell(spells[i]);
-                }
-            }
+            AddSpell(new SpellSummon(summon));
         }
     }
 
-    /// <summary>
-    /// Add a new spell for the game object.
-    /// </summary>
-    /// <param name="spell"></param>
-    public void AddSpell(string name)
+    public void AddSpell(Spell spell)
     {
-        Dictionary<string, XmlElement> objectConfig = GameDefault.Singleton.WorldObjectDefaults;
-        Dictionary<string, XmlElement> spellConfig = GameDefault.Singleton.SpellDefaults;
-
-        var spell = Spell.Create(name, World);
-        if (objectConfig.ContainsKey(name))
-        {
-            spell.Deserialize(objectConfig[name]);
-        }
-
-        if (spellConfig.ContainsKey(name))
-        {
-            spell.Deserialize(spellConfig[name]);
-        }
-
         spell.Owner = this;
         OnCreateSpell(spell);
-        Spells.Add(spell);
+        SpellList.Add(spell);
 
         if (Selected && Focused)
         {
@@ -478,14 +357,12 @@ public abstract class GameObject : Entity, ISelectable
             // Model.Tint = owner.TeamColor.ToVector3();
             if (AttackPoint.X > 0)
             {
-                AttackPoint.X += Owner.AttackPoint;
-                AttackPoint.Y += Owner.AttackPoint;
+                AttackPoint += Owner.AttackPoint * Vector2.One;
             }
 
             if (DefensePoint.X > 0)
             {
-                DefensePoint.X += Owner.DefensePoint;
-                DefensePoint.Y += Owner.DefensePoint;
+                DefensePoint += Owner.DefensePoint * Vector2.One;
             }
         }
     }
@@ -518,7 +395,7 @@ public abstract class GameObject : Entity, ISelectable
     public override void Update(GameTime gameTime)
     {
         // Update spells
-        foreach (Spell spell in Spells)
+        foreach (Spell spell in SpellList)
         {
             spell.Update(gameTime);
         }
@@ -536,7 +413,7 @@ public abstract class GameObject : Entity, ISelectable
         {
             if (attach.Value >= 0)
             {
-                attach.Key.Transform = Model.GetBoneTransform(attach.Value);
+                attach.Key.Transform = GameModel.GetBoneTransform(attach.Value);
             }
         }
 
@@ -671,14 +548,14 @@ public abstract class GameObject : Entity, ISelectable
         // Create a model shadow, draw the shadow model when we're in fog of war
         if (VisibleInFogOfWar)
         {
-            modelShadow = Model.ShadowCopy();
+            modelShadow = GameModel.ShadowCopy();
             modelShadow.Tint *= 0.3f;
         }
     }
 
     public GameModel GetAttachment(string boneName)
     {
-        var bone = Model.GetBone(boneName);
+        var bone = GameModel.GetBone(boneName);
 
         if (bone < 0)
         {
@@ -737,9 +614,9 @@ public abstract class GameObject : Entity, ISelectable
 
         if (Owner is LocalPlayer)
         {
-            for (var i = 0; i < Spells.Count; i++)
+            for (var i = 0; i < SpellList.Count; i++)
             {
-                ui.SetUIElement(i, true, Spells[i].Button);
+                ui.SetUIElement(i, true, SpellList[i].Button);
             }
         }
     }
@@ -795,21 +672,15 @@ public class Tree : GameObject
     private readonly Random random = new();
     private List<Point> pathGrids = new();
 
-    public Tree(GameWorld world) : base(world, "Tree")
+    public Tree()
     {
         ShowStatus = false;
         Spotted = true;
     }
 
-    public override void Deserialize(XmlElement xml)
+    public override void OnDeserialized()
     {
-        string value;
-        if ((value = xml.GetAttribute("Lumber")) != "")
-        {
-            lumber = int.Parse(value);
-        }
-
-        base.Deserialize(xml);
+        base.OnDeserialized();
 
         // Randomize scale and rotation
         var size = Helper.RandomInRange(0.9f, 1.1f);
@@ -875,11 +746,11 @@ public class Tree : GameObject
         {
             if (star == null)
             {
-                star = new EffectStar(World, this);
+                star = new EffectStar(this);
 
                 if (Helper.Random.Next(10) == 0)
                 {
-                    glow = new EffectGlow(World, this);
+                    glow = new EffectGlow(this);
                 }
             }
 
@@ -941,7 +812,7 @@ public class Goldmine : GameObject
     }
 
     private int gold = 10000;
-    private Vector2 obstructorSize;
+    public Vector2 ObstructorSize { get; set; }
     private readonly List<Point> pathGrids = new();
 
     public float RotationZ;
@@ -949,48 +820,23 @@ public class Goldmine : GameObject
     /// <summary>
     /// Gets or sets the spawn point for the goldmine.
     /// </summary>
-    public Vector3 SpawnPoint;
+    public Vector2 SpawnPoint { get; set; }
 
-    public Goldmine(GameWorld world) : base(world, "Goldmine")
+    public Goldmine()
     {
         Spotted = true;
-        SelectionAreaRadius = 30;
+        AreaRadius = 30;
     }
 
-    public override void Deserialize(XmlElement xml)
+    public void SetRotation(float value)
     {
-        string value;
-
-        // Read in rotation
-        if ((value = xml.GetAttribute("Rotation")) != "")
-        {
-            RotationZ = MathHelper.ToRadians(float.Parse(value));
-            Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, RotationZ);
-
-            // Don't forget to remove the Rotation attribute from the xml,
-            // otherwise our base will parse it as a Quaternion.
-            xml.RemoveAttribute("Rotation");
-        }
-
-        // Read in obstructor & spawn point
-        if ((_ = xml.GetAttribute("ObstructorSize")) != "")
-        {
-            obstructorSize = Helper.StringToVector2(xml.GetAttribute("ObstructorSize")) / 2;
-        }
-
-        if ((_ = xml.GetAttribute("SpawnPoint")) != "")
-        {
-            SpawnPoint = new Vector3(Helper.StringToVector2(xml.GetAttribute("SpawnPoint")), 0);
-        }
-
-        base.Deserialize(xml);
+        RotationZ = MathHelper.ToRadians(value);
+        Rotation = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, RotationZ);
     }
 
     public override void OnCreate()
     {
-        SpawnPoint = new Vector3(Math2D.LocalToWorld(
-                     new Vector2(SpawnPoint.X, SpawnPoint.Y),
-                         Vector2.Zero, RotationZ), 0);
+        SpawnPoint = Math2D.LocalToWorld(SpawnPoint, Vector2.Zero, RotationZ);
 
         pathGrids.AddRange(World.PathManager.EnumerateGridsInOutline(Outline));
         World.PathManager.Mark(pathGrids);
@@ -1007,14 +853,13 @@ public class Goldmine : GameObject
         position.X = Position.X;
         position.Y = Position.Y;
 
-        outline.SetRectangle(-obstructorSize, obstructorSize, position, RotationZ);
+        outline.SetRectangle(-ObstructorSize / 2, ObstructorSize / 2, position, RotationZ);
     }
 }
 
 public class BoxOfPandora : GameObject
 {
-    public BoxOfPandora(GameWorld world)
-        : base(world, "BoxOfPandora")
+    public BoxOfPandora()
     {
         VisibleInFogOfWar = false;
     }
@@ -1089,14 +934,14 @@ public interface IProjectile
 {
     event EventHandler Hit;
 
-    BaseEntity Target { get; }
+    Entity Target { get; }
 }
 
 public class Missile : Entity, IProjectile
 {
     public event EventHandler Hit;
 
-    public BaseEntity Target { get; }
+    public Entity Target { get; }
 
     private Vector3 velocity;
     private readonly float scaling;
@@ -1105,10 +950,11 @@ public class Missile : Entity, IProjectile
     public float MaxForce = 500;
     public float Mass = 0.5f;
 
-    public Missile(GameWorld world, GameModel ammo, BaseEntity target)
-        : base(world, ammo.ShadowCopy())
+    public Missile(GameModel ammo, Entity target)
     {
         Target = target;
+
+        GameModel = ammo.ShadowCopy();
 
         // Compute position
         Position = ammo.Transform.Translation;
@@ -1177,9 +1023,9 @@ public class Missile : Entity, IProjectile
         var rotation = Matrix.CreateFromAxisAngle(rotationAxis, angle);
         var translation = Matrix.CreateTranslation(Position);
 
-        if (Model != null)
+        if (GameModel != null)
         {
-            Model.Transform = Matrix.CreateScale(scaling) * rotation * translation;
+            GameModel.Transform = Matrix.CreateScale(scaling) * rotation * translation;
         }
     }
 
@@ -1196,18 +1042,4 @@ public class Missile : Entity, IProjectile
 
 public class Decoration : Entity
 {
-    public Decoration(GameWorld world)
-        : base(world, null) { }
-
-    public override void Deserialize(XmlElement xml)
-    {
-        base.Deserialize(xml);
-
-        string value;
-
-        if ((value = xml.GetAttribute("Position")) != "")
-        {
-            Position = Helper.StringToVector3(value);
-        }
-    }
 }

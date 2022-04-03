@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Text.Json;
-using System.Xml;
 
 using Isles.Screens;
 
@@ -43,7 +42,7 @@ public class GameScreen : IScreen, IEventListener
 
     private ReadmePanel readme;
 
-    public Level Level { get; set; }
+    private readonly Level Level;
 
     public GameScreen(string levelName)
     {
@@ -51,18 +50,7 @@ public class GameScreen : IScreen, IEventListener
         graphics = Game.Graphics;
 
         _worldRenderer = new(Game.GraphicsDevice, Game.Settings, Game.ModelRenderer, Game.ShaderLoader, Game.Input);
-        LoadWorld(levelName, new Skirmish(this, CreateTestPlayerInfo()));
-    }
-
-    private void LoadWorld(string levelFilename, Level level)
-    {
-        // Creates a default level if no input specified
-        if (level == null)
-        {
-            level = new Level();
-        }
-
-        Level = level;
+        Level = new Skirmish(this, CreateTestPlayerInfo());
 
         // Hide cursor
         Game.IsMouseVisible = false;
@@ -75,18 +63,14 @@ public class GameScreen : IScreen, IEventListener
         // Reset players
         Player.Reset();
 
-        // Read XML scene content
-        var doc = new XmlDocument();
-        doc.Load($"data/levels/{levelFilename}");
+        // Read level
+        var doc = JsonSerializer.Deserialize<LevelModel>(File.ReadAllBytes(levelName), JsonHelper.Options);
 
-        if (level != null)
-        {
-            level.Load(doc.DocumentElement, loadContext);
-        }
+        Level.Load(doc, loadContext);
 
         // Load game world
-        World = new GameWorld();
-        World.Load(doc.DocumentElement, loadContext);
+        GameWorld.Singleton = World = new GameWorld();
+        World.Load(doc, loadContext);
         World.Pick = _worldRenderer.Pick;
 
         loadContext.Refresh(100);
@@ -98,10 +82,7 @@ public class GameScreen : IScreen, IEventListener
         ResetUI();
 
         // Start level
-        if (level != null)
-        {
-            level.Start(World);
-        }
+        Level.Start(World);
 
         // Load complete
         loadContext.Refresh(100);
@@ -110,7 +91,11 @@ public class GameScreen : IScreen, IEventListener
         Cursors.SetCursor(Cursors.Default);
         Game.IsMouseVisible = true;
 
-        Event.SendMessage(EventType.Unknown, this, this, 1, 0.2f);
+        Task.Delay(200).ContinueWith(_ =>
+        {
+            readme.Visible = true;
+            Pause(readme);
+        });
     }
 
     private void ResetUI()
@@ -412,13 +397,6 @@ public class GameScreen : IScreen, IEventListener
 
     public EventResult HandleEvent(EventType type, object sender, object tag)
     {
-        if (type == EventType.Unknown && sender == this && (int)tag == 1)
-        {
-            readme.Visible = true;
-            Pause(readme);
-            return EventResult.Handled;
-        }
-
         if (paused)
         {
             if (activeObject != null)

@@ -5,10 +5,8 @@ namespace Isles;
 
 public enum PlayerType
 {
-    Dummy,
     Local,
     Computer,
-    Remote,
 }
 
 public enum PlayerRelation
@@ -507,9 +505,9 @@ public abstract class Player : IEventListener
         foreach (GameObject charactor in members)
         {
             // Find the max radius
-            if (charactor.SelectionAreaRadius > space)
+            if (charactor.AreaRadius > space)
             {
-                space = charactor.SelectionAreaRadius * 1.5f;
+                space = charactor.AreaRadius * 1.5f;
             }
         }
 
@@ -609,16 +607,6 @@ public abstract class Player : IEventListener
 }
 
 /// <summary>
-/// Dummy player will do nothing.
-/// </summary>
-public class DummyPlayer : Player
-{
-    public override void Update(GameTime gameTime) { }
-
-    public override void Start(GameWorld world) { }
-}
-
-/// <summary>
 /// The human player on the local machine.
 /// </summary>
 public class LocalPlayer : Player
@@ -671,12 +659,17 @@ public class LocalPlayer : Player
     private readonly List<GameObject> attackers = new();
     private readonly List<double> attackTimer = new();
 
+    public LocalPlayer()
+    {
+        Player.LocalPlayer = this;
+    }
+
     public override void Start(GameWorld world)
     {
         this.world = world ?? throw new ArgumentNullException();
         camera = game.Camera as GameCamera;
-        Attack = new SpellAttack(world);
-        Move = new SpellMove(world);
+        Attack = new SpellAttack();
+        Move = new SpellMove();
 
         for (var i = 0; i < teams.Length; i++)
         {
@@ -995,7 +988,7 @@ public class LocalPlayer : Player
         foreach (Entity e in gameObject.Owner.EnumerateObjects(gameObject.ClassID))
         {
             if (e is GameObject o && o.Owner == gameObject.Owner &&
-                o.Visible && o.IsVisible(game.ViewProjection) &&
+                o.Visible && o.WithinViewFrustum &&
                 o.IsAlive && o.ClassID == gameObject.ClassID)
             {
                 yield return o;

@@ -175,20 +175,22 @@ public class TitleScreen : IScreen
         buttons[0].Click += (o, e) =>
         {
             Audios.Play("OK");
-            BaseGame.Singleton.StartScreen(new GameScreen("World.xml"));
+            BaseGame.Singleton.StartScreen(new GameScreen("data/levels/demo.json"));
         };
 
         buttons[1].Click += (o, e) =>
         {
             Audios.Play("OK");
-            BaseGame.Singleton.StartScreen(new GameScreen("World.xml"));
+            BaseGame.Singleton.StartScreen(new GameScreen("data/levels/demo.json"));
         };
 
-        buttons[3].Click += (o, e) =>
+        buttons[3].Click += async (o, e) =>
         {
-            Event.SendMessage(EventType.Hit, this, this, null, 7);
             Audios.Play("OK");
             StartCredit();
+
+            await Task.Delay(7000);
+            Audios.Play("Credit");
         };
 
         // Click even for Exit button
@@ -334,12 +336,6 @@ public class TitleScreen : IScreen
 
     public EventResult HandleEvent(EventType type, object sender, object tag)
     {
-        if (type == EventType.Hit && sender == this)
-        {
-            Audios.Play("Credit");
-            return EventResult.Handled;
-        }
-
         // Let UI handle event first
         if (type == EventType.KeyDown && (tag as Keys?).Value == Keys.Escape)
         {

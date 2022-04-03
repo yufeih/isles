@@ -30,7 +30,7 @@ public class WorldRenderer
         var objectMap = _modelPicker.DrawObjectMap(
             viewProjection,
             world.WorldObjects.OfType<Entity>().Where(entity => entity.IsPickable),
-            entity => entity.Model);
+            entity => entity.GameModel);
 
         _pickedEntity = objectMap.Pick();
 
@@ -90,9 +90,9 @@ public class WorldRenderer
 
     private void DrawEntity(Entity entity)
     {
-        if (entity.Model != null && entity.Visible && entity.WithinViewFrustum)
+        if (entity.GameModel != null && entity.Visible && entity.WithinViewFrustum)
         {
-            entity.Model.Draw();
+            entity.GameModel.Draw();
         }
     }
 
@@ -104,7 +104,7 @@ public class WorldRenderer
             {
                 if (charactor.Glow == null)
                 {
-                    charactor.Glow = new EffectGlow(charactor.World, charactor);
+                    charactor.Glow = new EffectGlow(charactor);
                 }
 
                 charactor.Glow.Update(gameTime);
@@ -116,12 +116,12 @@ public class WorldRenderer
         if (entity.flashElapsedTime <= GameObject.FlashDuration)
         {
             var glow = (float)Math.Sin(MathHelper.Pi * entity.flashElapsedTime / GameObject.FlashDuration);
-            entity.Model.Glow = new Vector3(MathHelper.Clamp(glow, 0, 1));
+            entity.GameModel.Glow = new Vector3(MathHelper.Clamp(glow, 0, 1));
 
             entity.flashElapsedTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (entity.flashElapsedTime > GameObject.FlashDuration)
             {
-                entity.Model.Glow = default;
+                entity.GameModel.Glow = default;
             }
         }
 
@@ -173,22 +173,22 @@ public class WorldRenderer
             if (entity.Selected && entity.IsAlive)
             {
                 entity.World.Landscape.DrawSurface(
-                    entity.SelectionAreaRadius > 16 ?
+                    entity.AreaRadius > 16 ?
                     GameObject.SelectionAreaTextureLarge : GameObject.SelectionAreaTexture, 
                     entity.Position,
-                    entity.SelectionAreaRadius * 2, entity.SelectionAreaRadius * 2,
+                    entity.AreaRadius * 2, entity.AreaRadius * 2,
                     entity.Owner == null ? Color.Yellow : (
                         entity.Owner.GetRelation(Player.LocalPlayer) == PlayerRelation.Opponent ?
                                             Color.Red : Color.GreenYellow));
             }
 
-            if (entity.IsAlive && entity.maximumHealth > 0)
+            if (entity.IsAlive && entity.MaxHealth > 0)
             {
                 if (entity.Highlighted || _input.Keyboard.IsKeyDown(Keys.LeftAlt) || _input.Keyboard.IsKeyDown(Keys.RightAlt))
                 {
-                    var color = ProgressColor(1.0f * entity.health / entity.maximumHealth);
-                    GameUI.Singleton.DrawProgress(entity.TopCenter, 0, (int)(entity.SelectionAreaRadius * 10.0f),
-                        100 * entity.health / entity.maximumHealth, color);
+                    var color = ProgressColor(1.0f * entity.health / entity.MaxHealth);
+                    GameUI.Singleton.DrawProgress(entity.TopCenter, 0, (int)(entity.AreaRadius * 10.0f),
+                        100 * entity.Health / entity.MaxHealth, color);
 
                     if (entity is Building building)
                     {
@@ -277,7 +277,7 @@ public class WorldRenderer
         if (building.state == Building.BuildingState.Constructing)
         {
             GameUI.Singleton.DrawProgress(building.TopCenter, 5,
-                                        (int)(building.SelectionAreaRadius * 10.0f),
+                                        (int)(building.AreaRadius * 10.0f),
                                         100 * building.ConstructionTimeElapsed / building.ConstructionTime,
                                         Color.Orange);
         }

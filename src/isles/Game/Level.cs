@@ -1,86 +1,43 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Xml;
-
 namespace Isles;
 
 public class Level : IEventListener
 {
-    private readonly List<PlayerInfo> playerInfoFromMap = new();
-
-    public virtual void Load(XmlElement xml, ILoading progress)
+    public virtual void Load(LevelModel model, ILoading progress)
     {
-        // Read in player info from the map
-        XmlNodeList childNodes = xml.SelectNodes("Player");
+        var playerInfoFromMap = new List<PlayerInfo>();
 
-        foreach (XmlElement child in childNodes)
+        foreach (var spawnPoint in model.SpawnPoints)
         {
             var info = new PlayerInfo
             {
-                Name = child.GetAttribute("Name"),
+                SpawnPoint = spawnPoint,
             };
-            if (child.HasAttribute("Team"))
-            {
-                info.Team = int.Parse(child.GetAttribute("Team"));
-            }
-
-            if (child.HasAttribute("TeamColor"))
-            {
-                info.TeamColor = Helper.StringToColor(child.GetAttribute("TeamColor"));
-            }
-
-            if (child.HasAttribute("Type"))
-            {
-                info.Type = (PlayerType)Enum.Parse(typeof(PlayerType), child.GetAttribute("Type"));
-            }
-
-            if (child.HasAttribute("SpawnPoint"))
-            {
-                info.SpawnPoint = Helper.StringToVector2(child.GetAttribute("SpawnPoint"));
-            }
 
             playerInfoFromMap.Add(info);
-
-            // Remove those tag from xml since the world do not recognize them
-            xml.RemoveChild(child);
         }
 
         CreatePlayers(playerInfoFromMap);
 
         // Create actual player instances
         Player.LocalPlayer = null;
-        for (var i = 0; i < playerInfoFromMap.Count; i++)
+        foreach (var playerInfo in playerInfoFromMap)
         {
-            Player player;
-            if (playerInfoFromMap[i].Type == PlayerType.Local)
+            Player player = playerInfo.Type switch
             {
-                if (Player.LocalPlayer != null)
-                {
-                    throw new Exception("Only one local player is allowed");
-                }
-
-                player = Player.LocalPlayer = new LocalPlayer();
-            }
-            else
-            {
-                player = playerInfoFromMap[i].Type == PlayerType.Computer
-                    ? new ComputerPlayer()
-                    : (Player)(playerInfoFromMap[i].Type == PlayerType.Dummy ? new DummyPlayer() : throw new NotImplementedException());
-            }
-
-            player.Name = playerInfoFromMap[i].Name;
-            player.Team = playerInfoFromMap[i].Team;
-            player.TeamColor = playerInfoFromMap[i].TeamColor;
-            player.SpawnPoint = playerInfoFromMap[i].SpawnPoint;
+                PlayerType.Local => new LocalPlayer(),
+                PlayerType.Computer => new ComputerPlayer(),
+                _ => throw new InvalidOperationException(),
+            };
+            
+            player.Name = playerInfo.Name;
+            player.Team = playerInfo.Team;
+            player.TeamColor = playerInfo.TeamColor;
+            player.SpawnPoint = playerInfo.SpawnPoint;
 
             Player.AllPlayers.Add(player);
-        }
-
-        // Make sure one local player is created
-        if (Player.LocalPlayer == null)
-        {
-            Player.AllPlayers.Add(Player.LocalPlayer = new LocalPlayer());
         }
     }
 
@@ -226,22 +183,6 @@ public class Skirmish : Level
         player.AddDependency("PunishOfNatureUpgrade", "Altar");
         player.AddDependency("AttackUpgrade", "Barracks");
         player.AddDependency("DefenseUpgrade", "Barracks");
-
-        // Steamer
-        player.AddDependency("Steamhouse", "SteamFort");
-        player.AddDependency("Regenerator", "SteamFort");
-        player.AddDependency("SteamCannon", "SteamFort");
-        player.AddDependency("TraningCenter", "SteamFort");
-        player.AddDependency("SteamFactory", "SteamFort");
-        player.AddDependency("Miner", "SteamFort");
-        player.AddDependency("Swordman", "SteamFort");
-        player.AddDependency("Rifleman", "SteamFort");
-        player.AddDependency("Steambot", "SteamFort");
-        player.AddDependency("Swordman", "TraningCenter");
-        player.AddDependency("Rifleman", "TraningCenter");
-        player.AddDependency("Steambot", "SteamFactory");
-        player.AddDependency("AttackUpgrade", "TraningCenter");
-        player.AddDependency("DefenseUpgrade", "TraningCenter");
     }
 
     private void CreateStartup(GameWorld world, Player player, Vector3 position)
@@ -260,7 +201,7 @@ public class Skirmish : Level
         {
             if (world.Create("Follower") is Worker peon)
             {
-                peon.Position = building.Position + building.SpawnPoint;
+                peon.Position = building.Position + new Vector3(building.SpawnPoint, 0);
                 peon.Owner = player;
                 world.Add(peon);
 

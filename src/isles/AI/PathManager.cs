@@ -652,7 +652,6 @@ public class PathManager
         {
             landscape = value;
             Graph.Landscape = value;
-            LargeGraph.Landscape = value;
         }
     }
 
@@ -662,7 +661,6 @@ public class PathManager
     /// Graph search.
     /// </summary>
     private readonly GraphSearchAStar search;
-    private readonly GraphSearchAStar largeSearch;
 
     /// <summary>
     /// Gets the detailed path graph used for searching.
@@ -670,39 +668,9 @@ public class PathManager
     public PathGraph Graph { get; }
 
     /// <summary>
-    /// Gets the large path graph for path searching on the landscape.
-    /// </summary>
-    public PathGraph LargeGraph { get; }
-
-    /// <summary>
     /// Dynamic entities.
     /// </summary>
     private readonly List<IMovable> dynamicObstacles = new();
-
-    /// <summary>
-    /// Gets or sets the maximun number of search steps per update.
-    /// </summary>
-    public int MaxSearchStepsPerUpdate
-    {
-        get => maxSearchStepsPerUpdate;
-
-        set
-        {
-            if (value <= 0)
-            {
-                throw new ArgumentOutOfRangeException();
-            }
-
-            maxSearchStepsPerUpdate = value;
-        }
-    }
-
-    private int maxSearchStepsPerUpdate = 2000;
-
-    /// <summary>
-    /// Gets whether the path manager is busy at the moment.
-    /// </summary>
-    public bool Busy => pendingRequestsCount > 0;
 
     /// <summary>
     /// Pending query requests.
@@ -989,14 +957,9 @@ public class PathManager
 
         // Create a new graph
         Graph = new PathGraph(landscape, Resolution, occluders);
-        LargeGraph = new PathGraph(landscape, 0.25f, null);
 
         // Create a new graph searcher
         search = new GraphSearchAStar();
-        largeSearch = new GraphSearchAStar();
-
-        // Read in settings value
-        MaxSearchStepsPerUpdate = BaseGame.Singleton.Settings.MaxPathSearchStepsPerUpdate;
     }
 
     public void Mark(IMovable agent)
@@ -1255,53 +1218,6 @@ public class PathManager
         return true;
     }
 
-    /// <summary>
-    /// Querys a path on the large graph.
-    /// </summary>
-    public GraphPath QueryPath(Vector2 start, Vector2 end)
-    {
-        Point endGrid = LargeGraph.PositionToGrid(end.X, end.Y);
-
-        // Adjust end position to avoid searching on the whole graph
-        if (LargeGraph.IsGridObstructed(endGrid.X, endGrid.Y, true))
-        {
-            var counter = 0;
-            foreach (Point p in EnumerateGridsInnerOut(endGrid.X, endGrid.Y, 512))
-            {
-                if (counter++ > 512)
-                {
-                    return new GraphPath();
-                }
-
-                if (p.X >= 0 && p.X < LargeGraph.EntryWidth &&
-                    p.Y >= 0 && p.Y < LargeGraph.EntryHeight &&
-                    !LargeGraph.IsGridObstructed(p.X, p.Y, true))
-                {
-                    endGrid = p;
-                    break;
-                }
-            }
-        }
-
-        // Perform the search, this should be pretty fast
-        if (largeSearch.Search(LargeGraph, LargeGraph.PositionToIndex(start),
-                               LargeGraph.GridToIndex(endGrid.X, endGrid.Y)))
-        {
-            // Build standard path
-            GraphPath path = BuildPath(largeSearch.Path, LargeGraph, null, false);
-
-            // If we moved the end position, don't forget to append it to the end
-            if (path.Edges.Count > 0)
-            {
-                path.Edges.AddLast(new GraphPathEdge(end));
-            }
-
-            return path;
-        }
-
-        return null;
-    }
-
     public const int AreaSize = (int)(16 * Resolution);
     private const float FactorToStart = 0.55f;
 
@@ -1438,15 +1354,13 @@ public class PathManager
 
     private void UpdateSearch()
     {
-        var totalSteps = 0;
-
         // Do nothing if there's no pending requests
         if (pendingRequestsCount <= 0)
         {
             return;
         }
 
-        while (totalSteps < maxSearchStepsPerUpdate && pendingRequestsCount > 0)
+        while (pendingRequestsCount > 0)
         {
             var min = -1;
             var priority = float.MaxValue;
@@ -1486,47 +1400,41 @@ public class PathManager
             Unmark(query.Obstacle);
 
             // Handle current query
-            var result = search.Search(
-                Graph, query.Start, query.End, maxSearchStepsPerUpdate, out var steps);
+            var result = search.Search(Graph, query.Start, query.End);
 
             Mark(query.Obstacle);
 
             // If the search completed, we can stop dealing with this
             // query and notify the PathFound event
-            if (result.HasValue)
+            // No query now
+            currentQuery = null;
+
+            if (result)
             {
-                // No query now
-                currentQuery = null;
+                // Path found
+                // It turns out that entities gets stucked due to
+                // path simplification and smoothing :(
+                GraphPath path = BuildPath(search.Path, Graph, query.Obstacle, true);
 
-                if (result.Value)
-                {
-                    // Path found
-                    // It turns out that entities gets stucked due to
-                    // path simplification and smoothing :(
-                    GraphPath path = BuildPath(search.Path, Graph, query.Obstacle, true);
+                // Append the destination
+                path.Edges.AddLast(new GraphPathEdge(query.Destination));
 
-                    // Append the destination
-                    path.Edges.AddLast(new GraphPathEdge(query.Destination));
+                // Smooth path to eliminate artifical edges
+                SmoothPath(ref path, query.Obstacle);
 
-                    // Smooth path to eliminate artifical edges
-                    SmoothPath(ref path, query.Obstacle);
-
-                    // Notify the path found event
-                    Event.SendMessage(EventType.PathFound, query.Subscriber, this, path);
-                }
-                else
-                {
-                    // Path not found
-                    Event.SendMessage(EventType.PathNotFound,
-                                      query.Subscriber, this, null);
-                }
-
-                // Remove it from the pending requests
-                pendingRequests[min] = null;
-                pendingRequestsCount--;
+                // Notify the path found event
+                Event.SendMessage(EventType.PathFound, query.Subscriber, this, path);
+            }
+            else
+            {
+                // Path not found
+                Event.SendMessage(EventType.PathNotFound,
+                                  query.Subscriber, this, null);
             }
 
-            totalSteps += steps;
+            // Remove it from the pending requests
+            pendingRequests[min] = null;
+            pendingRequestsCount--;
         }
 
         // Set graph bounds to null whether we're not searching

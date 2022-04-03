@@ -1,8 +1,6 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Xml;
-
 namespace Isles;
 
 /// <summary>
@@ -32,7 +30,7 @@ public class Building : GameObject, IPlaceable
     /// <summary>
     /// Gets or sets the time to construct this building.
     /// </summary>
-    public float ConstructionTime;
+    public float ConstructionTime { get; set; }
 
     /// <summary>
     /// Gets or sets the time to construct this building.
@@ -42,17 +40,17 @@ public class Building : GameObject, IPlaceable
     /// <summary>
     /// Gets or sets how much wood needed for the building.
     /// </summary>
-    public int Lumber;
+    public int Lumber { get; set; }
 
     /// <summary>
     /// Gets or sets how much gold needed for the building.
     /// </summary>
-    public int Gold;
+    public int Gold { get; set; }
 
     /// <summary>
     /// Gets or sets how much food this building can provide.
     /// </summary>
-    public int Food;
+    public int Food { get; set; }
 
     /// <summary>
     /// Gets or sets the number of builders.
@@ -69,13 +67,13 @@ public class Building : GameObject, IPlaceable
     /// <summary>
     /// Path brush.
     /// </summary>
-    private Vector2 obstructorSize;
+    public Vector2 ObstructorSize { get; set; }
     private readonly List<Point> pathGrids = new();
 
     /// <summary>
     /// Gets the units that can be trained from this building.
     /// </summary>
-    public List<string> Units { get; private set; } = new();
+    public List<string> TrainedUnits { get; private set; } = new();
 
     /// <summary>
     /// Gets the pending requests that are going to be handled.
@@ -85,7 +83,7 @@ public class Building : GameObject, IPlaceable
     /// <summary>
     /// Gets or sets the spawn point of this building.
     /// </summary>
-    public Vector3 SpawnPoint;
+    public Vector2 SpawnPoint { get; set; }
     public Worker Builder;
 
     private EffectConstruct construct;
@@ -97,45 +95,12 @@ public class Building : GameObject, IPlaceable
     /// Halo effect.
     /// </summary>
     private EffectHalo halo;
-    private string haloParticle;
+    
+    
+    public string Halo { get; set; }
 
-    public Building(GameWorld world, string classID)
-        : base(world, classID) { }
-
-    public override void Deserialize(XmlElement xml)
+    public Building()
     {
-        int.TryParse(xml.GetAttribute("Lumber"), out Lumber);
-        int.TryParse(xml.GetAttribute("Gold"), out Gold);
-        int.TryParse(xml.GetAttribute("Food"), out Food);
-        float.TryParse(xml.GetAttribute("ConstructionTime"), out ConstructionTime);
-
-        string value;
-
-        if ((value = xml.GetAttribute("ObstructorSize")) != "")
-        {
-            obstructorSize = Helper.StringToVector2(value) / 2;
-        }
-
-        if ((value = xml.GetAttribute("SpawnPoint")) != "")
-        {
-            SpawnPoint = Helper.StringToVector3(value);
-        }
-
-        if ((value = xml.GetAttribute("Units")) != "")
-        {
-            Units = new List<string>(
-                value.Split(new char[] { ',', ' ', '\n', '\r' }));
-            Units.RemoveAll(delegate (string v) { return v.Length <= 0; });
-        }
-
-        if ((value = xml.GetAttribute("Halo")) != "")
-        {
-            haloParticle = value;
-        }
-
-        // Deserialize models after default attributes are assigned
-        base.Deserialize(xml);
-
         // Reset sound die to explosion
         SoundDie = "Explosion";
     }
@@ -146,7 +111,7 @@ public class Building : GameObject, IPlaceable
         position.X = Position.X;
         position.Y = Position.Y;
 
-        outline.SetRectangle(-obstructorSize, obstructorSize, position, RotationZ);
+        outline.SetRectangle(-ObstructorSize / 2, ObstructorSize / 2, position, RotationZ);
     }
 
     public override void OnCreate()
@@ -170,7 +135,7 @@ public class Building : GameObject, IPlaceable
         if (spell is SpellTraining training)
         {
             training.Enable = false;
-            Units.Add(training.Type);
+            TrainedUnits.Add(training.Type);
         }
     }
 
@@ -192,7 +157,7 @@ public class Building : GameObject, IPlaceable
             Owner.FoodCapacity += Food;
         }
 
-        foreach (Spell spell in Spells)
+        foreach (Spell spell in SpellList)
         {
             spell.Enable = true;
         }
@@ -247,7 +212,7 @@ public class Building : GameObject, IPlaceable
         // Create explosion
         if (ShouldDrawModel)
         {
-            new EffectExplosion(World, (TopCenter + Position) / 2);
+            new EffectExplosion((TopCenter + Position) / 2);
         }
 
         state = BuildingState.Destroyed;
@@ -260,7 +225,7 @@ public class Building : GameObject, IPlaceable
     /// </summary>
     public bool CanTrain(string type)
     {
-        if (state == BuildingState.Normal && Units != null && Units.Contains(type))
+        if (state == BuildingState.Normal && TrainedUnits != null && TrainedUnits.Contains(type))
         {
             return !Owner.IsUnique(type) || !Owner.IsFutureAvailable(type);
         }
@@ -313,7 +278,7 @@ public class Building : GameObject, IPlaceable
             Owner.Food += food;
             Owner.MarkFutureObject(type);
 
-            foreach (Spell s in Spells)
+            foreach (Spell s in SpellList)
             {
                 if (s is SpellTraining train && train.Type == type)
                 {
@@ -457,7 +422,7 @@ public class Building : GameObject, IPlaceable
         // Pre construct
         if (state == BuildingState.PreConstruct)
         {
-            Model.Tint = IsLocationPlacable() ? Vector3.One : Vector3.UnitX;
+            GameModel.Tint = IsLocationPlacable() ? Vector3.One : Vector3.UnitX;
         }
 
         // Wait
@@ -491,7 +456,7 @@ public class Building : GameObject, IPlaceable
         {
             if (construct == null)
             {
-                construct = new EffectConstruct(World, Outline * 0.5f, Position.Z, Position.Z + 10);
+                construct = new EffectConstruct(Outline * 0.5f, Position.Z, Position.Z + 10);
             }
 
             if (ShouldDrawModel)
@@ -509,14 +474,14 @@ public class Building : GameObject, IPlaceable
                 // Build complete
                 OnComplete();
 
-                Model.Alpha = 1.0f;
+                GameModel.Alpha = 1.0f;
                 state = BuildingState.Normal;
             }
         }
 
         // Building onfire
         const float StartBurnPercentage = 0.7f;
-        if (state == BuildingState.Normal && Health < MaximumHealth * StartBurnPercentage)
+        if (state == BuildingState.Normal && Health < MaxHealth * StartBurnPercentage)
         {
             if (fire == null)
             {
@@ -527,17 +492,17 @@ public class Building : GameObject, IPlaceable
 
                 var index = 1;
                 int bone;
-                while ((bone = Model.GetBone("fire" + index)) >= 0)
+                while ((bone = GameModel.GetBone("fire" + index)) >= 0)
                 {
                     index++;
-                    fireSpawnPoints.Add(Model.GetBoneTransform(bone).Translation);
+                    fireSpawnPoints.Add(GameModel.GetBoneTransform(bone).Translation);
                 }
 
                 fireSpawnPointsLeft.AddRange(fireSpawnPoints);
             }
 
             // How many fire we should set
-            var count = 1 + (int)(fireSpawnPoints.Count * (1 - Health / (MaximumHealth * StartBurnPercentage)));
+            var count = 1 + (int)(fireSpawnPoints.Count * (1 - Health / (MaxHealth * StartBurnPercentage)));
             if (count > fireSpawnPoints.Count)
             {
                 count = fireSpawnPoints.Count;
@@ -551,7 +516,7 @@ public class Building : GameObject, IPlaceable
 
                 fireSpawnPointsLeft.Remove(position);
 
-                fire.Add(new EffectFire(World, position));
+                fire.Add(new EffectFire(position));
 
                 Audios.Play("Damage", this);
             }
@@ -578,10 +543,10 @@ public class Building : GameObject, IPlaceable
         }
 
         // Repair building
-        if (state == BuildingState.Normal && Health < MaximumHealth && BuilderCount > 0)
+        if (state == BuildingState.Normal && Health < MaxHealth && BuilderCount > 0)
         {
             var elapsedSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            Health += 0.2f * MaximumHealth / ConstructionTime * elapsedSeconds *
+            Health += 0.2f * MaxHealth / ConstructionTime * elapsedSeconds *
                             (1 + (BuilderCount - 1) * CorporationTradeoff);
         }
 
@@ -594,11 +559,11 @@ public class Building : GameObject, IPlaceable
             }
 
             // Create halo effect
-            if (ShouldDrawModel && haloParticle != null)
+            if (ShouldDrawModel && Halo != null)
             {
                 if (halo == null)
                 {
-                    halo = new EffectHalo(World, TopCenter, 30, haloParticle);
+                    halo = new EffectHalo(TopCenter, 30, Halo);
                 }
 
                 halo.Update(gameTime);
@@ -662,7 +627,7 @@ public class Building : GameObject, IPlaceable
 
             Owner.Gold -= Gold;
             Owner.Lumber -= Lumber;
-            Model.Alpha = 0.3f;
+            GameModel.Alpha = 0.3f;
             state = BuildingState.PreConstruct;
         }
 
@@ -672,8 +637,8 @@ public class Building : GameObject, IPlaceable
     private List<Charactor> GetNegotiables()
     {
         var obstructors = new List<Charactor>();
-        var nearbyObjects = World.GetNearbyObjects(Position, Math.Max(obstructorSize.X,
-                                                                  obstructorSize.Y));
+        var nearbyObjects = World.GetNearbyObjects(Position, Math.Max(ObstructorSize.X / 2,
+                                                                  ObstructorSize.Y / 2));
         foreach (var wo in nearbyObjects)
         {
             if (wo is Charactor c && c.IsAlive && c.Owner == Owner)
@@ -820,11 +785,10 @@ public class Tower : Building
     private readonly SpellCombat combat;
     private GameObject currentTarget;
 
-    public Tower(GameWorld world, string classID)
-        : base(world, classID)
+    public Tower()
     {
         // Add a combat spell
-        combat = new SpellCombat(world, this);
+        combat = new SpellCombat(this);
     }
 
     public override void TriggerAttack(Entity target)
@@ -836,7 +800,7 @@ public class Tower : Building
         velocity *= 75;
 
         var fireball = new EffectFireball(
-            World, TopCenter - Vector3.UnitZ * 5, velocity, target,
+            TopCenter - Vector3.UnitZ * 5, velocity, target,
             "Frost", "FrostExplosion");
         fireball.Projectile.Hit += Hit;
         World.Add(fireball);

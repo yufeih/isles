@@ -1,0 +1,469 @@
+{
+    "Tree": {
+        "Type": "Tree",
+        "Name": "Tree",
+        "Lumber": 100,
+        "Model": "models/alphapalm",
+        "Alpha": 0.99,
+        "ScaleBias": 2.75
+    },
+    "BoxOfPandora": {
+        "Type": "BoxOfPandora",
+        "Name": "Box of Pandora",
+        "Description": "This magic box is a gift from pandora. Upon opened, it will either give you good fortune or create deadly damage. Be carefull when walk upon it.",
+        "Model": "models/box",
+        "ScaleBias": 0.15
+    },
+    "Goldmine": {
+        "Type": "Goldmine",
+        "Name": "Goldmine",
+        "Model": "models/goldmine",
+        "Icon": 34,
+        "RotationZBias": 180,
+        "ScaleBias": 0.4,
+        "ObstructorSize": [
+            30,
+            60
+        ],
+        "SpawnPoint": [
+            0,
+            -30
+        ],
+        "Snapshot": 15
+    },
+    "Townhall": {
+        "Type": "Building",
+        "Name": "Town hall",
+        "Description": "Base structure of Islander village. It provides food and stores gold and lumber. You can train followers from this building.",
+        "Hotkey": "T",
+        "Icon": 16,
+        "Snapshot": 9,
+        "Model": "models/townhall",
+        "RotationZBias": 90,
+        "ScaleBias": 0.86,
+        "ConstructionTime": 20,
+        "ObstructorSize": [
+            50,
+            50
+        ],
+        "AreaRadius": 30,
+        "Halo": "Blue",
+        "Lumber": 350,
+        "Gold": 425,
+        "Priority": 100,
+        "ViewDistance": 150,
+        "Defense": [
+            60,
+            80
+        ],
+        "Units": [
+            "Follower"
+        ],
+        "SpawnPoint": [
+            0,
+            -20
+        ],
+        "Food": 10,
+        "MaxHealth": 2000,
+        "Sound": "Townhall"
+    },
+    "Barracks": {
+        "Type": "Building",
+        "Name": "Barracks",
+        "Description": "Islander military structure. It trains militias and hunters. It can also upgrade attack and defense point for all Islander units.",
+        "Hotkey": "B",
+        "Icon": 19,
+        "Snapshot": 10,
+        "Model": "models/barracks",
+        "ViewDistance": 100,
+        "Halo": "Red",
+        "RotationZBias": 90,
+        "ScaleBias": 0.075,
+        "ConstructionTime": 20,
+        "ObstructorSize": [
+            40,
+            32
+        ],
+        "AreaRadius": 20,
+        "MaxHealth": 1500,
+        "Lumber": 175,
+        "Gold": 225,
+        "Defense": [
+            60,
+            80
+        ],
+        "Priority": 101,
+        "Units": [
+            "Militia",
+            "Hunter"
+        ],
+        "Upgrades": [
+            "AttackUpgrade",
+            "DefenseUpgrade"
+        ],
+        "Sound": "Barracks"
+    },
+    "Altar": {
+        "Type": "Building",
+        "Name": "Altar of Peace",
+        "Description": "A place where islanders worshiped their gold and nature. Fire sorceress can be summoned here. It can also reveal the ultimate spell \u0027Punish of Nature\u0027",
+        "Hotkey": "R",
+        "Icon": 22,
+        "Snapshot": 11,
+        "Model": "models/altar",
+        "ViewDistance": 100,
+        "RotationZBia": 90,
+        "ScaleBias": 0.7,
+        "Sound": "Altar",
+        "Halo": "Yellow",
+        "ObstructorSize": [
+            40,
+            40
+        ],
+        "AreaRadius": 26,
+        "ConstructionTime": 20,
+        "MaxHealth": 1800,
+        "Defense": [
+            60,
+            80
+        ],
+        "Lumber": 150,
+        "Gold": 175,
+        "Priority": 102,
+        "Units": [
+            "FireSorceress"
+        ],
+        "Upgrades": [
+            "PunishOfNatureUpgrade"
+        ]
+    },
+    "Lumbermill": {
+        "Type": "Building",
+        "Name": "Lumbermill",
+        "Description": "Wood can be stored in the lumbermill. \u0027Live of Nature\u0027 can be researched here to make nearby trees evergreen.",
+        "Halo": "Green",
+        "Hotkey": "L",
+        "Icon": 25,
+        "Snapshot": 12,
+        "Model": "models/lumbermill",
+        "Defense": [
+            60,
+            80
+        ],
+        "ScaleBias": 0.25,
+        "ConstructionTime": 20,
+        "MaxHealth": 750,
+        "ObstructorSize": [
+            30,
+            30
+        ],
+        "AreaRadius": 20,
+        "Lumber": 125,
+        "Gold": 215,
+        "Priority": 103,
+        "Upgrades": [
+            "LiveOfNature"
+        ],
+        "Sound": "Lumbermill"
+    },
+    "Tower": {
+        "Type": "Building",
+        "Name": "Defence Tower",
+        "Description": "Islander defense structure.",
+        "Hotkey": "D",
+        "Icon": 28,
+        "Snapshot": 13,
+        "Model": "models/tower",
+        "ScaleBias": 0.55,
+        "ConstructionTime": 10,
+        "ObstructorSize": [
+            28,
+            28
+        ],
+        "AreaRadius": 18,
+        "MaxHealth": 800,
+        "Lumber": 115,
+        "Gold": 150,
+        "Priority": 104,
+        "Sound": "Tower",
+        "ViewDistance": 100,
+        "AttackRange": [
+            0,
+            100
+        ],
+        "Attack": [
+            50,
+            75
+        ],
+        "Defense": [
+            60,
+            80
+        ],
+        "AttackDuration": 2
+    },
+    "Farmhouse": {
+        "Type": "Building",
+        "Name": "Farm house",
+        "Description": "Provides food for Islander units.",
+        "ViewDistance": 60,
+        "Hotkey": "F",
+        "Icon": 31,
+        "Snapshot": 14,
+        "Model": "models/farm",
+        "Defense": [
+            60,
+            80
+        ],
+        "Sound": "Farm",
+        "ScaleBias": 0.45,
+        "ConstructionTime": 20,
+        "MaxHealth": 500,
+        "ObstructorSize": [
+            28,
+            28
+        ],
+        "AreaRadius": 18,
+        "Lumber": 125,
+        "Gold": 100,
+        "Priority": 100,
+        "Food": 8
+    },
+    "Follower": {
+        "Type": "Worker",
+        "Name": "Follower",
+        "Description": "Religious followers of Islander god. Can construct buildings, harvest gold and lumber, repair damaged buildings and fight on the battlefield when necessary.",
+        "Model": "models/follower",
+        "Speed": 25,
+        "ObstructorRadius": 5,
+        "RotationZBias": -90,
+        "ScaleBias": 0.1,
+        "MaxHealth": 200,
+        "Gold": 50,
+        "Lumber": 0,
+        "Food": 1,
+        "Priority": 4,
+        "AreaRadius": 20,
+        "Icon": 40,
+        "Snapshot": 0,
+        "Buildings": [
+            "Townhall",
+            "Farmhouse",
+            "Lumbermill",
+            "Tower",
+            "Barracks",
+            "Altar"
+        ],
+        "Attachments": {
+            "Weapon": "models/hammer",
+            "Wood": "models/wood",
+            "Gold": "models/gold"
+        },
+        "Hotkey": "F",
+        "CoolDown": 10,
+        "Attack": [
+            12,
+            16
+        ],
+        "Defense": [
+            4,
+            8
+        ],
+        "AttackDuration": 2,
+        "Sound": "Follower",
+        "SoundCombat": "ChopWood",
+        "SoundDie": "FollowerDie"
+    },
+    "Militia": {
+        "Type": "Charactor",
+        "Name": "Militia",
+        "Description": "Basic Islander soldiers. They are good at combat using their power hammer.",
+        "Model": "models/militia",
+        "Speed": 30,
+        "ObstructorRadius": 7,
+        "Attachments": {
+            "Weapon": "models/warhammer",
+            "Shield": "models/shield"
+        },
+        "RotationZBias": -90,
+        "ScaleBias": 0.13,
+        "MaxHealth": 425,
+        "Gold": 155,
+        "Lumber": 50,
+        "Food": 2,
+        "Priority": 3,
+        "AreaRadius": 20,
+        "Hotkey": "T",
+        "CoolDown": 20,
+        "Attack": [
+            35,
+            42
+        ],
+        "Defense": [
+            21,
+            25
+        ],
+        "AttackDuration": 1.2,
+        "Sound": "Militia",
+        "SoundCombat": "Bone",
+        "SoundDie": "MilitiaDie",
+        "Icon": 43,
+        "Snapshot": 1
+    },
+    "Hunter": {
+        "Type": "Hunter",
+        "Name": "Hunter",
+        "Description": "Islander ranged units. Years of hunting life makes them masters of spears.",
+        "Model": "models/hunter",
+        "Attachments": {
+            "Weapon": "models/spear"
+        },
+        "Speed": 35,
+        "ObstructorRadius": 7,
+        "RotationZBias": -90,
+        "ScaleBias": 0.13,
+        "MaxHealth": 350,
+        "Gold": 125,
+        "Lumber": 105,
+        "Food": 2,
+        "Priority": 2,
+        "AreaRadius": 20,
+        "Hotkey": "H",
+        "Icon": 46,
+        "CoolDown": 20,
+        "Attack": [
+            43,
+            61
+        ],
+        "Defense": [
+            10,
+            18
+        ],
+        "AttackDuration": 1.8,
+        "AttackRange": [
+            0,
+            75
+        ],
+        "Sound": "Hunter",
+        "SoundDie": "HunterDie",
+        "Snapshot": 2
+    },
+    "FireSorceress": {
+        "Type": "FireSorceress",
+        "Name": "Fire Sorceress",
+        "Description": "One of the five golds that the Islander worshiped. She is the master of all fire magic. She can also summon the powerful hellfire to fight on the battlefield. When \u0027Punish of Nature\u0027 is researched, she will serve the justice for the nature.",
+        "Model": "models/sorceress",
+        "Speed": 40,
+        "ObstructorRadius": 8,
+        "RotationZBias": -90,
+        "ScaleBias": 0.18,
+        "MaxHealth": 750,
+        "Gold": 200,
+        "Lumber": 175,
+        "Food": 5,
+        "Priority": 0,
+        "AreaRadius": 22,
+        "Hotkey": "F",
+        "Icon": 49,
+        "CoolDown": 25,
+        "Attack": [
+            80,
+            95
+        ],
+        "Defense": [
+            35,
+            40
+        ],
+        "AttackDuration": 2,
+        "AttackRange": [
+            0,
+            50
+        ],
+        "IsUnique": true,
+        "Summons": [
+            "Hellfire"
+        ],
+        "Sound": "Flame",
+        "SoundDie": "Flame",
+        "Snapshot": 3
+    },
+    "Hellfire": {
+        "Type": "Hellfire",
+        "Name": "Hellfire",
+        "Description": "Summon the mighty giant creature that fight with fire sorceress.",
+        "Model": "models/hellfire",
+        "Speed": 35,
+        "ObstructorRadius": 12,
+        "RotationZBias": -90,
+        "ScaleBias": 0.18,
+        "MaxHealth": 1000,
+        "Gold": 0,
+        "Lumber": 0,
+        "Food": 0,
+        "Priority": 1,
+        "AreaRadius": 30,
+        "Hotkey": "F",
+        "Icon": 52,
+        "Attack": [
+            60,
+            85
+        ],
+        "Defense": [
+            30,
+            40
+        ],
+        "AttackDuration": 1.6,
+        "IsUnique": true,
+        "Sound": "Hellfire",
+        "SoundCombat": "Flesh",
+        "SoundDie": "Hellfire",
+        "Snapshot": 8,
+        "CoolDown": 80
+    },
+    "LiveOfNature": {
+        "Name": "Live of Nature",
+        "Description": "Keeps the nature in peace. When researched, trees around Islander lumbermills will become evergreen.",
+        "Icon": 37,
+        "IsUnique": true,
+        "Hotkey": "N",
+        "CoolDown": 20,
+        "Gold": 200,
+        "Lumber": 100
+    },
+    "PunishOfNatureUpgrade": {
+        "Name": "Punish of Nature",
+        "Description": "The ultimate spell of Islander. It creates a energy rain within an area, healing ally units and causing damage on enermies. The effect of this spell depends on the attitude of nature. When nature is satisfied with you, this can be really powerful on the battlefield.",
+        "Icon": 2,
+        "IsUnique": true,
+        "Hotkey": "N",
+        "CoolDown": 30,
+        "Gold": 350,
+        "Lumber": 350
+    },
+    "AttackUpgrade": {
+        "Name": "Upgrade Attack",
+        "Description": "Increase the attack point for all units",
+        "Icon": 56,
+        "IsUnique": true,
+        "Hotkey": "A",
+        "CoolDown": 10,
+        "Gold": 200,
+        "Lumber": 150
+    },
+    "DefenseUpgrade": {
+        "Name": "Upgrade Defense",
+        "Description": "Increase the defense point for all units",
+        "Icon": 59,
+        "IsUnique": true,
+        "Hotkey": "D",
+        "CoolDown": 10,
+        "Gold": 200,
+        "Lumber": 150
+    },
+    "PunishOfNature": {
+        "Name": "Punish of Nature",
+        "Description": "The ultimate spell of Islander. It creates a energy rain within an area, healing ally units and causing damage on enermies. The effect of this spell depends on the attitude of nature. When nature is satisfied with you, this can be really powerful on the battlefield.",
+        "Icon": 2,
+        "Hotkey": "N",
+        "CoolDown": 120
+    }
+}

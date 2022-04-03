@@ -144,7 +144,6 @@ public class BaseGame : Game, IEventListener
         CurrentGameTime = gameTime;
 
         Input.Update(gameTime);
-        Event.Update(gameTime);
 
         if (Camera != null)
         {

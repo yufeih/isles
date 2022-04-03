@@ -83,7 +83,7 @@ public class StateHarvestGold : BaseState
         if (state == StateType.Harvest || state == StateType.Wait)
         {
             // Respawn our charactor
-            owner.Spawn(goldmine.Position + goldmine.SpawnPoint);
+            owner.Spawn(goldmine.Position + new Vector3(goldmine.SpawnPoint, 0));
         }
 
         if (state == StateType.Harvest && goldmine != null)
@@ -199,7 +199,7 @@ public class StateHarvestGold : BaseState
                 owner.GoldCarried += harvested;
 
                 // Back to home happily
-                owner.Spawn(goldmine.Position + goldmine.SpawnPoint);
+                owner.Spawn(goldmine.Position + new Vector3(goldmine.SpawnPoint, 0));
                 goldmine.HarvesterCount--;
                 elapsedWorkTime = 0;
 
@@ -486,7 +486,7 @@ public class StateHarvestLumber : BaseState
                 // Stop moving and start harvest lumber
                 owner.Stop();
                 owner.Facing = tree.Position - owner.Position;
-                owner.Model.Play(owner.AttackAnimation, true, 0.2f, null, (13.0f / 20, HarvestOnce));
+                owner.GameModel.Play(owner.AttackAnimation, true, 0.2f, null, (13.0f / 20, HarvestOnce));
 
                 move = null;
                 tree.HarvesterCount++;
@@ -742,7 +742,7 @@ public class StateConstruct : BaseState
                 move = null;
                 owner.Stop();
                 owner.Facing = building.Position - owner.Position;
-                owner.Model.Play(owner.AttackAnimation, true, 0.2f, Hit, null);
+                owner.GameModel.Play(owner.AttackAnimation, true, 0.2f, Hit, null);
                 state = StateType.Build;
             }
             else if (result == StateResult.Completed)
@@ -868,7 +868,7 @@ public class StateRepair : BaseState
                 move = null;
                 owner.Stop();
                 owner.Facing = building.Position - owner.Position;
-                owner.Model.Play(owner.AttackAnimation, true, 0.2f, Hit, null);
+                owner.GameModel.Play(owner.AttackAnimation, true, 0.2f, Hit, null);
                 state = StateType.Repair;
             }
             else if (result == StateResult.Completed)
@@ -902,7 +902,7 @@ public class StateRepair : BaseState
     {
         return building == null || building.State != Building.BuildingState.Normal ||
                                   (building.State == Building.BuildingState.Normal &&
-                                   building.Health == building.MaximumHealth);
+                                   building.Health == building.MaxHealth);
     }
 }
 
@@ -966,9 +966,9 @@ public class StateCharactorDie : BaseState
 
     public override void Activate()
     {
-        if (owner.Model != null)
+        if (owner.GameModel != null)
         {
-            owner.Model.Play("Die", false, 0.0f, BeginSink, null);
+            owner.GameModel.Play("Die", false, 0.0f, BeginSink, null);
         }
         else
         {
@@ -978,9 +978,9 @@ public class StateCharactorDie : BaseState
 
     private void BeginSink(object sender, EventArgs e)
     {
-        if (owner.Model != null)
+        if (owner.GameModel != null)
         {
-            owner.Model.Pause();
+            owner.GameModel.Pause();
         }
 
         sink = true;

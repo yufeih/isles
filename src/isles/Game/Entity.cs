@@ -1,7 +1,7 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Xml;
+using System.Text.Json.Serialization;
 
 namespace Isles;
 
@@ -41,18 +41,29 @@ public abstract class BaseState : IEventListener
     }
 }
 
-public abstract class BaseEntity : IAudioEmitter, IEventListener
+[JsonConverter(typeof(BaseEntity.JsonConverter))]
+public abstract class BaseEntity : IAudioEmitter, IEventListener, IJsonOnDeserialized
 {
+    private static readonly Type[] s_knownTypes = new[]
+    {
+        typeof(Tree), typeof(Building), typeof(Goldmine), typeof(BoxOfPandora),
+        typeof(Tower), typeof(Worker), typeof(Charactor),
+        typeof(Hunter), typeof(FireSorceress), typeof(Hellfire)
+    };
+
+    class JsonConverter : TypeDiscriminatorJsonConverter<BaseEntity>
+    {
+        public JsonConverter() : base(s_knownTypes) { }
+    }
+
     public static int EntityCount;
 
-    public GameWorld World { get; }
+    public GameWorld World => GameWorld.Singleton;
 
     /// <summary>
     /// Gets or sets the 3D position of the entity.
     /// </summary>
-    public virtual Vector3 Position { get; set; }
-
-    public virtual BoundingBox BoundingBox => new();
+    public Vector3 Position { get; set; }
 
     /// <summary>
     /// Gets or sets entity name.
@@ -64,9 +75,9 @@ public abstract class BaseEntity : IAudioEmitter, IEventListener
     /// </summary>
     public string ClassID { get; set; }
 
-    public BaseEntity(GameWorld world)
+    public BaseEntity()
     {
-        World = world;
+        ClassID = GetType().Name;
     }
 
     public virtual void Update(GameTime gameTime) { }
@@ -75,26 +86,12 @@ public abstract class BaseEntity : IAudioEmitter, IEventListener
 
     public virtual void OnDestroy() { }
 
-    public virtual void Deserialize(XmlElement xml)
-    {
-        string value;
-
-        if (xml.HasAttribute("Name"))
-        {
-            Name = xml.GetAttribute("Name");
-        }
-
-        if ((value = xml.GetAttribute("Position")) != "")
-        {
-            // Note this should be the upper case Position!!!
-            Position = Helper.StringToVector3(value);
-        }
-    }
-
     public virtual EventResult HandleEvent(EventType type, object sender, object tag)
     {
         return EventResult.Unhandled;
     }
+
+    public virtual void OnDeserialized() { }
 }
 
 /// <summary>
@@ -125,7 +122,19 @@ public abstract class Entity : BaseEntity
 
     protected virtual bool OnStateChanged(BaseState newState, ref BaseState resultState) => true;
 
-    public GameModel Model { get; private set; }
+    public string Model { get; set; }
+
+    public float Alpha { get; set; } = 1;
+
+    public float ScaleBias { get; set; } = 1;
+
+    public float RotationXBias { get; set; }
+
+    public float RotationYBias { get; set; }
+
+    public float RotationZBias { get; set; }
+
+    public GameModel GameModel { get; set; }
 
     public virtual bool Visible => true;
 
@@ -140,16 +149,16 @@ public abstract class Entity : BaseEntity
     /// <summary>
     /// Returns the axis aligned bounding box of the game model.
     /// </summary>
-    public override BoundingBox BoundingBox
+    public BoundingBox BoundingBox
     {
         get
         {
-            if (Model == null)
+            if (GameModel == null)
             {
                 return new BoundingBox();
             }
 
-            return Model.BoundingBox;
+            return GameModel.BoundingBox;
         }
     }
 
@@ -176,120 +185,36 @@ public abstract class Entity : BaseEntity
 
     public virtual bool IsPickable => Visible;
 
-    public Entity(GameWorld world, GameModel model)
-        : base(world)
+    public override void OnDeserialized()
     {
-        Model = model;
-    }
+        base.OnDeserialized();
 
-    public override void Deserialize(XmlElement xml)
-    {
-        base.Deserialize(xml);
+        transformBias = Matrix.CreateScale(ScaleBias) *
+                        Matrix.CreateRotationX(MathHelper.ToRadians(RotationXBias) + MathHelper.PiOver2) *
+                        Matrix.CreateRotationY(MathHelper.ToRadians(RotationYBias)) *
+                        Matrix.CreateRotationZ(MathHelper.ToRadians(RotationZBias));
 
-        string value;
-
-        // Treat game model as level content
-        if ((value = xml.GetAttribute("Model")) != "")
+        if (Model != null)
         {
-            Model = new GameModel(value);
-        }
-
-        if ((value = xml.GetAttribute("Alpha")) != "")
-        {
-            Model.Alpha = float.Parse(value);
-        }
-
-        Vector3 scaleBias = Vector3.One;
-        Vector3 translation = Vector3.Zero;
-        float rotationX = 0, rotationY = 0, rotationZ = 0;
-
-        // Get entity transform bias
-        if ((value = xml.GetAttribute("RotationXBias")) != "")
-        {
-            rotationX = MathHelper.ToRadians(float.Parse(value));
-        }
-
-        if ((value = xml.GetAttribute("RotationYBias")) != "")
-        {
-            rotationY = MathHelper.ToRadians(float.Parse(value));
-        }
-
-        if ((value = xml.GetAttribute("RotationZBias")) != "")
-        {
-            rotationZ = MathHelper.ToRadians(float.Parse(value));
-        }
-
-        if ((value = xml.GetAttribute("ScaleBias")) != "")
-        {
-            scaleBias = Helper.StringToVector3(value);
-        }
-
-        if ((value = xml.GetAttribute("PositionBias")) != "")
-        {
-            translation = Helper.StringToVector3(value);
-        }
-
-        if (scaleBias != Vector3.One || rotationX != 0 || rotationY != 0 || rotationZ != 0 ||
-            translation != Vector3.Zero)
-        {
-            transformBias = Matrix.CreateScale(scaleBias) *
-                            Matrix.CreateRotationX(rotationX) *
-                            Matrix.CreateRotationY(rotationY) *
-                            Matrix.CreateRotationZ(rotationZ) *
-                            Matrix.CreateTranslation(translation);
+            GameModel = new(Model);
 
             // Update model transform
-            Model.Transform = transformBias;
+            GameModel.Transform = transformBias;
+            GameModel.Alpha = Alpha;
 
             // Center game model
-            Vector3 center = (Model.BoundingBox.Max + Model.BoundingBox.Min) / 2;
+            Vector3 center = (GameModel.BoundingBox.Max + GameModel.BoundingBox.Min) / 2;
             transformBias.M41 -= center.X;
             transformBias.M42 -= center.Y;
-            transformBias.M43 -= Model.BoundingBox.Min.Z;
+            transformBias.M43 -= GameModel.BoundingBox.Min.Z;
             transformBias.M43 -= 0.2f;  // A little offset under the ground
-        }
-
-        // Get entity transform
-        rotationX = rotationY = rotationZ = 0;
-
-        if ((value = xml.GetAttribute("RotationX")) != "")
-        {
-            rotationX = MathHelper.ToRadians(float.Parse(value));
-        }
-
-        if ((value = xml.GetAttribute("RotationY")) != "")
-        {
-            rotationY = MathHelper.ToRadians(float.Parse(value));
-        }
-
-        if ((value = xml.GetAttribute("RotationZ")) != "")
-        {
-            rotationZ = MathHelper.ToRadians(float.Parse(value));
-        }
-
-        if (rotationX != 0 || rotationX != 0 || rotationZ != 0)
-        {
-            Rotation = Quaternion.CreateFromRotationMatrix(
-                                Matrix.CreateRotationX(rotationX) *
-                                Matrix.CreateRotationY(rotationY) *
-                                Matrix.CreateRotationZ(rotationZ));
-        }
-
-        if ((value = xml.GetAttribute("Rotation")) != "")
-        {
-            Rotation = Helper.StringToQuaternion(value);
-        }
-
-        if ((value = xml.GetAttribute("Scale")) != "")
-        {
-            Scale = Helper.StringToVector3(value);
         }
     }
 
     /// <summary>
     /// Test to see if this entity is visible from a given view and projection.
     /// </summary>
-    public virtual bool IsVisible(Matrix viewProjection)
+    private bool IsVisible(Matrix viewProjection)
     {
         // Transform position to projection space
         var f = new BoundingFrustum(viewProjection);
@@ -322,12 +247,12 @@ public abstract class Entity : BaseEntity
             }
         }
 
-        Model.Transform = transformBias *
+        GameModel.Transform = transformBias *
             Matrix.CreateScale(Scale) *
             Matrix.CreateFromQuaternion(Rotation) *
             Matrix.CreateTranslation(Position);
 
-        Model.Update(gameTime);
+        GameModel.Update(gameTime);
 
         WithinViewFrustum = IsVisible(BaseGame.Singleton.ViewProjection);
     }

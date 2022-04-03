@@ -43,179 +43,9 @@ public interface IGraph
 }
 
 /// <summary>
-/// Sparse graph using adjacency list representation.
-/// </summary>
-public class SparseGraph<TNode> : IGraph
-{
-    /// <summary>
-    /// All graph nodes.
-    /// </summary>
-    private readonly List<TNode> nodes;
-
-    /// <summary>
-    /// Graph edge adjacency list.
-    /// </summary>
-    private readonly List<LinkedList<GraphEdge>> edges;
-
-    /// <summary>
-    /// Gets the total number of nodes in the graph.
-    /// </summary>
-    public int NodeCount => nodes.Count;
-
-    /// <summary>
-    /// Gets all nodes.
-    /// </summary>
-    public IEnumerable<TNode> Nodes => nodes;
-
-    /// <summary>
-    /// Gets a graph node from a given index.
-    /// </summary>
-    /// <param name="index"></param>
-    public TNode GetNode(int index)
-    {
-        return nodes[index];
-    }
-
-    /// <summary>
-    /// Gets the heuristic value between two nodes.
-    /// </summary>
-    /// <param name="currentIndex">Index to the current node.</param>
-    /// <param name="endIndex">Index to the end/target node.</param>
-    /// <returns>A heuristic value between the two nodes.</returns>
-    public float GetHeuristicValue(int currentIndex, int endIndex)
-    {
-        return 0;
-    }
-
-    /// <summary>
-    /// Gets all the out-going edges of a given node.
-    /// </summary>
-    public IEnumerable<GraphEdge> GetEdges(int nodeIndex)
-    {
-        return edges[nodeIndex];
-    }
-
-    /// <summary>
-    /// Creates new directed sparse graph.
-    /// </summary>
-    public SparseGraph()
-    {
-        nodes = new List<TNode>();
-        edges = new List<LinkedList<GraphEdge>>();
-    }
-
-    /// <summary>
-    /// Creates a new sparse graph with a initial node count.
-    /// </summary>
-    /// <param name="nodeCount"></param>
-    /// <param name="directed"></param>
-    public SparseGraph(int nodeCount)
-    {
-        nodes = new List<TNode>(nodeCount);
-        edges = new List<LinkedList<GraphEdge>>(nodeCount);
-
-        for (var i = 0; i < nodeCount; i++)
-        {
-            edges[i] = new LinkedList<GraphEdge>();
-        }
-    }
-
-    /// <summary>
-    /// Adds a new node to the graph.
-    /// </summary>
-    /// <param name="node"></param>
-    /// <returns>The index to the new node.</returns>
-    public int AddNode(TNode node)
-    {
-        nodes.Add(node);
-        edges.Add(new LinkedList<GraphEdge>());
-
-        return nodes.Count - 1;
-    }
-
-    /// <summary>
-    /// Adds a new edge to the graph.
-    /// </summary>
-    /// <param name="edge"></param>
-    public void AddEdge(GraphEdge edge)
-    {
-        // Validate edge nodes
-        if (edge.From < 0 || edge.From >= nodes.Count ||
-            edge.To < 0 || edge.To >= nodes.Count)
-        {
-            throw new ArgumentOutOfRangeException();
-        }
-
-        edges[edge.From].AddFirst(edge);
-    }
-
-    /// <summary>
-    /// Removes a graph node.
-    /// </summary>
-    /// <param name="nodeIndex"></param>
-    public void RemoveNode(int nodeIndex)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <summary>
-    /// Removes a graph edge.
-    /// </summary>
-    public void RemoveEdge(int from, int to)
-    {
-        throw new NotImplementedException();
-    }
-}
-
-/// <summary>
-/// Interface for graph search algorithm.
-/// </summary>
-public interface IGraphSearch
-{
-    /// <summary>
-    /// Perform a graph search on a graph, find a best path from start to end.
-    /// </summary>
-    /// <param name="graph"></param>
-    /// <param name="start"></param>
-    /// <param name="end"></param>
-    /// <returns>Whether a path has been found.</returns>
-    bool Search(IGraph graph, int start, int end);
-
-    /// <summary>
-    /// Perform a graph search on a graph, find a best path from start to end.
-    /// This algorithm complete the graph search in multiple calls instead of one,
-    /// the maximum number of graph nodes traversed in each call is specified by
-    /// the steps parameter. The algorithm aims at decomposing the time consuming
-    /// graph search algorithm into several steps in order to average the time cost.
-    /// When the search is incomplete, if a different graph, start or end point is
-    /// specified, a new search will be triggered.
-    /// </summary>
-    /// <param name="start"></param>
-    /// <param name="end"></param>
-    /// <param name="steps">
-    /// Max number of nodes to be searched in this call.
-    /// </param>
-    /// <param name="stepsUsed">
-    /// Actrual number of nodes searched during this call.
-    /// </param>
-    /// <returns>
-    /// True or false indicates whether a path has been found
-    /// Null if the search isn't complete.
-    /// </returns>
-    bool? Search(IGraph graph, int start, int end, int steps, out int stepsUsed);
-
-    /// <summary>
-    /// Gets the path from search result. The path is an array of index
-    /// to all the graph nodes on the path from start to end.
-    /// The path is valid only after search is called and completed.
-    /// </summary>
-    IEnumerable<int> Path { get; }
-}
-
-/// <summary>
 /// Performs an A* graph search on a given graph.
 /// </summary>
-public class GraphSearchAStar : IGraphSearch
+public class GraphSearchAStar
 {
     /// <summary>
     /// Start, end node of the search.
@@ -226,11 +56,6 @@ public class GraphSearchAStar : IGraphSearch
     /// Start, end node of the search.
     /// </summary>
     private int end;
-
-    /// <summary>
-    /// The graph we're currently searching.
-    /// </summary>
-    private IGraph graph;
 
     /// <summary>
     /// A list holding the path information.
@@ -253,18 +78,6 @@ public class GraphSearchAStar : IGraphSearch
     /// Create an priority queue to store node indices.
     /// </summary>
     private IndexedPriorityQueue queue;
-
-    /// <summary>
-    /// Gets whether a search query has finished.
-    /// </summary>
-    public bool Finished { get; private set; } = true;
-
-    /// <summary>
-    /// Creates a graph searcher using Dijkstra's algorithm.
-    /// </summary>
-    public GraphSearchAStar()
-    {
-    }
 
     /// <summary>
     /// Reset GraphSearch state.
@@ -305,52 +118,23 @@ public class GraphSearchAStar : IGraphSearch
     /// <returns>Whether a path has been found.</returns>
     public bool Search(IGraph graph, int start, int end)
     {
-        // Simple call our step search using infinite steps
-        return Search(graph, start, end, int.MaxValue, out _).Value;
-    }
-
-    /// <summary>
-    /// Perform a graph search on a graph, find a best path from start to end.
-    /// This algorithm complete the graph search in multiple calls instead of one,
-    /// the maximum number of graph nodes traversed in each call is specified by
-    /// the steps parameter. The algorithm aims at decomposing the time consuming
-    /// graph search algorithm into several steps in order to average the time cost.
-    /// </summary>
-    /// <param name="start"></param>
-    /// <param name="end"></param>
-    /// <param name="steps"></param>
-    /// <returns>
-    /// True or false indicates whether a path has been found
-    /// Null if the search isn't complete.
-    /// </returns>
-    public bool? Search(IGraph graph, int start, int end, int steps, out int stepCount)
-    {
         var nodeCount = graph.NodeCount;
 
-        // Start a new search
-        if (Finished || this.start != start || this.end != end || this.graph != graph)
+        this.start = start;
+        this.end = end;
+
+        // Validate input
+        if (nodeCount <= 0 || start < 0 || start >= nodeCount ||
+            end < 0 || end >= nodeCount)
         {
-            Finished = false;
-            this.graph = graph;
-            this.start = start;
-            this.end = end;
-
-            // Validate input
-            if (nodeCount <= 0 || start < 0 || start >= nodeCount ||
-                end < 0 || end >= nodeCount)
-            {
-                throw new ArgumentOutOfRangeException();
-            }
-
-            // Reset everything
-            Reset(nodeCount);
-
-            // Add the start node on the queue
-            queue.Add(start, 0);
+            throw new ArgumentOutOfRangeException();
         }
 
-        // Step count
-        stepCount = 0;
+        // Reset everything
+        Reset(nodeCount);
+
+        // Add the start node on the queue
+        queue.Add(start, 0);
 
         // While the queue is not empty
         while (!queue.Empty)
@@ -362,7 +146,6 @@ public class GraphSearchAStar : IGraphSearch
             // If we reached the end, everything is done
             if (end == top)
             {
-                Finished = true;
                 return true;
             }
 
@@ -397,18 +180,9 @@ public class GraphSearchAStar : IGraphSearch
                     queue.IncreasePriority(edge.To, GCost + HCost);
                 }
             }
-
-            // If we have processed enough nodes but still failed to reach the target,
-            // pause the search and return null.
-            if (++stepCount >= steps)
-            {
-                Finished = false;
-                return null;
-            }
         }
 
         // Finish the search
-        Finished = true;
         return false;
     }
 
