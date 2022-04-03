@@ -1,9 +1,6 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Diagnostics.CodeAnalysis;
-using System.Xml;
-
 namespace Isles;
 
 /// <summary>
@@ -138,13 +135,13 @@ public abstract class Spell : IEventListener
 
     public Spell(string classID)
     {
-        var dataSchema = new { Name = "", Description = "", Icon = 0, HotKey = default(Keys), CoolDown = 0.0f, AutoCast = false };
+        var dataSchema = new { Name = "", Description = "", Icon = 0, Hotkey = default(Keys), CoolDown = 0.0f, AutoCast = false };
         var data = JsonHelper.DeserializeAnonymousType(GameDefault.Singleton.Prefabs[classID], dataSchema);
 
         Name = data.Name;
         Description = data.Description;
         Icon = Icon.FromTiledTexture(data.Icon);
-        Hotkey = data.HotKey;
+        Hotkey = data.Hotkey;
         CoolDown = data.CoolDown;
         AutoCast = data.AutoCast;
     }

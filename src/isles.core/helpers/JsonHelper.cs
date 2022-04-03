@@ -18,6 +18,7 @@ public static class JsonHelper
 
     static JsonHelper()
     {
+        Options.Converters.Add(new JsonStringEnumConverter());
         Options.Converters.Add(new PointJsonConverter());
         Options.Converters.Add(new Vector2JsonConverter());
         Options.Converters.Add(new Vector3JsonConverter());
