@@ -91,7 +91,11 @@ public class GameScreen : IScreen, IEventListener
         Cursors.SetCursor(Cursors.Default);
         Game.IsMouseVisible = true;
 
-        Event.SendMessage(EventType.Unknown, this, this, 1, 0.2f);
+        Task.Delay(200).ContinueWith(_ =>
+        {
+            readme.Visible = true;
+            Pause(readme);
+        });
     }
 
     private void ResetUI()
@@ -393,13 +397,6 @@ public class GameScreen : IScreen, IEventListener
 
     public EventResult HandleEvent(EventType type, object sender, object tag)
     {
-        if (type == EventType.Unknown && sender == this && (int)tag == 1)
-        {
-            readme.Visible = true;
-            Pause(readme);
-            return EventResult.Handled;
-        }
-
         if (paused)
         {
             if (activeObject != null)
