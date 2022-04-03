@@ -138,65 +138,23 @@ public abstract class Spell : IEventListener
 
     public Spell(string classID)
     {
-        // Initialize from xml element
-        if (GameDefault.Singleton.WorldObjectDefaults.TryGetValue(classID, out XmlElement xml))
-        {
-            Deserialize(xml);
-        }
+        var dataSchema = new { Name = "", Description = "", Icon = 0, HotKey = default(Keys), CoolDown = 0.0f, AutoCast = false };
+        var data = JsonHelper.DeserializeAnonymousType(GameDefault.Singleton.Prefabs[classID], dataSchema);
 
-        if (GameDefault.Singleton.SpellDefaults.TryGetValue(classID, out xml))
-        {
-            Deserialize(xml);
-        }
+        Name = data.Name;
+        Description = data.Description;
+        Icon = Icon.FromTiledTexture(data.Icon);
+        Hotkey = data.HotKey;
+        CoolDown = data.CoolDown;
+        AutoCast = data.AutoCast;
     }
 
-    public virtual void Deserialize(XmlElement xml)
-    {
-        Name = xml.GetAttribute("Name");
-        Description = xml.GetAttribute("Description");
-        Description.Replace('\t', ' ');
-
-        string value;
-
-        if ((value = xml.GetAttribute("Icon")) != "")
-        {
-            Icon = Icon.FromTiledTexture(int.Parse(value));
-        }
-
-        if ((value = xml.GetAttribute("Hotkey")) != "")
-        {
-            Hotkey = (Keys)Enum.Parse(typeof(Keys), value);
-        }
-
-        if ((value = xml.GetAttribute("CoolDown")) != "")
-        {
-            CoolDown = float.Parse(value);
-        }
-
-        if ((value = xml.GetAttribute("AutoCast")) != "")
-        {
-            AutoCast = bool.Parse(value);
-        }
-    }
-
-    /// <summary>
-    /// Gets or sets the name of the spell.
-    /// </summary>
     public string Name;
 
-    /// <summary>
-    /// Gets or sets the description of the spell.
-    /// </summary>
     public string Description;
 
-    /// <summary>
-    /// Gets or sets the spell icon.
-    /// </summary>
     public Icon Icon = Icon.FromTiledTexture(0);
 
-    /// <summary>
-    /// Gets or sets the hot key for the spell.
-    /// </summary>
     public Keys Hotkey;
 
     /// <summary>

@@ -10,8 +10,11 @@ public static class JsonHelper
 {
     public static readonly JsonSerializerOptions Options = new();
 
-    public static T? DeserializeAnonymousType<T>(byte[] utf8Json, T _, JsonSerializerOptions? options = default)
-        => JsonSerializer.Deserialize<T>(utf8Json, options);
+    public static T? DeserializeAnonymousType<T>(byte[] utf8Json, T _)
+        => JsonSerializer.Deserialize<T>(utf8Json, Options);
+
+    public static T? DeserializeAnonymousType<T>(JsonElement element, T _)
+        => JsonSerializer.Deserialize<T>(element, Options);
 
     static JsonHelper()
     {
