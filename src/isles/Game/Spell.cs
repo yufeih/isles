@@ -614,16 +614,6 @@ public class SpellTraining : Spell
         Type = type ?? throw new ArgumentNullException();
     }
 
-    public override void Deserialize(XmlElement xml)
-    {
-        if (xml.HasAttribute("TrainingTime"))
-        {
-            CoolDown = float.Parse(xml.GetAttribute("TrainingTime"));
-        }
-
-        base.Deserialize(xml);
-    }
-
     protected override SpellButton CreateUIElement(GameUI ui)
     {
         SpellButton button = base.CreateUIElement(ui);

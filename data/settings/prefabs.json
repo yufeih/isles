@@ -259,7 +259,7 @@
             "Gold": "models/gold"
         },
         "Hotkey": "F",
-        "TrainingTime": 10,
+        "CoolDown": 10,
         "Attack": [
             12,
             16
@@ -293,7 +293,7 @@
         "Priority": 3,
         "AreaRadius": 20,
         "Hotkey": "T",
-        "TrainingTime": 20,
+        "CoolDown": 20,
         "Attack": [
             35,
             42
@@ -329,7 +329,7 @@
         "AreaRadius": 20,
         "Hotkey": "H",
         "Icon": 46,
-        "TrainingTime": 20,
+        "CoolDown": 20,
         "Attack": [
             43,
             61
@@ -364,7 +364,7 @@
         "AreaRadius": 22,
         "Hotkey": "F",
         "Icon": 49,
-        "TrainingTime": 25,
+        "CoolDown": 25,
         "Attack": [
             80,
             95
@@ -403,7 +403,6 @@
         "AreaRadius": 30,
         "Hotkey": "F",
         "Icon": 52,
-        "TrainingTime": 0,
         "Attack": [
             60,
             85
@@ -426,7 +425,7 @@
         "Icon": 37,
         "IsUnique": true,
         "Hotkey": "N",
-        "TrainingTime": 20,
+        "CoolDown": 20,
         "Gold": 200,
         "Lumber": 100
     },
@@ -436,7 +435,7 @@
         "Icon": 2,
         "IsUnique": true,
         "Hotkey": "N",
-        "TrainingTime": 30,
+        "CoolDown": 30,
         "Gold": 350,
         "Lumber": 350
     },
@@ -446,7 +445,7 @@
         "Icon": 56,
         "IsUnique": true,
         "Hotkey": "A",
-        "TrainingTime": 10,
+        "CoolDown": 10,
         "Gold": 200,
         "Lumber": 150
     },
@@ -456,7 +455,7 @@
         "Icon": 59,
         "IsUnique": true,
         "Hotkey": "D",
-        "TrainingTime": 10,
+        "CoolDown": 10,
         "Gold": 200,
         "Lumber": 150
     },

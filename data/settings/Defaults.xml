@@ -78,7 +78,7 @@ Can construct buildings, harvest gold and lumber, repair damaged buildings and f
         Gold="50" Lumber="0" Food="1" Priority="4" AreaRadius="20" Icon="40" Snapshot="0"
         Spells="Townhall, Farmhouse, Lumbermill, Tower, Barracks, Altar"
         Attachment="models/hammer|Weapon|models/wood|Wood|models/gold|Gold"
-        Hotkey="F" TrainingTime="10" Attack="12, 16" Defense="4, 8" AttackDuration="2"
+        Hotkey="F" CoolDown="10" Attack="12, 16" Defense="4, 8" AttackDuration="2"
         Sound="Follower" SoundCombat="ChopWood" SoundDie="FollowerDie"/>
 
     <Militia
@@ -88,7 +88,7 @@ They are good at combat using their power hammer."
         Attachment="models/warhammer|Weapon|models/shield|Shield"
         RotationZBias ="-90"  ScaleBias="0.13, 0.13, 0.13" MaxHealth="425"
         Gold="155" Lumber="50" Food="2" Priority="3" AreaRadius="20" Hotkey="T"
-        TrainingTime="20" Attack="35, 42" Defense="21, 25" AttackDuration="1.2"
+        CoolDown="20" Attack="35, 42" Defense="21, 25" AttackDuration="1.2"
         Sound="Militia" SoundCombat="Bone" SoundDie="MilitiaDie" Icon="43" Snapshot="1"/>
 
     <Hunter
@@ -97,7 +97,7 @@ Years of hunting life makes them masters of spears."
         Model="models/hunter" Attachment="models/spear|Weapon"  Speed = "35" ObstructorRadius="7"
         RotationZBias ="-90"  ScaleBias="0.13, 0.13, 0.13" MaxHealth="350"
         Gold="125" Lumber="105" Food="2" Priority="2" AreaRadius="20" Hotkey="H" Icon="46"
-        TrainingTime="20" Attack="43, 61" Defense="10, 18" AttackDuration="1.8" AttackRange="0, 75"
+        CoolDown="20" Attack="43, 61" Defense="10, 18" AttackDuration="1.8" AttackRange="0, 75"
         Sound="Hunter" SoundDie="HunterDie" Snapshot="2"/>
 
     <FireSorceress
@@ -108,7 +108,7 @@ When 'Punish of Nature' is researched, she will serve the justice for the nature
         Model="models/sorceress" Speed = "40" ObstructorRadius="8"
         RotationZBias ="-90"  ScaleBias="0.18, 0.18, 0.18" MaxHealth="750"
         Gold="200" Lumber="175" Food="5" Priority="0" AreaRadius="22" Hotkey="F" Icon="49"
-        TrainingTime="25" Attack="80, 95" Defense="35, 40" AttackDuration="2" AttackRange="0, 50"
+        CoolDown="25" Attack="80, 95" Defense="35, 40" AttackDuration="2" AttackRange="0, 50"
         IsUnique="true" Spells="SummonHellfire" Sound="Flame" SoundDir="Flame" Snapshot="3"/>
 
     <Hellfire
@@ -116,7 +116,7 @@ When 'Punish of Nature' is researched, she will serve the justice for the nature
         Model="models/hellfire" Speed = "35" ObstructorRadius="12"
         RotationZBias ="-90"  ScaleBias="0.18, 0.18, 0.18" MaxHealth="1000"
         Gold="0" Lumber="0" Food="0" Priority="1" AreaRadius="30" Hotkey="F" Icon="52"
-        TrainingTime="0" Attack="60, 85" Defense="30, 40" AttackDuration="1.6" IsUnique="true"
+        Attack="60, 85" Defense="30, 40" AttackDuration="1.6" IsUnique="true"
         Sound="Hellfire" SoundCombat="Flesh" SoundDie="Hellfire"  Snapshot="8" CoolDown="80"/>
 
   </WorldObject>
@@ -127,22 +127,22 @@ When 'Punish of Nature' is researched, she will serve the justice for the nature
     <LiveOfNature
         Name="Live of Nature" Description="Keeps the nature in peace.
 When researched, trees around Islander lumbermills will become evergreen."
-        Icon="37" IsUnique="true" Hotkey="N" TrainingTime="20" Gold="200" Lumber="100"/>
+        Icon="37" IsUnique="true" Hotkey="N" CoolDown="20" Gold="200" Lumber="100"/>
 
     <PunishOfNatureUpgrade
         Name="Punish of Nature" Description="The ultimate spell of Islander.
 It creates a energy rain within an area, healing ally units and causing damage on enermies.
 The effect of this spell depends on the attitude of nature.
 When nature is satisfied with you, this can be really powerful on the battlefield."
-        Icon="2" IsUnique="true" Hotkey="N" TrainingTime="30" Gold="350" Lumber="350"/>
+        Icon="2" IsUnique="true" Hotkey="N" CoolDown="30" Gold="350" Lumber="350"/>
 
     <AttackUpgrade
         Name="Upgrade Attack" Description="Increase the attack point for all units"
-        Icon="56" IsUnique="true" Hotkey="A" TrainingTime="10" Gold="200" Lumber="150"/>
+        Icon="56" IsUnique="true" Hotkey="A" CoolDown="10" Gold="200" Lumber="150"/>
 
     <DefenseUpgrade
         Name="Upgrade Defense" Description="Increase the defense point for all units"
-        Icon="59" IsUnique="true" Hotkey="D" TrainingTime="10" Gold="200" Lumber="150"/>
+        Icon="59" IsUnique="true" Hotkey="D" CoolDown="10" Gold="200" Lumber="150"/>
 
     <PunishOfNature
         Name="Punish of Nature" Description="The ultimate spell of Islander.
