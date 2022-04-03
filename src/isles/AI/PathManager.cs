@@ -652,7 +652,6 @@ public class PathManager
         {
             landscape = value;
             Graph.Landscape = value;
-            LargeGraph.Landscape = value;
         }
     }
 
@@ -662,17 +661,11 @@ public class PathManager
     /// Graph search.
     /// </summary>
     private readonly GraphSearchAStar search;
-    private readonly GraphSearchAStar largeSearch;
 
     /// <summary>
     /// Gets the detailed path graph used for searching.
     /// </summary>
     public PathGraph Graph { get; }
-
-    /// <summary>
-    /// Gets the large path graph for path searching on the landscape.
-    /// </summary>
-    public PathGraph LargeGraph { get; }
 
     /// <summary>
     /// Dynamic entities.
@@ -964,11 +957,9 @@ public class PathManager
 
         // Create a new graph
         Graph = new PathGraph(landscape, Resolution, occluders);
-        LargeGraph = new PathGraph(landscape, 0.25f, null);
 
         // Create a new graph searcher
         search = new GraphSearchAStar();
-        largeSearch = new GraphSearchAStar();
     }
 
     public void Mark(IMovable agent)
@@ -1225,53 +1216,6 @@ public class PathManager
 
         Mark(agent);
         return true;
-    }
-
-    /// <summary>
-    /// Querys a path on the large graph.
-    /// </summary>
-    public GraphPath QueryPath(Vector2 start, Vector2 end)
-    {
-        Point endGrid = LargeGraph.PositionToGrid(end.X, end.Y);
-
-        // Adjust end position to avoid searching on the whole graph
-        if (LargeGraph.IsGridObstructed(endGrid.X, endGrid.Y, true))
-        {
-            var counter = 0;
-            foreach (Point p in EnumerateGridsInnerOut(endGrid.X, endGrid.Y, 512))
-            {
-                if (counter++ > 512)
-                {
-                    return new GraphPath();
-                }
-
-                if (p.X >= 0 && p.X < LargeGraph.EntryWidth &&
-                    p.Y >= 0 && p.Y < LargeGraph.EntryHeight &&
-                    !LargeGraph.IsGridObstructed(p.X, p.Y, true))
-                {
-                    endGrid = p;
-                    break;
-                }
-            }
-        }
-
-        // Perform the search, this should be pretty fast
-        if (largeSearch.Search(LargeGraph, LargeGraph.PositionToIndex(start),
-                               LargeGraph.GridToIndex(endGrid.X, endGrid.Y)))
-        {
-            // Build standard path
-            GraphPath path = BuildPath(largeSearch.Path, LargeGraph, null, false);
-
-            // If we moved the end position, don't forget to append it to the end
-            if (path.Edges.Count > 0)
-            {
-                path.Edges.AddLast(new GraphPathEdge(end));
-            }
-
-            return path;
-        }
-
-        return null;
     }
 
     public const int AreaSize = (int)(16 * Resolution);
