@@ -75,7 +75,7 @@ public class Building : GameObject, IPlaceable
     /// <summary>
     /// Gets the units that can be trained from this building.
     /// </summary>
-    public List<string> Units { get; private set; } = new();
+    public List<string> TrainedUnits { get; private set; } = new();
 
     /// <summary>
     /// Gets the pending requests that are going to be handled.
@@ -137,7 +137,7 @@ public class Building : GameObject, IPlaceable
         if (spell is SpellTraining training)
         {
             training.Enable = false;
-            Units.Add(training.Type);
+            TrainedUnits.Add(training.Type);
         }
     }
 
@@ -227,7 +227,7 @@ public class Building : GameObject, IPlaceable
     /// </summary>
     public bool CanTrain(string type)
     {
-        if (state == BuildingState.Normal && Units != null && Units.Contains(type))
+        if (state == BuildingState.Normal && TrainedUnits != null && TrainedUnits.Contains(type))
         {
             return !Owner.IsUnique(type) || !Owner.IsFutureAvailable(type);
         }

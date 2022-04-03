@@ -77,33 +77,6 @@ public struct Icon
 public abstract class Spell : IEventListener
 {
     /// <summary>
-    /// Spell creators.
-    /// </summary>
-    private static readonly Dictionary<string, Func<GameWorld, Spell>> creators = new();
-
-    public static void RegisterCreator(Type spellType, Func<GameWorld, Spell> creator)
-    {
-        creators.Add(spellType.Name, creator);
-    }
-
-    public static void RegisterCreator(string spellName, Func<GameWorld, Spell> creator)
-    {
-        creators.Add(spellName, creator);
-    }
-
-    /// <summary>
-    /// Create a new game spell.
-    /// </summary>
-    /// <param name="spellTypeName"></param>
-    /// <param name="world"></param>
-    public static Spell Create(string spellTypeName, GameWorld world)
-    {
-        return !creators.TryGetValue(spellTypeName, out var creator)
-            ? throw new Exception("Failed to create spell, unknown spell type: " + spellTypeName)
-            : creator(world);
-    }
-
-    /// <summary>
     /// Cast a spell.
     /// </summary>
     public static void Cast(Spell spell)
@@ -870,13 +843,14 @@ public class SpellUpgrade : SpellTraining
         : base(type)
     {
         GameDefault.Singleton.SetUnique(Type);
-    }
-
-    public SpellUpgrade(string type, Action<Spell, Building> onComplete)
-        : base(type)
-    {
-        GameDefault.Singleton.SetUnique(Type);
-        Complete = onComplete;
+        Complete = type switch
+        {
+            "LiveOfNature" => LiveOfNature,
+            "PunishOfNatureUpgrade" => PunishOfNature,
+            "AttackUpgrade" => Attack,
+            "DefenseUpgrade" => Defense,
+            _ => throw new ArgumentException(type),
+        };
     }
 
     protected override void OnComplete()
@@ -886,12 +860,8 @@ public class SpellUpgrade : SpellTraining
             Audios.Play("UpgradeComplete");
         }
     }
-}
 
-[SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Uniform delegate")]
-public static class Upgrades
-{
-    public static void LiveOfNature(Spell spell, Building owner)
+    private static void LiveOfNature(Spell spell, Building owner)
     {
         if (owner != null && owner.Owner != null)
         {
@@ -899,7 +869,7 @@ public static class Upgrades
         }
     }
 
-    public static void PunishOfNature(Spell spell, Building owner)
+    private static void PunishOfNature(Spell spell, Building owner)
     {
         if (owner != null && owner.Owner != null)
         {
@@ -907,12 +877,12 @@ public static class Upgrades
 
             foreach (GameObject o in owner.Owner.EnumerateObjects("FireSorceress"))
             {
-                o.AddSpell("PunishOfNature");
+                o.AddSpell(new SpellPunishOfNature());
             }
         }
     }
 
-    public static void Attack(Spell spell, Building owner)
+    private static void Attack(Spell spell, Building owner)
     {
         if (owner != null && owner.Owner != null)
         {
@@ -929,7 +899,7 @@ public static class Upgrades
         }
     }
 
-    public static void Defense(Spell spell, Building owner)
+    private static void Defense(Spell spell, Building owner)
     {
         if (owner != null && owner.Owner != null)
         {

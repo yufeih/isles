@@ -693,7 +693,7 @@ public class FireSorceress : Charactor
 
         if (Owner != null && Owner.IsAvailable("PunishOfNatureUpgrade"))
         {
-            AddSpell("PunishOfNature");
+            AddSpell(new SpellPunishOfNature());
         }
     }
 

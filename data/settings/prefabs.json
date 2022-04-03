@@ -56,7 +56,7 @@
             60,
             80
         ],
-        "Spells": [
+        "Units": [
             "Follower"
         ],
         "SpawnPoint": [
@@ -93,9 +93,11 @@
             80
         ],
         "Priority": 101,
-        "Spells": [
+        "Units": [
             "Militia",
-            "Hunter",
+            "Hunter"
+        ],
+        "Upgrades": [
             "AttackUpgrade",
             "DefenseUpgrade"
         ],
@@ -128,8 +130,10 @@
         "Lumber": 150,
         "Gold": 175,
         "Priority": 102,
-        "Spells": [
-            "FireSorceress",
+        "Units": [
+            "FireSorceress"
+        ],
+        "Upgrades": [
             "PunishOfNatureUpgrade"
         ]
     },
@@ -157,7 +161,7 @@
         "Lumber": 125,
         "Gold": 215,
         "Priority": 103,
-        "Spells": [
+        "Upgrades": [
             "LiveOfNature"
         ],
         "Sound": "Lumbermill"
@@ -241,7 +245,7 @@
         "AreaRadius": 20,
         "Icon": 40,
         "Snapshot": 0,
-        "Spells": [
+        "Buildings": [
             "Townhall",
             "Farmhouse",
             "Lumbermill",
@@ -375,8 +379,8 @@
             50
         ],
         "IsUnique": true,
-        "Spells": [
-            "SummonHellfire"
+        "Summons": [
+            "Hellfire"
         ],
         "Sound": "Flame",
         "SoundDie": "Flame",

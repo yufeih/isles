@@ -142,7 +142,13 @@ public abstract class GameObject : Entity, ISelectable
 
     public float health;
 
-    public string[] Spells { get; set; } = Array.Empty<string>();
+    public string[] Units { get; set; } = Array.Empty<string>();
+
+    public string[] Buildings { get; set; } = Array.Empty<string>();
+
+    public string[] Summons { get; set; } = Array.Empty<string>();
+
+    public string[] Upgrades { get; set; } = Array.Empty<string>();
 
     public List<Spell> SpellList = new();
 
@@ -305,18 +311,29 @@ public abstract class GameObject : Entity, ISelectable
             ProfileButton.DoubleClick += (sender, e) => Player.LocalPlayer.SelectGroup(this);
         }
 
-        foreach (var spell in Spells)
+        foreach (var building in Buildings)
         {
-            AddSpell(spell);
+            AddSpell(new SpellConstruct(building));
+        }
+
+        foreach (var unit in Units)
+        {
+            AddSpell(new SpellTraining(unit));
+        }
+
+        foreach (var upgrade in Upgrades)
+        {
+            AddSpell(new SpellUpgrade(upgrade));
+        }
+
+        foreach (var summon in Summons)
+        {
+            AddSpell(new SpellSummon(summon));
         }
     }
-    /// <summary>
-    /// Add a new spell for the game object.
-    /// </summary>
-    /// <param name="spell"></param>
-    public void AddSpell(string name)
+
+    public void AddSpell(Spell spell)
     {
-        var spell = Spell.Create(name, World);
         spell.Owner = this;
         OnCreateSpell(spell);
         SpellList.Add(spell);
