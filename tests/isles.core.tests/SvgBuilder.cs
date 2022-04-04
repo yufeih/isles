@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Text;
 using System.Xml;
 using Xunit;
@@ -11,6 +12,7 @@ public class SvgBuilder
 
     private readonly List<(float x, float y, float r, List<(float x, float y)> animations, Dictionary<string, string> data)> _circles = new();
     private readonly List<(float x, float y, float w, float h)> _rectangles = new();
+    private readonly List<(int w, int h, float step)> _grids = new();
 
     public void AddCircle(float x, float y, float radius)
     {
@@ -30,6 +32,24 @@ public class SvgBuilder
     public void AddRectangle(float x, float y, float w, float h)
     {
         _rectangles.Add((x, y, w, h));
+    }
+
+    public void AddGrid(int width, int height, float step = 1, BitArray? bits = null)
+    {
+        _grids.Add((width, height, step));
+
+        if (bits != null)
+        {
+            for (var i = 0; i < bits.Length; i++)
+            {
+                if (bits[i])
+                {
+                    var x = i % width;
+                    var y = i / width;
+                    AddRectangle(x * step, y * step, step, step);
+                }
+            }
+        }
     }
 
     public void Snapshot(string name, float duration)
@@ -108,6 +128,17 @@ public class SvgBuilder
             xml.WriteEndElement();
         }
 
+        foreach (var (w, h, step) in _grids)
+        {
+            xml.WriteStartElement("path");
+            xml.WriteAttributeString("stroke", "gray");
+            xml.WriteAttributeString("stroke-width", $"{step / 100f}");
+            var hLines = string.Join(" ", Enumerable.Range(0, h + 1).Select(i => $"M {0},{step * i} h {step * w}"));
+            var vLines = string.Join(" ", Enumerable.Range(0, w + 1).Select(i => $"M {step * i},{0} v {step * h}"));
+            xml.WriteAttributeString("d", $"{hLines} {vLines}");
+            xml.WriteEndElement();
+        }
+
         foreach (var (x, y, w, h) in _rectangles)
         {
             xml.WriteStartElement("rect");
@@ -129,11 +160,13 @@ public class SvgBuilder
     {
         var x = _circles.Select(c => c.x).Concat(
             _circles.SelectMany(c => c.animations.Select(a => a.x))).Concat(
-            _rectangles.SelectMany(r => new[] { r.x, r.x + r.w }));
+            _rectangles.SelectMany(r => new[] { r.x, r.x + r.w })).Concat(
+            _grids.SelectMany(g => new[]{ 0, g.w * g.step }));
 
         var y = _circles.Select(c => c.y).Concat(
             _circles.SelectMany(c => c.animations.Select(a => a.y))).Concat(
-            _rectangles.SelectMany(r => new[] { r.y, r.y + r.h }));
+            _rectangles.SelectMany(r => new[] { r.y, r.y + r.h })).Concat(
+            _grids.SelectMany(g => new[]{ 0, g.h * g.step }));
 
         var r = _circles.Select(c => c.r).DefaultIfEmpty().Max();
 
