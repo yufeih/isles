@@ -63,12 +63,12 @@ public class MoveTests
     private static TheoryData<string, string> LoadTestCases()
     {
         var result = new TheoryData<string, string>();
-        var testCases = JsonSerializer.Deserialize<Dictionary<string, Movable[]>>(
+        var testCases = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(
             File.ReadAllBytes("data/move.json"), JsonHelper.Options);
 
-        foreach (var (name, movables) in testCases!)
+        foreach (var (name, value) in testCases!)
         {
-            result.Add(name, JsonSerializer.Serialize(movables, JsonHelper.Options));
+            result.Add(name, value.ToString());
         }
 
         return result;

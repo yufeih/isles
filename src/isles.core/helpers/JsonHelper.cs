@@ -8,7 +8,11 @@ namespace Isles;
 
 public static class JsonHelper
 {
-    public static readonly JsonSerializerOptions Options = new();
+    public static readonly JsonSerializerOptions Options = new()
+    {
+        IncludeFields = true,
+        PropertyNameCaseInsensitive = true,
+    };
 
     public static T? DeserializeAnonymousType<T>(byte[] utf8Json, T _)
         => JsonSerializer.Deserialize<T>(utf8Json, Options);

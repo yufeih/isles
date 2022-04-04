@@ -1,6 +1,7 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace Isles;
@@ -11,7 +12,6 @@ public struct Movable
     public float Speed;
     public Vector2 Position;
     public Vector2 Velocity;
-    public Vector2 Acceleration;
     public Vector2? Target;
 }
 
@@ -19,44 +19,46 @@ public class Move
 {
     private const float PositionEpsilonSquared = 0.01f;
     private const float VelocityEpsilonSquared = 0.01f;
-    private const int Iterations = 10;
-    private const float BiasFactor = 0.2f;
-    private const float AllowedPenetration = 0.01f;
 
     private readonly List<Contact> _contacts = new();
 
-    public void Update(float dt, Span<Movable> movables)
+    public void Update(float timeStep, Span<Movable> movables)
     {
-        var idt = 1.0f / dt;
-        var contacts = FindContacts(idt, movables);
+        var inverseTimeStep = 1.0f / timeStep;
+        var contacts = FindContacts(inverseTimeStep, movables);
 
-        foreach (ref var m in movables)
+        for (var i = 0; i < movables.Length; i++)
         {
+            ref var m = ref movables[i];
+
             if (m.Target is null)
             {
-                m.Acceleration = -m.Velocity * idt;
+                m.Velocity = default;
             }
             else
             {
                 var v = m.Target.Value - m.Position;
+
                 if (v.LengthSquared() <= PositionEpsilonSquared)
                 {
-                    m.Acceleration = -m.Velocity * idt;
+                    m.Velocity = default;
                 }
                 else
                 {
                     v.Normalize();
-                    m.Acceleration = (v * m.Speed - m.Velocity) * idt;
+                    v *= m.Speed;
+                    m.Velocity = v;
                 }
             }
         }
 
+        const int Iterations = 10;
         for (var itr = 0; itr < Iterations; itr++)
         {
             foreach (ref readonly var c in contacts)
             {
-                movables[c.A].Acceleration -= c.Impulse;
-                movables[c.B].Acceleration += c.Impulse;
+                movables[c.A].Velocity -= c.Impulse;
+                movables[c.B].Velocity += c.Impulse;
             }
 
             foreach (ref var m in movables)
@@ -64,31 +66,35 @@ public class Move
                 var v = m.Velocity;
                 if (v.LengthSquared() < VelocityEpsilonSquared)
                 {
-                    m.Acceleration = -m.Velocity * idt;
+                    m.Velocity = default;
                 }
                 else
                 {
                     v.Normalize();
-                    m.Acceleration = (v * m.Speed - m.Velocity) * idt;
+                    m.Velocity = v * m.Speed;
                 }
             }
         }
 
         foreach (ref var m in movables)
         {
-            m.Velocity += m.Acceleration * dt;
-            if (m.Velocity.LengthSquared() <= VelocityEpsilonSquared)
+            if (m.Velocity == default)
             {
-                m.Velocity = default;
-                m.Target = default;
+                m.Target = null;
             }
-
-            m.Position += m.Velocity * dt;
+            else
+            {
+                Debug.Assert(!float.IsNaN(m.Velocity.X) && !float.IsNaN(m.Velocity.Y));
+                m.Position += m.Velocity * timeStep;
+            }
         }
     }
 
-    private Span<Contact> FindContacts(float idt, ReadOnlySpan<Movable> movables)
+    private Span<Contact> FindContacts(float inverseTimeStep, ReadOnlySpan<Movable> movables)
     {
+        const float BiasFactor = 0.2f;
+        const float AllowedPenetration = 0.01f;
+
         _contacts.Clear();
         _contacts.EnsureCapacity(movables.Length);
 
@@ -100,17 +106,17 @@ public class Move
                 ref readonly var b = ref movables[j];
 
                 var normal = b.Position - a.Position;
-                var distanceSquared = normal.LengthSquared();
-                if (distanceSquared < PositionEpsilonSquared)
+                var distanceSq = normal.LengthSquared();
+                if (distanceSq < PositionEpsilonSquared)
                 {
                     continue;
                 }
 
-                var penetration = a.Radius + b.Radius - MathF.Sqrt(distanceSquared);
+                var penetration = a.Radius + b.Radius - MathF.Sqrt(distanceSq);
                 if (penetration > 0)
                 {
                     normal.Normalize();
-                    var bias = BiasFactor * idt * Math.Max(0.0f, penetration - AllowedPenetration);
+                    var bias = BiasFactor * inverseTimeStep * Math.Max(0.0f, penetration - AllowedPenetration);
 
                     _contacts.Add(new() { A = i, B = j, Impulse = normal * bias });
                 }
