@@ -32,7 +32,7 @@ public class MoveTests
             var running = false;
             for (var i = 0; i < movables.Length; i++)
             {
-                ref readonly Movable m = ref movables[i];
+                ref readonly var m = ref movables[i];
                 _svg.AnimateCircle(i, m.Position.X, m.Position.Y);
 
                 if (m.Velocity != default)
@@ -53,7 +53,8 @@ public class MoveTests
             var speeds = positions[i].Skip(1).Select((p, j) => (p - positions[i][j]).Length() / timeStep).ToArray();
             if (speeds.Length > 0)
             {
-                _svg.SetCircleData(i, "speed", speeds.Average().ToString());
+                _svg.SetCircleData(i, "avg-speed", speeds.Average().ToString());
+                _svg.SetCircleData(i, "speed", string.Join(", ", speeds));
             }
         }
 

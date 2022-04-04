@@ -17,7 +17,8 @@ public struct Movable
 public class Move
 {
     private const float PositionEpsilonSquared = 0.01f;
-    private const int Iterations = 10;
+    private const float VelocityEpsilonSquared = 0.001f;
+    private const float Bias = 0.5f;
 
     private readonly List<Contact> _contacts = new();
 
@@ -42,35 +43,55 @@ public class Move
             }
         }
 
-        for (var itr = 0; itr < Iterations; itr++)
+        foreach (ref readonly var c in contacts)
         {
-            foreach (ref readonly var c in contacts)
+            ref var a = ref movables[c.A];
+            ref var b = ref movables[c.B];
+
+            var speed = a.Speed + b.Speed;
+            var velocity = b.Velocity - a.Velocity;
+            var impulse = Bias * c.Normal * c.Penetration * idt;
+
+            if (a.Target is null && b.Target is null)
             {
-                ref var a = ref movables[c.A];
-                ref var b = ref movables[c.B];
+                a.Velocity -= impulse * 0.5f;
+                b.Velocity += impulse * 0.5f;
+            }
+            else if (a.Target != null && b.Target != null)
+            {
+                var perpendicular = Cross(velocity, c.Normal) > 0
+                    ? new Vector2(c.Normal.Y, -c.Normal.X)
+                    : new Vector2(-c.Normal.Y, c.Normal.X);
 
-                var dv = b.Velocity - a.Velocity;
-                var v = Vector2.Zero;
+                var targetVelocity = perpendicular * speed;
 
-                if (a.Target != null || b.Target != null)
+                var p = targetVelocity - velocity + impulse;
+
+                a.Velocity -= p * a.Speed / speed;
+                b.Velocity += p * b.Speed / speed;
+            }
+            else
+            {
+                (a, b) = a.Target != null ? (a, b) : (b, a);
+
+                var perpendicular = Cross(velocity, c.Normal) > 0
+                    ? new Vector2(a.Velocity.Y, -a.Velocity.X)
+                    : new Vector2(-a.Velocity.Y, a.Velocity.X);
+
+                perpendicular.Normalize();
+
+                if (!float.IsNaN(perpendicular.X))
                 {
-                    var speed = dv.Length();
-                    v = Cross(dv, c.Normal) > 0
-                        ? new Vector2(c.Normal.Y, -c.Normal.X) * speed
-                        : new Vector2(-c.Normal.Y, c.Normal.X) * speed;
+                    b.Velocity = perpendicular * b.Speed + impulse;
                 }
-
-                var p = v - dv + 0.2f * c.Normal * c.Penetration * idt;
-
-                a.Velocity -= p * 0.5f;
-                b.Velocity += p * 0.5f;
             }
         }
 
         foreach (ref var m in movables)
         {
-            if (m.Velocity == default)
+            if (m.Velocity.LengthSquared() < VelocityEpsilonSquared)
             {
+                m.Velocity = default;
                 m.Target = null;
             }
             else
@@ -103,6 +124,7 @@ public class Move
                 if (penetration > 0)
                 {
                     normal.Normalize();
+
                     _contacts.Add(new()
                     {
                         A = i,

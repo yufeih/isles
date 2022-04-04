@@ -3,8 +3,8 @@
     { "radius": 1, "speed": 5, "target": [10,0] }
   ],
   "a-to-b-2": [
-    { "radius": 1, "speed": 5, "target": [10,0] },
-    { "radius": 1, "speed": 5, "target": [10,0] }
+    { "radius": 1, "speed": 5, "target": [5,0] },
+    { "radius": 1, "speed": 5, "target": [5,0] }
   ],
   "a-push-b": [
     { "radius": 1, "speed": 5, "target": [10,0] },
@@ -13,6 +13,11 @@
   "a-push-b-up": [
     { "radius": 1, "speed": 5, "target": [10,0] },
     { "radius": 1, "speed": 5, "position": [5,-0.5]}
+  ],
+  "a-push-bc-up": [
+    { "radius": 1, "speed": 5, "target": [10,0] },
+    { "radius": 1, "speed": 5, "position": [4,-0.5]},
+    { "radius": 1, "speed": 5, "position": [6,-0.5]}
   ],
   "a-push-b-down": [
     { "radius": 1, "speed": 5, "target": [10,0] },
