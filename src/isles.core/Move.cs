@@ -1,7 +1,6 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace Isles;
@@ -19,6 +18,9 @@ public class Move
 {
     private const float PositionEpsilonSquared = 0.01f;
     private const float VelocityEpsilonSquared = 0.01f;
+    private const float BiasFactor = 0.2f;
+    private const float AllowedPenetration = 0.01f;
+    private const int Iterations = 10;
 
     private readonly List<Contact> _contacts = new();
 
@@ -52,7 +54,6 @@ public class Move
             }
         }
 
-        const int Iterations = 10;
         for (var itr = 0; itr < Iterations; itr++)
         {
             foreach (ref readonly var c in contacts)
@@ -84,7 +85,6 @@ public class Move
             }
             else
             {
-                Debug.Assert(!float.IsNaN(m.Velocity.X) && !float.IsNaN(m.Velocity.Y));
                 m.Position += m.Velocity * timeStep;
             }
         }
@@ -92,9 +92,6 @@ public class Move
 
     private Span<Contact> FindContacts(float inverseTimeStep, ReadOnlySpan<Movable> movables)
     {
-        const float BiasFactor = 0.2f;
-        const float AllowedPenetration = 0.01f;
-
         _contacts.Clear();
         _contacts.EnsureCapacity(movables.Length);
 
