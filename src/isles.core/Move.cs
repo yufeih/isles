@@ -17,8 +17,6 @@ public struct Movable
 public class Move
 {
     private const float PositionEpsilonSquared = 0.01f;
-    private const float VelocityEpsilonSquared = 0.01f;
-    private const float Skin = 0.2f;
     private const int Iterations = 10;
 
     private readonly List<Contact> _contacts = new();
@@ -51,25 +49,21 @@ public class Move
                 ref var a = ref movables[c.A];
                 ref var b = ref movables[c.B];
 
-                if (a.Target is null && b.Target is null)
+                var dv = b.Velocity - a.Velocity;
+                var v = Vector2.Zero;
+
+                if (a.Target != null || b.Target != null)
                 {
-                    var dv = b.Velocity - a.Velocity;
-                    var v = 0.2f * c.Normal * c.Penetration * idt;
-                    var p = v - dv;
-                    a.Velocity -= p * 0.5f;
-                    b.Velocity += p * 0.5f;
-                }
-                else
-                {
-                    var dv = b.Velocity - a.Velocity;
                     var speed = dv.Length();
-                    var v = Cross(dv, c.Normal) > 0
+                    v = Cross(dv, c.Normal) > 0
                         ? new Vector2(c.Normal.Y, -c.Normal.X) * speed
                         : new Vector2(-c.Normal.Y, c.Normal.X) * speed;
-                    var p = v - dv + 0.2f * c.Normal * c.Penetration * idt;
-                    a.Velocity -= p * 0.5f;
-                    b.Velocity += p * 0.5f;
                 }
+
+                var p = v - dv + 0.2f * c.Normal * c.Penetration * idt;
+
+                a.Velocity -= p * 0.5f;
+                b.Velocity += p * 0.5f;
             }
         }
 
