@@ -18,21 +18,19 @@ public class Move
 {
     private const float PositionEpsilonSquared = 0.01f;
     private const float VelocityEpsilonSquared = 0.01f;
-    private const float BiasFactor = 0.2f;
-    private const float AllowedPenetration = 0.01f;
+    private const float Skin = 0.2f;
     private const int Iterations = 10;
 
     private readonly List<Contact> _contacts = new();
 
-    public void Update(float timeStep, Span<Movable> movables)
+    public void Update(float dt, Span<Movable> movables)
     {
-        var inverseTimeStep = 1.0f / timeStep;
-        var contacts = FindContacts(inverseTimeStep, movables);
+        var idt = 1.0f / dt;
+        var contacts = FindContacts(idt, movables);
 
         for (var i = 0; i < movables.Length; i++)
         {
             ref var m = ref movables[i];
-
             if (m.Target is null)
             {
                 m.Velocity = default;
@@ -40,17 +38,9 @@ public class Move
             else
             {
                 var v = m.Target.Value - m.Position;
-
-                if (v.LengthSquared() <= PositionEpsilonSquared)
-                {
-                    m.Velocity = default;
-                }
-                else
-                {
-                    v.Normalize();
-                    v *= m.Speed;
-                    m.Velocity = v;
-                }
+                m.Velocity = v.LengthSquared() <= PositionEpsilonSquared
+                    ? default
+                    : Vector2.Normalize(v) * m.Speed;
             }
         }
 
@@ -58,21 +48,21 @@ public class Move
         {
             foreach (ref readonly var c in contacts)
             {
-                movables[c.A].Velocity -= c.Impulse;
-                movables[c.B].Velocity += c.Impulse;
-            }
+                ref var a = ref movables[c.A];
+                ref var b = ref movables[c.B];
 
-            foreach (ref var m in movables)
-            {
-                var v = m.Velocity;
-                if (v.LengthSquared() < VelocityEpsilonSquared)
+                if (a.Target is null && b.Target is null)
                 {
-                    m.Velocity = default;
+                    var dv = b.Velocity - a.Velocity;
+                    var dpn = Vector2.Dot(-dv, c.Normal);
+                    var pn = Math.Max(dpn, 0);
+                    a.Velocity -= pn * c.Normal;
+                    b.Velocity += pn * c.Normal;
                 }
                 else
                 {
-                    v.Normalize();
-                    m.Velocity = v * m.Speed;
+                    a.Velocity -= c.Normal * c.Lerp * idt;
+                    b.Velocity += c.Normal * c.Lerp * idt;
                 }
             }
         }
@@ -85,12 +75,12 @@ public class Move
             }
             else
             {
-                m.Position += m.Velocity * timeStep;
+                m.Position += m.Velocity * dt;
             }
         }
     }
 
-    private Span<Contact> FindContacts(float inverseTimeStep, ReadOnlySpan<Movable> movables)
+    private Span<Contact> FindContacts(float idt, ReadOnlySpan<Movable> movables)
     {
         _contacts.Clear();
         _contacts.EnsureCapacity(movables.Length);
@@ -104,18 +94,17 @@ public class Move
 
                 var normal = b.Position - a.Position;
                 var distanceSq = normal.LengthSquared();
-                if (distanceSq < PositionEpsilonSquared)
-                {
-                    continue;
-                }
-
                 var penetration = a.Radius + b.Radius - MathF.Sqrt(distanceSq);
                 if (penetration > 0)
                 {
                     normal.Normalize();
-                    var bias = BiasFactor * inverseTimeStep * Math.Max(0.0f, penetration - AllowedPenetration);
-
-                    _contacts.Add(new() { A = i, B = j, Impulse = normal * bias });
+                    _contacts.Add(new()
+                    {
+                        A = i,
+                        B = j,
+                        Lerp = Math.Min(1, penetration / Skin),
+                        Normal = float.IsNaN(normal.X) ? Vector2.One : normal
+                    });
                 }
             }
         }
@@ -127,6 +116,7 @@ public class Move
     {
         public int A;
         public int B;
-        public Vector2 Impulse;
+        public float Lerp;
+        public Vector2 Normal;
     }
 }
