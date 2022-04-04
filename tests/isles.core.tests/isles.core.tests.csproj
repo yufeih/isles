@@ -6,6 +6,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Using Include="Isles" />
+    <Using Include="Microsoft.Xna.Framework" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="data\**" LinkBase="data" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../../src/isles.core/isles.core.csproj" />
   </ItemGroup>
 
