@@ -25,7 +25,7 @@ public class Move
     public void Update(float dt, Span<Movable> movables)
     {
         var idt = 1.0f / dt;
-        var contacts = FindContacts(idt, movables);
+        var contacts = FindContacts(movables);
 
         for (var i = 0; i < movables.Length; i++)
         {
@@ -106,7 +106,7 @@ public class Move
         return a.X * b.Y - b.X * a.Y;
     }
 
-    private Span<Contact> FindContacts(float idt, ReadOnlySpan<Movable> movables)
+    private Span<Contact> FindContacts(ReadOnlySpan<Movable> movables)
     {
         _contacts.Clear();
         _contacts.EnsureCapacity(movables.Length);
