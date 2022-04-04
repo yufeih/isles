@@ -1,0 +1,6 @@
+<svg viewBox="-1 -1 2 2" xmlns="http://www.w3.org/2000/svg">
+  <circle r="1" cx="0" cy="0" fill="#1A8AF5">
+    <animate attributeName="cx" dur="1.0166664s" repeatCount="indefinite" calcMode="discrete" values="0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0" />
+    <animate attributeName="cy" dur="1.0166664s" repeatCount="indefinite" calcMode="discrete" values="0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0" />
+  </circle>
+</svg>

@@ -1,32 +1,48 @@
 {
-  "atob": [
-    { "radius": 1, "speed": 10, "target": [10,0] }
+  "a-to-b": [
+    { "radius": 1, "speed": 5, "target": [10,0] }
+  ],
+  "a-to-b-2": [
+    { "radius": 1, "speed": 5, "target": [10,0] },
+    { "radius": 1, "speed": 5, "target": [10,0] }
+  ],
+  "a-push-b": [
+    { "radius": 1, "speed": 5, "target": [10,0] },
+    { "radius": 1, "speed": 1, "position": [4,0] }
+  ],
+  "a-push-b-up": [
+    { "radius": 1, "speed": 5, "target": [10,0] },
+    { "radius": 1, "speed": 5, "position": [5,-0.5]}
+  ],
+  "a-push-b-down": [
+    { "radius": 1, "speed": 5, "target": [10,0] },
+    { "radius": 1, "speed": 5, "position": [5,0.5]}
   ],
   "pingpong": [
-    { "radius": 1, "speed": 10, "position": [0,0.5], "target": [10,-0.5] },
-    { "radius": 1, "speed": 10, "position": [10,-0.5], "target": [0,0.5] }
+    { "radius": 1, "speed": 5, "position": [0,0.5], "target": [10,-0.5] },
+    { "radius": 1, "speed": 5, "position": [10,-0.5], "target": [0,0.5] }
   ],
   "overlap-exact": [
-    { "radius": 1, "speed": 10 },
-    { "radius": 1, "speed": 10 }
+    { "radius": 1, "speed": 5 },
+    { "radius": 1, "speed": 5 }
   ],
   "overlap": [
-    { "radius": 1, "speed": 10 },
-    { "radius": 1, "speed": 10, "position": [0.1,0] }
+    { "radius": 1, "speed": 5 },
+    { "radius": 1, "speed": 5, "position": [0.1,0] }
   ],
   "spawn": [
-    { "radius": 1, "speed": 10, "position": [0.1,0.9] },
-    { "radius": 1, "speed": 10, "position": [0.3,0.2] },
-    { "radius": 1, "speed": 10, "position": [0.5,0.0] },
-    { "radius": 1, "speed": 10, "position": [0.7,0.8] },
-    { "radius": 1, "speed": 10, "position": [0.6,0.4] }
+    { "radius": 1, "speed": 5, "position": [0.1,0.9] },
+    { "radius": 1, "speed": 5, "position": [0.3,0.2] },
+    { "radius": 1, "speed": 5, "position": [0.5,0.0] },
+    { "radius": 1, "speed": 5, "position": [0.7,0.8] },
+    { "radius": 1, "speed": 5, "position": [0.6,0.4] }
   ],
   "passthrough": [
-    { "radius": 1, "speed": 10, "position": [-10,0], "target": [10,0] },
-    { "radius": 1, "speed": 10, "position": [0.1,0.9] },
-    { "radius": 1, "speed": 10, "position": [0.3,0.2] },
-    { "radius": 1, "speed": 10, "position": [0.5,0.0] },
-    { "radius": 1, "speed": 10, "position": [0.7,0.8] },
-    { "radius": 1, "speed": 10, "position": [0.6,0.4] }
+    { "radius": 1, "speed": 5, "position": [-10,0], "target": [10,0] },
+    { "radius": 1, "speed": 5, "position": [0.1,0.9] },
+    { "radius": 1, "speed": 5, "position": [0.3,0.2] },
+    { "radius": 1, "speed": 5, "position": [0.5,0.0] },
+    { "radius": 1, "speed": 5, "position": [0.7,0.8] },
+    { "radius": 1, "speed": 5, "position": [0.6,0.4] }
   ]
 }

@@ -54,15 +54,21 @@ public class Move
                 if (a.Target is null && b.Target is null)
                 {
                     var dv = b.Velocity - a.Velocity;
-                    var dpn = Vector2.Dot(-dv, c.Normal);
-                    var pn = Math.Max(dpn, 0);
-                    a.Velocity -= pn * c.Normal;
-                    b.Velocity += pn * c.Normal;
+                    var v = 0.2f * c.Normal * c.Penetration * idt;
+                    var p = v - dv;
+                    a.Velocity -= p * 0.5f;
+                    b.Velocity += p * 0.5f;
                 }
                 else
                 {
-                    a.Velocity -= c.Normal * c.Lerp * idt;
-                    b.Velocity += c.Normal * c.Lerp * idt;
+                    var dv = b.Velocity - a.Velocity;
+                    var speed = dv.Length();
+                    var v = Cross(dv, c.Normal) > 0
+                        ? new Vector2(c.Normal.Y, -c.Normal.X) * speed
+                        : new Vector2(-c.Normal.Y, c.Normal.X) * speed;
+                    var p = v - dv + 0.2f * c.Normal * c.Penetration * idt;
+                    a.Velocity -= p * 0.5f;
+                    b.Velocity += p * 0.5f;
                 }
             }
         }
@@ -78,6 +84,11 @@ public class Move
                 m.Position += m.Velocity * dt;
             }
         }
+    }
+
+    private static float Cross(Vector2 a, Vector2 b)
+    {
+        return a.X * b.Y - b.X * a.Y;
     }
 
     private Span<Contact> FindContacts(float idt, ReadOnlySpan<Movable> movables)
@@ -102,8 +113,8 @@ public class Move
                     {
                         A = i,
                         B = j,
-                        Lerp = Math.Min(1, penetration / Skin),
-                        Normal = float.IsNaN(normal.X) ? Vector2.One : normal
+                        Penetration = penetration,
+                        Normal = float.IsNaN(normal.X) ? Vector2.UnitX : normal
                     });
                 }
             }
@@ -116,7 +127,7 @@ public class Move
     {
         public int A;
         public int B;
-        public float Lerp;
+        public float Penetration;
         public Vector2 Normal;
     }
 }
