@@ -7,6 +7,14 @@ namespace Isles;
 
 public record PathGrid(int Width, int Height, float Step, BitArray Bits)
 {
+    public (int x, int y) GetPoint(Vector2 position)
+    {
+        var x = Math.Min(Width - 1, Math.Max(0, (int)(position.X / Step)));
+        var y = Math.Min(Height - 1, Math.Max(0, (int)(position.Y / Step)));
+
+        return (x, y);
+    }
+
     public int GetIndex(Vector2 position)
     {
         var x = Math.Min(Width - 1, Math.Max(0, (int)(position.X / Step)));

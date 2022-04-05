@@ -45,20 +45,17 @@ public class SvgBuilder
         _lineSegments.Add((lineSegments, width));
     }
 
-    public void AddGrid(int width, int height, float step = 1, BitArray? bits = null)
+    public void AddGrid(PathGrid grid)
     {
-        _grids.Add((width, height, step));
+        _grids.Add((grid.Width, grid.Height, grid.Step));
 
-        if (bits != null)
+        for (var i = 0; i < grid.Bits.Length; i++)
         {
-            for (var i = 0; i < bits.Length; i++)
+            if (grid.Bits[i])
             {
-                if (bits[i])
-                {
-                    var x = i % width;
-                    var y = i / width;
-                    AddRectangle(x * step, y * step, step, step, "#aaa");
-                }
+                var x = i % grid.Width;
+                var y = i / grid.Width;
+                AddRectangle(x * grid.Step, y * grid.Step, grid.Step, grid.Step, "#aaa");
             }
         }
     }

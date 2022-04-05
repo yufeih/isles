@@ -16,8 +16,9 @@ public class MoveTests
     {
         var duration = 0.0f;
         var timeStep = 1.0f / 60;
-        var testSchema = new { units = Array.Empty<Movable>(), grid = 0 };
+        var testSchema = new { units = Array.Empty<Movable>(), grid = Array.Empty<int>() };
         var test = JsonHelper.DeserializeAnonymousType(json, testSchema)!;
+        var grid = test.grid != null ? CreateGrid(test.grid) : null;
         var positions = Array.ConvertAll(test.units, m => new List<Vector2> { m.Position });
 
         foreach (var m in test.units)
@@ -27,7 +28,7 @@ public class MoveTests
 
         while (duration < 4)
         {
-            _move.Update(timeStep, test.units);
+            _move.Update(timeStep, test.units, grid);
             duration += timeStep;
 
             var running = false;
@@ -59,18 +60,19 @@ public class MoveTests
             }
         }
 
-        if (test.grid != 0)
+        if (grid != null)
         {
-            var random = new Random(test.grid);
-            var bits = new System.Collections.BitArray(10 * 10);
-            for (var i = 0; i < 10; i++)
-            {
-                bits[random.Next(bits.Length)] = true;
-            }
-            _svg.AddGrid(10, 10, 1, bits);
+            _svg.AddGrid(grid);
         }
 
         _svg.Snapshot($"move/{name}.svg", duration);
+    }
+
+    private static PathGrid CreateGrid(int[] grid)
+    {
+        var size = (int)Math.Sqrt(grid.Length);
+        var bits = new System.Collections.BitArray(grid.Select(g => g != 0).ToArray());
+        return new(size, size, 10, bits);
     }
 
     private static TheoryData<string, string> LoadTestCases()

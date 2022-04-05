@@ -21,11 +21,13 @@ public class Move
     private const float Bias = 0.5f;
 
     private readonly List<Contact> _contacts = new();
+    private readonly List<GridContact> _gridContacts = new();
 
-    public void Update(float dt, Span<Movable> movables)
+    public void Update(float dt, Span<Movable> movables, PathGrid? grid = null)
     {
         var idt = 1.0f / dt;
         var contacts = FindContacts(movables);
+        var gridContacts = grid != null ? FindGridContacts(grid, movables) : stackalloc GridContact[0];
 
         for (var i = 0; i < movables.Length; i++)
         {
@@ -43,6 +45,26 @@ public class Move
             }
         }
 
+        UpdateContacts(idt, movables, contacts);
+
+        UpdateGridContacts(idt, movables, gridContacts);
+
+        foreach (ref var m in movables)
+        {
+            if (m.Velocity.LengthSquared() < VelocityEpsilonSquared)
+            {
+                m.Velocity = default;
+                m.Target = null;
+            }
+            else
+            {
+                m.Position += m.Velocity * dt;
+            }
+        }
+    }
+
+    private static void UpdateContacts(float idt, Span<Movable> movables, ReadOnlySpan<Contact> contacts)
+    {
         foreach (ref readonly var c in contacts)
         {
             ref var a = ref movables[c.A];
@@ -86,17 +108,27 @@ public class Move
                 }
             }
         }
+    }
 
-        foreach (ref var m in movables)
+    private static void UpdateGridContacts(float idt, Span<Movable> movables, ReadOnlySpan<GridContact> contacts)
+    {
+        foreach (ref readonly var c in contacts)
         {
-            if (m.Velocity.LengthSquared() < VelocityEpsilonSquared)
+            ref var m = ref movables[c.Index];
+
+            var impulse = Bias * c.Normal * c.Penetration * idt;
+
+            if (m.Target is null)
             {
-                m.Velocity = default;
-                m.Target = null;
+                m.Velocity += impulse;
             }
             else
             {
-                m.Position += m.Velocity * dt;
+                var perpendicular = Cross(m.Velocity, c.Normal) > 0
+                    ? new Vector2(c.Normal.Y, -c.Normal.X)
+                    : new Vector2(-c.Normal.Y, c.Normal.X);
+
+                m.Velocity = perpendicular * m.Speed + impulse;
             }
         }
     }
@@ -106,7 +138,7 @@ public class Move
         return a.X * b.Y - b.X * a.Y;
     }
 
-    private Span<Contact> FindContacts(ReadOnlySpan<Movable> movables)
+    private ReadOnlySpan<Contact> FindContacts(ReadOnlySpan<Movable> movables)
     {
         _contacts.Clear();
         _contacts.EnsureCapacity(movables.Length);
@@ -139,11 +171,99 @@ public class Move
         return CollectionsMarshal.AsSpan(_contacts);
     }
 
+
+    private ReadOnlySpan<GridContact> FindGridContacts(PathGrid grid, ReadOnlySpan<Movable> movables)
+    {
+        _gridContacts.Clear();
+        _gridContacts.EnsureCapacity(movables.Length);
+
+        // 0 --
+        // |   |
+        //  -- 1
+        for (var i = 0; i < movables.Length; i++)
+        {
+            ref readonly var m = ref movables[i];
+
+            var p0 = new Vector2(m.Position.X - m.Radius, m.Position.Y - m.Radius);
+            var p1 = new Vector2(m.Position.X + m.Radius, m.Position.Y + m.Radius);
+
+            var gp0 = grid.GetPoint(p0);
+            var gp1 = grid.GetPoint(p1);
+
+            // left wall
+            for (var yy = gp0.y; yy <= gp1.y; yy++)
+            {
+                if (grid.Bits[gp1.x + yy * grid.Width])
+                {
+                    var penetration = p1.X - gp1.x * grid.Step;
+                    if (penetration > 0 && penetration < m.Radius)
+                    {
+                        _gridContacts.Add(new() { Index = i, Normal = -Vector2.UnitX, Penetration = penetration });
+                        goto next;
+                    }
+                }
+            }
+
+            // right wall
+            for (var yy = gp0.y; yy <= gp1.y; yy++)
+            {
+                if (grid.Bits[gp0.x + yy * grid.Width])
+                {
+                    var penetration = (gp0.x + 1) * grid.Step - p0.X;
+                    if (penetration > 0 && penetration < m.Radius)
+                    {
+                        _gridContacts.Add(new() { Index = i, Normal = Vector2.UnitX, Penetration = penetration });
+                        goto next;
+                    }
+                }
+            }
+
+            // upper wall
+            for (var xx = gp0.x; xx <= gp1.x; xx++)
+            {
+                if (grid.Bits[xx + gp1.y * grid.Width])
+                {
+                    var penetration = p1.Y - gp1.y * grid.Step;
+                    if (penetration > 0 && penetration < m.Radius)
+                    {
+                        _gridContacts.Add(new() { Index = i, Normal = -Vector2.UnitY, Penetration = penetration });
+                        goto next;
+                    }
+                }
+            }
+
+            // down wall
+            for (var xx = gp0.x; xx <= gp1.x; xx++)
+            {
+                if (grid.Bits[xx + gp0.y * grid.Width])
+                {
+                    var penetration = (gp0.y + 1) * grid.Step - p0.Y;
+                    if (penetration > 0 && penetration < m.Radius)
+                    {
+                        _gridContacts.Add(new() { Index = i, Normal = Vector2.UnitY, Penetration = penetration });
+                        goto next;
+                    }
+                }
+            }
+next:
+            continue;
+        }
+
+        return CollectionsMarshal.AsSpan(_gridContacts);
+    }
+
     struct Contact
     {
         public int A;
         public int B;
         public float Penetration;
         public Vector2 Normal;
+    }
+
+    struct GridContact
+    {
+        public int Index;
+        public Vector2 Normal;
+        public float Penetration;
     }
 }
