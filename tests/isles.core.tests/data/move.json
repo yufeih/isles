@@ -71,5 +71,9 @@
       { "radius": 1, "speed": 5, "position": [0.7,0.8] },
       { "radius": 1, "speed": 5, "position": [0.6,0.4] }
     ]
+  },
+  "grid": {
+      "grid": 12345,
+      "units": []
   }
 }

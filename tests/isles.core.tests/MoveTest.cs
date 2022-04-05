@@ -16,7 +16,7 @@ public class MoveTests
     {
         var duration = 0.0f;
         var timeStep = 1.0f / 60;
-        var testSchema = new { units = Array.Empty<Movable>(), grid = new { } };
+        var testSchema = new { units = Array.Empty<Movable>(), grid = 0 };
         var test = JsonHelper.DeserializeAnonymousType(json, testSchema)!;
         var positions = Array.ConvertAll(test.units, m => new List<Vector2> { m.Position });
 
@@ -58,11 +58,18 @@ public class MoveTests
                 _svg.SetCircleData(i, "speed", string.Join(", ", speeds));
             }
         }
-        
-        var bits = new System.Collections.BitArray(10 * 10);
-        bits[0] = true;
-        bits[2] = true;
-        _svg.AddGrid(10, 10, 1, bits);
+
+        if (test.grid != 0)
+        {
+            var random = new Random(test.grid);
+            var bits = new System.Collections.BitArray(10 * 10);
+            for (var i = 0; i < 10; i++)
+            {
+                bits[random.Next(bits.Length)] = true;
+            }
+            _svg.AddGrid(10, 10, 1, bits);
+        }
+
         _svg.Snapshot($"move/{name}.svg", duration);
     }
 
