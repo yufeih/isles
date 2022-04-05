@@ -62,12 +62,12 @@ public class GraphSearchAStar
     /// For a given node index, the value at that index is the parent
     /// (or the previous step) index.
     /// </summary>
-    private int[] path;
+    private int[] path = default!;
 
     /// <summary>
     /// Contains the real accumulative cost to that node.
     /// </summary>
-    private float[] costs;
+    private float[] costs = default!;
 
     /// <summary>
     /// Current length of path or costs (Node count).
@@ -77,7 +77,7 @@ public class GraphSearchAStar
     /// <summary>
     /// Create an priority queue to store node indices.
     /// </summary>
-    private IndexedPriorityQueue queue;
+    private IndexedPriorityQueue queue = default!;
 
     /// <summary>
     /// Reset GraphSearch state.

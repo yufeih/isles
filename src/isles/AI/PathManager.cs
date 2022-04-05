@@ -660,7 +660,7 @@ public class PathManager
     /// <summary>
     /// Graph search.
     /// </summary>
-    private readonly GraphSearchAStar search;
+    private readonly GraphSearchAStar search = new();
 
     /// <summary>
     /// Gets the detailed path graph used for searching.
@@ -957,9 +957,6 @@ public class PathManager
 
         // Create a new graph
         Graph = new PathGraph(landscape, Resolution, occluders);
-
-        // Create a new graph searcher
-        search = new GraphSearchAStar();
     }
 
     public void Mark(IMovable agent)

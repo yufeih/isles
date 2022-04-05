@@ -13,6 +13,7 @@ public class SvgBuilder
     private readonly Random _random = new(0);
     private readonly List<(float x, float y, float r, List<(float x, float y)> animations, Dictionary<string, string> data)> _circles = new();
     private readonly List<(float x, float y, float w, float h, string? color)> _rectangles = new();
+    private readonly List<(Vector2[] lines, float w)> _lineSegments = new();
     private readonly List<(int w, int h, float step)> _grids = new();
 
     public void AddCircle(float x, float y, float radius)
@@ -35,6 +36,15 @@ public class SvgBuilder
         _rectangles.Add((x, y, w, h, color));
     }
 
+    public void AddLineSegments(Vector2[] lineSegments, float width)
+    {
+        if (lineSegments.Length <= 1)
+        {
+            return;
+        }
+        _lineSegments.Add((lineSegments, width));
+    }
+
     public void AddGrid(int width, int height, float step = 1, BitArray? bits = null)
     {
         _grids.Add((width, height, step));
@@ -53,7 +63,7 @@ public class SvgBuilder
         }
     }
 
-    public void Snapshot(string name, float duration)
+    public void Snapshot(string name, float duration = default)
     {
         var path = Path.Combine(s_baseDirectory, "tests", "snapshots", name);
         var expected = File.Exists(path) ? File.ReadAllText(path) : null;
@@ -94,6 +104,17 @@ public class SvgBuilder
         var viewBox = ComputeViewBox();
         xml.WriteAttributeString("viewBox", $"{viewBox.x} {viewBox.y} {viewBox.w} {viewBox.h}");
 
+        foreach (var (w, h, step) in _grids)
+        {
+            xml.WriteStartElement("path");
+            xml.WriteAttributeString("stroke", "#ccc");
+            xml.WriteAttributeString("stroke-width", $"{step / 100f}");
+            var hLines = string.Join(" ", Enumerable.Range(0, h + 1).Select(i => $"M {0},{step * i} h {step * w}"));
+            var vLines = string.Join(" ", Enumerable.Range(0, w + 1).Select(i => $"M {step * i},{0} v {step * h}"));
+            xml.WriteAttributeString("d", $"{hLines} {vLines}");
+            xml.WriteEndElement();
+        }
+
         foreach (var (x, y, r, animations, data) in _circles)
         {
             xml.WriteStartElement("circle");
@@ -128,17 +149,6 @@ public class SvgBuilder
             xml.WriteEndElement();
         }
 
-        foreach (var (w, h, step) in _grids)
-        {
-            xml.WriteStartElement("path");
-            xml.WriteAttributeString("stroke", "#ccc");
-            xml.WriteAttributeString("stroke-width", $"{step / 100f}");
-            var hLines = string.Join(" ", Enumerable.Range(0, h + 1).Select(i => $"M {0},{step * i} h {step * w}"));
-            var vLines = string.Join(" ", Enumerable.Range(0, w + 1).Select(i => $"M {step * i},{0} v {step * h}"));
-            xml.WriteAttributeString("d", $"{hLines} {vLines}");
-            xml.WriteEndElement();
-        }
-
         foreach (var (x, y, w, h, color) in _rectangles)
         {
             xml.WriteStartElement("rect");
@@ -147,6 +157,17 @@ public class SvgBuilder
             xml.WriteAttributeString("width", w.ToString());
             xml.WriteAttributeString("height", h.ToString());
             xml.WriteAttributeString("fill", color ?? NextColor());
+            xml.WriteEndElement();
+        }
+
+        foreach (var (lines, width) in _lineSegments)
+        {
+            xml.WriteStartElement("path");
+            xml.WriteAttributeString("fill", "none");
+            xml.WriteAttributeString("stroke", NextColor());
+            xml.WriteAttributeString("stroke-width", width.ToString());
+            var value = string.Join(" ", lines.Skip(1).Select(i => $"L {i.X},{i.Y}"));
+            xml.WriteAttributeString("d", $"M {lines[0].X},{lines[0].Y} {value}");
             xml.WriteEndElement();
         }
 
