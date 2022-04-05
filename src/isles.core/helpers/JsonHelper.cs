@@ -14,6 +14,9 @@ public static class JsonHelper
         PropertyNameCaseInsensitive = true,
     };
 
+    public static T? DeserializeAnonymousType<T>(string json, T _)
+        => JsonSerializer.Deserialize<T>(json, Options);
+
     public static T? DeserializeAnonymousType<T>(byte[] utf8Json, T _)
         => JsonSerializer.Deserialize<T>(utf8Json, Options);
 

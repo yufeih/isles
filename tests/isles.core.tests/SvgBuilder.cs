@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Text;
 using System.Xml;
 using Xunit;
@@ -9,8 +10,10 @@ public class SvgBuilder
     private static readonly bool s_isCI = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CI"));
     private static readonly string s_baseDirectory = FindRepositoryRoot();
 
+    private readonly Random _random = new(0);
     private readonly List<(float x, float y, float r, List<(float x, float y)> animations, Dictionary<string, string> data)> _circles = new();
-    private readonly List<(float x, float y, float w, float h)> _rectangles = new();
+    private readonly List<(float x, float y, float w, float h, string? color)> _rectangles = new();
+    private readonly List<(int w, int h, float step)> _grids = new();
 
     public void AddCircle(float x, float y, float radius)
     {
@@ -27,9 +30,27 @@ public class SvgBuilder
         _circles[index].data[key] = value;
     }
 
-    public void AddRectangle(float x, float y, float w, float h)
+    public void AddRectangle(float x, float y, float w, float h, string? color = null)
     {
-        _rectangles.Add((x, y, w, h));
+        _rectangles.Add((x, y, w, h, color));
+    }
+
+    public void AddGrid(int width, int height, float step = 1, BitArray? bits = null)
+    {
+        _grids.Add((width, height, step));
+
+        if (bits != null)
+        {
+            for (var i = 0; i < bits.Length; i++)
+            {
+                if (bits[i])
+                {
+                    var x = i % width;
+                    var y = i / width;
+                    AddRectangle(x * step, y * step, step, step, "#aaa");
+                }
+            }
+        }
     }
 
     public void Snapshot(string name, float duration)
@@ -70,7 +91,6 @@ public class SvgBuilder
         using var xml = XmlWriter.Create(new StringWriter(sb), new() { Indent = true, OmitXmlDeclaration = true });
         xml.WriteStartElement("svg", ns: "http://www.w3.org/2000/svg");
 
-        var random = new Random(0);
         var viewBox = ComputeViewBox();
         xml.WriteAttributeString("viewBox", $"{viewBox.x} {viewBox.y} {viewBox.w} {viewBox.h}");
 
@@ -80,7 +100,7 @@ public class SvgBuilder
             xml.WriteAttributeString("r", r.ToString());
             xml.WriteAttributeString("cx", x.ToString());
             xml.WriteAttributeString("cy", y.ToString());
-            xml.WriteAttributeString("fill", $"#{Convert.ToHexString(BitConverter.GetBytes(random.Next()), 0, 3)}");
+            xml.WriteAttributeString("fill", NextColor());
 
             foreach (var (key, value) in data)
             {
@@ -108,14 +128,25 @@ public class SvgBuilder
             xml.WriteEndElement();
         }
 
-        foreach (var (x, y, w, h) in _rectangles)
+        foreach (var (w, h, step) in _grids)
+        {
+            xml.WriteStartElement("path");
+            xml.WriteAttributeString("stroke", "#ccc");
+            xml.WriteAttributeString("stroke-width", $"{step / 100f}");
+            var hLines = string.Join(" ", Enumerable.Range(0, h + 1).Select(i => $"M {0},{step * i} h {step * w}"));
+            var vLines = string.Join(" ", Enumerable.Range(0, w + 1).Select(i => $"M {step * i},{0} v {step * h}"));
+            xml.WriteAttributeString("d", $"{hLines} {vLines}");
+            xml.WriteEndElement();
+        }
+
+        foreach (var (x, y, w, h, color) in _rectangles)
         {
             xml.WriteStartElement("rect");
             xml.WriteAttributeString("x", x.ToString());
             xml.WriteAttributeString("y", y.ToString());
             xml.WriteAttributeString("width", w.ToString());
             xml.WriteAttributeString("height", h.ToString());
-            xml.WriteAttributeString("fill", $"#{Convert.ToHexString(BitConverter.GetBytes(random.Next()), 0, 3)}");
+            xml.WriteAttributeString("fill", color ?? NextColor());
             xml.WriteEndElement();
         }
 
@@ -129,11 +160,13 @@ public class SvgBuilder
     {
         var x = _circles.Select(c => c.x).Concat(
             _circles.SelectMany(c => c.animations.Select(a => a.x))).Concat(
-            _rectangles.SelectMany(r => new[] { r.x, r.x + r.w }));
+            _rectangles.SelectMany(r => new[] { r.x, r.x + r.w })).Concat(
+            _grids.SelectMany(g => new[]{ 0, g.w * g.step }));
 
         var y = _circles.Select(c => c.y).Concat(
             _circles.SelectMany(c => c.animations.Select(a => a.y))).Concat(
-            _rectangles.SelectMany(r => new[] { r.y, r.y + r.h }));
+            _rectangles.SelectMany(r => new[] { r.y, r.y + r.h })).Concat(
+            _grids.SelectMany(g => new[]{ 0, g.h * g.step }));
 
         var r = _circles.Select(c => c.r).DefaultIfEmpty().Max();
 
@@ -153,5 +186,10 @@ public class SvgBuilder
             directory = Path.GetDirectoryName(directory);
         }
         return directory!;
+    }
+
+    private string NextColor()
+    {
+        return $"#{Convert.ToHexString(BitConverter.GetBytes(_random.Next()), 0, 3)}";
     }
 }

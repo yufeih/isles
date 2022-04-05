@@ -12,27 +12,28 @@ public class MoveTests
 
     [Theory]
     [MemberData(nameof(TestCases))]
-    public void MoveTest(string name, string test)
+    public void MoveTest(string name, string json)
     {
         var duration = 0.0f;
         var timeStep = 1.0f / 60;
-        var movables = JsonSerializer.Deserialize<Movable[]>(test, JsonHelper.Options)!;
-        var positions = Array.ConvertAll(movables, m => new List<Vector2> { m.Position });
+        var testSchema = new { units = Array.Empty<Movable>(), grid = 0 };
+        var test = JsonHelper.DeserializeAnonymousType(json, testSchema)!;
+        var positions = Array.ConvertAll(test.units, m => new List<Vector2> { m.Position });
 
-        foreach (var m in movables)
+        foreach (var m in test.units)
         {
             _svg.AddCircle(m.Position.X, m.Position.Y, m.Radius);
         }
 
         while (duration < 4)
         {
-            _move.Update(timeStep, movables);
+            _move.Update(timeStep, test.units);
             duration += timeStep;
 
             var running = false;
-            for (var i = 0; i < movables.Length; i++)
+            for (var i = 0; i < test.units.Length; i++)
             {
-                ref readonly var m = ref movables[i];
+                ref readonly var m = ref test.units[i];
                 _svg.AnimateCircle(i, m.Position.X, m.Position.Y);
 
                 if (m.Velocity != default)
@@ -56,6 +57,17 @@ public class MoveTests
                 _svg.SetCircleData(i, "avg-speed", speeds.Average().ToString());
                 _svg.SetCircleData(i, "speed", string.Join(", ", speeds));
             }
+        }
+
+        if (test.grid != 0)
+        {
+            var random = new Random(test.grid);
+            var bits = new System.Collections.BitArray(10 * 10);
+            for (var i = 0; i < 10; i++)
+            {
+                bits[random.Next(bits.Length)] = true;
+            }
+            _svg.AddGrid(10, 10, 1, bits);
         }
 
         _svg.Snapshot($"move/{name}.svg", duration);

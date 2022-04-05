@@ -1,0 +1,13 @@
+<svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
+  <path stroke="#ccc" stroke-width="0.01" d="M 0,0 h 10 M 0,1 h 10 M 0,2 h 10 M 0,3 h 10 M 0,4 h 10 M 0,5 h 10 M 0,6 h 10 M 0,7 h 10 M 0,8 h 10 M 0,9 h 10 M 0,10 h 10 M 0,0 v 10 M 1,0 v 10 M 2,0 v 10 M 3,0 v 10 M 4,0 v 10 M 5,0 v 10 M 6,0 v 10 M 7,0 v 10 M 8,0 v 10 M 9,0 v 10 M 10,0 v 10" />
+  <rect x="6" y="0" width="1" height="1" fill="#aaa" />
+  <rect x="7" y="0" width="1" height="1" fill="#aaa" />
+  <rect x="6" y="1" width="1" height="1" fill="#aaa" />
+  <rect x="6" y="2" width="1" height="1" fill="#aaa" />
+  <rect x="0" y="5" width="1" height="1" fill="#aaa" />
+  <rect x="1" y="5" width="1" height="1" fill="#aaa" />
+  <rect x="3" y="7" width="1" height="1" fill="#aaa" />
+  <rect x="7" y="7" width="1" height="1" fill="#aaa" />
+  <rect x="9" y="7" width="1" height="1" fill="#aaa" />
+  <rect x="2" y="8" width="1" height="1" fill="#aaa" />
+</svg>
