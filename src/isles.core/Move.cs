@@ -21,13 +21,13 @@ public class Move
     private const float Bias = 0.5f;
 
     private readonly List<Contact> _contacts = new();
-    private readonly List<GridContact> _gridContacts = new();
+    private readonly List<EdgeContact> _edgeContacts = new();
 
     public void Update(float dt, Span<Movable> movables, PathGrid? grid = null)
     {
         var idt = 1.0f / dt;
         var contacts = FindContacts(movables);
-        var gridContacts = grid != null ? FindGridContacts(grid, movables) : stackalloc GridContact[0];
+        var edgeContacts = grid != null ? FindGridContacts(grid, movables) : stackalloc EdgeContact[0];
 
         for (var i = 0; i < movables.Length; i++)
         {
@@ -47,7 +47,7 @@ public class Move
 
         UpdateContacts(idt, movables, contacts);
 
-        UpdateGridContacts(idt, movables, gridContacts);
+        UpdateEdgeContacts(idt, movables, edgeContacts);
 
         foreach (ref var m in movables)
         {
@@ -110,7 +110,7 @@ public class Move
         }
     }
 
-    private static void UpdateGridContacts(float idt, Span<Movable> movables, ReadOnlySpan<GridContact> contacts)
+    private static void UpdateEdgeContacts(float idt, Span<Movable> movables, ReadOnlySpan<EdgeContact> contacts)
     {
         foreach (ref readonly var c in contacts)
         {
@@ -172,10 +172,10 @@ public class Move
     }
 
 
-    private ReadOnlySpan<GridContact> FindGridContacts(PathGrid grid, ReadOnlySpan<Movable> movables)
+    private ReadOnlySpan<EdgeContact> FindGridContacts(PathGrid grid, ReadOnlySpan<Movable> movables)
     {
-        _gridContacts.Clear();
-        _gridContacts.EnsureCapacity(movables.Length);
+        _edgeContacts.Clear();
+        _edgeContacts.EnsureCapacity(movables.Length);
 
         // 0 --
         // |   |
@@ -191,65 +191,71 @@ public class Move
             var gp1 = grid.GetPoint(p1);
 
             // left wall
-            for (var yy = gp0.y; yy <= gp1.y; yy++)
+            if (m.Velocity.X > 0)
             {
-                if (grid.Bits[gp1.x + yy * grid.Width])
+                for (var yy = gp0.y; yy <= gp1.y; yy++)
                 {
-                    var penetration = p1.X - gp1.x * grid.Step;
-                    if (penetration > 0 && penetration < m.Radius)
+                    if (grid.Bits[gp1.x + yy * grid.Width])
                     {
-                        _gridContacts.Add(new() { Index = i, Normal = -Vector2.UnitX, Penetration = penetration });
-                        goto next;
+                        var penetration = p1.X - gp1.x * grid.Step;
+                        if (penetration > 0)
+                        {
+                            _edgeContacts.Add(new() { Index = i, Normal = -Vector2.UnitX, Penetration = penetration });
+                        }
                     }
                 }
             }
 
             // right wall
-            for (var yy = gp0.y; yy <= gp1.y; yy++)
+            if (m.Velocity.X < 0)
             {
-                if (grid.Bits[gp0.x + yy * grid.Width])
+                for (var yy = gp0.y; yy <= gp1.y; yy++)
                 {
-                    var penetration = (gp0.x + 1) * grid.Step - p0.X;
-                    if (penetration > 0 && penetration < m.Radius)
+                    if (grid.Bits[gp0.x + yy * grid.Width])
                     {
-                        _gridContacts.Add(new() { Index = i, Normal = Vector2.UnitX, Penetration = penetration });
-                        goto next;
+                        var penetration = (gp0.x + 1) * grid.Step - p0.X;
+                        if (penetration > 0)
+                        {
+                            _edgeContacts.Add(new() { Index = i, Normal = Vector2.UnitX, Penetration = penetration });
+                        }
                     }
                 }
             }
 
             // upper wall
-            for (var xx = gp0.x; xx <= gp1.x; xx++)
+            if (m.Velocity.Y > 0)
             {
-                if (grid.Bits[xx + gp1.y * grid.Width])
+                for (var xx = gp0.x; xx <= gp1.x; xx++)
                 {
-                    var penetration = p1.Y - gp1.y * grid.Step;
-                    if (penetration > 0 && penetration < m.Radius)
+                    if (grid.Bits[xx + gp1.y * grid.Width])
                     {
-                        _gridContacts.Add(new() { Index = i, Normal = -Vector2.UnitY, Penetration = penetration });
-                        goto next;
+                        var penetration = p1.Y - gp1.y * grid.Step;
+                        if (penetration > 0)
+                        {
+                            _edgeContacts.Add(new() { Index = i, Normal = -Vector2.UnitY, Penetration = penetration });
+                        }
                     }
                 }
             }
 
             // down wall
-            for (var xx = gp0.x; xx <= gp1.x; xx++)
+            if (m.Velocity.Y < 0)
             {
-                if (grid.Bits[xx + gp0.y * grid.Width])
+                for (var xx = gp0.x; xx <= gp1.x; xx++)
                 {
-                    var penetration = (gp0.y + 1) * grid.Step - p0.Y;
-                    if (penetration > 0 && penetration < m.Radius)
+                    if (grid.Bits[xx + gp0.y * grid.Width])
                     {
-                        _gridContacts.Add(new() { Index = i, Normal = Vector2.UnitY, Penetration = penetration });
-                        goto next;
+                        var penetration = (gp0.y + 1) * grid.Step - p0.Y;
+                        if (penetration > 0)
+                        {
+                            _edgeContacts.Add(new() { Index = i, Normal = Vector2.UnitY, Penetration = penetration });
+                        }
                     }
                 }
             }
-next:
-            continue;
         }
 
-        return CollectionsMarshal.AsSpan(_gridContacts);
+        return CollectionsMarshal.AsSpan(_edgeContacts);
     }
 
     struct Contact
@@ -260,7 +266,7 @@ next:
         public Vector2 Normal;
     }
 
-    struct GridContact
+    struct EdgeContact
     {
         public int Index;
         public Vector2 Normal;
