@@ -12,7 +12,7 @@ public class PathFinderTest
         var svg = new SvgBuilder();
         var grid = CreateRandomGrid(random);
 
-        svg.AddGrid(grid.Width, grid.Height, grid.Step, grid.Bits);
+        svg.AddGrid(grid);
 
         var i = 0;
         var pathfinder = new PathFinder();

@@ -72,8 +72,30 @@
       { "radius": 1, "speed": 5, "position": [0.6,0.4] }
     ]
   },
-  "grid": {
-      "grid": 12345,
-      "units": []
+  "roundtable": {
+      "grid": [
+        0,0,0,
+        0,1,0,
+        0,0,0
+      ],
+      "units": [
+        { "radius": 2, "speed": 5, "position": [5,15], "target": [15,5] },
+        { "radius": 2, "speed": 5, "position": [15,5], "target": [25,15] },
+        { "radius": 2, "speed": 5, "position": [25,15], "target": [15,25] },
+        { "radius": 2, "speed": 5, "position": [15,25], "target": [5,15] }
+      ]
+  },
+  "roundtable-reverse": {
+      "grid": [
+        0,0,0,
+        0,1,0,
+        0,0,0
+      ],
+      "units": [
+        { "radius": 2, "speed": 5, "position": [15,5], "target": [5,15] },
+        { "radius": 2, "speed": 5, "position": [25,15], "target": [15,5] },
+        { "radius": 2, "speed": 5, "position": [15,25], "target": [25,15] },
+        { "radius": 2, "speed": 5, "position": [5,15], "target": [15,25] }
+      ]
   }
 }
