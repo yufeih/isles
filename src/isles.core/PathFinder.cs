@@ -35,9 +35,9 @@ public class PathFinder
 {
     private readonly GraphSearchAStar _search = new();
 
-    public ReadOnlySpan<Vector2> FindPath(PathGrid grid, float radius, Vector2 start, Vector2 end)
+    public ReadOnlySpan<Vector2> FindPath(PathGrid grid, float pathWidth, Vector2 start, Vector2 end)
     {
-        var size = (int)MathF.Ceiling(radius * 2);
+        var size = (int)MathF.Ceiling(pathWidth / grid.Step);
         if (!_search.Search(new PathGridGraph(grid, size), grid.GetIndex(start), grid.GetIndex(end)))
         {
             return Array.Empty<Vector2>().AsSpan();

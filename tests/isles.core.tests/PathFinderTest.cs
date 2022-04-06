@@ -9,7 +9,7 @@ public class PathFinderTest
     [InlineData(1)]
     [InlineData(2)]
     [InlineData(3)]
-    public void FindPath(int gridWidth)
+    public void FindPath(int pathWidth)
     {
         var random = new Random(0);
         var svg = new SvgBuilder();
@@ -23,19 +23,19 @@ public class PathFinderTest
         {
             var path = pathfinder.FindPath(
                 grid,
-                radius: gridWidth * 0.5f,
+                pathWidth,
                 new(random.NextSingle() * grid.Width * grid.Step, random.NextSingle() * grid.Width * grid.Step),
                 new(random.NextSingle() * grid.Width * grid.Step, random.NextSingle() * grid.Width * grid.Step));
 
             if (path.Length > 0)
             {
                 i++;
-                var lines = path.ToArray().Select(p => p + Vector2.One * (gridWidth % 2 == 0 ? 0.5f : 0)).ToArray();
-                svg.AddLineSegments(lines, gridWidth, data: new() { Opacity = 0.5f });
+                var lines = path.ToArray().Select(p => p + Vector2.One * (pathWidth % 2 == 0 ? 0.5f : 0)).ToArray();
+                svg.AddLineSegments(lines, pathWidth, data: new() { Opacity = 0.5f });
             }
         }
 
-        Snapshot.Save($"move/pathfinder-{gridWidth}.svg", svg.ToString());
+        Snapshot.Save($"move/pathfinder-{pathWidth}.svg", svg.ToString());
     }
 
     private static PathGrid CreateRandomGrid(Random random, int w = 64, int h = 64, float density = 0.1f)
