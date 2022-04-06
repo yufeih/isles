@@ -34,7 +34,7 @@ public record PathGrid(int Width, int Height, float Step, BitArray Bits)
 public class PathFinder
 {
     private readonly GraphSearchAStar _search = new();
-    private readonly ArrayBuilder<Vector2> _result = new();
+    private ArrayBuilder<Vector2> _result;
 
     public ReadOnlySpan<Vector2> FindPath(PathGrid grid, float pathWidth, Vector2 start, Vector2 end)
     {

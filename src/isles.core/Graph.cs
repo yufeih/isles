@@ -31,7 +31,7 @@ public class GraphSearchAStar
     private float[] _costs = default!;
     private MinHeap _heap = default!;
 
-    private readonly ArrayBuilder<int> _result = new();
+    private ArrayBuilder<int> _result;
 
     /// <summary>
     /// Returns a list of path index from end to start.
@@ -39,9 +39,19 @@ public class GraphSearchAStar
     public ReadOnlySpan<int> Search(IGraph graph, int start, int end)
     {
         var nodeCount = graph.NodeCount;
+
+        // Ensure capacity
         if (_path is null || nodeCount > _path.Length)
         {
-            EnsureCapacity(nodeCount);
+            _path = new int[nodeCount];
+            _costs = new float[nodeCount];
+            _heap = new MinHeap(nodeCount);
+
+            // Reset path to -1
+            for (var i = 0; i < nodeCount; i++)
+            {
+                _path[i] = -1;
+            }
         }
 
         // Clear costs (path don't need to be cleared)
@@ -107,18 +117,5 @@ public class GraphSearchAStar
 
         // Finish the search
         return Array.Empty<int>();
-    }
-
-    private void EnsureCapacity(int newLength)
-    {
-        _path = new int[newLength];
-        _costs = new float[newLength];
-        _heap = new MinHeap(newLength);
-
-        // Reset path to -1
-        for (var i = 0; i < newLength; i++)
-        {
-            _path[i] = -1;
-        }
     }
 }

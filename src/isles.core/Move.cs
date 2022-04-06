@@ -18,8 +18,8 @@ public class Move
     private const float VelocityEpsilonSquared = 0.001f;
     private const float Bias = 0.5f;
 
-    private readonly ArrayBuilder<Contact> _contacts = new();
-    private readonly ArrayBuilder<EdgeContact> _edgeContacts = new();
+    private ArrayBuilder<Contact> _contacts;
+    private ArrayBuilder<EdgeContact> _edgeContacts;
 
     public void Update(float dt, Span<Movable> movables, PathGrid? grid = null)
     {
