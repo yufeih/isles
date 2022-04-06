@@ -30,7 +30,7 @@ public class PathFinderTest
             }
         }
 
-        svg.Snapshot($"pathfinder.svg");
+        Snapshot.Save($"pathfinder.svg", svg.ToString());
     }
 
     private static PathGrid CreateRandomGrid(Random random, int w = 64, int h = 64, float density = 0.2f)

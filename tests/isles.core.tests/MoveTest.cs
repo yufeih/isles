@@ -21,11 +21,6 @@ public class MoveTests
         var grid = test.grid != null ? CreateGrid(test.grid) : null;
         var positions = Array.ConvertAll(test.units, m => new List<Vector2> { m.Position });
 
-        foreach (var m in test.units)
-        {
-            _svg.AddCircle(m.Position.X, m.Position.Y, m.Radius);
-        }
-
         while (duration < 4)
         {
             _move.Update(timeStep, test.units, grid);
@@ -35,12 +30,10 @@ public class MoveTests
             for (var i = 0; i < test.units.Length; i++)
             {
                 ref readonly var m = ref test.units[i];
-                _svg.AnimateCircle(i, m.Position.X, m.Position.Y);
-
+                positions[i].Add(m.Position);
                 if (m.Velocity != default)
                 {
                     running = true;
-                    positions[i].Add(m.Position);
                 }
             }
 
@@ -52,12 +45,24 @@ public class MoveTests
 
         for (var i = 0; i < positions.Length; i++)
         {
-            var speeds = positions[i].Skip(1).Select((p, j) => (p - positions[i][j]).Length() / timeStep).ToArray();
+            var data = default(SvgData);
+            var poses = positions[i];
+            var radius = test.units[i].Radius;
+            var speeds = poses.Skip(1).Select((p, j) => (p - poses[j]).Length() / timeStep).Where(s => s != 0).ToArray();
             if (speeds.Length > 0)
             {
-                _svg.SetCircleData(i, "avg-speed", speeds.Average().ToString());
-                _svg.SetCircleData(i, "speed", string.Join(", ", speeds));
+                data = new()
+                {
+                    Attributes = new()
+                    {
+                        ["avg-speed"] = speeds.Average().ToString(),
+                        ["speed"] = string.Join(", ", speeds),
+                    },
+                    Duration = duration,
+                    Animations = poses.Select(p => (p.X, p.Y)).ToArray()
+                };
             }
+            _svg.AddCircle(poses[0].X, poses[0].Y, radius, data: data);
         }
 
         if (grid != null)
@@ -65,7 +70,7 @@ public class MoveTests
             _svg.AddGrid(grid);
         }
 
-        _svg.Snapshot($"move/{name}.svg", duration);
+        Snapshot.Save($"move/{name}.svg", _svg.ToString());
     }
 
     private static PathGrid CreateGrid(int[] grid)
