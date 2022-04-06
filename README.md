@@ -17,7 +17,7 @@ Supported platforms: _Windows_, _MacOS_, _Linux_.
 ## Build from Source
 
 Prerequisite:
-- [cmake](https://cmake.org/download/)
+- [git](https://git-scm.com/)
 - [.NET Core 6 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
 
 1. Run `git submodule update --init --recursive` to fetch all dependencies.
