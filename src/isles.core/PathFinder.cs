@@ -57,6 +57,7 @@ public class PathFinder
 
         public IEnumerable<(int to, float cost)> GetEdges(int from)
         {
+            var half = (size - 1) / 2;
             var y = Math.DivRem(from, grid.Width, out var x);
 
             foreach (var (dx, dy) in s_edges)
@@ -65,6 +66,17 @@ public class PathFinder
                 var yy = y + dy;
                 var i = xx + yy * grid.Width;
                 var valid = true;
+
+                if (dx == 0)
+                {
+                    xx -= half;
+                    yy += dy > 0 ? size - 1 - half : -half;
+                }
+                else
+                {
+                    yy -= half;
+                    xx += dx > 0 ? size - 1 - half : -half;
+                }
 
                 for (var k = 0; k < size; k++)
                 {
@@ -84,7 +96,7 @@ public class PathFinder
                     {
                         xx++;
                     }
-                    else if (dy == 0)
+                    else
                     {
                         yy++;
                     }

@@ -95,7 +95,7 @@ public class SvgBuilder
             {
                 var x = i % grid.Width;
                 var y = i / grid.Width;
-                AddRectangle(x * grid.Step, y * grid.Step, grid.Step, grid.Step, "#555");
+                AddRectangle(x * grid.Step, y * grid.Step, grid.Step, grid.Step, "#333");
             }
         }
 
