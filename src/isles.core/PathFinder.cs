@@ -35,9 +35,10 @@ public class PathFinder
 {
     private readonly GraphSearchAStar _search = new();
 
-    public ReadOnlySpan<Vector2> FindPath(PathGrid grid, Vector2 start, Vector2 end)
+    public ReadOnlySpan<Vector2> FindPath(PathGrid grid, float pathWidth, Vector2 start, Vector2 end)
     {
-        if (!_search.Search(new PathGridGraph(grid), grid.GetIndex(start), grid.GetIndex(end)))
+        var size = (int)MathF.Ceiling(pathWidth / grid.Step);
+        if (!_search.Search(new PathGridGraph(grid, size), grid.GetIndex(start), grid.GetIndex(end)))
         {
             return Array.Empty<Vector2>().AsSpan();
         }
@@ -45,57 +46,72 @@ public class PathFinder
         return _search.Path.Select(grid.GetPosition).ToArray().AsSpan();
     }
 
-    record PathGridGraph(PathGrid grid) : IGraph
+    record PathGridGraph(PathGrid grid, int size) : IGraph
     {
-        // 6  7  0
-        //   \|/
-        // 5 - - 1
-        //   /|\
-        // 4  3  2
-        private static readonly (int dx, int dy, float cost)[] s_edges = new[]
+        private static readonly (int dx, int dy)[] s_edges = new[]
         {
-            (1, -1, 1.41421356237f),
-            (1, 0, 1.0f),
-            (1, 1, 1.41421356237f),
-            (0, 1, 1.0f),
-            (-1, 1, 1.41421356237f),
-            (-1, 0, 1.0f),
-            (-1, -1, 1.41421356237f),
-            (0, -1, 1.0f),
+            (1, 0), (0, 1), (-1, 0), (0, -1),
         };
 
         public int NodeCount => grid.Width * grid.Height;
 
-        public IEnumerable<GraphEdge> GetEdges(int nodeIndex)
+        public IEnumerable<(int to, float cost)> GetEdges(int from)
         {
-            var y = Math.DivRem(nodeIndex, grid.Width, out var x);
-            if (grid.Bits[x + y * grid.Width])
-            {
-                yield break;
-            }
+            var half = (size - 1) / 2;
+            var y = Math.DivRem(from, grid.Width, out var x);
 
-            foreach (var edge in s_edges)
+            foreach (var (dx, dy) in s_edges)
             {
-                var xx = x + edge.dx;
-                var yy = y + edge.dy;
-                if (xx < 0 || xx >= grid.Width || yy < 0 || yy >= grid.Height)
-                {
-                    continue;
-                }
-
+                var xx = x + dx;
+                var yy = y + dy;
                 var i = xx + yy * grid.Width;
-                if (grid.Bits[i])
+                var valid = true;
+
+                if (dx == 0)
                 {
-                    continue;
+                    xx -= half;
+                    yy += dy > 0 ? size - 1 - half : -half;
+                }
+                else
+                {
+                    yy -= half;
+                    xx += dx > 0 ? size - 1 - half : -half;
                 }
 
-                yield return new() { From = nodeIndex, To = i, Cost = edge.cost };
+                for (var k = 0; k < size; k++)
+                {
+                    if (xx < 0 || xx >= grid.Width || yy < 0 || yy >= grid.Height)
+                    {
+                        valid = false;
+                        continue;
+                    }
+
+                    if (grid.Bits[xx + yy * grid.Width])
+                    {
+                        valid = false;
+                        continue;
+                    }
+
+                    if (dx == 0)
+                    {
+                        xx++;
+                    }
+                    else
+                    {
+                        yy++;
+                    }
+                }
+
+                if (valid)
+                {
+                    yield return (i, grid.Step);
+                }
             }
         }
 
-        public float GetHeuristicValue(int currentIndex, int endIndex)
+        public float GetHeuristicValue(int from, int to)
         {
-            return (grid.GetPosition(endIndex) - grid.GetPosition(currentIndex)).Length();
+            return (grid.GetPosition(to) - grid.GetPosition(from)).Length();
         }
     }
 }
