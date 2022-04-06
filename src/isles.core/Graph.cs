@@ -27,106 +27,49 @@ public interface IGraph
 /// </summary>
 public class GraphSearchAStar
 {
-    /// <summary>
-    /// Start, end node of the search.
-    /// </summary>
-    private int start;
+    private int[] _path = default!;
+    private float[] _costs = default!;
+    private MinHeap _heap = default!;
+
+    private readonly ArrayBuilder<int> _result = new();
 
     /// <summary>
-    /// Start, end node of the search.
+    /// Returns a list of path index from end to start.
     /// </summary>
-    private int end;
-
-    /// <summary>
-    /// A list holding the path information.
-    /// For a given node index, the value at that index is the parent
-    /// (or the previous step) index.
-    /// </summary>
-    private int[] path = default!;
-
-    /// <summary>
-    /// Contains the real accumulative cost to that node.
-    /// </summary>
-    private float[] costs = default!;
-
-    /// <summary>
-    /// Current length of path or costs (Node count).
-    /// </summary>
-    private int length;
-
-    /// <summary>
-    /// Create an priority queue to store node indices.
-    /// </summary>
-    private IndexedPriorityQueue queue = default!;
-
-    /// <summary>
-    /// Reset GraphSearch state.
-    /// </summary>
-    private void Reset(int newLength)
+    public ReadOnlySpan<int> Search(IGraph graph, int start, int end)
     {
-        if (newLength > length)
+        var nodeCount = graph.NodeCount;
+        if (_path is null || nodeCount > _path.Length)
         {
-            length = newLength;
-
-            path = new int[length];
-            costs = new float[length];
-            queue = new IndexedPriorityQueue(length);
-
-            // Reset path to -1
-            for (var i = 0; i < length; i++)
-            {
-                path[i] = -1;
-            }
+            EnsureCapacity(nodeCount);
         }
 
         // Clear costs (path don't need to be cleared)
-        for (var i = 0; i < length; i++)
-        {
-            costs[i] = 0;
-        }
-
-        // Reset the queue
-        queue.Clear();
-    }
-
-    /// <summary>
-    /// Perform a graph search on a graph, find a best path from start to end.
-    /// </summary>
-    /// <param name="graph"></param>
-    /// <param name="start"></param>
-    /// <param name="end"></param>
-    /// <returns>Whether a path has been found.</returns>
-    public bool Search(IGraph graph, int start, int end)
-    {
-        var nodeCount = graph.NodeCount;
-
-        this.start = start;
-        this.end = end;
-
-        // Validate input
-        if (nodeCount <= 0 || start < 0 || start >= nodeCount ||
-            end < 0 || end >= nodeCount)
-        {
-            throw new ArgumentOutOfRangeException();
-        }
-
-        // Reset everything
-        Reset(nodeCount);
+        Array.Clear(_costs);
 
         // Add the start node on the queue
-        queue.Add(start, 0);
+        _heap.Clear();
+        _heap.Add(start, 0);
 
         // While the queue is not empty
-        while (!queue.Empty)
+        while (!_heap.Empty)
         {
             // Get the next node with the lowest cost
             // and removes it from the queue
-            var top = queue.Pop();
+            var top = _heap.Pop();
 
             // If we reached the end, everything is done
             if (end == top)
             {
-                return true;
+                _result.Clear();
+                var i = end;
+                while (i != start && i >= 0)
+                {
+                    _result.Add(i);
+                    i = _path[i];
+                }
+                _result.Add(start);
+                return _result.AsSpan();
             }
 
             // Otherwise test all node adjacent to this one
@@ -136,55 +79,46 @@ public class GraphSearchAStar
                 var HCost = graph.GetHeuristicValue(to, end);
 
                 // Calculate the 'real' cost to this node from the source (G)
-                var GCost = costs[top] + cost;
+                var GCost = _costs[top] + cost;
 
                 // If the node is discoverted for the first time,
                 // Setup it's cost then add it to the priority queue.
-                if (queue.Index[to] < 0)
+                if (_heap.Index[to] < 0)
                 {
-                    path[to] = top;
-                    costs[to] = GCost;
+                    _path[to] = top;
+                    _costs[to] = GCost;
 
-                    queue.Add(to, GCost + HCost);
+                    _heap.Add(to, GCost + HCost);
                 }
 
                 // If the node has already been visited, but we have found a
                 // new path with a lower cost, then replace the existing path
                 // and update the cost.
-                else if (queue.Index[to] > 0 && GCost < costs[to])
+                else if (_heap.Index[to] > 0 && GCost < _costs[to])
                 {
-                    path[to] = top;
-                    costs[to] = GCost;
+                    _path[to] = top;
+                    _costs[to] = GCost;
 
                     // Reset node cost
-                    queue.IncreasePriority(to, GCost + HCost);
+                    _heap.IncreasePriority(to, GCost + HCost);
                 }
             }
         }
 
         // Finish the search
-        return false;
+        return Array.Empty<int>();
     }
 
-    /// <summary>
-    /// Gets the path from search result. The path is an array of index
-    /// to all the graph nodes on the path FROM END TO START!!!.
-    /// The path is only valid after search is called and completed.
-    /// </summary>
-    public IEnumerable<int> Path
+    private void EnsureCapacity(int newLength)
     {
-        get
+        _path = new int[newLength];
+        _costs = new float[newLength];
+        _heap = new MinHeap(newLength);
+
+        // Reset path to -1
+        for (var i = 0; i < newLength; i++)
         {
-            var i = end;
-            while (i != start && i >= 0)
-            {
-                yield return i;
-
-                i = path[i];
-            }
-
-            // Do not forget to return start
-            yield return start;
+            _path[i] = -1;
         }
     }
 }

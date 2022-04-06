@@ -1,8 +1,6 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Runtime.InteropServices;
-
 namespace Isles;
 
 public struct Movable
@@ -20,14 +18,14 @@ public class Move
     private const float VelocityEpsilonSquared = 0.001f;
     private const float Bias = 0.5f;
 
-    private readonly List<Contact> _contacts = new();
-    private readonly List<EdgeContact> _edgeContacts = new();
+    private readonly ArrayBuilder<Contact> _contacts = new();
+    private readonly ArrayBuilder<EdgeContact> _edgeContacts = new();
 
     public void Update(float dt, Span<Movable> movables, PathGrid? grid = null)
     {
         var idt = 1.0f / dt;
         var contacts = FindContacts(movables);
-        var edgeContacts = grid != null ? FindGridContacts(grid, movables) : stackalloc EdgeContact[0];
+        var edgeContacts = grid != null ? FindGridContacts(grid, movables) : Array.Empty<EdgeContact>();
 
         for (var i = 0; i < movables.Length; i++)
         {
@@ -168,7 +166,7 @@ public class Move
             }
         }
 
-        return CollectionsMarshal.AsSpan(_contacts);
+        return _contacts.AsSpan();
     }
 
 
@@ -255,7 +253,7 @@ public class Move
             }
         }
 
-        return CollectionsMarshal.AsSpan(_edgeContacts);
+        return _edgeContacts.AsSpan();
     }
 
     struct Contact
@@ -271,5 +269,5 @@ public class Move
         public int Index;
         public Vector2 Normal;
         public float Penetration;
-    }
+     }
 }
