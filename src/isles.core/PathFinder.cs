@@ -79,6 +79,15 @@ public class PathFinder
                         valid = false;
                         continue;
                     }
+
+                    if (dx == 0)
+                    {
+                        xx++;
+                    }
+                    else if (dy == 0)
+                    {
+                        yy++;
+                    }
                 }
 
                 if (valid)
