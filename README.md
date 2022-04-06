@@ -25,7 +25,3 @@ Prerequisite:
 3. Run `dotnet build` for C# only changes.
 
 > The only way to rebuild  shaders (`*.fx` files) today is using Visual Studio on Windows due to dependency on `Microsoft.HLSL.CSharpVB`.
-
-## Discussion
-
-Join this [discord channel](https://discord.gg/YBSnhhxPTK) to discuss the develop of the game.
