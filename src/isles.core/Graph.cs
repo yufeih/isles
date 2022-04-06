@@ -3,24 +3,6 @@
 
 namespace Isles;
 
-public struct GraphEdge
-{
-    /// <summary>
-    /// Gets an index representing where the edge is from.
-    /// </summary>
-    public int From;
-
-    /// <summary>
-    /// Gets an index representing where the edge leads to.
-    /// </summary>
-    public int To;
-
-    /// <summary>
-    /// Gets a non-negtive cost associated to the edge.
-    /// </summary>
-    public float Cost;
-}
-
 public interface IGraph
 {
     /// <summary>
@@ -31,15 +13,13 @@ public interface IGraph
     /// <summary>
     /// Gets all the out-going edges of a given node.
     /// </summary>
-    IEnumerable<GraphEdge> GetEdges(int nodeIndex);
+    IEnumerable<(int to, float cost)> GetEdges(int from);
 
     /// <summary>
     /// Gets the heuristic value between two nodes used in A* algorithm.
     /// </summary>
-    /// <param name="currentIndex">Index to the current node.</param>
-    /// <param name="endIndex">Index to the end/target node.</param>
     /// <returns>A heuristic value between the two nodes.</returns>
-    float GetHeuristicValue(int currentIndex, int endIndex);
+    float GetHeuristicValue(int from, int to);
 }
 
 /// <summary>
@@ -150,34 +130,34 @@ public class GraphSearchAStar
             }
 
             // Otherwise test all node adjacent to this one
-            foreach (GraphEdge edge in graph.GetEdges(top))
+            foreach (var (to, cost) in graph.GetEdges(top))
             {
                 // Calculate the heuristic cost from this node to the target (H)
-                var HCost = graph.GetHeuristicValue(edge.To, end);
+                var HCost = graph.GetHeuristicValue(to, end);
 
                 // Calculate the 'real' cost to this node from the source (G)
-                var GCost = costs[top] + edge.Cost;
+                var GCost = costs[top] + cost;
 
                 // If the node is discoverted for the first time,
                 // Setup it's cost then add it to the priority queue.
-                if (queue.Index[edge.To] < 0)
+                if (queue.Index[to] < 0)
                 {
-                    path[edge.To] = top;
-                    costs[edge.To] = GCost;
+                    path[to] = top;
+                    costs[to] = GCost;
 
-                    queue.Add(edge.To, GCost + HCost);
+                    queue.Add(to, GCost + HCost);
                 }
 
                 // If the node has already been visited, but we have found a
                 // new path with a lower cost, then replace the existing path
                 // and update the cost.
-                else if (queue.Index[edge.To] > 0 && GCost < costs[edge.To])
+                else if (queue.Index[to] > 0 && GCost < costs[to])
                 {
-                    path[edge.To] = top;
-                    costs[edge.To] = GCost;
+                    path[to] = top;
+                    costs[to] = GCost;
 
                     // Reset node cost
-                    queue.IncreasePriority(edge.To, GCost + HCost);
+                    queue.IncreasePriority(to, GCost + HCost);
                 }
             }
         }

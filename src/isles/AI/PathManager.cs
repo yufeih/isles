@@ -582,9 +582,8 @@ public class PathGraph : IGraph
     /// <summary>
     /// Gets all the out-coming edges of a given node.
     /// </summary>
-    public IEnumerable<GraphEdge> GetEdges(int nodeIndex)
+    public IEnumerable<(int to, float cost)> GetEdges(int nodeIndex)
     {
-        GraphEdge edge;
         bool connected;
         var x = nodeIndex % EntryWidth;
         var y = nodeIndex / EntryWidth;
@@ -612,11 +611,10 @@ public class PathGraph : IGraph
 
             if (connected)
             {
-                edge.From = nodeIndex;
-                edge.To = GridToIndex(x + DX8[k], y + DY8[k]);
-                edge.Cost = (DX8[k] == 0 || DY8[k] == 0) ? 10 : 14;
+                var to = GridToIndex(x + DX8[k], y + DY8[k]);
+                var cost = (DX8[k] == 0 || DY8[k] == 0) ? 10 : 14;
 
-                yield return edge;
+                yield return (to, cost);
             }
         }
     }
