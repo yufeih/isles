@@ -1404,12 +1404,12 @@ public class PathManager
             // No query now
             currentQuery = null;
 
-            if (result)
+            if (result.Length > 0)
             {
                 // Path found
                 // It turns out that entities gets stucked due to
                 // path simplification and smoothing :(
-                GraphPath path = BuildPath(search.Path, Graph, query.Obstacle, true);
+                GraphPath path = BuildPath(result, Graph, query.Obstacle, true);
 
                 // Append the destination
                 path.Edges.AddLast(new GraphPathEdge(query.Destination));
@@ -1439,7 +1439,7 @@ public class PathManager
     /// <summary>
     /// Converts from graph path (Accessed by index) to realworld path (Accessed by position).
     /// </summary>
-    private GraphPath BuildPath(IEnumerable<int> path, PathGraph graph, IMovable agent, bool simplifyPath)
+    private GraphPath BuildPath(ReadOnlySpan<int> path, PathGraph graph, IMovable agent, bool simplifyPath)
     {
         var previous = new Point();
         var resultPath = new GraphPath();

@@ -34,16 +34,14 @@ public record PathGrid(int Width, int Height, float Step, BitArray Bits)
 public class PathFinder
 {
     private readonly GraphSearchAStar _search = new();
+    private ArrayBuilder<Vector2> _result;
 
     public ReadOnlySpan<Vector2> FindPath(PathGrid grid, float pathWidth, Vector2 start, Vector2 end)
     {
         var size = (int)MathF.Ceiling(pathWidth / grid.Step);
-        if (!_search.Search(new PathGridGraph(grid, size), grid.GetIndex(start), grid.GetIndex(end)))
-        {
-            return Array.Empty<Vector2>().AsSpan();
-        }
+        var path = _search.Search(new PathGridGraph(grid, size), grid.GetIndex(start), grid.GetIndex(end));
 
-        return _search.Path.Select(grid.GetPosition).ToArray().AsSpan();
+        return _result.ConvertAll(path, grid.GetPosition);
     }
 
     record PathGridGraph(PathGrid grid, int size) : IGraph

@@ -10,24 +10,24 @@ namespace Isles;
 /// <remarks>
 /// The size of the indexed priority queue is fixed.
 /// </remarks>
-public class IndexedPriorityQueue
+internal class MinHeap
 {
     /// <summary>
     /// Internal queue elements.
     /// The first element is not used for easy index generation.
     /// </summary>
-    private readonly int[] data;
+    private readonly int[] _data;
 
     /// <summary>
     /// Keep track of the position of individual item in the heap.
     /// E.g. index[3] = 5 means that data[5] = 3.
     /// </summary>
-    private readonly int[] index;
+    private readonly int[] _index;
 
     /// <summary>
     /// Cost of each item.
     /// </summary>
-    private readonly float[] costs;
+    private readonly float[] _costs;
 
     /// <summary>
     /// Actual data length.
@@ -37,17 +37,7 @@ public class IndexedPriorityQueue
     /// <summary>
     /// Gets element index array.
     /// </summary>
-    public int[] Index => index;
-
-    /// <summary>
-    /// Gets priority queue element count.
-    /// </summary>
-    public int Count => count;
-
-    /// <summary>
-    /// Gets priority queue capacity.
-    /// </summary>
-    public int Capacity => data.Length;
+    public int[] Index => _index;
 
     /// <summary>
     /// Gets whether the queue is empty.
@@ -55,24 +45,19 @@ public class IndexedPriorityQueue
     public bool Empty => count == 0;
 
     /// <summary>
-    /// Retrive the minimun (top) element without removing it.
-    /// </summary>
-    public int Top => data[1];
-
-    /// <summary>
     /// Creates a priority queue to hold n elements.
     /// </summary>
     /// <param name="capacity"></param>
-    public IndexedPriorityQueue(int capacity)
+    public MinHeap(int capacity)
     {
         if (capacity <= 0)
         {
             throw new ArgumentOutOfRangeException();
         }
 
-        data = new int[capacity];
-        costs = new float[capacity];
-        index = new int[capacity];
+        _data = new int[capacity];
+        _costs = new float[capacity];
+        _index = new int[capacity];
 
         Clear();
     }
@@ -82,10 +67,10 @@ public class IndexedPriorityQueue
     /// </summary>
     public void Clear()
     {
-        for (var i = 0; i < costs.Length; i++)
+        for (var i = 0; i < _costs.Length; i++)
         {
-            costs[i] = 0;
-            index[i] = -1;
+            _costs[i] = 0;
+            _index[i] = -1;
         }
 
         count = 0;
@@ -103,11 +88,11 @@ public class IndexedPriorityQueue
         while (i > 0)
         {
             x = i >> 1;
-            if (x > 0 && cost < costs[x])
+            if (x > 0 && cost < _costs[x])
             {
-                costs[i] = costs[x];
-                data[i] = data[x];
-                index[data[x]] = i;
+                _costs[i] = _costs[x];
+                _data[i] = _data[x];
+                _index[_data[x]] = i;
                 i = x;
             }
             else
@@ -117,9 +102,9 @@ public class IndexedPriorityQueue
         }
 
         // Assign the new element
-        costs[i] = cost;
-        data[i] = element;
-        index[element] = i;
+        _costs[i] = cost;
+        _data[i] = element;
+        _index[element] = i;
     }
 
     /// <summary>
@@ -133,9 +118,9 @@ public class IndexedPriorityQueue
         }
 
         // Make use of the first element here
-        var top = data[1];
-        index[top] = 0;
-        FixHeap(1, count - 1, data[count], costs[count]);
+        var top = _data[1];
+        _index[top] = 0;
+        FixHeap(1, count - 1, _data[count], _costs[count]);
         count--;
         return top;
     }
@@ -148,7 +133,7 @@ public class IndexedPriorityQueue
         int x, i;
 
         // Check to see if the element is in the heap
-        i = index[element];
+        i = _index[element];
         if (i <= 0)
         {
             return;
@@ -158,11 +143,11 @@ public class IndexedPriorityQueue
         while (i > 0)
         {
             x = i >> 1;
-            if (x > 0 && cost < costs[x])
+            if (x > 0 && cost < _costs[x])
             {
-                costs[i] = costs[x];
-                data[i] = data[x];
-                index[data[x]] = i;
+                _costs[i] = _costs[x];
+                _data[i] = _data[x];
+                _index[_data[x]] = i;
                 i = x;
             }
             else
@@ -172,9 +157,9 @@ public class IndexedPriorityQueue
         }
 
         // Assign the new element
-        costs[i] = cost;
-        data[i] = element;
-        index[element] = i;
+        _costs[i] = cost;
+        _data[i] = element;
+        _index[element] = i;
     }
 
     /// <summary>
@@ -196,14 +181,14 @@ public class IndexedPriorityQueue
             }
             else
             {
-                min = x == n ? x : (costs[x] < costs[x + 1]) ? x : x + 1;
+                min = x == n ? x : (_costs[x] < _costs[x + 1]) ? x : x + 1;
             }
 
-            if (costs[min] < cost)
+            if (_costs[min] < cost)
             {
-                costs[i] = costs[min];
-                data[i] = data[min];  /* Sink if k is bigger */
-                index[data[min]] = i;
+                _costs[i] = _costs[min];
+                _data[i] = _data[min];  /* Sink if k is bigger */
+                _index[_data[min]] = i;
                 i = min;
             }
             else
@@ -212,8 +197,8 @@ public class IndexedPriorityQueue
             }
         }
 
-        costs[i] = cost;
-        data[i] = k;
-        index[k] = i;
+        _costs[i] = cost;
+        _data[i] = k;
+        _index[k] = i;
     }
 }
