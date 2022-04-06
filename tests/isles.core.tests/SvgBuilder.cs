@@ -5,11 +5,13 @@ namespace Isles;
 
 public class SvgData
 {
+    public float? Opacity { get; init; }
+
     public Dictionary<string, string>? Attributes { get; init; }
 
     public float Duration { get; init; }
 
-    public (float x, float y)[]? Animations { get; init; }
+    public Vector2[]? Animations { get; init; }
 }
 
 public class SvgBuilder
@@ -93,7 +95,7 @@ public class SvgBuilder
             {
                 var x = i % grid.Width;
                 var y = i / grid.Width;
-                AddRectangle(x * grid.Step, y * grid.Step, grid.Step, grid.Step, "#aaa");
+                AddRectangle(x * grid.Step, y * grid.Step, grid.Step, grid.Step, "#555");
             }
         }
 
@@ -126,6 +128,11 @@ public class SvgBuilder
             return;
         }
 
+        if (data.Opacity != null)
+        {
+            _xml.WriteAttributeString("opacity", data.Opacity.ToString());
+        }
+
         if (data.Attributes != null)
         {
             foreach (var (key, value) in data.Attributes)
@@ -141,7 +148,7 @@ public class SvgBuilder
             _xml.WriteAttributeString("dur", $"{data.Duration}s");
             _xml.WriteAttributeString("repeatCount", "indefinite");
             _xml.WriteAttributeString("calcMode", "discrete");
-            _xml.WriteAttributeString("values", string.Join(';', data.Animations.Select(a => a.x)));
+            _xml.WriteAttributeString("values", string.Join(';', data.Animations.Select(a => a.X)));
             _xml.WriteEndElement();
 
             _xml.WriteStartElement("animate");
@@ -149,7 +156,7 @@ public class SvgBuilder
             _xml.WriteAttributeString("dur", $"{data.Duration}s");
             _xml.WriteAttributeString("repeatCount", "indefinite");
             _xml.WriteAttributeString("calcMode", "discrete");
-            _xml.WriteAttributeString("values", string.Join(';', data.Animations.Select(a => a.y)));
+            _xml.WriteAttributeString("values", string.Join(';', data.Animations.Select(a => a.Y)));
             _xml.WriteEndElement();
         }
     }
@@ -160,10 +167,10 @@ public class SvgBuilder
         {
             var w = maxX - minX;
             var h = maxY - minY;
-            minX = Math.Min(minX, data.Animations.Min(a => a.x) - w);
-            maxX = Math.Max(maxX, data.Animations.Max(a => a.x) + w);
-            minY = Math.Min(minY, data.Animations.Min(a => a.y) - h);
-            maxY = Math.Max(maxY, data.Animations.Max(a => a.y) + h);
+            minX = Math.Min(minX, data.Animations.Min(a => a.X) - w);
+            maxX = Math.Max(maxX, data.Animations.Max(a => a.X) + w);
+            minY = Math.Min(minY, data.Animations.Min(a => a.Y) - h);
+            maxY = Math.Max(maxY, data.Animations.Max(a => a.Y) + h);
         }
 
         _viewBox = (Math.Min(_viewBox.minX, minX), Math.Min(_viewBox.minY, minY), Math.Max(_viewBox.maxX, maxX), Math.Max(_viewBox.maxY, maxY));

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using Xunit;
 
 namespace Isles;
@@ -30,7 +31,8 @@ public class PathFinderTest
             if (path.Length > 0)
             {
                 i++;
-                svg.AddLineSegments(path.ToArray(), gridWidth);
+                var lines = path.ToArray().Select(p => p + Vector2.One * (gridWidth % 2 == 0 ? 0.5f : 0)).ToArray();
+                svg.AddLineSegments(lines, gridWidth, data: new() { Opacity = 0.5f });
             }
         }
 

@@ -59,7 +59,7 @@ public class MoveTests
                         ["speed"] = string.Join(", ", speeds),
                     },
                     Duration = duration,
-                    Animations = poses.Select(p => (p.X, p.Y)).ToArray()
+                    Animations = poses.ToArray()
                 };
             }
             _svg.AddCircle(poses[0].X, poses[0].Y, radius, data: data);
