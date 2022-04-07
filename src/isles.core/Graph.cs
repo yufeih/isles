@@ -79,7 +79,7 @@ public class GraphSearchAStar
                     i = _path[i];
                 }
                 _result.Add(start);
-                return _result.AsSpan();
+                return _result;
             }
 
             // Otherwise test all node adjacent to this one

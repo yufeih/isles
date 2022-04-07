@@ -166,9 +166,8 @@ public class Move
             }
         }
 
-        return _contacts.AsSpan();
+        return _contacts;
     }
-
 
     private ReadOnlySpan<EdgeContact> FindGridContacts(PathGrid grid, ReadOnlySpan<Movable> movables)
     {
@@ -253,7 +252,7 @@ public class Move
             }
         }
 
-        return _edgeContacts.AsSpan();
+        return _edgeContacts;
     }
 
     struct Contact

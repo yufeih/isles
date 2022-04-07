@@ -52,4 +52,9 @@ internal struct ArrayBuilder<T> where T : struct
 
         return _items.AsSpan(0, _count);
     }
+
+    public static implicit operator ReadOnlySpan<T>(ArrayBuilder<T> builder)
+    {
+        return builder._items.AsSpan(0, builder._count);
+    }
 }

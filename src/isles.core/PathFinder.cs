@@ -40,8 +40,27 @@ public class PathFinder
     {
         var size = (int)MathF.Ceiling(pathWidth / grid.Step);
         var path = _search.Search(new PathGridGraph(grid, size), grid.GetIndex(start), grid.GetIndex(end));
+        if (path.Length <= 1)
+        {
+            return Array.Empty<Vector2>();
+        }
 
-        return _result.ConvertAll(path, grid.GetPosition);
+        // Remove way points in the middle of a straight line
+        _result.Clear();
+        _result.Add(grid.GetPosition(path[0]));
+
+        var direction = Math.Abs(path[1] - path[0]) == 1;
+        for (var i = 1; i < path.Length - 1; i++)
+        {
+            var currentDirection = Math.Abs(path[i + 1] - path[i]) == 1;
+            if (direction != currentDirection)
+            {
+                direction = currentDirection;
+                _result.Add(grid.GetPosition(path[i]));
+            }
+        }
+        _result.Add(grid.GetPosition(path[path.Length - 1]));
+        return _result;
     }
 
     record PathGridGraph(PathGrid grid, int size) : IGraph
