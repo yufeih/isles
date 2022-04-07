@@ -33,7 +33,7 @@ public record PathGrid(int Width, int Height, float Step, BitArray Bits)
 
 public class PathFinder
 {
-    private readonly GraphSearchAStar _search = new();
+    private readonly AStarSearch _search = new();
     private ArrayBuilder<Vector2> _result;
 
     public ReadOnlySpan<Vector2> FindPath(PathGrid grid, float pathWidth, Vector2 start, Vector2 end)
@@ -63,7 +63,7 @@ public class PathFinder
         return _result;
     }
 
-    record PathGridGraph(PathGrid grid, int size) : IGraph
+    record PathGridGraph(PathGrid grid, int size) : IPathGraph
     {
         private static readonly (int dx, int dy)[] s_edges = new[]
         {

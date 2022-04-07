@@ -205,7 +205,7 @@ public class PathBrush
 /// <summary>
 /// Graph representing the path graph of Isles landscape.
 /// </summary>
-public class PathGraph : IGraph
+public class PathGraph : IPathGraph
 {
     /// <summary>
     /// Reference to the landscape.
@@ -658,7 +658,7 @@ public class PathManager
     /// <summary>
     /// Graph search.
     /// </summary>
-    private readonly GraphSearchAStar search = new();
+    private readonly AStarSearch search = new();
 
     /// <summary>
     /// Gets the detailed path graph used for searching.

@@ -3,7 +3,7 @@
 
 namespace Isles;
 
-public interface IGraph
+public interface IPathGraph
 {
     /// <summary>
     /// Gets the total number of nodes in the graph.
@@ -25,7 +25,7 @@ public interface IGraph
 /// <summary>
 /// Performs an A* graph search on a given graph.
 /// </summary>
-public class GraphSearchAStar
+public class AStarSearch
 {
     private int[] _path = default!;
     private float[] _costs = default!;
@@ -36,7 +36,7 @@ public class GraphSearchAStar
     /// <summary>
     /// Returns a list of path index from end to start.
     /// </summary>
-    public ReadOnlySpan<int> Search(IGraph graph, int start, int end)
+    public ReadOnlySpan<int> Search(IPathGraph graph, int start, int end)
     {
         var nodeCount = graph.NodeCount;
 
