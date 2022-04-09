@@ -79,34 +79,20 @@ public class PathFinder
         _cleanupLineOfSight.Clear();
         _cleanupLineOfSight.Add(path[0]);
 
-        var i = 0;
-        while (i < path.Length - 1)
+        for (var i = 0; i < path.Length - 1;)
         {
-            // Binary merge waypoints that has line of sight
-            var begin = i + 1;
-            var end = path.Length;
-
-            while (true)
+            var j = i + 2;
+            for (; j < path.Length; j++)
             {
-                var mid = (begin + end) / 2;
-                if (mid == begin)
+                var y0 = Math.DivRem(path[i], grid.Width, out var x0);
+                var y1 = Math.DivRem(path[j], grid.Width, out var x1);
+
+                if (!LineOfSightTest(grid, size, x0, y0, x1, y1))
                 {
-                    _cleanupLineOfSight.Add(path[i = begin]);
                     break;
                 }
-
-                var y0 = Math.DivRem(path[i], grid.Width, out var x0);
-                var y1 = Math.DivRem(path[mid], grid.Width, out var x1);
-
-                if (LineOfSightTest(grid, size, x0, y0, x1, y1))
-                {
-                    begin = mid;
-                }
-                else
-                {
-                    end = mid;
-                }
             }
+            _cleanupLineOfSight.Add(path[i = j - 1]);
         }
 
         return _cleanupLineOfSight;
