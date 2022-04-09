@@ -38,6 +38,33 @@ public class PathFinderTest
         Snapshot.Save($"move/pathfinder-{pathWidth}.svg", svg.ToString());
     }
 
+    [Fact]
+    public void LineOfSight()
+    {
+        var random = new Random(0);
+        var svg = new SvgBuilder();
+        var grid = CreateRandomGrid(random, density: 0.05f);
+
+        svg.AddGrid(grid);
+
+        var red = 0;
+        var green = 0;
+        var pathfinder = new PathFinder();
+        while (red < 5 || green < 5)
+        {
+            var start = new Vector2(random.NextSingle() * grid.Width * grid.Step, random.NextSingle() * grid.Width * grid.Step);
+            var end = new Vector2(random.NextSingle() * grid.Width * grid.Step, random.NextSingle() * grid.Width * grid.Step);
+            var reachable = pathfinder.LineOfSightTest(grid, start, end);
+
+            if ((reachable && green++ < 5) || (!reachable && red++ < 5))
+            {
+                svg.AddLineSegments(new[] { start, end }, color: reachable ? "green" : "red", data: new() { Opacity = 0.2f });
+            }
+        }
+
+        Snapshot.Save($"move/pathfinder-lineofsight.svg", svg.ToString());
+    }
+
     private static PathGrid CreateRandomGrid(Random random, int w = 64, int h = 64, float density = 0.1f)
     {
         var bits = new BitArray(w * h);

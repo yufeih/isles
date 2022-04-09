@@ -34,7 +34,7 @@ public record PathGrid(int Width, int Height, float Step, BitArray Bits)
 public class PathFinder
 {
     private readonly AStarSearch _search = new();
-    private ArrayBuilder<Vector2> _result;
+    private ArrayBuilder<Vector2> _path;
 
     public ReadOnlySpan<Vector2> FindPath(PathGrid grid, float pathWidth, Vector2 start, Vector2 end)
     {
@@ -46,8 +46,8 @@ public class PathFinder
         }
 
         // Remove way points in the middle of a straight line
-        _result.Clear();
-        _result.Add(grid.GetPosition(path[0]));
+        _path.Clear();
+        _path.Add(grid.GetPosition(path[0]));
 
         var direction = Math.Abs(path[1] - path[0]) == 1;
         for (var i = 1; i < path.Length - 1; i++)
@@ -56,11 +56,62 @@ public class PathFinder
             if (direction != currentDirection)
             {
                 direction = currentDirection;
-                _result.Add(grid.GetPosition(path[i]));
+                _path.Add(grid.GetPosition(path[i]));
             }
         }
-        _result.Add(grid.GetPosition(path[path.Length - 1]));
-        return _result;
+        _path.Add(grid.GetPosition(path[path.Length - 1]));
+        return _path;
+    }
+
+    public bool LineOfSightTest(PathGrid grid, Vector2 start, Vector2 end)
+    {
+        return !BresenhamLine(
+            (int)(start.X / grid.Step),
+            (int)(start.Y / grid.Step),
+            (int)(end.X / grid.Step),
+            (int)(end.Y / grid.Step),
+            HitTest,
+            grid);
+
+        static bool HitTest(int x, int y, PathGrid grid)
+        {
+            return grid.Bits[x + y * grid.Width];
+        }
+    }
+
+    private static bool BresenhamLine<T>(
+        int x0, int y0, int x1, int y1, Func<int, int, T, bool> setPixel, T state)
+    {
+        var dx = Math.Abs(x1 - x0);
+        var sx = x0 < x1 ? 1 : -1;
+        var dy = Math.Abs(y1 - y0);
+        var sy = y0 < y1 ? 1 : -1;
+        var error = (dx > dy ? dx : -dy) / 2;
+
+        while (true)
+        {
+            if (setPixel(x0, y0, state))
+            {
+                return true;
+            }
+
+            if (x0 == x1 && y0 == y1)
+            {
+                return false;
+            }
+
+            var err = error;
+            if (err > -dx)
+            {
+                error -= dy;
+                x0 += sx;
+            }
+            if (err < dy)
+            {
+                error += dx;
+                y0 += sy;
+            }
+        }
     }
 
     record PathGridGraph(PathGrid grid, int size) : IPathGraph

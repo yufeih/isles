@@ -187,7 +187,7 @@ public class Move
             var gp0 = grid.GetPoint(p0);
             var gp1 = grid.GetPoint(p1);
 
-            // left wall
+            // East
             if (m.Velocity.X > 0)
             {
                 for (var yy = gp0.y; yy <= gp1.y; yy++)
@@ -203,7 +203,7 @@ public class Move
                 }
             }
 
-            // right wall
+            // West
             if (m.Velocity.X < 0)
             {
                 for (var yy = gp0.y; yy <= gp1.y; yy++)
@@ -219,7 +219,7 @@ public class Move
                 }
             }
 
-            // upper wall
+            // South
             if (m.Velocity.Y > 0)
             {
                 for (var xx = gp0.x; xx <= gp1.x; xx++)
@@ -235,7 +235,7 @@ public class Move
                 }
             }
 
-            // down wall
+            // North
             if (m.Velocity.Y < 0)
             {
                 for (var xx = gp0.x; xx <= gp1.x; xx++)
