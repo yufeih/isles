@@ -3,7 +3,7 @@
 
 namespace Isles;
 
-internal struct ArrayBuilder<T> where T : struct
+public struct ArrayBuilder<T> where T : struct
 {
     private T[] _items;
     private int _count;

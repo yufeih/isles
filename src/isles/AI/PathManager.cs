@@ -269,6 +269,8 @@ public class PathGraph : IPathGraph
     /// </summary>
     public bool IgnoreDynamicObstacles { get; set; }
 
+    private ArrayBuilder<(int to, float cost)> _edges;
+
     /// <summary>
     /// Construct a landscape graph.
     /// </summary>
@@ -582,8 +584,10 @@ public class PathGraph : IPathGraph
     /// <summary>
     /// Gets all the out-coming edges of a given node.
     /// </summary>
-    public IEnumerable<(int to, float cost)> GetEdges(int nodeIndex)
+    public ReadOnlySpan<(int to, float cost)> GetEdges(int nodeIndex)
     {
+        _edges.Clear();
+
         bool connected;
         var x = nodeIndex % EntryWidth;
         var y = nodeIndex / EntryWidth;
@@ -614,9 +618,11 @@ public class PathGraph : IPathGraph
                 var to = GridToIndex(x + DX8[k], y + DY8[k]);
                 var cost = (DX8[k] == 0 || DY8[k] == 0) ? 10 : 14;
 
-                yield return (to, cost);
+                _edges.Add((to, cost));
             }
         }
+
+        return _edges;
     }
 
     /// <summary>

@@ -13,7 +13,7 @@ public interface IPathGraph
     /// <summary>
     /// Gets all the out-going edges of a given node.
     /// </summary>
-    IEnumerable<(int to, float cost)> GetEdges(int from);
+    ReadOnlySpan<(int to, float cost)> GetEdges(int from);
 
     /// <summary>
     /// Gets the heuristic value between two nodes used in A* algorithm.

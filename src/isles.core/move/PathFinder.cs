@@ -121,10 +121,14 @@ public class PathFinder
             (1, 0), (0, 1), (-1, 0), (0, -1),
         };
 
+        private ArrayBuilder<(int to, float cost)> _edges;
+
         public int NodeCount => grid.Width * grid.Height;
 
-        public IEnumerable<(int to, float cost)> GetEdges(int from)
+        public ReadOnlySpan<(int to, float cost)> GetEdges(int from)
         {
+            _edges.Clear();
+
             var half = (size - 1) / 2;
             var y = Math.DivRem(from, grid.Width, out var x);
 
@@ -172,9 +176,11 @@ public class PathFinder
 
                 if (valid)
                 {
-                    yield return (i, grid.Step);
+                    _edges.Add((i, grid.Step));
                 }
             }
+
+            return _edges;
         }
 
         public float GetHeuristicValue(int from, int to)
