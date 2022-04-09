@@ -38,7 +38,7 @@ public class PathFinder
     private ArrayBuilder<int> _cleanupStraightLine;
     private ArrayBuilder<int> _cleanupLineOfSight;
 
-    public ReadOnlySpan<Vector2> FindPath(PathGrid grid, float pathWidth, Vector2 start, Vector2 end, bool smoothPath = false)
+    public ReadOnlySpan<Vector2> FindPath(PathGrid grid, float pathWidth, Vector2 start, Vector2 end, bool smoothPath = true)
     {
         var size = (int)MathF.Ceiling(pathWidth / grid.Step);
         var path = _search.Search(new PathGridGraph(grid, size), grid.GetIndex(start), grid.GetIndex(end));
