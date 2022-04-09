@@ -7,7 +7,7 @@ public struct ArrayBuilder<T> where T : struct
 {
     private T[] _items;
     private int _count;
-    
+
     public ReadOnlySpan<T> AsSpan()
     {
         return _items.AsSpan(0, _count);

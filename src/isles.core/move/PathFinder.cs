@@ -34,7 +34,9 @@ public record PathGrid(int Width, int Height, float Step, BitArray Bits)
 public class PathFinder
 {
     private readonly AStarSearch _search = new();
-    private ArrayBuilder<Vector2> _path;
+    private ArrayBuilder<Vector2> _findPath;
+    private ArrayBuilder<int> _cleanupStraightLine;
+    private ArrayBuilder<int> _cleanupLineOfSight;
 
     public ReadOnlySpan<Vector2> FindPath(PathGrid grid, float pathWidth, Vector2 start, Vector2 end)
     {
@@ -45,10 +47,16 @@ public class PathFinder
             return Array.Empty<Vector2>();
         }
 
-        // Remove way points in the middle of a straight line
-        _path.Clear();
-        _path.Add(grid.GetPosition(path[0]));
+        path = CleanupStraightLine(path);
+        path = CleanupLineOfSight(grid, path, size);
 
+        return _findPath.ConvertAll<int>(path, i => grid.GetPosition(i));
+    }
+
+    private ReadOnlySpan<int> CleanupStraightLine(ReadOnlySpan<int> path)
+    {
+        _cleanupStraightLine.Clear();
+        _cleanupStraightLine.Add(path[0]);
         var direction = Math.Abs(path[1] - path[0]) == 1;
         for (var i = 1; i < path.Length - 1; i++)
         {
@@ -56,38 +64,74 @@ public class PathFinder
             if (direction != currentDirection)
             {
                 direction = currentDirection;
-                _path.Add(grid.GetPosition(path[i]));
+                _cleanupStraightLine.Add(path[i]);
             }
         }
-        _path.Add(grid.GetPosition(path[path.Length - 1]));
-        return _path;
+        _cleanupStraightLine.Add(path[path.Length - 1]);
+        return _cleanupStraightLine;
+    }
+
+    private ReadOnlySpan<int> CleanupLineOfSight(PathGrid grid, ReadOnlySpan<int> path, int size)
+    {
+        _cleanupLineOfSight.Clear();
+        _cleanupLineOfSight.Add(path[0]);
+
+        var i = 0;
+        while (i < path.Length)
+        {
+            // Binary merge waypoints that has line of sight
+            var begin = i + 1;
+            var end = path.Length;
+
+            while (true)
+            {
+                var mid = (end - begin) / 2;
+                if (mid == begin)
+                {
+                    _cleanupLineOfSight.Add(i = begin);
+                    break;
+                }
+
+                var y0 = Math.DivRem(path[i], grid.Width, out var x0);
+                var y1 = Math.DivRem(path[mid], grid.Width, out var x1);
+
+                if (LineOfSightTest(grid, size, x0, y0, x1, y1))
+                {
+                    begin = mid;
+                }
+                else
+                {
+                    end = mid;
+                }
+            }
+        }
+
+        return _cleanupLineOfSight;
     }
 
     public static bool LineOfSightTest(PathGrid grid, float pathWidth, Vector2 start, Vector2 end)
     {
         var size = (int)MathF.Ceiling(pathWidth / grid.Step);
-
-        return size == 1 ? LineOfSightTest1(grid, start, end) : LineOfSightTestN(grid, size, start, end);
-    }
-
-    private static bool LineOfSightTest1(PathGrid grid, Vector2 start, Vector2 end)
-    {
-        return !BresenhamLine(
-            (int)(start.X / grid.Step),
-            (int)(start.Y / grid.Step),
-            (int)(end.X / grid.Step),
-            (int)(end.Y / grid.Step),
-            GridHitTest,
-            grid);
-    }
-
-    private static bool LineOfSightTestN(PathGrid grid, int size, Vector2 start, Vector2 end)
-    {
         var x0 = (int)(start.X / grid.Step);
         var y0 = (int)(start.Y / grid.Step);
         var x1 = (int)(end.X / grid.Step);
         var y1 = (int)(end.Y / grid.Step);
 
+        return LineOfSightTest(grid, size, x0, y0, x1, y1);
+    }
+
+    private static bool LineOfSightTest(PathGrid grid, int size, int x0, int y0, int x1, int y1)
+    {
+        return size == 1 ? LineOfSightTest1(grid, x0, y0, x1, y1) : LineOfSightTestN(grid, size, x0, y0, x1, y1);
+    }
+
+    private static bool LineOfSightTest1(PathGrid grid, int x0, int y0, int x1, int y1)
+    {
+        return !BresenhamLine(x0, y0, x1, y1, GridHitTest, grid);
+    }
+
+    private static bool LineOfSightTestN(PathGrid grid, int size, int x0, int y0, int x1, int y1)
+    {
         var half = (size - 1) / 2;
         var w = Math.Abs(x1 - x0);
         var h = Math.Abs(y1 - y0);
