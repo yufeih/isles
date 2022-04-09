@@ -38,8 +38,11 @@ public class PathFinderTest
         Snapshot.Save($"move/pathfinder-{pathWidth}.svg", svg.ToString());
     }
 
-    [Fact]
-    public void LineOfSight()
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    public void LineOfSight(int pathWidth)
     {
         var random = new Random(0);
         var svg = new SvgBuilder();
@@ -49,20 +52,19 @@ public class PathFinderTest
 
         var red = 0;
         var green = 0;
-        var pathfinder = new PathFinder();
         while (red < 5 || green < 5)
         {
             var start = new Vector2(random.NextSingle() * grid.Width * grid.Step, random.NextSingle() * grid.Width * grid.Step);
             var end = new Vector2(random.NextSingle() * grid.Width * grid.Step, random.NextSingle() * grid.Width * grid.Step);
-            var reachable = pathfinder.LineOfSightTest(grid, start, end);
+            var reachable = PathFinder.LineOfSightTest(grid, pathWidth, start, end);
 
             if ((reachable && green++ < 5) || (!reachable && red++ < 5))
             {
-                svg.AddLineSegments(new[] { start, end }, color: reachable ? "green" : "red", data: new() { Opacity = 0.2f });
+                svg.AddLineSegments(new[] { start, end }, pathWidth, reachable ? "green" : "red", new() { Opacity = 0.2f });
             }
         }
 
-        Snapshot.Save($"move/pathfinder-lineofsight.svg", svg.ToString());
+        Snapshot.Save($"move/pathfinder-lineofsight-{pathWidth}.svg", svg.ToString());
     }
 
     private static PathGrid CreateRandomGrid(Random random, int w = 64, int h = 64, float density = 0.1f)

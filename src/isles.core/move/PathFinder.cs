@@ -63,20 +63,82 @@ public class PathFinder
         return _path;
     }
 
-    public bool LineOfSightTest(PathGrid grid, Vector2 start, Vector2 end)
+    public static bool LineOfSightTest(PathGrid grid, float pathWidth, Vector2 start, Vector2 end)
+    {
+        var size = (int)MathF.Ceiling(pathWidth / grid.Step);
+
+        return size == 1 ? LineOfSightTest1(grid, start, end) : LineOfSightTestN(grid, size, start, end);
+    }
+
+    private static bool LineOfSightTest1(PathGrid grid, Vector2 start, Vector2 end)
     {
         return !BresenhamLine(
             (int)(start.X / grid.Step),
             (int)(start.Y / grid.Step),
             (int)(end.X / grid.Step),
             (int)(end.Y / grid.Step),
-            HitTest,
+            GridHitTest,
             grid);
+    }
 
-        static bool HitTest(int x, int y, PathGrid grid)
+    private static bool LineOfSightTestN(PathGrid grid, int size, Vector2 start, Vector2 end)
+    {
+        var x0 = (int)(start.X / grid.Step);
+        var y0 = (int)(start.Y / grid.Step);
+        var x1 = (int)(end.X / grid.Step);
+        var y1 = (int)(end.Y / grid.Step);
+
+        var half = (size - 1) / 2;
+        var w = Math.Abs(x1 - x0);
+        var h = Math.Abs(y1 - y0);
+
+        if (w > h)
         {
-            return grid.Bits[x + y * grid.Width];
+            y0 -= half;
+            y1 -= half;
+            for (var k = 0; k < size; k++)
+            {
+                if (y0 < 0 || y0 >= grid.Height || y1 < 0 || y1 > grid.Height)
+                {
+                    return false;
+                }
+
+                if (BresenhamLine(x0, y0, x1, y1, GridHitTest, grid))
+                {
+                    return false;
+                }
+
+                y0++;
+                y1++;
+            }
         }
+        else
+        {
+            x0 -= half;
+            y0 -= half;
+            for (var k = 0; k < size; k++)
+            {
+                if (x0 < 0 || x0 >= grid.Width || x1 < 0 || x1 >= grid.Width)
+                {
+                    return false;
+                }
+
+                if (BresenhamLine(x0, y0, x1, y1, GridHitTest, grid))
+                {
+                    return false;
+                }
+
+                x0++;
+                x1++;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool GridHitTest(int x, int y, PathGrid grid)
+    {
+        return grid.Bits[x + y * grid.Width];
     }
 
     private static bool BresenhamLine<T>(
@@ -126,6 +188,37 @@ public class PathFinder
         public int NodeCount => grid.Width * grid.Height;
 
         public ReadOnlySpan<(int to, float cost)> GetEdges(int from)
+        {
+            return size == 1 ? GetEdges1(from) : GetEdgesN(from);
+        }
+
+        public ReadOnlySpan<(int to, float cost)> GetEdges1(int from)
+        {
+            _edges.Clear();
+
+            var y = Math.DivRem(from, grid.Width, out var x);
+
+            foreach (var (dx, dy) in s_edges)
+            {
+                var xx = x + dx;
+                var yy = y + dy;
+
+                if (xx < 0 || xx >= grid.Width || yy < 0 || yy >= grid.Height)
+                {
+                    continue;
+                }
+
+                var i = xx + yy * grid.Width;
+                if (!grid.Bits[i])
+                {
+                    _edges.Add((i, grid.Step));
+                }
+            }
+
+            return _edges;
+        }
+
+        public ReadOnlySpan<(int to, float cost)> GetEdgesN(int from)
         {
             _edges.Clear();
 
