@@ -67,7 +67,7 @@ public class PathFinder
                 _cleanupStraightLine.Add(path[i]);
             }
         }
-        _cleanupStraightLine.Add(path[path.Length - 1]);
+        _cleanupStraightLine.Add(path[^1]);
         return _cleanupStraightLine;
     }
 
@@ -77,7 +77,7 @@ public class PathFinder
         _cleanupLineOfSight.Add(path[0]);
 
         var i = 0;
-        while (i < path.Length)
+        while (i < path.Length - 1)
         {
             // Binary merge waypoints that has line of sight
             var begin = i + 1;
@@ -85,10 +85,10 @@ public class PathFinder
 
             while (true)
             {
-                var mid = (end - begin) / 2;
+                var mid = (begin + end) / 2;
                 if (mid == begin)
                 {
-                    _cleanupLineOfSight.Add(i = begin);
+                    _cleanupLineOfSight.Add(path[i = begin]);
                     break;
                 }
 
