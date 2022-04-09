@@ -13,29 +13,34 @@ public class PathFinderTest
     {
         var random = new Random(0);
         var svg = new SvgBuilder();
+        var svgSmooth = new SvgBuilder();
         var grid = CreateRandomGrid(random);
 
         svg.AddGrid(grid);
+        svgSmooth.AddGrid(grid);
 
         var i = 0;
         var pathfinder = new PathFinder();
         while (i < 10)
         {
-            var path = pathfinder.FindPath(
-                grid,
-                pathWidth,
-                new(random.NextSingle() * grid.Width * grid.Step, random.NextSingle() * grid.Width * grid.Step),
-                new(random.NextSingle() * grid.Width * grid.Step, random.NextSingle() * grid.Width * grid.Step));
+            var start = new Vector2(random.NextSingle() * grid.Width * grid.Step, random.NextSingle() * grid.Width * grid.Step);
+            var end = new Vector2(random.NextSingle() * grid.Width * grid.Step, random.NextSingle() * grid.Width * grid.Step);
 
+            var path = pathfinder.FindPath(grid, pathWidth, start, end, smoothPath: false);
             if (path.Length > 0)
             {
                 i++;
                 var lines = path.ToArray().Select(p => p + Vector2.One * (pathWidth % 2 == 0 ? 0.5f : 0)).ToArray();
                 svg.AddLineSegments(lines, pathWidth, data: new() { Opacity = 0.5f });
+
+                var smoothPath = pathfinder.FindPath(grid, pathWidth, start, end, smoothPath: true);
+                var smoothLines = smoothPath.ToArray().Select(p => p + Vector2.One * (pathWidth % 2 == 0 ? 0.5f : 0)).ToArray();
+                svgSmooth.AddLineSegments(smoothLines, pathWidth, data: new() { Opacity = 0.5f });
             }
         }
 
         Snapshot.Save($"move/pathfinder-{pathWidth}.svg", svg.ToString());
+        Snapshot.Save($"move/pathfinder-smooth-{pathWidth}.svg", svgSmooth.ToString());
     }
 
     [Theory]
