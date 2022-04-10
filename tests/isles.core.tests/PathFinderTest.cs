@@ -23,8 +23,8 @@ public class PathFinderTest
         var pathfinder = new PathFinder();
         while (i < 10)
         {
-            var start = new Vector2(random.NextSingle() * grid.Width, random.NextSingle() * grid.Width);
-            var end = new Vector2(random.NextSingle() * grid.Width, random.NextSingle() * grid.Width);
+            var start = new Vector2(random.NextSingle() * grid.Width, random.NextSingle() * grid.Height);
+            var end = new Vector2(random.NextSingle() * grid.Width, random.NextSingle() * grid.Height);
 
             var path = pathfinder.FindPath(grid, pathWidth, start, end, smoothPath: false);
             if (path.Length > 0)
