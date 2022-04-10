@@ -23,8 +23,8 @@ public class PathFinderTest
         var pathfinder = new PathFinder();
         while (i < 10)
         {
-            var start = new Vector2(random.NextSingle() * grid.Width * grid.Step, random.NextSingle() * grid.Width * grid.Step);
-            var end = new Vector2(random.NextSingle() * grid.Width * grid.Step, random.NextSingle() * grid.Width * grid.Step);
+            var start = new Vector2(random.NextSingle() * grid.Width, random.NextSingle() * grid.Height);
+            var end = new Vector2(random.NextSingle() * grid.Width, random.NextSingle() * grid.Height);
 
             var path = pathfinder.FindPath(grid, pathWidth, start, end, smoothPath: false);
             if (path.Length > 0)
@@ -59,8 +59,8 @@ public class PathFinderTest
         var green = 0;
         while (red < 5 || green < 5)
         {
-            var start = new Vector2(random.NextSingle() * grid.Width * grid.Step, random.NextSingle() * grid.Width * grid.Step);
-            var end = new Vector2(random.NextSingle() * grid.Width * grid.Step, random.NextSingle() * grid.Width * grid.Step);
+            var start = new Vector2(random.NextSingle() * grid.Width, random.NextSingle() * grid.Height);
+            var end = new Vector2(random.NextSingle() * grid.Width, random.NextSingle() * grid.Height);
             var reachable = PathFinder.LineOfSightTest(grid, pathWidth, start, end);
 
             if ((reachable && green++ < 5) || (!reachable && red++ < 5))
