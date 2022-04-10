@@ -116,7 +116,7 @@ public class PathFinder
 
     private static bool LineOfSightTest1(PathGrid grid, int x0, int y0, int x1, int y1)
     {
-        return !BresenhamLine(x0, y0, x1, y1, GridHitTest, grid);
+        return !PlotLine.WuLine(x0, y0, x1, y1, GridHitTest, grid);
     }
 
     private static bool LineOfSightTestN(PathGrid grid, int size, int x0, int y0, int x1, int y1)
@@ -136,7 +136,7 @@ public class PathFinder
                     return false;
                 }
 
-                if (BresenhamLine(x0, y0, x1, y1, GridHitTest, grid))
+                if (PlotLine.WuLine(x0, y0, x1, y1, GridHitTest, grid))
                 {
                     return false;
                 }
@@ -156,7 +156,7 @@ public class PathFinder
                     return false;
                 }
 
-                if (BresenhamLine(x0, y0, x1, y1, GridHitTest, grid))
+                if (PlotLine.WuLine(x0, y0, x1, y1, GridHitTest, grid))
                 {
                     return false;
                 }
@@ -169,44 +169,9 @@ public class PathFinder
         return true;
     }
 
-    private static bool GridHitTest(int x, int y, PathGrid grid)
+    private static bool GridHitTest(int x, int y, float a, PathGrid grid)
     {
         return grid.Bits[x + y * grid.Width];
-    }
-
-    private static bool BresenhamLine<T>(
-        int x0, int y0, int x1, int y1, Func<int, int, T, bool> setPixel, T state)
-    {
-        var dx = Math.Abs(x1 - x0);
-        var sx = x0 < x1 ? 1 : -1;
-        var dy = Math.Abs(y1 - y0);
-        var sy = y0 < y1 ? 1 : -1;
-        var error = (dx > dy ? dx : -dy) / 2;
-
-        while (true)
-        {
-            if (setPixel(x0, y0, state))
-            {
-                return true;
-            }
-
-            if (x0 == x1 && y0 == y1)
-            {
-                return false;
-            }
-
-            var err = error;
-            if (err > -dx)
-            {
-                error -= dy;
-                x0 += sx;
-            }
-            if (err < dy)
-            {
-                error += dx;
-                y0 += sy;
-            }
-        }
     }
 
     record PathGridGraph(PathGrid grid, int size) : IPathGraph

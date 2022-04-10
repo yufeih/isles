@@ -201,14 +201,14 @@
 <rect x="44" y="63" width="1" height="1" fill="#333" />
 <rect x="52" y="63" width="1" height="1" fill="#333" />
 <rect x="63" y="63" width="1" height="1" fill="#333" />
-<path fill="none" stroke="green" stroke-width="2" d="M 56.50509,34.858063 L 50.242897,32.898605" opacity="0.2" />
+<path fill="none" stroke="red" stroke-width="2" d="M 56.50509,34.858063 L 50.242897,32.898605" opacity="0.2" />
 <path fill="none" stroke="red" stroke-width="2" d="M 22.552542,63.471813 L 2.1403556,44.270557" opacity="0.2" />
 <path fill="none" stroke="red" stroke-width="2" d="M 7.7559104,12.474289 L 31.777077,37.202522" opacity="0.2" />
 <path fill="none" stroke="red" stroke-width="2" d="M 16.746523,19.863241 L 15.496708,50.180847" opacity="0.2" />
 <path fill="none" stroke="red" stroke-width="2" d="M 8.515838,39.20024 L 35.794567,41.959637" opacity="0.2" />
-<path fill="none" stroke="red" stroke-width="2" d="M 21.825779,1.49192 L 6.226299,56.186275" opacity="0.2" />
-<path fill="none" stroke="green" stroke-width="2" d="M 21.790894,49.800667 L 27.32124,41.4191" opacity="0.2" />
 <path fill="none" stroke="green" stroke-width="2" d="M 35.313786,19.474648 L 26.800161,25.022387" opacity="0.2" />
-<path fill="none" stroke="green" stroke-width="2" d="M 29.869986,51.15254 L 13.88143,58.17881" opacity="0.2" />
 <path fill="none" stroke="green" stroke-width="2" d="M 39.271492,40.781765 L 36.51613,52.23734" opacity="0.2" />
+<path fill="none" stroke="green" stroke-width="2" d="M 31.012617,22.842867 L 38.87717,26.623428" opacity="0.2" />
+<path fill="none" stroke="green" stroke-width="2" d="M 43.008415,30.909245 L 46.401257,30.774061" opacity="0.2" />
+<path fill="none" stroke="green" stroke-width="2" d="M 6.747034,59.19395 L 1.2812883,52.63422" opacity="0.2" />
 </svg>
