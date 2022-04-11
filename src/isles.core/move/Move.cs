@@ -19,6 +19,9 @@ public struct Movable
     internal Vector2 _velocity;
 
     public Vector2? Target { get; set; }
+
+    internal ArrayBuilder<Vector2> _path;
+    internal int _pathIndex;
 }
 
 public class Move
@@ -27,18 +30,28 @@ public class Move
     private const float VelocityEpsilonSquared = 0.001f;
     private const float Bias = 0.5f;
 
+    private readonly PathFinder _pathFinder = new();
+
     private ArrayBuilder<Contact> _contacts;
     private ArrayBuilder<EdgeContact> _edgeContacts;
 
     public void Update(float dt, Span<Movable> movables, PathGrid? grid = null)
     {
+        UpdateTarget(movables);
+
         var idt = 1.0f / dt;
         var contacts = FindContacts(movables);
         var edgeContacts = grid != null ? FindGridContacts(grid, movables) : Array.Empty<EdgeContact>();
 
-        for (var i = 0; i < movables.Length; i++)
+        UpdateContacts(idt, movables, contacts);
+        UpdateEdgeContacts(idt, movables, edgeContacts);
+        UpdatePositions(dt, movables);
+    }
+
+    private static void UpdateTarget(Span<Movable> movables)
+    {
+        foreach (ref var m in movables)
         {
-            ref var m = ref movables[i];
             if (m.Target is null)
             {
                 m._velocity = default;
@@ -51,11 +64,10 @@ public class Move
                     : Vector2.Normalize(v) * m.Speed;
             }
         }
+    }
 
-        UpdateContacts(idt, movables, contacts);
-
-        UpdateEdgeContacts(idt, movables, edgeContacts);
-
+    private static void UpdatePositions(float dt, Span<Movable> movables)
+    {
         foreach (ref var m in movables)
         {
             if (m._velocity.LengthSquared() < VelocityEpsilonSquared)
