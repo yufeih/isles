@@ -38,10 +38,23 @@ public class PathFinder
     private ArrayBuilder<int> _cleanupStraightLine;
     private ArrayBuilder<int> _cleanupLineOfSight;
 
+    /// <summary>
+    /// Finds a list of waypoints from start (exclusive) to end (inclusive).
+    /// The last element of the result is always `end`.
+    /// Returns an empty span if target is not reachable or if there is a direct path to target.
+    /// </summary>
     public ReadOnlySpan<Vector2> FindPath(PathGrid grid, float pathWidth, Vector2 start, Vector2 end, bool smoothPath = true)
     {
         var size = (int)MathF.Ceiling(pathWidth / grid.Step);
-        var path = _search.Search(new PathGridGraph(grid, size), grid.GetIndex(start), grid.GetIndex(end));
+        var (x0, y0) = grid.GetPoint(start);
+        var (x1, y1) = grid.GetPoint(end);
+
+        if (LineOfSightTest(grid, size, x0, x1, y0, y1))
+        {
+            return Array.Empty<Vector2>();
+        }
+
+        var path = _search.Search(new PathGridGraph(grid, size), x0 + y0 * grid.Width, x1 + y1 * grid.Width);
         if (path.Length <= 1)
         {
             return Array.Empty<Vector2>();
@@ -53,7 +66,13 @@ public class PathFinder
             path = CleanupLineOfSight(grid, path, size);
         }
 
-        return _findPath.ConvertAll<int>(path, i => grid.GetPosition(i));
+        _findPath.Clear();
+        for (var i = path.Length - 2; i > 0; i--)
+        {
+            _findPath.Add(grid.GetPosition(path[i]));
+        }
+        _findPath.Add(end);
+        return _findPath;
     }
 
     private ReadOnlySpan<int> CleanupStraightLine(ReadOnlySpan<int> path)

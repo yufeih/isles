@@ -97,5 +97,16 @@
         { "radius": 2, "speed": 5, "position": [15,25], "target": [25,15] },
         { "radius": 2, "speed": 5, "position": [5,15], "target": [15,25] }
       ]
+  },
+  "maze-1": {
+      "grid": [
+        0,0,0,0,
+        1,1,1,0,
+        0,0,0,0,
+        0,0,0,0
+      ],
+      "units": [
+        { "radius": 2, "speed": 18, "position": [5,5], "target": [10,30] }
+      ]
   }
 }

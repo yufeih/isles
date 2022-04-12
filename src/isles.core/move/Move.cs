@@ -37,7 +37,7 @@ public class Move
 
     public void Update(float dt, Span<Movable> movables, PathGrid? grid = null)
     {
-        UpdateTarget(movables);
+        UpdateTarget(movables, grid);
 
         var idt = 1.0f / dt;
         var contacts = FindContacts(movables);
@@ -48,20 +48,60 @@ public class Move
         UpdatePositions(dt, movables);
     }
 
-    private static void UpdateTarget(Span<Movable> movables)
+    private void UpdateTarget(Span<Movable> movables, PathGrid? grid)
     {
         foreach (ref var m in movables)
         {
             if (m.Target is null)
             {
                 m._velocity = default;
+                continue;
+            }
+
+            var target = m.Target.Value;
+
+            // Find path if there is no path to follow
+            if (grid != null)
+            {
+                if (m._path.Length == 0 || m._path[m._path.Length - 1] != m.Target.Value)
+                {
+                    m._path.Clear();
+                    m._pathIndex = 0;
+                    var path = _pathFinder.FindPath(grid, m.Radius * 2, m.Position, target);
+                    if (path.Length == 0)
+                    {
+                        m._path.Add(target);
+                    }
+                    else
+                    {
+                        m._path.AddRange(path);
+                    }
+                }
+
+                target = m._path[m._pathIndex];
+            }
+
+            var offset = target - m._position;
+            var distanceSquared = offset.LengthSquared();
+
+            // Follow next waypoint
+            if (m._pathIndex < m._path.Length - 1 && distanceSquared <= m.Radius * m.Radius)
+            {
+                target = m._path[m._pathIndex++];
+                offset = target - m._position;
+                distanceSquared = offset.LengthSquared();
+            }
+
+            // Update velocity
+            if (distanceSquared <= PositionEpsilonSquared)
+            {
+                m._velocity = default;
+                m._path.Clear();
+                m._pathIndex = 0;
             }
             else
             {
-                var v = m.Target.Value - m._position;
-                m._velocity = v.LengthSquared() <= PositionEpsilonSquared
-                    ? default
-                    : Vector2.Normalize(v) * m.Speed;
+                m._velocity = Vector2.Normalize(offset) * m.Speed;
             }
         }
     }
