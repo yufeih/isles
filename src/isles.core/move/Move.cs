@@ -26,8 +26,6 @@ public struct Movable
 
 public class Move
 {
-    private const float PositionEpsilonSquared = 0.01f;
-    private const float VelocityEpsilonSquared = 0.001f;
     private const float Bias = 0.5f;
 
     private readonly PathFinder _pathFinder = new();
@@ -37,7 +35,7 @@ public class Move
 
     public void Update(float dt, Span<Movable> movables, PathGrid? grid = null)
     {
-        UpdateTarget(movables, grid);
+        UpdateTarget(dt, movables, grid);
 
         var idt = 1.0f / dt;
         var contacts = FindContacts(movables);
@@ -48,7 +46,7 @@ public class Move
         UpdatePositions(dt, movables);
     }
 
-    private void UpdateTarget(Span<Movable> movables, PathGrid? grid)
+    private void UpdateTarget(float dt, Span<Movable> movables, PathGrid? grid)
     {
         foreach (ref var m in movables)
         {
@@ -93,7 +91,8 @@ public class Move
             }
 
             // Update velocity
-            if (distanceSquared <= PositionEpsilonSquared)
+            var distanceEpsilon = m.Speed * dt * 2;
+            if (distanceSquared <= distanceEpsilon * distanceEpsilon)
             {
                 m._velocity = default;
                 m._path.Clear();
@@ -110,7 +109,7 @@ public class Move
     {
         foreach (ref var m in movables)
         {
-            if (m._velocity.LengthSquared() < VelocityEpsilonSquared)
+            if (m._velocity.LengthSquared() < m.Speed * m.Speed * 0.001f)
             {
                 m._velocity = default;
                 m.Target = null;

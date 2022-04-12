@@ -106,7 +106,7 @@
         0,0,0,0
       ],
       "units": [
-        { "radius": 2, "speed": 18, "position": [5,5], "target": [10,30] }
+        { "radius": 2, "speed": 30, "position": [5,5], "target": [10,30] }
       ]
   }
 }
