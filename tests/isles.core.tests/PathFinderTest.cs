@@ -30,11 +30,11 @@ public class PathFinderTest
             if (path.Length > 0)
             {
                 i++;
-                var lines = path.ToArray().Select(p => p + Vector2.One * (pathWidth % 2 == 0 ? 0.5f : 0)).ToArray();
+                var lines = new[]{ start }.Concat(path.ToArray()).Select(p => p + Vector2.One * (pathWidth % 2 == 0 ? 0.5f : 0)).ToArray();
                 svg.AddLineSegments(lines, pathWidth, data: new() { Opacity = 0.5f });
 
                 var smoothPath = pathfinder.FindPath(grid, pathWidth, start, end, smoothPath: true);
-                var smoothLines = smoothPath.ToArray().Select(p => p + Vector2.One * (pathWidth % 2 == 0 ? 0.5f : 0)).ToArray();
+                var smoothLines = new[]{ start }.Concat(smoothPath.ToArray()).Select(p => p + Vector2.One * (pathWidth % 2 == 0 ? 0.5f : 0)).ToArray();
                 svgSmooth.AddLineSegments(smoothLines, pathWidth, data: new() { Opacity = 0.5f });
             }
         }
