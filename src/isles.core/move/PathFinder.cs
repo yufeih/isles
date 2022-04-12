@@ -34,6 +34,8 @@ public record PathGrid(int Width, int Height, float Step, BitArray Bits)
 public class PathFinder
 {
     private readonly AStarSearch _search = new();
+
+    private PathGridGraph _graph;
     private ArrayBuilder<Vector2> _findPath;
     private ArrayBuilder<int> _cleanupStraightLine;
     private ArrayBuilder<int> _cleanupLineOfSight;
@@ -54,7 +56,10 @@ public class PathFinder
             return Array.Empty<Vector2>();
         }
 
-        var path = _search.Search(new PathGridGraph(grid, size), x0 + y0 * grid.Width, x1 + y1 * grid.Width);
+        _graph.Grid = grid;
+        _graph.Size = size;
+
+        var path = _search.Search(_graph, x0 + y0 * grid.Width, x1 + y1 * grid.Width);
         if (path.Length <= 1)
         {
             return Array.Empty<Vector2>();
@@ -193,8 +198,11 @@ public class PathFinder
         return grid.Bits[x + y * grid.Width];
     }
 
-    record PathGridGraph(PathGrid grid, int size) : IPathGraph
+    private struct PathGridGraph : IPathGraph
     {
+        public PathGrid Grid;
+        public int Size;
+
         private static readonly (int dx, int dy)[] s_edges = new[]
         {
             (1, 0), (0, 1), (-1, 0), (0, -1),
@@ -202,33 +210,33 @@ public class PathFinder
 
         private ArrayBuilder<(int to, float cost)> _edges;
 
-        public int NodeCount => grid.Width * grid.Height;
+        public int NodeCount => Grid.Width * Grid.Height;
 
         public ReadOnlySpan<(int to, float cost)> GetEdges(int from)
         {
-            return size == 1 ? GetEdges1(from) : GetEdgesN(from);
+            return Size == 1 ? GetEdges1(from) : GetEdgesN(from);
         }
 
         public ReadOnlySpan<(int to, float cost)> GetEdges1(int from)
         {
             _edges.Clear();
 
-            var y = Math.DivRem(from, grid.Width, out var x);
+            var y = Math.DivRem(from, Grid.Width, out var x);
 
             foreach (var (dx, dy) in s_edges)
             {
                 var xx = x + dx;
                 var yy = y + dy;
 
-                if (xx < 0 || xx >= grid.Width || yy < 0 || yy >= grid.Height)
+                if (xx < 0 || xx >= Grid.Width || yy < 0 || yy >= Grid.Height)
                 {
                     continue;
                 }
 
-                var i = xx + yy * grid.Width;
-                if (!grid.Bits[i])
+                var i = xx + yy * Grid.Width;
+                if (!Grid.Bits[i])
                 {
-                    _edges.Add((i, grid.Step));
+                    _edges.Add((i, Grid.Step));
                 }
             }
 
@@ -239,36 +247,36 @@ public class PathFinder
         {
             _edges.Clear();
 
-            var half = (size - 1) / 2;
-            var y = Math.DivRem(from, grid.Width, out var x);
+            var half = (Size - 1) / 2;
+            var y = Math.DivRem(from, Grid.Width, out var x);
 
             foreach (var (dx, dy) in s_edges)
             {
                 var xx = x + dx;
                 var yy = y + dy;
-                var i = xx + yy * grid.Width;
+                var i = xx + yy * Grid.Width;
                 var valid = true;
 
                 if (dx == 0)
                 {
                     xx -= half;
-                    yy += dy > 0 ? size - 1 - half : -half;
+                    yy += dy > 0 ? Size - 1 - half : -half;
                 }
                 else
                 {
                     yy -= half;
-                    xx += dx > 0 ? size - 1 - half : -half;
+                    xx += dx > 0 ? Size - 1 - half : -half;
                 }
 
-                for (var k = 0; k < size; k++)
+                for (var k = 0; k < Size; k++)
                 {
-                    if (xx < 0 || xx >= grid.Width || yy < 0 || yy >= grid.Height)
+                    if (xx < 0 || xx >= Grid.Width || yy < 0 || yy >= Grid.Height)
                     {
                         valid = false;
                         continue;
                     }
 
-                    if (grid.Bits[xx + yy * grid.Width])
+                    if (Grid.Bits[xx + yy * Grid.Width])
                     {
                         valid = false;
                         continue;
@@ -286,7 +294,7 @@ public class PathFinder
 
                 if (valid)
                 {
-                    _edges.Add((i, grid.Step));
+                    _edges.Add((i, Grid.Step));
                 }
             }
 
@@ -295,7 +303,7 @@ public class PathFinder
 
         public float GetHeuristicValue(int from, int to)
         {
-            return (grid.GetPosition(to) - grid.GetPosition(from)).Length();
+            return (Grid.GetPosition(to) - Grid.GetPosition(from)).Length();
         }
     }
 }

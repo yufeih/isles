@@ -36,7 +36,7 @@ public class AStarSearch
     /// <summary>
     /// Returns a list of path index from end to start.
     /// </summary>
-    public ReadOnlySpan<int> Search(IPathGraph graph, int start, int end)
+    public ReadOnlySpan<int> Search<T>(T graph, int start, int end) where T : IPathGraph
     {
         var nodeCount = graph.NodeCount;
 
