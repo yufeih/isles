@@ -137,7 +137,6 @@ public class Move
             ref var b = ref movables[c.B];
 
             var speed = a.Speed + b.Speed;
-            var velocity = b._velocity - a._velocity;
             var impulse = Bias * c.Normal * c.Penetration * idt;
 
             if (a.Target is null && b.Target is null)
@@ -147,6 +146,7 @@ public class Move
             }
             else if (a.Target != null && b.Target != null)
             {
+                var velocity = b._velocity - a._velocity;
                 var perpendicular = Cross(velocity, c.Normal) > 0
                     ? new Vector2(c.Normal.Y, -c.Normal.X)
                     : new Vector2(-c.Normal.Y, c.Normal.X);
@@ -160,10 +160,20 @@ public class Move
             }
             else
             {
-                ref var lead = ref a.Target != null ? ref a : ref b;
-                ref var idle = ref a.Target != null ? ref b : ref a;
+                ref var lead = ref a;
+                ref var idle = ref b;
+                var normal = c.Normal;
 
-                var perpendicular = Cross(velocity, c.Normal) > 0
+                if (b.Target != null)
+                {
+                    lead = ref b;
+                    idle = ref a;
+                    impulse = -impulse;
+                    normal = -normal;
+                }
+
+                var velocity = idle._velocity - lead._velocity;
+                var perpendicular = Cross(velocity, normal) > 0
                     ? new Vector2(lead._velocity.Y, -lead._velocity.X)
                     : new Vector2(-lead._velocity.Y, lead._velocity.X);
 

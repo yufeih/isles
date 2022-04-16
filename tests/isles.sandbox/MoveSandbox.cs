@@ -23,6 +23,7 @@ class MoveSandbox : Game
     {
         Window.AllowUserResizing = true;
         IsMouseVisible = true;
+        IsFixedTimeStep = true;
 
         new GraphicsDeviceManager(this)
         {
@@ -52,42 +53,48 @@ class MoveSandbox : Game
     protected override void Update(GameTime gameTime)
     {
         UpdateSelection();
-        
+
         _move.Update((float)gameTime.ElapsedGameTime.TotalSeconds, _units);
+    }
 
-        void UpdateSelection()
+    private void UpdateSelection()
+    {
+        var mouse = Mouse.GetState();
+        if (mouse.RightButton == ButtonState.Pressed)
         {
-            var mouse = Mouse.GetState();
-            if (mouse.RightButton == ButtonState.Pressed)
+            foreach (var i in _selection)
             {
-                foreach (var i in _selection)
-                {
-                    _units[i].Target = new(mouse.X, mouse.Y);
-                }
+                _units[i].Target = new(mouse.X, mouse.Y);
             }
+        }
 
-            if (mouse.LeftButton == ButtonState.Pressed)
-            {
-                if (_selectStart == default)
-                    _selectStart = _selectEnd = new(mouse.X, mouse.Y);
-                else
-                    _selectEnd = new(mouse.X, mouse.Y);
-
-                var rectangle = GetSelectionRectangle();
-                _selection.Clear();
-                for (var i = 0; i < _units.Length; i++)
-                {
-                    ref readonly var unit = ref _units[i];
-                    if (rectangle.Contains((int)unit.Position.X, (int)unit.Position.Y))
-                    {
-                        _selection.Add(i);
-                    }
-                }
-            }
+        if (mouse.LeftButton == ButtonState.Pressed)
+        {
+            if (_selectStart == default)
+                _selectStart = _selectEnd = new(mouse.X, mouse.Y);
             else
+                _selectEnd = new(mouse.X, mouse.Y);
+
+            var rectangle = GetSelectionRectangle();
+            _selection.Clear();
+            for (var i = 0; i < _units.Length; i++)
             {
-                _selectStart = _selectEnd = default;
+                ref readonly var unit = ref _units[i];
+                if (rectangle.Contains((int)unit.Position.X, (int)unit.Position.Y))
+                {
+                    _selection.Add(i);
+                }
             }
+        }
+        else
+        {
+            _selectStart = _selectEnd = default;
+        }
+
+        if (_selection.Count == 1)
+        {
+            var unit = _units[_selection[0]];
+            Window.Title = $"[{_selection[0]}] r: {unit.Radius} s: {unit.Speed} p: {unit.Position} t: {unit.Target}";
         }
     }
 
