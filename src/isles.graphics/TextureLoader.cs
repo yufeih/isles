@@ -25,17 +25,16 @@ public class TextureLoader
         return _textures.GetOrAdd(path, LoadTextureCore);
     }
 
-    private Texture2D LoadTextureCore(string path)
+    private unsafe Texture2D LoadTextureCore(string path)
     {
-        using var stream = File.OpenRead(path);
-        using var bitmap = path.EndsWith(".svg") ? LoadSvg(stream) : SKBitmap.Decode(stream);
+        var pixels = ReadAllPixels(path, out var width, out var height);
+        var mipmap = IsPowerOfTwo(width) && IsPowerOfTwo(height);
+        var texture = new Texture2D(_graphicsDevice, width, height, mipmap, SurfaceFormat.Color);
 
-        var pixels = bitmap.Pixels;
-        SKColorToColor(pixels);
-
-        var mipmap = IsPowerOfTwo(bitmap.Width) && IsPowerOfTwo(bitmap.Height);
-        var texture = new Texture2D(_graphicsDevice, bitmap.Width, bitmap.Height, mipmap, SurfaceFormat.Color);
-        texture.SetData(pixels);
+        fixed (void* ptr = pixels)
+        {
+            texture.SetDataPointerEXT(0, null, (IntPtr)ptr, pixels.Length);
+        }
 
         if (mipmap)
         {
@@ -45,69 +44,81 @@ public class TextureLoader
         return texture;
 
         static bool IsPowerOfTwo(int x) => (x & (x - 1)) == 0;
-
-        static SKBitmap LoadSvg(Stream stream)
-        {
-            using var svg = new SKSvg();
-            return svg.Load(stream)!.ToBitmap(SKColors.Transparent, 1, 1, SKColorType.Bgra8888, SKAlphaType.Premul, null);
-        }
     }
 
-    public static (Color[], int width, int height) ReadAllPixels(string path)
+    public static Span<Color> ReadAllPixels(string path, out int width, out int height)
     {
         using var stream = File.OpenRead(path);
-        using var bitmap = SKBitmap.Decode(stream);
-        var pixels = MemoryMarshal.Cast<SKColor, Color>(bitmap.Pixels).ToArray();
-        return (pixels, bitmap.Width, bitmap.Height);
+        using var bitmap = path.EndsWith(".svg") ? LoadSvg(stream) : SKBitmap.Decode(stream);
+        width = bitmap.Width;
+        height = bitmap.Height;
+        return SKColorToColor(bitmap.Pixels);
     }
 
-    private static Texture2D CreateMipMaps(Texture2D texture, SKColor[] pixels)
+    private static SKBitmap LoadSvg(Stream stream)
+    {
+        using var svg = new SKSvg();
+        return svg.Load(stream)!.ToBitmap(SKColors.Transparent, 1, 1, SKColorType.Bgra8888, SKAlphaType.Premul, null);
+    }
+
+    private static unsafe Texture2D CreateMipMaps(Texture2D texture, ReadOnlySpan<Color> pixels)
     {
         var level = 1;
         var width = texture.Width / 2;
         var height = texture.Height / 2;
-        var bufferLarge = pixels;
-        var bufferSmall = ArrayPool<SKColor>.Shared.Rent(width * height);
+
+        var source = ArrayPool<Color>.Shared.Rent(width * height / 4);
+        var target = ArrayPool<Color>.Shared.Rent(width * height);
 
         while (width > 1 || height > 1)
         {
+            var ww = width * 2;
+            var src = level == 1 ? pixels : source;
             for (var y = 0; y < height; y++)
             {
+                var yy = y * 2;
                 for (var x = 0; x < width; x++)
                 {
-                    var a = bufferLarge[(y * 2) * width * 2 + x * 2];
-                    var b = bufferLarge[(y * 2 + 1) * width * 2 + x * 2];
-                    var c = bufferLarge[(y * 2) * width * 2 + x * 2 + 1];
-                    var d = bufferLarge[(y * 2 + 1) * width * 2 + x * 2 + 1];
+                    var xx = x * 2;
+                    var a = src[yy * ww + xx];
+                    var b = src[(yy + 1) * ww + xx];
+                    var c = src[yy * ww + xx + 1];
+                    var d = src[(yy + 1) * ww + xx + 1];
 
-                    bufferSmall[y * width + x] = new(
-                        (byte)((a.Red + b.Red + c.Red + d.Red) / 4),
-                        (byte)((a.Green + b.Green + c.Green + d.Green) / 4),
-                        (byte)((a.Blue + b.Blue + c.Blue + d.Blue) / 4),
-                        (byte)((a.Alpha + b.Alpha + c.Alpha + d.Alpha) / 4));
+                    target[y * width + x] = new(
+                        (a.R + b.R + c.R + d.R) / 4,
+                        (a.G + b.G + c.G + d.G) / 4,
+                        (a.B + b.B + c.B + d.B) / 4,
+                        (a.A + b.A + c.A + d.A) / 4);
                 }
             }
-            texture.SetData(level, null, bufferSmall, 0, width * height);
+
+            fixed (void* ptr = target)
+            {
+                texture.SetDataPointerEXT(level, null, (IntPtr)ptr, width * height);
+            }
 
             level++;
             width /= 2;
             height /= 2;
-            (bufferSmall, bufferLarge) = (bufferLarge, bufferSmall);
+
+            (source, target) = (target, source);
         }
 
-        ArrayPool<SKColor>.Shared.Return(pixels == bufferSmall ? bufferLarge : bufferSmall);
+        ArrayPool<Color>.Shared.Return(source);
+        ArrayPool<Color>.Shared.Return(target);
 
         return texture;
     }
 
-    private static Span<Color> SKColorToColor(SKColor[] pixels)
+    private static Span<Color> SKColorToColor(Span<SKColor> pixels)
     {
         // ARGB --> ABGR
         foreach (ref var pixel in MemoryMarshal.Cast<SKColor, uint>(pixels))
         {
-            pixel = ((pixel >> 16) & 0x000000ff) |
-                    ((pixel << 16) & 0x00ff0000) |
-                    (pixel & 0xff00ff00);
+            pixel = ((pixel >> 16) & 0x000000FF) |
+                    ((pixel << 16) & 0x00FF0000) |
+                    (pixel & 0xFF00FF00);
         }
 
         return MemoryMarshal.Cast<SKColor, Color>(pixels);
