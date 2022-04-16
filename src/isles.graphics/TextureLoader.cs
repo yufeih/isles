@@ -49,7 +49,7 @@ public class TextureLoader
         static SKBitmap LoadSvg(Stream stream)
         {
             using var svg = new SKSvg();
-            return svg.Load(stream)!.ToBitmap(SKColors.Transparent, 1, 1, SKColorType.Rgba8888, SKAlphaType.Premul, null);
+            return svg.Load(stream)!.ToBitmap(SKColors.Transparent, 1, 1, SKColorType.Bgra8888, SKAlphaType.Premul, null);
         }
     }
 
