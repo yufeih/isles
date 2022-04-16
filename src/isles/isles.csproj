@@ -6,9 +6,6 @@
     <NoWarn>X4717</NoWarn>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Platforms>x64</Platforms>
-    <DefineConstants Condition="$([MSBuild]::IsOSPlatform('windows'))">WINDOWS</DefineConstants>
-    <DefineConstants Condition="$([MSBuild]::IsOSPlatform('osx'))">OSX</DefineConstants>
-    <DefineConstants Condition="$([MSBuild]::IsOSPlatform('linux'))">LINUX</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,13 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\..\extern\FNA-redist\x64\**" Condition="$([MSBuild]::IsOSPlatform('windows'))" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="..\..\extern\FNA-redist\osx\**" Condition="$([MSBuild]::IsOSPlatform('osx'))" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="..\..\extern\FNA-redist\lib64\**" Condition="$([MSBuild]::IsOSPlatform('linux'))" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\extern\FNA\FNA.Core.csproj" />
+    <ProjectReference Include="..\isles.graphics\isles.graphics.csproj" />
     <ProjectReference Include="..\isles.core\isles.core.csproj" />
   </ItemGroup>
 
