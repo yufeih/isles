@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Using Include="Microsoft.Xna.Framework" />
+    <Using Include="Microsoft.Xna.Framework.Graphics" />
+    <Using Include="Microsoft.Xna.Framework.Graphics.PackedVector" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\extern\FNA-redist\x64\**" Condition="$([MSBuild]::IsOSPlatform('windows'))" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\extern\FNA-redist\osx\**" Condition="$([MSBuild]::IsOSPlatform('osx'))" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\extern\FNA-redist\lib64\**" Condition="$([MSBuild]::IsOSPlatform('linux'))" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Svg.Skia" Version="0.5.12" />
+    <PackageReference Include="SkiaSharp" Version="2.88.0-preview.232" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.88.0-preview.232" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\extern\FNA\FNA.Core.csproj" />
+    <ProjectReference Include="..\isles.core\isles.core.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -6,6 +6,7 @@ using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 
 using SkiaSharp;
+using Svg.Skia;
 
 namespace Isles.Graphics;
 
@@ -48,10 +49,16 @@ public class TextureLoader
     public static Span<Color> ReadAllPixels(string path, out int width, out int height)
     {
         using var stream = File.OpenRead(path);
-        using var bitmap = SKBitmap.Decode(stream);
+        using var bitmap = path.EndsWith(".svg") ? LoadSvg(stream) : SKBitmap.Decode(stream);
         width = bitmap.Width;
         height = bitmap.Height;
         return SKColorToColor(bitmap.Pixels);
+    }
+
+    private static SKBitmap LoadSvg(Stream stream)
+    {
+        using var svg = new SKSvg();
+        return svg.Load(stream)!.ToBitmap(SKColors.Transparent, 1, 1, SKColorType.Bgra8888, SKAlphaType.Premul, null);
     }
 
     private static unsafe Texture2D CreateMipMaps(Texture2D texture, ReadOnlySpan<Color> pixels)

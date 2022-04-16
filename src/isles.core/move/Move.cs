@@ -61,7 +61,7 @@ public class Move
             // Find path if there is no path to follow
             if (grid != null)
             {
-                if (m._path.Length == 0 || m._path[m._path.Length - 1] != m.Target.Value)
+                if (m._path.Length == 0 || m._path[^1] != m.Target.Value)
                 {
                     m._path.Clear();
                     m._pathIndex = 0;
@@ -152,17 +152,18 @@ public class Move
             }
             else
             {
-                (a, b) = a.Target != null ? (a, b) : (b, a);
+                ref var lead = ref a.Target != null ? ref a : ref b;
+                ref var idle = ref a.Target != null ? ref b : ref a;
 
                 var perpendicular = Cross(velocity, c.Normal) > 0
-                    ? new Vector2(a._velocity.Y, -a._velocity.X)
-                    : new Vector2(-a._velocity.Y, a._velocity.X);
+                    ? new Vector2(lead._velocity.Y, -lead._velocity.X)
+                    : new Vector2(-lead._velocity.Y, lead._velocity.X);
 
                 perpendicular.Normalize();
 
                 if (!float.IsNaN(perpendicular.X))
                 {
-                    b._velocity = perpendicular * b.Speed + impulse;
+                    idle._velocity = perpendicular * idle.Speed + impulse;
                 }
             }
         }
