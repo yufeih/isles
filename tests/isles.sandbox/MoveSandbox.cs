@@ -5,10 +5,10 @@ using Isles.Graphics;
 
 Directory.SetCurrentDirectory(AppContext.BaseDirectory);
 
-using var testBeds = new MoveTestBeds();
-testBeds.Run();
+using var sandbox = new MoveSandbox();
+sandbox.Run();
 
-class MoveTestBeds : Game
+class MoveSandbox : Game
 {
     private readonly Movable[] _units = new Movable[20];
     private readonly List<int> _selection = new();
@@ -19,7 +19,7 @@ class MoveTestBeds : Game
     private TextureLoader _textureLoader;
     private SpriteBatch _spriteBatch;
 
-    public MoveTestBeds()
+    public MoveSandbox()
     {
         Window.AllowUserResizing = true;
         IsMouseVisible = true;
@@ -38,6 +38,7 @@ class MoveTestBeds : Game
                 Radius = 20 + 20 * random.NextSingle(),
                 Position = new(random.NextSingle() * Window.ClientBounds.Width, random.NextSingle() * Window.ClientBounds.Height),
                 Speed = 200 + 200 * random.NextSingle(),
+                Facing = new(random.NextSingle(), random.NextSingle()),
             };
         }
     }
@@ -108,7 +109,7 @@ class MoveTestBeds : Game
                 unit.Position,
                 null,
                 color: _selection.Contains(i) ? Color.Orange : Color.DarkSlateBlue,
-                rotation: unit.Velocity == default ? 0 : MathF.Atan2(unit.Velocity.Y, unit.Velocity.X),
+                rotation: MathF.Atan2(unit.Facing.Y, unit.Facing.X),
                 origin: new(arrow.Width / 2, arrow.Height / 2),
                 scale: unit.Radius * 2 / arrow.Width,
                 SpriteEffects.None,

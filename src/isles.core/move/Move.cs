@@ -18,6 +18,13 @@ public struct Movable
     public Vector2 Velocity => _velocity;
     internal Vector2 _velocity;
 
+    public Vector2 Facing
+    {
+        get => _facing;
+        init => _facing = value;
+    }
+    internal Vector2 _facing;
+
     public Vector2? Target { get; set; }
 
     internal ArrayBuilder<Vector2> _path;
@@ -117,6 +124,7 @@ public class Move
             else
             {
                 m._position += m._velocity * dt;
+                m._facing = m._velocity;
             }
         }
     }
