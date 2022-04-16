@@ -10,7 +10,6 @@ public static class JsonHelper
 {
     public static readonly JsonSerializerOptions Options = new()
     {
-        IncludeFields = true,
         PropertyNameCaseInsensitive = true,
     };
 
