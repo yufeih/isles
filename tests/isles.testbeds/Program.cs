@@ -95,6 +95,8 @@ class MoveTestBeds : Game
         GraphicsDevice.Clear(Color.White);
 
         var arrow = _textureLoader.LoadTexture("data/arrow.svg");
+        var selection = _textureLoader.LoadTexture("data/selection.svg");
+
         _spriteBatch.Begin();
 
         for (var i = 0; i < _units.Length; i++)
@@ -105,17 +107,17 @@ class MoveTestBeds : Game
                 arrow,
                 unit.Position,
                 null,
-                color: _selection.Contains(i) ? Color.Red * 0.2f : Color.Black,
+                color: _selection.Contains(i) ? Color.Orange : Color.DarkSlateBlue,
                 rotation: unit.Velocity == default ? 0 : MathF.Atan2(unit.Velocity.Y, unit.Velocity.X),
                 origin: new(arrow.Width / 2, arrow.Height / 2),
-                scale: unit.Radius / arrow.Width,
+                scale: unit.Radius * 2 / arrow.Width,
                 SpriteEffects.None,
                 0);
         }
 
         if (_selectStart != _selectEnd)
         {
-            _spriteBatch.Draw(null, GetSelectionRectangle(), Color.Green * 0.2f);
+            _spriteBatch.Draw(selection, GetSelectionRectangle(), Color.Green * 0.5f);
         }
 
         _spriteBatch.End();
