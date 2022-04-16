@@ -399,7 +399,7 @@ public abstract class BaseLandscape : ILandscape
     {
         size = new(data.Width, data.Depth, data.Height);
 
-        var (heightmap, w, h) = TextureLoader.ReadAllPixels(data.Heightmap);
+        var heightmap = TextureLoader.ReadAllPixels(data.Heightmap, out var w, out var h);
 
         GridCountOnXAxis = w;
         GridCountOnYAxis = h;

@@ -25,13 +25,13 @@ public static class Cursors
 
     private static unsafe IntPtr LoadCursor(string name)
     {
-        var (pixels, w, h) = TextureLoader.ReadAllPixels($"data/cursors/{name}.png");
+        var pixels = TextureLoader.ReadAllPixels($"data/cursors/{name}.png", out var w, out var h);
         var info = JsonHelper.DeserializeAnonymousType(
             File.ReadAllBytes($"data/cursors/{name}.json"), new { hotspot = Array.Empty<int>() });
 
-        fixed (Color* ptr = pixels)
+        fixed (void* ptr = pixels)
         {
-            var surface = SDL_CreateRGBSurfaceFrom((IntPtr)ptr, w, h, 32, w * 4, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+            var surface = SDL_CreateRGBSurfaceFrom((IntPtr)ptr, w, h, 32, w * 4, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
             var cursor = SDL_CreateColorCursor(surface, info.hotspot[0], info.hotspot[1]);
             SDL_FreeSurface(surface);
             return cursor;
