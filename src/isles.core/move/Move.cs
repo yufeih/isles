@@ -180,17 +180,29 @@ public class Move
             }
             else if (a.Target != null && b.Target != null)
             {
-                var velocity = b._velocity - a._velocity;
-                var perpendicular = Cross(velocity, c.Normal) > 0
-                    ? new Vector2(c.Normal.Y, -c.Normal.X)
-                    : new Vector2(-c.Normal.Y, c.Normal.X);
+                var target = b.Target.Value - a.Target.Value;
+                var radius = a.Radius + b.Radius;
 
-                var targetVelocity = perpendicular * speed;
+                if (target.LengthSquared() <= radius * radius && (
+                    (a.Position - a.Target.Value).LengthSquared() <= a.Radius * a.Radius ||
+                    (b.Position - b.Target.Value).LengthSquared() <= b.Radius * b.Radius))
+                {
+                    a.Target = null;
+                    b.Target = null;
+                }
+                else
+                {
+                    var velocity = b._velocity - a._velocity;
+                    var perpendicular = Cross(velocity, c.Normal) > 0
+                        ? new Vector2(c.Normal.Y, -c.Normal.X)
+                        : new Vector2(-c.Normal.Y, c.Normal.X);
 
-                var p = targetVelocity - velocity + impulse;
+                    var targetVelocity = perpendicular * speed;
+                    var p = targetVelocity - velocity + impulse;
 
-                a._velocity -= p * a.Speed / speed;
-                b._velocity += p * b.Speed / speed;
+                    a._velocity -= p * a.Speed / speed;
+                    b._velocity += p * b.Speed / speed;
+                }
             }
             else
             {
