@@ -39,7 +39,7 @@ class MoveSandbox : Game
                 Radius = 20 + 20 * random.NextSingle(),
                 Position = new(random.NextSingle() * Window.ClientBounds.Width, random.NextSingle() * Window.ClientBounds.Height),
                 Speed = 200 + 200 * random.NextSingle(),
-                RotationSpeed = MathF.PI + random.NextSingle() * MathF.PI * 4,
+                RotationSpeed = MathF.PI * 2 + random.NextSingle() * MathF.PI * 2,
                 Rotation = random.NextSingle() * MathF.PI * 2 - MathF.PI,
             };
         }

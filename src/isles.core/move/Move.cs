@@ -102,6 +102,7 @@ public class Move
             var distanceEpsilon = m.Speed * dt * 2;
             if (distanceSquared <= distanceEpsilon * distanceEpsilon)
             {
+                m.Target = null;
                 m._velocity = default;
                 m._path.Clear();
                 m._pathIndex = 0;
@@ -120,7 +121,6 @@ public class Move
             if (m._velocity.LengthSquared() < m.Speed * m.Speed * 0.001f)
             {
                 m._velocity = default;
-                m.Target = null;
             }
             else
             {
@@ -140,7 +140,7 @@ public class Move
         {
             m._rotation += MathF.PI + MathF.PI;
         }
-        
+
         var targetRotation = MathF.Atan2(m._velocity.Y, m._velocity.X);
         var rotationOffset = targetRotation - m._rotation;
         var rotationDelta = m.RotationSpeed * dt;
@@ -187,8 +187,7 @@ public class Move
                     (a.Position - a.Target.Value).LengthSquared() <= a.Radius * a.Radius ||
                     (b.Position - b.Target.Value).LengthSquared() <= b.Radius * b.Radius))
                 {
-                    a.Target = null;
-                    b.Target = null;
+                    a.Target = b.Target = null;
                 }
                 else
                 {
