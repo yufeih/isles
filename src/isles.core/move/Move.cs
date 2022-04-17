@@ -160,28 +160,30 @@ public class Move
             }
             else
             {
-                ref var lead = ref a;
-                ref var idle = ref b;
                 var normal = c.Normal;
 
                 if (b.Target != null)
                 {
-                    lead = ref b;
-                    idle = ref a;
+                    ref var temp = ref a;
+                    a = ref b;
+                    b = ref temp;
                     impulse = -impulse;
                     normal = -normal;
                 }
 
-                var velocity = idle._velocity - lead._velocity;
-                var perpendicular = Cross(velocity, normal) > 0
-                    ? new Vector2(lead._velocity.Y, -lead._velocity.X)
-                    : new Vector2(-lead._velocity.Y, lead._velocity.X);
-
-                perpendicular.Normalize();
-
-                if (!float.IsNaN(perpendicular.X))
+                var direction = b.Position - a.Target!.Value;
+                if (direction.LengthSquared() > (a.Radius + b.Radius) * (a.Radius + b.Radius))
                 {
-                    idle._velocity = perpendicular * idle.Speed + impulse;
+                    var velocity = b._velocity - a._velocity;
+                    direction = Cross(velocity, normal) > 0
+                        ? new Vector2(a._velocity.Y, -a._velocity.X)
+                        : new Vector2(-a._velocity.Y, a._velocity.X);
+                }
+
+                direction.Normalize();
+                if (!float.IsNaN(direction.X))
+                {
+                    b._velocity = direction * b.Speed + impulse;
                 }
             }
         }
