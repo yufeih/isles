@@ -39,7 +39,8 @@ class MoveSandbox : Game
                 Radius = 20 + 20 * random.NextSingle(),
                 Position = new(random.NextSingle() * Window.ClientBounds.Width, random.NextSingle() * Window.ClientBounds.Height),
                 Speed = 200 + 200 * random.NextSingle(),
-                Facing = new(random.NextSingle(), random.NextSingle()),
+                RotationSpeed = MathF.PI + random.NextSingle() * MathF.PI * 4,
+                Rotation = random.NextSingle() * MathF.PI * 2 - MathF.PI,
             };
         }
     }
@@ -116,7 +117,7 @@ class MoveSandbox : Game
                 unit.Position,
                 null,
                 color: _selection.Contains(i) ? Color.Orange : Color.DarkSlateBlue,
-                rotation: MathF.Atan2(unit.Facing.Y, unit.Facing.X),
+                rotation: unit.Rotation,
                 origin: new(arrow.Width / 2, arrow.Height / 2),
                 scale: unit.Radius * 2 / arrow.Width,
                 SpriteEffects.None,

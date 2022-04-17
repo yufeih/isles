@@ -7,6 +7,7 @@ public struct Movable
 {
     public float Radius { get; init; }
     public float Speed { get; set; }
+    public float RotationSpeed { get; set; }
 
     public Vector2 Position
     {
@@ -18,12 +19,12 @@ public struct Movable
     public Vector2 Velocity => _velocity;
     internal Vector2 _velocity;
 
-    public Vector2 Facing
+    public float Rotation
     {
-        get => _facing;
-        init => _facing = value;
+        get => _rotation;
+        init => _rotation = value;
     }
-    internal Vector2 _facing;
+    internal float _rotation;
 
     public Vector2? Target { get; set; }
 
@@ -124,7 +125,40 @@ public class Move
             else
             {
                 m._position += m._velocity * dt;
-                m._facing = m._velocity;
+                UpdateRotation(ref m, dt);
+            }
+        }
+    }
+
+    private static void UpdateRotation(ref Movable m, float dt)
+    {
+        while (m._rotation > MathHelper.Pi)
+        {
+            m._rotation -= MathF.PI + MathF.PI;
+        }
+        while (m._rotation < -MathHelper.Pi)
+        {
+            m._rotation += MathF.PI + MathF.PI;
+        }
+        
+        var targetRotation = MathF.Atan2(m._velocity.Y, m._velocity.X);
+        var rotationOffset = targetRotation - m._rotation;
+        var rotationDelta = m.RotationSpeed * dt;
+
+        if (Math.Abs(rotationOffset) <= rotationDelta)
+        {
+            m._rotation = targetRotation;
+        }
+        else
+        {
+            if ((rotationOffset >=0 && rotationOffset < MathF.PI) ||
+                (rotationOffset >= -MathF.PI * 2 && rotationOffset < -MathF.PI))
+            {
+                m._rotation += rotationDelta;
+            }
+            else
+            {
+                m._rotation -= rotationDelta;
             }
         }
     }
