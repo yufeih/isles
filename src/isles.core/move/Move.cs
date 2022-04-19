@@ -34,8 +34,6 @@ public struct Movable
 
 public class Move
 {
-    private const float Bias = 0.5f;
-
     private readonly PathFinder _pathFinder = new();
 
     private ArrayBuilder<Contact> _contacts;
@@ -170,8 +168,7 @@ public class Move
             ref var a = ref movables[c.A];
             ref var b = ref movables[c.B];
 
-            var speed = a.Speed + b.Speed;
-            var impulse = Bias * c.Normal * c.Penetration * idt;
+            var impulse = c.Normal * c.Penetration * idt;
 
             if (a.Target is null && b.Target is null)
             {
@@ -196,6 +193,7 @@ public class Move
                         ? new Vector2(c.Normal.Y, -c.Normal.X)
                         : new Vector2(-c.Normal.Y, c.Normal.X);
 
+                    var speed = a.Speed + b.Speed;
                     var targetVelocity = perpendicular * speed;
                     var p = targetVelocity - velocity + impulse;
 
@@ -240,7 +238,7 @@ public class Move
         {
             ref var m = ref movables[c.Index];
 
-            var impulse = Bias * c.Normal * c.Penetration * idt;
+            var impulse = c.Normal * c.Penetration * idt;
 
             if (m.Target is null)
             {
