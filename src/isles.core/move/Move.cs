@@ -173,8 +173,9 @@ public class Move
 
             if (a.Target is null && b.Target is null)
             {
-                a._velocity -= impulse * 0.5f;
-                b._velocity += impulse * 0.5f;
+                var speed = a.Speed + b.Speed;
+                a._velocity -= impulse * a.Speed / speed;
+                b._velocity += impulse * b.Speed / speed;
             }
             else if (a.Target != null && b.Target != null)
             {
@@ -194,11 +195,10 @@ public class Move
                         : new Vector2(-c.Normal.Y, c.Normal.X);
 
                     var speed = a.Speed + b.Speed;
-                    var targetVelocity = perpendicular * speed;
-                    var p = targetVelocity - velocity + impulse;
+                    var desiredVelocity = perpendicular * speed + impulse;
 
-                    a._velocity -= p * a.Speed / speed;
-                    b._velocity += p * b.Speed / speed;
+                    a._velocity -= desiredVelocity * a.Speed / speed;
+                    b._velocity += desiredVelocity * b.Speed / speed;
                 }
             }
             else

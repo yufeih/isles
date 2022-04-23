@@ -49,13 +49,19 @@
   },
   "meet-exact": {
     "units": [
+      { "radius": 1, "speed": 5, "position": [0,0], "target": [3,0] },
+      { "radius": 1, "speed": 5, "position": [3,0], "target": [0,0] }
+    ]
+  },
+  "meet-exact-same-target": {
+    "units": [
       { "radius": 1, "speed": 5, "position": [0,0], "target": [4,0] },
       { "radius": 1, "speed": 5, "position": [8,0], "target": [4,0] }
     ]
   },
   "overlap": {
     "units": [
-      { "radius": 1, "speed": 5 },
+      { "radius": 1, "speed": 1 },
       { "radius": 1, "speed": 5, "position": [0.1,0] }
     ]
   },
