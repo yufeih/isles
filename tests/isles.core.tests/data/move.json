@@ -53,16 +53,23 @@
       { "radius": 1, "speed": 5, "position": [8,0], "target": [4,0] }
     ]
   },
+  "overlap": {
+    "units": [
+      { "radius": 1, "speed": 5 },
+      { "radius": 1, "speed": 5, "position": [0.1,0] }
+    ]
+  },
   "overlap-exact": {
     "units": [
       { "radius": 1, "speed": 5 },
       { "radius": 1, "speed": 5 }
     ]
   },
-  "overlap": {
+  "overlap-exact-3": {
     "units": [
       { "radius": 1, "speed": 5 },
-      { "radius": 1, "speed": 5, "position": [0.1,0] }
+      { "radius": 1, "speed": 5, "position": [0.2,0] },
+      { "radius": 1, "speed": 5, "position": [0.1,0.1] }
     ]
   },
   "spawn": {

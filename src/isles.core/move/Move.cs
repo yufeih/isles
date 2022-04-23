@@ -168,7 +168,8 @@ public class Move
             ref var a = ref movables[c.A];
             ref var b = ref movables[c.B];
 
-            var impulse = c.Normal * c.Penetration * idt;
+            var velocity = b._velocity - a._velocity;
+            var impulse = c.Normal * Math.Max(0, c.Penetration * idt - Vector2.Dot(velocity, c.Normal));
 
             if (a.Target is null && b.Target is null)
             {
@@ -188,7 +189,6 @@ public class Move
                 }
                 else
                 {
-                    var velocity = b._velocity - a._velocity;
                     var perpendicular = Cross(velocity, c.Normal) > 0
                         ? new Vector2(c.Normal.Y, -c.Normal.X)
                         : new Vector2(-c.Normal.Y, c.Normal.X);
@@ -217,7 +217,6 @@ public class Move
                 var direction = b.Position - a.Target!.Value;
                 if (direction.LengthSquared() > (a.Radius + b.Radius) * (a.Radius + b.Radius))
                 {
-                    var velocity = b._velocity - a._velocity;
                     direction = Cross(velocity, normal) > 0
                         ? new Vector2(a._velocity.Y, -a._velocity.X)
                         : new Vector2(-a._velocity.Y, a._velocity.X);
