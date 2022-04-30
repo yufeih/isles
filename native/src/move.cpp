@@ -82,8 +82,11 @@ int32_t move_get_contacts(MoveWorld* world, MoveContact* contacts, int32_t conta
 
 			if (contacts != nullptr && count < contactsLength) {
 				MoveContact c;
+				b2WorldManifold manifold;
+				contact->GetWorldManifold(&manifold);
 				c.a = contact->GetFixtureA()->GetUserData().pointer;
 				c.b = contact->GetFixtureB()->GetUserData().pointer;
+				c.normal = manifold.normal;
 				*contacts++ = c;
 			}
 			count++;

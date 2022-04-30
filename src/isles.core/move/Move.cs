@@ -51,6 +51,8 @@ public struct Movable
     internal float _rotation;
 
     public Vector2? Target { get; set; }
+
+    internal Vector2 _desiredVelocity;
 }
 
 public sealed class Move : IDisposable
@@ -77,11 +79,13 @@ public sealed class Move : IDisposable
         var idt = 1 / dt;
 
         foreach (ref var m in movables)
-        {
-            var desiredVelocity = Vector2.Zero;
-            desiredVelocity += MoveToTarget(ref m);
-            m._force = CalculateForce(idt, ref m, desiredVelocity);
-        }
+            m._desiredVelocity = MoveToTarget(ref m);
+
+        foreach (ref readonly var c in GetContacts())
+            UpdateContact(movables, c);
+
+        foreach (ref var m in movables)
+            m._force = CalculateForce(idt, ref m);
 
         fixed (void* units = movables)
         {
@@ -90,26 +94,24 @@ public sealed class Move : IDisposable
 
         foreach (ref var m in movables)
         {
-            m._state = MovableState.Idle;
             if (m._velocity.LengthSquared() > m.Speed * m.Speed * 0.001f)
                 UpdateRotation(dt, ref m);
         }
+    }
 
+    private unsafe ReadOnlySpan<Contact> GetContacts()
+    {
         var contactCount = move_get_contacts(_world, null, 0);
-        if (contactCount > 0)
-        {
-            _contacts.SetLength((int)contactCount);
-            fixed (Contact* contacts = _contacts.AsSpan())
-            {
-                move_get_contacts(_world, contacts, contactCount);
-            }
+        if (contactCount <= 0)
+            return Array.Empty<Contact>();
 
-            foreach (var c in _contacts.AsSpan())
-            {
-                movables[c.A]._state = MovableState.InContact;
-                movables[c.B]._state = MovableState.InContact;
-            }
+        _contacts.SetLength((int)contactCount);
+        fixed (Contact* contacts = _contacts.AsSpan())
+        {
+            move_get_contacts(_world, contacts, contactCount);
         }
+
+        return _contacts.AsSpan();
     }
 
     private Vector2 MoveToTarget(ref Movable m)
@@ -130,37 +132,79 @@ public sealed class Move : IDisposable
         // Should we start decelerating?
         var decelerationDistance = 0.5f * m.Velocity.LengthSquared() / m.Acceleration;
         if (distanceSq > decelerationDistance * decelerationDistance)
-        {
             return Vector2.Normalize(toTarget) * m.Speed;
-        }
 
         return default;
     }
 
-    private Vector2 CalculateForce(float idt, ref Movable m, Vector2 desiredVelocity)
+    private Vector2 CalculateForce(float idt, ref Movable m)
     {
-        var force = (desiredVelocity - m.Velocity) * idt;
+        var force = (m._desiredVelocity - m.Velocity) * idt;
         var accelerationSq = force.LengthSquared();
 
         // Are we turning or following a straight line?
-        var maxAcceleration = m.Acceleration == 0 ? m.Speed : m.Acceleration;
+        var maxAcceleration = m.Acceleration;
         if (m.Decceleration != 0)
         {
-            var v = desiredVelocity.Length() * m.Velocity.Length();
+            var v = m._desiredVelocity.Length() * m.Velocity.Length();
             if (v != 0)
             {
-                var lerp = (Vector2.Dot(desiredVelocity, m.Velocity) / v + 1) / 2;
+                var lerp = (Vector2.Dot(m._desiredVelocity, m.Velocity) / v + 1) / 2;
                 maxAcceleration = MathHelper.Lerp(m.Decceleration, m.Acceleration, lerp);
             }
         }
 
         // Cap max acceleration
         if (accelerationSq > maxAcceleration * maxAcceleration)
-        {
             return force * maxAcceleration / MathF.Sqrt(accelerationSq);
-        }
 
         return force;
+    }
+
+    private void UpdateContact(Span<Movable> movables, in Contact c)
+    {
+        ref var a = ref movables[c.A];
+        ref var b = ref movables[c.B];
+
+        // Are we separating?
+        var velocity = b._desiredVelocity - a._desiredVelocity;
+        if (Vector2.Dot(velocity, c.Normal) <= 0)
+            return;
+
+        if (a.Target != null && b.Target != null)
+        {
+            // Try circle around each other
+            var perpendicular = Cross(velocity, c.Normal) > 0
+                ? new Vector2(c.Normal.Y, -c.Normal.X)
+                : new Vector2(-c.Normal.Y, c.Normal.X);
+
+            a._desiredVelocity -= perpendicular * a.Speed;
+            b._desiredVelocity += perpendicular * b.Speed;
+        }
+        else if (a.Target != null || b.Target != null)
+        {
+            var normal = c.Normal;
+            if (b.Target != null)
+            {
+                ref var temp = ref a;
+                a = ref b;
+                b = ref temp;
+                normal = -normal;
+            }
+
+            // Choose a perpendicular direction if the moving unit isn't near its target
+            var direction = b.Position - a.Target!.Value;
+            if (direction.LengthSquared() > (a.Radius + b.Radius) * (a.Radius + b.Radius))
+                direction = Cross(velocity, normal) > 0
+                    ? new Vector2(a._desiredVelocity.Y, -a._desiredVelocity.X)
+                    : new Vector2(-a._desiredVelocity.Y, a._desiredVelocity.X);
+
+            if (direction.LengthSquared() > float.Epsilon * float.Epsilon)
+            {
+                direction.Normalize();
+                b._desiredVelocity -= direction * b.Speed;
+            }
+        }
     }
 
     private static void UpdateRotation(float dt, ref Movable m)
@@ -183,6 +227,12 @@ public sealed class Move : IDisposable
             m._rotation -= delta;
     }
 
+    private static float Cross(Vector2 a, Vector2 b)
+    {
+        return a.X * b.Y - b.X * a.Y;
+    }
+
+
     [StructLayout(LayoutKind.Sequential)]
     struct AABB
     {
@@ -195,6 +245,7 @@ public sealed class Move : IDisposable
     {
         public int A;
         public int B;
+        public Vector2 Normal;
     }
 
     [DllImport(LibName)] private static extern IntPtr move_new();
