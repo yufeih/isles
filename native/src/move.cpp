@@ -92,3 +92,26 @@ int move_query_aabb(MoveWorld* world, b2AABB* aabb, int* units, int unitsLength)
 	world->b2.QueryAABB(&cb, *aabb);
 	return cb.end - cb.begin;
 }
+
+struct MoveRayCastCallback : b2RayCastCallback
+{
+	int* unit;
+	int result;
+
+	virtual float ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float fraction)
+	{
+		*unit = fixture->GetUserData().pointer;
+		result = 1;
+		return 0;
+	}
+};
+
+int move_raycast(MoveWorld* world, b2Vec2* a, b2Vec2* b, int* unit)
+{
+	MoveRayCastCallback cb;
+	cb.result = 0;
+	cb.unit = unit;
+
+	world->b2.RayCast(&cb, *a, *b);
+	return cb.result;
+}

@@ -166,4 +166,5 @@ public sealed class Move : IDisposable
     [DllImport(LibName)] private static extern void move_delete(IntPtr world);
     [DllImport(LibName)] private static unsafe extern void move_step(IntPtr world, void* units, nint unitsLength, nint unitSizeInBytes, float dt);
     [DllImport(LibName)] private static unsafe extern nint move_query_aabb(IntPtr world, AABB* aabb, nint* units, nint unitsLength);
+    [DllImport(LibName)] private static unsafe extern nint move_raycast(IntPtr world, Vector2* a, Vector2* b, nint* unit);
 }
