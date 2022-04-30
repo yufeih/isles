@@ -14,7 +14,7 @@ class MoveSandbox : Game
 
     private readonly Movable[] _units = new Movable[20];
     private readonly List<int> _selection = new();
-    private readonly MoveNative _move = new();
+    private readonly Move _move = new();
 
     private Point _selectStart, _selectEnd;
 
