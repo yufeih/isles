@@ -42,7 +42,8 @@ class MoveSandbox : Game
                 Position = new(random.NextSingle() * Window.ClientBounds.Width / WorldScale, random.NextSingle() * Window.ClientBounds.Height / WorldScale),
                 Speed = 10 + 10 * random.NextSingle(),
                 Acceleration = 20 + 20 * random.NextSingle(),
-                RotationSpeed = MathF.PI * 2 + random.NextSingle() * MathF.PI * 2,
+                Decceleration = 400 + 400 * random.NextSingle(),
+                RotationSpeed = MathF.PI * 2 + random.NextSingle() * MathF.PI * 4,
                 Rotation = random.NextSingle() * MathF.PI * 2 - MathF.PI,
             };
         }
@@ -98,7 +99,7 @@ class MoveSandbox : Game
         if (_selection.Count == 1)
         {
             var unit = _units[_selection[0]];
-            Window.Title = $"[{_selection[0]}] r: {(int)unit.Radius} a: {(int)unit.Acceleration} s: {(int)unit.Velocity.Length()}/{(int)unit.Speed} ";
+            Window.Title = $"[{_selection[0]}] r: {(int)unit.Radius} a: {(int)unit.Acceleration}/{(int)unit.Decceleration} s: {(int)unit.Velocity.Length()}/{(int)unit.Speed} ";
         }
     }
 

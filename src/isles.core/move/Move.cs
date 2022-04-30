@@ -31,6 +31,7 @@ public struct Movable
 
     public float Speed { get; set; }
     public float Acceleration { get; set; }
+    public float Decceleration { get; set; }
     public float RotationSpeed { get; set; }
 
     public float Rotation
@@ -74,6 +75,7 @@ public sealed class Move : IDisposable
 
     private Vector2 CalculateForce(float idt, ref Movable m)
     {
+        var desiredDirection = Vector2.Zero;
         var desiredVelocity = Vector2.Zero;
 
         if (m.Target != null)
@@ -92,16 +94,26 @@ public sealed class Move : IDisposable
             var decelerationDistance = 0.5f * m.Velocity.LengthSquared() / m.Acceleration;
             if (distanceSq > decelerationDistance * decelerationDistance)
             {
-                desiredVelocity = Vector2.Normalize(toTarget) * m.Speed;
+                desiredDirection = Vector2.Normalize(toTarget);
+                desiredVelocity = desiredDirection * m.Speed;
             }
         }
 
-        // Calculate force and cap acceleration
         var force = (desiredVelocity - m.Velocity) * idt;
         var accelerationSq = force.LengthSquared();
-        if (accelerationSq > m.Acceleration * m.Acceleration)
+
+        // Are we turning or following a straight line?
+        var maxAcceleration = m.Acceleration == 0 ? m.Speed : m.Acceleration;
+        if (m.Decceleration != 0 && desiredDirection != default && m._velocity.LengthSquared() > m.Speed * m.Speed * 0.001f)
         {
-            return force * m.Acceleration / MathF.Sqrt(accelerationSq);
+            var dot = Vector2.Dot(desiredDirection, Vector2.Normalize(m.Velocity));
+            maxAcceleration = MathHelper.Lerp(m.Decceleration, m.Acceleration, (dot + 1) / 2);
+        }
+
+        // Cap max acceleration
+        if (accelerationSq > maxAcceleration * maxAcceleration)
+        {
+            return force * maxAcceleration / MathF.Sqrt(accelerationSq);
         }
 
         return force;
