@@ -24,7 +24,7 @@ MoveUnit& get_unit(void* units, int unitSizeInBytes, int i)
 	return *reinterpret_cast<MoveUnit*>(reinterpret_cast<std::byte*>(units) + i * unitSizeInBytes);
 }
 
-b2Body* create_body(b2World& b2, const MoveUnit& unit)
+b2Body* create_body(b2World& b2, const MoveUnit& unit, size_t i)
 {
 	b2CircleShape shape;
 	shape.m_radius = unit.radius;
@@ -41,28 +41,54 @@ b2Body* create_body(b2World& b2, const MoveUnit& unit)
 	fd.density = 1.0f / (b2_pi * unit.radius * unit.radius);
 
 	auto body = b2.CreateBody(&bd);
-	body->CreateFixture(&fd);
+	auto fixture = body->CreateFixture(&fd);
+	fixture->GetUserData().pointer = i;
 	return body;
 }
 
-void move_step(MoveWorld* world, void* units, int unitLength, int unitSizeInBytes, float dt)
+void move_step(MoveWorld* world, void* units, int unitsLength, int unitSizeInBytes, float dt)
 {
 	auto& bodies = world->bodies;
 	auto& b2 = world->b2;
 
-	for (auto i = 0; i < unitLength; i ++) {
+	for (auto i = 0; i < unitsLength; i ++) {
 		auto& unit = get_unit(units, unitSizeInBytes, i);
 		if (i >= bodies.size()) {
-			bodies.push_back(create_body(b2, unit));
+			bodies.push_back(create_body(b2, unit, i));
 		}
 		bodies[i]->ApplyForceToCenter(unit.force, unit.force.x != 0 || unit.force.y != 0);
 	}
 
 	b2.Step(dt, 8, 3);
 
-	for (auto i = 0; i < unitLength; i++) {
+	for (auto i = 0; i < unitsLength; i++) {
 		auto& unit = get_unit(units, unitSizeInBytes, i);
 		unit.position = bodies[i]->GetPosition();
 		unit.velocity = bodies[i]->GetLinearVelocity();
 	}
+}
+
+struct MoveQueryCallback : b2QueryCallback
+{
+	int* begin;
+	int* end;
+
+	virtual bool ReportFixture(b2Fixture* fixture)
+	{
+		if (begin == end)
+			return false;
+
+		*begin++ = fixture->GetUserData().pointer;
+		return true;
+	}
+};
+
+int move_query_aabb(MoveWorld* world, b2AABB* aabb, int* units, int unitsLength)
+{
+	MoveQueryCallback cb;
+	cb.begin = units;
+	cb.end = units + unitsLength;
+
+	world->b2.QueryAABB(&cb, *aabb);
+	return cb.end - cb.begin;
 }

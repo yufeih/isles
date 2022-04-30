@@ -155,7 +155,15 @@ public sealed class Move : IDisposable
             m._rotation -= delta;
     }
 
-    [DllImport(LibName)] public static extern IntPtr move_new();
-    [DllImport(LibName)] public static extern void move_delete(IntPtr world);
-    [DllImport(LibName)] public static unsafe extern void move_step(IntPtr world, void* units, nint unitLength, nint unitSizeInBytes, float dt);
+    [StructLayout(LayoutKind.Sequential)]
+    struct AABB
+    {
+        public Vector2 Min;
+        public Vector2 Max;
+    }
+
+    [DllImport(LibName)] private static extern IntPtr move_new();
+    [DllImport(LibName)] private static extern void move_delete(IntPtr world);
+    [DllImport(LibName)] private static unsafe extern void move_step(IntPtr world, void* units, nint unitsLength, nint unitSizeInBytes, float dt);
+    [DllImport(LibName)] private static unsafe extern nint move_query_aabb(IntPtr world, AABB* aabb, nint* units, nint unitsLength);
 }

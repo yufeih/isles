@@ -15,4 +15,5 @@ struct MoveWorld;
 
 EXPORT_API MoveWorld* move_new();
 EXPORT_API void move_delete(MoveWorld* world);
-EXPORT_API void move_step(MoveWorld* world, void* units, int unitLength, int unitSizeInBytes, float dt);
+EXPORT_API void move_step(MoveWorld* world, void* units, int unitsLength, int unitSizeInBytes, float dt);
+EXPORT_API int move_query_aabb(MoveWorld* world, b2AABB* aabb, int* units, int unitsLength);
