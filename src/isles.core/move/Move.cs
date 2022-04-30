@@ -67,7 +67,7 @@ public sealed class Move : IDisposable
         {
             if (m._velocity.LengthSquared() > m.Speed * m.Speed * 0.001f)
             {
-                m._rotation = MathF.Atan2(m._velocity.Y, m._velocity.X);
+                UpdateRotation(dt, ref m);
             }
         }
     }
@@ -105,6 +105,26 @@ public sealed class Move : IDisposable
         }
 
         return force;
+    }
+
+    private static void UpdateRotation(float dt, ref Movable m)
+    {
+        while (m._rotation > MathHelper.Pi)
+            m._rotation -= MathF.PI + MathF.PI;
+        while (m._rotation < -MathHelper.Pi)
+            m._rotation += MathF.PI + MathF.PI;
+
+        var targetRotation = MathF.Atan2(m._velocity.Y, m._velocity.X);
+        var offset = targetRotation - m._rotation;
+        var delta = m.RotationSpeed * dt;
+
+        if (Math.Abs(offset) <= delta)
+            m._rotation = targetRotation;
+        else if ((offset >=0 && offset < MathF.PI) ||
+                (offset >= -MathF.PI * 2 && offset < -MathF.PI))
+            m._rotation += delta;
+        else
+            m._rotation -= delta;
     }
 
     public void Dispose()
