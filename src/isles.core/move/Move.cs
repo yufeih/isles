@@ -5,6 +5,12 @@ using System.Runtime.InteropServices;
 
 namespace Isles;
 
+public enum MovableState
+{
+    Idle,
+    InContact,
+}
+
 [StructLayout(LayoutKind.Sequential)]
 public struct Movable
 {
@@ -13,6 +19,7 @@ public struct Movable
     internal Vector2 _position;
     internal Vector2 _velocity;
     internal Vector2 _force;
+    internal MovableState _state;
 #endregion
 
     public float Radius
@@ -28,6 +35,8 @@ public struct Movable
     }
 
     public Vector2 Velocity => _velocity;
+
+    public MovableState State => _state;
 
     public float Speed { get; set; }
     public float Acceleration { get; set; }

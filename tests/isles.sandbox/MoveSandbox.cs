@@ -116,11 +116,15 @@ class MoveSandbox : Game
         {
             ref readonly var unit = ref _units[i];
 
+            var color = unit.State == MovableState.InContact
+                ? Color.IndianRed
+                : _selection.Contains(i) ? Color.Orange : Color.DarkSlateBlue;
+
             _spriteBatch.Draw(
                 arrow,
                 unit.Position * WorldScale,
                 null,
-                color: _selection.Contains(i) ? Color.Orange : Color.DarkSlateBlue,
+                color: color,
                 rotation: unit.Rotation,
                 origin: new(arrow.Width / 2, arrow.Height / 2),
                 scale: unit.Radius * 2 * WorldScale / arrow.Width,

@@ -1,5 +1,6 @@
 #include <move.h>
 #include <vector>
+#include <set>
 
 struct MoveWorld
 {
@@ -63,8 +64,22 @@ void move_step(MoveWorld* world, void* units, int unitsLength, int unitSizeInByt
 
 	for (auto i = 0; i < unitsLength; i++) {
 		auto& unit = get_unit(units, unitSizeInBytes, i);
-		unit.position = bodies[i]->GetPosition();
-		unit.velocity = bodies[i]->GetLinearVelocity();
+		auto body = bodies[i];
+		unit.position = body->GetPosition();
+		unit.velocity = body->GetLinearVelocity();
+		unit.state &= ~MOVE_IN_CONTACT;
+	}
+
+	auto contact = b2.GetContactList();
+	while (contact != nullptr)
+	{
+		if (contact->IsEnabled() && contact->IsTouching()) {
+			auto a = contact->GetFixtureA()->GetUserData().pointer;
+			auto b = contact->GetFixtureB()->GetUserData().pointer;
+			get_unit(units, unitSizeInBytes, a).state |= MOVE_IN_CONTACT;
+			get_unit(units, unitSizeInBytes, b).state |= MOVE_IN_CONTACT;
+		}
+		contact = contact->GetNext();
 	}
 }
 

@@ -3,12 +3,15 @@
 #include "api.h"
 #include <box2d/box2d.h>
 
+#define MOVE_IN_CONTACT 1 << 0
+
 struct MoveUnit
 {
     float radius;
     b2Vec2 position;
     b2Vec2 velocity;
     b2Vec2 force;
+    int32_t state;
 };
 
 struct MoveWorld;
