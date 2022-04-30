@@ -13,7 +13,7 @@ public class MoveTests
     [MemberData(nameof(TestCases))]
     public void MoveTest(string name, string json)
     {
-        using var move = new MoveNative();
+        using var move = new Move();
         var duration = 0.0f;
         var timeStep = 1.0f / 60;
         var testSchema = new { units = Array.Empty<Movable>(), grid = Array.Empty<int>() };

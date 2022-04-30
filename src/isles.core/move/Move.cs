@@ -65,35 +65,46 @@ public sealed class Move : IDisposable
 
         foreach (ref var m in movables)
         {
-            var rotation = MathF.Atan2(m._velocity.Y, m._velocity.X);
-            if (!float.IsNaN(rotation))
-                m._rotation = rotation;
+            if (m._velocity.LengthSquared() > m.Speed * m.Speed * 0.001f)
+            {
+                m._rotation = MathF.Atan2(m._velocity.Y, m._velocity.X);
+            }
         }
     }
 
     private Vector2 CalculateForce(float idt, ref Movable m)
     {
-        var v = Vector2.Zero;
+        var desiredVelocity = Vector2.Zero;
 
         if (m.Target != null)
         {
-            var s = m.Target.Value - m.Position;
-            var ss = s.LengthSquared();
-            if (ss < m.Speed * m.Speed * 0.001f)
+            var toTarget = m.Target.Value - m.Position;
+
+            // Have we arrived at the target exactly?
+            var distanceSq = toTarget.LengthSquared();
+            if (distanceSq < m.Speed * m.Speed * 0.001f)
             {
                 m.Target = null;
                 return default;
             }
-            v = Vector2.Normalize(s) * m.Speed;
+
+            // Should we start decelerating?
+            var decelerationDistance = 0.5f * m.Velocity.LengthSquared() / m.Acceleration;
+            if (distanceSq > decelerationDistance * decelerationDistance)
+            {
+                desiredVelocity = Vector2.Normalize(toTarget) * m.Speed;
+            }
         }
 
-        var a = (v - m.Velocity) * idt;
-        var aa = a.LengthSquared();
-        if (aa > m.Acceleration * m.Acceleration)
+        // Calculate force and cap acceleration
+        var force = (desiredVelocity - m.Velocity) * idt;
+        var accelerationSq = force.LengthSquared();
+        if (accelerationSq > m.Acceleration * m.Acceleration)
         {
-            return a * m.Acceleration / MathF.Sqrt(aa);
+            return force * m.Acceleration / MathF.Sqrt(accelerationSq);
         }
-        return a;
+
+        return force;
     }
 
     public void Dispose()
