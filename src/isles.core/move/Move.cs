@@ -19,7 +19,6 @@ public struct Movable
     internal Vector2 _position;
     internal Vector2 _velocity;
     internal Vector2 _force;
-    internal MovableState _state;
 #endregion
 
     public float Radius
@@ -37,6 +36,7 @@ public struct Movable
     public Vector2 Velocity => _velocity;
 
     public MovableState State => _state;
+    internal MovableState _state;
 
     public float Speed { get; set; }
     public float Acceleration { get; set; }
@@ -58,6 +58,8 @@ public sealed class Move : IDisposable
     private const string LibName = "isles.native";
 
     private readonly IntPtr _world = move_new();
+
+    private ArrayBuilder<Contact> _contacts;
 
     public void Dispose()
     {
@@ -88,8 +90,25 @@ public sealed class Move : IDisposable
 
         foreach (ref var m in movables)
         {
+            m._state = MovableState.Idle;
             if (m._velocity.LengthSquared() > m.Speed * m.Speed * 0.001f)
                 UpdateRotation(dt, ref m);
+        }
+
+        var contactCount = move_get_contacts(_world, null, 0);
+        if (contactCount > 0)
+        {
+            _contacts.SetLength((int)contactCount);
+            fixed (Contact* contacts = _contacts.AsSpan())
+            {
+                move_get_contacts(_world, contacts, contactCount);
+            }
+
+            foreach (var c in _contacts.AsSpan())
+            {
+                movables[c.A]._state = MovableState.InContact;
+                movables[c.B]._state = MovableState.InContact;
+            }
         }
     }
 
@@ -171,9 +190,17 @@ public sealed class Move : IDisposable
         public Vector2 Max;
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    struct Contact
+    {
+        public int A;
+        public int B;
+    }
+
     [DllImport(LibName)] private static extern IntPtr move_new();
     [DllImport(LibName)] private static extern void move_delete(IntPtr world);
-    [DllImport(LibName)] private static unsafe extern void move_step(IntPtr world, void* units, nint unitsLength, nint unitSizeInBytes, float dt);
-    [DllImport(LibName)] private static unsafe extern nint move_query_aabb(IntPtr world, AABB* aabb, nint* units, nint unitsLength);
-    [DllImport(LibName)] private static unsafe extern nint move_raycast(IntPtr world, Vector2* a, Vector2* b, nint* unit);
+    [DllImport(LibName)] private static unsafe extern void move_step(IntPtr world, void* units, int unitsLength, int unitSizeInBytes, float dt);
+    [DllImport(LibName)] private static unsafe extern int move_get_contacts(IntPtr world, Contact* contacts, int contactsLength);
+    [DllImport(LibName)] private static unsafe extern int move_query_aabb(IntPtr world, AABB* aabb, int* units, int unitsLength);
+    [DllImport(LibName)] private static unsafe extern int move_raycast(IntPtr world, Vector2* a, Vector2* b, int* unit);
 }

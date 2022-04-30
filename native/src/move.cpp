@@ -20,7 +20,7 @@ void move_delete(MoveWorld* world)
 	delete world;
 }
 
-MoveUnit& get_unit(void* units, int unitSizeInBytes, int i)
+MoveUnit& get_unit(void* units, int32_t unitSizeInBytes, int32_t i)
 {
 	return *reinterpret_cast<MoveUnit*>(reinterpret_cast<std::byte*>(units) + i * unitSizeInBytes);
 }
@@ -47,7 +47,7 @@ b2Body* create_body(b2World& b2, const MoveUnit& unit, size_t i)
 	return body;
 }
 
-void move_step(MoveWorld* world, void* units, int unitsLength, int unitSizeInBytes, float dt)
+void move_step(MoveWorld* world, void* units, int32_t unitsLength, int32_t unitSizeInBytes, float dt)
 {
 	auto& bodies = world->bodies;
 	auto& b2 = world->b2;
@@ -67,26 +67,36 @@ void move_step(MoveWorld* world, void* units, int unitsLength, int unitSizeInByt
 		auto body = bodies[i];
 		unit.position = body->GetPosition();
 		unit.velocity = body->GetLinearVelocity();
-		unit.state &= ~MOVE_IN_CONTACT;
 	}
+}
 
-	auto contact = b2.GetContactList();
+int32_t move_get_contacts(MoveWorld* world, MoveContact* contacts, int32_t contactsLength)
+{
+	auto count = 0;
+	auto contact = world->b2.GetContactList();
 	while (contact != nullptr)
 	{
-		if (contact->IsEnabled() && contact->IsTouching()) {
-			auto a = contact->GetFixtureA()->GetUserData().pointer;
-			auto b = contact->GetFixtureB()->GetUserData().pointer;
-			get_unit(units, unitSizeInBytes, a).state |= MOVE_IN_CONTACT;
-			get_unit(units, unitSizeInBytes, b).state |= MOVE_IN_CONTACT;
+		if (contact->IsEnabled() && contact->IsTouching() &&
+			contact->GetFixtureA()->GetBody()->IsAwake() &&
+			contact->GetFixtureB()->GetBody()->IsAwake()) {
+
+			if (contacts != nullptr && count < contactsLength) {
+				MoveContact c;
+				c.a = contact->GetFixtureA()->GetUserData().pointer;
+				c.b = contact->GetFixtureB()->GetUserData().pointer;
+				*contacts++ = c;
+			}
+			count++;
 		}
 		contact = contact->GetNext();
 	}
+	return count;
 }
 
 struct MoveQueryCallback : b2QueryCallback
 {
-	int* begin;
-	int* end;
+	int32_t* begin;
+	int32_t* end;
 
 	virtual bool ReportFixture(b2Fixture* fixture)
 	{
@@ -98,7 +108,7 @@ struct MoveQueryCallback : b2QueryCallback
 	}
 };
 
-int move_query_aabb(MoveWorld* world, b2AABB* aabb, int* units, int unitsLength)
+int32_t move_query_aabb(MoveWorld* world, b2AABB* aabb, int32_t* units, int32_t unitsLength)
 {
 	MoveQueryCallback cb;
 	cb.begin = units;
@@ -110,8 +120,8 @@ int move_query_aabb(MoveWorld* world, b2AABB* aabb, int* units, int unitsLength)
 
 struct MoveRayCastCallback : b2RayCastCallback
 {
-	int* unit;
-	int result;
+	int32_t* unit;
+	int32_t result;
 
 	virtual float ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float fraction)
 	{
@@ -121,7 +131,7 @@ struct MoveRayCastCallback : b2RayCastCallback
 	}
 };
 
-int move_raycast(MoveWorld* world, b2Vec2* a, b2Vec2* b, int* unit)
+int32_t move_raycast(MoveWorld* world, b2Vec2* a, b2Vec2* b, int32_t* unit)
 {
 	MoveRayCastCallback cb;
 	cb.result = 0;

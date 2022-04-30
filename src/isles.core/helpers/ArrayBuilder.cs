@@ -44,6 +44,12 @@ public struct ArrayBuilder<T> where T : struct
         _count += newItems.Length;
     }
 
+    public void SetLength(int length)
+    {
+        EnsureCapacity(length);
+        _count = length;
+    }
+
     public void EnsureCapacity(int requestedCapacity)
     {
         if (requestedCapacity > (_items != null ? _items.Length : 0))
