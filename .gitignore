@@ -1,9 +1,11 @@
 .vs
 .vscode
+.cmake
 
 bin
 obj
 out
+build
 Debug
 Release
 

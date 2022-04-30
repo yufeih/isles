@@ -1,17 +1,18 @@
 #pragma once
 
 #include "api.h"
+#include <box2d/box2d.h>
 
 struct MoveUnit
 {
     float radius;
-    float speed; // settable
-    float x, y; // settable
-    float vx, vy;
+    b2Vec2 position;
+    b2Vec2 velocity;
+    b2Vec2 force;
 };
 
 struct MoveWorld;
 
 EXPORT_API MoveWorld* move_new();
 EXPORT_API void move_delete(MoveWorld* world);
-EXPORT_API void move_step(MoveWorld* world, MoveUnit *units, int unitLength, float timeStep);
+EXPORT_API void move_step(MoveWorld* world, MoveUnit* units, int unitLength, float timeStep);

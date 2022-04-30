@@ -12,7 +12,7 @@ public struct ArrayBuilder<T> where T : struct
 
     public ref T this[int index] => ref _items[index];
 
-    public ReadOnlySpan<T> AsSpan()
+    public Span<T> AsSpan()
     {
         return _items.AsSpan(0, _count);
     }

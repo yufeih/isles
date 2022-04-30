@@ -5,72 +5,90 @@ using System.Runtime.InteropServices;
 
 namespace Isles;
 
-internal sealed class MoveNative : IDisposable
+public sealed class MoveNative : IDisposable
 {
+    [StructLayout(LayoutKind.Sequential)]
+    public struct MoveUnit
+    {
+        public float radius;
+        public Vector2 position;
+        public Vector2 velocity;
+        public Vector2 force;
+    }
+
     private const string LibName = "isles.native";
 
-    private readonly IntPtr _world = move_world_new();
-    private readonly List<IntPtr> _units = new();
-    private readonly Random _random = new(0);
+    private readonly IntPtr _world = move_new();
+    private ArrayBuilder<MoveUnit> _units;
 
-    public void Step(float timeStep = 1.0f / 60)
+    public unsafe void Update(float dt, Span<Movable> movables, PathGrid? grid = null)
     {
-        move_world_step(_world, timeStep);
-    }
+        var idt = 1 / dt;
 
-    public void AddUnit(float x, float y, float radius)
-    {
-        // Give it some random initial velocity to kick start the simulation.
-        var vx = _random.NextSingle() - 0.5f;
-        var vy = _random.NextSingle() - 0.5f;
+        _units.Clear();
+        _units.EnsureCapacity(movables.Length);
 
-        _units.Add(move_add_unit(_world, radius, damping: 100.0f, x, y, vx, vy));
-    }
-
-    public void SetUnitVelocity(int i, float vx, float vy)
-    {
-        move_set_unit_velocity(_units[i], vx, vy);
-    }
-
-    public (float x, float y) GetUnitPosition(int i)
-    {
-        move_get_unit(_units[i], out var x, out var y, out _, out _);
-        return (x, y);
-    }
-
-    public bool IsRunning()
-    {
-        foreach (var unit in _units)
+        for (var i = 0; i < movables.Length; i++)
         {
-            if (move_get_unit_is_awake(unit) != 0)
-            {
-                return true;
-            }
+            ref var m = ref movables[i];
+            var force = UpdateUnit(idt, ref m);
+            _units.Add(new() { radius = m.Radius, position = m.Position, force = force });
         }
-        return false;
+
+        fixed (MoveUnit* units = _units.AsSpan())
+        {
+            move_step(_world, units, _units.Length, dt);
+        }
+
+        for (var i = 0; i < _units.Length; i++)
+        {
+            ref readonly var u = ref _units[i];
+            ref var m = ref movables[i];
+            m._position = u.position;
+            m._velocity = u.velocity;
+            var rotation = MathF.Atan2(u.velocity.Y, u.velocity.X);
+            if (!float.IsNaN(rotation))
+                m._rotation = rotation;
+        }
+    }
+
+    private Vector2 UpdateUnit(float idt, ref Movable m)
+    {
+        var v = Vector2.Zero;
+
+        if (m.Target != null)
+        {
+            var s = m.Target.Value - m.Position;
+            var ss = s.LengthSquared();
+            if (ss < m.Speed * m.Speed * 0.001f)
+            {
+                m.Target = null;
+                return default;
+            }
+            v = Vector2.Normalize(s) * m.Speed;
+        }
+
+        var a = (v - m.Velocity) * idt;
+        var aa = a.LengthSquared();
+        if (aa > m.Acceleration * m.Acceleration)
+        {
+            return a * m.Acceleration / MathF.Sqrt(aa);
+        }
+        return a;
     }
 
     public void Dispose()
     {
         GC.SuppressFinalize(this);
-        move_world_delete(_world);
+        move_delete(_world);
     }
 
     ~MoveNative()
     {
-        move_world_delete(_world);
+        move_delete(_world);
     }
 
-    [DllImport(LibName)] private static extern IntPtr move_world_new();
-    [DllImport(LibName)] private static extern void move_world_delete(IntPtr world);
-    [DllImport(LibName)] private static extern void move_world_step(IntPtr world, float timeStep);
-
-    [DllImport(LibName)] private static extern IntPtr move_add_unit(IntPtr world, float radius, float damping, float x, float y, float vx, float vy);
-    [DllImport(LibName)] private static extern void move_remove_unit(IntPtr world, IntPtr unit);
-    [DllImport(LibName)] private static extern void move_get_unit(IntPtr unit, out float x, out float y, out float vx, out float vy);
-    [DllImport(LibName)] private static extern int move_get_unit_is_awake(IntPtr unit);
-    [DllImport(LibName)] private static extern void move_set_unit_velocity(IntPtr unit, float vx, float vy);
-
-    [DllImport(LibName)] private static extern IntPtr move_add_obstacle(IntPtr world, float x, float y, float w, float h);
-    [DllImport(LibName)] private static extern void move_remove_obstacle(IntPtr world, IntPtr unit);
+    [DllImport(LibName)] public static extern IntPtr move_new();
+    [DllImport(LibName)] public static extern void move_delete(IntPtr world);
+    [DllImport(LibName)] public static unsafe extern void move_step(IntPtr world, MoveUnit* units, int unitsLength, float timeStep);
 }

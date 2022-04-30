@@ -1,84 +1,65 @@
 #include <move.h>
-#include <box2d/box2d.h>
 #include <vector>
 
-struct MoveWord
+struct MoveWorld
 {
-	b2World world;
-	std::Vector<b2Body*> bodies;
+	b2World b2;
+	std::vector<b2Body*> bodies;
+
+	MoveWorld() : b2({}) {}
+};
+
+MoveWorld* move_new()
+{
+	return new MoveWorld;
 }
 
-MoveWorld move_world_new()
-{
-	return new b2World({});
-}
-
-void move_world_delete(MoveWorld world)
+void move_delete(MoveWorld* world)
 {
 	delete world;
 }
 
-void move_world_step(MoveWorld* world, MoveUnit *units, int unitLength, float timeStep);
-{
-	world->Step(timeStep, 8, 3);
-}
-
-move_unit move_add_unit(move_world world, float radius, float damping, float x, float y, float vx, float vy)
+b2Body* create_body(b2World& b2, const MoveUnit& unit)
 {
 	b2CircleShape shape;
-	shape.m_radius = radius;
+	shape.m_radius = unit.radius;
 
 	b2BodyDef bd;
-	bd.linearDamping = damping;
-	bd.linearVelocity.x = vx;
-	bd.linearVelocity.y = vy;
 	bd.fixedRotation = true;
 	bd.type = b2_dynamicBody;
-	bd.position.Set(x, y);
+	bd.position = unit.position;
 
-	auto body = world->CreateBody(&bd);
-	body->CreateFixture(&shape, 1.0f);
+	b2FixtureDef fd;
+	fd.shape = &shape;
+	fd.friction = 0;
+	fd.restitutionThreshold = FLT_MAX;
+	fd.density = 1.0f / (b2_pi * unit.radius * unit.radius);
+
+	auto body = b2.CreateBody(&bd);
+	body->CreateFixture(&fd);
 	return body;
 }
 
-void move_remove_unit(move_world world, move_unit unit)
+void move_step(MoveWorld* world, MoveUnit* units, int unitsLength, float dt)
 {
-	world->DestroyBody(unit);
+	auto& bodies = world->bodies;
+	auto& b2 = world->b2;
+
+	for (auto i = 0; i < unitsLength; i ++) {
+		if (i >= bodies.size()) {
+			bodies.push_back(create_body(b2, *(units + i)));
+		}
+
+		auto& unit = units[i];
+		bodies[i]->ApplyForceToCenter(unit.force, unit.force.x != 0 || unit.force.y != 0);
+	}
+
+	b2.Step(dt, 8, 3);
+
+	for (auto i = 0; i < unitsLength; i++) {
+		auto* unit = units + i;
+		unit->position = bodies[i]->GetPosition();
+		unit->velocity = bodies[i]->GetLinearVelocity();
+	}
 }
 
-void move_get_unit(move_unit unit, float *x, float *y, float *vx, float *vy)
-{
-	auto pos = unit->GetPosition();
-	*x = pos.x;
-	*y = pos.y;
-
-	auto vel = unit->GetLinearVelocity();
-	*vx = vel.x;
-	*vy = vel.y;
-}
-
-int32_t move_get_unit_is_awake(move_unit unit)
-{
-	return unit->IsAwake() ? 1 : 0;
-}
-
-void move_set_unit_velocity(move_unit unit, float vx, float vy)
-{
-	b2Vec2 v(vx, vy);
-	unit->SetLinearVelocity(v);
-}
-
-move_obstacle move_add_obstacle(move_world world, float x, float y, float w, float h)
-{
-	b2PolygonShape shape;
-	shape.SetAsBox(w, h);
-
-	b2BodyDef bd;
-	bd.fixedRotation = true;
-	bd.type = b2_staticBody;
-	bd.position.Set(x, y);
-
-	auto body = world->CreateBody(&bd);
-	body->CreateFixture(&shape, 0.0f);
-	return body;
-}

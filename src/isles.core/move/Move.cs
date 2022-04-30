@@ -7,6 +7,7 @@ public struct Movable
 {
     public float Radius { get; init; }
     public float Speed { get; set; }
+    public float Acceleration { get; set; }
     public float RotationSpeed { get; set; }
 
     public Vector2 Position
