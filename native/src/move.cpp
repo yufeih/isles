@@ -76,7 +76,7 @@ int32_t move_get_contacts(MoveWorld* world, MoveContact* contacts, int32_t conta
 	auto contact = world->b2.GetContactList();
 	while (contact != nullptr)
 	{
-		if (contact->IsEnabled() && contact->IsTouching() &&
+		if (contact->IsEnabled() &&
 			contact->GetFixtureA()->GetBody()->IsAwake() &&
 			contact->GetFixtureB()->GetBody()->IsAwake()) {
 

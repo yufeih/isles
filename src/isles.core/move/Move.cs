@@ -57,10 +57,6 @@ public struct Movable
 
 public sealed class Move : IDisposable
 {
-    // Difference between 1 and the least value greater than 1 that is representable.
-    // Epsilon (1E-45) represents the smallest positive value that is greater than zero
-    // which is way too small to be practical.
-    private const float Epsilon = 1.19209290e-7F;
     private const string LibName = "isles.native";
 
     private readonly IntPtr _world = move_new();
@@ -83,10 +79,10 @@ public sealed class Move : IDisposable
         var idt = 1 / dt;
 
         foreach (ref var m in movables)
-            m._desiredVelocity = MoveToTarget(ref m);
+            m._desiredVelocity = MoveToTarget(dt, ref m);
 
-        foreach (ref readonly var c in GetContacts())
-            UpdateContact(movables, c);
+        //foreach (ref readonly var c in GetContacts())
+        //    UpdateContact(dt, movables, c);
 
         foreach (ref var m in movables)
             m._force = CalculateForce(idt, ref m);
@@ -115,7 +111,7 @@ public sealed class Move : IDisposable
         return _contacts.AsSpan();
     }
 
-    private Vector2 MoveToTarget(ref Movable m)
+    private Vector2 MoveToTarget(float dt, ref Movable m)
     {
         if (m.Target is null)
             return default;
@@ -124,7 +120,7 @@ public sealed class Move : IDisposable
 
         // Have we arrived at the target exactly?
         var distanceSq = toTarget.LengthSquared();
-        if (distanceSq < Epsilon)
+        if (distanceSq < m.Speed * m.Speed * dt * dt)
         {
             m.Target = null;
             return default;
@@ -162,7 +158,7 @@ public sealed class Move : IDisposable
         return force;
     }
 
-    private void UpdateContact(Span<Movable> movables, in Contact c)
+    private void UpdateContact(float dt, Span<Movable> movables, in Contact c)
     {
         ref var a = ref movables[c.A];
         ref var b = ref movables[c.B];
@@ -200,7 +196,7 @@ public sealed class Move : IDisposable
                     ? new Vector2(a._desiredVelocity.Y, -a._desiredVelocity.X)
                     : new Vector2(-a._desiredVelocity.Y, a._desiredVelocity.X);
 
-            if (direction.LengthSquared() > Epsilon)
+            if (direction.LengthSquared() > b.Speed * b.Speed * dt * dt)
             {
                 direction.Normalize();
                 b._desiredVelocity -= direction * b.Speed;
@@ -210,7 +206,7 @@ public sealed class Move : IDisposable
 
     private static void UpdateRotation(float dt, ref Movable m)
     {
-        if (m._velocity.LengthSquared() <= Epsilon)
+        if (m._velocity.LengthSquared() <= m.Speed * m.Speed * dt * dt)
             return;
 
         while (m._rotation > MathHelper.Pi)
