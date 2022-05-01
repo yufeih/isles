@@ -157,11 +157,10 @@ public sealed class Move : IDisposable
         }
 
         // Should we start decelerating?
-        var decelerationDistance = 0.5f * m.Velocity.LengthSquared() / m.Acceleration;
-        if (distanceSq > decelerationDistance * decelerationDistance)
-            return Vector2.Normalize(toTarget) * m.Speed;
+        var distance = MathF.Sqrt(distanceSq);
+        var speed = MathF.Sqrt(distance * m.Acceleration * 2);
 
-        return default;
+        return Vector2.Normalize(toTarget) * Math.Min(m.Speed, speed);
     }
 
     private Vector2 CalculateForce(float idt, ref Movable m)
