@@ -57,6 +57,10 @@ public struct Movable
 
 public sealed class Move : IDisposable
 {
+    // Difference between 1 and the least value greater than 1 that is representable.
+    // Epsilon (1E-45) represents the smallest positive value that is greater than zero
+    // which is way too small to be practical.
+    private const float Epsilon = 1.19209290e-7F;
     private const string LibName = "isles.native";
 
     private readonly IntPtr _world = move_new();
@@ -93,10 +97,7 @@ public sealed class Move : IDisposable
         }
 
         foreach (ref var m in movables)
-        {
-            if (m._velocity.LengthSquared() > m.Speed * m.Speed * 0.001f)
-                UpdateRotation(dt, ref m);
-        }
+            UpdateRotation(dt, ref m);
     }
 
     private unsafe ReadOnlySpan<Contact> GetContacts()
@@ -123,7 +124,7 @@ public sealed class Move : IDisposable
 
         // Have we arrived at the target exactly?
         var distanceSq = toTarget.LengthSquared();
-        if (distanceSq < m.Speed * m.Speed * 0.001f)
+        if (distanceSq < Epsilon)
         {
             m.Target = null;
             return default;
@@ -199,7 +200,7 @@ public sealed class Move : IDisposable
                     ? new Vector2(a._desiredVelocity.Y, -a._desiredVelocity.X)
                     : new Vector2(-a._desiredVelocity.Y, a._desiredVelocity.X);
 
-            if (direction.LengthSquared() > float.Epsilon * float.Epsilon)
+            if (direction.LengthSquared() > Epsilon)
             {
                 direction.Normalize();
                 b._desiredVelocity -= direction * b.Speed;
@@ -209,6 +210,9 @@ public sealed class Move : IDisposable
 
     private static void UpdateRotation(float dt, ref Movable m)
     {
+        if (m._velocity.LengthSquared() <= Epsilon)
+            return;
+
         while (m._rotation > MathHelper.Pi)
             m._rotation -= MathF.PI + MathF.PI;
         while (m._rotation < -MathHelper.Pi)
