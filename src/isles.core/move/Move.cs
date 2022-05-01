@@ -16,9 +16,9 @@ public enum MovableFlags
     HasContact = 1 << 0,
 
     /// <summary>
-    /// Wether this unit has any touching contact with other non-idle unit.
+    /// Wether this unit has any touching contact with other moving unit.
     /// </summary>
-    HasNonIdleContact = 1 << 1,
+    HasMovingContact = 1 << 1,
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -150,7 +150,7 @@ public sealed class Move : IDisposable
         }
 
         // Have we reached the target and there is an non-idle unit along the way?
-        if ((m.Flags & MovableFlags.HasNonIdleContact) != 0 && distanceSq <= m.Radius * m.Radius)
+        if ((m.Flags & MovableFlags.HasMovingContact) != 0 && distanceSq <= m.Radius * m.Radius)
         {
             m.Target = null;
             return default;
@@ -196,55 +196,56 @@ public sealed class Move : IDisposable
         b._flags |= MovableFlags.HasContact;
 
         if (a.Target != null && b.Target != null)
+            UpdateContactBothBuzy(ref a, ref b);
+        else if (a.Target != null)
+            UpdateContactOneBuzyOneIdle(ref a, ref b);
+        else if (b.Target != null)
+            UpdateContactOneBuzyOneIdle(ref b, ref a);
+    }
+
+    private void UpdateContactBothBuzy(ref Movable a, ref Movable b)
+    {
+        a._flags |= MovableFlags.HasMovingContact;
+        b._flags |= MovableFlags.HasMovingContact;
+
+        var velocity = b.Velocity - a.Velocity;
+        var normal = b.Position - a.Position;
+
+        if (normal.LengthSquared() <= Epsilon * Epsilon)
+            return;
+
+        normal.Normalize();
+
+        // Try circle around each other
+        var perpendicular = Cross(velocity, normal) > 0
+            ? new Vector2(normal.Y, -normal.X)
+            : new Vector2(-normal.Y, normal.X);
+
+        a._desiredVelocity -= perpendicular * a.Speed;
+        b._desiredVelocity += perpendicular * b.Speed;
+    }
+
+    private void UpdateContactOneBuzyOneIdle(ref Movable a, ref Movable b)
+    {
+        b._flags |= MovableFlags.HasMovingContact;
+
+        var velocity = a.Velocity;
+        var normal = b.Position - a.Position;
+
+        // Are we occupying the target?
+        var direction = b.Position - a.Target!.Value;
+        if (direction.LengthSquared() > (a.Radius + b.Radius) * (a.Radius + b.Radius))
         {
-            a._flags |= MovableFlags.HasNonIdleContact;
-            b._flags |= MovableFlags.HasNonIdleContact;
-
-            var velocity = b.Velocity - a.Velocity;
-            var normal = b.Position - a.Position;
-
-            if (normal.LengthSquared() <= Epsilon * Epsilon)
-                return;
-
-            normal.Normalize();
-
-            // Try circle around each other
-            var perpendicular = Cross(velocity, normal) > 0
-                ? new Vector2(normal.Y, -normal.X)
-                : new Vector2(-normal.Y, normal.X);
-
-            a._desiredVelocity -= perpendicular * a.Speed;
-            b._desiredVelocity += perpendicular * b.Speed;
+            // Choose a perpendicular direction to give way to the moving unit.
+            direction = Cross(velocity, normal) > 0
+                ? new Vector2(-a.Velocity.Y, a.Velocity.X)
+                : new Vector2(a.Velocity.Y, -a.Velocity.X);
         }
-        else if (a.Target != null || b.Target != null)
-        {
-            if (b.Target != null)
-            {
-                ref var temp = ref a;
-                a = ref b;
-                b = ref temp;
-            }
 
-            b._flags |= MovableFlags.HasNonIdleContact;
+        if (direction.LengthSquared() <= Epsilon * Epsilon)
+            return;
 
-            var velocity = a.Velocity;
-            var normal = b.Position - a.Position;
-
-            // Are we occupying the target?
-            var direction = b.Position - a.Target!.Value;
-            if (direction.LengthSquared() > (a.Radius + b.Radius) * (a.Radius + b.Radius))
-            {
-                // Choose a perpendicular direction to give way to the moving unit.
-                direction = Cross(velocity, normal) > 0
-                    ? new Vector2(-a.Velocity.Y, a.Velocity.X)
-                    : new Vector2(a.Velocity.Y, -a.Velocity.X);
-            }
-
-            if (direction.LengthSquared() <= Epsilon * Epsilon)
-                return;
-
-            b._desiredVelocity += Vector2.Normalize(direction) * b.Speed;
-        }
+        b._desiredVelocity += Vector2.Normalize(direction) * b.Speed;
     }
 
     private static void UpdateRotation(float dt, ref Movable m)
@@ -263,8 +264,7 @@ public sealed class Move : IDisposable
 
         if (Math.Abs(offset) <= delta)
             m._rotation = targetRotation;
-        else if ((offset >=0 && offset < MathF.PI) ||
-                (offset >= -MathF.PI * 2 && offset < -MathF.PI))
+        else if ((offset >=0 && offset < MathF.PI) || (offset >= -MathF.PI * 2 && offset < -MathF.PI))
             m._rotation += delta;
         else
             m._rotation -= delta;

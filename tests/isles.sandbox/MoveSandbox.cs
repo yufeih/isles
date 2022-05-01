@@ -10,9 +10,9 @@ sandbox.Run();
 
 class MoveSandbox : Game
 {
-    private const float WorldScale = 20f;
+    private const float WorldScale = 10f;
 
-    private readonly Movable[] _units = new Movable[20];
+    private readonly Movable[] _units = new Movable[200];
     private readonly List<int> _selection = new();
     private readonly Move _move = new();
 
@@ -116,8 +116,8 @@ class MoveSandbox : Game
         {
             ref readonly var unit = ref _units[i];
 
-            var color =  unit.Flags.HasFlag(MovableFlags.HasContact) ? Color.IndianRed
-                : unit.Target != null ? Color.Green
+            var color =  //unit.Flags.HasFlag(MovableFlags.HasContact) ? Color.IndianRed
+                unit.Target != null ? Color.Green
                 : _selection.Contains(i) ? Color.Orange : Color.DarkSlateBlue;
 
             _spriteBatch.Draw(
