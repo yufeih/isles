@@ -5,10 +5,11 @@ using System.Runtime.InteropServices;
 
 namespace Isles;
 
-public enum MovableState
+[Flags]
+public enum MovableFlags
 {
-    Idle,
-    InContact,
+    None = 0,
+    InContact = 1 << 0,
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -35,8 +36,8 @@ public struct Movable
 
     public Vector2 Velocity => _velocity;
 
-    public MovableState State => _state;
-    internal MovableState _state;
+    public MovableFlags State => _state;
+    internal MovableFlags _state;
 
     public float Speed { get; set; }
     public float Acceleration { get; set; }
@@ -83,7 +84,10 @@ public sealed class Move : IDisposable
         var idt = 1 / dt;
 
         foreach (ref var m in movables)
+        {
+            m._state &= ~MovableFlags.InContact;
             m._desiredVelocity = MoveToTarget(dt, ref m);
+        }
 
         foreach (ref readonly var c in GetContacts())
             UpdateContact(movables, c);
@@ -166,6 +170,9 @@ public sealed class Move : IDisposable
     {
         ref var a = ref movables[c.A];
         ref var b = ref movables[c.B];
+
+        a._state |= MovableFlags.InContact;
+        b._state |= MovableFlags.InContact;
 
         if (a.Target != null && b.Target != null)
         {
