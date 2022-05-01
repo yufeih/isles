@@ -57,6 +57,10 @@ public struct Movable
 
 public sealed class Move : IDisposable
 {
+    // Difference between 1 and the least value greater than 1 that is representable.
+    // Epsilon (1E-45) represents the smallest positive value that is greater than zero
+    // which is way too small to be practical.
+    private const float Epsilon = 1.19209290e-7F;
     private const string LibName = "isles.native";
 
     private readonly IntPtr _world = move_new();
@@ -81,8 +85,8 @@ public sealed class Move : IDisposable
         foreach (ref var m in movables)
             m._desiredVelocity = MoveToTarget(dt, ref m);
 
-        //foreach (ref readonly var c in GetContacts())
-        //    UpdateContact(dt, movables, c);
+        foreach (ref readonly var c in GetContacts())
+            UpdateContact(movables, c);
 
         foreach (ref var m in movables)
             m._force = CalculateForce(idt, ref m);
@@ -158,49 +162,55 @@ public sealed class Move : IDisposable
         return force;
     }
 
-    private void UpdateContact(float dt, Span<Movable> movables, in Contact c)
+    private void UpdateContact(Span<Movable> movables, in Contact c)
     {
         ref var a = ref movables[c.A];
         ref var b = ref movables[c.B];
 
-        // Are we separating?
-        var velocity = b._desiredVelocity - a._desiredVelocity;
-        if (Vector2.Dot(velocity, c.Normal) <= 0)
-            return;
-
         if (a.Target != null && b.Target != null)
         {
+            var velocity = b.Velocity - a.Velocity;
+            var normal = b.Position - a.Position;
+
+            if (normal.LengthSquared() <= Epsilon * Epsilon)
+                return;
+
+            normal.Normalize();
+
             // Try circle around each other
-            var perpendicular = Cross(velocity, c.Normal) > 0
-                ? new Vector2(c.Normal.Y, -c.Normal.X)
-                : new Vector2(-c.Normal.Y, c.Normal.X);
+            var perpendicular = Cross(velocity, normal) > 0
+                ? new Vector2(normal.Y, -normal.X)
+                : new Vector2(-normal.Y, normal.X);
 
             a._desiredVelocity -= perpendicular * a.Speed;
             b._desiredVelocity += perpendicular * b.Speed;
         }
         else if (a.Target != null || b.Target != null)
         {
-            var normal = c.Normal;
             if (b.Target != null)
             {
                 ref var temp = ref a;
                 a = ref b;
                 b = ref temp;
-                normal = -normal;
             }
 
-            // Choose a perpendicular direction if the moving unit isn't near its target
+            var velocity = a.Velocity;
+            var normal = b.Position - a.Position;
+
+            // Are we occupying the target?
             var direction = b.Position - a.Target!.Value;
             if (direction.LengthSquared() > (a.Radius + b.Radius) * (a.Radius + b.Radius))
-                direction = Cross(velocity, normal) > 0
-                    ? new Vector2(a._desiredVelocity.Y, -a._desiredVelocity.X)
-                    : new Vector2(-a._desiredVelocity.Y, a._desiredVelocity.X);
-
-            if (direction.LengthSquared() > b.Speed * b.Speed * dt * dt)
             {
-                direction.Normalize();
-                b._desiredVelocity -= direction * b.Speed;
+                // Choose a perpendicular direction to give way to the moving unit.
+                direction = Cross(velocity, normal) > 0
+                    ? new Vector2(-a.Velocity.Y, a.Velocity.X)
+                    : new Vector2(a.Velocity.Y, -a.Velocity.X);
             }
+
+            if (direction.LengthSquared() <= Epsilon * Epsilon)
+                return;
+
+            b._desiredVelocity += Vector2.Normalize(direction) * b.Speed;
         }
     }
 
@@ -245,7 +255,6 @@ public sealed class Move : IDisposable
     {
         public int A;
         public int B;
-        public Vector2 Normal;
     }
 
     [DllImport(LibName)] private static extern IntPtr move_new();

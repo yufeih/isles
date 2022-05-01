@@ -76,17 +76,14 @@ int32_t move_get_contacts(MoveWorld* world, MoveContact* contacts, int32_t conta
 	auto contact = world->b2.GetContactList();
 	while (contact != nullptr)
 	{
-		if (contact->IsEnabled() &&
+		if (contact->IsEnabled() && contact->IsTouching() &&
 			contact->GetFixtureA()->GetBody()->IsAwake() &&
 			contact->GetFixtureB()->GetBody()->IsAwake()) {
 
 			if (contacts != nullptr && count < contactsLength) {
 				MoveContact c;
-				b2WorldManifold manifold;
-				contact->GetWorldManifold(&manifold);
 				c.a = contact->GetFixtureA()->GetUserData().pointer;
 				c.b = contact->GetFixtureB()->GetUserData().pointer;
-				c.normal = manifold.normal;
 				*contacts++ = c;
 			}
 			count++;
