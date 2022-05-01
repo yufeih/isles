@@ -9,7 +9,16 @@ namespace Isles;
 public enum MovableFlags
 {
     None = 0,
-    InContact = 1 << 0,
+
+    /// <summary>
+    /// Wether this unit has any touching contact with other units.
+    /// </summary>
+    HasContact = 1 << 0,
+
+    /// <summary>
+    /// Wether this unit has any touching contact with other non-idle unit.
+    /// </summary>
+    HasNonIdleContact = 1 << 1,
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -36,8 +45,8 @@ public struct Movable
 
     public Vector2 Velocity => _velocity;
 
-    public MovableFlags State => _state;
-    internal MovableFlags _state;
+    public MovableFlags Flags => _flags;
+    internal MovableFlags _flags;
 
     public float Speed { get; set; }
     public float Acceleration { get; set; }
@@ -85,15 +94,20 @@ public sealed class Move : IDisposable
 
         foreach (ref var m in movables)
         {
-            m._state &= ~MovableFlags.InContact;
-            m._desiredVelocity = MoveToTarget(dt, ref m);
+            m._flags = 0;
+            m._desiredVelocity = default;
         }
 
         foreach (ref readonly var c in GetContacts())
+        {
             UpdateContact(movables, c);
+        }
 
         foreach (ref var m in movables)
+        {
+            m._desiredVelocity += MoveToTarget(dt, ref m);
             m._force = CalculateForce(idt, ref m);
+        }
 
         fixed (void* units = movables)
         {
@@ -101,7 +115,9 @@ public sealed class Move : IDisposable
         }
 
         foreach (ref var m in movables)
+        {
             UpdateRotation(dt, ref m);
+        }
     }
 
     private unsafe ReadOnlySpan<Contact> GetContacts()
@@ -124,11 +140,17 @@ public sealed class Move : IDisposable
         if (m.Target is null)
             return default;
 
-        var toTarget = m.Target.Value - m.Position;
-
         // Have we arrived at the target exactly?
+        var toTarget = m.Target.Value - m.Position;
         var distanceSq = toTarget.LengthSquared();
-        if (distanceSq < m.Speed * m.Speed * dt * dt)
+        if (distanceSq <= m.Speed * dt * m.Speed * dt)
+        {
+            m.Target = null;
+            return default;
+        }
+
+        // Have we reached the target and there is an non-idle unit along the way?
+        if ((m.Flags & MovableFlags.HasNonIdleContact) != 0 && distanceSq <= m.Radius * m.Radius)
         {
             m.Target = null;
             return default;
@@ -171,11 +193,14 @@ public sealed class Move : IDisposable
         ref var a = ref movables[c.A];
         ref var b = ref movables[c.B];
 
-        a._state |= MovableFlags.InContact;
-        b._state |= MovableFlags.InContact;
+        a._flags |= MovableFlags.HasContact;
+        b._flags |= MovableFlags.HasContact;
 
         if (a.Target != null && b.Target != null)
         {
+            a._flags |= MovableFlags.HasNonIdleContact;
+            b._flags |= MovableFlags.HasNonIdleContact;
+
             var velocity = b.Velocity - a.Velocity;
             var normal = b.Position - a.Position;
 
@@ -200,6 +225,8 @@ public sealed class Move : IDisposable
                 a = ref b;
                 b = ref temp;
             }
+
+            b._flags |= MovableFlags.HasNonIdleContact;
 
             var velocity = a.Velocity;
             var normal = b.Position - a.Position;
