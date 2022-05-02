@@ -10,7 +10,9 @@ sandbox.Run();
 
 class MoveSandbox : Game
 {
-    private readonly Movable[] _units = new Movable[20];
+    private const float WorldScale = 10f;
+
+    private readonly Movable[] _units = new Movable[200];
     private readonly List<int> _selection = new();
     private readonly Move _move = new();
 
@@ -36,10 +38,12 @@ class MoveSandbox : Game
         {
             _units[i] = new()
             {
-                Radius = 20 + 20 * random.NextSingle(),
-                Position = new(random.NextSingle() * Window.ClientBounds.Width, random.NextSingle() * Window.ClientBounds.Height),
-                Speed = 200 + 200 * random.NextSingle(),
-                RotationSpeed = MathF.PI * 2 + random.NextSingle() * MathF.PI * 2,
+                Radius = 1 + random.NextSingle(),
+                Position = new(random.NextSingle() * Window.ClientBounds.Width / WorldScale, random.NextSingle() * Window.ClientBounds.Height / WorldScale),
+                Speed = 10 + 10 * random.NextSingle(),
+                Acceleration = 20 + 20 * random.NextSingle(),
+                Decceleration = 400 + 400 * random.NextSingle(),
+                RotationSpeed = MathF.PI * 2 + random.NextSingle() * MathF.PI * 4,
                 Rotation = random.NextSingle() * MathF.PI * 2 - MathF.PI,
             };
         }
@@ -65,7 +69,7 @@ class MoveSandbox : Game
         {
             foreach (var i in _selection)
             {
-                _units[i].Target = new(mouse.X, mouse.Y);
+                _units[i].Target = new(mouse.X / WorldScale, mouse.Y / WorldScale);
             }
         }
 
@@ -81,7 +85,7 @@ class MoveSandbox : Game
             for (var i = 0; i < _units.Length; i++)
             {
                 ref readonly var unit = ref _units[i];
-                if (rectangle.Contains((int)unit.Position.X, (int)unit.Position.Y))
+                if (rectangle.Contains((int)(unit.Position.X * WorldScale), (int)(unit.Position.Y * WorldScale)))
                 {
                     _selection.Add(i);
                 }
@@ -95,7 +99,7 @@ class MoveSandbox : Game
         if (_selection.Count == 1)
         {
             var unit = _units[_selection[0]];
-            Window.Title = $"[{_selection[0]}] r: {unit.Radius} s: {unit.Speed} p: {unit.Position} t: {unit.Target}";
+            Window.Title = $"[{_selection[0]}] r: {(int)unit.Radius} a: {(int)unit.Acceleration}/{(int)unit.Decceleration} s: {(int)unit.Velocity.Length()}/{(int)unit.Speed} ";
         }
     }
 
@@ -112,14 +116,18 @@ class MoveSandbox : Game
         {
             ref readonly var unit = ref _units[i];
 
+            var color = //unit.Flags.HasFlag(MovableFlags.HasContact) ? Color.IndianRed
+                unit.Target != null ? Color.Green
+                : _selection.Contains(i) ? Color.Orange : Color.DarkSlateBlue;
+
             _spriteBatch.Draw(
                 arrow,
-                unit.Position,
+                unit.Position * WorldScale,
                 null,
-                color: _selection.Contains(i) ? Color.Orange : Color.DarkSlateBlue,
+                color: color,
                 rotation: unit.Rotation,
                 origin: new(arrow.Width / 2, arrow.Height / 2),
-                scale: unit.Radius * 2 / arrow.Width,
+                scale: unit.Radius * 2 * WorldScale / arrow.Width,
                 SpriteEffects.None,
                 0);
         }

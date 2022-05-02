@@ -21,14 +21,14 @@ jobs:
     - uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '6.0.x'
+    - run: ./build.sh
+      shell: bash
     - run: dotnet test -c Release --collect:"XPlat Code Coverage"
     - uses: codecov/codecov-action@v1
-    - run: dotnet publish src/isles -c Release -o out
     - uses: actions/upload-artifact@v2
       with:
-        name: failed-${{ matrix.os }}
-        path: tests/failed
-        if-no-files-found: ignore
+        name: snapshots-${{ matrix.os }}
+        path: snapshots
     - uses: actions/upload-artifact@v2
       with:
         name: isles-${{ matrix.os }}

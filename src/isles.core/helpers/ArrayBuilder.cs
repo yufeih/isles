@@ -12,7 +12,7 @@ public struct ArrayBuilder<T> where T : struct
 
     public ref T this[int index] => ref _items[index];
 
-    public ReadOnlySpan<T> AsSpan()
+    public Span<T> AsSpan()
     {
         return _items.AsSpan(0, _count);
     }
@@ -42,6 +42,12 @@ public struct ArrayBuilder<T> where T : struct
         EnsureCapacity(_count + newItems.Length);
         newItems.CopyTo(_items.AsSpan(_count));
         _count += newItems.Length;
+    }
+
+    public void SetLength(int length)
+    {
+        EnsureCapacity(length);
+        _count = length;
     }
 
     public void EnsureCapacity(int requestedCapacity)

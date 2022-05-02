@@ -4,39 +4,24 @@ namespace Isles;
 
 public static class Snapshot
 {
-    private static readonly bool s_isCI = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CI"));
-    private static readonly string s_baseDirectory = FindRepositoryRoot();
+    private static readonly string s_snapshotDirectory = Path.Combine(FindRepositoryRoot(), "snapshots");
 
-    public static readonly string SnapshotDirectory = Path.Combine(s_baseDirectory, "tests", "snapshots");
+    public static void Save(string name, byte[] actual)
+    {
+        var path = Path.Combine(s_snapshotDirectory, name);
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        File.WriteAllBytes(path, actual);
+    }
 
     public static void Save(string name, string actual)
     {
-        var path = Path.Combine(SnapshotDirectory, name);
+        var path = Path.Combine(s_snapshotDirectory, name);
         var expected = File.Exists(path) ? File.ReadAllText(path) : null;
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
         File.WriteAllText(path, actual);
 
-        if (expected is null && s_isCI)
-        {
-            throw new InvalidOperationException($"Cannot find snapshot file '{path}'");
-        }
-
-        if (expected is null)
-        {
-            return;
-        }
-
-        try
-        {
+        if (expected != null)
             Assert.Equal(expected, actual, ignoreLineEndingDifferences: true, ignoreWhiteSpaceDifferences: true);
-        }
-        catch when (s_isCI)
-        {
-            var failedPath = Path.Combine(s_baseDirectory, "tests", "failed", name);
-            Directory.CreateDirectory(Path.GetDirectoryName(failedPath)!);
-            File.WriteAllText(failedPath, actual);
-            throw;
-        }
     }
 
     private static string FindRepositoryRoot()

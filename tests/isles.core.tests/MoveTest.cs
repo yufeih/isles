@@ -5,7 +5,6 @@ namespace Isles;
 
 public class MoveTests
 {
-    private readonly Move _move = new();
     private readonly SvgBuilder _svg = new();
 
     public static TheoryData<string, string> TestCases { get; } = LoadTestCases();
@@ -14,6 +13,7 @@ public class MoveTests
     [MemberData(nameof(TestCases))]
     public void MoveTest(string name, string json)
     {
+        using var move = new Move();
         var duration = 0.0f;
         var timeStep = 1.0f / 60;
         var testSchema = new { units = Array.Empty<Movable>(), grid = Array.Empty<int>() };
@@ -23,7 +23,7 @@ public class MoveTests
 
         while (duration < 4)
         {
-            _move.Update(timeStep, test.units, grid);
+            move.Update(timeStep, test.units, grid);
             duration += timeStep;
 
             var running = false;
