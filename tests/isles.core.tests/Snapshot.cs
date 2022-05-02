@@ -4,9 +4,13 @@ namespace Isles;
 
 public static class Snapshot
 {
-    private static readonly string s_baseDirectory = FindRepositoryRoot();
+    public static string SnapshotDirectory { get; }
 
-    public static readonly string SnapshotDirectory = Path.Combine(s_baseDirectory, "snapshots");
+    static Snapshot()
+    {
+        SnapshotDirectory = Path.Combine(FindRepositoryRoot(), "snapshots");
+        Directory.CreateDirectory(SnapshotDirectory);
+    }
 
     public static void Save(string name, string actual)
     {
