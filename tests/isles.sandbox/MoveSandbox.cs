@@ -116,7 +116,7 @@ class MoveSandbox : Game
         {
             ref readonly var unit = ref _units[i];
 
-            var color =  //unit.Flags.HasFlag(MovableFlags.HasContact) ? Color.IndianRed
+            var color = //unit.Flags.HasFlag(MovableFlags.HasContact) ? Color.IndianRed
                 unit.Target != null ? Color.Green
                 : _selection.Contains(i) ? Color.Orange : Color.DarkSlateBlue;
 

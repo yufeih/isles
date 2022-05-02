@@ -63,6 +63,8 @@ public struct Movable
     public Vector2? Target { get; set; }
 
     internal Vector2 _desiredVelocity;
+
+    internal float _inContactSeconds;
 }
 
 public sealed class Move : IDisposable
@@ -71,6 +73,7 @@ public sealed class Move : IDisposable
     // Epsilon (1E-45) represents the smallest positive value that is greater than zero
     // which is way too small to be practical.
     private const float Epsilon = 1.19209290e-7F;
+    private const float MaxInContactSeconds = 5;
     private const string LibName = "isles.native";
 
     private readonly IntPtr _world = move_new();
@@ -105,6 +108,7 @@ public sealed class Move : IDisposable
 
         foreach (ref var m in movables)
         {
+            UpdateInContactSeconds(dt, ref m);
             m._desiredVelocity += MoveToTarget(dt, ref m);
             m._force = CalculateForce(idt, ref m);
         }
@@ -145,14 +149,14 @@ public sealed class Move : IDisposable
         var distanceSq = toTarget.LengthSquared();
         if (distanceSq <= m.Speed * dt * m.Speed * dt)
         {
-            m.Target = null;
+            ClearTarget(ref m);
             return default;
         }
 
         // Have we reached the target and there is an non-idle unit along the way?
         if ((m.Flags & MovableFlags.HasMovingContact) != 0 && distanceSq <= m.Radius * m.Radius)
         {
-            m.Target = null;
+            ClearTarget(ref m);
             return default;
         }
 
@@ -201,6 +205,24 @@ public sealed class Move : IDisposable
             UpdateContactOneBuzyOneIdle(ref a, ref b);
         else if (b.Target != null)
             UpdateContactOneBuzyOneIdle(ref b, ref a);
+    }
+
+    private void UpdateInContactSeconds(float dt, ref Movable m)
+    {
+        if (m.Target is null)
+            return;
+
+        if ((m.Flags & MovableFlags.HasContact) == 0)
+        {
+            m._inContactSeconds = Math.Max(0, m._inContactSeconds - dt);
+            return;
+        }
+
+        // Give up target if we have keeps bumping into other units for enough time
+        if ((m._inContactSeconds += dt) >= MaxInContactSeconds)
+        {
+            ClearTarget(ref m);
+        }
     }
 
     private void UpdateContactBothBuzy(ref Movable a, ref Movable b)
@@ -270,17 +292,15 @@ public sealed class Move : IDisposable
             m._rotation -= delta;
     }
 
+    private static void ClearTarget(ref Movable m)
+    {
+        m.Target = null;
+        m._inContactSeconds = 0;
+    }
+
     private static float Cross(Vector2 a, Vector2 b)
     {
         return a.X * b.Y - b.X * a.Y;
-    }
-
-
-    [StructLayout(LayoutKind.Sequential)]
-    struct AABB
-    {
-        public Vector2 Min;
-        public Vector2 Max;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -294,6 +314,4 @@ public sealed class Move : IDisposable
     [DllImport(LibName)] private static extern void move_delete(IntPtr world);
     [DllImport(LibName)] private static unsafe extern void move_step(IntPtr world, void* units, int unitsLength, int unitSizeInBytes, float dt);
     [DllImport(LibName)] private static unsafe extern int move_get_contacts(IntPtr world, Contact* contacts, int contactsLength);
-    [DllImport(LibName)] private static unsafe extern int move_query_aabb(IntPtr world, AABB* aabb, int* units, int unitsLength);
-    [DllImport(LibName)] private static unsafe extern int move_raycast(IntPtr world, Vector2* a, Vector2* b, int* unit);
 }
