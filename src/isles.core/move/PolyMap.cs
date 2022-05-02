@@ -13,7 +13,7 @@ public class PolyMap
         return result;
     }
 
-    private static int[] BuildVisibilityMap(Vector2[] vertices, Vector2 v)
+    public static int[] BuildVisibilityMap(Vector2[] vertices, Vector2 v)
     {
         const int Resolution = 256;
         var scanline = new (int i, float depth)[Resolution];
@@ -27,18 +27,17 @@ public class PolyMap
         {
             var a = vertices[i] - v;
             var b = vertices[(i + 1) % vertices.Length] - v;
-            var xa = MathF.Atan2(a.Y, a.X);
-            var xb = MathF.Atan2(b.Y, b.X);
 
-            // Backface culling
-            var dx = xb - xa;
-            if ((dx < 0 && dx > -MathF.PI) || dx > MathF.PI)
-                continue;
+            var nearClip = 1f;
+            var farClip = 1000f;
 
-            var ia = Math.Min((int)((xa * 0.5f / MathF.PI + 0.5f) * Resolution), Resolution - 1);
-            var ib = Math.Min((int)((xb * 0.5f / MathF.PI + 0.5f) * Resolution), Resolution - 1);
-            var ya = a.Length();
-            var yb = b.Length();
+            var ya = (-a.Y - nearClip) / (farClip - nearClip);
+            var yb = (-b.Y - nearClip) / (farClip - nearClip);
+
+            var ia = (int)Math.Min((a.X / -a.Y + 1) * 0.5f * Resolution, Resolution - 1);
+            var ib = (int)Math.Min((b.X / -b.Y + 1) * 0.5f * Resolution, Resolution - 1);
+
+            Console.WriteLine($"{a} --- {b} \t[{ia}, {ib}] -> \t[{ya}, {yb}]");
 
             if (ia == ib)
             {
@@ -46,8 +45,14 @@ public class PolyMap
                 if (y < scanline[ia].depth)
                     scanline[ia] = (i, y);
             }
-            else if (ib > ia)
+            else
             {
+                if (ib < ia)
+                {
+                    (ia, ib) = (ib, ia);
+                    (ya, yb) = (yb, ya);
+                }
+
                 var y = ya;
                 var dy = (yb - ya) / (ib - ia);
 
@@ -57,10 +62,6 @@ public class PolyMap
                         scanline[x] = (i, y);
                     y += dy;
                 }
-            }
-            else
-            {
-
             }
         }
 
