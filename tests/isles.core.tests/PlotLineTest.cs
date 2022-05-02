@@ -47,6 +47,6 @@ public class PlotLineTest
             draw(bitmap, random.Next(size), random.Next(size), random.Next(size), random.Next(size));
         }
 
-        File.WriteAllBytes(Path.Combine(Snapshot.SnapshotDirectory, $"move/plotline-{name}.png"), bitmap.Encode(SKEncodedImageFormat.Png, 100).ToArray());
+        Snapshot.Save($"move/plotline-{name}.png", bitmap.Encode(SKEncodedImageFormat.Png, 100).ToArray());
     }
 }

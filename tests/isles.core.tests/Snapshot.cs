@@ -4,17 +4,18 @@ namespace Isles;
 
 public static class Snapshot
 {
-    public static string SnapshotDirectory { get; }
+    private static readonly string s_snapshotDirectory = Path.Combine(FindRepositoryRoot(), "snapshots");
 
-    static Snapshot()
+    public static void Save(string name, byte[] actual)
     {
-        SnapshotDirectory = Path.Combine(FindRepositoryRoot(), "snapshots");
-        Directory.CreateDirectory(SnapshotDirectory);
+        var path = Path.Combine(s_snapshotDirectory, name);
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        File.WriteAllBytes(path, actual);
     }
 
     public static void Save(string name, string actual)
     {
-        var path = Path.Combine(SnapshotDirectory, name);
+        var path = Path.Combine(s_snapshotDirectory, name);
         var expected = File.Exists(path) ? File.ReadAllText(path) : null;
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
         File.WriteAllText(path, actual);
