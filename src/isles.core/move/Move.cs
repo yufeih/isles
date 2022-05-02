@@ -67,6 +67,11 @@ public struct Movable
     internal float _inContactSeconds;
 }
 
+public struct MoveObstacle
+{
+    public Vector2[] Vertices { get; init; }
+}
+
 public sealed class Move : IDisposable
 {
     // Difference between 1 and the least value greater than 1 that is representable.
@@ -91,36 +96,47 @@ public sealed class Move : IDisposable
         move_delete(_world);
     }
 
-    public unsafe void Update(float dt, Span<Movable> movables, PathGrid? grid = null)
+    public unsafe void SetObstacles(ReadOnlySpan<MoveObstacle> obstacles)
+    {
+        foreach (ref readonly var o in obstacles)
+        {
+            fixed (Vector2* vertices = o.Vertices)
+            {
+                move_add_obstacle(_world, vertices, o.Vertices.Length);
+            }
+        }
+    }
+
+    public unsafe void Update(float dt, Span<Movable> units, PathGrid? grid = null)
     {
         var idt = 1 / dt;
 
-        foreach (ref var m in movables)
+        foreach (ref var unit in units)
         {
-            m._flags = 0;
-            m._desiredVelocity = default;
+            unit._flags = 0;
+            unit._desiredVelocity = default;
         }
 
         foreach (ref readonly var c in GetContacts())
         {
-            UpdateContact(movables, c);
+            UpdateContact(units, c);
         }
 
-        foreach (ref var m in movables)
+        foreach (ref var unit in units)
         {
-            UpdateInContactSeconds(dt, ref m);
-            m._desiredVelocity += MoveToTarget(dt, ref m);
-            m._force = CalculateForce(idt, ref m);
+            UpdateInContactSeconds(dt, ref unit);
+            unit._desiredVelocity += MoveToTarget(dt, ref unit);
+            unit._force = CalculateForce(idt, ref unit);
         }
 
-        fixed (void* units = movables)
+        fixed (void* pUnits = units)
         {
-            move_step(_world, units, movables.Length, Marshal.SizeOf<Movable>(), dt);
+            move_step(_world, dt, pUnits, units.Length, Marshal.SizeOf<Movable>());
         }
 
-        foreach (ref var m in movables)
+        foreach (ref var unit in units)
         {
-            UpdateRotation(dt, ref m);
+            UpdateRotation(dt, ref unit);
         }
     }
 
@@ -312,6 +328,7 @@ public sealed class Move : IDisposable
 
     [DllImport(LibName)] private static extern IntPtr move_new();
     [DllImport(LibName)] private static extern void move_delete(IntPtr world);
-    [DllImport(LibName)] private static unsafe extern void move_step(IntPtr world, void* units, int unitsLength, int unitSizeInBytes, float dt);
-    [DllImport(LibName)] private static unsafe extern int move_get_contacts(IntPtr world, Contact* contacts, int contactsLength);
+    [DllImport(LibName)] private static unsafe extern void move_step(IntPtr world, float dt, void* units, int length, int sizeInBytes);
+    [DllImport(LibName)] private static unsafe extern void move_add_obstacle(IntPtr world, Vector2* vertices, int length);
+    [DllImport(LibName)] private static unsafe extern int move_get_contacts(IntPtr world, Contact* contacts, int length);
 }

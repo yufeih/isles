@@ -21,5 +21,8 @@ struct MoveWorld;
 
 EXPORT_API MoveWorld* move_new();
 EXPORT_API void move_delete(MoveWorld* world);
-EXPORT_API void move_step(MoveWorld* world, void* units, int32_t unitsLength, int32_t unitSizeInBytes, float dt);
-EXPORT_API int32_t move_get_contacts(MoveWorld* world, MoveContact* contacts, int32_t contactsLength);
+
+EXPORT_API void move_step(MoveWorld* world, float dt, void* units, int32_t length, int32_t sizeInBytes);
+EXPORT_API void move_add_obstacle(MoveWorld* world, b2Vec2* vertices, int32_t length);
+
+EXPORT_API int32_t move_get_contacts(MoveWorld* world, MoveContact* contacts, int32_t length);
