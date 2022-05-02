@@ -54,6 +54,31 @@ public class SvgBuilder
         UpdateViewBox(x, y, x + w, y + h, data);
     }
 
+    public void AddPolygon(Vector2[] vertices, float width = 1, string? color = null, SvgData? data = null)
+    {
+        if (vertices.Length <= 2)
+        {
+            return;
+        }
+
+        var value = string.Join(" ", vertices.Skip(1).Select(i => $"L {i.X},{i.Y}"));
+
+        _xml.WriteStartElement("path");
+        _xml.WriteAttributeString("fill", "none");
+        _xml.WriteAttributeString("stroke", color ?? NextColor());
+        _xml.WriteAttributeString("stroke-width", width.ToString());
+        _xml.WriteAttributeString("d", $"M {vertices[0].X},{vertices[0].Y} {value} L {vertices[0].X},{vertices[0].Y}");
+        WriteData(data);
+        _xml.WriteEndElement();
+
+        UpdateViewBox(
+            vertices.Min(p => p.X),
+            vertices.Min(p => p.Y),
+            vertices.Max(p => p.X),
+            vertices.Max(p => p.Y),
+            data);
+    }
+
     public void AddLineSegments(Vector2[] lineSegments, float width = 1, string? color = null, SvgData? data = null)
     {
         if (lineSegments.Length <= 1)
