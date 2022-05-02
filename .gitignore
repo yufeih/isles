@@ -6,9 +6,9 @@ bin
 obj
 out
 build
+snapshots
 Debug
 Release
-
 
 launchSettings.json
 
