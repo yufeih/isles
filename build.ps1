@@ -1,13 +1,9 @@
 # Build native code
-
-pushd native
-if (test-path out) {
-    rmdir -r -Force out
-}
-mkdir out
-cd out
-cmake ..
-cmake --build . --config Release
+mkdir -p build
+pushd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
 popd
+
+cmake --build build
 
 dotnet publish src/isles -c Release -o out
