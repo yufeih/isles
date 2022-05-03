@@ -1,0 +1,32 @@
+// Copyright (c) Yufei Huang. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+syntax = "proto3";
+
+package isles;
+
+service Move {
+    rpc Update (MoveUpdateRequest) returns (MoveUpdateReply) {}
+}
+
+message MoveUpdateRequest {
+    required float dt = 1;
+    repeated Unit units = 2;
+}
+
+message MoveUpdateReply {
+    repeated Unit units = 2;
+}
+
+message Unit {
+    int32 id = 1;
+    float radius = 2;
+    repeated float position = 3;
+    repeated float velocity = 4;
+    float speed = 5;
+    float acceleration = 6;
+    float decceleration = 7;
+    float rotationSpeed = 8;
+    float rotation = 9;
+    repeated float target = 10;
+}
