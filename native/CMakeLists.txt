@@ -26,8 +26,9 @@ if ( MSVC )
 endif ( MSVC )
 
 # box2d
-set(BOX2D_BUILD_UNIT_TESTS OFF CACHE BOOL "Build the Box2D unit tests" FORCE)
-set(BOX2D_BUILD_TESTBED OFF CACHE BOOL "Build the Box2D testbed" FORCE)
-
-add_subdirectory(../extern/box2d box2d)
+add_subdirectory(../extern/box2d box2d EXCLUDE_FROM_ALL)
 target_link_libraries(isles.native PUBLIC box2d)
+
+# grpc
+add_subdirectory(../extern/grpc grpc EXCLUDE_FROM_ALL)
+target_link_libraries(isles.native PUBLIC grpc)

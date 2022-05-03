@@ -4,3 +4,6 @@
 [submodule "src/native/extern/box2d"]
 	path = extern/box2d
 	url = https://github.com/erincatto/box2d
+[submodule "extern/grpc"]
+	path = extern/grpc
+	url = https://github.com/grpc/grpc
