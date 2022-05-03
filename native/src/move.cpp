@@ -5,9 +5,10 @@
 struct MoveWorld
 {
 	b2World b2;
+	b2Body* obstacles;
 	std::vector<b2Body*> bodies;
 
-	MoveWorld() : b2({}) {}
+	MoveWorld() : b2({}), obstacles(nullptr) {}
 };
 
 MoveWorld* move_new()
@@ -20,9 +21,9 @@ void move_delete(MoveWorld* world)
 	delete world;
 }
 
-MoveUnit& get_unit(void* units, int32_t unitSizeInBytes, int32_t i)
+MoveUnit& get_unit(void* units, int32_t sizeInBytes, int32_t i)
 {
-	return *reinterpret_cast<MoveUnit*>(reinterpret_cast<std::byte*>(units) + i * unitSizeInBytes);
+	return *reinterpret_cast<MoveUnit*>(reinterpret_cast<std::byte*>(units) + i * sizeInBytes);
 }
 
 b2Body* create_body(b2World& b2, const MoveUnit& unit, size_t i)
@@ -47,13 +48,13 @@ b2Body* create_body(b2World& b2, const MoveUnit& unit, size_t i)
 	return body;
 }
 
-void move_step(MoveWorld* world, void* units, int32_t unitsLength, int32_t unitSizeInBytes, float dt)
+void move_step(MoveWorld* world, float dt, void* units, int32_t length, int32_t sizeInBytes)
 {
 	auto& bodies = world->bodies;
 	auto& b2 = world->b2;
 
-	for (auto i = 0; i < unitsLength; i ++) {
-		auto& unit = get_unit(units, unitSizeInBytes, i);
+	for (auto i = 0; i < length; i ++) {
+		auto& unit = get_unit(units, sizeInBytes, i);
 		if (i >= bodies.size()) {
 			bodies.push_back(create_body(b2, unit, i));
 		}
@@ -62,31 +63,55 @@ void move_step(MoveWorld* world, void* units, int32_t unitsLength, int32_t unitS
 
 	b2.Step(dt, 8, 3);
 
-	for (auto i = 0; i < unitsLength; i++) {
-		auto& unit = get_unit(units, unitSizeInBytes, i);
+	for (auto i = 0; i < length; i++) {
+		auto& unit = get_unit(units, sizeInBytes, i);
 		auto body = bodies[i];
 		unit.position = body->GetPosition();
 		unit.velocity = body->GetLinearVelocity();
 	}
 }
 
-int32_t move_get_contacts(MoveWorld* world, MoveContact* contacts, int32_t contactsLength)
+void move_add_obstacle(MoveWorld* world, b2Vec2* vertices, int32_t length)
+{
+	auto body = world->obstacles;
+	if (body == nullptr) {
+		b2BodyDef bd;
+		bd.type = b2_staticBody;
+		body = world->b2.CreateBody(&bd);
+	}
+
+	b2ChainShape shape;
+	b2FixtureDef fd;
+	fd.density = 0;
+	fd.friction = 0;
+	fd.restitutionThreshold = FLT_MAX;
+	fd.shape = &shape;
+
+	shape.CreateLoop(vertices, length);
+	body->CreateFixture(&fd);
+}
+
+int32_t move_get_contacts(MoveWorld* world, MoveContact* contacts, int32_t length)
 {
 	auto count = 0;
 	auto contact = world->b2.GetContactList();
 	while (contact != nullptr)
 	{
-		if (contact->IsEnabled() && contact->IsTouching() &&
-			contact->GetFixtureA()->GetBody()->IsAwake() &&
-			contact->GetFixtureB()->GetBody()->IsAwake()) {
+		if (contact->IsEnabled() && contact->IsTouching()) {
+			auto a = contact->GetFixtureA()->GetBody();
+			auto b = contact->GetFixtureB()->GetBody();
 
-			if (contacts != nullptr && count < contactsLength) {
-				MoveContact c;
-				c.a = contact->GetFixtureA()->GetUserData().pointer;
-				c.b = contact->GetFixtureB()->GetUserData().pointer;
-				*contacts++ = c;
+			if (a->GetType() == b2_dynamicBody && a->IsAwake() &&
+				b->GetType() == b2_dynamicBody && b->IsAwake()) {
+
+				if (contacts != nullptr && count < length) {
+					MoveContact c;
+					c.a = contact->GetFixtureA()->GetUserData().pointer;
+					c.b = contact->GetFixtureB()->GetUserData().pointer;
+					*contacts++ = c;
+				}
+				count++;
 			}
-			count++;
 		}
 		contact = contact->GetNext();
 	}

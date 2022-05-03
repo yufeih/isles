@@ -13,6 +13,7 @@ class MoveSandbox : Game
     private const float WorldScale = 10f;
 
     private readonly Movable[] _units = new Movable[200];
+    private readonly MoveObstacle[] _obstacles;
     private readonly List<int> _selection = new();
     private readonly Move _move = new();
 
@@ -32,6 +33,13 @@ class MoveSandbox : Game
             PreferredBackBufferWidth = 1280,
             PreferredBackBufferHeight = 768,
         };
+
+        _obstacles = new MoveObstacle[]
+        {
+            new() { Vertices = new Vector2[] { new(400,100), new(600,200), new(700,300), new(600, 350), new(400,400) }.Select(v => v / WorldScale).ToArray() },
+        };
+
+        _move.SetObstacles(_obstacles);
 
         var random = new Random();
         for (var i = 0; i < _units.Length; i++)
@@ -135,6 +143,18 @@ class MoveSandbox : Game
         if (_selectStart != _selectEnd)
         {
             _spriteBatch.Draw(selection, GetSelectionRectangle(), Color.Green * 0.5f);
+        }
+
+        foreach (var obstacle in _obstacles)
+        {
+            for (var i = 0; i < obstacle.Vertices.Length; i++)
+            {
+                var a = obstacle.Vertices[i] * WorldScale;
+                var b = obstacle.Vertices[(i + 1) % obstacle.Vertices.Length] * WorldScale;
+                var rotation = MathF.Atan2(b.Y - a.Y, b.X - a.X);
+                var scale = new Vector2(Vector2.Distance(a, b), 4);
+                _spriteBatch.Draw(selection, a, null, Color.Brown, rotation, default, scale, SpriteEffects.None, 0);
+            }
         }
 
         _spriteBatch.End();
