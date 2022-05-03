@@ -8,10 +8,12 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # isles.native
 set(ISLES_HEADER_FILES
-    include/move.h)
+    include/move.h
+    include/navmesh.h)
 
 set(ISLES_SOURCE_FILES
-    src/move.cpp)
+    src/move.cpp
+    src/navmesh.cpp)
 
 add_library(isles.native SHARED ${ISLES_SOURCE_FILES})
 target_include_directories(isles.native PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -31,3 +33,6 @@ set(BOX2D_BUILD_TESTBED OFF CACHE BOOL "Build the Box2D testbed" FORCE)
 
 add_subdirectory(../extern/box2d box2d)
 target_link_libraries(isles.native PUBLIC box2d)
+
+# earcut.hpp
+include_directories(../extern/earcut.hpp/include/mapbox)

@@ -1,6 +1,5 @@
 #include <move.h>
 #include <vector>
-#include <set>
 
 struct MoveWorld
 {
