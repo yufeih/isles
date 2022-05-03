@@ -21,6 +21,10 @@ jobs:
     - uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '6.0.x'
+    - uses: actions/cache@v3
+      with:
+        path: build
+        key: cmake-build-${{ matrix.os }}
     - run: ./build.sh
       shell: bash
     - run: dotnet test -c Release --collect:"XPlat Code Coverage"
