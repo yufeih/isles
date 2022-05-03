@@ -35,4 +35,4 @@ add_subdirectory(../extern/box2d box2d)
 target_link_libraries(isles.native PUBLIC box2d)
 
 # earcut.hpp
-include_directories(../extern/earcut.hpp/include/mapbox)
+include_directories(../extern/earcut.hpp/include)

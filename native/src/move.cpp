@@ -1,5 +1,6 @@
 #include <move.h>
 #include <vector>
+#include <box2d/box2d.h>
 
 struct MoveWorld
 {
