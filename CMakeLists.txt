@@ -7,28 +7,25 @@ set(CMAKE_CXX_STANDARD_REQUIRED true)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # isles.native
-set(ISLES_HEADER_FILES
-    include/move.h)
-
 set(ISLES_SOURCE_FILES
-    src/move.cpp)
+    src/isles.native/move.cpp)
 
 add_library(isles.native SHARED ${ISLES_SOURCE_FILES})
 target_include_directories(isles.native PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/out)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/build)
 
 # Remove the Debug and Release directory added by MSVC
 # https://stackoverflow.com/questions/7747857/in-cmake-how-do-i-work-around-the-debug-and-release-directories-visual-studio-2
 if ( MSVC )
-    set_target_properties( isles.native PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_SOURCE_DIR}/out )
-    set_target_properties( isles.native PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_CURRENT_SOURCE_DIR}/out )
+    set_target_properties( isles.native PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_SOURCE_DIR}/build )
+    set_target_properties( isles.native PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_CURRENT_SOURCE_DIR}/build )
 endif ( MSVC )
 
 # box2d
-add_subdirectory(../extern/box2d box2d EXCLUDE_FROM_ALL)
+add_subdirectory(extern/box2d box2d EXCLUDE_FROM_ALL)
 target_link_libraries(isles.native PUBLIC box2d)
 
 # grpc
-add_subdirectory(../extern/grpc grpc EXCLUDE_FROM_ALL)
+add_subdirectory(extern/grpc grpc EXCLUDE_FROM_ALL)
 target_link_libraries(isles.native PUBLIC grpc)
