@@ -6,6 +6,9 @@ window.onload = main;
 // Start here
 //
 function main() {
+
+  let pixels = window.pixels
+
   const canvas = document.querySelector('#glcanvas');
   const gl = canvas.getContext('webgl');
 
@@ -235,12 +238,6 @@ function initBuffers(gl) {
     indices: indexBuffer,
   };
 }
-
-var buffer = new SharedArrayBuffer(1280 * 800 * 4)
-var pixels = new Uint8Array(buffer)
-pixels[0] = 255;
-pixels[3] = 255;
-
 
 //
 // Initialize a texture and load an image.
