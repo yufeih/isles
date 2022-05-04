@@ -8,7 +8,9 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # isles.native
 set(ISLES_SOURCE_FILES
-    src/isles.native/move.cpp)
+    src/isles.native/main.cpp
+    src/isles.native/move.cpp
+    src/isles.native/http.cpp)
 
 add_library(isles.native SHARED ${ISLES_SOURCE_FILES})
 target_include_directories(isles.native PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -25,3 +27,17 @@ endif ( MSVC )
 # box2d
 add_subdirectory(extern/box2d box2d EXCLUDE_FROM_ALL)
 target_link_libraries(isles.native PRIVATE box2d)
+
+# boost
+include(ExternalProject)
+ExternalProject_Add(
+    boost
+    URL https://boostorg.jfrog.io/artifactory/main/release/1.79.0/source/boost_1_79_0.zip
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND ""
+    INSTALL_COMMAND ""
+)
+
+ExternalProject_Get_Property(boost SOURCE_DIR)
+target_include_directories(isles.native PRIVATE ${SOURCE_DIR})
+add_dependencies(isles.native boost)
