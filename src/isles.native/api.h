@@ -34,7 +34,6 @@ EXPORT_API int32_t move_get_contacts(MoveWorld* world, MoveContact* contacts, in
 
 struct NavMeshPolygon;
 
-EXPORT_API NavMeshPolygon* navmesh_new_polygon();
-EXPORT_API void navmesh_delete_polygon(NavMeshPolygon* polygon);
-EXPORT_API void navmesh_polygon_add_polylines(NavMeshPolygon* polygon, b2Vec2* vertices, int length);
+EXPORT_API NavMeshPolygon* navmesh_polygon_new(int32_t* polylines, int32_t length, b2Vec2* vertices);
+EXPORT_API void navmesh_polygon_delete(NavMeshPolygon* polygon);
 EXPORT_API int32_t navmesh_polygon_triangulate(NavMeshPolygon* polygon, uint16_t** indices);

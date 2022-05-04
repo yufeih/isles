@@ -22,8 +22,7 @@ static class NativeMethods
     [DllImport(LibName)] public static unsafe extern void move_add_obstacle(IntPtr world, Vector2* vertices, int length);
     [DllImport(LibName)] public static unsafe extern int move_get_contacts(IntPtr world, MoveContact* contacts, int length);
 
-    [DllImport(LibName)] public static extern IntPtr navmesh_new_polygon();
-    [DllImport(LibName)] public static extern void navmesh_delete_polygon(IntPtr polygon);
-    [DllImport(LibName)] public static unsafe extern void navmesh_polygon_add_polylines(IntPtr polygon, Vector2* vertices, int length);
+    [DllImport(LibName)] public static unsafe extern IntPtr navmesh_polygon_new(int* polylines, int length, Vector2* vertices);
+    [DllImport(LibName)] public static extern void navmesh_polygon_delete(IntPtr polygon);
     [DllImport(LibName)] public static unsafe extern int navmesh_polygon_triangulate(IntPtr polygon, out ushort* indices);
 }

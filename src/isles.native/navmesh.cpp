@@ -26,24 +26,25 @@ struct NavMeshPolygon
     std::vector<uint16_t> triangles;
 };
 
-EXPORT_API NavMeshPolygon* navmesh_new_polygon()
+NavMeshPolygon* navmesh_polygon_new(int32_t* polylines, int32_t polylinesLength, b2Vec2* vertices)
 {
-    return new NavMeshPolygon();
+    auto polygon = new NavMeshPolygon();
+    for (auto i = 0; i < polylinesLength; i++) {
+        std::vector<b2Vec2> polyline;
+        auto step = polylines[i];
+        polyline.assign(vertices, vertices + step);
+        polygon->polygon.push_back(std::move(polyline));
+        vertices += step;
+    }
+    return polygon;
 }
 
-EXPORT_API void navmesh_delete_polygon(NavMeshPolygon* polygon)
+void navmesh_polygon_delete(NavMeshPolygon* polygon)
 {
     delete polygon;
 }
 
-EXPORT_API void navmesh_polygon_add_polylines(NavMeshPolygon* polygon, b2Vec2* vertices, int length)
-{
-    std::vector<b2Vec2> polylines;
-    polylines.assign(vertices, vertices + length);
-    polygon->polygon.push_back(std::move(polylines));
-}
-
-EXPORT_API int32_t navmesh_polygon_triangulate(NavMeshPolygon* polygon, uint16_t** indices)
+int32_t navmesh_polygon_triangulate(NavMeshPolygon* polygon, uint16_t** indices)
 {
     polygon->triangles = mapbox::earcut<uint16_t>(polygon->polygon);
     *indices = polygon->triangles.data();

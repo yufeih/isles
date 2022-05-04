@@ -7,25 +7,27 @@ namespace Isles;
 
 public class NavMesh
 {
-    private List<Vector2[]> _polygon;
+    private ArrayBuilder<ushort> _triangles;
 
-    private ArrayBuilder<int> _triangles;
-
-    public NavMesh(List<Vector2[]> polygons)
+    public unsafe ReadOnlySpan<ushort> Triangulate(ReadOnlySpan<Vector2> vertices, ReadOnlySpan<int> polylines)
     {
-        _polygon = polygons;
-    }
-
-    public unsafe ReadOnlySpan<int> Triangulate()
-    {
-        var polygon = navmesh_new_polygon();
-
-        foreach (var polylines in _polygon)
+        var sum = 0;
+        foreach (var count in polylines)
         {
-            fixed (Vector2* vertices = polylines)
-            {
-                navmesh_polygon_add_polylines(polygon, vertices, polylines.Length);
-            }
+            if (count < 3)
+                throw new ArgumentOutOfRangeException(nameof(polylines));
+            sum += count;
+        }
+
+        if (sum > vertices.Length)
+            throw new ArgumentOutOfRangeException(nameof(polylines));
+
+        IntPtr polygon;
+
+        fixed (Vector2* pVertices = vertices)
+        fixed (int* pPolylines = polylines)
+        {
+            polygon = navmesh_polygon_new(pPolylines, polylines.Length, pVertices);
         }
 
         _triangles.Clear();
@@ -35,7 +37,7 @@ public class NavMesh
             _triangles.Add(indices[i]);
         }
 
-        navmesh_delete_polygon(polygon);
+        navmesh_polygon_delete(polygon);
 
         return _triangles;
     }
