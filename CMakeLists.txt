@@ -8,8 +8,8 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # isles.native
 set(ISLES_SOURCE_FILES
-    src/move.cpp
-    src/navmesh.cpp)
+    src/isles.native/move.cpp
+    src/isles.native/navmesh.cpp)
 
 add_library(isles.native SHARED ${ISLES_SOURCE_FILES})
 target_include_directories(isles.native PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)

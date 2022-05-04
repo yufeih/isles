@@ -31,11 +31,11 @@ public class PathFinderTest
             {
                 i++;
                 var lines = new[]{ start }.Concat(path.ToArray()).Select(p => p + Vector2.One * (pathWidth % 2 == 0 ? 0.5f : 0)).ToArray();
-                svg.AddLineSegments(lines, pathWidth, data: new() { Opacity = 0.5f });
+                svg.AddLines(lines, pathWidth, data: new() { Opacity = 0.5f });
 
                 var smoothPath = pathfinder.FindPath(grid, pathWidth, start, end, smoothPath: true);
                 var smoothLines = new[]{ start }.Concat(smoothPath.ToArray()).Select(p => p + Vector2.One * (pathWidth % 2 == 0 ? 0.5f : 0)).ToArray();
-                svgSmooth.AddLineSegments(smoothLines, pathWidth, data: new() { Opacity = 0.5f });
+                svgSmooth.AddLines(smoothLines, pathWidth, data: new() { Opacity = 0.5f });
             }
         }
 
@@ -65,7 +65,7 @@ public class PathFinderTest
 
             if ((reachable && green++ < 5) || (!reachable && red++ < 5))
             {
-                svg.AddLineSegments(new[] { start, end }, pathWidth, reachable ? "green" : "red", new() { Opacity = 0.2f });
+                svg.AddLines(new[] { start, end }, pathWidth, reachable ? "green" : "red", new() { Opacity = 0.2f });
             }
         }
 

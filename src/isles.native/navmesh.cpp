@@ -1,4 +1,4 @@
-#include <navmesh.h>
+#include "api.h"
 #include <mapbox/earcut.hpp>
 
 namespace mapbox {

@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Runtime.InteropServices;
+using static Isles.NativeMethods;
 
 namespace Isles;
 
@@ -79,11 +80,10 @@ public sealed class Move : IDisposable
     // which is way too small to be practical.
     private const float Epsilon = 1.19209290e-7F;
     private const float MaxInContactSeconds = 5;
-    private const string LibName = "isles.native";
 
     private readonly IntPtr _world = move_new();
 
-    private ArrayBuilder<Contact> _contacts;
+    private ArrayBuilder<MoveContact> _contacts;
 
     public void Dispose()
     {
@@ -140,14 +140,14 @@ public sealed class Move : IDisposable
         }
     }
 
-    private unsafe ReadOnlySpan<Contact> GetContacts()
+    private unsafe ReadOnlySpan<MoveContact> GetContacts()
     {
         var contactCount = move_get_contacts(_world, null, 0);
         if (contactCount <= 0)
-            return Array.Empty<Contact>();
+            return Array.Empty<MoveContact>();
 
         _contacts.SetLength((int)contactCount);
-        fixed (Contact* contacts = _contacts.AsSpan())
+        fixed (MoveContact* contacts = _contacts.AsSpan())
         {
             move_get_contacts(_world, contacts, contactCount);
         }
@@ -207,7 +207,7 @@ public sealed class Move : IDisposable
         return force;
     }
 
-    private void UpdateContact(Span<Movable> movables, in Contact c)
+    private void UpdateContact(Span<Movable> movables, in MoveContact c)
     {
         ref var a = ref movables[c.A];
         ref var b = ref movables[c.B];
@@ -318,17 +318,4 @@ public sealed class Move : IDisposable
     {
         return a.X * b.Y - b.X * a.Y;
     }
-
-    [StructLayout(LayoutKind.Sequential)]
-    struct Contact
-    {
-        public int A;
-        public int B;
-    }
-
-    [DllImport(LibName)] private static extern IntPtr move_new();
-    [DllImport(LibName)] private static extern void move_delete(IntPtr world);
-    [DllImport(LibName)] private static unsafe extern void move_step(IntPtr world, float dt, void* units, int length, int sizeInBytes);
-    [DllImport(LibName)] private static unsafe extern void move_add_obstacle(IntPtr world, Vector2* vertices, int length);
-    [DllImport(LibName)] private static unsafe extern int move_get_contacts(IntPtr world, Contact* contacts, int length);
 }
