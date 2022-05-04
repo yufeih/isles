@@ -1,8 +1,5 @@
 #include <navmesh.h>
-#include <box2d/b2_math.h>
 #include <mapbox/earcut.hpp>
-
-using N = uint16_t;
 
 namespace mapbox {
 namespace util {
@@ -23,20 +20,32 @@ struct nth<1, b2Vec2> {
 } // namespace util
 } // namespace mapbox
 
-int navmesh_triangulate()
+struct NavMeshPolygon
 {
     std::vector<std::vector<b2Vec2>> polygon;
+    std::vector<uint16_t> triangles;
+};
 
-    // Fill polygon structure with actual data. Any winding order works.
-    // The first polyline defines the main polygon.
-    polygon.push_back({{100, 0}, {100, 100}, {0, 100}, {0, 0}});
-    // Following polylines define holes.
-    polygon.push_back({{75, 25}, {75, 75}, {25, 75}, {25, 25}});
+EXPORT_API NavMeshPolygon* navmesh_new_polygon()
+{
+    return new NavMeshPolygon();
+}
 
-    // Run tessellation
-    // Returns array of indices that refer to the vertices of the input polygon.
-    // e.g: the index 6 would refer to {25, 75} in this example.
-    // Three subsequent indices form a triangle. Output triangles are clockwise.
-    std::vector<N> indices = mapbox::earcut<N>(polygon);
-    return 0;
+EXPORT_API void navmesh_delete_polygon(NavMeshPolygon* polygon)
+{
+    delete polygon;
+}
+
+EXPORT_API void navmesh_polygon_add_polylines(NavMeshPolygon* polygon, b2Vec2* vertices, int length)
+{
+    std::vector<b2Vec2> polylines;
+    polylines.assign(vertices, vertices + length);
+    polygon->polygon.push_back(std::move(polylines));
+}
+
+EXPORT_API int32_t navmesh_polygon_triangulate(NavMeshPolygon* polygon, uint16_t** indices)
+{
+    polygon->triangles = mapbox::earcut<uint16_t>(polygon->polygon);
+    *indices = polygon->triangles.data();
+    return polygon->triangles.size();
 }
