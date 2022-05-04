@@ -1,0 +1,23 @@
+{
+  "name": "islese",
+  "version": "1.0.0",
+  "description": "Isles Editor",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yufeih/isles.git"
+  },
+  "author": "Yufei Huang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yufeih/isles/issues"
+  },
+  "homepage": "https://github.com/yufeih/isles",
+  "devDependencies": {
+    "electron": "^18.2.0"
+  }
+}
