@@ -2,31 +2,10 @@ var cubeRotation = 0.0;
 
 window.onload = main;
 
-async function drawVideo() {
-  const stream = await navigator.mediaDevices.getUserMedia({
-    audio: false,
-    video: {
-      mandatory: {
-        chromeMediaSource: 'desktop',
-        //chromeMediaSourceId: sourceId,
-        minWidth: 1280,
-        maxWidth: 1280,
-        minHeight: 720,
-        maxHeight: 720
-      }
-    }
-  })
-  const video = document.querySelector('#video')
-  video.srcObject = stream
-  video.onloadedmetadata = (e) => video.play()
-}
-
 //
 // Start here
 //
 function main() {
-  //drawVideo()
-
   const canvas = document.querySelector('#glcanvas');
   const gl = canvas.getContext('webgl');
 
@@ -91,7 +70,9 @@ function main() {
   // objects we'll be drawing.
   const buffers = initBuffers(gl);
 
-  const texture = loadTexture(gl, 'electron.webp');
+  const texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  updateTexture(gl, texture)
 
   var then = 0;
   var fps = 0;
@@ -107,13 +88,14 @@ function main() {
     then = now;
     fpsTimer += deltaTime;
     if (fpsTimer > 1) {
-      fpsSpan.innerText = fps
+      fpsSpan.innerText = `${fps}  ${pixels[1]}`
       fpsTimer = 0;
       fps = 0;
     }
 
+    pixels[1] = Math.min(255, [pixels[1] + 1])
+    updateTexture(gl, texture)
     drawScene(gl, programInfo, buffers, texture, deltaTime);
-
     requestAnimationFrame(render);
   }
   requestAnimationFrame(render);
@@ -254,13 +236,17 @@ function initBuffers(gl) {
   };
 }
 
+var buffer = new SharedArrayBuffer(1280 * 800 * 4)
+var pixels = new Uint8Array(buffer)
+pixels[0] = 255;
+pixels[3] = 255;
+
+
 //
 // Initialize a texture and load an image.
 // When the image finished loading copy it into the texture.
 //
-function loadTexture(gl, url) {
-  const texture = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, texture);
+function updateTexture(gl, texture) {
 
   // Because images have to be download over the internet
   // they might take a moment until they are ready.
@@ -274,34 +260,10 @@ function loadTexture(gl, url) {
   const border = 0;
   const srcFormat = gl.RGBA;
   const srcType = gl.UNSIGNED_BYTE;
-  const pixel = new Uint8Array([0, 0, 255, 255]);  // opaque blue
+
   gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
                 width, height, border, srcFormat, srcType,
-                pixel);
-
-  const image = new Image();
-  image.onload = function() {
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(gl.TEXTURE_2D, level, internalFormat,
-                  srcFormat, srcType, image);
-
-    // WebGL1 has different requirements for power of 2 images
-    // vs non power of 2 images so check if the image is a
-    // power of 2 in both dimensions.
-    if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
-       // Yes, it's a power of 2. Generate mips.
-       gl.generateMipmap(gl.TEXTURE_2D);
-    } else {
-       // No, it's not a power of 2. Turn of mips and set
-       // wrapping to clamp to edge
-       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    }
-  };
-  image.src = url;
-
-  return texture;
+                pixels);
 }
 
 function isPowerOf2(value) {
