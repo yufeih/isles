@@ -2,10 +2,31 @@ var cubeRotation = 0.0;
 
 window.onload = main;
 
+async function drawVideo() {
+  const stream = await navigator.mediaDevices.getUserMedia({
+    audio: false,
+    video: {
+      mandatory: {
+        chromeMediaSource: 'desktop',
+        //chromeMediaSourceId: sourceId,
+        minWidth: 1280,
+        maxWidth: 1280,
+        minHeight: 720,
+        maxHeight: 720
+      }
+    }
+  })
+  const video = document.querySelector('#video')
+  video.srcObject = stream
+  video.onloadedmetadata = (e) => video.play()
+}
+
 //
 // Start here
 //
 function main() {
+  //drawVideo()
+
   const canvas = document.querySelector('#glcanvas');
   const gl = canvas.getContext('webgl');
 
