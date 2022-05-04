@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 
 # Build native code
-pushd native
-rm -rf out
-mkdir out
-cd out
+mkdir build
+pushd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
-cmake --build . --config Release
 popd
+
+cmake --build build
 
 dotnet publish src/isles -c Release -o out
