@@ -48,5 +48,5 @@ int32_t navmesh_polygon_triangulate(NavMeshPolygon* polygon, uint16_t** indices)
 {
     polygon->triangles = mapbox::earcut<uint16_t>(polygon->polygon);
     *indices = polygon->triangles.data();
-    return polygon->triangles.size();
+    return static_cast<int32_t>(polygon->triangles.size());
 }
