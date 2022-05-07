@@ -54,28 +54,42 @@ public class SvgBuilder
         UpdateViewBox(x, y, x + w, y + h, data);
     }
 
-    public void AddLineSegments(Vector2[] lineSegments, float width = 1, string? color = null, SvgData? data = null)
+    public void AddPolygon(Vector2[] vertices, float width = 1, string? color = null, SvgData? data = null)
     {
-        if (lineSegments.Length <= 1)
+        AddLineSegments(vertices, width, color, loop: true, data);
+    }
+
+    public void AddLine(Vector2[] points, float width = 1, string? color = null, SvgData? data = null)
+    {
+        AddLineSegments(points, width, color, loop: false, data);
+    }
+
+    private void AddLineSegments(Vector2[] points, float width, string? color, bool loop, SvgData? data)
+    {
+        if (points.Length <= 1)
         {
             return;
         }
 
-        var value = string.Join(" ", lineSegments.Skip(1).Select(i => $"L {i.X},{i.Y}"));
+        var value = string.Join(" ", points.Skip(1).Select(i => $"L {i.X},{i.Y}"));
+        if (loop)
+        {
+            value += $" L {points[0].X},{points[0].Y}";
+        }
 
         _xml.WriteStartElement("path");
         _xml.WriteAttributeString("fill", "none");
         _xml.WriteAttributeString("stroke", color ?? NextColor());
         _xml.WriteAttributeString("stroke-width", width.ToString());
-        _xml.WriteAttributeString("d", $"M {lineSegments[0].X},{lineSegments[0].Y} {value}");
+        _xml.WriteAttributeString("d", $"M {points[0].X},{points[0].Y} {value}");
         WriteData(data);
         _xml.WriteEndElement();
 
         UpdateViewBox(
-            lineSegments.Min(p => p.X),
-            lineSegments.Min(p => p.Y),
-            lineSegments.Max(p => p.X),
-            lineSegments.Max(p => p.Y),
+            points.Min(p => p.X),
+            points.Min(p => p.Y),
+            points.Max(p => p.X),
+            points.Max(p => p.Y),
             data);
     }
 
