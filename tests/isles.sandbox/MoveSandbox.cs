@@ -39,7 +39,7 @@ class MoveSandbox : Game
             new() { Vertices = new Vector2[] { new(400,100), new(600,200), new(700,300), new(600, 350), new(400,400) }.Select(v => v / WorldScale).ToArray() },
         };
 
-        _move.SetObstacles(_obstacles);
+        //_move.SetObstacles(_obstacles);
 
         var random = new Random();
         for (var i = 0; i < _units.Length; i++)
