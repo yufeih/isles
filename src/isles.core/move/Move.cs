@@ -53,6 +53,8 @@ public struct MoveUnit
     public Vector2? Target { get; set; }
 
     internal IntPtr _body;
+    internal Vector2[]? _path;
+    internal int _pathIndex;
     internal Vector2 _desiredVelocity;
     internal float _inContactSeconds;
 }
@@ -73,11 +75,14 @@ public sealed class Move : IDisposable
     private const string LibName = "isles.native";
 
     private readonly IntPtr _world = move_new();
+    private readonly PathFinder _pathFinder = new();
+    private readonly PathGrid? _grid;
 
     public Move(PathGrid? grid = null)
     {
         if (grid != null)
             SetGridObstacles(grid);
+        _grid = grid;
     }
 
     public void Dispose()
@@ -99,6 +104,8 @@ public sealed class Move : IDisposable
         {
             unit._flags = 0;
             unit._desiredVelocity = default;
+
+            FollowPath(ref unit);
         }
 
         IntPtr contactItr = default;
@@ -112,7 +119,7 @@ public sealed class Move : IDisposable
         {
             ref var unit = ref units[i];
             UpdateInContactSeconds(dt, ref unit);
-            unit._desiredVelocity += MoveToTarget(dt, ref unit);
+            unit._desiredVelocity += SeekTarget(dt, ref unit);
             var force = CalculateForce(idt, ref unit);
             var nativeUnit = new NativeUnit()
             {
@@ -160,7 +167,30 @@ public sealed class Move : IDisposable
         }
     }
 
-    private Vector2 MoveToTarget(float dt, ref MoveUnit m)
+    private void FollowPath(ref MoveUnit unit)
+    {
+        if (_grid is null || unit.Target is null)
+            return;
+
+        if (unit._path is null)
+        {
+            unit._pathIndex = 0;
+            unit._path = _pathFinder.FindPath(_grid, unit.Radius * 2, unit.Position, unit.Target.Value).ToArray();
+        }
+
+        if (unit._path.Length <= 0 || unit._pathIndex >= unit._path.Length - 1)
+            return;
+
+        // Have we reached a waypoint?
+        var waypoint = unit._path[unit._pathIndex];
+        if (Vector2.Dot(unit.Position - waypoint, unit.Velocity) > 0)
+        {
+        var nextWaypoint = unit._pathIndex < unit._path.Length - 1 ? unit._path[unit._pathIndex + 1] : null;
+
+        }
+    }
+
+    private Vector2 SeekTarget(float dt, ref MoveUnit m)
     {
         if (m.Target is null)
             return default;
@@ -316,6 +346,8 @@ public sealed class Move : IDisposable
     private static void ClearTarget(ref MoveUnit m)
     {
         m.Target = null;
+        m._path = null;
+        m._pathIndex = 0;
         m._inContactSeconds = 0;
     }
 
