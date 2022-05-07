@@ -13,7 +13,6 @@ public class MoveTests
     [MemberData(nameof(TestCases))]
     public void MoveTest(string name, string json)
     {
-        using var move = new Move();
         var duration = 0.0f;
         var timeStep = 1.0f / 60;
         var testSchema = new { units = Array.Empty<MoveUnit>(), grid = Array.Empty<int>() };
@@ -21,9 +20,11 @@ public class MoveTests
         var grid = test.grid != null ? CreateGrid(test.grid) : null;
         var positions = Array.ConvertAll(test.units, m => new List<Vector2> { m.Position });
 
+        using var move = new Move(grid);
+
         while (duration < 4)
         {
-            move.Update(timeStep, test.units, grid);
+            move.Update(timeStep, test.units);
             duration += timeStep;
 
             var running = false;

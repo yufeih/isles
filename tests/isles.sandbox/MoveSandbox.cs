@@ -1,6 +1,7 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections;
 using Isles.Graphics;
 
 Directory.SetCurrentDirectory(AppContext.BaseDirectory);
@@ -12,10 +13,11 @@ class MoveSandbox : Game
 {
     private const float WorldScale = 10f;
 
-    private readonly MoveUnit[] _units = new MoveUnit[200];
+    private readonly MoveUnit[] _units = new MoveUnit[20];
     private readonly MoveObstacle[] _obstacles;
     private readonly List<int> _selection = new();
-    private readonly Move _move = new();
+    private readonly PathGrid _grid;
+    private readonly Move _move;
 
     private Point _selectStart, _selectEnd;
 
@@ -34,12 +36,14 @@ class MoveSandbox : Game
             PreferredBackBufferHeight = 768,
         };
 
+        var colors = TextureLoader.ReadAllPixels("data/grid.png", out var w, out var h);
+        var bits = new BitArray(colors.ToArray().Select(c => c.R < 100).ToArray());
+        _grid = new(w, h, 4, bits);
+        _move = new(_grid);
         _obstacles = new MoveObstacle[]
         {
-            new() { Vertices = new Vector2[] { new(400,100), new(600,200), new(700,300), new(600, 350), new(400,400) }.Select(v => v / WorldScale).ToArray() },
+            //new() { Vertices = new Vector2[] { new(400,100), new(600,200), new(700,300), new(600, 350), new(400,400) }.Select(v => v / WorldScale).ToArray() },
         };
-
-        //_move.SetObstacles(_obstacles);
 
         var random = new Random();
         for (var i = 0; i < _units.Length; i++)
@@ -120,6 +124,18 @@ class MoveSandbox : Game
 
         _spriteBatch.Begin();
 
+        DrawGrid(_grid);
+
+        foreach (var obstacle in _obstacles)
+        {
+            for (var i = 0; i < obstacle.Vertices.Length; i++)
+            {
+                var a = obstacle.Vertices[i] * WorldScale;
+                var b = obstacle.Vertices[(i + 1) % obstacle.Vertices.Length] * WorldScale;
+                DrawLine(a, b, 4, Color.Brown);
+            }
+        }
+
         for (var i = 0; i < _units.Length; i++)
         {
             ref readonly var unit = ref _units[i];
@@ -145,19 +161,44 @@ class MoveSandbox : Game
             _spriteBatch.Draw(selection, GetSelectionRectangle(), Color.Green * 0.5f);
         }
 
-        foreach (var obstacle in _obstacles)
+        _spriteBatch.End();
+
+        void DrawLine(Vector2 a, Vector2 b, float width, Color color)
         {
-            for (var i = 0; i < obstacle.Vertices.Length; i++)
+            var rotation = MathF.Atan2(b.Y - a.Y, b.X - a.X);
+            var scale = new Vector2(Vector2.Distance(a, b), width);
+            _spriteBatch.Draw(selection, a, null, color, rotation, default, scale, SpriteEffects.None, 0);
+        }
+        
+        void DrawGrid(PathGrid grid)
+        {
+            for (var y = 0; y <= grid.Height; y++)
+                DrawLine(
+                    new(0, y * grid.Step * WorldScale),
+                    new(grid.Width * grid.Step * WorldScale, y * grid.Step * WorldScale),
+                    1, Color.LightGray);
+
+            for (var x = 0; x <= grid.Height; x++)
+                DrawLine(
+                    new(x * grid.Step * WorldScale, 0),
+                    new(x * grid.Step * WorldScale, grid.Height * grid.Step * WorldScale),
+                    1, Color.LightGray);
+
+            for (var i = 0; i < grid.Bits.Length; i++)
             {
-                var a = obstacle.Vertices[i] * WorldScale;
-                var b = obstacle.Vertices[(i + 1) % obstacle.Vertices.Length] * WorldScale;
-                var rotation = MathF.Atan2(b.Y - a.Y, b.X - a.X);
-                var scale = new Vector2(Vector2.Distance(a, b), 4);
-                _spriteBatch.Draw(selection, a, null, Color.Brown, rotation, default, scale, SpriteEffects.None, 0);
+                if (grid.Bits[i])
+                {
+                    var x = i % grid.Width;
+                    var y = i / grid.Width;
+                    _spriteBatch.Draw(
+                        selection,
+                        new Rectangle(
+                            (int)(x * grid.Step * WorldScale), (int)(y * grid.Step * WorldScale),
+                            (int)(grid.Step * WorldScale), (int)(grid.Step * WorldScale)),
+                        Color.DarkCyan);
+                }
             }
         }
-
-        _spriteBatch.End();
     }
 
     private Rectangle GetSelectionRectangle()

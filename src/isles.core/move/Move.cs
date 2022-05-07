@@ -76,6 +76,12 @@ public sealed class Move : IDisposable
 
     private readonly IntPtr _world = move_new();
 
+    public Move(PathGrid? grid = null)
+    {
+        if (grid != null)
+            SetGridObstacles(grid);
+    }
+
     public void Dispose()
     {
         GC.SuppressFinalize(this);
@@ -87,7 +93,7 @@ public sealed class Move : IDisposable
         move_delete(_world);
     }
 
-    public unsafe void Update(float dt, Span<MoveUnit> units, PathGrid? grid = null)
+    public unsafe void Update(float dt, Span<MoveUnit> units)
     {
         var idt = 1 / dt;
 
@@ -103,6 +109,7 @@ public sealed class Move : IDisposable
             UpdateContact(units, c);
         }
 
+        // Update units
         for (var i = 0; i < units.Length; i++)
         {
             ref var unit = ref units[i];
@@ -119,8 +126,6 @@ public sealed class Move : IDisposable
             unit._body = move_set_unit(_world, unit._body, ref nativeUnit);
         }
 
-        var obstacles = GetObstacles(grid);
-
         move_step(_world, dt);
 
         foreach (ref var unit in units)
@@ -130,9 +135,31 @@ public sealed class Move : IDisposable
         }
     }
 
-    private Span<MoveObstacle> GetObstacles(PathGrid? grid)
+    private unsafe void SetGridObstacles(PathGrid grid)
     {
-        return Array.Empty<MoveObstacle>();
+        Span<Vector2> vertices = stackalloc Vector2[]
+        {
+            new(0, 0),
+            new(grid.Step, 0),
+            new(grid.Step, grid.Step),
+            new(0, grid.Step),
+        };
+
+        fixed (Vector2* pVertices = vertices)
+        {
+            for (var y = 0; y < grid.Height; y++)
+                for (var x = 0; x < grid.Width; x++)
+                    if (grid.Bits[x + (y * grid.Width)])
+                    {
+                        var nativeObstacle = new NativeObstacle()
+                        {
+                            vertices = pVertices,
+                            length = vertices.Length,
+                            position = new(x * grid.Step, y * grid.Step),
+                        };
+                        move_set_obstacle(_world, default, ref nativeObstacle);
+                    }
+        }
     }
 
     private Vector2 MoveToTarget(float dt, ref MoveUnit m)
