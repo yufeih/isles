@@ -12,7 +12,7 @@ class MoveSandbox : Game
 {
     private const float WorldScale = 10f;
 
-    private readonly Movable[] _units = new Movable[200];
+    private readonly MoveUnit[] _units = new MoveUnit[200];
     private readonly MoveObstacle[] _obstacles;
     private readonly List<int> _selection = new();
     private readonly Move _move = new();

@@ -17,6 +17,12 @@ struct MoveUnit
     b2Vec2 force;
 };
 
+struct MoveObstacle
+{
+    int32_t (*get_polygon)(const MoveObstacle*, b2Vec2*);
+    b2Vec2 position;
+};
+
 struct MoveContact
 {
     int32_t a;
@@ -27,6 +33,6 @@ struct MoveWorld;
 
 EXPORT_API MoveWorld* move_new();
 EXPORT_API void move_delete(MoveWorld* world);
-EXPORT_API void move_step(MoveWorld* world, float dt, void* units, int32_t length, int32_t sizeInBytes);
-EXPORT_API void move_add_obstacle(MoveWorld* world, b2Vec2* vertices, int32_t length);
+EXPORT_API void move_step(MoveWorld* world, float dt,
+    MoveUnit* units, int32_t unitsLength, MoveObstacle* obstacles, int32_t obstaclesLength);
 EXPORT_API int32_t move_get_next_contact(MoveWorld* world, void** iterator, MoveContact* contact);

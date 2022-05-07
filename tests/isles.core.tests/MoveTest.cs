@@ -16,7 +16,7 @@ public class MoveTests
         using var move = new Move();
         var duration = 0.0f;
         var timeStep = 1.0f / 60;
-        var testSchema = new { units = Array.Empty<Movable>(), grid = Array.Empty<int>() };
+        var testSchema = new { units = Array.Empty<MoveUnit>(), grid = Array.Empty<int>() };
         var test = JsonHelper.DeserializeAnonymousType(json, testSchema)!;
         var grid = test.grid != null ? CreateGrid(test.grid) : null;
         var positions = Array.ConvertAll(test.units, m => new List<Vector2> { m.Position });

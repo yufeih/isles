@@ -5,10 +5,10 @@
 struct MoveWorld
 {
 	b2World b2;
-	b2Body* obstacles;
-	std::vector<b2Body*> bodies;
+	std::vector<b2Body*> units;
+	std::vector<b2Body*> obstacles;
 
-	MoveWorld() : b2({}), obstacles(nullptr) {}
+	MoveWorld() : b2({}) {}
 };
 
 MoveWorld* move_new()
@@ -21,12 +21,7 @@ void move_delete(MoveWorld* world)
 	delete world;
 }
 
-MoveUnit& get_unit(void* units, int32_t sizeInBytes, int32_t i)
-{
-	return *reinterpret_cast<MoveUnit*>(reinterpret_cast<std::byte*>(units) + i * sizeInBytes);
-}
-
-b2Body* create_body(b2World& b2, const MoveUnit& unit, size_t i)
+b2Body* create_unit(b2World& b2, const MoveUnit& unit, int32_t i)
 {
 	b2CircleShape shape;
 	shape.m_radius = unit.radius;
@@ -43,52 +38,64 @@ b2Body* create_body(b2World& b2, const MoveUnit& unit, size_t i)
 	fd.density = 1.0f / (b2_pi * unit.radius * unit.radius);
 
 	auto body = b2.CreateBody(&bd);
-	auto fixture = body->CreateFixture(&fd);
-	fixture->GetUserData().pointer = i;
+	body->CreateFixture(&fd);
+	body->GetUserData().pointer = i;
 	return body;
 }
 
-void move_step(MoveWorld* world, float dt, void* units, int32_t length, int32_t sizeInBytes)
+b2Body* create_obstacle(b2World& b2, const MoveObstacle& obstacle, int32_t i)
 {
-	auto& bodies = world->bodies;
-	auto& b2 = world->b2;
+	b2BodyDef bd;
+	bd.type = b2_staticBody;
+	bd.position = obstacle.position;
+	auto body = b2.CreateBody(&bd);
 
-	for (auto i = 0; i < length; i ++) {
-		auto& unit = get_unit(units, sizeInBytes, i);
-		if (i >= bodies.size()) {
-			bodies.push_back(create_body(b2, unit, i));
-		}
-		bodies[i]->ApplyForceToCenter(unit.force, unit.force.x != 0 || unit.force.y != 0);
-	}
-
-	b2.Step(dt, 8, 3);
-
-	for (auto i = 0; i < length; i++) {
-		auto& unit = get_unit(units, sizeInBytes, i);
-		auto body = bodies[i];
-		unit.position = body->GetPosition();
-		unit.velocity = body->GetLinearVelocity();
-	}
-}
-
-void move_add_obstacle(MoveWorld* world, b2Vec2* vertices, int32_t length)
-{
-	auto body = world->obstacles;
-	if (body == nullptr) {
-		b2BodyDef bd;
-		bd.type = b2_staticBody;
-		body = world->b2.CreateBody(&bd);
-	}
-
-	b2ChainShape shape;
 	b2FixtureDef fd;
 	fd.density = 0;
 	fd.friction = 0;
 	fd.restitutionThreshold = FLT_MAX;
-	fd.shape = &shape;
 
-	shape.CreateLoop(vertices, length);
+	b2PolygonShape polygon;
+	b2ChainShape chain;
+
+	auto length = obstacle.get_polygon(&obstacle, nullptr);
+	std::vector<b2Vec2> vertices(length);
+	obstacle.get_polygon(&obstacle, vertices.data());
+	if (length <= b2_maxPolygonVertices) {
+		polygon.Set(vertices.data(), length);
+		fd.shape = &polygon;
+	} else {
+		chain.CreateLoop(vertices.data(), length);
+		fd.shape = &chain;
+	}
 	body->CreateFixture(&fd);
+	body->GetUserData().pointer = i;
+	return body;
+}
+
+void move_step(MoveWorld* world, float dt,
+    MoveUnit* units, int32_t unitsLength, MoveObstacle* obstacles, int32_t obstaclesLength)
+{
+	for (auto i = 0; i < unitsLength; i ++) {
+		auto& unit = units[i];
+		if (i >= world->units.size()) {
+			world->units.push_back(create_unit(world->b2, unit, i));
+		}
+		world->units[i]->ApplyForceToCenter(unit.force, unit.force.x != 0 || unit.force.y != 0);
+	}
+
+	for (auto i = 0; i < obstaclesLength; i++) {
+		if (i >= world->obstacles.size()) {
+			world->obstacles.push_back(create_obstacle(world->b2, obstacles[i], i));
+		}
+	}
+
+	world->b2.Step(dt, 8, 3);
+
+	for (auto i = 0; i < unitsLength; i++) {
+		units[i].position = world->units[i]->GetPosition();
+		units[i].velocity = world->units[i]->GetLinearVelocity();
+	}
 }
 
 int32_t move_get_next_contact(MoveWorld* world, void** iterator, MoveContact* contact)
@@ -108,8 +115,8 @@ int32_t move_get_next_contact(MoveWorld* world, void** iterator, MoveContact* co
 			if (a->GetType() == b2_dynamicBody && a->IsAwake() &&
 				b->GetType() == b2_dynamicBody && b->IsAwake()) {
 
-				contact->a = current->GetFixtureA()->GetUserData().pointer;
-				contact->b = current->GetFixtureB()->GetUserData().pointer;
+				contact->a = a->GetUserData().pointer;
+				contact->b = b->GetUserData().pointer;
 				*iterator = current;
 				return 1;
 			}

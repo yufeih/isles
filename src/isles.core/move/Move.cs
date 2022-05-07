@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace Isles;
 
 [Flags]
-public enum MovableFlags
+public enum MoveUnitFlags
 {
     None = 0,
 
@@ -22,7 +22,7 @@ public enum MovableFlags
 }
 
 [StructLayout(LayoutKind.Sequential)]
-public struct Movable
+public struct MoveUnit
 {
 #region Interop
     internal float _radius;
@@ -45,8 +45,8 @@ public struct Movable
 
     public Vector2 Velocity => _velocity;
 
-    public MovableFlags Flags => _flags;
-    internal MovableFlags _flags;
+    public MoveUnitFlags Flags => _flags;
+    internal MoveUnitFlags _flags;
 
     public float Speed { get; set; }
     public float Acceleration { get; set; }
@@ -67,9 +67,29 @@ public struct Movable
     internal float _inContactSeconds;
 }
 
-public struct MoveObstacle
+[StructLayout(LayoutKind.Sequential)]
+public unsafe struct MoveObstacle
 {
-    public Vector2[] Vertices { get; init; }
+#region Interop
+    delegate*<ref MoveObstacle, Vector2*, int> _getPolygon;
+    internal Vector2 _position;
+#endregion
+
+    public Vector2[] Polygon { get; init; }
+
+    public Vector2 Position
+    {
+        get => _position;
+        init => _position = value;
+    }
+
+    private static int GetPolygon(ref MoveObstacle obstacle, Vector2* vertices)
+    {
+        var polygon = obstacle._polygonFunc();
+        if (vertices != null)
+            polygon.CopyTo(new Span<Vector2>(vertices, polygon.Length));
+        return polygon.Length;
+    }
 }
 
 public sealed class Move : IDisposable
@@ -94,18 +114,7 @@ public sealed class Move : IDisposable
         move_delete(_world);
     }
 
-    public unsafe void SetObstacles(ReadOnlySpan<MoveObstacle> obstacles)
-    {
-        foreach (ref readonly var o in obstacles)
-        {
-            fixed (Vector2* vertices = o.Vertices)
-            {
-                move_add_obstacle(_world, vertices, o.Vertices.Length);
-            }
-        }
-    }
-
-    public unsafe void Update(float dt, Span<Movable> units, PathGrid? grid = null)
+    public unsafe void Update(float dt, Span<MoveUnit> units, PathGrid? grid = null)
     {
         var idt = 1 / dt;
 
@@ -115,8 +124,8 @@ public sealed class Move : IDisposable
             unit._desiredVelocity = default;
         }
 
-        void* contactItr;
-        while (move_get_next_contact(_world, &contactItr, out var c) != 0)
+        IntPtr contactItr = default;
+        while (move_get_next_contact(_world, ref contactItr, out var c) != 0)
         {
             UpdateContact(units, c);
         }
@@ -128,9 +137,12 @@ public sealed class Move : IDisposable
             unit._force = CalculateForce(idt, ref unit);
         }
 
-        fixed (void* pUnits = units)
+        var obstacles = GetObstacles(grid);
+
+        fixed (MoveUnit* pUnits = units)
+        fixed (MoveObstacle* pObstacles = obstacles)
         {
-            move_step(_world, dt, pUnits, units.Length, Marshal.SizeOf<Movable>());
+            move_step(_world, dt, pUnits, units.Length, pObstacles, obstacles.Length);
         }
 
         foreach (ref var unit in units)
@@ -139,7 +151,12 @@ public sealed class Move : IDisposable
         }
     }
 
-    private Vector2 MoveToTarget(float dt, ref Movable m)
+    private Span<MoveObstacle> GetObstacles(PathGrid? grid)
+    {
+        return Array.Empty<MoveObstacle>();
+    }
+
+    private Vector2 MoveToTarget(float dt, ref MoveUnit m)
     {
         if (m.Target is null)
             return default;
@@ -154,7 +171,7 @@ public sealed class Move : IDisposable
         }
 
         // Have we reached the target and there is an non-idle unit along the way?
-        if ((m.Flags & MovableFlags.HasMovingContact) != 0 && distanceSq <= m.Radius * m.Radius)
+        if ((m.Flags & MoveUnitFlags.HasMovingContact) != 0 && distanceSq <= m.Radius * m.Radius)
         {
             ClearTarget(ref m);
             return default;
@@ -167,7 +184,7 @@ public sealed class Move : IDisposable
         return Vector2.Normalize(toTarget) * Math.Min(m.Speed, speed);
     }
 
-    private Vector2 CalculateForce(float idt, ref Movable m)
+    private Vector2 CalculateForce(float idt, ref MoveUnit m)
     {
         var force = (m._desiredVelocity - m.Velocity) * idt;
         var accelerationSq = force.LengthSquared();
@@ -191,13 +208,13 @@ public sealed class Move : IDisposable
         return force;
     }
 
-    private void UpdateContact(Span<Movable> movables, in Contact c)
+    private void UpdateContact(Span<MoveUnit> movables, in NativeContact c)
     {
         ref var a = ref movables[c.A];
         ref var b = ref movables[c.B];
 
-        a._flags |= MovableFlags.HasContact;
-        b._flags |= MovableFlags.HasContact;
+        a._flags |= MoveUnitFlags.HasContact;
+        b._flags |= MoveUnitFlags.HasContact;
 
         if (a.Target != null && b.Target != null)
             UpdateContactBothBuzy(ref a, ref b);
@@ -207,12 +224,12 @@ public sealed class Move : IDisposable
             UpdateContactOneBuzyOneIdle(ref b, ref a);
     }
 
-    private void UpdateInContactSeconds(float dt, ref Movable m)
+    private void UpdateInContactSeconds(float dt, ref MoveUnit m)
     {
         if (m.Target is null)
             return;
 
-        if ((m.Flags & MovableFlags.HasContact) == 0)
+        if ((m.Flags & MoveUnitFlags.HasContact) == 0)
         {
             m._inContactSeconds = Math.Max(0, m._inContactSeconds - dt);
             return;
@@ -225,10 +242,10 @@ public sealed class Move : IDisposable
         }
     }
 
-    private void UpdateContactBothBuzy(ref Movable a, ref Movable b)
+    private void UpdateContactBothBuzy(ref MoveUnit a, ref MoveUnit b)
     {
-        a._flags |= MovableFlags.HasMovingContact;
-        b._flags |= MovableFlags.HasMovingContact;
+        a._flags |= MoveUnitFlags.HasMovingContact;
+        b._flags |= MoveUnitFlags.HasMovingContact;
 
         var velocity = b.Velocity - a.Velocity;
         var normal = b.Position - a.Position;
@@ -247,9 +264,9 @@ public sealed class Move : IDisposable
         b._desiredVelocity += perpendicular * b.Speed;
     }
 
-    private void UpdateContactOneBuzyOneIdle(ref Movable a, ref Movable b)
+    private void UpdateContactOneBuzyOneIdle(ref MoveUnit a, ref MoveUnit b)
     {
-        b._flags |= MovableFlags.HasMovingContact;
+        b._flags |= MoveUnitFlags.HasMovingContact;
 
         var velocity = a.Velocity;
         var normal = b.Position - a.Position;
@@ -270,7 +287,7 @@ public sealed class Move : IDisposable
         b._desiredVelocity += Vector2.Normalize(direction) * b.Speed;
     }
 
-    private static void UpdateRotation(float dt, ref Movable m)
+    private static void UpdateRotation(float dt, ref MoveUnit m)
     {
         if (m._velocity.LengthSquared() <= m.Speed * m.Speed * dt * dt)
             return;
@@ -292,7 +309,7 @@ public sealed class Move : IDisposable
             m._rotation -= delta;
     }
 
-    private static void ClearTarget(ref Movable m)
+    private static void ClearTarget(ref MoveUnit m)
     {
         m.Target = null;
         m._inContactSeconds = 0;
@@ -304,7 +321,7 @@ public sealed class Move : IDisposable
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    struct Contact
+    struct NativeContact
     {
         public int A;
         public int B;
@@ -312,7 +329,6 @@ public sealed class Move : IDisposable
 
     [DllImport(LibName)] private static extern IntPtr move_new();
     [DllImport(LibName)] private static extern void move_delete(IntPtr world);
-    [DllImport(LibName)] private static unsafe extern void move_step(IntPtr world, float dt, void* units, int length, int sizeInBytes);
-    [DllImport(LibName)] private static unsafe extern void move_add_obstacle(IntPtr world, Vector2* vertices, int length);
-    [DllImport(LibName)] private static unsafe extern int move_get_next_contact(IntPtr world, void** iterator, out Contact contact);
+    [DllImport(LibName)] private static extern unsafe void move_step(IntPtr world, float dt, MoveUnit* units, int unitsLength, MoveObstacle obstacles, int obstaclesLength);
+    [DllImport(LibName)] private static extern int move_get_next_contact(IntPtr world, ref IntPtr iterator, out NativeContact contact);
 }
