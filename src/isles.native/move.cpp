@@ -91,29 +91,31 @@ void move_add_obstacle(MoveWorld* world, b2Vec2* vertices, int32_t length)
 	body->CreateFixture(&fd);
 }
 
-int32_t move_get_contacts(MoveWorld* world, MoveContact* contacts, int32_t length)
+int32_t move_get_next_contact(MoveWorld* world, void** iterator, MoveContact* contact)
 {
-	auto count = 0;
-	auto contact = world->b2.GetContactList();
-	while (contact != nullptr)
+	assert(iterator != nullptr);
+
+	auto current = *iterator == nullptr
+		? world->b2.GetContactList()
+		: reinterpret_cast<b2Contact*>(*iterator)->GetNext();
+
+	while (current != nullptr)
 	{
-		if (contact->IsEnabled() && contact->IsTouching()) {
-			auto a = contact->GetFixtureA()->GetBody();
-			auto b = contact->GetFixtureB()->GetBody();
+		if (current->IsEnabled() && current->IsTouching()) {
+			auto a = current->GetFixtureA()->GetBody();
+			auto b = current->GetFixtureB()->GetBody();
 
 			if (a->GetType() == b2_dynamicBody && a->IsAwake() &&
 				b->GetType() == b2_dynamicBody && b->IsAwake()) {
 
-				if (contacts != nullptr && count < length) {
-					MoveContact c;
-					c.a = contact->GetFixtureA()->GetUserData().pointer;
-					c.b = contact->GetFixtureB()->GetUserData().pointer;
-					*contacts++ = c;
-				}
-				count++;
+				contact->a = current->GetFixtureA()->GetUserData().pointer;
+				contact->b = current->GetFixtureB()->GetUserData().pointer;
+				*iterator = current;
+				return 1;
 			}
 		}
-		contact = contact->GetNext();
+		current = current->GetNext();
 	}
-	return count;
+
+	return 0;
 }

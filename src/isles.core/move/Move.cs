@@ -83,8 +83,6 @@ public sealed class Move : IDisposable
 
     private readonly IntPtr _world = move_new();
 
-    private ArrayBuilder<Contact> _contacts;
-
     public void Dispose()
     {
         GC.SuppressFinalize(this);
@@ -117,7 +115,8 @@ public sealed class Move : IDisposable
             unit._desiredVelocity = default;
         }
 
-        foreach (ref readonly var c in GetContacts())
+        void* contactItr;
+        while (move_get_next_contact(_world, &contactItr, out var c) != 0)
         {
             UpdateContact(units, c);
         }
@@ -138,21 +137,6 @@ public sealed class Move : IDisposable
         {
             UpdateRotation(dt, ref unit);
         }
-    }
-
-    private unsafe ReadOnlySpan<Contact> GetContacts()
-    {
-        var contactCount = move_get_contacts(_world, null, 0);
-        if (contactCount <= 0)
-            return Array.Empty<Contact>();
-
-        _contacts.SetLength((int)contactCount);
-        fixed (Contact* contacts = _contacts.AsSpan())
-        {
-            move_get_contacts(_world, contacts, contactCount);
-        }
-
-        return _contacts.AsSpan();
     }
 
     private Vector2 MoveToTarget(float dt, ref Movable m)
@@ -330,5 +314,5 @@ public sealed class Move : IDisposable
     [DllImport(LibName)] private static extern void move_delete(IntPtr world);
     [DllImport(LibName)] private static unsafe extern void move_step(IntPtr world, float dt, void* units, int length, int sizeInBytes);
     [DllImport(LibName)] private static unsafe extern void move_add_obstacle(IntPtr world, Vector2* vertices, int length);
-    [DllImport(LibName)] private static unsafe extern int move_get_contacts(IntPtr world, Contact* contacts, int length);
+    [DllImport(LibName)] private static unsafe extern int move_get_next_contact(IntPtr world, void** iterator, out Contact contact);
 }
