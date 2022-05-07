@@ -8,6 +8,7 @@
   <ItemGroup>
     <Using Include="Isles" />
     <Using Include="Microsoft.Xna.Framework" />
+    <Using Include="System.Buffers" />
   </ItemGroup>
 
   <ItemGroup>

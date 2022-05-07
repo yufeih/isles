@@ -7,9 +7,40 @@ namespace Isles;
 
 public class NavMesh
 {
+    private ArrayBuilder<Vector2> _vertices;
+    private ArrayBuilder<int> _polylines;
     private ArrayBuilder<ushort> _triangles;
 
-    public unsafe ReadOnlySpan<ushort> Triangulate(ReadOnlySpan<Vector2> vertices, ReadOnlySpan<int> polylines)
+    public ReadOnlySpan<Vector2> Vertices => _vertices;
+    public ReadOnlySpan<int> Polylines => _polylines;
+    public ReadOnlySpan<ushort> Triangles => _triangles;
+
+    public NavMesh(PathGrid grid)
+    {
+        _vertices.Add(new(0, 0));
+        _vertices.Add(new(grid.Width * grid.Step, 0));
+        _vertices.Add(new(grid.Width * grid.Step, grid.Height * grid.Step));
+        _vertices.Add(new(0, grid.Height * grid.Step));
+        _polylines.Add(4);
+
+        for (var y = 0; y < grid.Height; y++)
+            for (var x = 0; x < grid.Width; x++)
+                if (grid.Bits[x + grid.Width * y])
+                {
+                    _vertices.AddRange(stackalloc Vector2[]
+                    {
+                        new(x * grid.Step, y * grid.Step),
+                        new((x + 1) * grid.Step, y * grid.Step),
+                        new((x + 1) * grid.Step, (y + 1) * grid.Step),
+                        new(x * grid.Step, (y + 1) * grid.Step),
+                    });
+                    _polylines.Add(4);
+                }
+
+        Triangulate(_vertices, _polylines);
+    }
+
+    private unsafe void Triangulate(ReadOnlySpan<Vector2> vertices, ReadOnlySpan<int> polylines)
     {
         var sum = 0;
         foreach (var count in polylines)
@@ -38,7 +69,5 @@ public class NavMesh
         }
 
         navmesh_polygon_delete(polygon);
-
-        return _triangles;
     }
 }

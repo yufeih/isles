@@ -14,7 +14,7 @@ public class PathFinderTest
         var random = new Random(0);
         var svg = new SvgBuilder();
         var svgSmooth = new SvgBuilder();
-        var grid = CreateRandomGrid(random);
+        var grid = TestHelper.CreateRandomGrid(random);
 
         svg.AddGrid(grid);
         svgSmooth.AddGrid(grid);
@@ -51,7 +51,7 @@ public class PathFinderTest
     {
         var random = new Random(0);
         var svg = new SvgBuilder();
-        var grid = CreateRandomGrid(random, density: 0.05f);
+        var grid = TestHelper.CreateRandomGrid(random, density: 0.05f);
 
         svg.AddGrid(grid);
 
@@ -70,15 +70,5 @@ public class PathFinderTest
         }
 
         Snapshot.Save($"move/pathfinder-lineofsight-{pathWidth}.svg", svg.ToString());
-    }
-
-    private static PathGrid CreateRandomGrid(Random random, int w = 64, int h = 64, float density = 0.1f)
-    {
-        var bits = new BitArray(w * h);
-        for (var i = 0; i < (int)(w * h * density); i++)
-        {
-            bits[random.Next(bits.Length)] = true;
-        }
-        return new PathGrid(w, h, 1, bits);
     }
 }
