@@ -11,13 +11,11 @@ public class PathFinder
 {
     private readonly Dictionary<(int, int), FlowField<PathGridGraph>> _flowFields = new();
 
-    public IFlowField? GetFlowField(PathGrid grid, float pathWidth, Vector2 target)
+    public IFlowField GetFlowField(PathGrid grid, float pathWidth, Vector2 target)
     {
         var size = (int)MathF.Ceiling(pathWidth / grid.Step);
         var graph = new PathGridGraph(grid, size);
         var targetIndex = graph.GetNodeIndex(target);
-        if (!graph.IsValidLocation(targetIndex))
-            return null;
 
         if (!_flowFields.TryGetValue((targetIndex, size), out var result))
             result = _flowFields[(targetIndex, size)] = FlowField<PathGridGraph>.Create(graph, targetIndex);
@@ -27,7 +25,8 @@ public class PathFinder
 
     struct PathGridGraph : IPathGraph2
     {
-        private const float DCost = 1.414213562373095f;
+        private const float WallCost = 999999f;
+        private const float DiagonalCost = 1.414213562373095f;
 
         private static readonly (int dx, int dy)[] s_steps = new[]
         {
@@ -51,16 +50,6 @@ public class PathFinder
         public int MaxEdgeCount => 8;
 
         public int NodeCount => _grid.Width * _grid.Height;
-
-        public bool IsValidLocation(int index)
-        {
-            var y = Math.DivRem(index, _grid.Width, out var x);
-            for (var yy = y; yy < y + _size; yy++)
-                for (var xx = x; xx < x + _size; xx++)
-                    if (CheckBit(xx, yy))
-                        return false;
-            return true;
-        }
 
         public Vector2 GetPosition(int index)
         {
@@ -91,10 +80,13 @@ public class PathFinder
             {
                 var (dx, dy) = s_steps[i];
                 var (xx, yy) = (x + dx, y + dy);
-                if (CheckBit(xx, yy))
+
+                if (IsOutOfBounds(xx, yy))
                     continue;
 
-                edges[count++] = (xx + yy * _grid.Width, 1);
+                var isWall = IsWallNoBoundsCheck(xx, yy);
+
+                edges[count++] = (xx + yy * _grid.Width, isWall ? WallCost : 1);
             }
 
             // Diagonal edges
@@ -105,10 +97,12 @@ public class PathFinder
                 var (dx2, dy2) = s_steps[e2];
                 var (xx, yy) = (x + dx1 + dx2, y + dy1 + dy2);
 
-                if (CheckBit(xx, yy) || CheckBit(x + dx1, y + dy1) || CheckBit(x + dx2, y + dy2))
+                if (IsOutOfBounds(xx, yy))
                     continue;
 
-                edges[count++] = (xx + yy * _grid.Width, DCost);
+                var isWall = IsWallNoBoundsCheck(xx, yy) || IsWall(x + dx1, y + dy1) || IsWall(x + dx2, y + dy2);
+
+                edges[count++] = (xx + yy * _grid.Width, isWall ? WallCost : DiagonalCost);
             }
 
             return count;
@@ -126,13 +120,15 @@ public class PathFinder
                 var (dx, dy) = s_steps[i];
                 var (xx, yy) = (x + dx, y + dy);
 
+                if (IsOutOfBounds(xx, yy))
+                    continue;
+
                 dx *= (m * (_size - 1) + 1);
                 dy *= (m * (_size - 1) + 1);
 
-                if (CheckBits(x + dx, y + dy, lx, ly, _size))
-                    continue;
+                var isWall = IsWall(x + dx, y + dy, lx, ly, _size);
 
-                edges[count++] = (xx + yy * _grid.Width, 1);
+                edges[count++] = (xx + yy * _grid.Width, isWall ? WallCost : 1);
             }
 
             // Diagonal edges
@@ -145,38 +141,47 @@ public class PathFinder
                 var (dx2, dy2) = s_steps[e2];
                 var (xx, yy) = (x + dx1 + dx2, y + dy1 + dy2);
 
+                if (IsOutOfBounds(xx, yy))
+                    continue;
+
                 dx1 *= (m1 * (_size - 1) + 1);
                 dy1 *= (m1 * (_size - 1) + 1);
                 dx2 *= (m2 * (_size - 1) + 1);
                 dy2 *= (m2 * (_size - 1) + 1);
 
-                if (CheckBit(x + dx1 + dx2, y + dy1 + dy2) ||
-                    CheckBits(x + dx1, y + dy1, lx1, ly1, _size) ||
-                    CheckBits(x + dx2, y + dy2, lx2, ly2, _size))
-                    continue;
+                var isWall = IsWall(x + dx1 + dx2, y + dy1 + dy2) ||
+                    IsWall(x + dx1, y + dy1, lx1, ly1, _size) ||
+                    IsWall(x + dx2, y + dy2, lx2, ly2, _size);
 
-                edges[count++] = (xx + yy * _grid.Width, DCost);
+                edges[count++] = (xx + yy * _grid.Width, isWall ? WallCost : DiagonalCost);
             }
 
             return count;
         }
 
-        private bool CheckBit(int x, int y)
+        private bool IsOutOfBounds(int x, int y)
         {
-            if (x < 0 || x >= _grid.Width || y < 0 || y >= _grid.Height)
-            {
-                return true;
-            }
-
-            var index = x + y * _grid.Width;
-            return _grid.Bits[index];
+            return x < 0 || x >= _grid.Width || y < 0 || y >= _grid.Height;
         }
 
-        private bool CheckBits(int x, int y, int dx, int dy, int count)
+        private bool IsWallNoBoundsCheck(int x, int y)
+        {
+            return _grid.Bits[x + y * _grid.Width];
+        }
+
+        private bool IsWall(int x, int y)
+        {
+            if (IsOutOfBounds(x, y))
+                return true;
+
+            return _grid.Bits[x + y * _grid.Width];
+        }
+
+        private bool IsWall(int x, int y, int dx, int dy, int count)
         {
             for (var i = 0; i < count; i++)
             {
-                if (CheckBit(x, y))
+                if (IsWall(x, y))
                     return true;
                 x += dx;
                 y += dy;
