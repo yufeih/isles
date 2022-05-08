@@ -3,18 +3,14 @@
 
 namespace Isles;
 
-public record FlowField(int Width, int Height, float Step, ushort[] Next)
+public record VectorField(int Width, int Height, float Step, (Half, Half)[] Vectors)
 {
     private const float H = 0.707106781186548f;
 
     public Vector2 GetDirection(int i)
     {
-        var y = Math.DivRem(i, Width, out var x);
-        if (Next[i] == ushort.MaxValue)
-            return default;
-
-        var yy = Math.DivRem(Next[i], Width, out var xx);
-        return Vector2.Normalize(new(xx - x, yy - y));
+        var (x, y) = Vectors[i];
+        return new((float)x, (float)y);
     }
 
     public Vector2 GetDirection(Vector2 position)
@@ -29,7 +25,14 @@ public record FlowField(int Width, int Height, float Step, ushort[] Next)
     }
 }
 
-public class FlowFieldSearch
+public interface IDijkstraGraph
+{
+    int NodeCount { get; }
+
+    ReadOnlySpan<(int to, float cost)> GetEdges(int from);
+}
+
+public class DijkstraSearch
 {
     private const float D = 1.414213562373095f;
 
@@ -40,9 +43,9 @@ public class FlowFieldSearch
     };
 
     private readonly PriorityQueue _heap = new();
-    private readonly Dictionary<int, FlowField?> _flowFields = new();
+    private readonly Dictionary<int, VectorField?> _flowFields = new();
 
-    public FlowField? GetFlowField(PathGrid grid, Vector2 target)
+    public VectorField? GetFlowField(PathGrid grid, Vector2 target)
     {
         var x = Math.Max(0, Math.Min(grid.Width - 1, (int)(target.X / grid.Step)));
         var y = Math.Max(0, Math.Min(grid.Height - 1, (int)(target.Y / grid.Step)));
@@ -54,15 +57,17 @@ public class FlowFieldSearch
         return result;
     }
 
-    private FlowField? CreateFlowField(PathGrid grid, int index)
+    private VectorField? CreateFlowField(PathGrid grid, int index)
     {
         if (grid.Bits[index])
             return null;
 
         var nodeCount = grid.Width * grid.Height;
         var distance = ArrayPool<float>.Shared.Rent(nodeCount);
-        var next = new ushort[nodeCount];
-        Array.Fill(next, ushort.MaxValue, 0, nodeCount);
+        var prev = ArrayPool<ushort>.Shared.Rent(nodeCount);
+        var vectors = new (Half, Half)[nodeCount];
+
+        Array.Fill(prev, ushort.MaxValue, 0, nodeCount);
         Array.Fill(distance, float.MaxValue, 0, nodeCount);
         _heap.Fill(nodeCount, int.MaxValue);
 
@@ -85,8 +90,11 @@ public class FlowFieldSearch
                         if (newCost < distance[targetIndex])
                         {
                             distance[targetIndex] = newCost;
-                            next[targetIndex] = (ushort)top;
+                            prev[targetIndex] = (ushort)top;
                             _heap.UpdatePriority(targetIndex, newCost);
+
+                            var v = Vector2.Normalize(GetPosition(top) - GetPosition(targetIndex));
+                            vectors[targetIndex] = ((Half)v.X, (Half)v.Y);
                         }
                     }
                 }
@@ -94,7 +102,14 @@ public class FlowFieldSearch
         }
 
         ArrayPool<float>.Shared.Return(distance);
+        ArrayPool<ushort>.Shared.Return(prev);
 
-        return new(grid.Width, grid.Height, grid.Step, next);
+        return new(grid.Width, grid.Height, grid.Step, vectors);
+
+        Vector2 GetPosition(int node)
+        {
+            var y = Math.DivRem(node, grid.Width, out var x);
+            return new((x + 0.5f) * grid.Step, (y + 0.5f) * grid.Step);
+        }
     }
 }

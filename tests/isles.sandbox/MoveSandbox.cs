@@ -13,15 +13,15 @@ class MoveSandbox : Game
 {
     private const float WorldScale = 10f;
 
-    private readonly MoveUnit[] _units = new MoveUnit[1];
+    private readonly MoveUnit[] _units = new MoveUnit[0];
     private readonly MoveObstacle[] _obstacles;
     private readonly List<int> _selection = new();
     private readonly PathGrid _grid;
-    private readonly FlowFieldSearch _flowFieldSearch = new();
+    private readonly DijkstraSearch _flowFieldSearch = new();
     private readonly Move _move;
 
     private Point _selectStart, _selectEnd;
-    private FlowField? _flowField;
+    private VectorField? _flowField;
 
     private TextureLoader _textureLoader = default!;
     private SpriteBatch _spriteBatch = default!;
@@ -207,7 +207,7 @@ class MoveSandbox : Game
             }
         }
 
-        void DrawFlowField(FlowField flowfield)
+        void DrawFlowField(VectorField flowfield)
         {
             var arrow = _textureLoader.LoadTexture("data/arrow.svg");
             for (var i = 0; i < flowfield.Width * flowfield.Height; i++)
