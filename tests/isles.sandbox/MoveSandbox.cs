@@ -82,7 +82,7 @@ class MoveSandbox : Game
         if (mouse.RightButton == ButtonState.Pressed)
         {
             var target = new Vector2(mouse.X / WorldScale, mouse.Y / WorldScale);
-            _flowField = _pathFinder.GetFlowField(_grid, 1, target);
+            _flowField = _pathFinder.GetFlowField(_grid, 4, target);
             foreach (var i in _selection)
             {
                 _units[i].Target = target;

@@ -7,15 +7,7 @@ namespace Isles;
 
 public record PathGrid(int Width, int Height, float Step, BitArray Bits)
 {
-    public (int x, int y) GetPoint(Vector2 position)
-    {
-        var x = Math.Min(Width - 1, Math.Max(0, (int)(position.X / Step)));
-        var y = Math.Min(Height - 1, Math.Max(0, (int)(position.Y / Step)));
-
-        return (x, y);
-    }
-
-    public int GetIndex(Vector2 position)
+    public int GetNodeIndex(Vector2 position)
     {
         var x = Math.Min(Width - 1, Math.Max(0, (int)(position.X / Step)));
         var y = Math.Min(Height - 1, Math.Max(0, (int)(position.Y / Step)));
@@ -38,7 +30,7 @@ public class PathFinder
     public IFlowField? GetFlowField(PathGrid grid, float pathWidth, Vector2 target)
     {
         var size = (int)MathF.Ceiling(pathWidth / grid.Step);
-        var targetIndex = grid.GetIndex(target);
+        var targetIndex = grid.GetNodeIndex(target);
         if (grid.Bits[targetIndex])
             return null;
 
@@ -53,16 +45,16 @@ public class PathFinder
 
     struct PathGridGraph : IPathGraph2
     {
-        private const float D = 1.414213562373095f;
+        private const float DCost = 1.414213562373095f;
 
-        private static readonly (sbyte x, sbyte y)[] s_directions = new (sbyte, sbyte)[]
+        private static readonly (int dx, int dy)[] s_steps = new[]
         {
-            (0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1),
+            (0, -1), (1, 0), (0, 1), (-1, 0)
         };
 
-        private static readonly (sbyte b1, sbyte b2, float cost)[] s_edges = new (sbyte, sbyte, float)[]
+        private static readonly (int multiplier, int lineX, int lineY)[] s_edges = new[]
         {
-            (-1, -1, 1), (0, 2, D), (-1, -1, 1), (2, 4, D), (-1, -1, 1), (4, 6, D), (-1, -1, 1), (6, 0, D),
+            (0, 1, 0), (1, 0, 1), (1, 1, 0), (0, 0, 1),
         };
 
         private readonly PathGrid _grid;
@@ -81,12 +73,15 @@ public class PathFinder
         public Vector2 GetPosition(int i)
         {
             var y = Math.DivRem(i, _grid.Width, out var x);
-            return new((x + 0.5f) * _grid.Step, (y + 0.5f) * _grid.Step);
+            return new((x + 0.5f * _size) * _grid.Step, (y + 0.5f * _size) * _grid.Step);
         }
 
         public int GetNodeIndex(Vector2 position)
         {
-            return _grid.GetIndex(position);
+            var x = Math.Min(_grid.Width - 1, Math.Max(0, (int)(position.X / _grid.Step - 0.5f * (_size - 1))));
+            var y = Math.Min(_grid.Height - 1, Math.Max(0, (int)(position.Y / _grid.Step - 0.5f * (_size - 1))));
+
+            return y * _grid.Width + x;
         }
 
         public int GetEdges(int from, Span<(int to, float cost)> edges)
@@ -94,42 +89,34 @@ public class PathFinder
             return _size == 1 ? GetEdges1(from, edges) : GetEdgesN(from, edges);
         }
 
-        private bool CheckBit(int x, int y, out int index)
-        {
-            if (x < 0 || x >= _grid.Width || y < 0 || y >= _grid.Height)
-            {
-                index = 0;
-                return true;
-            }
-
-            index = x + y * _grid.Width;
-            return _grid.Bits[index];
-        }
-
         private int GetEdges1(int from, Span<(int to, float cost)> edges)
         {
             var count = 0;
             var y = Math.DivRem(from, _grid.Width, out var x);
 
-            for (var i = 0; i < s_edges.Length; i++)
+            // Horizontal and vertical edges
+            for (var i = 0; i < 4; i++)
             {
-                if (CheckBit(x + s_directions[i].x, y + s_directions[i].y, out var to))
-                {
+                var (dx, dy) = s_steps[i];
+                var (xx, yy) = (x + dx, y + dy);
+                if (CheckBit(xx, yy))
                     continue;
-                }
 
-                var (b1, b2, cost) = s_edges[i];
-                if (b1 >= 0 && (
-                    CheckBit(x + s_directions[b1].x, y + s_directions[b1].y, out _) ||
-                    CheckBit(x + s_directions[b2].x, y + s_directions[b2].y, out _)))
-                {
+                edges[count++] = (xx + yy * _grid.Width, 1);
+            }
+
+            // Diagonal edges
+            for (var i = 0; i < 4; i++)
+            {
+                var (e1, e2) = (i, (i + 1) % 4);
+                var (dx1, dy1) = s_steps[e1];
+                var (dx2, dy2) = s_steps[e2];
+                var (xx, yy) = (x + dx1 + dx2, y + dy1 + dy2);
+
+                if (CheckBit(xx, yy) || CheckBit(x + dx1, y + dy1) || CheckBit(x + dx2, y + dy2))
                     continue;
-                }
 
-                if (!_grid.Bits[to])
-                {
-                    edges[count++] = (to, cost);
-                }
+                edges[count++] = (xx + yy * _grid.Width, DCost);
             }
 
             return count;
@@ -138,58 +125,71 @@ public class PathFinder
         private int GetEdgesN(int from, Span<(int to, float cost)> edges)
         {
             var count = 0;
-            var half = (_size - 1) / 2;
             var y = Math.DivRem(from, _grid.Width, out var x);
 
-            foreach (var (dx, dy, cost) in s_edges)
+            // Horizontal and vertical edges
+            for (var i = 0; i < 4; i++)
             {
-                var xx = x + dx;
-                var yy = y + dy;
-                var i = xx + yy * _grid.Width;
-                var valid = true;
+                var (m, lx, ly) = s_edges[i];
+                var (dx, dy) = s_steps[i];
+                var (xx, yy) = (x + dx, y + dy);
 
-                if (dx == 0)
-                {
-                    xx -= half;
-                    yy += dy > 0 ? _size - 1 - half : -half;
-                }
-                else
-                {
-                    yy -= half;
-                    xx += dx > 0 ? _size - 1 - half : -half;
-                }
+                dx *= (m * (_size - 1) + 1);
+                dy *= (m * (_size - 1) + 1);
 
-                for (var k = 0; k < _size; k++)
-                {
-                    if (xx < 0 || xx >= _grid.Width || yy < 0 || yy >= _grid.Height)
-                    {
-                        valid = false;
-                        continue;
-                    }
+                if (CheckBits(x + dx, y + dy, lx, ly, _size))
+                    continue;
 
-                    if (_grid.Bits[xx + yy * _grid.Width])
-                    {
-                        valid = false;
-                        continue;
-                    }
+                edges[count++] = (xx + yy * _grid.Width, 1);
+            }
 
-                    if (dx == 0)
-                    {
-                        xx++;
-                    }
-                    else
-                    {
-                        yy++;
-                    }
-                }
+            // Diagonal edges
+            for (var i = 0; i < 4; i++)
+            {
+                var (e1, e2) = (i, (i + 1) % 4);
+                var (m1, lx1, ly1) = s_edges[e1];
+                var (m2, lx2, ly2) = s_edges[e2];
+                var (dx1, dy1) = s_steps[e1];
+                var (dx2, dy2) = s_steps[e2];
+                var (xx, yy) = (x + dx1 + dx2, y + dy1 + dy2);
 
-                if (valid)
-                {
-                    edges[count++] = (i, cost);
-                }
+                dx1 *= (m1 * (_size - 1) + 1);
+                dy1 *= (m1 * (_size - 1) + 1);
+                dx2 *= (m2 * (_size - 1) + 1);
+                dy2 *= (m2 * (_size - 1) + 1);
+
+                if (CheckBit(x + dx1 + dx2, y + dy1 + dy2) ||
+                    CheckBits(x + dx1, y + dy1, lx1, ly1, _size) ||
+                    CheckBits(x + dx2, y + dy2, lx2, ly2, _size))
+                    continue;
+
+                edges[count++] = (xx + yy * _grid.Width, DCost);
             }
 
             return count;
+        }
+
+        private bool CheckBit(int x, int y)
+        {
+            if (x < 0 || x >= _grid.Width || y < 0 || y >= _grid.Height)
+            {
+                return true;
+            }
+
+            var index = x + y * _grid.Width;
+            return _grid.Bits[index];
+        }
+
+        private bool CheckBits(int x, int y, int dx, int dy, int count)
+        {
+            for (var i = 0; i < count; i++)
+            {
+                if (CheckBit(x, y))
+                    return true;
+                x += dx;
+                y += dy;
+            }
+            return false;
         }
     }
 }
