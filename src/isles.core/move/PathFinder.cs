@@ -33,12 +33,14 @@ public record PathGrid(int Width, int Height, float Step, BitArray Bits)
 
 public class PathFinder
 {
-    private readonly Dictionary<(int, int), FlowField<PathGridGraph>?> _flowFields = new();
+    private readonly Dictionary<(int, int), FlowField<PathGridGraph>> _flowFields = new();
 
     public IFlowField? GetFlowField(PathGrid grid, float pathWidth, Vector2 target)
     {
         var size = (int)MathF.Ceiling(pathWidth / grid.Step);
         var targetIndex = grid.GetIndex(target);
+        if (grid.Bits[targetIndex])
+            return null;
 
         if (!_flowFields.TryGetValue((targetIndex, size), out var result))
         {
@@ -106,7 +108,7 @@ public class PathFinder
                 var i = xx + yy * _grid.Width;
                 if (!_grid.Bits[i])
                 {
-                    edges[count++] = (i, _grid.Step);
+                    edges[count++] = (i, cost);
                 }
             }
 
@@ -163,7 +165,7 @@ public class PathFinder
 
                 if (valid)
                 {
-                    edges[count++] = (i, _grid.Step);
+                    edges[count++] = (i, cost);
                 }
             }
 

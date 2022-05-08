@@ -49,7 +49,7 @@ public readonly struct FlowField<T> : IFlowField where T : IPathGraph2
         return GetDirection(_graph.GetNodeIndex(position));
     }
 
-    public static FlowField<T>? Create(T graph, int nodeIndex)
+    public static FlowField<T> Create(T graph, int nodeIndex)
     {
         var nodeCount = graph.NodeCount;
         var distance = ArrayPool<float>.Shared.Rent(nodeCount);
