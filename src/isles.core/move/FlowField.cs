@@ -3,11 +3,19 @@
 
 namespace Isles;
 
-public enum FlowFieldDirection : byte { N, NE, E, SE, S, SW, W, NW }
-
-public record FlowField(int Width, int Height, float Step, FlowFieldDirection[] Directions)
+public record FlowField(int Width, int Height, float Step, ushort[] Next)
 {
     private const float H = 0.707106781186548f;
+
+    public Vector2 GetDirection(int i)
+    {
+        var y = Math.DivRem(i, Width, out var x);
+        if (Next[i] == ushort.MaxValue)
+            return default;
+
+        var yy = Math.DivRem(Next[i], Width, out var xx);
+        return Vector2.Normalize(new(xx - x, yy - y));
+    }
 
     public Vector2 GetDirection(Vector2 position)
     {
@@ -17,35 +25,21 @@ public record FlowField(int Width, int Height, float Step, FlowFieldDirection[] 
         if (x < 0 || x >= Width || y < 0 || y >= Height)
             return default;
 
-        switch (Directions[(x + y * Width)])
-        {
-            case FlowFieldDirection.N: return new(0, -1);
-            case FlowFieldDirection.NE: return new(H, -H);
-            case FlowFieldDirection.E: return new(1, 0);
-            case FlowFieldDirection.SE: return new(H, H);
-            case FlowFieldDirection.S: return new(0, 1);
-            case FlowFieldDirection.SW: return new(-H, H);
-            case FlowFieldDirection.W: return new(-1, 0);
-            case FlowFieldDirection.NW: return new(-H, -H);
-            default: return default;
-        }
+        return GetDirection(x + y * Width);
     }
 }
 
 public class FlowFieldSearch
 {
-    private static readonly (int dx, int dy)[] s_edges4 = new[]
+    private const float D = 1.414213562373095f;
+
+    private static readonly (int dx, int dy, float cost)[] s_edges = new[]
     {
-        (1, 0), (0, 1), (-1, 0), (0, -1),
+        (0, -1, 1), (1, -1, D), (1, 0, 1), (1, 1, D),
+        (0, 1, 1), (-1, 1, D), (-1, 0, 1), (-1, -1, D),
     };
 
-    private static readonly (int dx, int dy)[] s_edges8 = new[]
-    {
-        (0, -1), (1, -1), (1, 0), (1, 1),
-        (0, 1), (-1, 1), (-1, 0), (-1, -1),
-    };
-
-    private readonly Queue<int> _queue = new();
+    private readonly PriorityQueue _heap = new();
     private readonly Dictionary<int, FlowField?> _flowFields = new();
 
     public FlowField? GetFlowField(PathGrid grid, Vector2 target)
@@ -65,56 +59,42 @@ public class FlowFieldSearch
         if (grid.Bits[index])
             return null;
 
-        var costs = ArrayPool<ushort>.Shared.Rent(grid.Width * grid.Height);
-        Array.Fill(costs, ushort.MaxValue, 0, grid.Width * grid.Height);
+        var nodeCount = grid.Width * grid.Height;
+        var distance = ArrayPool<float>.Shared.Rent(nodeCount);
+        var next = new ushort[nodeCount];
+        Array.Fill(next, ushort.MaxValue, 0, nodeCount);
+        Array.Fill(distance, float.MaxValue, 0, nodeCount);
+        _heap.Fill(nodeCount, int.MaxValue);
 
-        costs[index] = 0;
-        _queue.Enqueue(index);
+        distance[index] = 0;
+        _heap.UpdatePriority(index, 0);
 
-        while (_queue.TryDequeue(out var node))
+        while (_heap.TryDequeue(out var top, out var cost))
         {
-            var nodeCost = costs[node];
-            var cy = Math.DivRem(node, grid.Width, out var cx);
+            var cy = Math.DivRem(top, grid.Width, out var cx);
 
-            foreach (var (dx, dy) in s_edges4)
+            foreach (var (dx, dy, dcost) in s_edges)
             {
                 var (tx, ty) = (cx + dx, cy + dy);
                 if (tx >= 0 && tx < grid.Width && ty >= 0 && ty < grid.Height)
                 {
                     var targetIndex = tx + ty * grid.Width;
-                    var cost = grid.Bits[targetIndex] ? ushort.MaxValue : (ushort)(nodeCost + 1);
-                    if (cost < costs[targetIndex])
-                        costs[targetIndex] = cost;
-                    if (cost != ushort.MaxValue)
-                        _queue.Enqueue(targetIndex);
-                }
-            }
-        }
-
-        ArrayPool<ushort>.Shared.Return(costs);
-
-        var directions = new FlowFieldDirection[grid.Width * grid.Height];
-
-        for (var i = 0; i < directions.Length; i++)
-        {
-            var minCost = ushort.MaxValue;
-            var y = Math.DivRem(i, grid.Width, out var x);
-
-            for (var d = 0; d < s_edges8.Length; d++)
-            {
-                var (tx, ty) = (x + s_edges8[d].dx, y + s_edges8[d].dy);
-                if (tx >= 0 && tx < grid.Width && ty >= 0 && ty < grid.Height)
-                {
-                    var cost = costs[tx + ty * grid.Width];
-                    if (cost < minCost)
+                    if (!grid.Bits[targetIndex])
                     {
-                        minCost = cost;
-                        directions[i] = (FlowFieldDirection)d;
+                        var newCost = cost + dcost;
+                        if (newCost < distance[targetIndex])
+                        {
+                            distance[targetIndex] = newCost;
+                            next[targetIndex] = (ushort)top;
+                            _heap.UpdatePriority(targetIndex, newCost);
+                        }
                     }
                 }
             }
         }
 
-        return new(grid.Width, grid.Height, grid.Step, directions);
+        ArrayPool<float>.Shared.Return(distance);
+
+        return new(grid.Width, grid.Height, grid.Step, next);
     }
 }

@@ -13,16 +13,18 @@ class MoveSandbox : Game
 {
     private const float WorldScale = 10f;
 
-    private readonly MoveUnit[] _units = new MoveUnit[20];
+    private readonly MoveUnit[] _units = new MoveUnit[1];
     private readonly MoveObstacle[] _obstacles;
     private readonly List<int> _selection = new();
     private readonly PathGrid _grid;
+    private readonly FlowFieldSearch _flowFieldSearch = new();
     private readonly Move _move;
 
     private Point _selectStart, _selectEnd;
+    private FlowField? _flowField;
 
-    private TextureLoader _textureLoader;
-    private SpriteBatch _spriteBatch;
+    private TextureLoader _textureLoader = default!;
+    private SpriteBatch _spriteBatch = default!;
 
     public MoveSandbox()
     {
@@ -38,7 +40,7 @@ class MoveSandbox : Game
 
         var colors = TextureLoader.ReadAllPixels("data/grid.png", out var w, out var h);
         var bits = new BitArray(colors.ToArray().Select(c => c.R < 100).ToArray());
-        _grid = new(w, h, 4, bits);
+        _grid = new(w, h, 2, bits);
         _move = new(_grid);
         _obstacles = new MoveObstacle[]
         {
@@ -79,9 +81,11 @@ class MoveSandbox : Game
         var mouse = Mouse.GetState();
         if (mouse.RightButton == ButtonState.Pressed)
         {
+            var target = new Vector2(mouse.X / WorldScale, mouse.Y / WorldScale);
+            _flowField = _flowFieldSearch.GetFlowField(_grid, target);
             foreach (var i in _selection)
             {
-                _units[i].Target = new(mouse.X / WorldScale, mouse.Y / WorldScale);
+                _units[i].Target = target;
             }
         }
 
@@ -119,12 +123,15 @@ class MoveSandbox : Game
     {
         GraphicsDevice.Clear(Color.White);
 
-        var arrow = _textureLoader.LoadTexture("data/arrow.svg");
-        var selection = _textureLoader.LoadTexture("data/selection.svg");
+        var arrow = _textureLoader.LoadTexture("data/unit.svg");
+        var selection = _textureLoader.LoadTexture("data/pixel.svg");
 
         _spriteBatch.Begin();
 
         DrawGrid(_grid);
+
+        if (_flowField != null)
+            DrawFlowField(_flowField);
 
         foreach (var obstacle in _obstacles)
         {
@@ -197,6 +204,32 @@ class MoveSandbox : Game
                             (int)(grid.Step * WorldScale), (int)(grid.Step * WorldScale)),
                         Color.DarkCyan);
                 }
+            }
+        }
+
+        void DrawFlowField(FlowField flowfield)
+        {
+            var arrow = _textureLoader.LoadTexture("data/arrow.svg");
+            for (var i = 0; i < flowfield.Width * flowfield.Height; i++)
+            {
+                var x = i % flowfield.Width;
+                var y = i / flowfield.Width;
+                var v = flowfield.GetDirection(i);
+                if (v == default)
+                    continue;
+
+                var rotation = MathF.Atan2(v.Y, v.X);
+
+                _spriteBatch.Draw(
+                    arrow,
+                    new Vector2((x + 0.5f) * flowfield.Step * WorldScale, (y + 0.5f) * flowfield.Step * WorldScale),
+                    null,
+                    Color.Gray * 0.2f,
+                    rotation,
+                    new Vector2(arrow.Width / 2, arrow.Height / 2),
+                    flowfield.Step * WorldScale / arrow.Width,
+                    default,
+                    default);
             }
         }
     }
