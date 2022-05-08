@@ -17,11 +17,11 @@ class MoveSandbox : Game
     private readonly MoveObstacle[] _obstacles;
     private readonly List<int> _selection = new();
     private readonly PathGrid _grid;
-    private readonly DijkstraSearch _flowFieldSearch = new();
+    private readonly PathFinder _pathFinder = new();
     private readonly Move _move;
 
     private Point _selectStart, _selectEnd;
-    private VectorField? _flowField;
+    private IFlowField? _flowField;
 
     private TextureLoader _textureLoader = default!;
     private SpriteBatch _spriteBatch = default!;
@@ -82,7 +82,7 @@ class MoveSandbox : Game
         if (mouse.RightButton == ButtonState.Pressed)
         {
             var target = new Vector2(mouse.X / WorldScale, mouse.Y / WorldScale);
-            _flowField = _flowFieldSearch.GetFlowField(_grid, target);
+            _flowField = _pathFinder.GetFlowField(_grid, 1, target);
             foreach (var i in _selection)
             {
                 _units[i].Target = target;
@@ -207,13 +207,11 @@ class MoveSandbox : Game
             }
         }
 
-        void DrawFlowField(VectorField flowfield)
+        void DrawFlowField(IFlowField flowfield)
         {
             var arrow = _textureLoader.LoadTexture("data/arrow.svg");
-            for (var i = 0; i < flowfield.Width * flowfield.Height; i++)
+            for (var i = 0; i < flowfield.Graph.NodeCount; i++)
             {
-                var x = i % flowfield.Width;
-                var y = i / flowfield.Width;
                 var v = flowfield.GetDirection(i);
                 if (v == default)
                     continue;
@@ -222,12 +220,12 @@ class MoveSandbox : Game
 
                 _spriteBatch.Draw(
                     arrow,
-                    new Vector2((x + 0.5f) * flowfield.Step * WorldScale, (y + 0.5f) * flowfield.Step * WorldScale),
+                    flowfield.Graph.GetPosition(i) * WorldScale,
                     null,
                     Color.Gray * 0.2f,
                     rotation,
                     new Vector2(arrow.Width / 2, arrow.Height / 2),
-                    flowfield.Step * WorldScale / arrow.Width,
+                    _grid.Step * WorldScale / arrow.Width,
                     default,
                     default);
             }

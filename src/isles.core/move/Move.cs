@@ -61,8 +61,6 @@ public struct MoveObstacle
 {
     public Vector2[] Vertices { get; init; }
     public Vector2 Position { get; init; }
-
-    internal IntPtr _body;
 }
 
 public sealed class Move : IDisposable
