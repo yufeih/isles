@@ -9,16 +9,14 @@ public record PathGrid(int Width, int Height, float Step, BitArray Bits);
 
 public class PathFinder
 {
-    private readonly Dictionary<(int, int), FlowField<PathGridGraph>> _flowFields = new();
+    private readonly Dictionary<(Vector2, int), FlowField<PathGridGraph>> _flowFields = new();
 
     public IFlowField GetFlowField(PathGrid grid, float pathWidth, Vector2 target)
     {
         var size = (int)MathF.Ceiling(pathWidth / grid.Step);
-        var graph = new PathGridGraph(grid, size);
-        var targetIndex = graph.GetNodeIndex(target);
-
-        if (!_flowFields.TryGetValue((targetIndex, size), out var result))
-            result = _flowFields[(targetIndex, size)] = FlowField<PathGridGraph>.Create(graph, targetIndex);
+        if (!_flowFields.TryGetValue((target, size), out var result))
+            result = _flowFields[(target, size)] = FlowField<PathGridGraph>.Create(
+                new PathGridGraph(grid, size), target);
 
         return result;
     }

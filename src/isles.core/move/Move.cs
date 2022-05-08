@@ -200,7 +200,7 @@ public sealed class Move : IDisposable
         if (_grid is null || unit.Target is null)
             return default;
 
-        if (unit._flowField is null)
+        if (unit._flowField is null || unit.Target.Value != unit._flowField.Target)
             unit._flowField = _pathFinder.GetFlowField(_grid, unit.Radius * 2, unit.Target.Value);
 
         return unit._flowField.GetDirection(unit.Position);

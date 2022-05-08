@@ -5,6 +5,8 @@ namespace Isles;
 
 public interface IFlowField
 {
+    Vector2 Target { get; }
+
     IPathGraph2 Graph { get; }
 
     Vector2 GetDirection(int nodeIndex);
@@ -30,12 +32,14 @@ public readonly struct FlowField<T> : IFlowField where T : IPathGraph2
     private readonly T _graph;
     private readonly (Half, Half)[] _vectors;
 
+    public Vector2 Target { get; }
     public IPathGraph2 Graph => _graph;
 
-    public FlowField(T graph, (Half, Half)[] vectors)
+    public FlowField(T graph, Vector2 target, (Half, Half)[] vectors)
     {
         _graph = graph;
         _vectors = vectors;
+        Target = target;
     }
 
     public Vector2 GetDirection(int nodeIndex)
@@ -49,9 +53,10 @@ public readonly struct FlowField<T> : IFlowField where T : IPathGraph2
         return GetDirection(_graph.GetNodeIndex(position));
     }
 
-    public static FlowField<T> Create(T graph, int nodeIndex)
+    public static FlowField<T> Create(T graph, Vector2 target)
     {
         var nodeCount = graph.NodeCount;
+        var nodeIndex = graph.GetNodeIndex(target);
         var distance = ArrayPool<float>.Shared.Rent(nodeCount);
         var prev = ArrayPool<ushort>.Shared.Rent(nodeCount);
         var vectors = new (Half, Half)[nodeCount];
@@ -91,6 +96,6 @@ public readonly struct FlowField<T> : IFlowField where T : IPathGraph2
         ArrayPool<float>.Shared.Return(distance);
         ArrayPool<ushort>.Shared.Return(prev);
 
-        return new(graph, vectors);
+        return new(graph, target, vectors);
     }
 }
