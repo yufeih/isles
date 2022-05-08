@@ -55,10 +55,14 @@ public class PathFinder
     {
         private const float D = 1.414213562373095f;
 
-        private static readonly (int dx, int dy, float cost)[] s_edges = new[]
+        private static readonly (sbyte x, sbyte y)[] s_directions = new (sbyte, sbyte)[]
         {
-            (0, -1, 1), (1, -1, D), (1, 0, 1), (1, 1, D),
-            (0, 1, 1), (-1, 1, D), (-1, 0, 1), (-1, -1, D),
+            (0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1),
+        };
+
+        private static readonly (sbyte b1, sbyte b2, float cost)[] s_edges = new (sbyte, sbyte, float)[]
+        {
+            (-1, -1, 1), (0, 2, D), (-1, -1, 1), (2, 4, D), (-1, -1, 1), (4, 6, D), (-1, -1, 1), (6, 0, D),
         };
 
         private readonly PathGrid _grid;
@@ -90,25 +94,41 @@ public class PathFinder
             return _size == 1 ? GetEdges1(from, edges) : GetEdgesN(from, edges);
         }
 
+        private bool CheckBit(int x, int y, out int index)
+        {
+            if (x < 0 || x >= _grid.Width || y < 0 || y >= _grid.Height)
+            {
+                index = 0;
+                return true;
+            }
+
+            index = x + y * _grid.Width;
+            return _grid.Bits[index];
+        }
+
         private int GetEdges1(int from, Span<(int to, float cost)> edges)
         {
             var count = 0;
             var y = Math.DivRem(from, _grid.Width, out var x);
 
-            foreach (var (dx, dy, cost) in s_edges)
+            for (var i = 0; i < s_edges.Length; i++)
             {
-                var xx = x + dx;
-                var yy = y + dy;
-
-                if (xx < 0 || xx >= _grid.Width || yy < 0 || yy >= _grid.Height)
+                if (CheckBit(x + s_directions[i].x, y + s_directions[i].y, out var to))
                 {
                     continue;
                 }
 
-                var i = xx + yy * _grid.Width;
-                if (!_grid.Bits[i])
+                var (b1, b2, cost) = s_edges[i];
+                if (b1 >= 0 && (
+                    CheckBit(x + s_directions[b1].x, y + s_directions[b1].y, out _) ||
+                    CheckBit(x + s_directions[b2].x, y + s_directions[b2].y, out _)))
                 {
-                    edges[count++] = (i, cost);
+                    continue;
+                }
+
+                if (!_grid.Bits[to])
+                {
+                    edges[count++] = (to, cost);
                 }
             }
 
