@@ -222,7 +222,7 @@ class MoveSandbox : Game
                     arrow,
                     flowfield.Graph.GetPosition(i) * WorldScale,
                     null,
-                    Color.Gray * 0.2f,
+                    Color.Gray * 0.5f,
                     rotation,
                     new Vector2(arrow.Width / 2, arrow.Height / 2),
                     _grid.Step * WorldScale / arrow.Width,

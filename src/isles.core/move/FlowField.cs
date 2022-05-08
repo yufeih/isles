@@ -20,7 +20,7 @@ public interface IPathGraph2
 
     int GetEdges(int from, Span<(int to, float cost)> edges);
 
-    Vector2 GetPosition(int i);
+    Vector2 GetPosition(int index);
 
     int GetNodeIndex(Vector2 position);
 }
@@ -62,13 +62,16 @@ public readonly struct FlowField<T> : IFlowField where T : IPathGraph2
         Span<(int, float)> edges = stackalloc (int, float)[graph.MaxEdgeCount];
 
         var heap = new PriorityQueue();
-        heap.Fill(nodeCount, int.MaxValue);
+        heap.Fill(nodeCount, float.PositiveInfinity);
 
         distance[nodeIndex] = 0;
         heap.UpdatePriority(nodeIndex, 0);
 
         while (heap.TryDequeue(out var from, out var cost))
         {
+            if (cost == float.PositiveInfinity)
+                continue;
+
             var edgeCount = graph.GetEdges(from, edges);
             foreach (var (to, dcost) in edges.Slice(0, edgeCount))
             {

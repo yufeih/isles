@@ -24,6 +24,8 @@ public class PathFinderTest
             var flowField = pathfinder.GetFlowField(grid, pathWidth, end);
             if (flowField is null)
                 continue;
+
+            svg.AddCircle(end.X, end.Y, pathWidth * 0.5f, "red");
             
             for (var i = 0; i < flowField.Graph.NodeCount; i++)
             {

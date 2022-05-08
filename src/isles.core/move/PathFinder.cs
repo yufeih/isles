@@ -5,23 +5,7 @@ using System.Collections;
 
 namespace Isles;
 
-public record PathGrid(int Width, int Height, float Step, BitArray Bits)
-{
-    public int GetNodeIndex(Vector2 position)
-    {
-        var x = Math.Min(Width - 1, Math.Max(0, (int)(position.X / Step)));
-        var y = Math.Min(Height - 1, Math.Max(0, (int)(position.Y / Step)));
-
-        return y * Width + x;
-    }
-
-    public Vector2 GetPosition(int index)
-    {
-        var y = Math.DivRem(index, Width, out var x);
-
-        return new(x * Step + Step / 2, y * Step + Step / 2);
-    }
-}
+public record PathGrid(int Width, int Height, float Step, BitArray Bits);
 
 public class PathFinder
 {
@@ -30,15 +14,13 @@ public class PathFinder
     public IFlowField? GetFlowField(PathGrid grid, float pathWidth, Vector2 target)
     {
         var size = (int)MathF.Ceiling(pathWidth / grid.Step);
-        var targetIndex = grid.GetNodeIndex(target);
-        if (grid.Bits[targetIndex])
+        var graph = new PathGridGraph(grid, size);
+        var targetIndex = graph.GetNodeIndex(target);
+        if (!graph.IsValidLocation(targetIndex))
             return null;
 
         if (!_flowFields.TryGetValue((targetIndex, size), out var result))
-        {
-            result = _flowFields[(targetIndex, size)] = FlowField<PathGridGraph>.Create(
-                new PathGridGraph(grid, size), targetIndex);
-        }
+            result = _flowFields[(targetIndex, size)] = FlowField<PathGridGraph>.Create(graph, targetIndex);
 
         return result;
     }
@@ -70,9 +52,19 @@ public class PathFinder
 
         public int NodeCount => _grid.Width * _grid.Height;
 
-        public Vector2 GetPosition(int i)
+        public bool IsValidLocation(int index)
         {
-            var y = Math.DivRem(i, _grid.Width, out var x);
+            var y = Math.DivRem(index, _grid.Width, out var x);
+            for (var yy = y; yy < y + _size; yy++)
+                for (var xx = x; xx < x + _size; xx++)
+                    if (CheckBit(xx, yy))
+                        return false;
+            return true;
+        }
+
+        public Vector2 GetPosition(int index)
+        {
+            var y = Math.DivRem(index, _grid.Width, out var x);
             return new((x + 0.5f * _size) * _grid.Step, (y + 0.5f * _size) * _grid.Step);
         }
 
