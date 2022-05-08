@@ -13,7 +13,7 @@ class MoveSandbox : Game
 {
     private const float WorldScale = 10f;
 
-    private readonly MoveUnit[] _units = new MoveUnit[0];
+    private readonly MoveUnit[] _units = new MoveUnit[40];
     private readonly MoveObstacle[] _obstacles;
     private readonly List<int> _selection = new();
     private readonly PathGrid _grid;
@@ -222,7 +222,7 @@ class MoveSandbox : Game
                     arrow,
                     flowfield.Graph.GetPosition(i) * WorldScale,
                     null,
-                    Color.Gray * 0.5f,
+                    Color.Gray * 0.1f,
                     rotation,
                     new Vector2(arrow.Width / 2, arrow.Height / 2),
                     _grid.Step * WorldScale / arrow.Width,

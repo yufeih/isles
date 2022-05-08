@@ -53,8 +53,7 @@ public struct MoveUnit
     public Vector2? Target { get; set; }
 
     internal IntPtr _body;
-    internal Vector2[]? _path;
-    internal int _pathIndex;
+    internal IFlowField? _flowField;
     internal Vector2 _desiredVelocity;
     internal float _inContactSeconds;
 }
@@ -104,8 +103,6 @@ public sealed class Move : IDisposable
         {
             unit._flags = 0;
             unit._desiredVelocity = default;
-
-            FollowPath(ref unit);
         }
 
         IntPtr contactItr = default;
@@ -119,7 +116,7 @@ public sealed class Move : IDisposable
         {
             ref var unit = ref units[i];
             UpdateInContactSeconds(dt, ref unit);
-            unit._desiredVelocity += SeekTarget(dt, ref unit);
+            unit._desiredVelocity += MoveToTarget(dt, ref unit);
             var force = CalculateForce(idt, ref unit);
             var nativeUnit = new NativeUnit()
             {
@@ -167,30 +164,7 @@ public sealed class Move : IDisposable
         }
     }
 
-    private void FollowPath(ref MoveUnit unit)
-    {
-        if (_grid is null || unit.Target is null)
-            return;
-
-        if (unit._path is null)
-        {
-            unit._pathIndex = 0;
-            unit._path = _pathFinder.FindPath(_grid, unit.Radius * 2, unit.Position, unit.Target.Value).ToArray();
-        }
-
-        if (unit._path.Length <= 0 || unit._pathIndex >= unit._path.Length - 1)
-            return;
-
-        // Have we reached a waypoint?
-        var waypoint = unit._path[unit._pathIndex];
-        if (Vector2.Dot(unit.Position - waypoint, unit.Velocity) > 0)
-        {
-        var nextWaypoint = unit._pathIndex < unit._path.Length - 1 ? unit._path[unit._pathIndex + 1] : null;
-
-        }
-    }
-
-    private Vector2 SeekTarget(float dt, ref MoveUnit m)
+    private Vector2 MoveToTarget(float dt, ref MoveUnit m)
     {
         if (m.Target is null)
             return default;
@@ -215,7 +189,21 @@ public sealed class Move : IDisposable
         var distance = MathF.Sqrt(distanceSq);
         var speed = MathF.Sqrt(distance * m.Acceleration * 2);
 
-        return Vector2.Normalize(toTarget) * Math.Min(m.Speed, speed);
+        var flowFieldDirection = FollowFlowField(ref m);
+        var direction = flowFieldDirection == default ? Vector2.Normalize(toTarget) : flowFieldDirection;
+
+        return direction * Math.Min(m.Speed, speed);
+    }
+
+    private Vector2 FollowFlowField(ref MoveUnit unit)
+    {
+        if (_grid is null || unit.Target is null)
+            return default;
+
+        if (unit._flowField is null)
+            unit._flowField = _pathFinder.GetFlowField(_grid, unit.Radius * 2, unit.Target.Value);
+
+        return unit._flowField.GetDirection(unit.Position);
     }
 
     private Vector2 CalculateForce(float idt, ref MoveUnit m)
@@ -346,8 +334,7 @@ public sealed class Move : IDisposable
     private static void ClearTarget(ref MoveUnit m)
     {
         m.Target = null;
-        m._path = null;
-        m._pathIndex = 0;
+        m._flowField = null;
         m._inContactSeconds = 0;
     }
 
