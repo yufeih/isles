@@ -55,7 +55,6 @@ public struct PathGridFlowField
 
 public struct PathGridGraph : IPathGraph2
 {
-    private const float WallCost = 999999f;
     private const float DiagonalCost = 1.414213562373095f;
 
     private static readonly (int dx, int dy)[] s_directions = new[]
@@ -116,12 +115,10 @@ public struct PathGridGraph : IPathGraph2
             var (dx, dy) = s_steps[i];
             var (xx, yy) = (x + dx, y + dy);
 
-            if (IsOutOfBounds(xx, yy))
+            if (IsWall(xx, yy))
                 continue;
 
-            var isWall = IsWallNoBoundsCheck(xx, yy);
-
-            edges[count++] = (xx + yy * _grid.Width, isWall ? WallCost : 1);
+            edges[count++] = (xx + yy * _grid.Width, 1);
         }
 
         // Diagonal edges
@@ -132,12 +129,10 @@ public struct PathGridGraph : IPathGraph2
             var (dx2, dy2) = s_steps[e2];
             var (xx, yy) = (x + dx1 + dx2, y + dy1 + dy2);
 
-            if (IsOutOfBounds(xx, yy))
+            if (IsWall(xx, yy) || IsWall(x + dx1, y + dy1) || IsWall(x + dx2, y + dy2))
                 continue;
 
-            var isWall = IsWallNoBoundsCheck(xx, yy) || IsWall(x + dx1, y + dy1) || IsWall(x + dx2, y + dy2);
-
-            edges[count++] = (xx + yy * _grid.Width, isWall ? WallCost : DiagonalCost);
+            edges[count++] = (xx + yy * _grid.Width, DiagonalCost);
         }
 
         return count;
@@ -155,15 +150,13 @@ public struct PathGridGraph : IPathGraph2
             var (dx, dy) = s_steps[i];
             var (xx, yy) = (x + dx, y + dy);
 
-            if (IsOutOfBounds(xx, yy))
-                continue;
-
             dx *= (m * (_size - 1) + 1);
             dy *= (m * (_size - 1) + 1);
 
-            var isWall = IsWall(x + dx, y + dy, lx, ly, _size);
+            if (IsWall(x + dx, y + dy, lx, ly, _size))
+                continue;
 
-            edges[count++] = (xx + yy * _grid.Width, isWall ? WallCost : 1);
+            edges[count++] = (xx + yy * _grid.Width, 1);
         }
 
         // Diagonal edges
@@ -176,7 +169,7 @@ public struct PathGridGraph : IPathGraph2
             var (dx2, dy2) = s_steps[e2];
             var (xx, yy) = (x + dx1 + dx2, y + dy1 + dy2);
 
-            if (IsOutOfBounds(xx, yy))
+            if (IsWall(xx, yy))
                 continue;
 
             dx1 *= (m1 * (_size - 1) + 1);
@@ -184,11 +177,12 @@ public struct PathGridGraph : IPathGraph2
             dx2 *= (m2 * (_size - 1) + 1);
             dy2 *= (m2 * (_size - 1) + 1);
 
-            var isWall = IsWall(x + dx1 + dx2, y + dy1 + dy2) ||
+            if (IsWall(x + dx1 + dx2, y + dy1 + dy2) ||
                 IsWall(x + dx1, y + dy1, lx1, ly1, _size) ||
-                IsWall(x + dx2, y + dy2, lx2, ly2, _size);
+                IsWall(x + dx2, y + dy2, lx2, ly2, _size))
+                continue;
 
-            edges[count++] = (xx + yy * _grid.Width, isWall ? WallCost : DiagonalCost);
+            edges[count++] = (xx + yy * _grid.Width, DiagonalCost);
         }
 
         return count;
@@ -203,19 +197,9 @@ public struct PathGridGraph : IPathGraph2
         return true;
     }
 
-    private bool IsOutOfBounds(int x, int y)
-    {
-        return x < 0 || x >= _grid.Width || y < 0 || y >= _grid.Height;
-    }
-
-    private bool IsWallNoBoundsCheck(int x, int y)
-    {
-        return _grid.Bits[x + y * _grid.Width];
-    }
-
     private bool IsWall(int x, int y)
     {
-        if (IsOutOfBounds(x, y))
+        if (x < 0 || x >= _grid.Width || y < 0 || y >= _grid.Height)
             return true;
 
         return _grid.Bits[x + y * _grid.Width];
