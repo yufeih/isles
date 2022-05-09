@@ -22,9 +22,11 @@ public interface IPathGraph2
 
     int GetEdges(int from, Span<(int to, float cost)> edges);
 
-    Vector2 GetPosition(int index);
+    Vector2 GetPosition(int nodeInde);
 
     int GetNodeIndex(Vector2 position);
+
+    bool CanLineTo(int nodeIndex, Vector2 target);
 }
 
 public readonly struct FlowField<T> : IFlowField where T : IPathGraph2
@@ -56,7 +58,7 @@ public readonly struct FlowField<T> : IFlowField where T : IPathGraph2
     public static FlowField<T> Create(T graph, Vector2 target)
     {
         var nodeCount = graph.NodeCount;
-        var nodeIndex = graph.GetNodeIndex(target);
+        var targetIndex = graph.GetNodeIndex(target);
         var distance = ArrayPool<float>.Shared.Rent(nodeCount);
         var prev = ArrayPool<ushort>.Shared.Rent(nodeCount);
         var vectors = new (Half, Half)[nodeCount];
@@ -69,13 +71,15 @@ public readonly struct FlowField<T> : IFlowField where T : IPathGraph2
         var heap = new PriorityQueue();
         heap.Fill(nodeCount, float.PositiveInfinity);
 
-        distance[nodeIndex] = 0;
-        heap.UpdatePriority(nodeIndex, 0);
+        distance[targetIndex] = 0;
+        heap.UpdatePriority(targetIndex, 0);
 
         while (heap.TryDequeue(out var from, out var cost))
         {
             if (cost == float.PositiveInfinity)
                 continue;
+
+            EmitNode(from);
 
             var edgeCount = graph.GetEdges(from, edges);
             foreach (var (to, dcost) in edges.Slice(0, edgeCount))
@@ -86,9 +90,6 @@ public readonly struct FlowField<T> : IFlowField where T : IPathGraph2
                     distance[to] = newCost;
                     prev[to] = (ushort)from;
                     heap.UpdatePriority(to, newCost);
-
-                    var v = Vector2.Normalize(graph.GetPosition(from) - graph.GetPosition(to));
-                    vectors[to] = ((Half)v.X, (Half)v.Y);
                 }
             }
         }
@@ -97,5 +98,25 @@ public readonly struct FlowField<T> : IFlowField where T : IPathGraph2
         ArrayPool<ushort>.Shared.Return(prev);
 
         return new(graph, target, vectors);
+
+        void EmitNode(int from)
+        {
+            var to = from;
+            while (prev[to] != ushort.MaxValue)
+                to = prev[to];
+
+            if (from == to)
+                return;
+
+            var toPosition = to == targetIndex ? target : graph.GetPosition(to);
+            if (!graph.CanLineTo(from, toPosition))
+            {
+                toPosition = graph.GetPosition(prev[from]);
+                prev[from] = ushort.MaxValue;
+            }
+
+            var flow = Vector2.Normalize(toPosition - graph.GetPosition(from));
+            vectors[from] = ((Half)flow.X, (Half)flow.Y);
+        }
     }
 }

@@ -53,7 +53,7 @@ public struct MoveUnit
     public Vector2? Target { get; set; }
 
     internal IntPtr _body;
-    internal IFlowField? _flowField;
+    internal PathGridFlowField? _flowField;
     internal Vector2 _desiredVelocity;
     internal float _inContactSeconds;
 }
@@ -201,7 +201,7 @@ public sealed class Move : IDisposable
             return default;
 
         if (unit._flowField is null || unit.Target.Value != unit._flowField.Target)
-            unit._flowField = _pathFinder.GetFlowField(_grid, unit.Radius * 2, unit.Target.Value);
+            unit._flowField = _pathFinder.GetFlowField2(_grid, unit.Radius * 2, unit.Target.Value);
 
         return unit._flowField.GetDirection(unit.Position);
     }
@@ -314,18 +314,17 @@ public sealed class Move : IDisposable
         if (m._velocity.LengthSquared() <= m.Speed * m.Speed * dt * dt)
             return;
 
-        while (m._rotation > MathHelper.Pi)
-            m._rotation -= MathF.PI + MathF.PI;
-        while (m._rotation < -MathHelper.Pi)
-            m._rotation += MathF.PI + MathF.PI;
-
         var targetRotation = MathF.Atan2(m._velocity.Y, m._velocity.X);
         var offset = targetRotation - m._rotation;
-        var delta = m.RotationSpeed * dt;
+        if (offset > MathF.PI)
+            offset -= 2 * MathF.PI;
+        if (offset < -MathF.PI)
+            offset += 2 * MathF.PI;
 
+        var delta = m.RotationSpeed * dt;
         if (Math.Abs(offset) <= delta)
             m._rotation = targetRotation;
-        else if ((offset >=0 && offset < MathF.PI) || (offset >= -MathF.PI * 2 && offset < -MathF.PI))
+        else if (offset > 0)
             m._rotation += delta;
         else
             m._rotation -= delta;

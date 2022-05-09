@@ -39,8 +39,8 @@ class MoveSandbox : Game
         };
 
         var colors = TextureLoader.ReadAllPixels("data/grid.png", out var w, out var h);
-        var bits = new BitArray(colors.ToArray().Select(c => c.R < 100).ToArray());
-        _grid = new(w, h, 2, bits);
+        var bits = new BitArray(colors.ToArray().Select(c => false).ToArray());
+        _grid = new(w, h, 6, bits);
         _move = new(_grid);
         _obstacles = new MoveObstacle[]
         {
@@ -222,7 +222,7 @@ class MoveSandbox : Game
                     arrow,
                     flowfield.Graph.GetPosition(i) * WorldScale,
                     null,
-                    Color.Gray * 0.1f,
+                    Color.Gray * 0.2f,
                     rotation,
                     new Vector2(arrow.Width / 2, arrow.Height / 2),
                     _grid.Step * WorldScale / arrow.Width,
