@@ -11,7 +11,7 @@ sandbox.Run();
 
 class MoveSandbox : Game
 {
-    private const float WorldScale = 10f;
+    private const float WorldScale = 5f;
 
     private readonly MoveUnit[] _units = new MoveUnit[40];
     private readonly MoveObstacle[] _obstacles;
@@ -21,7 +21,7 @@ class MoveSandbox : Game
     private readonly Move _move;
 
     private Point _selectStart, _selectEnd;
-    private IFlowField? _flowField;
+    private PathGridFlowField? _flowField;
 
     private TextureLoader _textureLoader = default!;
     private SpriteBatch _spriteBatch = default!;
@@ -39,7 +39,7 @@ class MoveSandbox : Game
         };
 
         var colors = TextureLoader.ReadAllPixels("data/grid.png", out var w, out var h);
-        var bits = new BitArray(colors.ToArray().Select(c => false).ToArray());
+        var bits = new BitArray(colors.ToArray().Select(c => c.R < 100).ToArray());
         _grid = new(w, h, 6, bits);
         _move = new(_grid);
         _obstacles = new MoveObstacle[]
@@ -131,7 +131,7 @@ class MoveSandbox : Game
         DrawGrid(_grid);
 
         if (_flowField != null)
-            DrawFlowField(_flowField);
+            DrawFlowField(_flowField.Value);
 
         foreach (var obstacle in _obstacles)
         {
@@ -207,20 +207,22 @@ class MoveSandbox : Game
             }
         }
 
-        void DrawFlowField(IFlowField flowfield)
+        void DrawFlowField(PathGridFlowField flowfield)
         {
             var arrow = _textureLoader.LoadTexture("data/arrow.svg");
-            for (var i = 0; i < flowfield.Graph.NodeCount; i++)
+            var grid = flowfield.Grid;
+            for (var y = 0; y < grid.Height; y++)
+            for (var x = 0; x < grid.Width; x++)
             {
-                var v = flowfield.GetDirection(i);
+                var position = new Vector2((x + 0.5f) * grid.Step, (y + 0.5f) * grid.Step);
+                var v = flowfield.GetDirection(position);
                 if (v == default)
                     continue;
-
                 var rotation = MathF.Atan2(v.Y, v.X);
 
                 _spriteBatch.Draw(
                     arrow,
-                    flowfield.Graph.GetPosition(i) * WorldScale,
+                    position * WorldScale,
                     null,
                     Color.Gray * 0.2f,
                     rotation,

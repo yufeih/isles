@@ -190,9 +190,9 @@ public sealed class Move : IDisposable
         var speed = MathF.Sqrt(distance * m.Acceleration * 2);
 
         var flowFieldDirection = FollowFlowField(ref m);
-        var direction = flowFieldDirection == default ? Vector2.Normalize(toTarget) : flowFieldDirection;
+        var direction = flowFieldDirection == default ? toTarget : flowFieldDirection;
 
-        return direction * Math.Min(m.Speed, speed);
+        return Vector2.Normalize(direction) * Math.Min(m.Speed, speed);
     }
 
     private Vector2 FollowFlowField(ref MoveUnit unit)
@@ -200,10 +200,10 @@ public sealed class Move : IDisposable
         if (_grid is null || unit.Target is null)
             return default;
 
-        if (unit._flowField is null || unit.Target.Value != unit._flowField.Target)
-            unit._flowField = _pathFinder.GetFlowField2(_grid, unit.Radius * 2, unit.Target.Value);
+        if (unit._flowField is null || unit.Target.Value != unit._flowField.Value.Target)
+            unit._flowField = _pathFinder.GetFlowField(_grid, unit.Radius * 2, unit.Target.Value);
 
-        return unit._flowField.GetDirection(unit.Position);
+        return unit._flowField.Value.GetDirection(unit.Position);
     }
 
     private Vector2 CalculateForce(float idt, ref MoveUnit m)
@@ -333,7 +333,7 @@ public sealed class Move : IDisposable
     private static void ClearTarget(ref MoveUnit m)
     {
         m.Target = null;
-        m._flowField = null;
+        m._flowField = default;
         m._inContactSeconds = 0;
     }
 

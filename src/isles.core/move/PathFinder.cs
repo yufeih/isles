@@ -9,54 +9,47 @@ public record PathGrid(int Width, int Height, float Step, BitArray Bits);
 
 public class PathFinder
 {
-    private readonly Dictionary<(Vector2, int), FlowField<PathGridGraph>> _flowFields = new();
+    private readonly Dictionary<(Vector2, int), FlowField> _flowFields = new();
 
-    public IFlowField GetFlowField(PathGrid grid, float pathWidth, Vector2 target)
+    public PathGridFlowField GetFlowField(PathGrid grid, float pathWidth, Vector2 target)
     {
         var size = (int)MathF.Ceiling(pathWidth / grid.Step);
-        if (!_flowFields.TryGetValue((target, size), out var result))
-            result = _flowFields[(target, size)] = FlowField<PathGridGraph>.Create(
+        if (!_flowFields.TryGetValue((target, size), out var flowField))
+            flowField = _flowFields[(target, size)] = FlowField.Create(
                 new PathGridGraph(grid, size), target);
 
-        return result;
-    }
-
-    public PathGridFlowField GetFlowField2(PathGrid grid, float pathWidth, Vector2 target)
-    {
-        return new(grid, (FlowField<PathGridGraph>)GetFlowField(grid, pathWidth, target));
+        return new() { Target = target, Grid = grid, FlowField = flowField };
     }
 }
 
-public class PathGridFlowField
+public struct PathGridFlowField
 {
-    private readonly PathGrid _grid;
-    private readonly FlowField<PathGridGraph> _flowField;
+    public Vector2 Target;
+    public PathGrid Grid;
+    public FlowField FlowField;
 
-    public Vector2 Target => _flowField.Target;
-
-    public PathGridFlowField(PathGrid grid, FlowField<PathGridGraph> flowField)
-    {
-        _grid = grid;
-        _flowField = flowField;
-    }
+    public bool IsValid => Grid != null;
 
     public Vector2 GetDirection(Vector2 position)
     {
-        var x = position.X / _grid.Step - 0.5f;
-        var y = position.Y / _grid.Step - 0.5f;
+        var x = position.X / Grid.Step - 0.5f;
+        var y = position.Y / Grid.Step - 0.5f;
+        if (x < 0 || x >= Grid.Width || y < 0 || y >= Grid.Height)
+            return default;
 
-        var (fx, fy) = (x % 1, y %1);
-        var (ix, iy) = ((int)x, (int)y);
+        var (fx, fy) = (x % 1, y % 1);
+        var (minx, miny) = ((int)x, (int)y);
+        var (maxx, maxy) = (Math.Min(minx + 1, Grid.Width - 1), Math.Min(miny + 1, Grid.Height - 1));
 
         return Vector2.Lerp(
-            Vector2.Lerp(GetDirection(ix, iy), GetDirection(ix + 1, iy ), fx),
-            Vector2.Lerp(GetDirection(ix, iy + 1), GetDirection(ix + 1, iy + 1), fx),
+            Vector2.Lerp(GetDirection(minx, miny), GetDirection(maxx, miny), fx),
+            Vector2.Lerp(GetDirection(minx, maxy), GetDirection(maxx, maxy), fx),
             fy);
     }
 
     private Vector2 GetDirection(int x, int y)
     {
-        return _flowField.GetDirection(x + y * _grid.Width);
+        return FlowField.GetDirection(x + y * Grid.Width);
     }
 }
 
@@ -96,24 +89,15 @@ public struct PathGridGraph : IPathGraph2
     public Vector2 GetPosition(int nodeIndex)
     {
         var y = Math.DivRem(nodeIndex, _grid.Width, out var x);
-        return new((x + 0.5f * _size) * _grid.Step, (y + 0.5f * _size) * _grid.Step);
+        return new((x + 0.5f) * _grid.Step, (y + 0.5f) * _grid.Step);
     }
 
     public int GetNodeIndex(Vector2 position)
     {
-        var x = Math.Min(_grid.Width - 1, Math.Max(0, (int)(position.X / _grid.Step - 0.5f * (_size - 1))));
-        var y = Math.Min(_grid.Height - 1, Math.Max(0, (int)(position.Y / _grid.Step - 0.5f * (_size - 1))));
+        var x = Math.Min(_grid.Width - 1, Math.Max(0, (int)(position.X / _grid.Step)));
+        var y = Math.Min(_grid.Height - 1, Math.Max(0, (int)(position.Y / _grid.Step)));
 
         return y * _grid.Width + x;
-    }
-
-    public bool CanLineTo(int nodeIndex, Vector2 target)
-    {
-        var y = Math.DivRem(nodeIndex, _grid.Width, out var x);
-        foreach (var (dx, dy) in s_directions)
-            if (IsWall(x + dx, y + dy))
-                return false;
-        return true;
     }
 
     public int GetEdges(int from, Span<(int to, float cost)> edges)
@@ -208,6 +192,15 @@ public struct PathGridGraph : IPathGraph2
         }
 
         return count;
+    }
+
+    public bool CanLineTo(int nodeIndex, Vector2 target)
+    {
+        var y = Math.DivRem(nodeIndex, _grid.Width, out var x);
+        foreach (var (dx, dy) in s_directions)
+            if (IsWall(x + dx, y + dy))
+                return false;
+        return true;
     }
 
     private bool IsOutOfBounds(int x, int y)

@@ -18,26 +18,18 @@ public class PathFinderTest
         svg.AddGrid(grid);
 
         var pathfinder = new PathFinder();
-        while (true)
-        {
-            var end = new Vector2(random.NextSingle() * grid.Width, random.NextSingle() * grid.Height);
-            var flowField = pathfinder.GetFlowField(grid, pathWidth, end);
-            if (flowField is null)
-                continue;
+        var end = new Vector2(random.NextSingle() * grid.Width, random.NextSingle() * grid.Height);
+        var flowField = pathfinder.GetFlowField(grid, pathWidth, end);
 
-            svg.AddCircle(end.X, end.Y, pathWidth * 0.5f, "red");
-            
-            for (var i = 0; i < flowField.Graph.NodeCount; i++)
+        svg.AddCircle(end.X, end.Y, pathWidth * 0.5f, "red");
+
+        for (var y = 0; y < grid.Height; y++)
+            for (var x = 0; x < grid.Width; x++)
             {
-                var v = flowField.GetDirection(i);
-                if (v == default)
-                    continue;
-
-                var center = flowField.Graph.GetPosition(i);
-                svg.AddLine(center, center + v, 0.1f, "gray", data: new() { Opacity = 0.5f });
+                var position = new Vector2(x * grid.Step, y * grid.Step);
+                var v = flowField.GetDirection(position);
+                svg.AddLine(position, position + v, 0.1f, "gray", data: new() { Opacity = 0.5f });
             }
-            break;
-        }
 
         Snapshot.Save($"move/flowfield-{pathWidth}.svg", svg.ToString());
     }

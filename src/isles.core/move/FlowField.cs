@@ -3,17 +3,6 @@
 
 namespace Isles;
 
-public interface IFlowField
-{
-    Vector2 Target { get; }
-
-    IPathGraph2 Graph { get; }
-
-    Vector2 GetDirection(int nodeIndex);
-
-    Vector2 GetDirection(Vector2 position);
-}
-
 public interface IPathGraph2
 {
     int NodeCount { get; }
@@ -29,33 +18,17 @@ public interface IPathGraph2
     bool CanLineTo(int nodeIndex, Vector2 target);
 }
 
-public readonly struct FlowField<T> : IFlowField where T : IPathGraph2
+public struct FlowField
 {
-    private readonly T _graph;
-    private readonly (Half, Half)[] _vectors;
-
-    public Vector2 Target { get; }
-    public IPathGraph2 Graph => _graph;
-
-    public FlowField(T graph, Vector2 target, (Half, Half)[] vectors)
-    {
-        _graph = graph;
-        _vectors = vectors;
-        Target = target;
-    }
+    public (Half, Half)[] Vectors;
 
     public Vector2 GetDirection(int nodeIndex)
     {
-        var (x, y) = _vectors[nodeIndex];
+        var (x, y) = Vectors[nodeIndex];
         return new((float)x, (float)y);
     }
 
-    public Vector2 GetDirection(Vector2 position)
-    {
-        return GetDirection(_graph.GetNodeIndex(position));
-    }
-
-    public static FlowField<T> Create(T graph, Vector2 target)
+    public static FlowField Create<T>(T graph, Vector2 target) where T: IPathGraph2
     {
         var nodeCount = graph.NodeCount;
         var targetIndex = graph.GetNodeIndex(target);
@@ -97,16 +70,13 @@ public readonly struct FlowField<T> : IFlowField where T : IPathGraph2
         ArrayPool<float>.Shared.Return(distance);
         ArrayPool<ushort>.Shared.Return(prev);
 
-        return new(graph, target, vectors);
+        return new() { Vectors = vectors };
 
         void EmitNode(int from)
         {
             var to = from;
             while (prev[to] != ushort.MaxValue)
                 to = prev[to];
-
-            if (from == to)
-                return;
 
             var toPosition = to == targetIndex ? target : graph.GetPosition(to);
             if (!graph.CanLineTo(from, toPosition))
@@ -115,7 +85,7 @@ public readonly struct FlowField<T> : IFlowField where T : IPathGraph2
                 prev[from] = ushort.MaxValue;
             }
 
-            var flow = Vector2.Normalize(toPosition - graph.GetPosition(from));
+            var flow = toPosition - graph.GetPosition(from);
             vectors[from] = ((Half)flow.X, (Half)flow.Y);
         }
     }
