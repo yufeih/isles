@@ -15,7 +15,7 @@ public interface IPathGraph2
 
     int GetNodeIndex(Vector2 position);
 
-    bool CanLineTo(int nodeIndex, Vector2 target);
+    bool IsTurnPoint(int nodeIndex, Vector2 target);
 }
 
 public struct FlowField
@@ -79,9 +79,8 @@ public struct FlowField
                 to = prev[to];
 
             var toPosition = to == targetIndex ? target : graph.GetPosition(to);
-            if (!graph.CanLineTo(from, toPosition))
+            if (graph.IsTurnPoint(from, toPosition))
             {
-                toPosition = graph.GetPosition(prev[from]);
                 prev[from] = ushort.MaxValue;
             }
 

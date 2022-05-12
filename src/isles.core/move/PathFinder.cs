@@ -57,19 +57,22 @@ public struct PathGridGraph : IPathGraph2
 {
     private const float DiagonalCost = 1.414213562373095f;
 
-    private static readonly (int dx, int dy)[] s_directions = new[]
-    {
-        (0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, 1),
-    };
-
-    private static readonly (int dx, int dy)[] s_steps = new[]
+    private static readonly (int dx, int dy)[] Steps = new[]
     {
         (0, -1), (1, 0), (0, 1), (-1, 0)
     };
 
-    private static readonly (int multiplier, int lineX, int lineY)[] s_edges = new[]
+    private static readonly (int multiplier, int lineX, int lineY)[] Edges = new[]
     {
         (0, 1, 0), (1, 0, 1), (1, 1, 0), (0, 0, 1),
+    };
+
+    private static readonly (int dx, int dy, float min, float max)[] TurnPoints = new[]
+    {
+        (1, 1, MathF.PI / 2, 0),
+        (1, -1, 0, -MathF.PI / 2),
+        (-1, -1, -MathF.PI / 2, MathF.PI),
+        (-1, 1, MathF.PI, MathF.PI / 2),
     };
 
     private readonly PathGrid _grid;
@@ -112,7 +115,7 @@ public struct PathGridGraph : IPathGraph2
         // Horizontal and vertical edges
         for (var i = 0; i < 4; i++)
         {
-            var (dx, dy) = s_steps[i];
+            var (dx, dy) = Steps[i];
             var (xx, yy) = (x + dx, y + dy);
 
             if (IsWall(xx, yy))
@@ -125,8 +128,8 @@ public struct PathGridGraph : IPathGraph2
         for (var i = 0; i < 4; i++)
         {
             var (e1, e2) = (i, (i + 1) % 4);
-            var (dx1, dy1) = s_steps[e1];
-            var (dx2, dy2) = s_steps[e2];
+            var (dx1, dy1) = Steps[e1];
+            var (dx2, dy2) = Steps[e2];
             var (xx, yy) = (x + dx1 + dx2, y + dy1 + dy2);
 
             if (IsWall(xx, yy) || IsWall(x + dx1, y + dy1) || IsWall(x + dx2, y + dy2))
@@ -146,8 +149,8 @@ public struct PathGridGraph : IPathGraph2
         // Horizontal and vertical edges
         for (var i = 0; i < 4; i++)
         {
-            var (m, lx, ly) = s_edges[i];
-            var (dx, dy) = s_steps[i];
+            var (m, lx, ly) = Edges[i];
+            var (dx, dy) = Steps[i];
             var (xx, yy) = (x + dx, y + dy);
 
             dx *= (m * (_size - 1) + 1);
@@ -163,10 +166,10 @@ public struct PathGridGraph : IPathGraph2
         for (var i = 0; i < 4; i++)
         {
             var (e1, e2) = (i, (i + 1) % 4);
-            var (m1, lx1, ly1) = s_edges[e1];
-            var (m2, lx2, ly2) = s_edges[e2];
-            var (dx1, dy1) = s_steps[e1];
-            var (dx2, dy2) = s_steps[e2];
+            var (m1, lx1, ly1) = Edges[e1];
+            var (m2, lx2, ly2) = Edges[e2];
+            var (dx1, dy1) = Steps[e1];
+            var (dx2, dy2) = Steps[e2];
             var (xx, yy) = (x + dx1 + dx2, y + dy1 + dy2);
 
             if (IsWall(xx, yy))
@@ -188,13 +191,35 @@ public struct PathGridGraph : IPathGraph2
         return count;
     }
 
-    public bool CanLineTo(int nodeIndex, Vector2 target)
+    public bool IsTurnPoint(int nodeIndex, Vector2 target)
     {
+        var r = float.NaN;
         var y = Math.DivRem(nodeIndex, _grid.Width, out var x);
-        foreach (var (dx, dy) in s_directions)
-            if (IsWall(x + dx, y + dy))
-                return false;
-        return true;
+
+        foreach (var (dx, dy, min, max) in TurnPoints)
+        {
+            if (!IsWall(x + dx, y + dy) || IsWall(x + dx, y) || IsWall(x, y + dy))
+                continue;
+
+            if (float.IsNaN(r))
+            {
+                var v = target - GetPosition(nodeIndex);
+                r = MathF.Atan2(v.Y, v.X);
+            }
+
+            if (NormalizeRotation(r - min) < 0 || NormalizeRotation(r - max) > 0)
+                return true;
+        }
+        return false;
+    }
+
+    private static float NormalizeRotation(float r)
+    {
+        if (r > MathF.PI)
+            r -= 2 * MathF.PI;
+        if (r <= -MathF.PI)
+            r += 2 * MathF.PI;
+        return r;
     }
 
     private bool IsWall(int x, int y)

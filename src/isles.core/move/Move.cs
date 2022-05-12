@@ -318,7 +318,7 @@ public sealed class Move : IDisposable
         var offset = targetRotation - m._rotation;
         if (offset > MathF.PI)
             offset -= 2 * MathF.PI;
-        if (offset < -MathF.PI)
+        if (offset <= -MathF.PI)
             offset += 2 * MathF.PI;
 
         var delta = m.RotationSpeed * dt;
