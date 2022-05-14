@@ -28,6 +28,8 @@ class MoveSandbox : Game
     private SpriteBatch _spriteBatch = default!;
     private ImGuiRenderer _imguiRenderer = default!;
 
+    private bool _showFlowField;
+
     public MoveSandbox()
     {
         Window.AllowUserResizing = true;
@@ -135,8 +137,8 @@ class MoveSandbox : Game
         _spriteBatch.Begin();
 
         DrawGrid(_grid);
-
-        if (_flowField != null)
+        Checkbox("Show FlowField", ref _showFlowField);
+        if (_flowField != null && _showFlowField)
             DrawFlowField(_flowField.Value);
 
         foreach (var obstacle in _obstacles)
