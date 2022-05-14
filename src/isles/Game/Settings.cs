@@ -12,7 +12,6 @@ public class Settings
     public bool IsFixedTimeStep { get; set; } = true;
     public bool RevealMap { get; set; }
     public bool Cheat { get; set; }
-    public CameraSettings CameraSettings { get; set; } = new();
 
     public int ScreenWidth { get; set; } = 960;
     public int ScreenHeight { get; set; } = 600;

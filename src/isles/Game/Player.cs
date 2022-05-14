@@ -1180,7 +1180,7 @@ public class LocalPlayer : Player
         // Left click to select an entity
         if (type == EventType.LeftButtonDown && !multiSelecting)
         {
-            if (game.Camera is Camera)
+            if (game.Camera is BirdEyeCamera)
             {
                 game.Camera.Freezed = true;
             }
@@ -1194,7 +1194,7 @@ public class LocalPlayer : Player
         }
         else if (type == EventType.LeftButtonUp && multiSelecting)
         {
-            if (game.Camera is Camera)
+            if (game.Camera is BirdEyeCamera)
             {
                 game.Camera.Freezed = false;
             }

@@ -6,7 +6,7 @@ namespace Isles;
 public class MiniMap : UIElement
 {
     private readonly Rectangle FogOfWarSourceRectangle = new(500, 692, 429, 429);
-    private Camera camera;
+    private BirdEyeCamera camera;
     private readonly BaseGame game;
     private readonly GameWorld world;
     private const float Factor = 0.7f;

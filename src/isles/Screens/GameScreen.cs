@@ -160,7 +160,7 @@ public class GameScreen : IScreen, IEventListener
 
     private void ResetCamera()
     {
-        var camera = new Camera(Game.Settings.CameraSettings);
+        var camera = new BirdEyeCamera();
         camera.SetTarget(new Vector3(Player.LocalPlayer.SpawnPoint, 0));
         Game.Camera = camera;
     }
@@ -248,7 +248,7 @@ public class GameScreen : IScreen, IEventListener
         postScreenRectangle.X = (Game.ScreenWidth - postScreenRectangle.Width) / 2;
         postScreenRectangle.Y = (Game.ScreenHeight - postScreenRectangle.Height) / 2;
 
-        ((Camera)Game.Camera).Freezed = true;
+        ((BirdEyeCamera)Game.Camera).Freezed = true;
 
         Game.Input.Uncapture();
         postScreen = true;
@@ -315,10 +315,10 @@ public class GameScreen : IScreen, IEventListener
 
         return Game.Camera.ScrollState switch
         {
-            CameraScrollState.N or CameraScrollState.NE or CameraScrollState.NW => Cursors.Top,
-            CameraScrollState.S or CameraScrollState.SE or CameraScrollState.SW => Cursors.Bottom,
-            CameraScrollState.W => Cursors.Left,
-            CameraScrollState.E => Cursors.Right,
+            BirdEyeCameraScrollState.N or BirdEyeCameraScrollState.NE or BirdEyeCameraScrollState.NW => Cursors.Top,
+            BirdEyeCameraScrollState.S or BirdEyeCameraScrollState.SE or BirdEyeCameraScrollState.SW => Cursors.Bottom,
+            BirdEyeCameraScrollState.W => Cursors.Left,
+            BirdEyeCameraScrollState.E => Cursors.Right,
             _ => Cursors.Default,
         };
     }
