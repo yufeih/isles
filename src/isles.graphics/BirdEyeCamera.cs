@@ -28,16 +28,15 @@ public class BirdEyeCamera
     };
 
     private Vector3 _lookAt;
-    private float _radius;
+    private float _radius = 180;
     private int _scrollWheelValue;
 
     public Matrix View { get; private set; } = Matrix.Identity;
 
     public float MinRadius { get; set; } = 80;
     public float MaxRadius { get; set; } = 250;
-    public float DefaultRadius { get; set; } = 180;
     public float WheelSpeed { get; set; } = 0.1f;
-    public float ScrollSpeed { get; set; } = 0.3f;
+    public float ScrollSpeed { get; set; } = 0.4f;
 
     public bool Freezed { get; set; }
 
@@ -59,7 +58,7 @@ public class BirdEyeCamera
         if (terrain != null)
         {
             _lookAt.X = MathHelper.Clamp(_lookAt.X, BoundsBorder, terrain.Size.X - BoundsBorder);
-            _lookAt.X = MathHelper.Clamp(_lookAt.Y, BoundsBorder, terrain.Size.Y - BoundsBorder);
+            _lookAt.Y = MathHelper.Clamp(_lookAt.Y, BoundsBorder, terrain.Size.Y - BoundsBorder);
             _lookAt.Z = terrain.GetHeight(_lookAt.X, _lookAt.Y);
         }
 
@@ -79,7 +78,7 @@ public class BirdEyeCamera
         var mouse = Mouse.GetState();
         var scrollWheelOffset = mouse.ScrollWheelValue - _scrollWheelValue;
         _scrollWheelValue = mouse.ScrollWheelValue;
-        _radius -= scrollWheelOffset * WheelSpeed;
+        _radius += scrollWheelOffset * WheelSpeed;
         _radius = MathHelper.Clamp(_radius, MinRadius, MaxRadius);
 
         var (dx, dy) = (0,0);
