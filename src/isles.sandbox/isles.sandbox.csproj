@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <NoWarn>X4717</NoWarn>
+    <Platforms>x64</Platforms>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Using Include="Isles" />
+    <Using Include="Microsoft.Xna.Framework" />
+    <Using Include="Microsoft.Xna.Framework.Graphics" />
+    <Using Include="Microsoft.Xna.Framework.Graphics.PackedVector" />
+    <Using Include="Microsoft.Xna.Framework.Input" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="data\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\extern\FNA\FNA.Core.csproj" />
+    <ProjectReference Include="..\isles.graphics\isles.graphics.csproj" />
+    <ProjectReference Include="..\isles.core\isles.core.csproj" />
+  </ItemGroup>
+
+</Project>

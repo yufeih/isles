@@ -17,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "extern", "extern", "{FF0759
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "isles.core", "src\isles.core\isles.core.csproj", "{2C5440C6-E5F0-4F1A-B06E-B815FDE2E9B9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "isles.sandbox", "tests\isles.sandbox\isles.sandbox.csproj", "{6710C501-F765-47FC-9DEA-6388DD0E3648}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "isles.sandbox", "src\isles.sandbox\isles.sandbox.csproj", "{6710C501-F765-47FC-9DEA-6388DD0E3648}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "isles.graphics", "src\isles.graphics\isles.graphics.csproj", "{AC6BFF74-168B-453D-B682-4088E8C10CA9}"
 EndProject
