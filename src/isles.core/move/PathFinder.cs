@@ -42,14 +42,15 @@ public struct PathGridFlowField
         var (maxx, maxy) = (Math.Min(minx + 1, Grid.Width - 1), Math.Min(miny + 1, Grid.Height - 1));
 
         return Vector2.Lerp(
-            Vector2.Lerp(GetDirection(minx, miny), GetDirection(maxx, miny), fx),
-            Vector2.Lerp(GetDirection(minx, maxy), GetDirection(maxx, maxy), fx),
+            Vector2.Lerp(GetVector(minx, miny), GetVector(maxx, miny), fx),
+            Vector2.Lerp(GetVector(minx, maxy), GetVector(maxx, maxy), fx),
             fy);
     }
 
-    private Vector2 GetDirection(int x, int y)
+    private Vector2 GetVector(int x, int y)
     {
-        return FlowField.GetDirection(x + y * Grid.Width);
+        var (vx, vy, _) = FlowField.Vectors[x + y * Grid.Width];
+        return new((float)vx, (float)vy);
     }
 }
 

@@ -11,7 +11,7 @@ sandbox.Run();
 
 class MoveSandbox : Game
 {
-    private const float WorldScale = 5f;
+    private const float WorldScale = 4f;
 
     private readonly MoveUnit[] _units = new MoveUnit[40];
     private readonly MoveObstacle[] _obstacles;
@@ -40,7 +40,7 @@ class MoveSandbox : Game
 
         var colors = TextureLoader.ReadAllPixels("data/grid.png", out var w, out var h);
         var bits = new BitArray(colors.ToArray().Select(c => c.R < 100).ToArray());
-        _grid = new(w, h, 6, bits);
+        _grid = new(w, h, 4, bits);
         _move = new(_grid);
         _obstacles = new MoveObstacle[]
         {
@@ -54,7 +54,7 @@ class MoveSandbox : Game
             {
                 Radius = 1 + random.NextSingle(),
                 Position = new(random.NextSingle() * Window.ClientBounds.Width / WorldScale, random.NextSingle() * Window.ClientBounds.Height / WorldScale),
-                Speed = 10 + 10 * random.NextSingle(),
+                Speed = 20 + 10 * random.NextSingle(),
                 Acceleration = 20 + 20 * random.NextSingle(),
                 Decceleration = 400 + 400 * random.NextSingle(),
                 RotationSpeed = MathF.PI * 2 + random.NextSingle() * MathF.PI * 4,
@@ -219,12 +219,14 @@ class MoveSandbox : Game
                 if (v == default)
                     continue;
                 var rotation = MathF.Atan2(v.Y, v.X);
+                var color = flowfield.FlowField.Vectors[x + y * grid.Width].flags.HasFlag(FlowFieldFlags.TurnPoint)
+                    ? Color.Gray : Color.Gray * 0.2f;
 
                 _spriteBatch.Draw(
                     arrow,
                     position * WorldScale,
                     null,
-                    Color.Gray * 0.2f,
+                    color,
                     rotation,
                     new Vector2(arrow.Width / 2, arrow.Height / 2),
                     _grid.Step * WorldScale / arrow.Width,

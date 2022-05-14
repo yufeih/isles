@@ -18,15 +18,15 @@ public interface IPathGraph2
     bool IsTurnPoint(int nodeIndex, Vector2 target);
 }
 
+[Flags]
+public enum FlowFieldFlags : byte
+{
+    TurnPoint = 1,
+}
+
 public struct FlowField
 {
-    public (Half, Half)[] Vectors;
-
-    public Vector2 GetDirection(int nodeIndex)
-    {
-        var (x, y) = Vectors[nodeIndex];
-        return new((float)x, (float)y);
-    }
+    public (Half x, Half y, FlowFieldFlags flags)[] Vectors;
 
     public static FlowField Create<T>(T graph, Vector2 target) where T: IPathGraph2
     {
@@ -34,7 +34,7 @@ public struct FlowField
         var targetIndex = graph.GetNodeIndex(target);
         var distance = ArrayPool<float>.Shared.Rent(nodeCount);
         var prev = ArrayPool<ushort>.Shared.Rent(nodeCount);
-        var vectors = new (Half, Half)[nodeCount];
+        var vectors = new (Half, Half, FlowFieldFlags)[nodeCount];
 
         Array.Fill(prev, ushort.MaxValue, 0, nodeCount);
         Array.Fill(distance, float.MaxValue, 0, nodeCount);
@@ -78,14 +78,16 @@ public struct FlowField
             while (prev[to] != ushort.MaxValue)
                 to = prev[to];
 
+            var flags = default(FlowFieldFlags);
             var toPosition = to == targetIndex ? target : graph.GetPosition(to);
+            var flow = toPosition - graph.GetPosition(from);
             if (graph.IsTurnPoint(from, toPosition))
             {
+                flags = FlowFieldFlags.TurnPoint;
                 prev[from] = ushort.MaxValue;
             }
 
-            var flow = toPosition - graph.GetPosition(from);
-            vectors[from] = ((Half)flow.X, (Half)flow.Y);
+            vectors[from] = ((Half)flow.X, (Half)flow.Y, flags);
         }
     }
 }
