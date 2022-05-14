@@ -4,6 +4,8 @@ using ImGuiNET;
 
 namespace Isles.Graphics;
 
+#nullable disable
+
 public class ImGuiRenderer
 {
     private static readonly int s_vertexSize = Marshal.SizeOf<ImDrawVert>();

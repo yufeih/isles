@@ -3,6 +3,8 @@
 
 namespace Isles.Graphics;
 
+#nullable disable
+
 public class Model
 {
     public Mesh[] Meshes { get; init; }

@@ -6,6 +6,8 @@ using System.Runtime.InteropServices;
 
 namespace Isles.Graphics;
 
+#nullable disable
+
 public class ModelLoader
 {
     private readonly GraphicsDevice _graphicsDevice;

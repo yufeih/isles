@@ -325,7 +325,8 @@ public class GameScreen : IScreen, IEventListener
 
     public void Draw(GameTime gameTime)
     {
-        _worldRenderer.Draw(World, Game.ViewProjection, Game.Eye, Game.Facing, gameTime);
+        var matrics = new ViewMatrices(Game.Camera.View, Game.Camera.GetProjection(Game.GraphicsDevice.Viewport.Bounds));
+        _worldRenderer.Draw(World, matrics, gameTime);
 
         // Draw player info
         foreach (var player in Player.AllPlayers)
@@ -334,9 +335,9 @@ public class GameScreen : IScreen, IEventListener
         }
 
         // Force everything to be presented before UI is rendered
-        Game.Billboard.Present();
+        Game.Billboard.Present(matrics);
         Game.Graphics2D.Present();
-        ParticleSystem.Present();
+        ParticleSystem.Present(matrics);
 
         if (postScreen)
         {

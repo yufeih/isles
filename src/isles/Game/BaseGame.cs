@@ -30,23 +30,15 @@ public class BaseGame : Game, IEventListener
 
     public Matrix View => view;
 
-    public Matrix Projection => projection;
-
     public Matrix ViewProjection => viewProjection;
 
     public Matrix ViewInverse => viewInverse;
 
     public Matrix ProjectionInverse => projectionInverse;
 
-    public Matrix ViewProjectionInverse => viewProjectionInverse;
-
-    public BoundingFrustum ViewFrustum { get; private set; }
-
     public Ray PickRay => pickRay;
 
     public Vector3 Eye => eye;
-
-    public Vector3 Facing => facing;
 
     public Settings Settings { get; set; }
 
@@ -151,7 +143,6 @@ public class BaseGame : Game, IEventListener
             Camera.Update(gs.World.Landscape);
             Camera.UpdateInput(dt, GraphicsDevice.Viewport.Bounds);
             UpdateMatrices();
-            UpdateFrustum();
             UpdatePickRay();
             UpdateAudioListener();
         }
@@ -163,11 +154,6 @@ public class BaseGame : Game, IEventListener
 
         Audios.Update(gameTime);
         base.Update(gameTime);
-    }
-
-    private void UpdateFrustum()
-    {
-        ViewFrustum = new BoundingFrustum(viewProjection);
     }
 
     private void UpdateAudioListener()
@@ -279,8 +265,6 @@ public class BaseGame : Game, IEventListener
         Bloom?.BeginDraw();
         Graphics.GraphicsDevice.Clear(backgroundColor);
         CurrentScreen?.Draw(gameTime);
-        Billboard?.Present();
-        ParticleSystem.Present();
         Graphics2D.Present();
         Bloom?.EndDraw();
     }
