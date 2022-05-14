@@ -3,77 +3,6 @@
 
 namespace Isles;
 
-public interface ICamera : IEventListener
-{
-    Matrix View { get; }
-
-    Matrix Projection { get; }
-
-    void Update(GameTime gameTime);
-}
-
-/// <summary>
-/// Game camera class.
-/// Coordinate system in Xna is right-handed!
-/// Z axis is up by default, since we are using a bird-eye view.
-/// </summary>
-public class Camera : ICamera
-{
-    protected Vector3 eye = new(0, -100, 100);
-    protected Vector3 lookAt = Vector3.Zero;
-    protected Vector3 up = Vector3.UnitZ;
-
-    protected Matrix view;
-    protected Matrix projection;
-
-    protected GraphicsDevice device;
-
-    protected float nearPlane = 1;
-    protected float farPlane = 5000;
-    protected float fieldOfView = MathHelper.PiOver4;
-
-    /// <summary>
-    /// Gets camera view matrix. Can't be set due to consistency.
-    /// </summary>
-    public Matrix View => view;
-
-    /// <summary>
-    /// Gets camera projection matrix.
-    /// </summary>
-    public Matrix Projection => projection;
-
-    public Camera(GraphicsDevice graphics)
-    {
-        device = graphics;
-        graphics.DeviceReset += ResetProjection;
-        view = Matrix.CreateLookAt(eye, lookAt, up);
-        ResetProjection(null, EventArgs.Empty);
-    }
-
-    protected void ResetProjection(object sender, EventArgs e)
-    {
-        projection = Matrix.CreatePerspectiveFieldOfView(
-            MathHelper.PiOver4,
-            (float)device.Viewport.Width / device.Viewport.Height,
-            nearPlane, farPlane);
-    }
-
-    /// <summary>
-    /// Allows the game component to update itself.
-    /// </summary>
-    /// <param name="gameTime">Provides a snapshot of timing values.</param>
-    public virtual void Update(GameTime gameTime)
-    {
-        // Update matrix and view frustum
-        Matrix.CreateLookAt(ref eye, ref lookAt, ref up, out view);
-    }
-
-    public virtual EventResult HandleEvent(EventType type, object sender, object tag)
-    {
-        return EventResult.Unhandled;
-    }
-}
-
 public class GameCameraSettings
 {
     /// <summary>
@@ -120,8 +49,44 @@ public class GameCameraSettings
     public float MaxSpeed { get; set; } = 1.0f;
 }
 
-public class GameCamera : Camera
+/// <summary>
+/// Game camera class.
+/// Coordinate system in Xna is right-handed!
+/// Z axis is up by default, since we are using a bird-eye view.
+/// </summary>
+public class GameCamera : IEventListener
 {
+    protected Vector3 eye = new(0, -100, 100);
+    protected Vector3 lookAt = Vector3.Zero;
+    protected Vector3 up = Vector3.UnitZ;
+
+    protected Matrix view;
+    protected Matrix projection;
+
+    protected GraphicsDevice device;
+
+    protected float nearPlane = 1;
+    protected float farPlane = 5000;
+    protected float fieldOfView = MathHelper.PiOver4;
+
+    /// <summary>
+    /// Gets camera view matrix. Can't be set due to consistency.
+    /// </summary>
+    public Matrix View => view;
+
+    /// <summary>
+    /// Gets camera projection matrix.
+    /// </summary>
+    public Matrix Projection => projection;
+
+    protected void ResetProjection(object sender, EventArgs e)
+    {
+        projection = Matrix.CreatePerspectiveFieldOfView(
+            MathHelper.PiOver4,
+            (float)device.Viewport.Width / device.Viewport.Height,
+            nearPlane, farPlane);
+    }
+
     public GameCameraSettings Settings { get; set; }
 
     private readonly GameWorld world;
@@ -193,9 +158,13 @@ public class GameCamera : Camera
     private bool moving;
 
     public GameCamera(GameCameraSettings settings, GameWorld world)
-        : base(BaseGame.Singleton.GraphicsDevice)
     {
         this.world = world;
+
+        device = BaseGame.Singleton.GraphicsDevice;
+        BaseGame.Singleton.GraphicsDevice.DeviceReset += ResetProjection;
+        view = Matrix.CreateLookAt(eye, lookAt, up);
+        ResetProjection(null, EventArgs.Empty);
 
         Settings = settings;
 
@@ -238,7 +207,7 @@ public class GameCamera : Camera
         }
     }
 
-    public override void Update(GameTime gameTime)
+    public void Update(GameTime gameTime)
     {
         // Apply global camera sensitivity
         var elapsedTime = Settings.Sensitivity *
@@ -254,7 +223,7 @@ public class GameCamera : Camera
         UpdateOrientation(elapsedTime, smoother);
         UpdateEye(smoother);
 
-        base.Update(gameTime);
+        Matrix.CreateLookAt(ref eye, ref lookAt, ref up, out view);
     }
 
     private void UpdateEye(float smoother)
@@ -482,7 +451,7 @@ public class GameCamera : Camera
         pitch += offset * smoother;
     }
 
-    public override EventResult HandleEvent(EventType type, object sender, object tag)
+    public EventResult HandleEvent(EventType type, object sender, object tag)
     {
         var input = sender as Input;
         var key = tag as Keys?;

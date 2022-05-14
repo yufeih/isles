@@ -77,7 +77,7 @@ public class MiniMap : UIElement
     public MiniMap(BaseGame game, GameWorld world)
     {
         this.game = game;
-        camera = game.Camera as GameCamera;
+        camera = game.Camera;
         this.world = world;
     }
 
@@ -250,7 +250,7 @@ public class MiniMap : UIElement
     {
         if (camera == null)
         {
-            camera = game.Camera as GameCamera;
+            camera = game.Camera;
         }
 
         if (draging)

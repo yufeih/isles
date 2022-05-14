@@ -667,7 +667,7 @@ public class LocalPlayer : Player
     public override void Start(GameWorld world)
     {
         this.world = world ?? throw new ArgumentNullException();
-        camera = game.Camera as GameCamera;
+        camera = game.Camera;
         Attack = new SpellAttack();
         Move = new SpellMove();
 
@@ -1179,7 +1179,7 @@ public class LocalPlayer : Player
             // Press space to back to spawnpoint
             if (game.Camera is GameCamera)
             {
-                (game.Camera as GameCamera).FlyTo(new Vector3(SpawnPoint, 0), false);
+                game.Camera.FlyTo(new Vector3(SpawnPoint, 0), false);
             }
 
             return EventResult.Handled;
@@ -1203,7 +1203,7 @@ public class LocalPlayer : Player
         {
             if (game.Camera is GameCamera)
             {
-                (game.Camera as GameCamera).Freezed = true;
+                game.Camera.Freezed = true;
             }
 
             input.Capture(this);
@@ -1217,7 +1217,7 @@ public class LocalPlayer : Player
         {
             if (game.Camera is GameCamera)
             {
-                (game.Camera as GameCamera).Freezed = false;
+                game.Camera.Freezed = false;
             }
 
             input.Uncapture();
@@ -1304,7 +1304,7 @@ public class LocalPlayer : Player
                             keyDoublePressed = false;
                             if (game.Camera is GameCamera && teams[value].Count > 0)
                             {
-                                (game.Camera as GameCamera).FlyTo(
+                                game.Camera.FlyTo(
                                    ProjectToScreenCenter(GetTeamPosition(teams[value])), false);
                             }
                         }

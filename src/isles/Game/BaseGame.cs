@@ -26,7 +26,7 @@ public class BaseGame : Game, IEventListener
 
     public IScreen CurrentScreen { get; private set; }
 
-    public ICamera Camera { get; set; }
+    public GameCamera Camera { get; set; }
 
     public Matrix View => view;
 

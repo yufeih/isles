@@ -28,14 +28,14 @@ public class GameScreen : IScreen, IEventListener
     {
         this.activeObject = activeObject;
         paused = true;
-        (Game.Camera as GameCamera).Freezed = true;
+        Game.Camera.Freezed = true;
     }
 
     public void Resume()
     {
         paused = false;
         activeObject = null;
-        (Game.Camera as GameCamera).Freezed = false;
+        Game.Camera.Freezed = false;
     }
 
     public GameWorld World { get; private set; }
