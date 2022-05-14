@@ -3,6 +3,7 @@
 
 using System.Collections;
 using Isles.Graphics;
+using static ImGuiNET.ImGui;
 
 Directory.SetCurrentDirectory(AppContext.BaseDirectory);
 
@@ -25,6 +26,7 @@ class MoveSandbox : Game
 
     private TextureLoader _textureLoader = default!;
     private SpriteBatch _spriteBatch = default!;
+    private ImGuiRenderer _imguiRenderer = default!;
 
     public MoveSandbox()
     {
@@ -67,6 +69,7 @@ class MoveSandbox : Game
     {
         _textureLoader = new(GraphicsDevice);
         _spriteBatch = new(GraphicsDevice);
+        _imguiRenderer = new(GraphicsDevice);
     }
 
     protected override void Update(GameTime gameTime)
@@ -74,6 +77,8 @@ class MoveSandbox : Game
         UpdateSelection();
 
         _move.Update((float)gameTime.ElapsedGameTime.TotalSeconds, _units);
+
+        _imguiRenderer.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
     }
 
     private void UpdateSelection()
@@ -126,6 +131,7 @@ class MoveSandbox : Game
         var arrow = _textureLoader.LoadTexture("data/unit.svg");
         var selection = _textureLoader.LoadTexture("data/pixel.svg");
 
+        _imguiRenderer.Begin();
         _spriteBatch.Begin();
 
         DrawGrid(_grid);
@@ -169,6 +175,7 @@ class MoveSandbox : Game
         }
 
         _spriteBatch.End();
+        _imguiRenderer.End();
 
         void DrawLine(Vector2 a, Vector2 b, float width, Color color)
         {
