@@ -145,9 +145,9 @@ public class BaseGame : Game, IEventListener
 
         Input.Update(gameTime);
 
-        if (Camera != null)
+        if (Camera != null && CurrentScreen is GameScreen gs)
         {
-            Camera.Update(gameTime);
+            Camera.Update(gameTime, gs.World.Landscape);
             UpdateMatrices();
             UpdateFrustum();
             UpdatePickRay();

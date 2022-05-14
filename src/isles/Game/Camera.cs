@@ -5,48 +5,13 @@ namespace Isles;
 
 public class CameraSettings
 {
-    /// <summary>
-    /// Minmun camera height above ground.
-    /// </summary>
-    public float MinRadius { get; set; } = 10.0f;
-
-    /// <summary>
-    /// Max camera arcball radius.
-    /// </summary>
-    public float MaxRadius { get; set; } = 1000.0f;
-
-    /// <summary>
-    /// Default camera arcball radius.
-    /// </summary>
-    public float DefaultRadius { get; set; } = 100.0f;
-
-    /// <summary>
-    /// Size of the hot area at the borders of the screen that
-    /// scroll the position of the camera, in pixels.
-    /// </summary>
-    public float ScrollAreaSize { get; set; } = 10;
-
-    /// <summary>
-    /// Global camera sensitivity scaler.
-    /// </summary>
-    public float Sensitivity { get; set; } = 1.0f;
-
-    /// <summary>
-    /// Controls how mouse wheel value affects view distance.
-    /// </summary>
+    public float MinRadius { get; set; } = 50;
+    public float MaxRadius { get; set; } = 225;
+    public float DefaultRadius { get; set; } = 180;
+    public float ScrollAreaSize { get; set; } = 2;
+    public float Sensitivity { get; set; } = 1;
     public float WheelFactor { get; set; } = 0.1f;
-
-    /// <summary>
-    /// Controls the global smoothness of camera transitions.
-    /// </summary>
-    public float Smoothness { get; set; } = 1.0f;
-
-    /// <summary>
-    /// Scrolling speed of the camera. It's faster to scroll
-    /// when the camera gets higher (Depends on arcball radius).
-    /// </summary>
-    public float MinSpeed { get; set; } = 0.2f;
-    public float MaxSpeed { get; set; } = 1.0f;
+    public float Speed { get; set; } = 0.3f;
 }
 
 public enum CameraMoveState
@@ -76,7 +41,6 @@ public class Camera : IEventListener
 
     public CameraSettings Settings { get; set; }
 
-    private readonly GameWorld world;
     private const float BorderSize = 100;
 
     private readonly BaseGame game = BaseGame.Singleton;
@@ -89,9 +53,6 @@ public class Camera : IEventListener
     private float pitch = -MathHelper.PiOver2;
     private const float DefaultPitch = -MathHelper.PiOver2;
 
-    private float eyeZ;
-    private float eyeZTarget;
-    private Vector3 lookAtTarget;
     private readonly float minRoll = MathHelper.ToRadians(60);
     private readonly float maxRoll = MathHelper.ToRadians(80);
     private Vector3 direction = Vector3.Zero;
@@ -111,9 +72,6 @@ public class Camera : IEventListener
 
     public CameraMoveState MoveState { get; private set; }
 
-    /// <summary>
-    /// Events
-    /// </summary>
     public event EventHandler BeginRotate;
 
     public event EventHandler EndRotate;
@@ -124,70 +82,34 @@ public class Camera : IEventListener
 
     private bool moving;
 
-    public Camera(CameraSettings settings, GameWorld world)
+    public Camera(CameraSettings settings)
     {
-        this.world = world;
         view = Matrix.CreateLookAt(eye, lookAt, up);
 
         Settings = settings;
 
         radius = settings.DefaultRadius;
-
-        // Center camera
-        FlyTo(new Vector3(
-            world.Landscape.Size.X / 2, world.Landscape.Size.Y / 2, 0), true);
     }
 
-    public void FlyTo(Vector3 position, bool teleport)
+    public void FlyTo(Vector3 position)
     {
-        const float Distance = 200;
-
-        position = RestrictToBorder(position);
-
-        if (teleport)
-        {
-            lookAtTarget = lookAt = position;
-        }
-        else
-        {
-            lookAtTarget = position;
-
-            Vector2 distance;
-            distance.X = position.X - lookAt.X;
-            distance.Y = position.Y - lookAt.Y;
-
-            if (distance.LengthSquared() > Distance * Distance)
-            {
-                distance.Normalize();
-
-                lookAt.X = lookAtTarget.X - distance.X * Distance;
-                lookAt.Y = lookAtTarget.Y - distance.Y * Distance;
-            }
-        }
+        lookAt = position;
     }
 
-    public void Update(GameTime gameTime)
+    public void Update(GameTime gameTime, ILandscape terrain)
     {
-        // Apply global camera sensitivity
-        var elapsedTime = Settings.Sensitivity * (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-        var smoother = elapsedTime * 0.005f * Settings.Smoothness;
-        if (smoother > 1)
-        {
-            smoother = 1;
-        }
-
         if (!Freezed)
         {
-            UpdateLookAt(elapsedTime);
-            UpdateViewDistance(elapsedTime);
-            UpdateOrientation();
-        }
-        UpdateEye(smoother);
+            var elapsedTime = Settings.Sensitivity * (float)gameTime.ElapsedGameTime.TotalMilliseconds;
 
-        Matrix.CreateLookAt(ref eye, ref lookAt, ref up, out view);
+            UpdateLookAt(elapsedTime);
+            UpdateViewDistance();
+            UpdateOrientation();
+            UpdateEye(terrain);
+        }
     }
 
-    private void UpdateEye(float smoother)
+    private void UpdateEye(ILandscape terrain)
     {
         // Compute eye position
         var r = (float)(radius * Math.Cos(roll));
@@ -197,16 +119,14 @@ public class Camera : IEventListener
 
         // Update eye position
         eye = lookAt + direction;
+        eye.Z = Math.Max(eye.Z, terrain.GetHeight(eye.X, eye.Y) + Settings.MinRadius);
 
-        // Avoid collision with heightmap
-        eyeZTarget = world.Landscape.GetHeight(eye.X, eye.Y) + Settings.MinRadius;
-        eyeZTarget += (Settings.MaxRadius - eyeZTarget) * eye.Z / Settings.MaxRadius;
+        lookAt = ClampBounds(lookAt, terrain);
 
-        eyeZ += (eyeZTarget - eyeZ) * smoother;
-        eye.Z = eyeZ;
+        Matrix.CreateLookAt(ref eye, ref lookAt, ref up, out view);
     }
 
-    private void UpdateViewDistance(float elapsedTime)
+    private void UpdateViewDistance()
     {
         if (!Freezed)
         {
@@ -222,10 +142,7 @@ public class Camera : IEventListener
         var xMove = false;
         var yMove = false;
 
-        // Compute camera speed based on radius
-        var speed = MathHelper.Lerp(
-            Settings.MinSpeed, Settings.MaxSpeed, radius / Settings.MaxRadius);
-
+        var speed =  Settings.Speed;
         var sin = (float)(speed * Math.Sin(pitch)) * elapsedTime;
         var cos = (float)(speed * Math.Cos(pitch)) * elapsedTime;
 
@@ -276,39 +193,34 @@ public class Camera : IEventListener
                 BeginMove(this, EventArgs.Empty);
             }
 
-            lookAtTarget.X += xDelta;
-            lookAtTarget.Y += yDelta;
-            lookAtTarget = RestrictToBorder(lookAtTarget);
+            lookAt.X += xDelta;
+            lookAt.Y += yDelta;
         }
         else if (moving)
         {
             moving = false;
             EndMove(this, EventArgs.Empty);
         }
-
-        // Smooth look at position
-        lookAt = lookAtTarget;
     }
 
-    private Vector3 RestrictToBorder(Vector3 v)
+    private static Vector3 ClampBounds(Vector3 v, ILandscape terrain)
     {
-        // Restrict look at to the world.Landscape bounds
         if (v.X < BorderSize)
         {
             v.X = BorderSize;
         }
-        else if (v.X > world.Landscape.Size.X - BorderSize)
+        else if (v.X > terrain.Size.X - BorderSize)
         {
-            v.X = world.Landscape.Size.X - BorderSize;
+            v.X = terrain.Size.X - BorderSize;
         }
 
         if (v.Y < BorderSize)
         {
             v.Y = BorderSize;
         }
-        else if (v.Y > world.Landscape.Size.Y - BorderSize)
+        else if (v.Y > terrain.Size.Y - BorderSize)
         {
-            v.Y = world.Landscape.Size.Y - BorderSize;
+            v.Y = terrain.Size.Y - BorderSize;
         }
 
         return v;
@@ -322,34 +234,12 @@ public class Camera : IEventListener
         // Adjusting view
         if (dragging && game.Input.Mouse.MiddleButton == ButtonState.Pressed)
         {
-            pitch = startPitch + (game.Input.MousePosition.X - startMousePosition.X) * RotationFactorX;
-            roll = startRoll - (game.Input.MousePosition.Y - startMousePosition.Y) * RotationFactorY;
+            pitch = MathFHelper.NormalizeRotation(startPitch + (game.Input.MousePosition.X - startMousePosition.X) * RotationFactorX);
+            roll = MathHelper.Clamp(
+                MathFHelper.NormalizeRotation(startRoll - (game.Input.MousePosition.Y - startMousePosition.Y) * RotationFactorY),
+                minRoll,
+                maxRoll);
         }
-
-        // Restrict roll
-        if (roll < minRoll)
-        {
-            roll = minRoll;
-        }
-        else if (roll > maxRoll)
-        {
-            roll = maxRoll;
-        }
-
-        // Orbit around the point
-        const float PiPi = 2 * MathHelper.Pi;
-        var offset = pitch - pitch;
-        while (offset > MathHelper.Pi)
-        {
-            offset -= PiPi;
-        }
-
-        while (offset < -MathHelper.Pi)
-        {
-            offset += PiPi;
-        }
-
-        pitch += offset;
     }
 
     public EventResult HandleEvent(EventType type, object sender, object tag)

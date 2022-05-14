@@ -208,19 +208,10 @@ public struct PathGridGraph : IPathGraph2
                 r = MathF.Atan2(v.Y, v.X);
             }
 
-            if (NormalizeRotation(r - min) < 0 || NormalizeRotation(r - max) > 0)
+            if (MathFHelper.NormalizeRotation(r - min) < 0 || MathFHelper.NormalizeRotation(r - max) > 0)
                 return true;
         }
         return false;
-    }
-
-    private static float NormalizeRotation(float r)
-    {
-        if (r > MathF.PI)
-            r -= 2 * MathF.PI;
-        if (r <= -MathF.PI)
-            r += 2 * MathF.PI;
-        return r;
     }
 
     private bool IsWall(int x, int y)

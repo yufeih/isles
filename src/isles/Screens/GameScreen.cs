@@ -162,8 +162,8 @@ public class GameScreen : IScreen, IEventListener
 
     private void ResetCamera()
     {
-        var camera = new Camera(Game.Settings.CameraSettings, World);
-        camera.FlyTo(new Vector3(Player.LocalPlayer.SpawnPoint, 0), true);
+        var camera = new Camera(Game.Settings.CameraSettings);
+        camera.FlyTo(new Vector3(Player.LocalPlayer.SpawnPoint, 0));
         Game.Camera = camera;
 
         camera.BeginMove += (sender, e) =>
