@@ -241,7 +241,7 @@ public class BillboardManager : IDisposable
         billboards.Add(billboard);
     }
 
-    public void Present()
+    public void Present(in ViewMatrices matrices)
     {
         if (billboards.Count <= 0)
         {
@@ -251,8 +251,8 @@ public class BillboardManager : IDisposable
         BillboardType currentType = BillboardType.NormalOriented;
 
         // Set effect parameters
-        effect.Parameters["View"].SetValue(game.View);
-        effect.Parameters["Projection"].SetValue(game.Projection);
+        effect.Parameters["View"].SetValue(matrices.View);
+        effect.Parameters["Projection"].SetValue(matrices.Projection);
 
         // Make sure normal oriented is 0 and center oriented is 1
         effect.CurrentTechnique = effect.Techniques[0];

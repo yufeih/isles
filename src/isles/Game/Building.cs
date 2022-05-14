@@ -187,14 +187,6 @@ public class Building : GameObject, IPlaceable
         base.OnDeselect(ui);
     }
 
-    public static Building LastDestroyedBuilding;
-
-    public override void OnDestroy()
-    {
-        LastDestroyedBuilding = this;
-        base.OnDestroy();
-    }
-
     protected override void OnDie()
     {
         if (pathGrids != null)

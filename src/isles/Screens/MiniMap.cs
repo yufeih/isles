@@ -6,7 +6,7 @@ namespace Isles;
 public class MiniMap : UIElement
 {
     private readonly Rectangle FogOfWarSourceRectangle = new(500, 692, 429, 429);
-    private GameCamera camera;
+    private BirdEyeCamera camera;
     private readonly BaseGame game;
     private readonly GameWorld world;
     private const float Factor = 0.7f;
@@ -77,7 +77,7 @@ public class MiniMap : UIElement
     public MiniMap(BaseGame game, GameWorld world)
     {
         this.game = game;
-        camera = game.Camera as GameCamera;
+        camera = game.Camera;
         this.world = world;
     }
 
@@ -250,7 +250,7 @@ public class MiniMap : UIElement
     {
         if (camera == null)
         {
-            camera = game.Camera as GameCamera;
+            camera = game.Camera;
         }
 
         if (draging)
@@ -261,7 +261,7 @@ public class MiniMap : UIElement
                 RadiusFactor * DestinationRectangle.Width * RadiusFactor * DestinationRectangle.Width)
             {
                 Vector3 position = MapPointToWorldPositionNegativeAllowed(game.Input.MousePosition);
-                camera.FlyTo(position, true);
+                camera.SetTarget(position);
             }
             else
             {
@@ -292,7 +292,7 @@ public class MiniMap : UIElement
                 Vector3? position = MapToWorld(input.MousePosition);
                 if (position != null)
                 {
-                    camera.FlyTo(position.Value, true);
+                    camera.SetTarget(position.Value);
                     return EventResult.Handled;
                 }
             }

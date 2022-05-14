@@ -28,14 +28,14 @@ public class GameScreen : IScreen, IEventListener
     {
         this.activeObject = activeObject;
         paused = true;
-        (Game.Camera as GameCamera).Freezed = true;
+        Game.Camera.Freezed = true;
     }
 
     public void Resume()
     {
         paused = false;
         activeObject = null;
-        (Game.Camera as GameCamera).Freezed = false;
+        Game.Camera.Freezed = false;
     }
 
     public GameWorld World { get; private set; }
@@ -158,26 +158,11 @@ public class GameScreen : IScreen, IEventListener
         UI.Display.Add(pausePanel);
     }
 
-    private bool scrollingCamera;
-
     private void ResetCamera()
     {
-        var camera = new GameCamera(Game.Settings.CameraSettings, World);
-        camera.FlyTo(new Vector3(Player.LocalPlayer.SpawnPoint, 0), true);
+        var camera = new BirdEyeCamera();
+        camera.SetTarget(new Vector3(Player.LocalPlayer.SpawnPoint, 0));
         Game.Camera = camera;
-
-        camera.BeginMove += (sender, e) =>
-        {
-            Cursors.SetCursor(Cursors.Move);
-            scrollingCamera = true;
-        };
-        camera.EndMove += (sender, e) =>
-        {
-            scrollingCamera = false;
-            Cursors.SetCursor(Cursors.Default);
-        };
-        camera.BeginRotate += (sender, e) => Cursors.SetCursor(Cursors.Rotate);
-        camera.EndRotate += (sender, e) => Cursors.SetCursor(Cursors.Default);
     }
 
     private IEnumerable<PlayerInfo> CreateTestPlayerInfo()
@@ -263,13 +248,7 @@ public class GameScreen : IScreen, IEventListener
         postScreenRectangle.X = (Game.ScreenWidth - postScreenRectangle.Width) / 2;
         postScreenRectangle.Y = (Game.ScreenHeight - postScreenRectangle.Height) / 2;
 
-        Vector3? position = null;
-        if (Building.LastDestroyedBuilding != null)
-        {
-            position = Building.LastDestroyedBuilding.Position;
-        }
-
-        ((GameCamera)Game.Camera).Orbit(position, 0.00008f, 150, MathHelper.ToRadians(40));
+        ((BirdEyeCamera)Game.Camera).Freezed = true;
 
         Game.Input.Uncapture();
         postScreen = true;
@@ -291,7 +270,7 @@ public class GameScreen : IScreen, IEventListener
             return;
         }
 
-        UpdateCursorArrows();
+        Cursors.SetCursor(GetCursor());
 
         // Update UI first
         if (UI != null)
@@ -326,35 +305,28 @@ public class GameScreen : IScreen, IEventListener
         }
     }
 
-    private void UpdateCursorArrows()
+    private IntPtr GetCursor()
     {
-        if (scrollingCamera)
-        {
-            Point mouse = Game.Input.MousePosition;
-            var border = (int)Game.Settings.CameraSettings.ScrollAreaSize;
+        if (Spell.CurrentSpell is SpellAttack attack && attack.CastState == SpellCastState.Trigger)
+            return Cursors.TargetRed;
 
-            if (mouse.Y <= border)
-            {
-                Cursors.SetCursor(Cursors.Top);
-            }
-            else if (mouse.Y >= Game.ScreenHeight - border)
-            {
-                Cursors.SetCursor(Cursors.Bottom);
-            }
-            else if (mouse.X <= border)
-            {
-                Cursors.SetCursor(Cursors.Left);
-            }
-            else if (mouse.X >= Game.ScreenWidth - border)
-            {
-                Cursors.SetCursor(Cursors.Right);
-            }
-        }
+        if (Spell.CurrentSpell is SpellMove move && move.CastState == SpellCastState.Trigger)
+            return Cursors.TargetGreen;
+
+        return Game.Camera.ScrollState switch
+        {
+            BirdEyeCameraScrollState.N or BirdEyeCameraScrollState.NE or BirdEyeCameraScrollState.NW => Cursors.Top,
+            BirdEyeCameraScrollState.S or BirdEyeCameraScrollState.SE or BirdEyeCameraScrollState.SW => Cursors.Bottom,
+            BirdEyeCameraScrollState.W => Cursors.Left,
+            BirdEyeCameraScrollState.E => Cursors.Right,
+            _ => Cursors.Default,
+        };
     }
 
     public void Draw(GameTime gameTime)
     {
-        _worldRenderer.Draw(World, Game.ViewProjection, Game.Eye, Game.Facing, gameTime);
+        var matrics = new ViewMatrices(Game.Camera.View, Game.Camera.GetProjection(Game.GraphicsDevice.Viewport.Bounds));
+        _worldRenderer.Draw(World, matrics, gameTime);
 
         // Draw player info
         foreach (var player in Player.AllPlayers)
@@ -363,9 +335,9 @@ public class GameScreen : IScreen, IEventListener
         }
 
         // Force everything to be presented before UI is rendered
-        Game.Billboard.Present();
+        Game.Billboard.Present(matrics);
         Game.Graphics2D.Present();
-        ParticleSystem.Present();
+        ParticleSystem.Present(matrics);
 
         if (postScreen)
         {

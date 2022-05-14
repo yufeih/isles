@@ -226,7 +226,7 @@ public class Terrain : BaseLandscape
         }
     }
 
-    public void PresentSurface()
+    public void PresentSurface(in ViewMatrices matrices)
     {
         if (texturedSurfaces.Count <= 0)
         {
@@ -235,7 +235,7 @@ public class Terrain : BaseLandscape
 
         game.GraphicsDevice.SetRenderState(BlendState.NonPremultiplied, DepthStencilState.Default);
 
-        surfaceEffect.Parameters["WorldViewProjection"].SetValue(game.ViewProjection);
+        surfaceEffect.Parameters["WorldViewProjection"].SetValue(matrices.ViewProjection);
 
         surfaceEffect.CurrentTechnique.Passes[0].Apply();
 
@@ -401,7 +401,7 @@ public class Terrain : BaseLandscape
         waterIndices.SetData(indexData);
     }
 
-    public void UpdateWaterReflectionAndRefraction()
+    public void UpdateWaterReflectionAndRefraction(in ViewMatrices matrices)
     {
         graphics.PushRenderTarget(reflectionRenderTarget);
 
@@ -409,15 +409,15 @@ public class Terrain : BaseLandscape
 
         // Create a reflection view matrix
         var viewReflect = Matrix.Multiply(
-            Matrix.CreateReflection(new Plane(Vector3.UnitZ, 0)), game.View);
+            Matrix.CreateReflection(new Plane(Vector3.UnitZ, 0)), matrices.View);
 
-        DrawTerrain(viewReflect * game.Projection, true);
+        DrawTerrain(viewReflect * matrices.Projection, true);
 
         // Present the model manager to draw those models
-        game.ModelRenderer.Draw(viewReflect * game.Projection);
+        game.ModelRenderer.Draw(viewReflect * matrices.Projection);
 
         // Draw refraction onto the reflection texture
-        DrawTerrain(game.ViewProjection, false);
+        DrawTerrain(matrices.ViewProjection, false);
 
         graphics.PopRenderTarget();
 
@@ -425,7 +425,7 @@ public class Terrain : BaseLandscape
         waterReflection = reflectionRenderTarget;
     }
 
-    public void DrawWater(GameTime gameTime)
+    public void DrawWater(GameTime gameTime, in ViewMatrices matrices)
     {
         graphics.SetRenderState(BlendState.Opaque, DepthStencilState.DepthRead, RasterizerState.CullNone);
 
@@ -451,9 +451,9 @@ public class Terrain : BaseLandscape
         }
 
         WaterEffect.Parameters["DistortionTexture"].SetValue(waterDstortion);
-        WaterEffect.Parameters["ViewInverse"].SetValue(game.ViewInverse);
-        WaterEffect.Parameters["WorldViewProj"].SetValue(game.ViewProjection);
-        WaterEffect.Parameters["WorldView"].SetValue(game.View);
+        WaterEffect.Parameters["ViewInverse"].SetValue(matrices.ViewInverse);
+        WaterEffect.Parameters["WorldViewProj"].SetValue(matrices.ViewProjection);
+        WaterEffect.Parameters["WorldView"].SetValue(matrices.View);
         WaterEffect.Parameters["DisplacementScroll"].SetValue(MoveInCircle(gameTime, 0.01f));
 
         WaterEffect.CurrentTechnique.Passes[0].Apply();
@@ -483,9 +483,9 @@ public class Terrain : BaseLandscape
         DrawTerrain(viewProjection, technique);
     }
 
-    public void DrawTerrain(ShadowEffect shadowEffect)
+    public void DrawTerrain(ShadowEffect shadowEffect, in ViewMatrices matrices)
     {
-        DrawTerrain(game.ViewProjection, terrainEffect.Techniques["Default"]);
+        DrawTerrain(matrices.ViewProjection, terrainEffect.Techniques["Default"]);
 
         if (shadowEffect != null)
         {

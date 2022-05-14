@@ -26,11 +26,9 @@ public class BaseGame : Game, IEventListener
 
     public IScreen CurrentScreen { get; private set; }
 
-    public ICamera Camera { get; set; }
+    public BirdEyeCamera Camera { get; set; }
 
     public Matrix View => view;
-
-    public Matrix Projection => projection;
 
     public Matrix ViewProjection => viewProjection;
 
@@ -38,15 +36,9 @@ public class BaseGame : Game, IEventListener
 
     public Matrix ProjectionInverse => projectionInverse;
 
-    public Matrix ViewProjectionInverse => viewProjectionInverse;
-
-    public BoundingFrustum ViewFrustum { get; private set; }
-
     public Ray PickRay => pickRay;
 
     public Vector3 Eye => eye;
-
-    public Vector3 Facing => facing;
 
     public Settings Settings { get; set; }
 
@@ -145,11 +137,12 @@ public class BaseGame : Game, IEventListener
 
         Input.Update(gameTime);
 
-        if (Camera != null)
+        if (Camera != null && CurrentScreen is GameScreen gs)
         {
-            Camera.Update(gameTime);
+            var dt = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+            Camera.Update(gs.World.Landscape);
+            Camera.UpdateInput(dt, GraphicsDevice.Viewport.Bounds);
             UpdateMatrices();
-            UpdateFrustum();
             UpdatePickRay();
             UpdateAudioListener();
         }
@@ -161,11 +154,6 @@ public class BaseGame : Game, IEventListener
 
         Audios.Update(gameTime);
         base.Update(gameTime);
-    }
-
-    private void UpdateFrustum()
-    {
-        ViewFrustum = new BoundingFrustum(viewProjection);
     }
 
     private void UpdateAudioListener()
@@ -246,7 +234,7 @@ public class BaseGame : Game, IEventListener
         if (Camera != null)
         {
             view = Camera.View;
-            projection = Camera.Projection;
+            projection = Camera.GetProjection(Graphics.GraphicsDevice.Viewport.Bounds);
             viewProjection = view * projection;
             viewInverse = Matrix.Invert(view);
             projectionInverse = Matrix.Invert(projection);
@@ -277,8 +265,6 @@ public class BaseGame : Game, IEventListener
         Bloom?.BeginDraw();
         Graphics.GraphicsDevice.Clear(backgroundColor);
         CurrentScreen?.Draw(gameTime);
-        Billboard?.Present();
-        ParticleSystem.Present();
         Graphics2D.Present();
         Bloom?.EndDraw();
     }
@@ -290,10 +276,6 @@ public class BaseGame : Game, IEventListener
         {
             return EventResult.Handled;
         }
-
-        return Camera != null &&
-            Camera.HandleEvent(type, sender, tag) == EventResult.Handled
-            ? EventResult.Handled
-            : EventResult.Unhandled;
+        return EventResult.Unhandled;
     }
 }

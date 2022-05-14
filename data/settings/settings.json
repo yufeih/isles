@@ -20,20 +20,6 @@
   "IsFixedTimeStep": true,
   "ClipCursor": true,
   "MaxSearchStepsPerUpdate": 5000,
-  "TraceUnits": false,
   "Cheat": false,
-  "RevealMap": false,
-  "CameraSettings": {
-    "MinHeightAboveGround": 50,
-    "ScrollAreaSize": 2,
-    "WheelFactor": 0.425,
-    "Sensitivity": 1.5,
-    "Smoothness": 1.0,
-    "MaxRadius": 225,
-    "DefaultRadius": 180,
-    "MinSpeed": 0.04,
-    "MaxSpeed": 0.2,
-    "RotationFactorX": 0.0052359877559,
-    "RotationFactorY": 0.0104719755119
-  }
+  "RevealMap": false
 }

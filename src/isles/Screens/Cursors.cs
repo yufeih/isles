@@ -15,12 +15,16 @@ public static class Cursors
     public static IntPtr Bottom { get; } = LoadCursor("screen_bottom");
     public static IntPtr Left { get; } = LoadCursor("screen_left");
     public static IntPtr Right { get; } = LoadCursor("screen_right");
-    public static IntPtr Move { get; } = LoadCursor("screen_move");
-    public static IntPtr Rotate { get; } = LoadCursor("screen_rotate");
+
+    private static IntPtr s_cursor;
 
     public static void SetCursor(IntPtr cursor)
     {
-        SDL_SetCursor(cursor);
+        if (s_cursor != cursor)
+        {
+            s_cursor = cursor;
+            SDL_SetCursor(cursor);
+        }
     }
 
     private static unsafe IntPtr LoadCursor(string name)

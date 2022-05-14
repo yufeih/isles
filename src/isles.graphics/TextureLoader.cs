@@ -10,6 +10,8 @@ using Svg.Skia;
 
 namespace Isles.Graphics;
 
+#nullable disable
+
 public class TextureLoader
 {
     private readonly GraphicsDevice _graphicsDevice;

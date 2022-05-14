@@ -315,12 +315,7 @@ public sealed class Move : IDisposable
             return;
 
         var targetRotation = MathF.Atan2(m._velocity.Y, m._velocity.X);
-        var offset = targetRotation - m._rotation;
-        if (offset > MathF.PI)
-            offset -= 2 * MathF.PI;
-        if (offset <= -MathF.PI)
-            offset += 2 * MathF.PI;
-
+        var offset = MathFHelper.NormalizeRotation(targetRotation - m._rotation);
         var delta = m.RotationSpeed * dt;
         if (Math.Abs(offset) <= delta)
             m._rotation = targetRotation;

@@ -3,6 +3,39 @@
 
 namespace Isles;
 
+public readonly struct ViewMatrices
+{
+    public readonly Matrix View;
+    public readonly Matrix Projection;
+    public readonly Matrix ViewProjection;
+    public readonly Matrix ViewProjectionInverse;
+    public readonly Matrix ViewInverse;
+    public readonly Matrix ProjectionInverse;
+    public readonly Vector3 Eye;
+    public readonly Vector3 Facing;
+
+    public ViewMatrices(in Matrix view, in Matrix projection)
+    {
+        View = view;
+        Projection = projection;
+        ViewProjection = view * Projection;
+        ViewInverse = Matrix.Invert(view);
+        ProjectionInverse = Matrix.Invert(Projection);
+
+        // Guess this is more accurate
+        ViewProjectionInverse = ProjectionInverse * ViewInverse;
+
+        // Update eye / facing / right
+        Eye.X = ViewInverse.M41;
+        Eye.Y = ViewInverse.M42;
+        Eye.Z = ViewInverse.M43;
+
+        Facing.X = -view.M13;
+        Facing.Y = -view.M23;
+        Facing.Z = -view.M33;
+    }
+}
+
 public class WorldRenderer
 {
     private readonly Input _input;
@@ -25,10 +58,10 @@ public class WorldRenderer
         _modelPicker = new(graphics, modelRenderer);
     }
 
-    public void Draw(GameWorld world, Matrix viewProjection, Vector3 eye, Vector3 facing, GameTime gameTime)
+    public void Draw(GameWorld world, in ViewMatrices matrices, GameTime gameTime)
     {
         var objectMap = _modelPicker.DrawObjectMap(
-            viewProjection,
+            matrices.ViewProjection,
             world.WorldObjects.OfType<Entity>().Where(entity => entity.IsPickable),
             entity => entity.GameModel);
 
@@ -43,13 +76,13 @@ public class WorldRenderer
 
         if (_settings.ReflectionEnabled)
         {
-            world.Landscape.UpdateWaterReflectionAndRefraction();
+            world.Landscape.UpdateWaterReflectionAndRefraction(matrices);
         }
 
         // Generate shadow map
         if (_shadow != null)
         {
-            _shadow.Begin(eye, facing);
+            _shadow.Begin(matrices.Eye, matrices.Facing);
             _modelRenderer.DrawShadowMap(_shadow);
             _shadow.End();
         }
@@ -57,22 +90,22 @@ public class WorldRenderer
         // Draw spell
         Spell.CurrentSpell?.Draw(gameTime);
 
-        world.Landscape.DrawWater(gameTime);
+        world.Landscape.DrawWater(gameTime, matrices);
 
         // Draw shadow receivers with the shadow map
-        world.Landscape.DrawTerrain(_shadow);
+        world.Landscape.DrawTerrain(_shadow, matrices);
 
         // Present surface
-        world.Landscape.PresentSurface();
+        world.Landscape.PresentSurface(matrices);
 
         // FIXME: There are some weired things when models are drawed after
         // drawing the terrain... Annoying...
-        _modelRenderer.Draw(viewProjection, true, false);
+        _modelRenderer.Draw(matrices.ViewProjection, true, false);
 
         // TODO: Draw particles with ZEnable = true, ZWriteEnable = false
-        ParticleSystem.Present();
+        ParticleSystem.Present(matrices);
 
-        _modelRenderer.Draw(viewProjection, false, true);
+        _modelRenderer.Draw(matrices.ViewProjection, false, true);
     }
 
     private void Draw(BaseEntity baseEntity, GameTime gameTime)

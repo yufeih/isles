@@ -232,7 +232,6 @@ public class ParticleSystem
     // Shared random number generator.
     private static readonly Random random = new();
 
-    private static BaseGame baseGame;
     private static Dictionary<string, ParticleSystem> ParticleSystems;
 
     /// <summary>
@@ -240,8 +239,6 @@ public class ParticleSystem
     /// </summary>
     public static void LoadContent(BaseGame game)
     {
-        baseGame = game;
-
         var particleSettings = JsonSerializer.Deserialize<Dictionary<string, ParticleSettings>>(
                 File.ReadAllText("data/settings/particles.json"),
                 new JsonSerializerOptions { IncludeFields = true });
@@ -261,11 +258,11 @@ public class ParticleSystem
     /// Flush all the particle system effects onto the screen.
     /// </summary>
     /// <param name="gameTime"></param>
-    public static void Present()
+    public static void Present(in ViewMatrices matrices)
     {
         foreach (ParticleSystem ps in ParticleSystems.Values)
         {
-            ps.SetCamera(baseGame.View, baseGame.Projection);
+            ps.SetCamera(matrices.View, matrices.Projection);
             ps.Draw();
         }
     }

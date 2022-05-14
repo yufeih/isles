@@ -67,12 +67,20 @@ public struct Icon
     }
 }
 
+public enum SpellCastState
+{
+    None,
+    Trigger,
+}
+
 /// <summary>
 /// Base class for all game spells.
 /// A new spell instance is created whenever a spell is been casted.
 /// </summary>
 public abstract class Spell : IEventListener
 {
+    public SpellCastState CastState { get; private set; } 
+
     /// <summary>
     /// Cast a spell.
     /// </summary>
@@ -80,6 +88,7 @@ public abstract class Spell : IEventListener
     {
         if (CurrentSpell == null && spell.Trigger())
         {
+            spell.CastState = SpellCastState.Trigger;
             CurrentSpell = spell;
         }
     }
@@ -89,6 +98,8 @@ public abstract class Spell : IEventListener
     /// </summary>
     public static void EndSpell()
     {
+        if (CurrentSpell != null)
+            CurrentSpell.CastState = SpellCastState.None;
         CurrentSpell = null;
     }
 
@@ -1255,7 +1266,6 @@ public class SpellMove : Spell
     public override bool Trigger()
     {
         Audios.Play("OK");
-        Cursors.SetCursor(Cursors.TargetGreen);
         return true;
     }
 
