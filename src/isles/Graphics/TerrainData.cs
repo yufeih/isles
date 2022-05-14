@@ -10,7 +10,6 @@ public class TerrainData
     public float Height { get; init; }
     public float BaseHeight { get; init; }
     public string Heightmap { get; init; }
-    public float EarthRadius { get; init; }
     public string WaterTexture { get; init; }
     public string WaterBumpTexture { get; init; }
     public Layer[] Layers { get; init; }

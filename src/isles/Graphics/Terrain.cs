@@ -18,14 +18,6 @@ public class Terrain : BaseLandscape
     public Texture2D FogTexture { get; set; }
 
     /// <summary>
-    /// The water is part of a spherical surface to make it look vast.
-    /// But during rendering, e.g., for computing reflection and refraction,
-    /// the water is treated as a flat plane with the height of zero.
-    /// This value determines the shape of the surface.
-    /// </summary>
-    private float earthRadius;
-
-    /// <summary>
     /// A static texture applied to the water surface.
     /// </summary>
     private Texture waterTexture;
@@ -59,7 +51,6 @@ public class Terrain : BaseLandscape
     {
         base.Load(data, textureLoader);
 
-        earthRadius = data.EarthRadius;
         waterTexture = textureLoader.LoadTexture(data.WaterTexture);
         waterDstortion = textureLoader.LoadTexture(data.WaterBumpTexture);
 
@@ -341,9 +332,6 @@ public class Terrain : BaseLandscape
         var vertexData = new VertexPositionTexture[waterVertexCount];
 
         // Water height is zero at the 4 corners of the terrain quad
-        var highest = earthRadius - (float)Math.Sqrt(
-            earthRadius * earthRadius - Size.X * Size.X / 4);
-
         var waterSize = Math.Max(Size.X, Size.Y) * 2;
         var cellSize = waterSize / CellCount;
 
@@ -358,14 +346,8 @@ public class Terrain : BaseLandscape
                 pos.X = (Size.X - waterSize) / 2 + cellSize * x;
                 pos.Y = (Size.Y - waterSize) / 2 + cellSize * y;
 
-                var len = Vector2.Subtract(pos, center).Length();
-
                 vertexData[i].Position.X = pos.X;
                 vertexData[i].Position.Y = pos.Y;
-
-                // Make the water a sphere surface
-                vertexData[i].Position.Z = highest - earthRadius +
-                        (float)Math.Sqrt(earthRadius * earthRadius - len * len);
 
                 vertexData[i].TextureCoordinate.X = 1.0f * x * TextureRepeat / CellCount;
                 vertexData[i].TextureCoordinate.Y = 1.0f * y * TextureRepeat / CellCount;

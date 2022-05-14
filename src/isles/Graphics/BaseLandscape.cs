@@ -5,13 +5,13 @@ namespace Isles.Graphics;
 
 public abstract class BaseLandscape : ILandscape, ITerrain
 {
-    public struct Layer
+    protected struct Layer
     {
         public Texture2D ColorTexture;
         public Texture2D AlphaTexture;
     }
 
-    public class Patch
+    protected class Patch
     {
         private BoundingBox boundingBox;
         private readonly BaseLandscape landscape;
@@ -363,37 +363,37 @@ public abstract class BaseLandscape : ILandscape, ITerrain
     /// <summary>
     /// Gets the heightfield data of the landscape.
     /// </summary>
-    public float[,] HeightField { get; private set; }
+    protected float[,] HeightField { get; private set; }
 
     /// <summary>
     /// Gets the number of patches on the x axis.
     /// </summary>
-    public int PatchCountOnXAxis { get; private set; }
+    protected int PatchCountOnXAxis { get; private set; }
 
     /// <summary>
     /// Gets the number of patches on the y axis.
     /// </summary>
-    public int PatchCountOnYAxis { get; private set; }
+    protected int PatchCountOnYAxis { get; private set; }
 
     /// <summary>
     /// All terrain layers.
     /// </summary>
-    public List<Layer> Layers { get; private set; } = new();
+    protected List<Layer> Layers { get; private set; } = new();
 
     /// <summary>
     /// Gets terrain patches.
     /// </summary>
-    public List<Patch> Patches { get; private set; }
+    protected List<Patch> Patches { get; private set; }
 
     /// <summary>
     /// Gets the width of grid.
     /// </summary>
-    public int GridCountOnXAxis { get; private set; }
+    protected int GridCountOnXAxis { get; private set; }
 
     /// <summary>
     /// Gets the height of grid.
     /// </summary>
-    public int GridCountOnYAxis { get; private set; }
+    protected int GridCountOnYAxis { get; private set; }
 
     public virtual void Load(TerrainData data, TextureLoader textureLoader)
     {
@@ -472,34 +472,12 @@ public abstract class BaseLandscape : ILandscape, ITerrain
         graphics = game.GraphicsDevice;
     }
 
-    public Patch GetPatch(int x, int y)
+    protected Patch GetPatch(int x, int y)
     {
         return Patches[y * PatchCountOnXAxis + x];
     }
 
-    public Vector2 GridToPosition(int x, int y)
-    {
-        return new Vector2(
-            x * size.X / (GridCountOnXAxis - 1),
-            y * size.Y / (GridCountOnYAxis - 1));
-    }
-
-    public Point PositionToGrid(float x, float y)
-    {
-        return new Point(
-            (int)(x * (GridCountOnXAxis - 1) / size.X),
-            (int)(y * (GridCountOnYAxis - 1) / size.Y));
-    }
-
     public Point GridCount => new(GridCountOnXAxis, GridCountOnYAxis);
-
-    /// <summary>
-    /// Gets the landscape size.Z of a given point on the heightfield.
-    /// </summary>
-    public float GetGridHeight(int x, int y)
-    {
-        return HeightField[x, y];
-    }
 
     /// <summary>
     /// Gets whether the point is walkable (E.g., above water).
@@ -748,10 +726,6 @@ public abstract class BaseLandscape : ILandscape, ITerrain
         return null;
     }
 
-    /// <summary>
-    /// Update landscape every frame.
-    /// </summary>
-    /// <param name="gameTime"></param>
     public virtual void Update(GameTime gameTime)
     {
         // Set picked to null
