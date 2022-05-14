@@ -615,7 +615,6 @@ public class LocalPlayer : Player
     /// Standard stuff.
     /// </summary>
     private readonly BaseGame game = BaseGame.Singleton;
-    private GameCamera camera;
     private GameWorld world;
 
     /// <summary>
@@ -645,7 +644,6 @@ public class LocalPlayer : Player
     private Point multiSelectStart;
     private bool keyDoublePressed;
     private double doubleClickTime;
-    private bool traceCamera;
 
     /// <summary>
     /// Spells.
@@ -667,7 +665,6 @@ public class LocalPlayer : Player
     public override void Start(GameWorld world)
     {
         this.world = world ?? throw new ArgumentNullException();
-        camera = game.Camera;
         Attack = new SpellAttack();
         Move = new SpellMove();
 
@@ -1098,21 +1095,6 @@ public class LocalPlayer : Player
             SelectionDirty = true;
         }
 
-        // Camera tracing
-        if (camera != null)
-        {
-            // Stop tracing units if camera is interrupted by user
-            if (camera.MovedByUser)
-            {
-                traceCamera = false;
-            }
-
-            if (traceCamera)
-            {
-                camera.FlyTo(ProjectToScreenCenter(GetCenter(Selected)), false);
-            }
-        }
-
         // Update attacker
         const double DisappearTime = 4;
         const float RevealRadius = 40;
@@ -1177,7 +1159,7 @@ public class LocalPlayer : Player
         if (type == EventType.KeyDown && tag is Keys? && (tag as Keys?).Value == Keys.Space)
         {
             // Press space to back to spawnpoint
-            if (game.Camera is GameCamera)
+            if (game.Camera is Camera)
             {
                 game.Camera.FlyTo(new Vector3(SpawnPoint, 0), false);
             }
@@ -1201,7 +1183,7 @@ public class LocalPlayer : Player
         // Left click to select an entity
         if (type == EventType.LeftButtonDown && !multiSelecting)
         {
-            if (game.Camera is GameCamera)
+            if (game.Camera is Camera)
             {
                 game.Camera.Freezed = true;
             }
@@ -1215,7 +1197,7 @@ public class LocalPlayer : Player
         }
         else if (type == EventType.LeftButtonUp && multiSelecting)
         {
-            if (game.Camera is GameCamera)
+            if (game.Camera is Camera)
             {
                 game.Camera.Freezed = false;
             }
@@ -1302,7 +1284,7 @@ public class LocalPlayer : Player
                         if ((currentSeconds - doubleClickTime) < Input.DoubleClickInterval)
                         {
                             keyDoublePressed = false;
-                            if (game.Camera is GameCamera && teams[value].Count > 0)
+                            if (game.Camera is Camera && teams[value].Count > 0)
                             {
                                 game.Camera.FlyTo(
                                    ProjectToScreenCenter(GetTeamPosition(teams[value])), false);
@@ -1491,13 +1473,6 @@ public class LocalPlayer : Player
             {
                 pair.Key.PerformAction(new Vector3(pair.Value, 0), queueAction);
             }
-
-            // Let the camera follow units
-            if (camera != null && game.Settings.TraceUnits)
-            {
-                traceCamera = true;
-                camera.MovedByUser = false;
-            }
         }
         else
         {
@@ -1526,13 +1501,6 @@ public class LocalPlayer : Player
                 (pair.Key as Charactor).AttackTo(
                     new Vector3(pair.Value, 0), game.Input.IsShiftPressed);
             }
-
-            // Let the camera follow units
-            if (camera != null && game.Settings.TraceUnits)
-            {
-                traceCamera = true;
-                camera.MovedByUser = false;
-            }
         }
     }
 
@@ -1559,13 +1527,6 @@ public class LocalPlayer : Player
             {
                 (pair.Key as Charactor).MoveTo(
                     new Vector3(pair.Value, 0), game.Input.IsShiftPressed);
-            }
-
-            // Let the camera follow units
-            if (camera != null && game.Settings.TraceUnits)
-            {
-                traceCamera = true;
-                camera.MovedByUser = false;
             }
         }
     }

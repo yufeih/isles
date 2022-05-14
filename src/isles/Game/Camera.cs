@@ -3,12 +3,12 @@
 
 namespace Isles;
 
-public class GameCameraSettings
+public class CameraSettings
 {
     /// <summary>
     /// Minmun camera height above ground.
     /// </summary>
-    public float MinHeightAboveGround { get; set; } = 10.0f;
+    public float MinRadius { get; set; } = 10.0f;
 
     /// <summary>
     /// Max camera arcball radius.
@@ -49,76 +49,46 @@ public class GameCameraSettings
     public float MaxSpeed { get; set; } = 1.0f;
 }
 
-/// <summary>
-/// Game camera class.
-/// Coordinate system in Xna is right-handed!
-/// Z axis is up by default, since we are using a bird-eye view.
-/// </summary>
-public class GameCamera : IEventListener
+public enum CameraMoveState
 {
-    protected Vector3 eye = new(0, -100, 100);
-    protected Vector3 lookAt = Vector3.Zero;
-    protected Vector3 up = Vector3.UnitZ;
+    None,
+    Move,
+    Rotate,
+    N, NE, E, SE, S, SW, W, NW,
+    Freeze,
+}
 
-    protected Matrix view;
-    protected Matrix projection;
+public class Camera : IEventListener
+{
+    private Vector3 eye = new(0, -100, 100);
+    private Vector3 lookAt = Vector3.Zero;
+    private Vector3 up = Vector3.UnitZ;
 
-    protected GraphicsDevice device;
+    private Matrix view;
 
-    protected float nearPlane = 1;
-    protected float farPlane = 5000;
-    protected float fieldOfView = MathHelper.PiOver4;
-
-    /// <summary>
-    /// Gets camera view matrix. Can't be set due to consistency.
-    /// </summary>
     public Matrix View => view;
 
-    /// <summary>
-    /// Gets camera projection matrix.
-    /// </summary>
-    public Matrix Projection => projection;
-
-    protected void ResetProjection(object sender, EventArgs e)
+    public Matrix GetProjection(Viewport viewport)
     {
-        projection = Matrix.CreatePerspectiveFieldOfView(
-            MathHelper.PiOver4,
-            (float)device.Viewport.Width / device.Viewport.Height,
-            nearPlane, farPlane);
+        return Matrix.CreatePerspectiveFieldOfView(
+            MathHelper.PiOver4, (float)viewport.Width / viewport.Height, 1, 5000);
     }
 
-    public GameCameraSettings Settings { get; set; }
+    public CameraSettings Settings { get; set; }
 
     private readonly GameWorld world;
     private const float BorderSize = 100;
 
     private readonly BaseGame game = BaseGame.Singleton;
 
-    /// <summary>
-    /// Radius of the camera arcball.
-    /// </summary>
     private float radius = 100.0f;
-    private float radiusScaler = 100.0f;
-    private float radiusTarget = 100.0f;
-    private const float DefaultRadius = 180.0f;
 
-    /// <summary>
-    /// Roll of the camera arcball. (Rotate around x in view space).
-    /// </summary>
     private float roll = DefaultRoll;
-    private float rollTarget = DefaultRoll;
     private const float DefaultRoll = 1.02173047639f;
 
-    /// <summary>
-    /// Pitch of the camera arcball. (Rotate around z in world space).
-    /// </summary>
     private float pitch = -MathHelper.PiOver2;
-    private float pitchTarget = -MathHelper.PiOver2;
     private const float DefaultPitch = -MathHelper.PiOver2;
 
-    /// <summary>
-    /// Height of the camera.
-    /// </summary>
     private float eyeZ;
     private float eyeZTarget;
     private Vector3 lookAtTarget;
@@ -139,10 +109,7 @@ public class GameCamera : IEventListener
     /// </summary>
     public bool Freezed { get; set; }
 
-    /// <summary>
-    /// Gets or sets whether this camera is been moved by user.
-    /// </summary>
-    public bool MovedByUser { get; set; }
+    public CameraMoveState MoveState { get; private set; }
 
     /// <summary>
     /// Events
@@ -157,21 +124,14 @@ public class GameCamera : IEventListener
 
     private bool moving;
 
-    public GameCamera(GameCameraSettings settings, GameWorld world)
+    public Camera(CameraSettings settings, GameWorld world)
     {
         this.world = world;
-
-        device = BaseGame.Singleton.GraphicsDevice;
-        BaseGame.Singleton.GraphicsDevice.DeviceReset += ResetProjection;
         view = Matrix.CreateLookAt(eye, lookAt, up);
-        ResetProjection(null, EventArgs.Empty);
 
         Settings = settings;
 
-        radius = radiusScaler = radiusTarget = settings.DefaultRadius;
-
-        // Apply changes
-        ResetProjection(null, EventArgs.Empty);
+        radius = settings.DefaultRadius;
 
         // Center camera
         FlyTo(new Vector3(
@@ -186,7 +146,6 @@ public class GameCamera : IEventListener
 
         if (teleport)
         {
-            MovedByUser = true;
             lookAtTarget = lookAt = position;
         }
         else
@@ -210,17 +169,19 @@ public class GameCamera : IEventListener
     public void Update(GameTime gameTime)
     {
         // Apply global camera sensitivity
-        var elapsedTime = Settings.Sensitivity *
-            (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+        var elapsedTime = Settings.Sensitivity * (float)gameTime.ElapsedGameTime.TotalMilliseconds;
         var smoother = elapsedTime * 0.005f * Settings.Smoothness;
         if (smoother > 1)
         {
             smoother = 1;
         }
 
-        UpdateLookAt(elapsedTime, smoother);
-        UpdateViewDistance(elapsedTime, smoother);
-        UpdateOrientation(elapsedTime, smoother);
+        if (!Freezed)
+        {
+            UpdateLookAt(elapsedTime);
+            UpdateViewDistance(elapsedTime);
+            UpdateOrientation();
+        }
         UpdateEye(smoother);
 
         Matrix.CreateLookAt(ref eye, ref lookAt, ref up, out view);
@@ -238,50 +199,23 @@ public class GameCamera : IEventListener
         eye = lookAt + direction;
 
         // Avoid collision with heightmap
-        eyeZTarget = world.Landscape.GetHeight(eye.X, eye.Y) + Settings.MinHeightAboveGround;
+        eyeZTarget = world.Landscape.GetHeight(eye.X, eye.Y) + Settings.MinRadius;
         eyeZTarget += (Settings.MaxRadius - eyeZTarget) * eye.Z / Settings.MaxRadius;
 
         eyeZ += (eyeZTarget - eyeZ) * smoother;
         eye.Z = eyeZ;
     }
 
-    /// <summary>
-    /// Adjust view distance (radius) using mouse wheel or 'PgUp', 'PgDown' button.
-    /// </summary>
-    private void UpdateViewDistance(float elapsedTime, float smoother)
+    private void UpdateViewDistance(float elapsedTime)
     {
         if (!Freezed)
         {
-            radiusScaler -= game.Input.MouseWheelDelta * Settings.WheelFactor;
-
-            if (game.Input.Keyboard.IsKeyDown(Keys.PageUp))
-            {
-                radiusScaler += 0.5f * elapsedTime;
-            }
-            else if (game.Input.Keyboard.IsKeyDown(Keys.PageDown))
-            {
-                radiusScaler -= 0.5f * elapsedTime;
-            }
-
-            radiusScaler = MathHelper.Clamp(
-                radiusScaler, Settings.MinHeightAboveGround, Settings.MaxRadius);
-
-            radiusTarget = (float)(Settings.MaxRadius *
-                (Math.Exp(radiusScaler / Settings.MaxRadius) - 1) / (Math.E - 1));
-
-            radiusTarget = MathHelper.Clamp(
-                radiusTarget, Settings.MinHeightAboveGround, Settings.MaxRadius);
+            radius -= game.Input.MouseWheelDelta * Settings.WheelFactor;
+            radius = MathHelper.Clamp(radius, Settings.MinRadius, Settings.MaxRadius);
         }
-
-        // Smooth radius
-        radius += (radiusTarget - radius) * smoother;
     }
 
-    /// <summary>
-    /// Update the position of camera lookat when the cursor enters the
-    /// borders of the screen.
-    /// </summary>
-    private void UpdateLookAt(float elapsedTime, float smoother)
+    private void UpdateLookAt(float elapsedTime)
     {
         float xDelta = 0;
         float yDelta = 0;
@@ -336,8 +270,6 @@ public class GameCamera : IEventListener
         // Update look at position
         if (xDelta != 0 || yDelta != 0)
         {
-            MovedByUser = true;
-
             if (!moving)
             {
                 moving = true;
@@ -355,7 +287,7 @@ public class GameCamera : IEventListener
         }
 
         // Smooth look at position
-        lookAt += (lookAtTarget - lookAt) * smoother / 2;
+        lookAt = lookAtTarget;
     }
 
     private Vector3 RestrictToBorder(Vector3 v)
@@ -385,59 +317,28 @@ public class GameCamera : IEventListener
     private const float RotationFactorX = 0.0052359877559f;
     private const float RotationFactorY = 0.0104719755119f;
 
-    /// <summary>
-    /// Adjust the orientation of the camera using middle button or arrow keys.
-    /// Simulate middle button by pressing left and right button at the same time.
-    /// </summary>
-    private void UpdateOrientation(float elapsedTime, float smoother)
+    private void UpdateOrientation()
     {
         // Adjusting view
         if (dragging && game.Input.Mouse.MiddleButton == ButtonState.Pressed)
         {
-            pitchTarget = startPitch +
-                (game.Input.MousePosition.X - startMousePosition.X) * RotationFactorX;
-            rollTarget = startRoll -
-                (game.Input.MousePosition.Y - startMousePosition.Y) * RotationFactorY;
-        }
-
-        if (!Freezed)
-        {
-            // Adjust roll/pitch using arrow keys
-            if (game.Input.Keyboard.IsKeyDown(Keys.Left))
-            {
-                pitchTarget -= 0.4f * RotationFactorX * elapsedTime;
-            }
-            else if (game.Input.Keyboard.IsKeyDown(Keys.Right))
-            {
-                pitchTarget += 0.4f * RotationFactorX * elapsedTime;
-            }
-
-            if (game.Input.Keyboard.IsKeyDown(Keys.Up))
-            {
-                rollTarget += 0.2f * RotationFactorY * elapsedTime;
-            }
-            else if (game.Input.Keyboard.IsKeyDown(Keys.Down))
-            {
-                rollTarget -= 0.2f * RotationFactorY * elapsedTime;
-            }
+            pitch = startPitch + (game.Input.MousePosition.X - startMousePosition.X) * RotationFactorX;
+            roll = startRoll - (game.Input.MousePosition.Y - startMousePosition.Y) * RotationFactorY;
         }
 
         // Restrict roll
-        if (rollTarget < minRoll)
+        if (roll < minRoll)
         {
-            rollTarget = minRoll;
+            roll = minRoll;
         }
-        else if (rollTarget > maxRoll)
+        else if (roll > maxRoll)
         {
-            rollTarget = maxRoll;
+            roll = maxRoll;
         }
-
-        // Smooth pitch and roll
-        roll += (rollTarget - roll) * smoother;
 
         // Orbit around the point
         const float PiPi = 2 * MathHelper.Pi;
-        var offset = pitchTarget - pitch;
+        var offset = pitch - pitch;
         while (offset > MathHelper.Pi)
         {
             offset -= PiPi;
@@ -448,7 +349,7 @@ public class GameCamera : IEventListener
             offset += PiPi;
         }
 
-        pitch += offset * smoother;
+        pitch += offset;
     }
 
     public EventResult HandleEvent(EventType type, object sender, object tag)
@@ -481,9 +382,9 @@ public class GameCamera : IEventListener
         // Press space to return to normal view
         if (!Freezed && type == EventType.KeyDown && (tag as Keys?).Value == Keys.Back)
         {
-            rollTarget = DefaultRoll;
-            radiusScaler = radiusTarget = DefaultRadius;
-            pitchTarget = DefaultPitch;
+            roll = DefaultRoll;
+            radius = Settings.DefaultRadius;
+            pitch = DefaultPitch;
         }
 
         // Pump the event down to other listener

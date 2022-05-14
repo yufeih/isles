@@ -162,7 +162,7 @@ public class GameScreen : IScreen, IEventListener
 
     private void ResetCamera()
     {
-        var camera = new GameCamera(Game.Settings.CameraSettings, World);
+        var camera = new Camera(Game.Settings.CameraSettings, World);
         camera.FlyTo(new Vector3(Player.LocalPlayer.SpawnPoint, 0), true);
         Game.Camera = camera;
 
@@ -263,7 +263,7 @@ public class GameScreen : IScreen, IEventListener
         postScreenRectangle.X = (Game.ScreenWidth - postScreenRectangle.Width) / 2;
         postScreenRectangle.Y = (Game.ScreenHeight - postScreenRectangle.Height) / 2;
 
-        ((GameCamera)Game.Camera).Freezed = true;
+        ((Camera)Game.Camera).Freezed = true;
 
         Game.Input.Uncapture();
         postScreen = true;

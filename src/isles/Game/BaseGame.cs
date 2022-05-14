@@ -26,7 +26,7 @@ public class BaseGame : Game, IEventListener
 
     public IScreen CurrentScreen { get; private set; }
 
-    public GameCamera Camera { get; set; }
+    public Camera Camera { get; set; }
 
     public Matrix View => view;
 
@@ -246,7 +246,7 @@ public class BaseGame : Game, IEventListener
         if (Camera != null)
         {
             view = Camera.View;
-            projection = Camera.Projection;
+            projection = Camera.GetProjection(Graphics.GraphicsDevice.Viewport);
             viewProjection = view * projection;
             viewInverse = Matrix.Invert(view);
             projectionInverse = Matrix.Invert(projection);

@@ -11,9 +11,8 @@ public class Settings
     public bool IsMouseVisible { get; set; }
     public bool IsFixedTimeStep { get; set; } = true;
     public bool RevealMap { get; set; }
-    public bool TraceUnits { get; set; }
     public bool Cheat { get; set; }
-    public GameCameraSettings CameraSettings { get; set; } = new();
+    public CameraSettings CameraSettings { get; set; } = new();
 
     public int ScreenWidth { get; set; } = 960;
     public int ScreenHeight { get; set; } = 600;
