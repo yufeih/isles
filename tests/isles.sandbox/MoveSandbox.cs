@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Isles.Graphics;
+using static ImGuiNET.ImGui;
 
 Directory.SetCurrentDirectory(AppContext.BaseDirectory);
 
@@ -21,6 +22,7 @@ class MoveSandbox : Game
 
     private TextureLoader _textureLoader;
     private SpriteBatch _spriteBatch;
+    private ImGuiRenderer _imguiRenderer;
 
     public MoveSandbox()
     {
@@ -61,6 +63,7 @@ class MoveSandbox : Game
     {
         _textureLoader = new(GraphicsDevice);
         _spriteBatch = new(GraphicsDevice);
+        _imguiRenderer = new(GraphicsDevice);
     }
 
     protected override void Update(GameTime gameTime)
@@ -68,6 +71,8 @@ class MoveSandbox : Game
         UpdateSelection();
 
         _move.Update((float)gameTime.ElapsedGameTime.TotalSeconds, _units);
+
+        _imguiRenderer.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
     }
 
     private void UpdateSelection()
@@ -115,6 +120,8 @@ class MoveSandbox : Game
     {
         GraphicsDevice.Clear(Color.White);
 
+        _imguiRenderer.Begin();
+
         var arrow = _textureLoader.LoadTexture("data/arrow.svg");
         var selection = _textureLoader.LoadTexture("data/selection.svg");
 
@@ -158,6 +165,14 @@ class MoveSandbox : Game
         }
 
         _spriteBatch.End();
+
+        DrawUI();
+        _imguiRenderer.End();
+    }
+
+    private void DrawUI()
+    {
+        Text("Oblivate");
     }
 
     private Rectangle GetSelectionRectangle()
