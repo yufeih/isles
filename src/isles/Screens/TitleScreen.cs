@@ -200,7 +200,6 @@ public class TitleScreen : IScreen
         expectedHighlightPos = highLightMoveTo;
 
         Audios.Counter = 0;
-        Cursors.SetCursor(Cursors.MenuDefault);
         Audios.PlayMusic("Menu", true, 0, 5);
     }
 
@@ -302,6 +301,8 @@ public class TitleScreen : IScreen
     /// <param name="gameTime"></param>
     public void Update(GameTime gameTime)
     {
+        Cursors.SetCursor(Cursors.MenuDefault);
+
         expectedHighlightPos += (highLightMoveTo - expectedHighlightPos)
                                 * 5.5 * gameTime.ElapsedGameTime.TotalSeconds;
         highLight.X = (int)expectedHighlightPos;

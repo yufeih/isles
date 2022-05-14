@@ -261,7 +261,7 @@ public class MiniMap : UIElement
                 RadiusFactor * DestinationRectangle.Width * RadiusFactor * DestinationRectangle.Width)
             {
                 Vector3 position = MapPointToWorldPositionNegativeAllowed(game.Input.MousePosition);
-                camera.FlyTo(position);
+                camera.SetTarget(position);
             }
             else
             {
@@ -292,7 +292,7 @@ public class MiniMap : UIElement
                 Vector3? position = MapToWorld(input.MousePosition);
                 if (position != null)
                 {
-                    camera.FlyTo(position.Value);
+                    camera.SetTarget(position.Value);
                     return EventResult.Handled;
                 }
             }

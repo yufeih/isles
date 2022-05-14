@@ -147,7 +147,9 @@ public class BaseGame : Game, IEventListener
 
         if (Camera != null && CurrentScreen is GameScreen gs)
         {
-            Camera.Update(gameTime, gs.World.Landscape);
+            var dt = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+            Camera.Update(gs.World.Landscape);
+            Camera.UpdateInput(dt, GraphicsDevice.Viewport.Bounds);
             UpdateMatrices();
             UpdateFrustum();
             UpdatePickRay();
@@ -246,7 +248,7 @@ public class BaseGame : Game, IEventListener
         if (Camera != null)
         {
             view = Camera.View;
-            projection = Camera.GetProjection(Graphics.GraphicsDevice.Viewport);
+            projection = Camera.GetProjection(Graphics.GraphicsDevice.Viewport.Bounds);
             viewProjection = view * projection;
             viewInverse = Matrix.Invert(view);
             projectionInverse = Matrix.Invert(projection);
@@ -290,10 +292,6 @@ public class BaseGame : Game, IEventListener
         {
             return EventResult.Handled;
         }
-
-        return Camera != null &&
-            Camera.HandleEvent(type, sender, tag) == EventResult.Handled
-            ? EventResult.Handled
-            : EventResult.Unhandled;
+        return EventResult.Unhandled;
     }
 }

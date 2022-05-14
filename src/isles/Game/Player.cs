@@ -1159,7 +1159,7 @@ public class LocalPlayer : Player
         if (type == EventType.KeyDown && tag is Keys? && (tag as Keys?).Value == Keys.Space)
         {
             // Press space to back to spawnpoint
-            game.Camera.FlyTo(new Vector3(SpawnPoint, 0));
+            game.Camera.SetTarget(new Vector3(SpawnPoint, 0));
 
             return EventResult.Handled;
         }
@@ -1283,7 +1283,7 @@ public class LocalPlayer : Player
                             keyDoublePressed = false;
                             if (teams[value].Count > 0)
                             {
-                                game.Camera.FlyTo(ProjectToScreenCenter(GetTeamPosition(teams[value])));
+                                game.Camera.SetTarget(ProjectToScreenCenter(GetTeamPosition(teams[value])));
                             }
                         }
                         else

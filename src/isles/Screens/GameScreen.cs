@@ -158,26 +158,11 @@ public class GameScreen : IScreen, IEventListener
         UI.Display.Add(pausePanel);
     }
 
-    private bool scrollingCamera;
-
     private void ResetCamera()
     {
         var camera = new Camera(Game.Settings.CameraSettings);
-        camera.FlyTo(new Vector3(Player.LocalPlayer.SpawnPoint, 0));
+        camera.SetTarget(new Vector3(Player.LocalPlayer.SpawnPoint, 0));
         Game.Camera = camera;
-
-        camera.BeginMove += (sender, e) =>
-        {
-            Cursors.SetCursor(Cursors.Move);
-            scrollingCamera = true;
-        };
-        camera.EndMove += (sender, e) =>
-        {
-            scrollingCamera = false;
-            Cursors.SetCursor(Cursors.Default);
-        };
-        camera.BeginRotate += (sender, e) => Cursors.SetCursor(Cursors.Rotate);
-        camera.EndRotate += (sender, e) => Cursors.SetCursor(Cursors.Default);
     }
 
     private IEnumerable<PlayerInfo> CreateTestPlayerInfo()
@@ -285,7 +270,7 @@ public class GameScreen : IScreen, IEventListener
             return;
         }
 
-        UpdateCursorArrows();
+        Cursors.SetCursor(GetCursor());
 
         // Update UI first
         if (UI != null)
@@ -320,30 +305,22 @@ public class GameScreen : IScreen, IEventListener
         }
     }
 
-    private void UpdateCursorArrows()
+    private IntPtr GetCursor()
     {
-        if (scrollingCamera)
-        {
-            Point mouse = Game.Input.MousePosition;
-            var border = (int)Game.Settings.CameraSettings.ScrollAreaSize;
+        if (Spell.CurrentSpell is SpellAttack attack && attack.CastState == SpellCastState.Trigger)
+            return Cursors.TargetRed;
 
-            if (mouse.Y <= border)
-            {
-                Cursors.SetCursor(Cursors.Top);
-            }
-            else if (mouse.Y >= Game.ScreenHeight - border)
-            {
-                Cursors.SetCursor(Cursors.Bottom);
-            }
-            else if (mouse.X <= border)
-            {
-                Cursors.SetCursor(Cursors.Left);
-            }
-            else if (mouse.X >= Game.ScreenWidth - border)
-            {
-                Cursors.SetCursor(Cursors.Right);
-            }
-        }
+        if (Spell.CurrentSpell is SpellMove move && move.CastState == SpellCastState.Trigger)
+            return Cursors.TargetGreen;
+
+        return Game.Camera.ScrollState switch
+        {
+            CameraScrollState.N or CameraScrollState.NE or CameraScrollState.NW => Cursors.Top,
+            CameraScrollState.S or CameraScrollState.SE or CameraScrollState.SW => Cursors.Bottom,
+            CameraScrollState.W => Cursors.Left,
+            CameraScrollState.E => Cursors.Right,
+            _ => Cursors.Default,
+        };
     }
 
     public void Draw(GameTime gameTime)
