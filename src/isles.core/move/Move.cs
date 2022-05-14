@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace Isles;
 
 [Flags]
-public enum MovableFlags
+public enum MoveUnitFlags
 {
     None = 0,
 
@@ -21,32 +21,22 @@ public enum MovableFlags
     HasMovingContact = 1 << 1,
 }
 
-[StructLayout(LayoutKind.Sequential)]
-public struct Movable
+public struct MoveUnit
 {
-#region Interop
-    internal float _radius;
-    internal Vector2 _position;
-    internal Vector2 _velocity;
-    internal Vector2 _force;
-#endregion
-
-    public float Radius
-    {
-        get => _radius;
-        init => _radius = value;
-    }
+    public float Radius { get; init; }
 
     public Vector2 Position
     {
         get => _position;
         init => _position = value;
     }
+    internal Vector2 _position;
 
     public Vector2 Velocity => _velocity;
+    internal Vector2 _velocity;
 
-    public MovableFlags Flags => _flags;
-    internal MovableFlags _flags;
+    public MoveUnitFlags Flags => _flags;
+    internal MoveUnitFlags _flags;
 
     public float Speed { get; set; }
     public float Acceleration { get; set; }
@@ -62,14 +52,16 @@ public struct Movable
 
     public Vector2? Target { get; set; }
 
+    internal IntPtr _body;
+    internal PathGridFlowField? _flowField;
     internal Vector2 _desiredVelocity;
-
     internal float _inContactSeconds;
 }
 
 public struct MoveObstacle
 {
     public Vector2[] Vertices { get; init; }
+    public Vector2 Position { get; init; }
 }
 
 public sealed class Move : IDisposable
@@ -82,8 +74,15 @@ public sealed class Move : IDisposable
     private const string LibName = "isles.native";
 
     private readonly IntPtr _world = move_new();
+    private readonly PathFinder _pathFinder = new();
+    private readonly PathGrid? _grid;
 
-    private ArrayBuilder<Contact> _contacts;
+    public Move(PathGrid? grid = null)
+    {
+        if (grid != null)
+            SetGridObstacles(grid);
+        _grid = grid;
+    }
 
     public void Dispose()
     {
@@ -96,18 +95,7 @@ public sealed class Move : IDisposable
         move_delete(_world);
     }
 
-    public unsafe void SetObstacles(ReadOnlySpan<MoveObstacle> obstacles)
-    {
-        foreach (ref readonly var o in obstacles)
-        {
-            fixed (Vector2* vertices = o.Vertices)
-            {
-                move_add_obstacle(_world, vertices, o.Vertices.Length);
-            }
-        }
-    }
-
-    public unsafe void Update(float dt, Span<Movable> units, PathGrid? grid = null)
+    public unsafe void Update(float dt, Span<MoveUnit> units)
     {
         var idt = 1 / dt;
 
@@ -117,45 +105,66 @@ public sealed class Move : IDisposable
             unit._desiredVelocity = default;
         }
 
-        foreach (ref readonly var c in GetContacts())
+        IntPtr contactItr = default;
+        while (move_get_next_contact(_world, ref contactItr, out var c) != 0)
         {
             UpdateContact(units, c);
         }
 
-        foreach (ref var unit in units)
+        // Update units
+        for (var i = 0; i < units.Length; i++)
         {
+            ref var unit = ref units[i];
             UpdateInContactSeconds(dt, ref unit);
             unit._desiredVelocity += MoveToTarget(dt, ref unit);
-            unit._force = CalculateForce(idt, ref unit);
+            var force = CalculateForce(idt, ref unit);
+            var nativeUnit = new NativeUnit()
+            {
+                id = i,
+                radius = unit.Radius,
+                position = unit.Position,
+                force = force,
+            };
+            unit._body = move_set_unit(_world, unit._body, ref nativeUnit);
         }
 
-        fixed (void* pUnits = units)
-        {
-            move_step(_world, dt, pUnits, units.Length, Marshal.SizeOf<Movable>());
-        }
+        move_step(_world, dt);
 
         foreach (ref var unit in units)
         {
+            move_get_unit(unit._body, ref unit._position, ref unit._velocity);
             UpdateRotation(dt, ref unit);
         }
     }
 
-    private unsafe ReadOnlySpan<Contact> GetContacts()
+    private unsafe void SetGridObstacles(PathGrid grid)
     {
-        var contactCount = move_get_contacts(_world, null, 0);
-        if (contactCount <= 0)
-            return Array.Empty<Contact>();
-
-        _contacts.SetLength((int)contactCount);
-        fixed (Contact* contacts = _contacts.AsSpan())
+        Span<Vector2> vertices = stackalloc Vector2[]
         {
-            move_get_contacts(_world, contacts, contactCount);
-        }
+            new(0, 0),
+            new(grid.Step, 0),
+            new(grid.Step, grid.Step),
+            new(0, grid.Step),
+        };
 
-        return _contacts.AsSpan();
+        fixed (Vector2* pVertices = vertices)
+        {
+            for (var y = 0; y < grid.Height; y++)
+                for (var x = 0; x < grid.Width; x++)
+                    if (grid.Bits[x + (y * grid.Width)])
+                    {
+                        var nativeObstacle = new NativeObstacle()
+                        {
+                            vertices = pVertices,
+                            length = vertices.Length,
+                            position = new(x * grid.Step, y * grid.Step),
+                        };
+                        move_set_obstacle(_world, default, ref nativeObstacle);
+                    }
+        }
     }
 
-    private Vector2 MoveToTarget(float dt, ref Movable m)
+    private Vector2 MoveToTarget(float dt, ref MoveUnit m)
     {
         if (m.Target is null)
             return default;
@@ -170,7 +179,7 @@ public sealed class Move : IDisposable
         }
 
         // Have we reached the target and there is an non-idle unit along the way?
-        if ((m.Flags & MovableFlags.HasMovingContact) != 0 && distanceSq <= m.Radius * m.Radius)
+        if ((m._flags & MoveUnitFlags.HasMovingContact) != 0 && distanceSq <= m.Radius * m.Radius)
         {
             ClearTarget(ref m);
             return default;
@@ -180,10 +189,24 @@ public sealed class Move : IDisposable
         var distance = MathF.Sqrt(distanceSq);
         var speed = MathF.Sqrt(distance * m.Acceleration * 2);
 
-        return Vector2.Normalize(toTarget) * Math.Min(m.Speed, speed);
+        var flowFieldDirection = FollowFlowField(ref m);
+        var direction = flowFieldDirection == default ? toTarget : flowFieldDirection;
+
+        return Vector2.Normalize(direction) * Math.Min(m.Speed, speed);
     }
 
-    private Vector2 CalculateForce(float idt, ref Movable m)
+    private Vector2 FollowFlowField(ref MoveUnit unit)
+    {
+        if (_grid is null || unit.Target is null)
+            return default;
+
+        if (unit._flowField is null || unit.Target.Value != unit._flowField.Value.Target)
+            unit._flowField = _pathFinder.GetFlowField(_grid, unit.Radius * 2, unit.Target.Value);
+
+        return unit._flowField.Value.GetDirection(unit.Position);
+    }
+
+    private Vector2 CalculateForce(float idt, ref MoveUnit m)
     {
         var force = (m._desiredVelocity - m.Velocity) * idt;
         var accelerationSq = force.LengthSquared();
@@ -207,13 +230,13 @@ public sealed class Move : IDisposable
         return force;
     }
 
-    private void UpdateContact(Span<Movable> movables, in Contact c)
+    private void UpdateContact(Span<MoveUnit> movables, in NativeContact c)
     {
-        ref var a = ref movables[c.A];
-        ref var b = ref movables[c.B];
+        ref var a = ref movables[c.a];
+        ref var b = ref movables[c.b];
 
-        a._flags |= MovableFlags.HasContact;
-        b._flags |= MovableFlags.HasContact;
+        a._flags |= MoveUnitFlags.HasContact;
+        b._flags |= MoveUnitFlags.HasContact;
 
         if (a.Target != null && b.Target != null)
             UpdateContactBothBuzy(ref a, ref b);
@@ -223,12 +246,12 @@ public sealed class Move : IDisposable
             UpdateContactOneBuzyOneIdle(ref b, ref a);
     }
 
-    private void UpdateInContactSeconds(float dt, ref Movable m)
+    private void UpdateInContactSeconds(float dt, ref MoveUnit m)
     {
         if (m.Target is null)
             return;
 
-        if ((m.Flags & MovableFlags.HasContact) == 0)
+        if ((m._flags & MoveUnitFlags.HasContact) == 0)
         {
             m._inContactSeconds = Math.Max(0, m._inContactSeconds - dt);
             return;
@@ -241,10 +264,10 @@ public sealed class Move : IDisposable
         }
     }
 
-    private void UpdateContactBothBuzy(ref Movable a, ref Movable b)
+    private void UpdateContactBothBuzy(ref MoveUnit a, ref MoveUnit b)
     {
-        a._flags |= MovableFlags.HasMovingContact;
-        b._flags |= MovableFlags.HasMovingContact;
+        a._flags |= MoveUnitFlags.HasMovingContact;
+        b._flags |= MoveUnitFlags.HasMovingContact;
 
         var velocity = b.Velocity - a.Velocity;
         var normal = b.Position - a.Position;
@@ -263,9 +286,9 @@ public sealed class Move : IDisposable
         b._desiredVelocity += perpendicular * b.Speed;
     }
 
-    private void UpdateContactOneBuzyOneIdle(ref Movable a, ref Movable b)
+    private void UpdateContactOneBuzyOneIdle(ref MoveUnit a, ref MoveUnit b)
     {
-        b._flags |= MovableFlags.HasMovingContact;
+        b._flags |= MoveUnitFlags.HasMovingContact;
 
         var velocity = a.Velocity;
         var normal = b.Position - a.Position;
@@ -286,31 +309,31 @@ public sealed class Move : IDisposable
         b._desiredVelocity += Vector2.Normalize(direction) * b.Speed;
     }
 
-    private static void UpdateRotation(float dt, ref Movable m)
+    private static void UpdateRotation(float dt, ref MoveUnit m)
     {
         if (m._velocity.LengthSquared() <= m.Speed * m.Speed * dt * dt)
             return;
 
-        while (m._rotation > MathHelper.Pi)
-            m._rotation -= MathF.PI + MathF.PI;
-        while (m._rotation < -MathHelper.Pi)
-            m._rotation += MathF.PI + MathF.PI;
-
         var targetRotation = MathF.Atan2(m._velocity.Y, m._velocity.X);
         var offset = targetRotation - m._rotation;
-        var delta = m.RotationSpeed * dt;
+        if (offset > MathF.PI)
+            offset -= 2 * MathF.PI;
+        if (offset <= -MathF.PI)
+            offset += 2 * MathF.PI;
 
+        var delta = m.RotationSpeed * dt;
         if (Math.Abs(offset) <= delta)
             m._rotation = targetRotation;
-        else if ((offset >=0 && offset < MathF.PI) || (offset >= -MathF.PI * 2 && offset < -MathF.PI))
+        else if (offset > 0)
             m._rotation += delta;
         else
             m._rotation -= delta;
     }
 
-    private static void ClearTarget(ref Movable m)
+    private static void ClearTarget(ref MoveUnit m)
     {
         m.Target = null;
+        m._flowField = default;
         m._inContactSeconds = 0;
     }
 
@@ -320,15 +343,35 @@ public sealed class Move : IDisposable
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    struct Contact
+    struct NativeUnit
     {
-        public int A;
-        public int B;
+        public int id;
+        public float radius;
+        public Vector2 position;
+        public Vector2 force;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    unsafe struct NativeObstacle
+    {
+        public int id;
+        public Vector2* vertices;
+        public int length;
+        public Vector2 position;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    struct NativeContact
+    {
+        public int a;
+        public int b;
     }
 
     [DllImport(LibName)] private static extern IntPtr move_new();
     [DllImport(LibName)] private static extern void move_delete(IntPtr world);
-    [DllImport(LibName)] private static unsafe extern void move_step(IntPtr world, float dt, void* units, int length, int sizeInBytes);
-    [DllImport(LibName)] private static unsafe extern void move_add_obstacle(IntPtr world, Vector2* vertices, int length);
-    [DllImport(LibName)] private static unsafe extern int move_get_contacts(IntPtr world, Contact* contacts, int length);
+    [DllImport(LibName)] private static extern void move_step(IntPtr world, float dt);
+    [DllImport(LibName)] private static extern IntPtr move_set_unit(IntPtr world, IntPtr body, ref NativeUnit unit);
+    [DllImport(LibName)] private static extern IntPtr move_set_obstacle(IntPtr world, IntPtr body, ref NativeObstacle obstacle);
+    [DllImport(LibName)] private static extern void move_get_unit(IntPtr unit, ref Vector2 position, ref Vector2 velocity);
+    [DllImport(LibName)] private static extern int move_get_next_contact(IntPtr world, ref IntPtr iterator, out NativeContact contact);
 }

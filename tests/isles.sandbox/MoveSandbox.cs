@@ -1,6 +1,7 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections;
 using Isles.Graphics;
 using static ImGuiNET.ImGui;
 
@@ -11,18 +12,23 @@ sandbox.Run();
 
 class MoveSandbox : Game
 {
-    private const float WorldScale = 10f;
+    private const float WorldScale = 4f;
 
-    private readonly Movable[] _units = new Movable[200];
+    private readonly MoveUnit[] _units = new MoveUnit[40];
     private readonly MoveObstacle[] _obstacles;
     private readonly List<int> _selection = new();
-    private readonly Move _move = new();
+    private readonly PathGrid _grid;
+    private readonly PathFinder _pathFinder = new();
+    private readonly Move _move;
 
     private Point _selectStart, _selectEnd;
+    private PathGridFlowField? _flowField;
 
-    private TextureLoader _textureLoader;
-    private SpriteBatch _spriteBatch;
-    private ImGuiRenderer _imguiRenderer;
+    private TextureLoader _textureLoader = default!;
+    private SpriteBatch _spriteBatch = default!;
+    private ImGuiRenderer _imguiRenderer = default!;
+
+    private bool _showFlowField;
 
     public MoveSandbox()
     {
@@ -36,12 +42,14 @@ class MoveSandbox : Game
             PreferredBackBufferHeight = 768,
         };
 
+        var colors = TextureLoader.ReadAllPixels("data/grid.png", out var w, out var h);
+        var bits = new BitArray(colors.ToArray().Select(c => c.R < 100).ToArray());
+        _grid = new(w, h, 4, bits);
+        _move = new(_grid);
         _obstacles = new MoveObstacle[]
         {
-            new() { Vertices = new Vector2[] { new(400,100), new(600,200), new(700,300), new(600, 350), new(400,400) }.Select(v => v / WorldScale).ToArray() },
+            //new() { Vertices = new Vector2[] { new(400,100), new(600,200), new(700,300), new(600, 350), new(400,400) }.Select(v => v / WorldScale).ToArray() },
         };
-
-        _move.SetObstacles(_obstacles);
 
         var random = new Random();
         for (var i = 0; i < _units.Length; i++)
@@ -50,7 +58,7 @@ class MoveSandbox : Game
             {
                 Radius = 1 + random.NextSingle(),
                 Position = new(random.NextSingle() * Window.ClientBounds.Width / WorldScale, random.NextSingle() * Window.ClientBounds.Height / WorldScale),
-                Speed = 10 + 10 * random.NextSingle(),
+                Speed = 20 + 10 * random.NextSingle(),
                 Acceleration = 20 + 20 * random.NextSingle(),
                 Decceleration = 400 + 400 * random.NextSingle(),
                 RotationSpeed = MathF.PI * 2 + random.NextSingle() * MathF.PI * 4,
@@ -80,9 +88,11 @@ class MoveSandbox : Game
         var mouse = Mouse.GetState();
         if (mouse.RightButton == ButtonState.Pressed)
         {
+            var target = new Vector2(mouse.X / WorldScale, mouse.Y / WorldScale);
+            _flowField = _pathFinder.GetFlowField(_grid, 4, target);
             foreach (var i in _selection)
             {
-                _units[i].Target = new(mouse.X / WorldScale, mouse.Y / WorldScale);
+                _units[i].Target = target;
             }
         }
 
@@ -120,12 +130,26 @@ class MoveSandbox : Game
     {
         GraphicsDevice.Clear(Color.White);
 
+        var arrow = _textureLoader.LoadTexture("data/unit.svg");
+        var selection = _textureLoader.LoadTexture("data/pixel.svg");
+
         _imguiRenderer.Begin();
-
-        var arrow = _textureLoader.LoadTexture("data/arrow.svg");
-        var selection = _textureLoader.LoadTexture("data/selection.svg");
-
         _spriteBatch.Begin();
+
+        DrawGrid(_grid);
+        Checkbox("Show FlowField", ref _showFlowField);
+        if (_flowField != null && _showFlowField)
+            DrawFlowField(_flowField.Value);
+
+        foreach (var obstacle in _obstacles)
+        {
+            for (var i = 0; i < obstacle.Vertices.Length; i++)
+            {
+                var a = obstacle.Vertices[i] * WorldScale;
+                var b = obstacle.Vertices[(i + 1) % obstacle.Vertices.Length] * WorldScale;
+                DrawLine(a, b, 4, Color.Brown);
+            }
+        }
 
         for (var i = 0; i < _units.Length; i++)
         {
@@ -152,27 +176,73 @@ class MoveSandbox : Game
             _spriteBatch.Draw(selection, GetSelectionRectangle(), Color.Green * 0.5f);
         }
 
-        foreach (var obstacle in _obstacles)
+        _spriteBatch.End();
+        _imguiRenderer.End();
+
+        void DrawLine(Vector2 a, Vector2 b, float width, Color color)
         {
-            for (var i = 0; i < obstacle.Vertices.Length; i++)
+            var rotation = MathF.Atan2(b.Y - a.Y, b.X - a.X);
+            var scale = new Vector2(Vector2.Distance(a, b), width);
+            _spriteBatch.Draw(selection, a, null, color, rotation, default, scale, SpriteEffects.None, 0);
+        }
+        
+        void DrawGrid(PathGrid grid)
+        {
+            for (var y = 0; y <= grid.Height; y++)
+                DrawLine(
+                    new(0, y * grid.Step * WorldScale),
+                    new(grid.Width * grid.Step * WorldScale, y * grid.Step * WorldScale),
+                    1, Color.LightGray);
+
+            for (var x = 0; x <= grid.Height; x++)
+                DrawLine(
+                    new(x * grid.Step * WorldScale, 0),
+                    new(x * grid.Step * WorldScale, grid.Height * grid.Step * WorldScale),
+                    1, Color.LightGray);
+
+            for (var i = 0; i < grid.Bits.Length; i++)
             {
-                var a = obstacle.Vertices[i] * WorldScale;
-                var b = obstacle.Vertices[(i + 1) % obstacle.Vertices.Length] * WorldScale;
-                var rotation = MathF.Atan2(b.Y - a.Y, b.X - a.X);
-                var scale = new Vector2(Vector2.Distance(a, b), 4);
-                _spriteBatch.Draw(selection, a, null, Color.Brown, rotation, default, scale, SpriteEffects.None, 0);
+                if (grid.Bits[i])
+                {
+                    var x = i % grid.Width;
+                    var y = i / grid.Width;
+                    _spriteBatch.Draw(
+                        selection,
+                        new Rectangle(
+                            (int)(x * grid.Step * WorldScale), (int)(y * grid.Step * WorldScale),
+                            (int)(grid.Step * WorldScale), (int)(grid.Step * WorldScale)),
+                        Color.DarkCyan);
+                }
             }
         }
 
-        _spriteBatch.End();
+        void DrawFlowField(PathGridFlowField flowfield)
+        {
+            var arrow = _textureLoader.LoadTexture("data/arrow.svg");
+            var grid = flowfield.Grid;
+            for (var y = 0; y < grid.Height; y++)
+            for (var x = 0; x < grid.Width; x++)
+            {
+                var position = new Vector2((x + 0.5f) * grid.Step, (y + 0.5f) * grid.Step);
+                var v = flowfield.GetDirection(position);
+                if (v == default)
+                    continue;
+                var rotation = MathF.Atan2(v.Y, v.X);
+                var color = flowfield.FlowField.Vectors[x + y * grid.Width].flags.HasFlag(FlowFieldFlags.TurnPoint)
+                    ? Color.Gray : Color.Gray * 0.2f;
 
-        DrawUI();
-        _imguiRenderer.End();
-    }
-
-    private void DrawUI()
-    {
-        Text("Oblivate");
+                _spriteBatch.Draw(
+                    arrow,
+                    position * WorldScale,
+                    null,
+                    color,
+                    rotation,
+                    new Vector2(arrow.Width / 2, arrow.Height / 2),
+                    _grid.Step * WorldScale / arrow.Width,
+                    default,
+                    default);
+            }
+        }
     }
 
     private Rectangle GetSelectionRectangle()

@@ -5,305 +5,241 @@ using System.Collections;
 
 namespace Isles;
 
-public record PathGrid(int Width, int Height, float Step, BitArray Bits)
-{
-    public (int x, int y) GetPoint(Vector2 position)
-    {
-        var x = Math.Min(Width - 1, Math.Max(0, (int)(position.X / Step)));
-        var y = Math.Min(Height - 1, Math.Max(0, (int)(position.Y / Step)));
-
-        return (x, y);
-    }
-
-    public int GetIndex(Vector2 position)
-    {
-        var x = Math.Min(Width - 1, Math.Max(0, (int)(position.X / Step)));
-        var y = Math.Min(Height - 1, Math.Max(0, (int)(position.Y / Step)));
-
-        return y * Width + x;
-    }
-
-    public Vector2 GetPosition(int index)
-    {
-        var y = Math.DivRem(index, Width, out var x);
-
-        return new(x * Step + Step / 2, y * Step + Step / 2);
-    }
-}
+public record PathGrid(int Width, int Height, float Step, BitArray Bits);
 
 public class PathFinder
 {
-    private readonly AStarSearch _search = new();
+    private readonly Dictionary<(Vector2, int), FlowField> _flowFields = new();
 
-    private PathGridGraph _graph;
-    private ArrayBuilder<Vector2> _findPath;
-    private ArrayBuilder<int> _cleanupStraightLine;
-    private ArrayBuilder<int> _cleanupLineOfSight;
-
-    /// <summary>
-    /// Finds a list of waypoints from start (exclusive) to end (inclusive).
-    /// The last element of the result is always `end`.
-    /// Returns an empty span if target is not reachable or if there is a direct path to target.
-    /// </summary>
-    public ReadOnlySpan<Vector2> FindPath(PathGrid grid, float pathWidth, Vector2 start, Vector2 end, bool smoothPath = true)
+    public PathGridFlowField GetFlowField(PathGrid grid, float pathWidth, Vector2 target)
     {
         var size = (int)MathF.Ceiling(pathWidth / grid.Step);
-        var (x0, y0) = grid.GetPoint(start);
-        var (x1, y1) = grid.GetPoint(end);
+        if (!_flowFields.TryGetValue((target, size), out var flowField))
+            flowField = _flowFields[(target, size)] = FlowField.Create(
+                new PathGridGraph(grid, size), target);
 
-        if (LineOfSightTest(grid, size, x0, x1, y0, y1))
-        {
-            return Array.Empty<Vector2>();
-        }
+        return new() { Target = target, Grid = grid, FlowField = flowField };
+    }
+}
 
-        _graph.Grid = grid;
-        _graph.Size = size;
+public struct PathGridFlowField
+{
+    public Vector2 Target;
+    public PathGrid Grid;
+    public FlowField FlowField;
 
-        var path = _search.Search(_graph, x0 + y0 * grid.Width, x1 + y1 * grid.Width);
-        if (path.Length <= 1)
-        {
-            return Array.Empty<Vector2>();
-        }
+    public bool IsValid => Grid != null;
 
-        path = CleanupStraightLine(path);
-        if (smoothPath)
-        {
-            path = CleanupLineOfSight(grid, path, size);
-        }
+    public Vector2 GetDirection(Vector2 position)
+    {
+        var x = position.X / Grid.Step - 0.5f;
+        var y = position.Y / Grid.Step - 0.5f;
+        if (x < 0 || x >= Grid.Width || y < 0 || y >= Grid.Height)
+            return default;
 
-        _findPath.Clear();
-        for (var i = path.Length - 2; i > 0; i--)
-        {
-            _findPath.Add(grid.GetPosition(path[i]));
-        }
-        _findPath.Add(end);
-        return _findPath;
+        var (fx, fy) = (x % 1, y % 1);
+        var (minx, miny) = ((int)x, (int)y);
+        var (maxx, maxy) = (Math.Min(minx + 1, Grid.Width - 1), Math.Min(miny + 1, Grid.Height - 1));
+
+        return Vector2.Lerp(
+            Vector2.Lerp(GetVector(minx, miny), GetVector(maxx, miny), fx),
+            Vector2.Lerp(GetVector(minx, maxy), GetVector(maxx, maxy), fx),
+            fy);
     }
 
-    private ReadOnlySpan<int> CleanupStraightLine(ReadOnlySpan<int> path)
+    private Vector2 GetVector(int x, int y)
     {
-        _cleanupStraightLine.Clear();
-        _cleanupStraightLine.Add(path[0]);
-        var direction = Math.Abs(path[1] - path[0]) == 1;
-        for (var i = 1; i < path.Length - 1; i++)
+        var (vx, vy, _) = FlowField.Vectors[x + y * Grid.Width];
+        return new((float)vx, (float)vy);
+    }
+}
+
+public struct PathGridGraph : IPathGraph2
+{
+    private const float DiagonalCost = 1.414213562373095f;
+
+    private static readonly (int dx, int dy)[] Steps = new[]
+    {
+        (0, -1), (1, 0), (0, 1), (-1, 0)
+    };
+
+    private static readonly (int multiplier, int lineX, int lineY)[] Edges = new[]
+    {
+        (0, 1, 0), (1, 0, 1), (1, 1, 0), (0, 0, 1),
+    };
+
+    private static readonly (int dx, int dy, float min, float max)[] TurnPoints = new[]
+    {
+        (1, 1, MathF.PI / 2, 0),
+        (1, -1, 0, -MathF.PI / 2),
+        (-1, -1, -MathF.PI / 2, MathF.PI),
+        (-1, 1, MathF.PI, MathF.PI / 2),
+    };
+
+    private readonly PathGrid _grid;
+    private readonly int _size;
+
+    public PathGridGraph(PathGrid grid, int size)
+    {
+        _grid = grid;
+        _size = size;
+    }
+
+    public int MaxEdgeCount => 8;
+
+    public int NodeCount => _grid.Width * _grid.Height;
+
+    public Vector2 GetPosition(int nodeIndex)
+    {
+        var y = Math.DivRem(nodeIndex, _grid.Width, out var x);
+        return new((x + 0.5f) * _grid.Step, (y + 0.5f) * _grid.Step);
+    }
+
+    public int GetNodeIndex(Vector2 position)
+    {
+        var x = Math.Min(_grid.Width - 1, Math.Max(0, (int)(position.X / _grid.Step)));
+        var y = Math.Min(_grid.Height - 1, Math.Max(0, (int)(position.Y / _grid.Step)));
+
+        return y * _grid.Width + x;
+    }
+
+    public int GetEdges(int from, Span<(int to, float cost)> edges)
+    {
+        return _size == 1 ? GetEdges1(from, edges) : GetEdgesN(from, edges);
+    }
+
+    private int GetEdges1(int from, Span<(int to, float cost)> edges)
+    {
+        var count = 0;
+        var y = Math.DivRem(from, _grid.Width, out var x);
+
+        // Horizontal and vertical edges
+        for (var i = 0; i < 4; i++)
         {
-            var currentDirection = Math.Abs(path[i + 1] - path[i]) == 1;
-            if (direction != currentDirection)
+            var (dx, dy) = Steps[i];
+            var (xx, yy) = (x + dx, y + dy);
+
+            if (IsWall(xx, yy))
+                continue;
+
+            edges[count++] = (xx + yy * _grid.Width, 1);
+        }
+
+        // Diagonal edges
+        for (var i = 0; i < 4; i++)
+        {
+            var (e1, e2) = (i, (i + 1) % 4);
+            var (dx1, dy1) = Steps[e1];
+            var (dx2, dy2) = Steps[e2];
+            var (xx, yy) = (x + dx1 + dx2, y + dy1 + dy2);
+
+            if (IsWall(xx, yy) || IsWall(x + dx1, y + dy1) || IsWall(x + dx2, y + dy2))
+                continue;
+
+            edges[count++] = (xx + yy * _grid.Width, DiagonalCost);
+        }
+
+        return count;
+    }
+
+    private int GetEdgesN(int from, Span<(int to, float cost)> edges)
+    {
+        var count = 0;
+        var y = Math.DivRem(from, _grid.Width, out var x);
+
+        // Horizontal and vertical edges
+        for (var i = 0; i < 4; i++)
+        {
+            var (m, lx, ly) = Edges[i];
+            var (dx, dy) = Steps[i];
+            var (xx, yy) = (x + dx, y + dy);
+
+            dx *= (m * (_size - 1) + 1);
+            dy *= (m * (_size - 1) + 1);
+
+            if (IsWall(x + dx, y + dy, lx, ly, _size))
+                continue;
+
+            edges[count++] = (xx + yy * _grid.Width, 1);
+        }
+
+        // Diagonal edges
+        for (var i = 0; i < 4; i++)
+        {
+            var (e1, e2) = (i, (i + 1) % 4);
+            var (m1, lx1, ly1) = Edges[e1];
+            var (m2, lx2, ly2) = Edges[e2];
+            var (dx1, dy1) = Steps[e1];
+            var (dx2, dy2) = Steps[e2];
+            var (xx, yy) = (x + dx1 + dx2, y + dy1 + dy2);
+
+            if (IsWall(xx, yy))
+                continue;
+
+            dx1 *= (m1 * (_size - 1) + 1);
+            dy1 *= (m1 * (_size - 1) + 1);
+            dx2 *= (m2 * (_size - 1) + 1);
+            dy2 *= (m2 * (_size - 1) + 1);
+
+            if (IsWall(x + dx1 + dx2, y + dy1 + dy2) ||
+                IsWall(x + dx1, y + dy1, lx1, ly1, _size) ||
+                IsWall(x + dx2, y + dy2, lx2, ly2, _size))
+                continue;
+
+            edges[count++] = (xx + yy * _grid.Width, DiagonalCost);
+        }
+
+        return count;
+    }
+
+    public bool IsTurnPoint(int nodeIndex, Vector2 target)
+    {
+        var r = float.NaN;
+        var y = Math.DivRem(nodeIndex, _grid.Width, out var x);
+
+        foreach (var (dx, dy, min, max) in TurnPoints)
+        {
+            if (!IsWall(x + dx, y + dy) || IsWall(x + dx, y) || IsWall(x, y + dy))
+                continue;
+
+            if (float.IsNaN(r))
             {
-                direction = currentDirection;
-                _cleanupStraightLine.Add(path[i]);
-            }
-        }
-        _cleanupStraightLine.Add(path[^1]);
-        return _cleanupStraightLine;
-    }
-
-    private ReadOnlySpan<int> CleanupLineOfSight(PathGrid grid, ReadOnlySpan<int> path, int size)
-    {
-        _cleanupLineOfSight.Clear();
-        _cleanupLineOfSight.Add(path[0]);
-
-        for (var i = 0; i < path.Length - 1;)
-        {
-            var j = i + 2;
-            for (; j < path.Length; j++)
-            {
-                var y0 = Math.DivRem(path[i], grid.Width, out var x0);
-                var y1 = Math.DivRem(path[j], grid.Width, out var x1);
-
-                if (!LineOfSightTest(grid, size, x0, y0, x1, y1))
-                {
-                    break;
-                }
-            }
-            _cleanupLineOfSight.Add(path[i = j - 1]);
-        }
-
-        return _cleanupLineOfSight;
-    }
-
-    public static bool LineOfSightTest(PathGrid grid, float pathWidth, Vector2 start, Vector2 end)
-    {
-        var size = (int)MathF.Ceiling(pathWidth / grid.Step);
-        var x0 = (int)(start.X / grid.Step);
-        var y0 = (int)(start.Y / grid.Step);
-        var x1 = (int)(end.X / grid.Step);
-        var y1 = (int)(end.Y / grid.Step);
-
-        return LineOfSightTest(grid, size, x0, y0, x1, y1);
-    }
-
-    private static bool LineOfSightTest(PathGrid grid, int size, int x0, int y0, int x1, int y1)
-    {
-        return size == 1 ? LineOfSightTest1(grid, x0, y0, x1, y1) : LineOfSightTestN(grid, size, x0, y0, x1, y1);
-    }
-
-    private static bool LineOfSightTest1(PathGrid grid, int x0, int y0, int x1, int y1)
-    {
-        return !PlotLine.WuLine(x0, y0, x1, y1, GridHitTest, grid);
-    }
-
-    private static bool LineOfSightTestN(PathGrid grid, int size, int x0, int y0, int x1, int y1)
-    {
-        var half = (size - 1) / 2;
-        var w = Math.Abs(x1 - x0);
-        var h = Math.Abs(y1 - y0);
-
-        if (w > h)
-        {
-            y0 -= half;
-            y1 -= half;
-            for (var k = 0; k < size; k++)
-            {
-                if (y0 < 0 || y0 >= grid.Height || y1 < 0 || y1 > grid.Height)
-                {
-                    return false;
-                }
-
-                if (PlotLine.WuLine(x0, y0, x1, y1, GridHitTest, grid))
-                {
-                    return false;
-                }
-
-                y0++;
-                y1++;
-            }
-        }
-        else
-        {
-            x0 -= half;
-            y0 -= half;
-            for (var k = 0; k < size; k++)
-            {
-                if (x0 < 0 || x0 >= grid.Width || x1 < 0 || x1 >= grid.Width)
-                {
-                    return false;
-                }
-
-                if (PlotLine.WuLine(x0, y0, x1, y1, GridHitTest, grid))
-                {
-                    return false;
-                }
-
-                x0++;
-                x1++;
-            }
-        }
-
-        return true;
-    }
-
-    private static bool GridHitTest(int x, int y, float a, PathGrid grid)
-    {
-        return grid.Bits[x + y * grid.Width];
-    }
-
-    private struct PathGridGraph : IPathGraph
-    {
-        public PathGrid Grid;
-        public int Size;
-
-        private static readonly (int dx, int dy)[] s_edges = new[]
-        {
-            (1, 0), (0, 1), (-1, 0), (0, -1),
-        };
-
-        private ArrayBuilder<(int to, float cost)> _edges;
-
-        public int NodeCount => Grid.Width * Grid.Height;
-
-        public ReadOnlySpan<(int to, float cost)> GetEdges(int from)
-        {
-            return Size == 1 ? GetEdges1(from) : GetEdgesN(from);
-        }
-
-        public ReadOnlySpan<(int to, float cost)> GetEdges1(int from)
-        {
-            _edges.Clear();
-
-            var y = Math.DivRem(from, Grid.Width, out var x);
-
-            foreach (var (dx, dy) in s_edges)
-            {
-                var xx = x + dx;
-                var yy = y + dy;
-
-                if (xx < 0 || xx >= Grid.Width || yy < 0 || yy >= Grid.Height)
-                {
-                    continue;
-                }
-
-                var i = xx + yy * Grid.Width;
-                if (!Grid.Bits[i])
-                {
-                    _edges.Add((i, Grid.Step));
-                }
-            }
-
-            return _edges;
-        }
-
-        public ReadOnlySpan<(int to, float cost)> GetEdgesN(int from)
-        {
-            _edges.Clear();
-
-            var half = (Size - 1) / 2;
-            var y = Math.DivRem(from, Grid.Width, out var x);
-
-            foreach (var (dx, dy) in s_edges)
-            {
-                var xx = x + dx;
-                var yy = y + dy;
-                var i = xx + yy * Grid.Width;
-                var valid = true;
-
-                if (dx == 0)
-                {
-                    xx -= half;
-                    yy += dy > 0 ? Size - 1 - half : -half;
-                }
-                else
-                {
-                    yy -= half;
-                    xx += dx > 0 ? Size - 1 - half : -half;
-                }
-
-                for (var k = 0; k < Size; k++)
-                {
-                    if (xx < 0 || xx >= Grid.Width || yy < 0 || yy >= Grid.Height)
-                    {
-                        valid = false;
-                        continue;
-                    }
-
-                    if (Grid.Bits[xx + yy * Grid.Width])
-                    {
-                        valid = false;
-                        continue;
-                    }
-
-                    if (dx == 0)
-                    {
-                        xx++;
-                    }
-                    else
-                    {
-                        yy++;
-                    }
-                }
-
-                if (valid)
-                {
-                    _edges.Add((i, Grid.Step));
-                }
+                var v = target - GetPosition(nodeIndex);
+                r = MathF.Atan2(v.Y, v.X);
             }
 
-            return _edges;
+            if (NormalizeRotation(r - min) < 0 || NormalizeRotation(r - max) > 0)
+                return true;
         }
+        return false;
+    }
 
-        public float GetHeuristicValue(int from, int to)
+    private static float NormalizeRotation(float r)
+    {
+        if (r > MathF.PI)
+            r -= 2 * MathF.PI;
+        if (r <= -MathF.PI)
+            r += 2 * MathF.PI;
+        return r;
+    }
+
+    private bool IsWall(int x, int y)
+    {
+        if (x < 0 || x >= _grid.Width || y < 0 || y >= _grid.Height)
+            return true;
+
+        return _grid.Bits[x + y * _grid.Width];
+    }
+
+    private bool IsWall(int x, int y, int dx, int dy, int count)
+    {
+        for (var i = 0; i < count; i++)
         {
-            return (Grid.GetPosition(to) - Grid.GetPosition(from)).Length();
+            if (IsWall(x, y))
+                return true;
+            x += dx;
+            y += dy;
         }
+        return false;
     }
 }

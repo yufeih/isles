@@ -4,6 +4,7 @@
     <OutputType>WinExe</OutputType>
     <NoWarn>X4717</NoWarn>
     <Platforms>x64</Platforms>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

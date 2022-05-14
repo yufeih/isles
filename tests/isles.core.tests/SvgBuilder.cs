@@ -59,6 +59,11 @@ public class SvgBuilder
         AddLineSegments(vertices, width, color, loop: true, data);
     }
 
+    public void AddLine(Vector2 a, Vector2 b, float width = 1, string? color = null, SvgData? data = null)
+    {
+        AddLineSegments(new[] { a, b }, width, color, loop: false, data);
+    }
+
     public void AddLine(Vector2[] points, float width = 1, string? color = null, SvgData? data = null)
     {
         AddLineSegments(points, width, color, loop: false, data);
