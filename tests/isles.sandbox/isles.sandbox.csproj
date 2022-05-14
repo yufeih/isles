@@ -22,6 +22,10 @@
     <Content Include="..\..\extern\FNA-redist\x64\**" Condition="$([MSBuild]::IsOSPlatform('windows'))" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\extern\FNA-redist\osx\**" Condition="$([MSBuild]::IsOSPlatform('osx'))" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\extern\FNA-redist\lib64\**" Condition="$([MSBuild]::IsOSPlatform('linux'))" CopyToOutputDirectory="PreserveNewest" />
+
+    <Content Include="..\..\extern\cimgui\win-x64\**" Condition="$([MSBuild]::IsOSPlatform('windows'))" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\extern\cimgui\osx\**" Condition="$([MSBuild]::IsOSPlatform('osx'))" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\extern\cimgui\linux-x64\**" Condition="$([MSBuild]::IsOSPlatform('linux'))" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
