@@ -191,8 +191,6 @@ public class GameCamera : Camera
     public event EventHandler EndMove;
 
     private bool moving;
-    private bool orbit;
-    private float orbitSpeed;
 
     public GameCamera(GameCameraSettings settings, GameWorld world)
         : base(BaseGame.Singleton.GraphicsDevice)
@@ -240,20 +238,6 @@ public class GameCamera : Camera
         }
     }
 
-    public void Orbit(Vector3? point, float speed, float radius, float roll)
-    {
-        if (point.HasValue)
-        {
-            FlyTo(point.Value, false);
-        }
-
-        orbitSpeed = speed;
-        radiusTarget = radius;
-        rollTarget = roll;
-        orbit = true;
-        Freezed = true;
-    }
-
     public override void Update(GameTime gameTime)
     {
         // Apply global camera sensitivity
@@ -297,7 +281,7 @@ public class GameCamera : Camera
     /// </summary>
     private void UpdateViewDistance(float elapsedTime, float smoother)
     {
-        if (!Freezed && !orbit)
+        if (!Freezed)
         {
             radiusScaler -= game.Input.MouseWheelDelta * Settings.WheelFactor;
 
@@ -342,7 +326,7 @@ public class GameCamera : Camera
         var sin = (float)(speed * Math.Sin(pitch)) * elapsedTime;
         var cos = (float)(speed * Math.Cos(pitch)) * elapsedTime;
 
-        if (!Freezed && !orbit)
+        if (!Freezed)
         {
             // Navigation
             if (game.Input.MousePosition.X <= Settings.ScrollAreaSize)
@@ -447,7 +431,7 @@ public class GameCamera : Camera
                 (game.Input.MousePosition.Y - startMousePosition.Y) * RotationFactorY;
         }
 
-        if (!Freezed && !orbit)
+        if (!Freezed)
         {
             // Adjust roll/pitch using arrow keys
             if (game.Input.Keyboard.IsKeyDown(Keys.Left))
@@ -470,42 +454,32 @@ public class GameCamera : Camera
         }
 
         // Restrict roll
-        if (!orbit)
+        if (rollTarget < minRoll)
         {
-            if (rollTarget < minRoll)
-            {
-                rollTarget = minRoll;
-            }
-            else if (rollTarget > maxRoll)
-            {
-                rollTarget = maxRoll;
-            }
+            rollTarget = minRoll;
+        }
+        else if (rollTarget > maxRoll)
+        {
+            rollTarget = maxRoll;
         }
 
         // Smooth pitch and roll
         roll += (rollTarget - roll) * smoother;
 
         // Orbit around the point
-        if (orbit)
+        const float PiPi = 2 * MathHelper.Pi;
+        var offset = pitchTarget - pitch;
+        while (offset > MathHelper.Pi)
         {
-            pitch += elapsedTime * orbitSpeed;
+            offset -= PiPi;
         }
-        else
+
+        while (offset < -MathHelper.Pi)
         {
-            const float PiPi = 2 * MathHelper.Pi;
-            var offset = pitchTarget - pitch;
-            while (offset > MathHelper.Pi)
-            {
-                offset -= PiPi;
-            }
-
-            while (offset < -MathHelper.Pi)
-            {
-                offset += PiPi;
-            }
-
-            pitch += offset * smoother;
+            offset += PiPi;
         }
+
+        pitch += offset * smoother;
     }
 
     public override EventResult HandleEvent(EventType type, object sender, object tag)
@@ -514,7 +488,7 @@ public class GameCamera : Camera
         var key = tag as Keys?;
 
         // Start adjusting view by pressing middle button
-        if (type == EventType.MiddleButtonDown && !moving && !Freezed && !orbit)
+        if (type == EventType.MiddleButtonDown && !moving && !Freezed)
         {
             input.Capture(this);
             dragging = true;
@@ -536,7 +510,7 @@ public class GameCamera : Camera
         }
 
         // Press space to return to normal view
-        if (!Freezed && !orbit && type == EventType.KeyDown && (tag as Keys?).Value == Keys.Back)
+        if (!Freezed && type == EventType.KeyDown && (tag as Keys?).Value == Keys.Back)
         {
             rollTarget = DefaultRoll;
             radiusScaler = radiusTarget = DefaultRadius;

@@ -263,13 +263,7 @@ public class GameScreen : IScreen, IEventListener
         postScreenRectangle.X = (Game.ScreenWidth - postScreenRectangle.Width) / 2;
         postScreenRectangle.Y = (Game.ScreenHeight - postScreenRectangle.Height) / 2;
 
-        Vector3? position = null;
-        if (Building.LastDestroyedBuilding != null)
-        {
-            position = Building.LastDestroyedBuilding.Position;
-        }
-
-        ((GameCamera)Game.Camera).Orbit(position, 0.00008f, 150, MathHelper.ToRadians(40));
+        ((GameCamera)Game.Camera).Freezed = true;
 
         Game.Input.Uncapture();
         postScreen = true;
