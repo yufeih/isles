@@ -150,8 +150,8 @@ public class Skirmish : Level
 
             do
             {
-                position.X = Helper.RandomInRange(0, world.Terrain.Size.X);
-                position.Y = Helper.RandomInRange(0, world.Terrain.Size.Y);
+                position.X = Helper.RandomInRange(0, world.Heightmap.Size.X);
+                position.Y = Helper.RandomInRange(0, world.Heightmap.Size.Y);
                 position.Z = 0;
             }
             while (world.PathManager.Graph.IsPositionObstructed(position.X, position.Y, true));

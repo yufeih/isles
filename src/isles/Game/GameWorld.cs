@@ -20,6 +20,8 @@ public class GameWorld
 
     public Terrain Terrain { get; private set; }
 
+    public Water Water { get; private set; }
+
     public Heightmap Heightmap { get; private set; }
 
     public PathManager PathManager { get; private set; }
@@ -52,17 +54,10 @@ public class GameWorld
         var terrainData = JsonSerializer.Deserialize<TerrainData>(File.ReadAllBytes(model.Landscape));
 
         Heightmap = Heightmap.Load(terrainData.Heightmap, terrainData.Step, terrainData.MinHeight, terrainData.MaxHeight);
-
-        // Load landscape
-        Terrain = new Terrain(Game.GraphicsDevice, terrainData, Heightmap, Game.ModelRenderer, Game.ShaderLoader, Game.TextureLoader);
-
-        // Initialize fog of war
-        FogOfWar = new FogOfWar(Game.GraphicsDevice, Terrain.Size.X, Terrain.Size.Y);
-
-        context.Refresh(5);
-
-        // Create a path manager for the landscape
-        PathManager = new PathManager(Heightmap, model.PathOccluders);
+        Terrain = new(Game.GraphicsDevice, terrainData, Heightmap, Game.ShaderLoader, Game.TextureLoader);
+        Water = new(Game.GraphicsDevice, terrainData, Game.ModelRenderer, Game.ShaderLoader, Game.TextureLoader);
+        FogOfWar = new(Game.GraphicsDevice, Heightmap.Size.X, Heightmap.Size.Y);
+        PathManager = new(Heightmap, model.PathOccluders);
 
         context.Refresh(10);
 
@@ -114,7 +109,6 @@ public class GameWorld
 
     public void Remove(BaseEntity worldObject)
     {
-        // Remove it from selected and highlighed
         if (worldObject is Entity e)
         {
             e.OnDestroy();

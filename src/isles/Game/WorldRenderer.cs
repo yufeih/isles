@@ -74,11 +74,6 @@ public class WorldRenderer
             Draw(entity, gameTime);
         }
 
-        if (_settings.ReflectionEnabled)
-        {
-            world.Terrain.UpdateWaterReflectionAndRefraction(matrices);
-        }
-
         // Generate shadow map
         if (_shadow != null)
         {
@@ -90,7 +85,7 @@ public class WorldRenderer
         // Draw spell
         Spell.CurrentSpell?.Draw(gameTime);
 
-        world.Terrain.DrawWater(gameTime, matrices);
+        world.Water.Draw(gameTime, matrices, world.Terrain.FogTexture);
 
         // Draw shadow receivers with the shadow map
         world.Terrain.DrawTerrain(_shadow, matrices);

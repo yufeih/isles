@@ -33,18 +33,19 @@ public class Heightmap
 
     public float GetHeight(float x, float y)
     {
-        x = MathHelper.Clamp(x / Step, 0, Width - 1);
-        y = MathHelper.Clamp(y / Step, 0, Height - 1);
-
-        // Get the position ON the current tile (0.0-1.0)!!!
-        float fX = x - (int)x, fY = y - (int)y;
+        x /= Step;
+        y /= Step;
 
         // Interpolate the current position
-        var ix2 = (int)x;
-        var iy2 = (int)y;
+        var ix2 = Math.Max(0, Math.Min((int)x, Width - 2));
+        var iy2 = Math.Max(0, Math.Min((int)y, Height - 2));
 
         var ix1 = ix2 + 1;
         var iy1 = iy2 + 1;
+
+        // Get the position ON the current tile (0.0-1.0)!!!
+        var fX = MathHelper.Clamp(x - (int)x, 0, 1);
+        var fY = MathHelper.Clamp(y - (int)y, 0, 1);
 
         if (fX + fY > 1) // opt. version
         {

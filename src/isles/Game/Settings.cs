@@ -12,7 +12,6 @@ public class Settings
     public int ScreenWidth { get; set; } = 960;
     public int ScreenHeight { get; set; } = 600;
     public bool Fullscreen { get; set; }
-    public bool ReflectionEnabled { get; set; }
     public bool ShadowEnabled { get; set; } = true;
     public BloomSettings BloomSettings { get; set; } = new();
     public float ViewDistanceSquared { get; set; } = 800;

@@ -1,32 +1,15 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Buffers;
-
 namespace Isles.Graphics;
 
 public class Terrain
 {
     private readonly GraphicsDevice _graphicsDevice;
-    private readonly ModelRenderer _modelRenderer;
     private readonly Heightmap _heightmap;
     private readonly Effect _terrainEffect;
 
-    private readonly int _vertexCount;
-    private readonly int _primitiveCount;
-    private readonly IndexBuffer _indexBuffer;
-    private readonly VertexBuffer _vertexBuffer;
-
-    private Texture waterTexture;
-    private Texture waterDstortion;
-    private RenderTarget2D reflectionRenderTarget;
-    private Texture2D waterReflection;
-    private int waterVertexCount;
-    private int waterPrimitiveCount;
-    private VertexBuffer waterVertices;
-    private IndexBuffer waterIndices;
-
-    private readonly Effect _waterEffect;
+    private readonly MeshDrawable _mesh;
 
     public Vector2 Size => _heightmap.Size;
 
@@ -34,82 +17,31 @@ public class Terrain
 
     private readonly List<(Texture2D color, Texture2D alpha)> _layers = new();
 
-    public Terrain(GraphicsDevice graphicsDevice, TerrainData data, Heightmap heightnmap, ModelRenderer modelRenderer, ShaderLoader shaderLoader, TextureLoader textureLoader)
+    public Terrain(GraphicsDevice graphicsDevice, TerrainData data, Heightmap heightmap, ShaderLoader shaderLoader, TextureLoader textureLoader)
     {
         _graphicsDevice = graphicsDevice;
-        _heightmap = heightnmap;
-        _modelRenderer = modelRenderer;
+        _heightmap = heightmap;
 
         foreach (var layer in data.Layers)
         {
             _layers.Add((textureLoader.LoadTexture(layer.ColorTexture), textureLoader.LoadTexture(layer.AlphaTexture)));
         }
 
-        waterTexture = textureLoader.LoadTexture(data.WaterTexture);
-        waterDstortion = textureLoader.LoadTexture(data.WaterBumpTexture);
-
         // Load terrain effect
         _terrainEffect = shaderLoader.LoadShader("shaders/Terrain.cso");
 
-        _vertexCount = _heightmap.Width * _heightmap.Height;
-        _primitiveCount = (_heightmap.Width - 1) * (_heightmap.Height - 1) * 2;
-        _vertexBuffer = new VertexBuffer(graphicsDevice, TerrainVertex.VertexDeclaration, _vertexCount, BufferUsage.WriteOnly);
-        _indexBuffer = new IndexBuffer(graphicsDevice, typeof(ushort), _primitiveCount * 3, BufferUsage.WriteOnly);
+        _mesh = MeshHelper.CreateHeightmap<VertexPositionTexture2>(heightmap, 32, SetTerrainVertex).ToDrawable(graphicsDevice);
 
-        var vertices = ArrayPool<TerrainVertex>.Shared.Rent(_vertexCount);
-        var indices = ArrayPool<ushort>.Shared.Rent(_primitiveCount * 3);
-
-        Triangulate(_heightmap, vertices, indices);
-
-        _indexBuffer.SetData(indices, 0, _primitiveCount * 3);
-        _vertexBuffer.SetData(vertices, 0, _vertexCount);
-
-        ArrayPool<TerrainVertex>.Shared.Return(vertices);
-        ArrayPool<ushort>.Shared.Return(indices);
-
-        _waterEffect = shaderLoader.LoadShader("shaders/Water.cso");
-        InitializeWater();
+        void SetTerrainVertex(int x, int y, ref VertexPositionTexture2 vertex)
+        {
+            vertex.TextureCoordinate1 = new(1.0f * x / (heightmap.Width - 1), 1.0f * y / (heightmap.Height - 1));
+        }
 
         surfaceEffect = shaderLoader.LoadShader("shaders/Surface.cso");
         surfaceVertexBuffer = new DynamicVertexBuffer(_graphicsDevice,
             typeof(VertexPositionColorTexture), MaxSurfaceVertices, BufferUsage.WriteOnly);
         surfaceIndexBuffer = new DynamicIndexBuffer(_graphicsDevice,
             typeof(ushort), MaxSurfaceIndices, BufferUsage.WriteOnly);
-    }
-
-    private static void Triangulate(Heightmap heightmap, TerrainVertex[] vertices, ushort[] indices)
-    {
-        var (w, h) = (heightmap.Width, heightmap.Height);
-
-        for (var i = 0; i < heightmap.Heights.Length; i++)
-        {
-            var y = Math.DivRem(i, w, out var x);
-            var z = (float)heightmap.Heights[i];
-
-            vertices[i].Position = new(x * heightmap.Step, y * heightmap.Step, z);
-            vertices[i].TextureCoordinate0 = new(1.0f * x / (w - 1) * heightmap.Step, 1.0f * y / (h - 1) * heightmap.Step);
-            vertices[i].TextureCoordinate1 = new(1.0f * x / (w - 1), 1.0f * y / (h - 1));
-        }
-
-        var index = 0;
-        for (var y = 0; y < h - 1; y++)
-        {
-            for (var x = 0; x < w - 1; x++)
-            {
-                var v0 = (ushort)(x + y * w);
-                var v1 = (ushort)(v0 + 1);
-                var v2 = (ushort)(x + (y + 1) * w);
-                var v3 = (ushort)(v2 + 1);
-
-                indices[index++] = v0;
-                indices[index++] = v1;
-                indices[index++] = v3;
-
-                indices[index++] = v0;
-                indices[index++] = v3;
-                indices[index++] = v2;
-            }
-        }
     }
 
     private struct TexturedSurface
@@ -271,145 +203,6 @@ public class Terrain
             PrimitiveType.TriangleList, 0, 0, surfaceVertices.Count, 0, surfaceIndices.Count / 3);
     }
 
-    private void InitializeWater()
-    {
-        // Reflection & Refraction textures
-        reflectionRenderTarget = new RenderTarget2D(
-            _graphicsDevice, 1024, 1024, true, SurfaceFormat.Color, _graphicsDevice.PresentationParameters.DepthStencilFormat, 0, RenderTargetUsage.DiscardContents);
-
-        // Create vb / ib
-        const int CellCount = 16;
-        const int TextureRepeat = 32;
-
-        waterVertexCount = (CellCount + 1) * (CellCount + 1);
-        waterPrimitiveCount = CellCount * CellCount * 2;
-        var vertexData = new VertexPositionTexture[waterVertexCount];
-
-        // Water height is zero at the 4 corners of the terrain quad
-        var waterSize = Math.Max(Size.X, Size.Y) * 2;
-        var cellSize = waterSize / CellCount;
-
-        var i = 0;
-        Vector2 pos;
-
-        for (var y = 0; y <= CellCount; y++)
-        {
-            for (var x = 0; x <= CellCount; x++)
-            {
-                pos.X = (Size.X - waterSize) / 2 + cellSize * x;
-                pos.Y = (Size.Y - waterSize) / 2 + cellSize * y;
-
-                vertexData[i].Position.X = pos.X;
-                vertexData[i].Position.Y = pos.Y;
-
-                vertexData[i].TextureCoordinate.X = 1.0f * x * TextureRepeat / CellCount;
-                vertexData[i].TextureCoordinate.Y = 1.0f * y * TextureRepeat / CellCount;
-
-                i++;
-            }
-        }
-
-        var indexData = new short[waterPrimitiveCount * 3];
-
-        i = 0;
-        for (var y = 0; y < CellCount; y++)
-        {
-            for (var x = 0; x < CellCount; x++)
-            {
-                indexData[i++] = (short)((CellCount + 1) * (y + 1) + x);     // 0
-                indexData[i++] = (short)((CellCount + 1) * y + x + 1);       // 2
-                indexData[i++] = (short)((CellCount + 1) * (y + 1) + x + 1); // 1
-                indexData[i++] = (short)((CellCount + 1) * (y + 1) + x);     // 0
-                indexData[i++] = (short)((CellCount + 1) * y + x);           // 3
-                indexData[i++] = (short)((CellCount + 1) * y + x + 1);       // 2
-            }
-        }
-
-        waterVertices = new VertexBuffer(
-            _graphicsDevice, typeof(VertexPositionTexture), waterVertexCount, BufferUsage.WriteOnly);
-
-        waterVertices.SetData(vertexData);
-
-        waterIndices = new IndexBuffer(
-            _graphicsDevice, typeof(short), waterPrimitiveCount * 3, BufferUsage.WriteOnly);
-
-        waterIndices.SetData(indexData);
-    }
-
-    public void UpdateWaterReflectionAndRefraction(in ViewMatrices matrices)
-    {
-        _graphicsDevice.PushRenderTarget(reflectionRenderTarget);
-
-        _graphicsDevice.Clear(Color.Black);
-
-        // Create a reflection view matrix
-        var viewReflect = Matrix.Multiply(
-            Matrix.CreateReflection(new Plane(Vector3.UnitZ, 0)), matrices.View);
-
-        DrawTerrain(viewReflect * matrices.Projection, true);
-
-        // Present the model manager to draw those models
-        _modelRenderer.Draw(viewReflect * matrices.Projection);
-
-        // Draw refraction onto the reflection texture
-        DrawTerrain(matrices.ViewProjection, false);
-
-        _graphicsDevice.PopRenderTarget();
-
-        // Retrieve refraction texture
-        waterReflection = reflectionRenderTarget;
-    }
-
-    public void DrawWater(GameTime gameTime, in ViewMatrices matrices)
-    {
-        _graphicsDevice.SetRenderState(BlendState.Opaque, DepthStencilState.DepthRead, RasterizerState.CullNone);
-
-        // Draw water mesh
-        _graphicsDevice.Indices = waterIndices;
-        _graphicsDevice.SetVertexBuffer(waterVertices);
-
-        if (FogTexture != null)
-        {
-            _waterEffect.Parameters["FogTexture"].SetValue(FogTexture);
-        }
-
-        _waterEffect.Parameters["ColorTexture"].SetValue(waterTexture);
-
-        if (waterReflection != null)
-        {
-            _waterEffect.CurrentTechnique = _waterEffect.Techniques["Realisic"];
-            _waterEffect.Parameters["ReflectionTexture"].SetValue(waterReflection);
-        }
-        else
-        {
-            _waterEffect.CurrentTechnique = _waterEffect.Techniques["Default"];
-        }
-
-        _waterEffect.Parameters["DistortionTexture"].SetValue(waterDstortion);
-        _waterEffect.Parameters["ViewInverse"].SetValue(matrices.ViewInverse);
-        _waterEffect.Parameters["WorldViewProj"].SetValue(matrices.ViewProjection);
-        _waterEffect.Parameters["WorldView"].SetValue(matrices.View);
-        _waterEffect.Parameters["DisplacementScroll"].SetValue(MoveInCircle(gameTime, 0.01f));
-
-        _waterEffect.CurrentTechnique.Passes[0].Apply();
-
-        _graphicsDevice.DrawIndexedPrimitives(
-            PrimitiveType.TriangleList, 0, 0, waterVertexCount, 0, waterPrimitiveCount);
-    }
-
-    /// <summary>
-    /// Helper for moving a value around in a circle.
-    /// </summary>
-    private static Vector2 MoveInCircle(GameTime gameTime, float speed)
-    {
-        var time = gameTime.TotalGameTime.TotalSeconds * speed;
-
-        var x = (float)Math.Cos(time);
-        var y = (float)Math.Sin(time);
-
-        return new Vector2(x, y);
-    }
-
     public void DrawTerrain(Matrix viewProjection, bool upper)
     {
         EffectTechnique technique = upper ?
@@ -440,9 +233,6 @@ public class Terrain
 
         _terrainEffect.Parameters["WorldViewProjection"].SetValue(viewProjection);
 
-        _graphicsDevice.SetVertexBuffer(_vertexBuffer);
-        _graphicsDevice.Indices = _indexBuffer;
-
         _terrainEffect.CurrentTechnique = technique;
         _terrainEffect.CurrentTechnique.Passes[0].Apply();
 
@@ -452,7 +242,7 @@ public class Terrain
             _terrainEffect.Parameters["AlphaTexture"].SetValue(alphaTexture);
             _terrainEffect.CurrentTechnique.Passes[0].Apply();
 
-            _graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, _vertexCount, 0, _primitiveCount);
+            _mesh.DrawPrimitives();
         }
     }
 
@@ -466,22 +256,6 @@ public class Terrain
 
         _terrainEffect.CurrentTechnique.Passes[0].Apply();
 
-        _graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, _vertexCount, 0, _primitiveCount);
-    }
-
-    struct TerrainVertex : IVertexType
-    {
-        public Vector3 Position { get; set; }
-        public Vector2 TextureCoordinate0 { get; set; }
-        public Vector2 TextureCoordinate1 { get; set; }
-
-        public static readonly VertexDeclaration VertexDeclaration = new(new VertexElement[]
-        {
-            new(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
-            new(12, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0),
-            new(20, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 1),
-        });
-
-        VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;
+        _mesh.DrawPrimitives();
     }
 }
