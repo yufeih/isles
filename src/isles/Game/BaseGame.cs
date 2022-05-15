@@ -54,8 +54,6 @@ public class BaseGame : Game, IEventListener
 
     public int ScreenHeight { get; private set; }
 
-    public BillboardManager Billboard { get; private set; }
-
     public ModelRenderer ModelRenderer { get; private set; }
 
     public Graphics2D Graphics2D { get; private set; }
@@ -115,8 +113,6 @@ public class BaseGame : Game, IEventListener
 
         // Initialize text
         Graphics2D = new Graphics2D(this);
-
-        Billboard = new BillboardManager(this);
 
         ModelRenderer = new ModelRenderer(GraphicsDevice, ShaderLoader);
 

@@ -6,7 +6,6 @@ namespace Isles.Graphics;
 public class Water
 {
     private readonly GraphicsDevice _graphicsDevice;
-    private readonly ModelRenderer _modelRenderer;
 
     private readonly Matrix _world;
     private readonly MeshDrawable _mesh;
@@ -15,10 +14,9 @@ public class Water
     private Texture _texture;
     private Texture _distortionTexture;
     
-    public Water(GraphicsDevice graphicsDevice, TerrainData data, ModelRenderer modelRenderer, ShaderLoader shaderLoader, TextureLoader textureLoader)
+    public Water(GraphicsDevice graphicsDevice, TerrainData data, ShaderLoader shaderLoader, TextureLoader textureLoader)
     {
         _graphicsDevice = graphicsDevice;
-        _modelRenderer = modelRenderer;
 
         _texture = textureLoader.LoadTexture(data.WaterTexture);
         _distortionTexture = textureLoader.LoadTexture(data.WaterBumpTexture);

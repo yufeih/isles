@@ -335,7 +335,6 @@ public class GameScreen : IScreen, IEventListener
         }
 
         // Force everything to be presented before UI is rendered
-        Game.Billboard.Present(matrics);
         Game.Graphics2D.Present();
         ParticleSystem.Present(matrics);
 

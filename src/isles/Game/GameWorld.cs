@@ -55,7 +55,7 @@ public class GameWorld
 
         Heightmap = Heightmap.Load(terrainData.Heightmap, terrainData.Step, terrainData.MinHeight, terrainData.MaxHeight);
         Terrain = new(Game.GraphicsDevice, terrainData, Heightmap, Game.ShaderLoader, Game.TextureLoader);
-        Water = new(Game.GraphicsDevice, terrainData, Game.ModelRenderer, Game.ShaderLoader, Game.TextureLoader);
+        Water = new(Game.GraphicsDevice, terrainData, Game.ShaderLoader, Game.TextureLoader);
         FogOfWar = new(Game.GraphicsDevice, Heightmap.Size.X, Heightmap.Size.Y);
         PathManager = new(Heightmap, model.PathOccluders);
 
