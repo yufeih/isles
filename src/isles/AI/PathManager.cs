@@ -207,10 +207,7 @@ public class PathBrush
 /// </summary>
 public class PathGraph : IPathGraph
 {
-    /// <summary>
-    /// Reference to the landscape.
-    /// </summary>
-    public ILandscape Landscape { get; set; }
+    public Heightmap Heightmap { get; set; }
 
     /// <summary>
     /// Graph data.
@@ -271,23 +268,20 @@ public class PathGraph : IPathGraph
 
     private ArrayBuilder<(int to, float cost)> _edges;
 
-    /// <summary>
-    /// Construct a landscape graph.
-    /// </summary>
-    public PathGraph(ILandscape landscape, float resolution, IEnumerable<Point> occluders)
+    public PathGraph(Heightmap heightmap, float resolution, IEnumerable<Point> occluders)
     {
-        Landscape = landscape ?? throw new ArgumentNullException();
+        Heightmap = heightmap ?? throw new ArgumentNullException();
 
         // Note landscape grid include the edges.
         // Currently the maximum grid resolution is 256 * 256, which generates
         // a path graph with a resolution of 2048 * 2048. Pretty large, ha :)
-        if (landscape.GridCount.X > 257 || landscape.GridCount.Y > 257)
+        if (heightmap.Width > 257 || heightmap.Height > 257)
         {
             throw new ArgumentException();
         }
 
-        EntryWidth = landscape.GridCount.X - 1;
-        EntryHeight = landscape.GridCount.Y - 1;
+        EntryWidth = heightmap.Width - 1;
+        EntryHeight = heightmap.Height - 1;
 
         if ((EntryWidth != 32 && EntryWidth != 64 && EntryWidth != 128 && EntryWidth != 256) ||
             (EntryHeight != 32 && EntryHeight != 64 && EntryHeight != 128 && EntryHeight != 256))
@@ -301,8 +295,8 @@ public class PathGraph : IPathGraph
 
         NodeCount = EntryHeight * EntryWidth;
 
-        mapWidth = landscape.Size.X;
-        mapHeight = landscape.Size.Y;
+        mapWidth = heightmap.Size.X;
+        mapHeight = heightmap.Size.Y;
 
         if (!Math2D.FloatEquals(mapWidth / EntryWidth, mapHeight / EntryHeight))
         {
@@ -315,7 +309,7 @@ public class PathGraph : IPathGraph
         // Initialize grid data
         InitializeEntry(resolution, occluders);
 
-        Landscape = landscape;
+        Heightmap = heightmap;
     }
 
     public static readonly int[] DX8 = new int[8] { 1, 1, 1, 0, -1, -1, -1, 0 };
@@ -342,7 +336,7 @@ public class PathGraph : IPathGraph
                 {
                     // If our resolution is big enough, we only test mid point
                     Vector2 position = GridToPosition(x, y);
-                    if (Landscape.IsPointOccluded(position.X, position.Y))
+                    if (Heightmap.GetHeight(position.X, position.Y) < -4)
                     {
                         Mark(x, y);
                     }
@@ -361,7 +355,7 @@ public class PathGraph : IPathGraph
                     {
                         for (var yy = y * CellSize; yy < (y + 1) * CellSize; yy += step)
                         {
-                            if (Landscape.IsPointOccluded(xx, yy))
+                            if (Heightmap.GetHeight(xx, yy) < -4)
                             {
                                 overlappedPoints++;
                             }
@@ -645,21 +639,6 @@ public class PathManager
     /// Resolution for small graph.
     /// </summary>
     public const float Resolution = 4;
-
-    /// <summary>
-    /// Current landscape.
-    /// </summary>
-    public ILandscape Landscape
-    {
-        get => landscape;
-        set
-        {
-            landscape = value;
-            Graph.Landscape = value;
-        }
-    }
-
-    private ILandscape landscape;
 
     /// <summary>
     /// Graph search.
@@ -951,16 +930,9 @@ public class PathManager
         }
     }
 
-    /// <summary>
-    /// Create a new path manager on a given landscape.
-    /// </summary>
-    /// <param name="landscape"></param>
-    public PathManager(ILandscape landscape, IEnumerable<Point> occluders)
+    public PathManager(Heightmap heightmap, IEnumerable<Point> occluders)
     {
-        this.landscape = landscape;
-
-        // Create a new graph
-        Graph = new PathGraph(landscape, Resolution, occluders);
+        Graph = new PathGraph(heightmap, Resolution, occluders);
     }
 
     public void Mark(IMovable agent)

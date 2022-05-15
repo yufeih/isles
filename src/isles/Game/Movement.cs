@@ -388,7 +388,7 @@ public class StateSeekToPosition : BaseState
             elapsedWaitTime = 0;
 
             // Move one step forward
-            target.Z = pathManager.Landscape.GetHeight(target.X, target.Y);
+            target.Z = pathManager.Graph.Heightmap.GetHeight(target.X, target.Y);
 
             owner.Position = target;
             pathManager.UpdateMovable(owner);

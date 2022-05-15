@@ -395,11 +395,15 @@ public abstract class BaseLandscape : ILandscape, ITerrain
     /// </summary>
     protected int GridCountOnYAxis { get; private set; }
 
-    public virtual void Load(TerrainData data, TextureLoader textureLoader)
-    {
-        size = new(data.Width, data.Depth, data.Height);
+    protected Heightmap Heightmap { get; private set; }
 
-        var heightmap = TextureLoader.ReadAllPixels(data.Heightmap, out var w, out var h);
+    public virtual void Load(TerrainData data, Heightmap heightnmap, TextureLoader textureLoader)
+    {
+        Heightmap = heightnmap;
+
+        var w = heightnmap.Width;
+        var h = heightnmap.Height;
+        size = new((w - 1) * data.Step, (h - 1) * data.Step, data.MaxHeight - data.MinHeight);
 
         GridCountOnXAxis = w;
         GridCountOnYAxis = h;
@@ -409,13 +413,7 @@ public abstract class BaseLandscape : ILandscape, ITerrain
         {
             for (var x = 0; x < GridCountOnXAxis; x++)
             {
-                HeightField[x, y] = data.BaseHeight + data.Height * heightmap[y * w + x].R / 255f;
-
-                // TEST: Lower vertices under water
-                if (HeightField[x, y] < 0)
-                {
-                    HeightField[x, y] *= 1.4f;
-                }
+                HeightField[x, y] = (float)heightnmap.Heights[y * w + x];
             }
         }
 
@@ -475,260 +473,5 @@ public abstract class BaseLandscape : ILandscape, ITerrain
     protected Patch GetPatch(int x, int y)
     {
         return Patches[y * PatchCountOnXAxis + x];
-    }
-
-    public Point GridCount => new(GridCountOnXAxis, GridCountOnYAxis);
-
-    /// <summary>
-    /// Gets whether the point is walkable (E.g., above water).
-    /// </summary>
-    public bool IsPointOccluded(float x, float y)
-    {
-        return GetHeight(x, y) < -4;
-    }
-
-    /// <summary>
-    /// Gets the landscape size.Z of any given point.
-    /// </summary>
-    public float GetHeight(float x, float y)
-    {
-        // Grabbed and modified from racing game
-        // We don't want to cause any exception here
-        if (x < 0)
-        {
-            x = 0;
-        }
-        else if (x >= size.X)
-        {
-            x = size.X - 1;  // x can't be heightfieldWidth-1
-        }
-
-        // or there'll be an out of range
-        if (y < 0) // exception. So is y.
-        {
-            y = 0;
-        }
-        else if (y >= size.Y)
-        {
-            y = size.Y - 1;
-        }
-
-        // Rescale to our heightfield dimensions
-        x *= (GridCountOnXAxis - 1) / size.X;
-        y *= (GridCountOnYAxis - 1) / size.Y;
-
-        // Get the position ON the current tile (0.0-1.0)!!!
-        float
-            fX = x - (int)x,
-            fY = y - (int)y;
-
-        // Interpolate the current position
-        var ix2 = (int)x;
-        var iy2 = (int)y;
-
-        var ix1 = ix2 + 1;
-        var iy1 = iy2 + 1;
-
-        if (fX + fY > 1) // opt. version
-        {
-            // we are on triangle 1 !!
-            //  0____1
-            //   \   |
-            //    \  |
-            //     \ |
-            //      \|
-            //  2    3
-            return
-                HeightField[ix1, iy1] + // 1
-                (1.0f - fX) * (HeightField[ix2, iy1] - HeightField[ix1, iy1]) + // 0
-                (1.0f - fY) * (HeightField[ix1, iy2] - HeightField[ix1, iy1]); // 3
-        }
-
-        // we are on triangle 1 !!
-        //  0     1
-        //  |\
-        //  | \
-        //  |  \
-        //  |   \
-        //  |    \
-        //  2_____3
-        var height =
-            HeightField[ix2, iy2] + // 2
-            fX * (HeightField[ix1, iy2] - HeightField[ix2, iy2]) + // 3
-            fY * (HeightField[ix2, iy1] - HeightField[ix2, iy2]); // 0
-
-        // For those area underwater, we set the height to zero
-        return height;// < 0 ? 0 : height;
-    }
-
-    /// <summary>
-    /// Cached pick position. Remember to set it to null each frame.
-    /// </summary>
-    private Vector3? picked;
-
-    /// <summary>
-    /// Gets the current point of the terrain picked by the cursor.
-    /// </summary>
-    public Vector3? Pick()
-    {
-        return picked != null ? picked : Intersects(game.PickRay);
-    }
-
-    /// <summary>
-    /// Checks whether a ray intersects the terrain mesh.
-    /// </summary>
-    /// <param name="ray"></param>
-    /// <returns>Intersection point or null if there's no intersection.</returns>
-    public Vector3? Intersects(Ray ray)
-    {
-        // Normalize ray direction
-        ray.Direction.Normalize();
-
-        // Get two vertices to draw a line through the
-        // heightfield.
-        //
-        // 1. Project the ray to XY plane
-        // 2. Compute the 2 intersections of the ray and
-        //    terrain bounding box (Projected)
-        // 3. Find the 2 points to draw
-        var i = 0;
-        var points = new Vector3[2];
-
-        // Line equation: y = k * (x - x0) + y0
-        var k = ray.Direction.Y / ray.Direction.X;
-        var invK = ray.Direction.X / ray.Direction.Y;
-        var r = ray.Position.Y - ray.Position.X * k;
-        if (r >= 0 && r <= size.Y)
-        {
-            points[i++] = new Vector3(0, r,
-                ray.Position.Z - ray.Position.X *
-                ray.Direction.Z / ray.Direction.X);
-        }
-
-        r = ray.Position.Y + (size.X - ray.Position.X) * k;
-        if (r >= 0 && r <= size.Y)
-        {
-            points[i++] = new Vector3(size.X, r,
-                ray.Position.Z + (size.X - ray.Position.X) *
-                ray.Direction.Z / ray.Direction.X);
-        }
-
-        if (i < 2)
-        {
-            r = ray.Position.X - ray.Position.Y * invK;
-            if (r >= 0 && r <= size.X)
-            {
-                points[i++] = new Vector3(r, 0,
-                    ray.Position.Z - ray.Position.Y *
-                    ray.Direction.Z / ray.Direction.Y);
-            }
-        }
-
-        if (i < 2)
-        {
-            r = ray.Position.X + (size.Y - ray.Position.Y) * invK;
-            if (r >= 0 && r <= size.X)
-            {
-                points[i++] = new Vector3(r, size.Y,
-                    ray.Position.Z + (size.Y - ray.Position.Y) *
-                    ray.Direction.Z / ray.Direction.Y);
-            }
-        }
-
-        if (i < 2)
-        {
-            return null;
-        }
-
-        // When ray position is inside the box, it should be one
-        // of the starting point
-        var inside = ray.Position.X > 0 && ray.Position.X < size.X &&
-                      ray.Position.Y > 0 && ray.Position.Y < size.Y;
-
-        Vector3 v1 = Vector3.Zero, v2 = Vector3.Zero;
-        // Sort the 2 points to make the line follow the direction
-        if (ray.Direction.X > 0)
-        {
-            if (points[0].X < points[1].X)
-            {
-                v2 = points[1];
-                v1 = inside ? ray.Position : points[0];
-            }
-            else
-            {
-                v2 = points[0];
-                v1 = inside ? ray.Position : points[1];
-            }
-        }
-        else if (ray.Direction.X < 0)
-        {
-            if (points[0].X > points[1].X)
-            {
-                v2 = points[1];
-                v1 = inside ? ray.Position : points[0];
-            }
-            else
-            {
-                v2 = points[0];
-                v1 = inside ? ray.Position : points[1];
-            }
-        }
-
-        // Trace steps along your line and determine the size.Z at each point,
-        // for each sample point look up the size.Z of the terrain and determine
-        // if the point on the line is above or below the terrain. Once you have
-        // determined the two sampling points that are above and below the terrain
-        // you can refine using binary searching.
-        const float SamplePrecision = 5.0f;
-        const int RefineSteps = 5;
-
-        var length = Vector3.Subtract(v2, v1).Length();
-        float current = 0;
-
-        var point = new Vector3[2];
-        Vector3 step = ray.Direction * SamplePrecision;
-        point[0] = v1;
-
-        while (current < length)
-        {
-            if (GetHeight(point[0].X, point[0].Y) >= point[0].Z)
-            {
-                break;
-            }
-
-            point[0] += step;
-            current += SamplePrecision;
-        }
-
-        if (current > 0 && current < length)
-        {
-            // Perform binary search
-            Vector3 p = point[0];
-            point[1] = point[0] - step;
-
-            for (i = 0; i < RefineSteps; i++)
-            {
-                p = (point[0] + point[1]) * 0.5f;
-
-                if (GetHeight(p.X, p.Y) >= p.Z)
-                {
-                    point[0] = p;
-                }
-                else
-                {
-                    point[1] = p;
-                }
-            }
-
-            return p;
-        }
-
-        return null;
-    }
-
-    public virtual void Update(GameTime gameTime)
-    {
-        // Set picked to null
-        picked = null;
     }
 }

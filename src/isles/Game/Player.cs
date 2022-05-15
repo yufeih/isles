@@ -1316,7 +1316,7 @@ public class LocalPlayer : Player
         if (Selected.Count > 0 && type == EventType.RightButtonDown)
         {
             Entity picked = world.Pick();
-            Vector3? location = world.Landscape.Pick();
+            Vector3? location = world.Heightmap.Raycast(game.PickRay);
             EventResult handled = EventResult.Unhandled;
 
             var queueAction = game.Input.Keyboard.IsKeyDown(Keys.LeftShift) ||
@@ -1432,7 +1432,7 @@ public class LocalPlayer : Player
         Vector3 center;
         center.X = position.X;
         center.Y = position.Y;
-        center.Z = world.Landscape.GetHeight(position.X, position.Y);
+        center.Z = world.Heightmap.GetHeight(position.X, position.Y);
 
         Ray ray = game.Unproject(game.ScreenWidth / 2, game.ScreenHeight / 2);
 
@@ -1481,7 +1481,7 @@ public class LocalPlayer : Player
             }
         }
 
-        location.Z = world.Landscape.GetHeight(location.X, location.Y);
+        location.Z = world.Heightmap.GetHeight(location.X, location.Y);
         GameUI.Singleton.SetCursorFocus(location, Color.Green);
     }
 

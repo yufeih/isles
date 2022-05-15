@@ -1,10 +1,8 @@
 {
-  "Width": 2048,
-  "Depth": 2048,
-  "Height": 80,
-  "BaseHeight": -43.3,
+  "Step": 16,
+  "MaxHeight": 40,
+  "MinHeight": -40,
   "Heightmap": "data/landscapes/isles.png",
-  "EarthRadius": 65000,
   "WaterTexture": "data/landscapes/water.png",
   "WaterBumpTexture": "data/landscapes/water_normalmap.png",
   "Layers": [

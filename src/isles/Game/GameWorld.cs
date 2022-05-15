@@ -20,6 +20,8 @@ public class GameWorld
 
     public Terrain Landscape { get; private set; }
 
+    public Heightmap Heightmap { get; private set; }
+
     public PathManager PathManager { get; private set; }
 
     public FogOfWar FogOfWar { get; private set; }
@@ -29,7 +31,6 @@ public class GameWorld
     public void Update(GameTime gameTime)
     {
         Flush();
-        Landscape.Update(gameTime);
 
         foreach (var o in _worldObjects)
         {
@@ -48,10 +49,13 @@ public class GameWorld
     {
         context.Refresh(2);
 
+        var terrainData = JsonSerializer.Deserialize<TerrainData>(File.ReadAllBytes(model.Landscape));
+
+        Heightmap = Heightmap.Load(terrainData.Heightmap, terrainData.Step, terrainData.MinHeight, terrainData.MaxHeight);
+
         // Load landscape
         Landscape = new Terrain();
-        Landscape.Load(JsonSerializer.Deserialize<TerrainData>(
-            File.ReadAllBytes(model.Landscape)), BaseGame.Singleton.TextureLoader);
+        Landscape.Load(terrainData, Heightmap, BaseGame.Singleton.TextureLoader);
 
         // Initialize fog of war
         FogOfWar = new FogOfWar(Game.GraphicsDevice, Landscape.Size.X, Landscape.Size.Y);
@@ -59,7 +63,7 @@ public class GameWorld
         context.Refresh(5);
 
         // Create a path manager for the landscape
-        PathManager = new PathManager(Landscape, model.PathOccluders);
+        PathManager = new PathManager(Heightmap, model.PathOccluders);
 
         context.Refresh(10);
 

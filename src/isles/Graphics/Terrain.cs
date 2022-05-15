@@ -47,9 +47,9 @@ public class Terrain : BaseLandscape
 
     public Effect WaterEffect { get; set; }
 
-    public override void Load(TerrainData data, TextureLoader textureLoader)
+    public override void Load(TerrainData data, Heightmap heightmap, TextureLoader textureLoader)
     {
-        base.Load(data, textureLoader);
+        base.Load(data, heightmap, textureLoader);
 
         waterTexture = textureLoader.LoadTexture(data.WaterTexture);
         waterDstortion = textureLoader.LoadTexture(data.WaterBumpTexture);
@@ -187,7 +187,7 @@ public class Terrain : BaseLandscape
         surface.Position = position;
 
         // Plus a little offset
-        surface.Position.Z = GetHeight(position.X, position.Y) + 6;
+        surface.Position.Z = Heightmap.GetHeight(position.X, position.Y) + 6;
 
         // Divided by 2 so we don't have to do this during presentation
         surface.Width = width / 2;
@@ -337,7 +337,6 @@ public class Terrain : BaseLandscape
 
         var i = 0;
         Vector2 pos;
-        var center = new Vector2(Size.X / 2, Size.Y / 2);
 
         for (var y = 0; y <= CellCount; y++)
         {

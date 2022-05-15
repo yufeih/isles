@@ -90,7 +90,7 @@ public class MiniMap : UIElement
                 X = world.Landscape.Size.X * (mapPoint.X - ActualArea.X) / ActualArea.Width,
                 Y = world.Landscape.Size.Y * (ActualArea.Bottom - mapPoint.Y) / ActualArea.Height,
             };
-            rtv.Z = world.Landscape.GetHeight(rtv.X, rtv.Y);
+            rtv.Z = world.Heightmap.GetHeight(rtv.X, rtv.Y);
             return rtv;
         }
 
@@ -104,7 +104,7 @@ public class MiniMap : UIElement
             X = world.Landscape.Size.X * (mapPoint.X - ActualArea.X) / ActualArea.Width,
             Y = world.Landscape.Size.Y * (ActualArea.Bottom - mapPoint.Y) / ActualArea.Height,
         };
-        rtv.Z = world.Landscape.GetHeight(rtv.X, rtv.Y);
+        rtv.Z = world.Heightmap.GetHeight(rtv.X, rtv.Y);
         return rtv;
     }
 

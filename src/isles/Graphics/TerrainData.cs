@@ -5,10 +5,9 @@ namespace Isles.Graphics;
 
 public class TerrainData
 {
-    public float Width { get; init; }
-    public float Depth { get; init; }
-    public float Height { get; init; }
-    public float BaseHeight { get; init; }
+    public float Step { get; init; }
+    public float MinHeight { get; init; }
+    public float MaxHeight { get; init; }
     public string Heightmap { get; init; }
     public string WaterTexture { get; init; }
     public string WaterBumpTexture { get; init; }

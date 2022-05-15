@@ -404,7 +404,7 @@ public abstract class GameObject : Entity, ISelectable
         UpdateFogOfWar();
 
         // Snap to ground
-        Position = new(Position.X, Position.Y, World.Landscape.GetHeight(Position.X, Position.Y));
+        Position = new(Position.X, Position.Y, World.Heightmap.GetHeight(Position.X, Position.Y));
 
         base.Update(gameTime);
 
