@@ -74,11 +74,6 @@ public class WorldRenderer
             Draw(entity, gameTime);
         }
 
-        if (_settings.ReflectionEnabled)
-        {
-            world.Landscape.UpdateWaterReflectionAndRefraction(matrices);
-        }
-
         // Generate shadow map
         if (_shadow != null)
         {
@@ -90,13 +85,13 @@ public class WorldRenderer
         // Draw spell
         Spell.CurrentSpell?.Draw(gameTime);
 
-        world.Landscape.DrawWater(gameTime, matrices);
+        world.Water.Draw(gameTime, matrices, world.Terrain.FogTexture);
 
         // Draw shadow receivers with the shadow map
-        world.Landscape.DrawTerrain(_shadow, matrices);
+        world.Terrain.DrawTerrain(_shadow, matrices);
 
         // Present surface
-        world.Landscape.PresentSurface(matrices);
+        world.Terrain.PresentSurface(matrices);
 
         // FIXME: There are some weired things when models are drawed after
         // drawing the terrain... Annoying...
@@ -205,7 +200,7 @@ public class WorldRenderer
         {
             if (entity.Selected && entity.IsAlive)
             {
-                entity.World.Landscape.DrawSurface(
+                entity.World.Terrain.DrawSurface(
                     entity.AreaRadius > 16 ?
                     GameObject.SelectionAreaTextureLarge : GameObject.SelectionAreaTexture, 
                     entity.Position,

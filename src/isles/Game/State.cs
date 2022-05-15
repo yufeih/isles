@@ -984,7 +984,7 @@ public class StateCharactorDie : BaseState
         }
 
         sink = true;
-        baseHeight = owner.World.Landscape.GetHeight(
+        baseHeight = owner.World.Heightmap.GetHeight(
             owner.Position.X, owner.Position.Y) - height;
     }
 

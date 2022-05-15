@@ -72,9 +72,6 @@ public class FogOfWar
 
     private readonly List<Entry> visibleAreas = new();
 
-    /// <summary>
-    /// Creates a new fog of war mask.
-    /// </summary>
     public FogOfWar(GraphicsDevice graphics, float width, float height)
     {
         if (graphics == null || width <= 0 || height <= 0)

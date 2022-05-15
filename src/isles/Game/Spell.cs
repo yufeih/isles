@@ -996,7 +996,7 @@ public class SpellConstruct : Spell
         // Update entity position
         if (step == 0)
         {
-            var target = world.Landscape.Pick();
+            var target = world.Heightmap.Raycast(world.Game.PickRay);
             if (target.HasValue)
             {
                 entity.Position = target.Value;
@@ -1225,7 +1225,7 @@ public class SpellAttack : Spell
             }
 
             // Attack to position
-            Vector3? point = world.Landscape.Pick();
+            Vector3? point = world.Heightmap.Raycast(world.Game.PickRay);
 
             if (point.HasValue)
             {
@@ -1234,7 +1234,7 @@ public class SpellAttack : Spell
                 Spell.EndSpell();
 
                 Vector3 location = point.Value;
-                location.Z = world.Landscape.GetHeight(location.X, location.Y);
+                location.Z = world.Heightmap.GetHeight(location.X, location.Y);
                 GameUI.Singleton.SetCursorFocus(location, Color.Red);
             }
 
@@ -1309,7 +1309,7 @@ public class SpellMove : Spell
             }
 
             // Attack to position
-            Vector3? point = world.Landscape.Pick();
+            Vector3? point = world.Heightmap.Raycast(world.Game.PickRay);
 
             if (point.HasValue)
             {
@@ -1318,7 +1318,7 @@ public class SpellMove : Spell
                 Spell.EndSpell();
 
                 Vector3 location = point.Value;
-                location.Z = world.Landscape.GetHeight(location.X, location.Y);
+                location.Z = world.Heightmap.GetHeight(location.X, location.Y);
                 GameUI.Singleton.SetCursorFocus(location, Color.Green);
             }
 

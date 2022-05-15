@@ -1,7 +1,7 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Isles;
+namespace Isles.Graphics;
 
 public enum MessageType
 {
@@ -191,10 +191,10 @@ public class GameUI : IEventListener
         // Init rendering of fog of war
         fogOfWarVertices = new VertexPositionTexture[4]
         {
-                new VertexPositionTexture(Vector3.Zero, new Vector2(0, 0)),
-                new VertexPositionTexture(Vector3.Zero, new Vector2(0, 1)),
-                new VertexPositionTexture(Vector3.Zero, new Vector2(1, 0)),
-                new VertexPositionTexture(Vector3.Zero, new Vector2(1, 1)),
+            new() { TextureCoordinate = new(0, 0) },
+            new() { TextureCoordinate = new(0, 1) },
+            new() { TextureCoordinate = new(1, 0) },
+            new() { TextureCoordinate = new(1, 1) },
         };
     }
 
@@ -718,7 +718,7 @@ public class GameUI : IEventListener
             game.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, fogOfWarVertices, 0, 2);
 
             // This will be drawed next frame...
-            world.Landscape.FogTexture = world.FogOfWar.Mask;
+            world.Terrain.FogTexture = world.FogOfWar.Mask;
         }
     }
 

@@ -87,10 +87,10 @@ public class MiniMap : UIElement
         {
             var rtv = new Vector3
             {
-                X = world.Landscape.Size.X * (mapPoint.X - ActualArea.X) / ActualArea.Width,
-                Y = world.Landscape.Size.Y * (ActualArea.Bottom - mapPoint.Y) / ActualArea.Height,
+                X = world.Terrain.Size.X * (mapPoint.X - ActualArea.X) / ActualArea.Width,
+                Y = world.Terrain.Size.Y * (ActualArea.Bottom - mapPoint.Y) / ActualArea.Height,
             };
-            rtv.Z = world.Landscape.GetHeight(rtv.X, rtv.Y);
+            rtv.Z = world.Heightmap.GetHeight(rtv.X, rtv.Y);
             return rtv;
         }
 
@@ -101,22 +101,22 @@ public class MiniMap : UIElement
     {
         var rtv = new Vector3
         {
-            X = world.Landscape.Size.X * (mapPoint.X - ActualArea.X) / ActualArea.Width,
-            Y = world.Landscape.Size.Y * (ActualArea.Bottom - mapPoint.Y) / ActualArea.Height,
+            X = world.Terrain.Size.X * (mapPoint.X - ActualArea.X) / ActualArea.Width,
+            Y = world.Terrain.Size.Y * (ActualArea.Bottom - mapPoint.Y) / ActualArea.Height,
         };
-        rtv.Z = world.Landscape.GetHeight(rtv.X, rtv.Y);
+        rtv.Z = world.Heightmap.GetHeight(rtv.X, rtv.Y);
         return rtv;
     }
 
     public Point? WorldToMap(Vector3 position)
     {
-        if (position.X >= 0 && position.X <= world.Landscape.Size.X &&
-            position.Y >= 0 && position.Y <= world.Landscape.Size.Y)
+        if (position.X >= 0 && position.X <= world.Terrain.Size.X &&
+            position.Y >= 0 && position.Y <= world.Terrain.Size.Y)
         {
             var mp = new Point
             {
-                X = (int)(position.X / world.Landscape.Size.X * ActualArea.Width + ActualArea.X),
-                Y = (int)((1 - position.Y / world.Landscape.Size.Y) * ActualArea.Height + ActualArea.Y),
+                X = (int)(position.X / world.Terrain.Size.X * ActualArea.Width + ActualArea.X),
+                Y = (int)((1 - position.Y / world.Terrain.Size.Y) * ActualArea.Height + ActualArea.Y),
             };
             return mp;
         }
@@ -128,8 +128,8 @@ public class MiniMap : UIElement
     {
         var mp = new Point
         {
-            X = (int)(position.X / world.Landscape.Size.X * ActualArea.Width + ActualArea.X),
-            Y = (int)((1 - position.Y / world.Landscape.Size.Y) * ActualArea.Height + ActualArea.Y),
+            X = (int)(position.X / world.Terrain.Size.X * ActualArea.Width + ActualArea.X),
+            Y = (int)((1 - position.Y / world.Terrain.Size.Y) * ActualArea.Height + ActualArea.Y),
         };
         return mp;
     }

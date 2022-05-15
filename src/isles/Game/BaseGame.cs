@@ -85,8 +85,8 @@ public class BaseGame : Game, IEventListener
         };
 
         // Show cursor
-        IsMouseVisible = Settings.IsMouseVisible;
-        IsFixedTimeStep = Settings.IsFixedTimeStep;
+        IsMouseVisible = true;
+        IsFixedTimeStep = true;
     }
 
     public static BaseGame Singleton { get; private set; }
@@ -140,7 +140,7 @@ public class BaseGame : Game, IEventListener
         if (Camera != null && CurrentScreen is GameScreen gs)
         {
             var dt = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-            Camera.Update(gs.World.Landscape);
+            Camera.Update(gs.World.Heightmap);
             Camera.UpdateInput(dt, GraphicsDevice.Viewport.Bounds);
             UpdateMatrices();
             UpdatePickRay();
