@@ -85,8 +85,8 @@ public class BaseGame : Game, IEventListener
         };
 
         // Show cursor
-        IsMouseVisible = Settings.IsMouseVisible;
-        IsFixedTimeStep = Settings.IsFixedTimeStep;
+        IsMouseVisible = true;
+        IsFixedTimeStep = true;
     }
 
     public static BaseGame Singleton { get; private set; }

@@ -18,7 +18,7 @@ public class GameWorld
 
     public BaseGame Game { get; } = BaseGame.Singleton;
 
-    public Terrain Landscape { get; private set; }
+    public Terrain Terrain { get; private set; }
 
     public Heightmap Heightmap { get; private set; }
 
@@ -54,11 +54,10 @@ public class GameWorld
         Heightmap = Heightmap.Load(terrainData.Heightmap, terrainData.Step, terrainData.MinHeight, terrainData.MaxHeight);
 
         // Load landscape
-        Landscape = new Terrain();
-        Landscape.Load(terrainData, Heightmap, BaseGame.Singleton.TextureLoader);
+        Terrain = new Terrain(Game.GraphicsDevice, terrainData, Heightmap, Game.ModelRenderer, Game.ShaderLoader, Game.TextureLoader);
 
         // Initialize fog of war
-        FogOfWar = new FogOfWar(Game.GraphicsDevice, Landscape.Size.X, Landscape.Size.Y);
+        FogOfWar = new FogOfWar(Game.GraphicsDevice, Terrain.Size.X, Terrain.Size.Y);
 
         context.Refresh(5);
 

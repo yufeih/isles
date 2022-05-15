@@ -718,7 +718,7 @@ public class GameUI : IEventListener
             game.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, fogOfWarVertices, 0, 2);
 
             // This will be drawed next frame...
-            world.Landscape.FogTexture = world.FogOfWar.Mask;
+            world.Terrain.FogTexture = world.FogOfWar.Mask;
         }
     }
 
