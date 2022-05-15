@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Using Include="Isles.Graphics" />
     <Using Include="Microsoft.Xna.Framework" />
     <Using Include="Microsoft.Xna.Framework.Graphics" />
     <Using Include="Microsoft.Xna.Framework.Graphics.PackedVector" />

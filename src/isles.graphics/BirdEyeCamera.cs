@@ -53,13 +53,13 @@ public class BirdEyeCamera
         _lookAt = position;
     }
 
-    public void Update(ITerrain? terrain)
+    public void Update(Heightmap? heightmap)
     {
-        if (terrain != null)
+        if (heightmap != null)
         {
-            _lookAt.X = MathHelper.Clamp(_lookAt.X, BoundsBorder, terrain.Size.X - BoundsBorder);
-            _lookAt.Y = MathHelper.Clamp(_lookAt.Y, BoundsBorder, terrain.Size.Y - BoundsBorder);
-            _lookAt.Z = terrain.GetHeight(_lookAt.X, _lookAt.Y);
+            _lookAt.X = MathHelper.Clamp(_lookAt.X, BoundsBorder, heightmap.Size.X - BoundsBorder);
+            _lookAt.Y = MathHelper.Clamp(_lookAt.Y, BoundsBorder, heightmap.Size.Y - BoundsBorder);
+            _lookAt.Z = heightmap.GetHeight(_lookAt.X, _lookAt.Y);
         }
 
         var angle = MathHelper.ToRadians(60);

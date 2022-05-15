@@ -3,7 +3,7 @@
 
 namespace Isles.Graphics;
 
-public abstract class BaseLandscape : ILandscape, ITerrain
+public abstract class BaseLandscape
 {
     protected struct Layer
     {
