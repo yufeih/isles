@@ -3,6 +3,11 @@
 
 namespace Isles.Graphics;
 
+public interface IVertexPosition
+{
+    Vector3 Position { get; set; }
+}
+
 public class Heightmap
 {
     public int Width { get; }
@@ -76,6 +81,39 @@ public class Heightmap
 
         // For those area underwater, we set the height to zero
         return height;// < 0 ? 0 : height;
+    }
+
+    public void Triangulate<T>(Span<T> vertices, Span<ushort> indices) where T: IVertexPosition
+    {
+        for (var y = 0; y < Height; y++)
+        {
+            for (var x = 0; x < Width; x++)
+            {
+                var i = x + y * Width;
+                var z = (float)Heights[i];
+                vertices[i].Position = new(x * Step, y * Step, z);
+            }
+        }
+
+        var index = 0;
+        for (var y = 0; y < Height - 1; y++)
+        {
+            for (var x = 0; x < Width - 1; x++)
+            {
+                var v0 = (ushort)(x + y * Width);
+                var v1 = (ushort)(v0 + 1);
+                var v2 = (ushort)(x + (y + 1) * Width);
+                var v3 = (ushort)(v2 + 1);
+
+                indices[index++] = v0;
+                indices[index++] = v1;
+                indices[index++] = v3;
+
+                indices[index++] = v0;
+                indices[index++] = v3;
+                indices[index++] = v3;
+            }
+        }
     }
 
     /// <summary>

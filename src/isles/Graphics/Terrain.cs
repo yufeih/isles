@@ -1,45 +1,24 @@
 // Copyright (c) Yufei Huang. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Buffers;
+
 namespace Isles.Graphics;
 
 public class Terrain : BaseLandscape
 {
     private Effect terrainEffect;
-    private IndexBuffer indexBuffer;
-    private VertexBuffer[] vertexBuffers;
 
-    private int vertexCount;
-    private int primitiveCount;
+    private int _vertexCount;
+    private int _primitiveCount;
+    private IndexBuffer _indexBuffer;
+    private VertexBuffer _vertexBuffer;
 
-    /// <summary>
-    /// Gets or sets the fog texture used to draw the landscape.
-    /// </summary>
     public Texture2D FogTexture { get; set; }
-
-    /// <summary>
-    /// A static texture applied to the water surface.
-    /// </summary>
     private Texture waterTexture;
-
-    /// <summary>
-    /// This texture is used as a bump map to simulate water.
-    /// </summary>
     private Texture waterDstortion;
-
-    /// <summary>
-    /// Render target used to draw the reflection & refraction texture.
-    /// </summary>
     private RenderTarget2D reflectionRenderTarget;
-
-    /// <summary>
-    /// This texture is generated each frame for water reflection color sampling.
-    /// </summary>
     private Texture2D waterReflection;
-
-    /// <summary>
-    /// Water mesh.
-    /// </summary>
     private int waterVertexCount;
     private int waterPrimitiveCount;
     private VertexBuffer waterVertices;
@@ -64,89 +43,22 @@ public class Terrain : BaseLandscape
         // Load terrain effect
         terrainEffect = game.ShaderLoader.LoadShader("shaders/Terrain.cso");
 
-        // Set patch LOD to highest
-        foreach (Patch patch in Patches)
-        {
-            patch.LevelOfDetail = Patch.HighestLOD;
-        }
+        _vertexCount = Heightmap.Width * Heightmap.Height;
+        _primitiveCount = (Heightmap.Width - 1) * (Heightmap.Height - 1) * 2;
+        _vertexBuffer = new VertexBuffer(game.GraphicsDevice, TerrainVertex.VertexDeclaration, _vertexCount, BufferUsage.WriteOnly);
+        _indexBuffer = new IndexBuffer(game.GraphicsDevice, typeof(ushort), _primitiveCount * 3, BufferUsage.WriteOnly);
 
-        // Initialize index buffer.
-        // All patches use the same index buffer since tiled landscape
-        // do not deal with LOD stuff :)
-        indexBuffer = new IndexBuffer(game.GraphicsDevice, typeof(ushort),
-                                      6 * Patch.MaxPatchResolution *
-                                          Patch.MaxPatchResolution,
-                                      BufferUsage.WriteOnly);
+        var vertices = ArrayPool<TerrainVertex>.Shared.Rent(_vertexCount);
+        var indices = ArrayPool<ushort>.Shared.Rent(_primitiveCount * 3);
 
-        var indices = new ushort[6 * Patch.MaxPatchResolution *
-                                          Patch.MaxPatchResolution];
+        Heightmap.Triangulate<TerrainVertex>(vertices, indices);
+        FillTextureCoordinates(vertices);
 
-        // Fill index buffer and
-        Patches[0].FillIndices16(ref indices, 0);
+        _indexBuffer.SetData(indices, 0, _primitiveCount * 3);
+        _vertexBuffer.SetData(vertices, 0, _vertexCount);
 
-        indexBuffer.SetData(indices);
-
-        // Initialize vertices
-        var vertexBufferElementCount = (Patch.MaxPatchResolution + 1) *
-                                       (Patch.MaxPatchResolution + 1);
-
-        vertexCount = vertexBufferElementCount;
-        primitiveCount = Patch.MaxPatchResolution * Patch.MaxPatchResolution * 2;
-
-        // Create a vertex buffer for each patch
-        vertexBuffers = new VertexBuffer[PatchCountOnXAxis * PatchCountOnYAxis];
-
-        // Create an array to store the vertices
-        var vertices = new TerrainVertex[vertexBufferElementCount];
-
-        // Initialize individual patch vertex buffer
-        var patchIndex = 0;
-        for (var yPatch = 0; yPatch < PatchCountOnYAxis; yPatch++)
-        {
-            for (var xPatch = 0; xPatch < PatchCountOnYAxis; xPatch++)
-            {
-                // Fill patch vertices
-                Patches[patchIndex].FillVertices(0,
-                delegate (int x, int y)
-                {
-                    return new Vector3(x * Size.X / (GridCountOnXAxis - 1),
-                                       y * Size.Y / (GridCountOnYAxis - 1),
-                                       HeightField[x, y]);
-                },
-                delegate (uint index, Vector3 position)
-                {
-                    vertices[index].Position = position;
-                },
-                delegate (uint index, int x, int y)
-                {
-                    vertices[index].Position = new Vector3(
-                        x * Size.X / (GridCountOnXAxis - 1),
-                        y * Size.Y / (GridCountOnYAxis - 1), HeightField[x, y]);
-
-                        // Texture0 is the tile texture, which only covers half patch
-                        vertices[index].TextureCoordinate0 = new Vector2(
-                        2.0f * PatchCountOnXAxis * x / (GridCountOnXAxis - 1),
-                        2.0f * PatchCountOnYAxis * y / (GridCountOnYAxis - 1));
-
-                        // Texture1 is the visibility texture, which covers the entire terrain
-                        vertices[index].TextureCoordinate1 = new Vector2(
-                        1.0f * x / (GridCountOnXAxis - 1),
-                        1.0f * y / (GridCountOnYAxis - 1));
-                });
-
-                // Create a vertex buffer for the patch
-                vertexBuffers[patchIndex] = new VertexBuffer(game.GraphicsDevice,
-                                                             typeof(TerrainVertex),
-                                                             vertexBufferElementCount,
-                                                             BufferUsage.WriteOnly);
-
-                // Set vertex buffer vertices
-                vertexBuffers[patchIndex].SetData(vertices);
-
-                // Next patch
-                patchIndex++;
-            }
-        }
+        ArrayPool<TerrainVertex>.Shared.Return(vertices);
+        ArrayPool<ushort>.Shared.Return(indices);
 
         WaterEffect = game.ShaderLoader.LoadShader("shaders/Water.cso");
         InitializeWater();
@@ -156,6 +68,21 @@ public class Terrain : BaseLandscape
             typeof(VertexPositionColorTexture), MaxSurfaceVertices, BufferUsage.WriteOnly);
         surfaceIndexBuffer = new DynamicIndexBuffer(game.GraphicsDevice,
             typeof(ushort), MaxSurfaceIndices, BufferUsage.WriteOnly);
+    }
+
+    private void FillTextureCoordinates(TerrainVertex[] vertices, int step = 32)
+    {
+        int w = Heightmap.Width, h = Heightmap.Height;
+        for (var i = 0; i < vertices.Length; i++)
+        {
+            var y = Math.DivRem(i, w, out var x);
+
+            // Texture0 is the tile texture, which only covers half patch
+            vertices[i].TextureCoordinate0 = new(1.0f * x / (w - 1) / step, 1.0f * y / (h - 1) / step);
+
+            // Texture1 is the visibility texture, which covers the entire terrain
+            vertices[i].TextureCoordinate1 = new(1.0f * x / (w - 1), 1.0f * y / (h - 1));
+        }
     }
 
     private struct TexturedSurface
@@ -486,37 +413,19 @@ public class Terrain : BaseLandscape
 
         terrainEffect.Parameters["WorldViewProjection"].SetValue(viewProjection);
 
-        var viewFrustum = new BoundingFrustum(viewProjection);
-
-        // Set indices and vertices
-        game.GraphicsDevice.Indices = indexBuffer;
+        game.GraphicsDevice.SetVertexBuffer(_vertexBuffer);
+        game.GraphicsDevice.Indices = _indexBuffer;
 
         terrainEffect.CurrentTechnique = technique;
-
         terrainEffect.CurrentTechnique.Passes[0].Apply();
 
-        // Draw each patch
-        for (var iPatch = 0; iPatch < Patches.Count; iPatch++)
+        foreach (Layer layer in Layers)
         {
-            Patches[iPatch].Visible = viewFrustum.Intersects(Patches[iPatch].BoundingBox);
-            if (Patches[iPatch].Visible)
-            {
-                // Set patch vertex buffer
-                game.GraphicsDevice.SetVertexBuffer(vertexBuffers[iPatch]);
+            terrainEffect.Parameters["ColorTexture"].SetValue(layer.ColorTexture);
+            terrainEffect.Parameters["AlphaTexture"].SetValue(layer.AlphaTexture);
+            terrainEffect.CurrentTechnique.Passes[0].Apply();
 
-                // Draw each layer
-                foreach (Layer layer in Layers)
-                {
-                    // Set textures
-                    terrainEffect.Parameters["ColorTexture"].SetValue(layer.ColorTexture);
-                    terrainEffect.Parameters["AlphaTexture"].SetValue(layer.AlphaTexture);
-                    terrainEffect.CurrentTechnique.Passes[0].Apply();
-
-                    // Draw patch primitives
-                    game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList,
-                                                              0, 0, vertexCount, 0, primitiveCount);
-                }
-            }
+            game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, _vertexCount, 0, _primitiveCount);
         }
     }
 
@@ -530,26 +439,14 @@ public class Terrain : BaseLandscape
 
         terrainEffect.CurrentTechnique.Passes[0].Apply();
 
-        // Draw each patch
-        for (var iPatch = 0; iPatch < Patches.Count; iPatch++)
-        {
-            if (Patches[iPatch].Visible)
-            {
-                // Set patch vertex buffer
-                game.GraphicsDevice.SetVertexBuffer(vertexBuffers[iPatch]);
-
-                // Draw patch primitives
-                game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList,
-                                                          0, 0, vertexCount, 0, primitiveCount);
-            }
-        }
+        game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, _vertexCount, 0, _primitiveCount);
     }
 
-    public struct TerrainVertex : IVertexType
+    public struct TerrainVertex : IVertexType, IVertexPosition
     {
-        public Vector3 Position;
-        public Vector2 TextureCoordinate0;
-        public Vector2 TextureCoordinate1;
+        public Vector3 Position { get; set; }
+        public Vector2 TextureCoordinate0 { get; set; }
+        public Vector2 TextureCoordinate1 { get; set; }
 
         public static readonly VertexDeclaration VertexDeclaration = new(new VertexElement[]
         {
