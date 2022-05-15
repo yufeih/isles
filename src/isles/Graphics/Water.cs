@@ -11,8 +11,8 @@ public class Water
     private readonly MeshDrawable _mesh;
     private readonly Effect _waterEffect;
 
-    private Texture _texture;
-    private Texture _distortionTexture;
+    private readonly Texture _texture;
+    private readonly Texture _distortionTexture;
     
     public Water(GraphicsDevice graphicsDevice, TerrainData data, ShaderLoader shaderLoader, TextureLoader textureLoader)
     {

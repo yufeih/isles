@@ -40,8 +40,8 @@ public class WorldRenderer
 {
     private readonly Input _input;
     private readonly ShadowEffect _shadow;
-    private readonly Settings _settings;
     private readonly ModelRenderer _modelRenderer;
+    private readonly Sprite3DRenderer _sprite3DRenderer;
     private readonly ModelPicker<Entity> _modelPicker;
     private readonly GameModel _rallyPointModel = new("Models/rally");
     private Entity _pickedEntity;
@@ -52,8 +52,8 @@ public class WorldRenderer
         GraphicsDevice graphics, Settings settings, ModelRenderer modelRenderer, ShaderLoader shaderLoader, Input input)
     {
         _input = input;
-        _settings = settings;
         _modelRenderer = modelRenderer;
+        _sprite3DRenderer = new(graphics, shaderLoader);
         _shadow = settings.ShadowEnabled ? new(graphics, shaderLoader) : null;
         _modelPicker = new(graphics, modelRenderer);
     }
@@ -69,9 +69,11 @@ public class WorldRenderer
 
         // Collect models
         _modelRenderer.Clear();
+        _sprite3DRenderer.Clear();
+
         foreach (var entity in world.WorldObjects)
         {
-            Draw(entity, gameTime);
+            Draw(world, entity, gameTime);
         }
 
         // Generate shadow map
@@ -91,7 +93,7 @@ public class WorldRenderer
         world.Terrain.DrawTerrain(_shadow, matrices);
 
         // Present surface
-        world.Terrain.PresentSurface(matrices);
+        _sprite3DRenderer.Draw(matrices);
 
         // FIXME: There are some weired things when models are drawed after
         // drawing the terrain... Annoying...
@@ -103,12 +105,12 @@ public class WorldRenderer
         _modelRenderer.Draw(matrices.ViewProjection, false, true);
     }
 
-    private void Draw(BaseEntity baseEntity, GameTime gameTime)
+    private void Draw(GameWorld world, BaseEntity baseEntity, GameTime gameTime)
     {
         switch (baseEntity)
         {
             case GameObject gameObject:
-                DrawGameObject(gameObject, gameTime);
+                DrawGameObject(world, gameObject, gameTime);
                 break;
             case Entity entity:
                 DrawEntity(entity);
@@ -124,7 +126,7 @@ public class WorldRenderer
         }
     }
 
-    private void DrawGameObject(GameObject entity, GameTime gameTime)
+    private void DrawGameObject(GameWorld world, GameObject entity, GameTime gameTime)
     {
         if (entity is Charactor charactor)
         {
@@ -200,14 +202,17 @@ public class WorldRenderer
         {
             if (entity.Selected && entity.IsAlive)
             {
-                entity.World.Terrain.DrawSurface(
+                var position = entity.Position;
+                position.Z = world.Heightmap.GetHeight(position.X, position.Y) + 6;
+
+                _sprite3DRenderer.Add(
                     entity.AreaRadius > 16 ?
-                    GameObject.SelectionAreaTextureLarge : GameObject.SelectionAreaTexture, 
-                    entity.Position,
+                        GameObject.SelectionAreaTextureLarge : GameObject.SelectionAreaTexture, 
+                    position,
                     entity.AreaRadius * 2, entity.AreaRadius * 2,
                     entity.Owner == null ? Color.Yellow : (
                         entity.Owner.GetRelation(Player.LocalPlayer) == PlayerRelation.Opponent ?
-                                            Color.Red : Color.GreenYellow));
+                            Color.Red : Color.GreenYellow));
             }
 
             if (entity.IsAlive && entity.MaxHealth > 0)
