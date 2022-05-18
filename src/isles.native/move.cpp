@@ -48,21 +48,68 @@ struct UnitOverlapQuery : b2QueryCallback
 	}
 };
 
+struct SnapUnitToContactRayCast : b2RayCastCallback
+{
+	b2Body* body;
+	float minFraction;
+
+	float ReportFixture(b2Fixture* fixture, const b2Vec2& point, const b2Vec2& normal, float fraction) override
+	{
+		if (fixture == body->GetFixtureList())
+			return -1;
+
+		if (fraction < minFraction)
+			minFraction = fraction;
+		return fraction;
+	}
+};
+
+static void snap_unit_to_contact(b2World* world, b2Body* body, float radius, const b2Vec2& center)
+{
+	auto pos = body->GetPosition();
+
+	SnapUnitToContactRayCast rayCast;
+	rayCast.body = body;
+
+	if (abs(pos.y - center.y) > radius) {
+		rayCast.minFraction = FLT_MAX;
+		world->RayCast(&rayCast, pos, {pos.x, center.y});
+		rayCast.minFraction = rayCast.minFraction == FLT_MAX ? 1.0 :
+			rayCast.minFraction - radius / abs(center.y - pos.y);
+		if (rayCast.minFraction > 0)
+			pos.y += rayCast.minFraction * (center.y - pos.y);
+	}
+
+	if (abs(pos.x - center.x) > radius) {
+		rayCast.minFraction = FLT_MAX;
+		world->RayCast(&rayCast, pos, {center.x, pos.y});
+		rayCast.minFraction = rayCast.minFraction == FLT_MAX ? 1.0 :
+			rayCast.minFraction - radius / abs(center.x - pos.x);
+		if (rayCast.minFraction > 0)
+			pos.x += rayCast.minFraction * (center.x - pos.x);
+	}
+
+	body->SetTransform(pos, 0);
+}
+
 static void update_unit_spawn_position(b2World* world, b2Body* body, float radius)
 {
 	const int MaxSpawnSearchSteps = 1000;
+
 	UnitOverlapQuery query;
 	query.fixtureB = body->GetFixtureList();
 
-	b2Vec2 center = body->GetPosition();
 	float r = 0, a = 0;
 
+	b2Vec2 center = body->GetPosition();
 	for (int i = 0; i < MaxSpawnSearchSteps; i++) {
-		std::cout << body->GetPosition().x << " " << body->GetPosition().y;
 		query.manifold.pointCount = 0;
 		world->QueryAABB(&query, body->GetFixtureList()->GetAABB(0));
-		if (query.manifold.pointCount == 0)
+		if (query.manifold.pointCount == 0) {
+			if (i != 0)
+				snap_unit_to_contact(world, body, radius, center);
 			return;
+		}
 
 		if (r > 0)
 			a += 2 * asinf(radius / r);

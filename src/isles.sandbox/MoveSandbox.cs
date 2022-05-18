@@ -82,7 +82,7 @@ class MoveSandbox : Game
             {
                 _units.Add(new()
                 {
-                    Radius = 2 + _random.NextSingle() * 2,
+                    Radius = 4,
                     Position = new(mouse.X / WorldScale, mouse.Y / WorldScale),
                     Speed = 20 + 10 * _random.NextSingle(),
                     Acceleration = 20 + 20 * _random.NextSingle(),
