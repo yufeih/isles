@@ -73,19 +73,20 @@ static void snap_unit_to_contact(b2World* world, b2Body* body, float radius, con
 	if (abs(pos.y - center.y) > radius) {
 		rayCast.minFraction = FLT_MAX;
 		world->RayCast(&rayCast, pos, {pos.x, center.y});
-		rayCast.minFraction = rayCast.minFraction == FLT_MAX ? 1.0 :
-			rayCast.minFraction - radius / abs(center.y - pos.y);
-		if (rayCast.minFraction > 0)
-			pos.y += rayCast.minFraction * (center.y - pos.y);
+		auto f = rayCast.minFraction;
+		f = f == FLT_MAX ? 1.0f : f - radius / abs(center.y - pos.y);
+		if (f > 0)
+			pos.y += f * (center.y - pos.y);
 	}
 
 	if (abs(pos.x - center.x) > radius) {
 		rayCast.minFraction = FLT_MAX;
 		world->RayCast(&rayCast, pos, {center.x, pos.y});
-		rayCast.minFraction = rayCast.minFraction == FLT_MAX ? 1.0 :
-			rayCast.minFraction - radius / abs(center.x - pos.x);
-		if (rayCast.minFraction > 0)
-			pos.x += rayCast.minFraction * (center.x - pos.x);
+		auto f = rayCast.minFraction;
+		f = f == FLT_MAX ? 1.0f :
+			f - radius / abs(center.x - pos.x);
+		if (f > 0)
+			pos.x += f * (center.x - pos.x);
 	}
 
 	body->SetTransform(pos, 0);
@@ -114,7 +115,7 @@ static void update_unit_spawn_position(b2World* world, b2Body* body, float radiu
 			a += 2 * asinf(radius / r);
 		if (a < FLT_EPSILON)
 			r += radius * 2;
-		else if (a > M_PI * 2) {
+		else if (a > b2_pi * 2) {
 			a = 0;
 			r += radius * 2;
 		}
