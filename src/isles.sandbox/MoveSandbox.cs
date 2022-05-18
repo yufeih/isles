@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections;
+using System.Runtime.InteropServices;
 using Isles.Graphics;
 using static ImGuiNET.ImGui;
 
@@ -14,12 +15,13 @@ class MoveSandbox : Game
 {
     private const float WorldScale = 4f;
 
-    private readonly MoveUnit[] _units = new MoveUnit[40];
+    private readonly List<MoveUnit> _units = new();
     private readonly MoveObstacle[] _obstacles;
     private readonly List<int> _selection = new();
     private readonly PathGrid _grid;
     private readonly PathFinder _pathFinder = new();
     private readonly Move _move;
+    private readonly Random _random = new();
 
     private Point _selectStart, _selectEnd;
     private PathGridFlowField? _flowField;
@@ -29,6 +31,7 @@ class MoveSandbox : Game
     private ImGuiRenderer _imguiRenderer = default!;
 
     private bool _showFlowField;
+    private MouseState _lastMouseState;
 
     public MoveSandbox()
     {
@@ -44,27 +47,12 @@ class MoveSandbox : Game
 
         var colors = TextureLoader.ReadAllPixels("data/grid.png", out var w, out var h);
         var bits = new BitArray(colors.ToArray().Select(c => c.R < 100).ToArray());
-        _grid = new(w, h, 4, bits);
+        _grid = new(w, h, 10, bits);
         _move = new(_grid);
         _obstacles = new MoveObstacle[]
         {
             //new() { Vertices = new Vector2[] { new(400,100), new(600,200), new(700,300), new(600, 350), new(400,400) }.Select(v => v / WorldScale).ToArray() },
         };
-
-        var random = new Random();
-        for (var i = 0; i < _units.Length; i++)
-        {
-            _units[i] = new()
-            {
-                Radius = 1 + random.NextSingle(),
-                Position = new(random.NextSingle() * Window.ClientBounds.Width / WorldScale, random.NextSingle() * Window.ClientBounds.Height / WorldScale),
-                Speed = 20 + 10 * random.NextSingle(),
-                Acceleration = 20 + 20 * random.NextSingle(),
-                Decceleration = 400 + 400 * random.NextSingle(),
-                RotationSpeed = MathF.PI * 2 + random.NextSingle() * MathF.PI * 4,
-                Rotation = random.NextSingle() * MathF.PI * 2 - MathF.PI,
-            };
-        }
     }
 
     protected override void LoadContent()
@@ -78,21 +66,37 @@ class MoveSandbox : Game
     {
         UpdateSelection();
 
-        _move.Update((float)gameTime.ElapsedGameTime.TotalSeconds, _units);
+        _move.Update((float)gameTime.ElapsedGameTime.TotalSeconds, CollectionsMarshal.AsSpan(_units));
 
         _imguiRenderer.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
     }
 
     private void UpdateSelection()
     {
+        var units = CollectionsMarshal.AsSpan(_units);
+
         var mouse = Mouse.GetState();
         if (mouse.RightButton == ButtonState.Pressed)
         {
+            if (_selection.Count == 0 && _lastMouseState.RightButton != ButtonState.Pressed)
+            {
+                _units.Add(new()
+                {
+                    Radius = 2 + _random.NextSingle() * 2,
+                    Position = new(mouse.X / WorldScale, mouse.Y / WorldScale),
+                    Speed = 20 + 10 * _random.NextSingle(),
+                    Acceleration = 20 + 20 * _random.NextSingle(),
+                    Decceleration = 400 + 400 * _random.NextSingle(),
+                    RotationSpeed = MathF.PI * 2 + _random.NextSingle() * MathF.PI * 4,
+                    Rotation = _random.NextSingle() * MathF.PI * 2 - MathF.PI,
+                });
+            }
+
             var target = new Vector2(mouse.X / WorldScale, mouse.Y / WorldScale);
             _flowField = _pathFinder.GetFlowField(_grid, 4, target);
             foreach (var i in _selection)
             {
-                _units[i].Target = target;
+                units[i].Target = target;
             }
         }
 
@@ -105,9 +109,9 @@ class MoveSandbox : Game
 
             var rectangle = GetSelectionRectangle();
             _selection.Clear();
-            for (var i = 0; i < _units.Length; i++)
+            for (var i = 0; i < units.Length; i++)
             {
-                ref readonly var unit = ref _units[i];
+                ref readonly var unit = ref units[i];
                 if (rectangle.Contains((int)(unit.Position.X * WorldScale), (int)(unit.Position.Y * WorldScale)))
                 {
                     _selection.Add(i);
@@ -124,11 +128,15 @@ class MoveSandbox : Game
             var unit = _units[_selection[0]];
             Window.Title = $"[{_selection[0]}] r: {(int)unit.Radius} a: {(int)unit.Acceleration}/{(int)unit.Decceleration} s: {(int)unit.Velocity.Length()}/{(int)unit.Speed} ";
         }
+
+        _lastMouseState = mouse;
     }
 
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.White);
+
+        var units = CollectionsMarshal.AsSpan(_units);
 
         var arrow = _textureLoader.LoadTexture("data/unit.svg");
         var selection = _textureLoader.LoadTexture("data/pixel.svg");
@@ -151,9 +159,9 @@ class MoveSandbox : Game
             }
         }
 
-        for (var i = 0; i < _units.Length; i++)
+        for (var i = 0; i < units.Length; i++)
         {
-            ref readonly var unit = ref _units[i];
+            ref readonly var unit = ref units[i];
 
             var color = //unit.Flags.HasFlag(MovableFlags.HasContact) ? Color.IndianRed
                 unit.Target != null ? Color.Green
