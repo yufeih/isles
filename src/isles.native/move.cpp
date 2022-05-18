@@ -1,7 +1,6 @@
 #include "api.h"
 #include <vector>
 #include <box2d/box2d.h>
-#include <iostream>
 
 b2World* move_new()
 {
@@ -236,29 +235,4 @@ int32_t move_get_next_contact(b2World* world, void** iterator, MoveContact* cont
 	}
 
 	return 0;
-}
-
-struct QueryAABB : b2QueryCallback
-{
-	int32_t* begin;
-	int32_t* end;
-
-	bool ReportFixture(b2Fixture* fixture) override
-	{
-		auto body = fixture->GetBody();
-		if (body->GetType() == b2_dynamicBody)
-			*begin++ = body->GetUserData().pointer;
-		return begin != end;
-	}
-};
-
-int32_t move_query_aabb(b2World* world, const b2Vec2* min, const b2Vec2* max, int32_t* result, int32_t length)
-{
-	QueryAABB query;
-	query.begin = result;
-	query.end = result + length;
-
-	b2AABB aabb{*min, *max};
-	world->QueryAABB(&query, aabb);
-	return query.begin - result;
 }
