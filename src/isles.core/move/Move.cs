@@ -369,4 +369,5 @@ public sealed class Move : IDisposable
     [DllImport(LibName)] private static extern IntPtr move_set_obstacle(IntPtr world, IntPtr body, ref NativeObstacle obstacle);
     [DllImport(LibName)] private static extern void move_get_unit(IntPtr unit, ref Vector2 position, ref Vector2 velocity);
     [DllImport(LibName)] private static extern int move_get_next_contact(IntPtr world, ref IntPtr iterator, out NativeContact contact);
+    [DllImport(LibName)] private static unsafe extern int move_query_aabb(IntPtr world, ref Vector2 min, ref Vector2 max, int* result, int length);
 }

@@ -38,3 +38,4 @@ EXPORT_API b2Body* move_set_unit(b2World* world, b2Body* body, MoveUnit* unit);
 EXPORT_API b2Body* move_set_obstacle(b2World* world, b2Body* body, MoveObstacle* obstacle);
 EXPORT_API void move_get_unit(b2Body* unit, b2Vec2* position, b2Vec2* velocity);
 EXPORT_API int32_t move_get_next_contact(b2World* world, void** iterator, MoveContact* contact);
+EXPORT_API int32_t move_query_aabb(b2World* world, const b2Vec2* min, const b2Vec2* max, int32_t* result, int32_t length);
