@@ -1,6 +1,5 @@
-#include "api.h"
+#include "move.h"
 #include <vector>
-#include <box2d/box2d.h>
 
 b2World* move_new()
 {
@@ -12,7 +11,7 @@ void move_delete(b2World* world)
 	delete world;
 }
 
-struct UnitOverlapQuery : b2QueryCallback
+struct OverlapQuery : b2QueryCallback
 {
 	b2Fixture* fixtureB;
 	b2Manifold manifold;
@@ -47,7 +46,7 @@ struct UnitOverlapQuery : b2QueryCallback
 	}
 };
 
-struct SnapUnitToContactRayCast : b2RayCastCallback
+struct SnapToContactRayCast : b2RayCastCallback
 {
 	b2Body* body;
 	float minFraction;
@@ -63,11 +62,11 @@ struct SnapUnitToContactRayCast : b2RayCastCallback
 	}
 };
 
-static void snap_unit_to_contact(b2World* world, b2Body* body, float radius, const b2Vec2& center)
+static void snap_to_contact(b2World* world, b2Body* body, float radius, const b2Vec2& center)
 {
 	auto pos = body->GetPosition();
 
-	SnapUnitToContactRayCast rayCast;
+	SnapToContactRayCast rayCast;
 	rayCast.body = body;
 
 	if (abs(pos.y - center.y) > radius) {
@@ -92,11 +91,11 @@ static void snap_unit_to_contact(b2World* world, b2Body* body, float radius, con
 	body->SetTransform(pos, 0);
 }
 
-static void update_unit_spawn_position(b2World* world, b2Body* body, float radius)
+static void update_spawn_position(b2World* world, b2Body* body, float radius)
 {
 	const int MaxSpawnSearchSteps = 1000;
 
-	UnitOverlapQuery query;
+	OverlapQuery query;
 	query.fixtureB = body->GetFixtureList();
 
 	float r = 0, a = 0;
@@ -107,7 +106,7 @@ static void update_unit_spawn_position(b2World* world, b2Body* body, float radiu
 		world->QueryAABB(&query, body->GetFixtureList()->GetAABB(0));
 		if (query.manifold.pointCount == 0) {
 			if (i != 0)
-				snap_unit_to_contact(world, body, radius, center);
+				snap_to_contact(world, body, radius, center);
 			return;
 		}
 
@@ -128,85 +127,117 @@ static void update_unit_spawn_position(b2World* world, b2Body* body, float radiu
 	body->SetTransform(center, 0);
 }
 
-b2Body* move_set_unit(b2World* world, b2Body* body, MoveUnit* unit)
-{
-	if (body == nullptr) {
-		b2CircleShape shape;
-		shape.m_radius = unit->radius;
+static b2Body* create_movable(b2World* world, const Movable& m) {
+	b2CircleShape shape;
+	shape.m_radius = m.radius;
 
-		b2BodyDef bd;
-		bd.enabled = true;
-		bd.fixedRotation = true;
-		bd.type = b2_dynamicBody;
-		bd.position = unit->position;
+	b2BodyDef bd;
+	bd.enabled = true;
+	bd.fixedRotation = true;
+	bd.type = b2_dynamicBody;
+	bd.position = m.position;
 
-		b2FixtureDef fd;
-		fd.shape = &shape;
-		fd.friction = 0;
-		fd.restitutionThreshold = FLT_MAX;
-		fd.density = 1.0f / (b2_pi * unit->radius * unit->radius);
+	b2FixtureDef fd;
+	fd.shape = &shape;
+	fd.friction = 0;
+	fd.restitutionThreshold = FLT_MAX;
+	fd.density = 1.0f / (b2_pi * m.radius * m.radius);
 
-		body = world->CreateBody(&bd);
-		body->CreateFixture(&fd);
+	auto body = world->CreateBody(&bd);
+	body->CreateFixture(&fd);
 
-		update_unit_spawn_position(world, body, unit->radius * 1.01f);
-	}
-
-	if (unit->id < 0) {
-		world->DestroyBody(body);
-		return nullptr;
-	}
-
-	body->GetUserData().pointer = unit->id;
-	body->ApplyForceToCenter(unit->force, true);
+	update_spawn_position(world, body, m.radius * 1.01f);
 	return body;
 }
 
-b2Body* move_set_obstacle(b2World* world, b2Body* body, MoveObstacle* obstacle)
+static b2Body* create_obstacle(b2World* world, const Obstacle& obstacle)
 {
-	if (body == nullptr) {
-		b2BodyDef bd;
-		bd.enabled = true;
-		bd.type = b2_staticBody;
-		bd.position = obstacle->position;
+	b2BodyDef bd;
+	bd.enabled = true;
+	bd.type = b2_staticBody;
+	bd.position = obstacle.position;
 
-		b2FixtureDef fd;
-		fd.density = 0;
-		fd.friction = 0;
-		fd.restitutionThreshold = FLT_MAX;
+	b2PolygonShape polygon;
+	polygon.SetAsBox(obstacle.size / 2, obstacle.size / 2);
 
-		b2PolygonShape polygon;
-		b2ChainShape chain;
+	b2FixtureDef fd;
+	fd.density = 0;
+	fd.friction = 0;
+	fd.restitutionThreshold = FLT_MAX;
+	fd.shape = &polygon;
 
-		if (obstacle->length <= b2_maxPolygonVertices) {
-			polygon.Set(obstacle->vertices, obstacle->length);
-			fd.shape = &polygon;
-		} else {
-			chain.CreateLoop(obstacle->vertices, obstacle->length);
-			fd.shape = &chain;
-		}
-		body = world->CreateBody(&bd);
-		body->CreateFixture(&fd);
-	}
-
-	if (obstacle->id < 0) {
-		world->DestroyBody(body);
-		return nullptr;
-	}
-
-	body->GetUserData().pointer = obstacle->id;
+	auto body = world->CreateBody(&bd);
+	body->CreateFixture(&fd);
 	return body;
 }
 
-void move_get_unit(b2Body* unit, b2Vec2* position, b2Vec2* velocity)
+static inline bool is_movable(b2Body* body)
 {
-	*position = unit->GetPosition();
-	*velocity = unit->GetLinearVelocity();
+	return body->GetType() == b2_dynamicBody;
 }
 
-void move_step(b2World* world, float dt)
+static inline bool is_obstacle(b2Body* body)
 {
+	return body->GetType() == b2_staticBody;
+}
+
+void sync_state_before_step(
+	b2World* world, Movable* movables, int32_t movablesLength,
+	Obstacle* obstacles, int32_t obstaclesLength)
+{
+	b2Body* body;
+
+	body = world->GetBodyList();
+	while (body != nullptr) {
+		body->GetUserData().pointer = -1;
+		body = body->GetNext();
+	}
+
+	// Upsert movables
+	for (int i = 0; i < movablesLength; i++) {
+		auto& m = movables[i];
+		if (m.body == nullptr) 
+			m.body = create_movable(world, m);
+		m.body->GetUserData().pointer = i;
+		m.body->ApplyForceToCenter(m.force, true);
+	}
+
+	// Upsert obstacles
+	for (int i = 0; i < obstaclesLength; i++) {
+		auto& obstacle = obstacles[i];
+		if (obstacle.body == nullptr)
+			obstacle.body = create_obstacle(world, obstacle);
+		obstacle.body->GetUserData().pointer = i;
+	}
+
+	// Delete unreferenced bodies
+	body = world->GetBodyList();
+	while (body != nullptr) {
+		auto next = body->GetNext();
+		if (body->GetUserData().pointer == -1)
+			world->DestroyBody(body);
+		body = next;
+	}
+}
+
+void sync_state_after_step(Movable* movables, int32_t movablesLength)
+{
+	for (int i = 0; i < movablesLength; i++) {
+		auto& m = movables[i];
+		m.position = m.body->GetPosition();
+		m.velocity = m.body->GetLinearVelocity();
+	}
+}
+
+void move_step(
+	b2World* world, float dt, Movable* movables, int32_t movablesLength,
+	Obstacle* obstacles, int32_t obstaclesLength)
+{
+	sync_state_before_step(world, movables, movablesLength, obstacles, obstaclesLength);
+
 	world->Step(dt, 8, 3);
+
+	sync_state_after_step(movables, movablesLength);
 }
 
 int32_t move_get_next_contact(b2World* world, void** iterator, MoveContact* contact)

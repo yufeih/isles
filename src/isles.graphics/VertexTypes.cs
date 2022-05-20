@@ -11,7 +11,7 @@ public interface IVertexPositionTexture
     Vector2 TextureCoordinate { get; set; }
 }
 
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
+[StructLayout(LayoutKind.Sequential)]
 public struct VertexPositionTexture : IVertexType, IVertexPositionTexture
 {
     public Vector3 Position { get; set; }
@@ -26,7 +26,7 @@ public struct VertexPositionTexture : IVertexType, IVertexPositionTexture
     VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;
 }
 
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
+[StructLayout(LayoutKind.Sequential)]
 public struct VertexPositionTexture2 : IVertexType, IVertexPositionTexture
 {
     public Vector3 Position { get; set; }

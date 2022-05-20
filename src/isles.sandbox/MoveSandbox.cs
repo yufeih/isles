@@ -15,12 +15,12 @@ class MoveSandbox : Game
 {
     private const float WorldScale = 4f;
 
-    private readonly List<MoveUnit> _units = new();
-    private readonly MoveObstacle[] _obstacles;
+    private readonly List<Movable> _moveUnits = new();
+    private readonly List<Unit> _units = new();
     private readonly List<int> _selection = new();
     private readonly PathGrid _grid;
     private readonly PathFinder _pathFinder = new();
-    private readonly Move _move;
+    private readonly Move _move = new();
     private readonly Random _random = new();
 
     private Point _selectStart, _selectEnd;
@@ -48,11 +48,6 @@ class MoveSandbox : Game
         var colors = TextureLoader.ReadAllPixels("data/grid.png", out var w, out var h);
         var bits = new BitArray(colors.ToArray().Select(c => c.R < 100).ToArray());
         _grid = new(w, h, 10, bits);
-        _move = new(_grid);
-        _obstacles = new MoveObstacle[]
-        {
-            //new() { Vertices = new Vector2[] { new(400,100), new(600,200), new(700,300), new(600, 350), new(400,400) }.Select(v => v / WorldScale).ToArray() },
-        };
     }
 
     protected override void LoadContent()
@@ -66,13 +61,18 @@ class MoveSandbox : Game
     {
         UpdateSelection();
 
-        _move.Update((float)gameTime.ElapsedGameTime.TotalSeconds, CollectionsMarshal.AsSpan(_units));
+        _move.Update(
+            (float)gameTime.ElapsedGameTime.TotalSeconds,
+            CollectionsMarshal.AsSpan(_moveUnits),
+            CollectionsMarshal.AsSpan(_units),
+            _grid);
 
         _imguiRenderer.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
     }
 
     private void UpdateSelection()
     {
+        var moveUnits = CollectionsMarshal.AsSpan(_moveUnits);
         var units = CollectionsMarshal.AsSpan(_units);
 
         var mouse = Mouse.GetState();
@@ -80,10 +80,13 @@ class MoveSandbox : Game
         {
             if (_selection.Count == 0 && _lastMouseState.RightButton != ButtonState.Pressed)
             {
-                _units.Add(new()
+                _moveUnits.Add(new()
                 {
                     Radius = 2 + _random.NextSingle() * 2,
                     Position = new(mouse.X / WorldScale, mouse.Y / WorldScale),
+                });
+                _units.Add(new()
+                {
                     Speed = 20 + 10 * _random.NextSingle(),
                     Acceleration = 20 + 20 * _random.NextSingle(),
                     Decceleration = 400 + 400 * _random.NextSingle(),
@@ -109,10 +112,10 @@ class MoveSandbox : Game
 
             var rectangle = GetSelectionRectangle();
             _selection.Clear();
-            for (var i = 0; i < units.Length; i++)
+            for (var i = 0; i < moveUnits.Length; i++)
             {
-                ref readonly var unit = ref units[i];
-                if (rectangle.Contains((int)(unit.Position.X * WorldScale), (int)(unit.Position.Y * WorldScale)))
+                ref readonly var m = ref moveUnits[i];
+                if (rectangle.Contains((int)(m.Position.X * WorldScale), (int)(m.Position.Y * WorldScale)))
                 {
                     _selection.Add(i);
                 }
@@ -125,8 +128,9 @@ class MoveSandbox : Game
 
         if (_selection.Count == 1)
         {
-            var unit = _units[_selection[0]];
-            Window.Title = $"[{_selection[0]}] r: {(int)unit.Radius} a: {(int)unit.Acceleration}/{(int)unit.Decceleration} s: {(int)unit.Velocity.Length()}/{(int)unit.Speed} ";
+            var m = _moveUnits[_selection[0]];
+            var u = _units[_selection[0]];
+            Window.Title = $"[{_selection[0]}] r: {(int)m.Radius} a: {(int)u.Acceleration}/{(int)u.Decceleration} s: {(int)m.Velocity.Length()}/{(int)u.Speed} ";
         }
 
         _lastMouseState = mouse;
@@ -136,8 +140,6 @@ class MoveSandbox : Game
     {
         GraphicsDevice.Clear(Color.White);
 
-        var units = CollectionsMarshal.AsSpan(_units);
-
         var arrow = _textureLoader.LoadTexture("data/unit.svg");
         var selection = _textureLoader.LoadTexture("data/pixel.svg");
 
@@ -145,36 +147,38 @@ class MoveSandbox : Game
         _spriteBatch.Begin();
 
         DrawGrid(_grid);
+
         Checkbox("Show FlowField", ref _showFlowField);
+
+        if (Button("Delete Unit") && _units.Count > 0)
+        {
+            _moveUnits.RemoveAt(_moveUnits.Count - 1);
+            _units.RemoveAt(_units.Count - 1);
+        }
+
+        var moveUnits = CollectionsMarshal.AsSpan(_moveUnits);
+        var units = CollectionsMarshal.AsSpan(_units);
+
         if (_flowField != null && _showFlowField)
             DrawFlowField(_flowField.Value);
 
-        foreach (var obstacle in _obstacles)
-        {
-            for (var i = 0; i < obstacle.Vertices.Length; i++)
-            {
-                var a = obstacle.Vertices[i] * WorldScale;
-                var b = obstacle.Vertices[(i + 1) % obstacle.Vertices.Length] * WorldScale;
-                DrawLine(a, b, 4, Color.Brown);
-            }
-        }
-
         for (var i = 0; i < units.Length; i++)
         {
-            ref readonly var unit = ref units[i];
+            ref readonly var m = ref moveUnits[i];
+            ref readonly var u = ref units[i];
 
-            var color = //unit.Flags.HasFlag(MovableFlags.HasContact) ? Color.IndianRed
-                unit.Target != null ? Color.Green
+            var color = u.Flags.HasFlag(UnitFlags.HasContact) ? Color.IndianRed :
+                u.Target != null ? Color.Green
                 : _selection.Contains(i) ? Color.Orange : Color.DarkSlateBlue;
 
             _spriteBatch.Draw(
                 arrow,
-                unit.Position * WorldScale,
+                m.Position * WorldScale,
                 null,
                 color: color,
-                rotation: unit.Rotation,
+                rotation: u.Rotation,
                 origin: new(arrow.Width / 2, arrow.Height / 2),
-                scale: unit.Radius * 2 * WorldScale / arrow.Width,
+                scale: m.Radius * 2 * WorldScale / arrow.Width,
                 SpriteEffects.None,
                 0);
         }
