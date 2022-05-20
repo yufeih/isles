@@ -40,7 +40,6 @@ public class WorldRenderer
 {
     private readonly Input _input;
     private readonly ShadowEffect _shadow;
-    private readonly Settings _settings;
     private readonly ModelRenderer _modelRenderer;
     private readonly ModelPicker<Entity> _modelPicker;
     private readonly GameModel _rallyPointModel = new("Models/rally");
@@ -52,7 +51,6 @@ public class WorldRenderer
         GraphicsDevice graphics, Settings settings, ModelRenderer modelRenderer, ShaderLoader shaderLoader, Input input)
     {
         _input = input;
-        _settings = settings;
         _modelRenderer = modelRenderer;
         _shadow = settings.ShadowEnabled ? new(graphics, shaderLoader) : null;
         _modelPicker = new(graphics, modelRenderer);
