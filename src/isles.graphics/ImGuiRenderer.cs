@@ -58,6 +58,8 @@ public class ImGuiRenderer
 
         ImGui.GetIO().Fonts.AddFontDefault();
         CreateFontAtlas();
+
+        SetupInput();
     }
 
     private void SetupInput()

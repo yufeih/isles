@@ -196,10 +196,11 @@ void sync_state_before_step(
 	// Upsert movables
 	for (int i = 0; i < movablesLength; i++) {
 		auto& m = movables[i];
-		if (m.body == nullptr) 
+		if (m.body == nullptr)
 			m.body = create_movable(world, m);
 		m.body->GetUserData().pointer = i;
-		m.body->ApplyForceToCenter(m.force, true);
+		if (m.force.LengthSquared() > b2_epsilon * b2_epsilon)
+			m.body->ApplyForceToCenter(m.force, true);
 	}
 
 	// Upsert obstacles

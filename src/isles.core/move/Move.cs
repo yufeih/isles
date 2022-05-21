@@ -60,7 +60,6 @@ public struct Unit
 
     internal PathGridFlowField? _flowField;
     internal Vector2 _contactVelocity;
-    internal float _inContactSeconds;
 }
 
 public sealed class Move : IDisposable
@@ -71,6 +70,7 @@ public sealed class Move : IDisposable
     private readonly IntPtr _world = move_new();
     private readonly PathFinder _pathFinder = new();
     private readonly List<Obstacle> _obstacles = new();
+    private PathGrid? _grid;
 
     public void Dispose()
     {
@@ -94,13 +94,15 @@ public sealed class Move : IDisposable
             ref var u = ref units[i];
 
             var desiredVelocity = u._contactVelocity;
-            UpdateInContactSeconds(dt, ref u);
             desiredVelocity += MoveToTarget(dt, grid, m, ref u);
             m.Force = CalculateForce(idt, m, u, desiredVelocity);
         }
 
-        if (grid != null && _obstacles.Count == 0)
+        if (grid != null && grid != _grid)
+        {
             UpdateObstacles(grid);
+            _grid = grid;
+        }
 
         fixed (Movable* pMoveUnits = moveUnits)
         fixed (Obstacle* pObstacles = CollectionsMarshal.AsSpan(_obstacles))
@@ -216,22 +218,6 @@ public sealed class Move : IDisposable
             UpdateContactOneBuzyOneIdle(mb, ref ub, ma, ref ua);
     }
 
-    private void UpdateInContactSeconds(float dt, ref Unit u)
-    {
-        if (u.Target is null)
-            return;
-
-        if ((u._flags & UnitFlags.HasContact) == 0)
-        {
-            u._inContactSeconds = Math.Max(0, u._inContactSeconds - dt);
-            return;
-        }
-
-        // Give up target if we have keeps bumping into other units for enough time
-        if ((u._inContactSeconds += dt) >= 20)
-            ClearTarget(ref u);
-    }
-
     private void UpdateContactBothBuzy(in Movable ma, ref Unit ua, in Movable mb, ref Unit ub)
     {
         ua._flags |= UnitFlags.HasMovingContact;
@@ -307,7 +293,6 @@ public sealed class Move : IDisposable
     {
         u.Target = null;
         u._flowField = default;
-        u._inContactSeconds = 0;
     }
 
     private static float Cross(Vector2 a, Vector2 b)

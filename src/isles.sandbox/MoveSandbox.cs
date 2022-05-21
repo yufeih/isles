@@ -18,7 +18,7 @@ class MoveSandbox : Game
     private readonly List<Movable> _moveUnits = new();
     private readonly List<Unit> _units = new();
     private readonly List<int> _selection = new();
-    private readonly PathGrid _grid;
+    private readonly PathGrid[] _grids;
     private readonly PathFinder _pathFinder = new();
     private readonly Move _move = new();
     private readonly Random _random = new();
@@ -30,7 +30,12 @@ class MoveSandbox : Game
     private SpriteBatch _spriteBatch = default!;
     private ImGuiRenderer _imguiRenderer = default!;
 
+    private int _gridIndex;
     private bool _showFlowField;
+    private int _spawnCount = 1;
+    private System.Numerics.Vector2 _spawnSpeed = new(20, 40);
+    private System.Numerics.Vector2 _spawnRadius = new(2, 4);
+    private System.Numerics.Vector2 _spawnAcceleration = new(20, 40);
     private MouseState _lastMouseState;
 
     public MoveSandbox()
@@ -47,7 +52,11 @@ class MoveSandbox : Game
 
         var colors = TextureLoader.ReadAllPixels("data/grid.png", out var w, out var h);
         var bits = new BitArray(colors.ToArray().Select(c => c.R < 100).ToArray());
-        _grid = new(w, h, 10, bits);
+        _grids = new PathGrid[]
+        {
+            new(w, h, 10, bits),
+            new(w, h, 10, new(w * h)),
+        };
     }
 
     protected override void LoadContent()
@@ -59,15 +68,21 @@ class MoveSandbox : Game
 
     protected override void Update(GameTime gameTime)
     {
-        UpdateSelection();
+        if (!GetIO().WantCaptureMouse)
+            UpdateSelection();
 
         _move.Update(
             (float)gameTime.ElapsedGameTime.TotalSeconds,
             CollectionsMarshal.AsSpan(_moveUnits),
             CollectionsMarshal.AsSpan(_units),
-            _grid);
+            _grids[_gridIndex]);
 
         _imguiRenderer.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+    }
+
+    private float Random(System.Numerics.Vector2 v)
+    {
+        return v.X + (v.Y - v.X) * _random.NextSingle();
     }
 
     private void UpdateSelection()
@@ -80,23 +95,26 @@ class MoveSandbox : Game
         {
             if (_selection.Count == 0 && _lastMouseState.RightButton != ButtonState.Pressed)
             {
-                _moveUnits.Add(new()
+                for (var i = 0; i < _spawnCount; i++)
                 {
-                    Radius = 2 + _random.NextSingle() * 2,
-                    Position = new(mouse.X / WorldScale, mouse.Y / WorldScale),
-                });
-                _units.Add(new()
-                {
-                    Speed = 20 + 10 * _random.NextSingle(),
-                    Acceleration = 20 + 20 * _random.NextSingle(),
-                    Decceleration = 400 + 400 * _random.NextSingle(),
-                    RotationSpeed = MathF.PI * 2 + _random.NextSingle() * MathF.PI * 4,
-                    Rotation = _random.NextSingle() * MathF.PI * 2 - MathF.PI,
-                });
+                    _moveUnits.Add(new()
+                    {
+                        Radius = Random(_spawnRadius),
+                        Position = new(mouse.X / WorldScale, mouse.Y / WorldScale),
+                    });
+                    _units.Add(new()
+                    {
+                        Speed = Random(_spawnSpeed),
+                        Acceleration = Random(_spawnAcceleration),
+                        Decceleration = 400 + 400 * _random.NextSingle(),
+                        RotationSpeed = MathF.PI * 2 + _random.NextSingle() * MathF.PI * 4,
+                        Rotation = _random.NextSingle() * MathF.PI * 2 - MathF.PI,
+                    });
+                }
             }
 
             var target = new Vector2(mouse.X / WorldScale, mouse.Y / WorldScale);
-            _flowField = _pathFinder.GetFlowField(_grid, 4, target);
+            _flowField = _pathFinder.GetFlowField(_grids[_gridIndex], 4, target);
             foreach (var i in _selection)
             {
                 units[i].Target = target;
@@ -146,14 +164,25 @@ class MoveSandbox : Game
         _imguiRenderer.Begin();
         _spriteBatch.Begin();
 
-        DrawGrid(_grid);
+        DrawGrid(_grids[_gridIndex]);
 
+        Text($"FPS: {GetIO().Framerate}");
+        SliderInt("Grid", ref _gridIndex, 0, _grids.Length - 1);
         Checkbox("Show FlowField", ref _showFlowField);
 
-        if (Button("Delete Unit") && _units.Count > 0)
+        SliderInt("Spawn Count", ref _spawnCount, 1, 20);
+        SliderFloat2("Spawn Speed", ref _spawnSpeed, 10, 50);
+        SliderFloat2("Spawn Radius", ref _spawnRadius, 1, 10);
+        SliderFloat2("Spawn Accel.", ref _spawnAcceleration, 10, 100);
+
+        if (_selection.Count > 0 && Button("Delete Units"))
         {
-            _moveUnits.RemoveAt(_moveUnits.Count - 1);
-            _units.RemoveAt(_units.Count - 1);
+            foreach (var i in _selection.OrderByDescending(x => x))
+            {
+                _moveUnits.RemoveAt(i);
+                _units.RemoveAt(i);
+            }
+            _selection.Clear();
         }
 
         var moveUnits = CollectionsMarshal.AsSpan(_moveUnits);
@@ -167,7 +196,7 @@ class MoveSandbox : Game
             ref readonly var m = ref moveUnits[i];
             ref readonly var u = ref units[i];
 
-            var color = u.Flags.HasFlag(UnitFlags.HasContact) ? Color.IndianRed :
+            var color = //u.Flags.HasFlag(UnitFlags.HasContact) ? Color.IndianRed :
                 u.Target != null ? Color.Green
                 : _selection.Contains(i) ? Color.Orange : Color.DarkSlateBlue;
 
@@ -250,7 +279,7 @@ class MoveSandbox : Game
                     color,
                     rotation,
                     new Vector2(arrow.Width / 2, arrow.Height / 2),
-                    _grid.Step * WorldScale / arrow.Width,
+                    _grids[_gridIndex].Step * WorldScale / arrow.Width,
                     default,
                     default);
             }
