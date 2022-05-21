@@ -3,12 +3,18 @@
 #include "api.h"
 #include <box2d/box2d.h>
 
+#define kMovable_Awake 1
+#define kMovable_Wake 2
+#define kMovable_HasContact 4
+#define kMovable_HasTouchingContact 8
+
 struct Movable
 {
     float radius;
     b2Vec2 position;
     b2Vec2 velocity;
     b2Vec2 force;
+    int32_t flags;
     b2Body* body;
 };
 

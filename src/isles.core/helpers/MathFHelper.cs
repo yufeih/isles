@@ -8,7 +8,7 @@ public static class MathFHelper
     // Difference between 1 and the least value greater than 1 that is representable.
     // Epsilon (1E-45) represents the smallest positive value that is greater than zero
     // which is way too small to be practical.
-    private const float Epsilon = 1.19209290e-7F;
+    public const float Epsilon = 1.19209290e-7F;
 
     public static float NormalizeRotation(float r)
     {
@@ -19,18 +19,18 @@ public static class MathFHelper
         return r;
     }
 
-    public static bool TryNormalize(this Vector2 v)
+    public static float TryNormalize(this ref Vector2 v)
     {
         var length = v.Length();
         if (length < Epsilon)
         {
-            return false;
+            return 0.0f;
         }
 
         var invLength = 1.0f / length;
         v.X *= invLength;
         v.Y *= invLength;
 
-        return true;
+        return length;
     }
 }

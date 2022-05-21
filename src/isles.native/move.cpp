@@ -200,7 +200,8 @@ void sync_state_before_step(
 			m.body = create_movable(world, m);
 		m.body->GetUserData().pointer = i;
 		if (m.force.LengthSquared() > b2_epsilon * b2_epsilon)
-			m.body->ApplyForceToCenter(m.force, true);
+			m.body->ApplyForceToCenter(m.force, m.flags & kMovable_Wake);
+		m.flags = 0;
 	}
 
 	// Upsert obstacles
@@ -221,12 +222,28 @@ void sync_state_before_step(
 	}
 }
 
-void sync_state_after_step(Movable* movables, int32_t movablesLength)
+void sync_state_after_step(b2World* world, Movable* movables, int32_t movablesLength)
 {
+	auto contact = world->GetContactList();
+	while (contact != nullptr) {
+		auto a = contact->GetFixtureA()->GetBody();
+		auto b = contact->GetFixtureB()->GetBody();
+		auto flag = kMovable_HasContact;
+		if (contact->IsTouching())
+			flag |= kMovable_HasTouchingContact; 
+		if (is_movable(a))
+			movables[a->GetUserData().pointer].flags |= flag;
+		if (is_movable(b))
+			movables[b->GetUserData().pointer].flags |= flag;
+		contact = contact->GetNext();
+	}
+
 	for (int i = 0; i < movablesLength; i++) {
 		auto& m = movables[i];
 		m.position = m.body->GetPosition();
 		m.velocity = m.body->GetLinearVelocity();
+		if (m.body->IsAwake())
+			m.flags |= kMovable_Awake;
 	}
 }
 
@@ -238,7 +255,7 @@ void move_step(
 
 	world->Step(dt, 8, 3);
 
-	sync_state_after_step(movables, movablesLength);
+	sync_state_after_step(world, movables, movablesLength);
 }
 
 int32_t move_get_next_contact(b2World* world, void** iterator, MoveContact* contact)

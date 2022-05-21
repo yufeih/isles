@@ -24,9 +24,9 @@ public enum FlowFieldFlags : byte
     TurnPoint = 1,
 }
 
-public struct FlowField
+public readonly struct FlowField
 {
-    public (Half x, Half y, FlowFieldFlags flags)[] Vectors;
+    public readonly (Half x, Half y, FlowFieldFlags flags)[] Vectors { get; init; }
 
     public static FlowField Create<T>(T graph, Vector2 target) where T: IPathGraph2
     {
