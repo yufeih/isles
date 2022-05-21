@@ -22,15 +22,13 @@ public class PathFinder
     }
 }
 
-public struct PathGridFlowField
+public readonly struct PathGridFlowField
 {
-    public Vector2 Target;
-    public PathGrid Grid;
-    public FlowField FlowField;
+    public readonly Vector2 Target { get; init; }
+    public readonly PathGrid Grid { get; init; }
+    public readonly FlowField FlowField { get; init; }
 
-    public bool IsValid => Grid != null;
-
-    public Vector2 GetDirection(Vector2 position)
+    public Vector2 GetVector(Vector2 position)
     {
         var x = position.X / Grid.Step - 0.5f;
         var y = position.Y / Grid.Step - 0.5f;

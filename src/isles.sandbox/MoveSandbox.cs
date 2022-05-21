@@ -193,7 +193,7 @@ class MoveSandbox : Game
         {
             var flowField = units[_selection[0]].FlowField;
             if (flowField != null)
-                DrawFlowField(flowField);
+                DrawFlowField(flowField.Value);
         }
 
         for (var i = 0; i < units.Length; i++)
