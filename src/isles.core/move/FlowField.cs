@@ -18,25 +18,44 @@ public interface IPathGraph2
     bool IsTurnPoint(int nodeIndex, Vector2 target);
 }
 
-[Flags]
-public enum FlowFieldFlags : byte
+public readonly struct FlowFieldVector
 {
-    TurnPoint = 1,
+    private readonly Half _x;
+    private readonly Half _y;
+    private readonly short _next;
+
+    public readonly float X => (float)_x;
+    public readonly float Y => (float)_y;
+    public readonly short Next => _next switch
+    {
+        -1 => -1,
+        < -1 => (short)(-_next - 1),
+        >= 0 => _next,
+    };
+
+    public readonly bool IsTurnPoint => _next < 0;
+
+    public FlowFieldVector(float x, float y, short next, bool isTurnPoint)
+    {
+        _x = (Half)x;
+        _y = (Half)y;
+        _next = next == -1 ? (short)-1 : (isTurnPoint ? (short)-(next + 1) : next);
+    }
 }
 
 public readonly struct FlowField
 {
-    public readonly (Half x, Half y, FlowFieldFlags flags)[] Vectors { get; init; }
+    public readonly FlowFieldVector[] Vectors { get; init; }
 
     public static FlowField Create<T>(T graph, Vector2 target) where T: IPathGraph2
     {
         var nodeCount = graph.NodeCount;
         var targetIndex = graph.GetNodeIndex(target);
         var distance = ArrayPool<float>.Shared.Rent(nodeCount);
-        var prev = ArrayPool<ushort>.Shared.Rent(nodeCount);
-        var vectors = new (Half, Half, FlowFieldFlags)[nodeCount];
+        var prev = ArrayPool<short>.Shared.Rent(nodeCount);
+        var vectors = new FlowFieldVector[nodeCount];
 
-        Array.Fill(prev, ushort.MaxValue, 0, nodeCount);
+        Array.Fill(prev, (short)-1, 0, nodeCount);
         Array.Fill(distance, float.MaxValue, 0, nodeCount);
 
         Span<(int, float)> edges = stackalloc (int, float)[graph.MaxEdgeCount];
@@ -61,33 +80,34 @@ public readonly struct FlowField
                 if (newCost < distance[to])
                 {
                     distance[to] = newCost;
-                    prev[to] = (ushort)from;
+                    prev[to] = (short)from;
                     heap.UpdatePriority(to, newCost);
                 }
             }
         }
 
         ArrayPool<float>.Shared.Return(distance);
-        ArrayPool<ushort>.Shared.Return(prev);
+        ArrayPool<short>.Shared.Return(prev);
 
         return new() { Vectors = vectors };
 
         void EmitNode(int from)
         {
+            var next = prev[from];
             var to = from;
-            while (prev[to] != ushort.MaxValue)
+            while (prev[to] >= 0)
                 to = prev[to];
 
-            var flags = default(FlowFieldFlags);
+            var isTurnPoint = false;
             var toPosition = to == targetIndex ? target : graph.GetPosition(to);
             var flow = toPosition - graph.GetPosition(from);
             if (graph.IsTurnPoint(from, toPosition))
             {
-                flags = FlowFieldFlags.TurnPoint;
-                prev[from] = ushort.MaxValue;
+                isTurnPoint = true;
+                prev[from] = -1;
             }
 
-            vectors[from] = ((Half)flow.X, (Half)flow.Y, flags);
+            vectors[from] = new(flow.X, flow.Y, next, isTurnPoint);
         }
     }
 }

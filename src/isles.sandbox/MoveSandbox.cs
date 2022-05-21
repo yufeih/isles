@@ -193,7 +193,7 @@ class MoveSandbox : Game
         {
             var flowField = units[_selection[0]].FlowField;
             if (flowField != null)
-                DrawFlowField(flowField.Value);
+                DrawFlowField(flowField);
         }
 
         for (var i = 0; i < units.Length; i++)
@@ -275,8 +275,11 @@ class MoveSandbox : Game
                     continue;
                 var rotation = MathF.Atan2(v.Y, v.X);
                 var scale = Math.Min(v.Length() / grid.Step, 1);
-                var color = flowfield.FlowField.Vectors[x + y * grid.Width].flags.HasFlag(FlowFieldFlags.TurnPoint)
-                    ? Color.Gray : Color.Gray * 0.2f;
+                var heat = (float)flowfield.Heatmap[x + y * grid.Width];
+                heat = MathHelper.Clamp(heat, 0, 1);
+                var color = Color.Lerp(Color.Gray, Color.Red, heat);
+                if (!flowfield.FlowField.Vectors[x + y * grid.Width].IsTurnPoint)
+                    color *= 0.2f;
 
                 _spriteBatch.Draw(
                     arrow,

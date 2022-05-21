@@ -55,7 +55,7 @@ public sealed class Move : IDisposable
     private readonly IntPtr _world = move_new();
     private readonly PathFinder _pathFinder = new();
     private readonly List<Obstacle> _obstacles = new();
-    private PathGrid? _grid;
+    private PathGrid? _lastGrid;
 
     public void Dispose()
     {
@@ -68,14 +68,14 @@ public sealed class Move : IDisposable
         move_delete(_world);
     }
 
-    public unsafe void Update(float dt, Span<Movable> moveUnits, Span<Unit> units, PathGrid grid)
+    public unsafe void Update(float dt, Span<Movable> movables, Span<Unit> units, PathGrid grid)
     {
         var idt = 1 / dt;
 
         // Update units
         for (var i = 0; i < units.Length; i++)
         {
-            ref var m = ref moveUnits[i];
+            ref var m = ref movables[i];
             ref var u = ref units[i];
 
             if (u.Target != null && u.FlowField is null)
@@ -92,24 +92,25 @@ public sealed class Move : IDisposable
             m.Force = CalculateForce(idt, m, u, desiredVelocity);
         }
 
-        if (grid != _grid)
+        if (grid != _lastGrid)
         {
             UpdateObstacles(grid);
-            _grid = grid;
+            _lastGrid = grid;
         }
 
-        fixed (Movable* pMoveUnits = moveUnits)
+        fixed (Movable* pmovables = movables)
         fixed (Obstacle* pObstacles = CollectionsMarshal.AsSpan(_obstacles))
-            move_step(_world, dt, pMoveUnits, moveUnits.Length, pObstacles, _obstacles.Count);
+            move_step(_world, dt, pmovables, movables.Length, pObstacles, _obstacles.Count);
 
         for (var i = 0; i < units.Length; i++)
         {
             ref var u = ref units[i];
             u._contactVelocity = default;
-            UpdateRotation(dt, moveUnits[i], ref u);
+            UpdateRotation(dt, movables[i], ref u);
         }
 
-        UpdateFlowField(dt, grid, moveUnits, units);
+        foreach (var flowField in _pathFinder.GetFlowFields())
+            UpdateFlowField(flowField, movables);
     }
 
     private void UpdateObstacles(PathGrid grid)
@@ -142,10 +143,10 @@ public sealed class Move : IDisposable
         if (u.Target is null)
             return default;
 
-        if (u.FlowField is null || u.Target.Value != u.FlowField.Value.Target)
+        if (u.FlowField is null || u.Target.Value != u.FlowField.Target)
             u.FlowField = _pathFinder.GetFlowField(grid, m.Radius * 2, u.Target.Value);
 
-        return u.FlowField.Value.GetVector(m.Position);
+        return u.FlowField.GetVector(m.Position);
     }
 
     private static Vector2 CalculateForce(float idt, in Movable m, in Unit u, in Vector2 desiredVelocity)
@@ -172,9 +173,45 @@ public sealed class Move : IDisposable
         return force;
     }
 
-    private void UpdateFlowField(float dt, PathGrid grid, Span<Movable> movables, Span<Unit> units)
+    private void UpdateFlowField(PathGridFlowField flowField, ReadOnlySpan<Movable> movables)
     {
-        
+        UpdateHeatmap(flowField, movables);
+    }
+
+    private void UpdateHeatmap(PathGridFlowField flowField, ReadOnlySpan<Movable> movables)
+    {
+        var heatmap = flowField.Heatmap;
+        Array.Clear(heatmap);
+
+        foreach (ref readonly var m in movables)
+        {
+            var pos = m.Position / flowField.Grid.Step;
+            var index = (int)pos.X + (int)pos.Y * flowField.Grid.Width;
+            heatmap[index] = (Half)((float)heatmap[index] + m.Radius);
+        }
+
+        // Clear heatmap disconnected from the target
+        for (var i = 0; i < heatmap.Length; i++)
+        {
+            if (heatmap[i] == default)
+                continue;
+            
+            var node = i;
+            while (node >= 0 && !flowField.Grid.Bits[node])
+            {
+                if (heatmap[node] == default)
+                {
+                    var begin = i;
+                    while (begin != node)
+                    {
+                        heatmap[begin] = default;
+                        begin = flowField.FlowField.Vectors[begin].Next;
+                    }
+                    break;
+                }
+                node = flowField.FlowField.Vectors[node].Next;
+            }
+        }
     }
 
     private static void UpdateRotation(float dt, in Movable m, ref Unit u)

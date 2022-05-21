@@ -9,25 +9,42 @@ public record PathGrid(int Width, int Height, float Step, BitArray Bits);
 
 public class PathFinder
 {
-    private readonly Dictionary<(Vector2, int), FlowField> _flowFields = new();
+    private readonly Dictionary<(Vector2, int), WeakReference<PathGridFlowField>> _flowFields = new();
 
     public PathGridFlowField GetFlowField(PathGrid grid, float pathWidth, Vector2 target)
     {
         var size = (int)MathF.Ceiling(pathWidth / grid.Step);
-        if (!_flowFields.TryGetValue((target, size), out var flowField))
-            flowField = _flowFields[(target, size)] = FlowField.Create(
-                new PathGridGraph(grid, size), target);
+        if (!_flowFields.TryGetValue((target, size), out var flowFieldRef) ||
+            !flowFieldRef.TryGetTarget(out var flowField))
+        {
+            flowField = new(target, grid, FlowField.Create(new PathGridGraph(grid, size), target), new Half[grid.Width * grid.Height]);
+            _flowFields[(target, size)] = new(flowField);
+        }
+        return flowField;
+    }
 
-        return new() { Target = target, Grid = grid, FlowField = flowField };
+    public IEnumerable<PathGridFlowField> GetFlowFields()
+    {
+        (Vector2, int)? keyToRemove = default;
+
+        foreach (var (key, value) in _flowFields)
+        {
+            if (!value.TryGetTarget(out var flowField))
+            {
+                keyToRemove = key;
+                continue;
+            }
+            yield return flowField;
+        }
+
+        // Remove one entry per frame
+        if (keyToRemove != null)
+            _flowFields.Remove(keyToRemove.Value);
     }
 }
 
-public readonly struct PathGridFlowField
+public record PathGridFlowField(Vector2 Target, PathGrid Grid, FlowField FlowField, Half[] Heatmap)
 {
-    public readonly Vector2 Target { get; init; }
-    public readonly PathGrid Grid { get; init; }
-    public readonly FlowField FlowField { get; init; }
-
     public Vector2 GetVector(Vector2 position)
     {
         var x = position.X / Grid.Step - 0.5f;
@@ -39,16 +56,24 @@ public readonly struct PathGridFlowField
         var (minx, miny) = ((int)x, (int)y);
         var (maxx, maxy) = (Math.Min(minx + 1, Grid.Width - 1), Math.Min(miny + 1, Grid.Height - 1));
 
-        return Vector2.Lerp(
-            Vector2.Lerp(GetVector(minx, miny), GetVector(maxx, miny), fx),
-            Vector2.Lerp(GetVector(minx, maxy), GetVector(maxx, maxy), fx),
-            fy);
-    }
+        var a = Get(minx, miny);
+        var b = Get(maxx, miny);
+        var c = Get(minx, maxy);
+        var d = Get(maxx, maxy);
 
-    private Vector2 GetVector(int x, int y)
-    {
-        var (vx, vy, _) = FlowField.Vectors[x + y * Grid.Width];
-        return new((float)vx, (float)vy);
+        var v = Vector2.Lerp(Vector2.Lerp(a.v, b.v, fx), Vector2.Lerp(c.v, d.v, fx), fy);
+        var h = MathHelper.Lerp(MathHelper.Lerp(a.h, b.h, fx), MathHelper.Lerp(c.h, d.h, fx), fy);
+        if (h <= 0 || (v.TryNormalize() is var length && length == 0))
+            return v;
+
+        return default;
+
+        (Vector2 v, float h) Get(int x, int y)
+        {
+            var i = x + y * Grid.Width;
+            ref readonly var v = ref FlowField.Vectors[i];
+            return (new(v.X, v.Y), (float)Heatmap[i]);
+        }
     }
 }
 
