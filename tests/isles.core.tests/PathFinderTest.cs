@@ -27,7 +27,7 @@ public class PathFinderTest
             for (var x = 0; x < grid.Width; x++)
             {
                 var position = new Vector2(x * grid.Step, y * grid.Step);
-                var v = flowField.GetDirection(position);
+                var v = flowField.GetVector(position);
                 svg.AddLine(position, position + v, 0.1f, "gray", data: new() { Opacity = 0.5f });
             }
 

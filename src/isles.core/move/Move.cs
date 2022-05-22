@@ -6,19 +6,13 @@ using System.Runtime.InteropServices;
 namespace Isles;
 
 [Flags]
-public enum UnitFlags
+public enum MovableFlags : int
 {
     None = 0,
-
-    /// <summary>
-    /// Wether this unit has any touching contact with other units.
-    /// </summary>
-    HasContact = 1 << 0,
-
-    /// <summary>
-    /// Wether this unit has any touching contact with other moving unit.
-    /// </summary>
-    HasMovingContact = 1 << 1,
+    Awake = 1,
+    Wake = 2,
+    HasContact = 4,
+    HasTouchingContact = 8,
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -28,6 +22,7 @@ public struct Movable
     public Vector2 Position { get; init; }
     public Vector2 Velocity { get; init; }
     public Vector2 Force { get; set; }
+    public MovableFlags Flags { get; set; }
     private IntPtr _body;
 }
 
@@ -41,24 +36,14 @@ public struct Obstacle
 
 public struct Unit
 {
-    public UnitFlags Flags => _flags;
-    internal UnitFlags _flags;
-
     public float Speed { get; set; }
     public float Acceleration { get; set; }
     public float Decceleration { get; set; }
     public float RotationSpeed { get; set; }
-
-    public float Rotation
-    {
-        get => _rotation;
-        init => _rotation = value;
-    }
-    internal float _rotation;
-
+    public float Rotation { get; set; }
     public Vector2? Target { get; set; }
+    public PathGridFlowField? FlowField { get; internal set; }
 
-    internal PathGridFlowField? _flowField;
     internal Vector2 _contactVelocity;
 }
 
@@ -70,7 +55,7 @@ public sealed class Move : IDisposable
     private readonly IntPtr _world = move_new();
     private readonly PathFinder _pathFinder = new();
     private readonly List<Obstacle> _obstacles = new();
-    private PathGrid? _grid;
+    private PathGrid? _lastGrid;
 
     public void Dispose()
     {
@@ -83,132 +68,61 @@ public sealed class Move : IDisposable
         move_delete(_world);
     }
 
-    public unsafe void Update(float dt, Span<Movable> moveUnits, Span<Unit> units, PathGrid? grid = null)
+    public unsafe void Update(float dt, Span<Movable> movables, Span<Unit> units, PathGrid grid)
     {
         var idt = 1 / dt;
 
         // Update units
         for (var i = 0; i < units.Length; i++)
         {
-            ref var m = ref moveUnits[i];
+            ref var m = ref movables[i];
             ref var u = ref units[i];
 
-            var desiredVelocity = u._contactVelocity;
-            desiredVelocity += MoveToTarget(dt, grid, m, ref u);
-            m.Force = CalculateForce(idt, m, u, desiredVelocity);
+            if (u.Target != null && u.FlowField is null)
+            {
+                m.Flags |= MovableFlags.Wake;
+            }
+            else if ((m.Flags & MovableFlags.Awake) == 0)
+            {
+                u.Target = null;
+                u.FlowField = null;
+            }
+
+            var desiredVelocity = GetDesiredVelocity(dt, grid, m, ref u);
+            m.Force = CalculateForce(idt, m, u, desiredVelocity + u._contactVelocity);
         }
 
-        if (grid != null && grid != _grid)
+        if (grid != _lastGrid)
         {
             UpdateObstacles(grid);
-            _grid = grid;
+            _lastGrid = grid;
         }
 
-        fixed (Movable* pMoveUnits = moveUnits)
+        fixed (Movable* pmovables = movables)
         fixed (Obstacle* pObstacles = CollectionsMarshal.AsSpan(_obstacles))
-            move_step(_world, dt, pMoveUnits, moveUnits.Length, pObstacles, _obstacles.Count);
+            move_step(_world, dt, pmovables, movables.Length, pObstacles, _obstacles.Count);
 
         for (var i = 0; i < units.Length; i++)
         {
             ref var u = ref units[i];
-            u._flags = 0;
             u._contactVelocity = default;
-            UpdateRotation(dt, moveUnits[i], ref u);
+            UpdateRotation(dt, movables[i], ref u);
         }
 
         IntPtr contactItr = default;
         while (move_get_next_contact(_world, ref contactItr, out var c) != 0)
-            UpdateContact(moveUnits, units, c);
+            UpdateContact(movables, units, c);
+
+        foreach (var flowField in _pathFinder.GetFlowFields())
+            UpdateFlowField(flowField, movables);
     }
 
-    private void UpdateObstacles(PathGrid grid)
+    private void UpdateContact(Span<Movable> movables, Span<Unit> units, in NativeContact c)
     {
-        _obstacles.Clear();
-        for (var i = 0; i < grid.Bits.Length; i++)
-        {
-            if (grid.Bits[i])
-            {
-                var y = Math.DivRem(i, grid.Width, out var x);
-                _obstacles.Add(new() { Size = grid.Step, Position = new((x + 0.5f) * grid.Step, (y + 0.5f) * grid.Step) });
-            }
-        }
-    }
-
-    private Vector2 MoveToTarget(float dt, PathGrid? grid, in Movable m, ref Unit u)
-    {
-        if (u.Target is null)
-            return default;
-
-        // Have we arrived at the target exactly?
-        var toTarget = u.Target.Value - m.Position;
-        var distanceSq = toTarget.LengthSquared();
-        if (distanceSq <= u.Speed * dt * u.Speed * dt)
-        {
-            ClearTarget(ref u);
-            return default;
-        }
-
-        // Have we reached the target and there is an non-idle unit along the way?
-        if ((u._flags & UnitFlags.HasMovingContact) != 0 && distanceSq <= m.Radius * m.Radius)
-        {
-            ClearTarget(ref u);
-            return default;
-        }
-
-        // Should we start decelerating?
-        var distance = MathF.Sqrt(distanceSq);
-        var speed = MathF.Sqrt(distance * u.Acceleration * 2);
-
-        var flowFieldDirection = FollowFlowField(grid, m, ref u);
-        var direction = flowFieldDirection == default ? toTarget : flowFieldDirection;
-
-        return Vector2.Normalize(direction) * Math.Min(u.Speed, speed);
-    }
-
-    private Vector2 FollowFlowField(PathGrid? grid, in Movable m, ref Unit u)
-    {
-        if (grid is null || u.Target is null)
-            return default;
-
-        if (u._flowField is null || u.Target.Value != u._flowField.Value.Target)
-            u._flowField = _pathFinder.GetFlowField(grid, m.Radius * 2, u.Target.Value);
-
-        return u._flowField.Value.GetDirection(m.Position);
-    }
-
-    private Vector2 CalculateForce(float idt, in Movable m, in Unit u, in Vector2 desiredVelocity)
-    {
-        var force = (desiredVelocity - m.Velocity) * idt;
-        var accelerationSq = force.LengthSquared();
-
-        // Are we turning or following a straight line?
-        var maxAcceleration = u.Acceleration;
-        if (u.Decceleration != 0)
-        {
-            var v = desiredVelocity.Length() * m.Velocity.Length();
-            if (v != 0)
-            {
-                var lerp = (Vector2.Dot(desiredVelocity, m.Velocity) / v + 1) / 2;
-                maxAcceleration = MathHelper.Lerp(u.Decceleration, u.Acceleration, lerp);
-            }
-        }
-
-        // Cap max acceleration
-        if (accelerationSq > maxAcceleration * maxAcceleration)
-            return force * maxAcceleration / MathF.Sqrt(accelerationSq);
-
-        return force;
-    }
-
-    private void UpdateContact(Span<Movable> moveUnits, Span<Unit> units, in NativeContact c)
-    {
-        ref var ma = ref moveUnits[c.a];
-        ref var mb = ref moveUnits[c.b];
+        ref var ma = ref movables[c.a];
+        ref var mb = ref movables[c.b];
         ref var ua = ref units[c.a];
         ref var ub = ref units[c.b];
-
-        ua._flags |= UnitFlags.HasContact;
-        ub._flags |= UnitFlags.HasContact;
 
         if (ua.Target != null && ub.Target != null)
             UpdateContactBothBuzy(ma, ref ua, mb, ref ub);
@@ -220,15 +134,12 @@ public sealed class Move : IDisposable
 
     private void UpdateContactBothBuzy(in Movable ma, ref Unit ua, in Movable mb, ref Unit ub)
     {
-        ua._flags |= UnitFlags.HasMovingContact;
-        ub._flags |= UnitFlags.HasMovingContact;
-
         var velocity = mb.Velocity - ma.Velocity;
         var normal = mb.Position - ma.Position;
-        if (!normal.TryNormalize())
+        if (normal.TryNormalize() == 0)
             return;
 
-        var perpendicular = Cross(velocity, normal) > 0
+        var perpendicular = MathFHelper.Cross(velocity, normal) > 0
             ? new Vector2(normal.Y, -normal.X)
             : new Vector2(-normal.Y, normal.X);
 
@@ -252,8 +163,6 @@ public sealed class Move : IDisposable
 
     private void UpdateContactOneBuzyOneIdle(in Movable ma, ref Unit ua, in Movable mb, ref Unit ub)
     {
-        ub._flags |= UnitFlags.HasMovingContact;
-
         var velocity = ma.Velocity;
         var normal = mb.Position - ma.Position;
 
@@ -262,15 +171,95 @@ public sealed class Move : IDisposable
         if (direction.LengthSquared() > (ma.Radius + mb.Radius) * (ma.Radius + mb.Radius))
         {
             // Choose a perpendicular direction to give way to the moving unit.
-            direction = Cross(velocity, normal) > 0
+            direction = MathFHelper.Cross(velocity, normal) > 0
                 ? new Vector2(-ma.Velocity.Y, ma.Velocity.X)
                 : new Vector2(ma.Velocity.Y, -ma.Velocity.X);
         }
 
-        if (!direction.TryNormalize())
+        if (direction.TryNormalize() == 0)
             return;
 
         ub._contactVelocity += direction * ub.Speed;
+    }
+
+    private void UpdateObstacles(PathGrid grid)
+    {
+        _obstacles.Clear();
+        for (var i = 0; i < grid.Bits.Length; i++)
+        {
+            if (grid.Bits[i])
+            {
+                var y = Math.DivRem(i, grid.Width, out var x);
+                _obstacles.Add(new() { Size = grid.Step, Position = new((x + 0.5f) * grid.Step, (y + 0.5f) * grid.Step) });
+            }
+        }
+    }
+
+    private Vector2 GetDesiredVelocity(float dt, PathGrid grid, in Movable m, ref Unit u)
+    {
+        var targetVector = GetTargetVector(grid, m, ref u);
+        var distance = targetVector.TryNormalize();
+        if (distance <= u.Speed * dt)
+            return default;
+
+        // Should we start decelerating?
+        var speed = MathF.Sqrt(distance * u.Acceleration * 2);
+        return targetVector * Math.Min(u.Speed, speed);
+    }
+
+    private Vector2 GetTargetVector(PathGrid grid, in Movable m, ref Unit u)
+    {
+        if (u.Target is null)
+            return default;
+
+        if (u.FlowField is null || u.Target.Value != u.FlowField.Target)
+            u.FlowField = _pathFinder.GetFlowField(grid, m.Radius * 2, u.Target.Value);
+
+        return u.FlowField.GetVector(m.Position);
+    }
+
+    private static Vector2 CalculateForce(float idt, in Movable m, in Unit u, in Vector2 desiredVelocity)
+    {
+        var force = (desiredVelocity - m.Velocity) * idt;
+        var accelerationSq = force.LengthSquared();
+
+        // Are we turning or following a straight line?
+        var maxAcceleration = u.Acceleration;
+        if (u.Decceleration != 0)
+        {
+            var v = desiredVelocity.Length() * m.Velocity.Length();
+            if (v != 0)
+            {
+                var lerp = (Vector2.Dot(desiredVelocity, m.Velocity) / v + 1) / 2;
+                maxAcceleration = MathHelper.Lerp(u.Decceleration, u.Acceleration, lerp);
+            }
+        }
+
+        // Cap max acceleration
+        if (accelerationSq > maxAcceleration * maxAcceleration)
+            return force * maxAcceleration / MathF.Sqrt(accelerationSq);
+
+        return force;
+    }
+
+    private void UpdateFlowField(PathGridFlowField flowField, ReadOnlySpan<Movable> movables)
+    {
+        UpdateHeatmap(flowField, movables);
+    }
+
+    private void UpdateHeatmap(PathGridFlowField flowField, ReadOnlySpan<Movable> movables)
+    {
+        var heatmap = flowField.Heatmap;
+        Array.Clear(heatmap);
+
+        foreach (ref readonly var m in movables)
+        {
+            var pos = m.Position / flowField.Grid.Step;
+            var index = (int)pos.X + (int)pos.Y * flowField.Grid.Width;
+            heatmap[index] += m.Radius * m.Radius * 4;
+        }
+
+        flowField.UpdateHeatmap();
     }
 
     private static void UpdateRotation(float dt, in Movable m, ref Unit u)
@@ -279,25 +268,14 @@ public sealed class Move : IDisposable
             return;
 
         var targetRotation = MathF.Atan2(m.Velocity.Y, m.Velocity.X);
-        var offset = MathFHelper.NormalizeRotation(targetRotation - u._rotation);
+        var offset = MathFHelper.NormalizeRotation(targetRotation - u.Rotation);
         var delta = u.RotationSpeed * dt;
         if (Math.Abs(offset) <= delta)
-            u._rotation = targetRotation;
+            u.Rotation = targetRotation;
         else if (offset > 0)
-            u._rotation += delta;
+            u.Rotation += delta;
         else
-            u._rotation -= delta;
-    }
-
-    private static void ClearTarget(ref Unit u)
-    {
-        u.Target = null;
-        u._flowField = default;
-    }
-
-    private static float Cross(Vector2 a, Vector2 b)
-    {
-        return a.X * b.Y - b.X * a.Y;
+            u.Rotation -= delta;
     }
 
     [StructLayout(LayoutKind.Sequential)]
