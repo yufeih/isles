@@ -60,14 +60,15 @@ public readonly struct FlowField
 
         Span<(int, float)> edges = stackalloc (int, float)[graph.MaxEdgeCount];
 
-        var heap = new PriorityQueue();
-        heap.Fill(nodeCount, float.PositiveInfinity);
-
+        var queue = new PriorityQueue<int, float>(nodeCount);
         distance[targetIndex] = 0;
-        heap.UpdatePriority(targetIndex, 0);
+        queue.Enqueue(targetIndex, 0);
 
-        while (heap.TryDequeue(out var from, out var cost))
+        while (queue.TryDequeue(out var from, out var cost))
         {
+            if (vectors[from].X != default || vectors[from].Y != default)
+                continue;
+
             if (cost == float.PositiveInfinity)
                 continue;
 
@@ -81,7 +82,7 @@ public readonly struct FlowField
                 {
                     distance[to] = newCost;
                     prev[to] = (short)from;
-                    heap.UpdatePriority(to, newCost);
+                    queue.Enqueue(to, newCost);
                 }
             }
         }
