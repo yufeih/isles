@@ -187,31 +187,10 @@ public sealed class Move : IDisposable
         {
             var pos = m.Position / flowField.Grid.Step;
             var index = (int)pos.X + (int)pos.Y * flowField.Grid.Width;
-            heatmap[index] = (Half)((float)heatmap[index] + m.Radius);
+            heatmap[index] += m.Radius * m.Radius * 4;
         }
 
-        // Clear heatmap disconnected from the target
-        for (var i = 0; i < heatmap.Length; i++)
-        {
-            if (heatmap[i] == default)
-                continue;
-            
-            var node = i;
-            while (node >= 0 && !flowField.Grid.Bits[node])
-            {
-                if (heatmap[node] == default)
-                {
-                    var begin = i;
-                    while (begin != node)
-                    {
-                        heatmap[begin] = default;
-                        begin = flowField.FlowField.Vectors[begin].Next;
-                    }
-                    break;
-                }
-                node = flowField.FlowField.Vectors[node].Next;
-            }
-        }
+        flowField.UpdateHeatmap();
     }
 
     private static void UpdateRotation(float dt, in Movable m, ref Unit u)

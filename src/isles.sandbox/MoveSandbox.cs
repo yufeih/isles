@@ -276,8 +276,7 @@ class MoveSandbox : Game
                 var rotation = MathF.Atan2(v.Y, v.X);
                 var scale = Math.Min(v.Length() / grid.Step, 1);
                 var heat = (float)flowfield.Heatmap[x + y * grid.Width];
-                heat = MathHelper.Clamp(heat, 0, 1);
-                var color = Color.Lerp(Color.Gray, Color.Red, heat);
+                var color = Color.Gray;
                 if (!flowfield.FlowField.Vectors[x + y * grid.Width].IsTurnPoint)
                     color *= 0.2f;
 

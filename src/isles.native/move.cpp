@@ -185,13 +185,8 @@ void sync_state_before_step(
 	b2World* world, Movable* movables, int32_t movablesLength,
 	Obstacle* obstacles, int32_t obstaclesLength)
 {
-	b2Body* body;
-
-	body = world->GetBodyList();
-	while (body != nullptr) {
+	for (auto body = world->GetBodyList(); body; body = body->GetNext())
 		body->GetUserData().pointer = -1;
-		body = body->GetNext();
-	}
 
 	// Upsert movables
 	for (int i = 0; i < movablesLength; i++) {
@@ -213,8 +208,7 @@ void sync_state_before_step(
 	}
 
 	// Delete unreferenced bodies
-	body = world->GetBodyList();
-	while (body != nullptr) {
+	for (auto body = world->GetBodyList(); body;) {
 		auto next = body->GetNext();
 		if (body->GetUserData().pointer == -1)
 			world->DestroyBody(body);
@@ -224,8 +218,7 @@ void sync_state_before_step(
 
 void sync_state_after_step(b2World* world, Movable* movables, int32_t movablesLength)
 {
-	auto contact = world->GetContactList();
-	while (contact != nullptr) {
+	for (auto contact = world->GetContactList(); contact; contact = contact->GetNext()) {
 		auto a = contact->GetFixtureA()->GetBody();
 		auto b = contact->GetFixtureB()->GetBody();
 		auto flag = kMovable_HasContact;
@@ -235,7 +228,6 @@ void sync_state_after_step(b2World* world, Movable* movables, int32_t movablesLe
 			movables[a->GetUserData().pointer].flags |= flag;
 		if (is_movable(b))
 			movables[b->GetUserData().pointer].flags |= flag;
-		contact = contact->GetNext();
 	}
 
 	for (int i = 0; i < movablesLength; i++) {
@@ -266,8 +258,7 @@ int32_t move_get_next_contact(b2World* world, void** iterator, MoveContact* cont
 		? world->GetContactList()
 		: reinterpret_cast<b2Contact*>(*iterator)->GetNext();
 
-	while (current != nullptr)
-	{
+	for (; current; current = current->GetNext()) {
 		if (current->IsEnabled() && current->IsTouching()) {
 			auto a = current->GetFixtureA()->GetBody();
 			auto b = current->GetFixtureB()->GetBody();
@@ -281,7 +272,6 @@ int32_t move_get_next_contact(b2World* world, void** iterator, MoveContact* cont
 				return 1;
 			}
 		}
-		current = current->GetNext();
 	}
 
 	return 0;

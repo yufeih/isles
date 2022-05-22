@@ -17,7 +17,7 @@ public class PathFinder
         if (!_flowFields.TryGetValue((target, size), out var flowFieldRef) ||
             !flowFieldRef.TryGetTarget(out var flowField))
         {
-            flowField = new(target, grid, FlowField.Create(new PathGridGraph(grid, size), target), new Half[grid.Width * grid.Height]);
+            flowField = new(target, grid, FlowField.Create(new PathGridGraph(grid, size), target), new float[grid.Width * grid.Height]);
             _flowFields[(target, size)] = new(flowField);
         }
         return flowField;
@@ -43,8 +43,10 @@ public class PathFinder
     }
 }
 
-public record PathGridFlowField(Vector2 Target, PathGrid Grid, FlowField FlowField, Half[] Heatmap)
+public record PathGridFlowField(Vector2 Target, PathGrid Grid, FlowField FlowField, float[] Heatmap)
 {
+    private readonly PriorityQueue<int, float> _paintQueue = new();
+
     public Vector2 GetVector(Vector2 position)
     {
         var x = position.X / Grid.Step - 0.5f;
@@ -73,6 +75,75 @@ public record PathGridFlowField(Vector2 Target, PathGrid Grid, FlowField FlowFie
             var i = x + y * Grid.Width;
             ref readonly var v = ref FlowField.Vectors[i];
             return (new(v.X, v.Y), (float)Heatmap[i]);
+        }
+    }
+
+    public void UpdateHeatmap()
+    {
+        ClearDisconnectedHeat();
+        var area = SumArea();
+        if (area <= Grid.Step * Grid.Step)
+            return;
+        Array.Clear(Heatmap);
+        PaintArea(area);
+
+        void ClearDisconnectedHeat()
+        {
+            for (var i = 0; i < Heatmap.Length; i++)
+            {
+                if (Heatmap[i] == default)
+                    continue;
+                
+                var node = i;
+                while (node >= 0 && !Grid.Bits[node])
+                {
+                    if (Heatmap[node] == default)
+                    {
+                        var begin = i;
+                        while (begin != node)
+                        {
+                            Heatmap[begin] = default;
+                            begin = FlowField.Vectors[begin].Next;
+                        }
+                        break;
+                    }
+                    node = FlowField.Vectors[node].Next;
+                }
+            }
+        }
+
+        float SumArea()
+        {
+            var sum = 0.0f;
+            foreach (var heat in Heatmap)
+                if (heat != default)
+                    sum += (float)heat;
+            return sum;
+        }
+
+        void PaintArea(float area)
+        {
+            var gridArea = Grid.Step * Grid.Step;
+            var gridCount = (int)MathF.Ceiling(area / gridArea);
+            var graph = new PathGridGraph(Grid, 1);
+            var startIndex = (int)(Target.X / Grid.Step) + (int)(Target.Y / Grid.Step) * Grid.Width;
+            Span<(int, float)> edges = stackalloc (int, float)[graph.MaxEdgeCount];
+
+            _paintQueue.Enqueue(startIndex, 0);
+            while (gridCount-- >= 0 && _paintQueue.TryDequeue(out var from, out var cost))
+            {
+                Heatmap[from] = gridArea;
+                var edgeCount = graph.GetEdges(from, edges);
+                foreach (var (to, ecost) in edges.Slice(0, edgeCount))
+                {
+                    if (Heatmap[to] == default)
+                    {
+                        Heatmap[to] = -1;
+                        _paintQueue.Enqueue(to, cost + ecost);
+                    }
+                }
+            }
+            Console.WriteLine(Heatmap.Count(f => f > 0));
         }
     }
 }
