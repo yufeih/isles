@@ -89,7 +89,7 @@ public sealed class Move : IDisposable
             }
 
             var desiredVelocity = GetDesiredVelocity(dt, grid, m, ref u);
-            m.Force = CalculateForce(idt, m, u, desiredVelocity);
+            m.Force = CalculateForce(idt, m, u, desiredVelocity + u._contactVelocity);
         }
 
         if (grid != _lastGrid)
@@ -109,8 +109,77 @@ public sealed class Move : IDisposable
             UpdateRotation(dt, movables[i], ref u);
         }
 
+        IntPtr contactItr = default;
+        while (move_get_next_contact(_world, ref contactItr, out var c) != 0)
+            UpdateContact(movables, units, c);
+
         foreach (var flowField in _pathFinder.GetFlowFields())
             UpdateFlowField(flowField, movables);
+    }
+
+    private void UpdateContact(Span<Movable> movables, Span<Unit> units, in NativeContact c)
+    {
+        ref var ma = ref movables[c.a];
+        ref var mb = ref movables[c.b];
+        ref var ua = ref units[c.a];
+        ref var ub = ref units[c.b];
+
+        if (ua.Target != null && ub.Target != null)
+            UpdateContactBothBuzy(ma, ref ua, mb, ref ub);
+        else if (ua.Target != null)
+            UpdateContactOneBuzyOneIdle(ma, ref ua, mb, ref ub);
+        else if (ub.Target != null)
+            UpdateContactOneBuzyOneIdle(mb, ref ub, ma, ref ua);
+    }
+
+    private void UpdateContactBothBuzy(in Movable ma, ref Unit ua, in Movable mb, ref Unit ub)
+    {
+        var velocity = mb.Velocity - ma.Velocity;
+        var normal = mb.Position - ma.Position;
+        if (normal.TryNormalize() == 0)
+            return;
+
+        var perpendicular = MathFHelper.Cross(velocity, normal) > 0
+            ? new Vector2(normal.Y, -normal.X)
+            : new Vector2(-normal.Y, normal.X);
+
+        if (Vector2.Dot(ma.Velocity, mb.Velocity) < 0)
+        {
+            // Try circle around each other on meeting
+            ua._contactVelocity -= perpendicular * ua.Speed;
+            ub._contactVelocity += perpendicular * ub.Speed;
+        }
+        else if (ua.Speed > ub.Speed && Vector2.Dot(ma.Velocity, normal) > 0)
+        {
+            // Try surpass when A chase B
+            ua._contactVelocity += perpendicular * ua.Speed;
+        }
+        else if (ub.Speed > ua.Speed && Vector2.Dot(mb.Velocity, normal) < 0)
+        {
+            // Try surpass when B chase A
+            ub._contactVelocity += perpendicular * ub.Speed;
+        }
+    }
+
+    private void UpdateContactOneBuzyOneIdle(in Movable ma, ref Unit ua, in Movable mb, ref Unit ub)
+    {
+        var velocity = ma.Velocity;
+        var normal = mb.Position - ma.Position;
+
+        // Are we occupying the target?
+        var direction = mb.Position - ua.Target!.Value;
+        if (direction.LengthSquared() > (ma.Radius + mb.Radius) * (ma.Radius + mb.Radius))
+        {
+            // Choose a perpendicular direction to give way to the moving unit.
+            direction = MathFHelper.Cross(velocity, normal) > 0
+                ? new Vector2(-ma.Velocity.Y, ma.Velocity.X)
+                : new Vector2(ma.Velocity.Y, -ma.Velocity.X);
+        }
+
+        if (direction.TryNormalize() == 0)
+            return;
+
+        ub._contactVelocity += direction * ub.Speed;
     }
 
     private void UpdateObstacles(PathGrid grid)

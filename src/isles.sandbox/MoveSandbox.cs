@@ -163,7 +163,7 @@ class MoveSandbox : Game
         SliderInt("Spawn Count", ref _spawnCount, 1, 20);
         SliderFloat2("Spawn Speed", ref _spawnSpeed, 10, 50);
         SliderFloat2("Spawn Radius", ref _spawnRadius, 1, 10);
-        SliderFloat2("Spawn Accel.", ref _spawnAcceleration, 10, 100);
+        SliderFloat2("Spawn Accel.", ref _spawnAcceleration, 10, 500);
 
         if (_selection.Count > 0 && Button("Delete Units"))
         {

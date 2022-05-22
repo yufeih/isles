@@ -143,7 +143,6 @@ public record PathGridFlowField(Vector2 Target, PathGrid Grid, FlowField FlowFie
                     }
                 }
             }
-            Console.WriteLine(Heatmap.Count(f => f > 0));
         }
     }
 }

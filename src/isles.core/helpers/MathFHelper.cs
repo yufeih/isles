@@ -10,6 +10,11 @@ public static class MathFHelper
     // which is way too small to be practical.
     public const float Epsilon = 1.19209290e-7F;
 
+    public static float Cross(in Vector2 a, in Vector2 b)
+    {
+        return a.X * b.Y - b.X * a.Y;
+    }
+
     public static float NormalizeRotation(float r)
     {
         while (r > MathF.PI)
