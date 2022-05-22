@@ -266,8 +266,8 @@ int32_t move_get_next_contact(b2World* world, void** iterator, MoveContact* cont
 			if (a->GetType() == b2_dynamicBody && a->IsAwake() &&
 				b->GetType() == b2_dynamicBody && b->IsAwake()) {
 
-				contact->a = a->GetUserData().pointer;
-				contact->b = b->GetUserData().pointer;
+				contact->a = (int32_t)a->GetUserData().pointer;
+				contact->b = (int32_t)b->GetUserData().pointer;
 				*iterator = current;
 				return 1;
 			}
