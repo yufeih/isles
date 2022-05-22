@@ -250,29 +250,26 @@ void move_step(
 	sync_state_after_step(world, movables, movablesLength);
 }
 
-int32_t move_get_next_contact(b2World* world, void** iterator, MoveContact* contact)
+int32_t move_get_contact_count(b2World* world)
 {
-	assert(iterator != nullptr);
+	return world->GetContactCount();
+}
 
-	auto current = *iterator == nullptr
-		? world->GetContactList()
-		: reinterpret_cast<b2Contact*>(*iterator)->GetNext();
+int32_t move_copy_contacts(b2World* world, MoveContact* contacts, int32_t length)
+{
+	auto begin = contacts;
+	auto end = contacts + length;
+	for (auto c = world->GetContactList(); c && contacts != end; c = c->GetNext()) {
+		if (c->IsEnabled() && c->IsTouching()) {
+			auto a = c->GetFixtureA()->GetBody();
+			auto b = c->GetFixtureB()->GetBody();
 
-	for (; current; current = current->GetNext()) {
-		if (current->IsEnabled() && current->IsTouching()) {
-			auto a = current->GetFixtureA()->GetBody();
-			auto b = current->GetFixtureB()->GetBody();
-
-			if (a->GetType() == b2_dynamicBody && a->IsAwake() &&
-				b->GetType() == b2_dynamicBody && b->IsAwake()) {
-
-				contact->a = a->GetUserData().pointer;
-				contact->b = b->GetUserData().pointer;
-				*iterator = current;
-				return 1;
+			if (a->IsAwake() && is_movable(a) && b->IsAwake() && is_movable(b)) {
+				contacts->a = (int32_t)a->GetUserData().pointer;
+				contacts->b = (int32_t)b->GetUserData().pointer;
+				contacts++;
 			}
 		}
 	}
-
-	return 0;
+	return contacts - begin;
 }

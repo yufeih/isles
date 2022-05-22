@@ -38,4 +38,5 @@ EXPORT_API void move_step(
     b2World* world, float dt, Movable* movables, int32_t movablesLength,
     Obstacle* obstacles, int32_t obstaclesLength);
 
-EXPORT_API int32_t move_get_next_contact(b2World* world, void** iterator, MoveContact* contact);
+EXPORT_API int32_t move_get_contact_count(b2World* world);
+EXPORT_API int32_t move_copy_contacts(b2World* world, MoveContact* contacts, int32_t length);

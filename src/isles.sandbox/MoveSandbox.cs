@@ -204,6 +204,12 @@ class MoveSandbox : Game
             var color = u.Target != null ? Color.Green : _selection.Contains(i) ? Color.Orange : Color.DarkSlateBlue;
             if (!m.Flags.HasFlag(MovableFlags.Awake))
                 color *= 0.5f;
+            
+            //if (u.Island != 0)
+            {
+                var r = new Random(u.Island);
+                color = new(r.NextSingle(), r.NextSingle(), r.NextSingle());
+            }
 
             _spriteBatch.Draw(
                 arrow,

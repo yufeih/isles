@@ -43,6 +43,7 @@ public struct Unit
     public float Rotation { get; set; }
     public Vector2? Target { get; set; }
     public PathGridFlowField? FlowField { get; internal set; }
+    public int Island { get; set; }
 
     internal Vector2 _contactVelocity;
 }
@@ -53,6 +54,7 @@ public sealed class Move : IDisposable
     private const string LibName = "isles.native";
 
     private readonly IntPtr _world = move_new();
+    private readonly MoveIsland _island = new();
     private readonly PathFinder _pathFinder = new();
     private readonly List<Obstacle> _obstacles = new();
     private PathGrid? _lastGrid;
@@ -106,80 +108,20 @@ public sealed class Move : IDisposable
         {
             ref var u = ref units[i];
             u._contactVelocity = default;
+            u.Island = 0;
             UpdateRotation(dt, movables[i], ref u);
         }
 
-        IntPtr contactItr = default;
-        while (move_get_next_contact(_world, ref contactItr, out var c) != 0)
-            UpdateContact(movables, units, c);
-
+        var contactLength = move_get_contact_count(_world);
+        var contacts = ArrayPool<(int, int)>.Shared.Rent(contactLength);
+        fixed ((int, int)* pContacts = contacts)
+            contactLength = move_copy_contacts(_world, pContacts, contacts.Length);
+        if (contactLength > 0)
+            _island.Solve(contacts.AsSpan(0, contactLength), movables, units);
+        ArrayPool<(int, int)>.Shared.Return(contacts);
+    
         foreach (var flowField in _pathFinder.GetFlowFields())
             UpdateFlowField(flowField, movables);
-    }
-
-    private void UpdateContact(Span<Movable> movables, Span<Unit> units, in NativeContact c)
-    {
-        ref var ma = ref movables[c.a];
-        ref var mb = ref movables[c.b];
-        ref var ua = ref units[c.a];
-        ref var ub = ref units[c.b];
-
-        if (ua.Target != null && ub.Target != null)
-            UpdateContactBothBuzy(ma, ref ua, mb, ref ub);
-        else if (ua.Target != null)
-            UpdateContactOneBuzyOneIdle(ma, ref ua, mb, ref ub);
-        else if (ub.Target != null)
-            UpdateContactOneBuzyOneIdle(mb, ref ub, ma, ref ua);
-    }
-
-    private void UpdateContactBothBuzy(in Movable ma, ref Unit ua, in Movable mb, ref Unit ub)
-    {
-        var velocity = mb.Velocity - ma.Velocity;
-        var normal = mb.Position - ma.Position;
-        if (normal.TryNormalize() == 0)
-            return;
-
-        var perpendicular = MathFHelper.Cross(velocity, normal) > 0
-            ? new Vector2(normal.Y, -normal.X)
-            : new Vector2(-normal.Y, normal.X);
-
-        if (Vector2.Dot(ma.Velocity, mb.Velocity) < 0)
-        {
-            // Try circle around each other on meeting
-            ua._contactVelocity -= perpendicular * ua.Speed;
-            ub._contactVelocity += perpendicular * ub.Speed;
-        }
-        else if (ua.Speed > ub.Speed && Vector2.Dot(ma.Velocity, normal) > 0)
-        {
-            // Try surpass when A chase B
-            ua._contactVelocity += perpendicular * ua.Speed;
-        }
-        else if (ub.Speed > ua.Speed && Vector2.Dot(mb.Velocity, normal) < 0)
-        {
-            // Try surpass when B chase A
-            ub._contactVelocity += perpendicular * ub.Speed;
-        }
-    }
-
-    private void UpdateContactOneBuzyOneIdle(in Movable ma, ref Unit ua, in Movable mb, ref Unit ub)
-    {
-        var velocity = ma.Velocity;
-        var normal = mb.Position - ma.Position;
-
-        // Are we occupying the target?
-        var direction = mb.Position - ua.Target!.Value;
-        if (direction.LengthSquared() > (ma.Radius + mb.Radius) * (ma.Radius + mb.Radius))
-        {
-            // Choose a perpendicular direction to give way to the moving unit.
-            direction = MathFHelper.Cross(velocity, normal) > 0
-                ? new Vector2(-ma.Velocity.Y, ma.Velocity.X)
-                : new Vector2(ma.Velocity.Y, -ma.Velocity.X);
-        }
-
-        if (direction.TryNormalize() == 0)
-            return;
-
-        ub._contactVelocity += direction * ub.Speed;
     }
 
     private void UpdateObstacles(PathGrid grid)
@@ -278,15 +220,9 @@ public sealed class Move : IDisposable
             u.Rotation -= delta;
     }
 
-    [StructLayout(LayoutKind.Sequential)]
-    struct NativeContact
-    {
-        public int a;
-        public int b;
-    }
-
     [DllImport(LibName)] private static extern IntPtr move_new();
     [DllImport(LibName)] private static extern void move_delete(IntPtr world);
     [DllImport(LibName)] private static unsafe extern void move_step(IntPtr world, float dt, Movable* units, int unitsLength, Obstacle* obstacles, int obstaclesLength);
-    [DllImport(LibName)] private static extern int move_get_next_contact(IntPtr world, ref IntPtr iterator, out NativeContact contact);
+    [DllImport(LibName)] private static extern int move_get_contact_count(IntPtr world);
+    [DllImport(LibName)] private static unsafe extern int move_copy_contacts(IntPtr world, (int, int)* contacts, int length);
 }
