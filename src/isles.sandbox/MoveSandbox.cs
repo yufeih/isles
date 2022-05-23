@@ -30,10 +30,13 @@ class MoveSandbox : Game
 
     private int _gridIndex;
     private bool _showFlowField = true;
+    private bool _showIslands;
+    private bool _showSpeed;
     private int _spawnCount = 1;
-    private System.Numerics.Vector2 _spawnSpeed = new(40, 40);
+    private System.Numerics.Vector2 _spawnSpeed = new(50, 50);
+    private System.Numerics.Vector2 _spawnRotateSpeed = new(50, 50);
     private System.Numerics.Vector2 _spawnRadius = new(4, 4);
-    private System.Numerics.Vector2 _spawnAcceleration = new(40, 40);
+    private System.Numerics.Vector2 _spawnAcceleration = new(300, 300);
     private MouseState _lastMouseState;
 
     public MoveSandbox()
@@ -105,7 +108,7 @@ class MoveSandbox : Game
                         Speed = Random(_spawnSpeed),
                         Acceleration = Random(_spawnAcceleration),
                         Decceleration = 400 + 400 * _random.NextSingle(),
-                        RotationSpeed = MathF.PI * 2 + _random.NextSingle() * MathF.PI * 4,
+                        RotationSpeed = Random(_spawnRotateSpeed),
                         Rotation = _random.NextSingle() * MathF.PI * 2 - MathF.PI,
                     });
                 }
@@ -159,11 +162,14 @@ class MoveSandbox : Game
         Text($"FPS: {GetIO().Framerate}");
         SliderInt("Grid", ref _gridIndex, 0, _grids.Length - 1);
         Checkbox("Show FlowField", ref _showFlowField);
+        Checkbox("Show Islands", ref _showIslands);
+        Checkbox("Show Speed", ref _showSpeed);
 
         SliderInt("Spawn Count", ref _spawnCount, 1, 20);
         SliderFloat2("Spawn Speed", ref _spawnSpeed, 10, 50);
-        SliderFloat2("Spawn Radius", ref _spawnRadius, 1, 10);
-        SliderFloat2("Spawn Accel.", ref _spawnAcceleration, 10, 500);
+        SliderFloat2("Spawn Rotation Speed", ref _spawnRotateSpeed, 5, 50);
+        SliderFloat2("Spawn Radius", ref _spawnRadius, 1, 6);
+        SliderFloat2("Spawn Accel.", ref _spawnAcceleration, 10, 300);
 
         if (_selection.Count > 0 && Button("Delete Units"))
         {
@@ -205,10 +211,15 @@ class MoveSandbox : Game
             if (!m.Flags.HasFlag(MovableFlags.Awake))
                 color *= 0.5f;
             
-            //if (u.Island != 0)
+            if (_showIslands)
             {
-                var r = new Random(u.Island);
+                var r = new Random(u.IslandId + 1);
                 color = new(r.NextSingle(), r.NextSingle(), r.NextSingle());
+            }
+            else if (_showSpeed)
+            {
+                var r = MathHelper.Clamp(m.Velocity.Length() / u.Speed, 0, 1);
+                color = r > 0.95f ? new(r, 0, 0) : (r > 0.9f ? new(0,r,0) : new(0,0,r));
             }
 
             _spriteBatch.Draw(
@@ -281,7 +292,6 @@ class MoveSandbox : Game
                     continue;
                 var rotation = MathF.Atan2(v.Y, v.X);
                 var scale = Math.Min(v.Length() / grid.Step, 1);
-                var heat = (float)flowfield.Heatmap[x + y * grid.Width];
                 var color = Color.Gray;
                 if (!flowfield.FlowField.Vectors[x + y * grid.Width].IsTurnPoint)
                     color *= 0.2f;

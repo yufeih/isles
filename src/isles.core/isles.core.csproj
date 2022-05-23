@@ -9,6 +9,7 @@
     <Using Include="Isles" />
     <Using Include="Microsoft.Xna.Framework" />
     <Using Include="System.Buffers" />
+    <Using Include="System.Runtime.InteropServices" />
   </ItemGroup>
 
   <ItemGroup>

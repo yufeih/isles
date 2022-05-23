@@ -7,10 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "isles", "src\isles\isles.cs
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FNA.Core", "extern\FNA\FNA.Core.csproj", "{35253CE1-C864-4CD3-8249-4D1319748E8F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{6A8FB7D2-C38D-4953-8CFE-67BDF5906A17}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "isles.core.tests", "tests\isles.core.tests\isles.core.tests.csproj", "{2BD814BE-90FC-440A-BC40-A07395938896}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D31A5CF7-0DEB-43D9-9C1D-5A491FDB718E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "extern", "extern", "{FF07596E-C13F-41CB-9913-1E31DBF9E291}"

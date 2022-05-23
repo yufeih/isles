@@ -6,6 +6,7 @@ namespace Isles;
 class MoveIsland
 {
     private readonly Stack<int> _stack = new();
+    private readonly List<int> _island = new();
 
     public void Solve(ReadOnlySpan<(int a, int b)> contacts, ReadOnlySpan<Movable> movables, Span<Unit> units)
     {
@@ -13,7 +14,7 @@ class MoveIsland
         for (var i = 0; i < contacts.Length; i++)
         {
             var (a, b) = contacts[i];
-            if (units[a].Island != 0 || units[b].Island != 0)
+            if (units[a].IslandId != 0 || units[b].IslandId != 0)
                 continue;
 
             _stack.Push(a);
@@ -21,24 +22,54 @@ class MoveIsland
 
             while (_stack.TryPop(out var x))
             {
-                units[x].Island = islandCount;
+                _island.Add(x);
+                units[x].IslandId = islandCount;
                 for (var j = i + 1; j < contacts.Length; j++)
                 {
                     var (aa, bb) = contacts[j];
-                    if (aa == x && units[bb].Island == 0)
+                    if (aa == x && units[bb].IslandId == 0)
                         _stack.Push(bb);
-                    if (bb == x && units[aa].Island == 0)
+                    if (bb == x && units[aa].IslandId == 0)
                         _stack.Push(aa);
                 }
             }
 
-            UpdateIsland(islandCount++, movables, units);
+            UpdateIsland(CollectionsMarshal.AsSpan(_island), movables, units);
+            islandCount++;
+            _island.Clear();
         }
     }
 
-    void UpdateIsland(int island, ReadOnlySpan<Movable> movables, Span<Unit> units)
+    private void UpdateIsland(ReadOnlySpan<int> island, ReadOnlySpan<Movable> movables, Span<Unit> units)
     {
+        
+    }
 
+    private void Align(float weight, ReadOnlySpan<int> island, ReadOnlySpan<Movable> movables, Span<Unit> units)
+    {
+        var averageVelocity = default(Vector2);
+        foreach (var i in island)
+            averageVelocity += movables[i].Velocity;
+        averageVelocity /= island.Length;
+
+        if (averageVelocity.TryNormalize() != 0)
+            foreach (var i in island)
+                units[i]._contactDirection += weight * averageVelocity;
+    }
+
+    private void Separate(float weight, ReadOnlySpan<int> island, ReadOnlySpan<Movable> movables, Span<Unit> units)
+    {
+        var center = default(Vector2);
+        foreach (var i in island)
+            center += movables[i].Position;
+        center /= island.Length;
+
+        foreach (var i in island)
+        {
+            var offset = movables[i].Position - center;
+            if (offset.TryNormalize() != 0)
+                units[i]._contactDirection = offset * weight;
+        }
     }
 
     private void UpdateContact(Span<Movable> movables, Span<Unit> units, in (int a, int b) c)
@@ -70,18 +101,18 @@ class MoveIsland
         if (Vector2.Dot(ma.Velocity, mb.Velocity) < 0)
         {
             // Try circle around each other on meeting
-            ua._contactVelocity -= perpendicular * ua.Speed;
-            ub._contactVelocity += perpendicular * ub.Speed;
+            ua._contactDirection -= perpendicular;
+            ub._contactDirection += perpendicular;
         }
         else if (ua.Speed > ub.Speed && Vector2.Dot(ma.Velocity, normal) > 0)
         {
             // Try surpass when A chase B
-            ua._contactVelocity += perpendicular * ua.Speed;
+            ua._contactDirection += perpendicular;
         }
         else if (ub.Speed > ua.Speed && Vector2.Dot(mb.Velocity, normal) < 0)
         {
             // Try surpass when B chase A
-            ub._contactVelocity += perpendicular * ub.Speed;
+            ub._contactDirection += perpendicular;
         }
     }
 
@@ -103,6 +134,6 @@ class MoveIsland
         if (direction.TryNormalize() == 0)
             return;
 
-        ub._contactVelocity += direction * ub.Speed;
+        ub._contactDirection += direction;
     }
 }
