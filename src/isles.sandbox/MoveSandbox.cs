@@ -4,6 +4,7 @@
 using System.Collections;
 using System.Runtime.InteropServices;
 using Isles.Graphics;
+
 using static ImGuiNET.ImGui;
 
 Directory.SetCurrentDirectory(AppContext.BaseDirectory);
@@ -15,8 +16,7 @@ class MoveSandbox : Game
 {
     private const float WorldScale = 4f;
 
-    private readonly List<Movable> _moveUnits = new();
-    private readonly List<Unit> _units = new();
+    private readonly List<Movable> _movables = new();
     private readonly List<int> _selection = new();
     private readonly PathGrid[] _grids;
     private readonly Move _move = new();
@@ -30,10 +30,12 @@ class MoveSandbox : Game
 
     private int _gridIndex;
     private bool _showFlowField = true;
+    private bool _showSpeed;
     private int _spawnCount = 1;
-    private System.Numerics.Vector2 _spawnSpeed = new(40, 40);
+    private System.Numerics.Vector2 _spawnSpeed = new(50, 50);
+    private System.Numerics.Vector2 _spawnRotateSpeed = new(50, 50);
     private System.Numerics.Vector2 _spawnRadius = new(4, 4);
-    private System.Numerics.Vector2 _spawnAcceleration = new(40, 40);
+    private System.Numerics.Vector2 _spawnAcceleration = new(300, 300);
     private MouseState _lastMouseState;
 
     public MoveSandbox()
@@ -71,8 +73,7 @@ class MoveSandbox : Game
 
         _move.Update(
             (float)gameTime.ElapsedGameTime.TotalSeconds,
-            CollectionsMarshal.AsSpan(_moveUnits),
-            CollectionsMarshal.AsSpan(_units),
+            CollectionsMarshal.AsSpan(_movables),
             _grids[_gridIndex]);
 
         _imguiRenderer.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
@@ -85,8 +86,7 @@ class MoveSandbox : Game
 
     private void UpdateSelection()
     {
-        var moveUnits = CollectionsMarshal.AsSpan(_moveUnits);
-        var units = CollectionsMarshal.AsSpan(_units);
+        var movables = CollectionsMarshal.AsSpan(_movables);
 
         var mouse = Mouse.GetState();
         if (mouse.RightButton == ButtonState.Pressed)
@@ -95,17 +95,14 @@ class MoveSandbox : Game
             {
                 for (var i = 0; i < _spawnCount; i++)
                 {
-                    _moveUnits.Add(new()
+                    _movables.Add(new()
                     {
                         Radius = Random(_spawnRadius),
                         Position = new(mouse.X / WorldScale, mouse.Y / WorldScale),
-                    });
-                    _units.Add(new()
-                    {
                         Speed = Random(_spawnSpeed),
                         Acceleration = Random(_spawnAcceleration),
                         Decceleration = 400 + 400 * _random.NextSingle(),
-                        RotationSpeed = MathF.PI * 2 + _random.NextSingle() * MathF.PI * 4,
+                        RotationSpeed = Random(_spawnRotateSpeed),
                         Rotation = _random.NextSingle() * MathF.PI * 2 - MathF.PI,
                     });
                 }
@@ -114,7 +111,7 @@ class MoveSandbox : Game
             var target = new Vector2(mouse.X / WorldScale, mouse.Y / WorldScale);
             foreach (var i in _selection)
             {
-                units[i].Target = target;
+                movables[i].Target = target;
             }
         }
 
@@ -127,9 +124,9 @@ class MoveSandbox : Game
 
             var rectangle = GetSelectionRectangle();
             _selection.Clear();
-            for (var i = 0; i < moveUnits.Length; i++)
+            for (var i = 0; i < movables.Length; i++)
             {
-                ref readonly var m = ref moveUnits[i];
+                ref readonly var m = ref movables[i];
                 if (rectangle.Contains((int)(m.Position.X * WorldScale), (int)(m.Position.Y * WorldScale)))
                 {
                     _selection.Add(i);
@@ -159,58 +156,63 @@ class MoveSandbox : Game
         Text($"FPS: {GetIO().Framerate}");
         SliderInt("Grid", ref _gridIndex, 0, _grids.Length - 1);
         Checkbox("Show FlowField", ref _showFlowField);
+        Checkbox("Show Speed", ref _showSpeed);
 
         SliderInt("Spawn Count", ref _spawnCount, 1, 20);
         SliderFloat2("Spawn Speed", ref _spawnSpeed, 10, 50);
-        SliderFloat2("Spawn Radius", ref _spawnRadius, 1, 10);
-        SliderFloat2("Spawn Accel.", ref _spawnAcceleration, 10, 500);
+        SliderFloat2("Spawn Rotation Speed", ref _spawnRotateSpeed, 5, 50);
+        SliderFloat2("Spawn Radius", ref _spawnRadius, 1, 6);
+        SliderFloat2("Spawn Accel.", ref _spawnAcceleration, 10, 300);
 
-        if (_selection.Count > 0 && Button("Delete Units"))
+
+        if (_selection.Count > 0 && Button("Delete movables"))
         {
             foreach (var i in _selection.OrderByDescending(x => x))
             {
-                _moveUnits.RemoveAt(i);
-                _units.RemoveAt(i);
+                _movables.RemoveAt(i);
             }
             _selection.Clear();
         }
 
-        var moveUnits = CollectionsMarshal.AsSpan(_moveUnits);
-        var units = CollectionsMarshal.AsSpan(_units);
+        var movables = CollectionsMarshal.AsSpan(_movables);
 
         if (_selection.Count == 1)
         {
-            ref readonly var m = ref moveUnits[_selection[0]];
-            ref readonly var u = ref units[_selection[0]];
+            ref readonly var m = ref movables[_selection[0]];
             Text($"pos: {m.Position.X:000.00}, {m.Position.Y:000.00}");
             Text($"vel: {m.Velocity.X:000.00}, {m.Velocity.Y:000.00}");
             Text($"force: {m.Force.X:000.00}, {m.Force.Y:000.00}");
-            Text($"speed: {m.Velocity.Length():00.00} / {u.Speed:00.00}");
+            Text($"speed: {m.Velocity.Length():00.00} / {m.Speed:00.00}");
             Text($"flags: {m.Flags}");
         }
 
         if (_showFlowField && _selection.Count > 0)
         {
-            var flowField = units[_selection[0]].FlowField;
+            var flowField = movables[_selection[0]].FlowField;
             if (flowField != null)
                 DrawFlowField(flowField);
         }
 
-        for (var i = 0; i < units.Length; i++)
+        for (var i = 0; i < movables.Length; i++)
         {
-            ref readonly var m = ref moveUnits[i];
-            ref readonly var u = ref units[i];
+            ref readonly var m = ref movables[i];
 
-            var color = u.Target != null ? Color.Green : _selection.Contains(i) ? Color.Orange : Color.DarkSlateBlue;
+            var color = m.Target != null ? Color.Green : _selection.Contains(i) ? Color.Orange : Color.DarkSlateBlue;
             if (!m.Flags.HasFlag(MovableFlags.Awake))
                 color *= 0.5f;
+
+            if (_showSpeed)
+            {
+                var r = MathHelper.Clamp(m.Velocity.Length() / m.Speed, 0, 1);
+                color = r > 0.95f ? new(r, 0, 0) : (r > 0.9f ? new(0,r,0) : new(0,0,r));
+            }
 
             _spriteBatch.Draw(
                 arrow,
                 m.Position * WorldScale,
                 null,
                 color: color,
-                rotation: u.Rotation,
+                rotation: m.Rotation,
                 origin: new(arrow.Width / 2, arrow.Height / 2),
                 scale: m.Radius * 2 * WorldScale / arrow.Width,
                 SpriteEffects.None,
@@ -275,7 +277,6 @@ class MoveSandbox : Game
                     continue;
                 var rotation = MathF.Atan2(v.Y, v.X);
                 var scale = Math.Min(v.Length() / grid.Step, 1);
-                var heat = (float)flowfield.Heatmap[x + y * grid.Width];
                 var color = Color.Gray;
                 if (!flowfield.FlowField.Vectors[x + y * grid.Width].IsTurnPoint)
                     color *= 0.2f;
