@@ -55,6 +55,9 @@ class MoveContactSolver
         foreach (var c in _contacts.Values)
             c.IsDeleted = true;
 
+        var normal = Vector2.Zero;
+        var penetration = 0.0f;
+
         for (var i = 0; i < movables.Length; i++)
         {
             for (var j = i + 1; j < movables.Length; j++)
@@ -62,17 +65,10 @@ class MoveContactSolver
                 ref var a = ref movables[i];
                 ref var b = ref movables[j];
 
-                var normal = b.Position - a.Position;
-                var distanceSq = normal.LengthSquared();
-                if (distanceSq >= (a.Radius + b.Radius) * (a.Radius + b.Radius) ||
-                    distanceSq <= MathFHelper.Epsilon * MathFHelper.Epsilon)
+                if (!MoveCollision.CollideMovables(a, b, ref normal, ref penetration))
                     continue;
 
-                var distance = MathF.Sqrt(distanceSq);
-                normal /= distance;
-                var penetration = a.Radius + b.Radius - distance;
                 var impulseBias = 0.2f / dt * Math.Max(0, penetration - AllowedPenetration);
-
                 if (_contacts.TryGetValue((i, j), out var c))
                 {
                     c.Normal = normal;
